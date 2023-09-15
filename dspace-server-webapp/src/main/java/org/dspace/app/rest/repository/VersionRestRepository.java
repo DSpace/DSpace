@@ -124,12 +124,12 @@ public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Int
         if (Objects.nonNull(versionHistory)) {
             Version lastVersion = versionHistoryService.getLatestVersion(context, versionHistory);
             if (Objects.nonNull(lastVersion)) {
-                workflowItem = workflowItemService.findByItem(context, lastVersion.getItem());
-                workspaceItem = workspaceItemService.findByItem(context, lastVersion.getItem());
+                workflowItem = workflowItemService.findByItem(context.getSession(), lastVersion.getItem());
+                workspaceItem = workspaceItemService.findByItem(context.getSession(), lastVersion.getItem());
             }
         } else {
-            workflowItem = workflowItemService.findByItem(context, item);
-            workspaceItem = workspaceItemService.findByItem(context, item);
+            workflowItem = workflowItemService.findByItem(context.getSession(), item);
+            workspaceItem = workspaceItemService.findByItem(context.getSession(), item);
         }
 
         if (Objects.nonNull(workflowItem) || Objects.nonNull(workspaceItem)) {

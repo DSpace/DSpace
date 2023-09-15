@@ -54,7 +54,7 @@ public class EntityServiceImpl implements EntityService {
         Item item = entity.getItem();
         List<MetadataValue> list = itemService.getMetadata(item, "dspace", "entity", "type", Item.ANY, false);
         if (!list.isEmpty()) {
-            return entityTypeService.findByEntityType(context, list.get(0).getValue());
+            return entityTypeService.findByEntityType(context.getSession(), list.get(0).getValue());
         } else {
             return null;
         }
@@ -104,7 +104,8 @@ public class EntityServiceImpl implements EntityService {
     @Override
     public List<RelationshipType> getAllRelationshipTypes(Context context, Entity entity, Integer limit, Integer offset)
             throws SQLException {
-        return relationshipTypeService.findByEntityType(context, this.getType(context, entity), limit, offset);
+        return relationshipTypeService.findByEntityType(context.getSession(),
+                this.getType(context, entity), limit, offset);
     }
 
     @Override
@@ -116,7 +117,8 @@ public class EntityServiceImpl implements EntityService {
     @Override
     public List<RelationshipType> getLeftRelationshipTypes(Context context, Entity entity, boolean isLeft,
                                                            Integer limit, Integer offset) throws SQLException {
-        return relationshipTypeService.findByEntityType(context, this.getType(context, entity), isLeft, limit, offset);
+        return relationshipTypeService.findByEntityType(context.getSession(),
+                this.getType(context, entity), isLeft, limit, offset);
     }
 
     @Override
@@ -129,7 +131,8 @@ public class EntityServiceImpl implements EntityService {
     public List<RelationshipType> getRightRelationshipTypes(Context context, Entity entity, boolean isLeft,
                                                             Integer limit, Integer offset) throws SQLException {
 
-        return relationshipTypeService.findByEntityType(context, this.getType(context, entity), isLeft, limit, offset);
+        return relationshipTypeService.findByEntityType(context.getSession(),
+                this.getType(context, entity), isLeft, limit, offset);
     }
 
     @Override
@@ -140,6 +143,6 @@ public class EntityServiceImpl implements EntityService {
     @Override
     public List<RelationshipType> getRelationshipTypesByTypeName(Context context, String typeName,
                                                                  Integer limit, Integer offset) throws SQLException {
-        return relationshipTypeService.findByLeftwardOrRightwardTypeName(context, typeName, limit, offset);
+        return relationshipTypeService.findByLeftwardOrRightwardTypeName(context.getSession(), typeName, limit, offset);
     }
 }

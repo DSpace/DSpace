@@ -127,7 +127,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     public WorkspaceItemRest findOne(Context context, Integer id) {
         WorkspaceItem witem = null;
         try {
-            witem = wis.find(context, id);
+            witem = wis.find(context.getSession(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -142,7 +142,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     public Page<WorkspaceItemRest> findAll(Context context, Pageable pageable) {
         try {
             long total = wis.countTotal(context);
-            List<WorkspaceItem> witems = wis.findAll(context, pageable.getPageSize(),
+            List<WorkspaceItem> witems = wis.findAll(context.getSession(), pageable.getPageSize(),
                     Math.toIntExact(pageable.getOffset()));
             return converter.toRestPage(witems, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
@@ -158,7 +158,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             Context context = obtainContext();
             EPerson ep = epersonService.find(context.getSession(), submitterID);
             long total = wis.countByEPerson(context, ep);
-            List<WorkspaceItem> witems = wis.findByEPerson(context, ep, pageable.getPageSize(),
+            List<WorkspaceItem> witems = wis.findByEPerson(context.getSession(), ep, pageable.getPageSize(),
                     Math.toIntExact(pageable.getOffset()));
             return converter.toRestPage(witems, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
@@ -184,7 +184,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
         Context context = obtainContext();
         WorkspaceItemRest wsi = findOne(context, id);
-        WorkspaceItem source = wis.find(context, id);
+        WorkspaceItem source = wis.find(context.getSession(), id);
         List<ErrorRest> errors = submissionService.uploadFileToInprogressSubmission(context, request, wsi, source,
                 file);
         wsi = converter.toRest(source, utils.obtainProjection());
@@ -203,7 +203,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                       Patch patch) throws SQLException, AuthorizeException {
         List<Operation> operations = patch.getOperations();
         WorkspaceItemRest wsi = findOne(context, id);
-        WorkspaceItem source = wis.find(context, id);
+        WorkspaceItem source = wis.find(context.getSession(), id);
         for (Operation op : operations) {
             //the value in the position 0 is a null value
             String[] path = op.getPath().substring(1).split("/", 3);
@@ -223,7 +223,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     protected void delete(Context context, Integer id) throws AuthorizeException {
         WorkspaceItem witem = null;
         try {
-            witem = wis.find(context, id);
+            witem = wis.find(context.getSession(), id);
             wis.deleteAll(context, witem);
             context.addEvent(new Event(Event.DELETE, Constants.ITEM, witem.getItem().getID(), null,
                 itemService.getIdentifiers(context, witem.getItem())));
@@ -346,7 +346,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         try {
             Context context = obtainContext();
             Item item = itemService.find(context.getSession(), itemUuid);
-            WorkspaceItem workspaceItem = wis.findByItem(context, item);
+            WorkspaceItem workspaceItem = wis.findByItem(context.getSession(), item);
             if (workspaceItem == null) {
                 return null;
             }
@@ -361,7 +361,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
     @Override
     public WorkspaceItem findDomainObjectByPk(Context context, Integer id) throws SQLException {
-        return wis.find(context, id);
+        return wis.find(context.getSession(), id);
     }
 
     @Override

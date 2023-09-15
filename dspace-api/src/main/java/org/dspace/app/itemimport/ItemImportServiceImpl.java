@@ -396,7 +396,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
         // find matching relationship type
         List<RelationshipType> relTypes = relationshipTypeService.findByLeftwardOrRightwardTypeName(
-            c, relationshipType);
+            c.getSession(), relationshipType);
         RelationshipType foundRelationshipType = RelationshipUtils.matchRelationshipType(
             relTypes, relatedEntityType, itemEntityType, relationshipType);
 

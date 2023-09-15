@@ -46,7 +46,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
     public BitstreamFormatRest findOne(Context context, Integer id) {
         BitstreamFormat bit = null;
         try {
-            bit = bitstreamFormatService.find(context, id);
+            bit = bitstreamFormatService.find(context.getSession(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -59,7 +59,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
     @Override
     public Page<BitstreamFormatRest> findAll(Context context, Pageable pageable) {
         try {
-            List<BitstreamFormat> bit = bitstreamFormatService.findAll(context);
+            List<BitstreamFormat> bit = bitstreamFormatService.findAll(context.getSession());
             return converter.toRestPage(bit, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -106,7 +106,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
         String notFoundException = "ResourceNotFoundException:" + apiCategory + "." + model
                 + " with id: " + id + " not found";
         try {
-            bitstreamFormat = bitstreamFormatService.find(context, id);
+            bitstreamFormat = bitstreamFormatService.find(context.getSession(), id);
             if (bitstreamFormat == null) {
                 throw new ResourceNotFoundException(notFoundException);
             }
@@ -131,7 +131,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
         String notFoundException = "ResourceNotFoundException:" + BitstreamFormatRest.CATEGORY + "."
                 + BitstreamFormatRest.NAME + " with id: " + id + " not found";
         try {
-            bitstreamFormat = bitstreamFormatService.find(context, id);
+            bitstreamFormat = bitstreamFormatService.find(context.getSession(), id);
             if (bitstreamFormat == null) {
                 throw new ResourceNotFoundException(notFoundException);
             }

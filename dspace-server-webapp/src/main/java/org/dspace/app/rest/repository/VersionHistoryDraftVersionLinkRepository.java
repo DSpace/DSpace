@@ -60,15 +60,17 @@ public class VersionHistoryDraftVersionLinkRepository extends AbstractDSpaceRest
         if (Objects.isNull(versionHistoryId) || versionHistoryId < 0) {
             throw new DSpaceBadRequestException("Provided id is not correct!");
         }
-        VersionHistory versionHistory = versionHistoryService.find(context, versionHistoryId);
+        VersionHistory versionHistory = versionHistoryService.find(context.getSession(), versionHistoryId);
         if (Objects.isNull(versionHistory)) {
             throw new ResourceNotFoundException("No such version found");
         }
         Version oldestVersion = versionHistoryService.getLatestVersion(context, versionHistory);
 
         if (Objects.nonNull(oldestVersion) && Objects.nonNull(oldestVersion.getItem())) {
-            WorkflowItem workflowItem = workflowItemService.findByItem(context, oldestVersion.getItem());
-            WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, oldestVersion.getItem());
+            WorkflowItem workflowItem = workflowItemService.findByItem(context.getSession(),
+                    oldestVersion.getItem());
+            WorkspaceItem workspaceItem = workspaceItemService.findByItem(context.getSession(),
+                    oldestVersion.getItem());
             if (Objects.nonNull(workflowItem)) {
                 return converter.toRest(workflowItem, projection);
             }

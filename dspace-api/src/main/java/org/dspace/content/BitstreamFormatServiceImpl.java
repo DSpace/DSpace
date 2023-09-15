@@ -19,6 +19,7 @@ import org.dspace.content.dao.BitstreamFormatDAO;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -57,49 +58,41 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
     /**
      * Get a bitstream format from the database.
      *
-     * @param context DSpace context object
+     * @param session current request's database context.
      * @param id      ID of the bitstream format
      * @return the bitstream format, or null if the ID is invalid.
      * @throws SQLException if database error
      */
     @Override
-    public BitstreamFormat find(Context context, int id)
+    public BitstreamFormat find(Session session, int id)
         throws SQLException {
         BitstreamFormat bitstreamFormat
-                = bitstreamFormatDAO.findByID(context.getSession(), BitstreamFormat.class, id);
+                = bitstreamFormatDAO.findByID(session, BitstreamFormat.class, id);
 
         if (bitstreamFormat == null) {
-            if (log.isDebugEnabled()) {
-                log.debug(LogHelper.getHeader(context,
-                                               "find_bitstream_format",
-                                               "not_found,bitstream_format_id=" + id));
-            }
-
+            log.debug("find_bitstream_format not_found,bitstream_format_id={}", id);
             return null;
         }
 
         // not null, return format object
-        if (log.isDebugEnabled()) {
-            log.debug(LogHelper.getHeader(context, "find_bitstream_format",
-                                           "bitstream_format_id=" + id));
-        }
+        log.debug("find_bitstream_format bitstream_format_id={}", id);
 
         return bitstreamFormat;
     }
 
     @Override
-    public BitstreamFormat findByMIMEType(Context context, String mimeType) throws SQLException {
-        return bitstreamFormatDAO.findByMIMEType(context.getSession(), mimeType, false);
+    public BitstreamFormat findByMIMEType(Session session, String mimeType) throws SQLException {
+        return bitstreamFormatDAO.findByMIMEType(session, mimeType, false);
     }
 
     @Override
-    public BitstreamFormat findByShortDescription(Context context, String desc) throws SQLException {
-        return bitstreamFormatDAO.findByShortDescription(context.getSession(), desc);
+    public BitstreamFormat findByShortDescription(Session session, String desc) throws SQLException {
+        return bitstreamFormatDAO.findByShortDescription(session, desc);
     }
 
     @Override
-    public BitstreamFormat findUnknown(Context context) throws SQLException {
-        BitstreamFormat bf = findByShortDescription(context, "Unknown");
+    public BitstreamFormat findUnknown(Session session) throws SQLException {
+        BitstreamFormat bf = findByShortDescription(session, "Unknown");
 
         if (bf == null) {
             throw new IllegalStateException(
@@ -110,13 +103,13 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
     }
 
     @Override
-    public List<BitstreamFormat> findAll(Context context) throws SQLException {
-        return bitstreamFormatDAO.findAll(context.getSession(), BitstreamFormat.class);
+    public List<BitstreamFormat> findAll(Session session) throws SQLException {
+        return bitstreamFormatDAO.findAll(session, BitstreamFormat.class);
     }
 
     @Override
-    public List<BitstreamFormat> findNonInternal(Context context) throws SQLException {
-        return bitstreamFormatDAO.findNonInternal(context.getSession());
+    public List<BitstreamFormat> findNonInternal(Session session) throws SQLException {
+        return bitstreamFormatDAO.findNonInternal(session);
     }
 
     @Override
@@ -144,7 +137,7 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
         // You can not reset the unknown's registry's name
         BitstreamFormat unknown = null;
         try {
-            unknown = findUnknown(context);
+            unknown = findUnknown(context.getSession());
         } catch (IllegalStateException e) {
             // No short_description='Unknown' found in bitstreamformatregistry
             // table. On first load of registries this is expected because it
@@ -208,7 +201,7 @@ public class BitstreamFormatServiceImpl implements BitstreamFormatService {
         }
 
         // Find "unknown" type
-        BitstreamFormat unknown = findUnknown(context);
+        BitstreamFormat unknown = findUnknown(context.getSession());
 
         if (unknown.getID().equals(bitstreamFormat.getID())) {
             throw new IllegalArgumentException("The Unknown bitstream format may not be deleted.");

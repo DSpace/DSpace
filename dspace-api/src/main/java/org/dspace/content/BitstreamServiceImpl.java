@@ -223,7 +223,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         // but we need to find the unknown format!
         if (bitstreamFormat == null) {
             // Use "Unknown" format
-            bitstreamFormat = bitstreamFormatService.findUnknown(context);
+            bitstreamFormat = bitstreamFormatService.findUnknown(context.getSession());
         }
 
         // Remove user type description
@@ -423,7 +423,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Override
     public BitstreamFormat getFormat(Context context, Bitstream bitstream) throws SQLException {
         if (bitstream.getBitstreamFormat() == null) {
-            return bitstreamFormatService.findUnknown(context);
+            return bitstreamFormatService.findUnknown(context.getSession());
         } else {
             return bitstream.getBitstreamFormat();
         }

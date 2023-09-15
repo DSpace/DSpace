@@ -389,7 +389,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         // do item install on new publication //
         ////////////////////////////////////////
 
-        WorkspaceItem newPublicationWSI = workspaceItemService.findByItem(context, newPublication);
+        WorkspaceItem newPublicationWSI = workspaceItemService.findByItem(context.getSession(), newPublication);
         installItemService.installItem(context, newPublicationWSI);
         context.dispatchEvents();
 
@@ -729,7 +729,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         // do item install on new publication //
         ////////////////////////////////////////
 
-        WorkspaceItem newPublicationWSI = workspaceItemService.findByItem(context, newPublication);
+        WorkspaceItem newPublicationWSI = workspaceItemService.findByItem(context.getSession(), newPublication);
         installItemService.installItem(context, newPublicationWSI);
         context.dispatchEvents();
 
@@ -1025,7 +1025,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         // do item install on new person //
         ///////////////////////////////////
 
-        WorkspaceItem newPersonWSI = workspaceItemService.findByItem(context, newPerson);
+        WorkspaceItem newPersonWSI = workspaceItemService.findByItem(context.getSession(), newPerson);
         installItemService.installItem(context, newPersonWSI);
         context.dispatchEvents();
 
@@ -1513,7 +1513,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         // do item install on new publication //
         ////////////////////////////////////////
 
-        WorkspaceItem newPublicationWSI = workspaceItemService.findByItem(context, newPublication);
+        WorkspaceItem newPublicationWSI = workspaceItemService.findByItem(context.getSession(), newPublication);
         installItemService.installItem(context, newPublicationWSI);
         context.dispatchEvents();
 
@@ -1786,7 +1786,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         /////////////////////////////////////
 
         Item v1_2 = versioningService.createNewVersion(context, v1_1).getItem();
-        installItemService.installItem(context, workspaceItemService.findByItem(context, v1_2));
+        installItemService.installItem(context, workspaceItemService.findByItem(context.getSession(), v1_2));
         context.commit();
 
         ////////////////////////////////////
@@ -1794,7 +1794,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         ////////////////////////////////////
 
         Item i3_2 = versioningService.createNewVersion(context, i3_1).getItem();
-        installItemService.installItem(context, workspaceItemService.findByItem(context, i3_2));
+        installItemService.installItem(context, workspaceItemService.findByItem(context.getSession(), i3_2));
         context.commit();
 
         ////////////////////////////////////////////////
@@ -2320,7 +2320,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
                 /////////////////////////////////////
 
                 Item pe3_2 = versioningService.createNewVersion(context, pe3_1).getItem();
-                installItemService.installItem(context, workspaceItemService.findByItem(context, pe3_2));
+                installItemService.installItem(context, workspaceItemService.findByItem(context.getSession(), pe3_2));
                 context.commit();
 
                 //////////////////////////////////////
@@ -2328,7 +2328,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
                 //////////////////////////////////////
 
                 Item pr3_2 = versioningService.createNewVersion(context, pr3_1).getItem();
-                installItemService.installItem(context, workspaceItemService.findByItem(context, pr3_2));
+                installItemService.installItem(context, workspaceItemService.findByItem(context.getSession(), pr3_2));
                 context.commit();
 
                 ////////////////////////////////////////////////
@@ -3060,7 +3060,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         /////////////////////////////////////
 
         Item v1_2 = versioningService.createNewVersion(context, v1_1).getItem();
-        installItemService.installItem(context, workspaceItemService.findByItem(context, v1_2));
+        installItemService.installItem(context, workspaceItemService.findByItem(context.getSession(), v1_2));
         context.commit();
 
         ////////////////////////////////////
@@ -3068,7 +3068,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         ////////////////////////////////////
 
         Item i3_2 = versioningService.createNewVersion(context, i3_1).getItem();
-        installItemService.installItem(context, workspaceItemService.findByItem(context, i3_2));
+        installItemService.installItem(context, workspaceItemService.findByItem(context.getSession(), i3_2));
         context.commit();
 
         ////////////////////////////////////////////////
@@ -3513,7 +3513,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         ///////////////////////////////////////////////////////
 
         Item publication1V2 = versioningService.createNewVersion(context, publication1V1).getItem();
-        installItemService.installItem(context, workspaceItemService.findByItem(context, publication1V2));
+        installItemService.installItem(context, workspaceItemService.findByItem(context.getSession(), publication1V2));
         context.dispatchEvents();
 
         ////////////////////////////////////
@@ -3691,7 +3691,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         // archive new version of person 1 //
         /////////////////////////////////////
 
-        installItemService.installItem(context, workspaceItemService.findByItem(context, person1V2));
+        installItemService.installItem(context, workspaceItemService.findByItem(context.getSession(), person1V2));
         context.dispatchEvents();
 
         ///////////////////
@@ -4033,7 +4033,7 @@ public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWith
         // archive new version of person 2 //
         /////////////////////////////////////
 
-        installItemService.installItem(context, workspaceItemService.findByItem(context, person2V2));
+        installItemService.installItem(context, workspaceItemService.findByItem(context.getSession(), person2V2));
         context.dispatchEvents();
 
         ///////////////////

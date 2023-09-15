@@ -72,7 +72,7 @@ public class RelationshipTypeTest
         when(relationshipTypeDAO.findByID(any(), any(), any(Integer.class))).thenReturn(firstRelationshipType);
 
         // Declare objects utilized for this test
-        RelationshipType found = relationshipTypeService.find(context, 1);
+        RelationshipType found = relationshipTypeService.find(context.getSession(), 1);
 
         // Pass expected and actual RelationshipTypes into comparator method
         checkRelationshipTypeValues(found, firstRelationshipType);
@@ -85,7 +85,8 @@ public class RelationshipTypeTest
                 .thenReturn(firstRelationshipType);
 
         // Declare objects utilized for this test
-        RelationshipType found = relationshipTypeService.findbyTypesAndTypeName(context, mock(EntityType.class),
+        RelationshipType found = relationshipTypeService.findbyTypesAndTypeName(context.getSession(),
+                mock(EntityType.class),
                 mock(EntityType.class),
                 "mock", "mock");
 
@@ -104,7 +105,7 @@ public class RelationshipTypeTest
         when(relationshipTypeDAO.findAll(context.getSession(), RelationshipType.class, -1, -1)).thenReturn(mockedList);
 
         // Invoke findAll()
-        List<RelationshipType> foundRelationshipTypes = relationshipTypeService.findAll(context);
+        List<RelationshipType> foundRelationshipTypes = relationshipTypeService.findAll(context.getSession());
 
         // Assert that our foundRelationshipTypes should not be null and contain two RelationshipTypes
         assertThat(foundRelationshipTypes, notNullValue());
@@ -122,7 +123,8 @@ public class RelationshipTypeTest
                 "mock", -1, -1)).thenReturn(mockedList);
 
         // Invoke findByLeftwardOrRightwardTypeName()
-        List<RelationshipType> found = relationshipTypeService.findByLeftwardOrRightwardTypeName(context, "mock");
+        List<RelationshipType> found
+                = relationshipTypeService.findByLeftwardOrRightwardTypeName(context.getSession(), "mock");
 
         // Assert that our expected list contains our expected RelationshipType and nothing more
         assertThat(found, notNullValue());
@@ -141,7 +143,7 @@ public class RelationshipTypeTest
 
         // Invoke findByEntityType()
         List<RelationshipType> found = relationshipTypeService
-                .findByEntityType(context, mock(EntityType.class), -1, -1);
+                .findByEntityType(context.getSession(), mock(EntityType.class), -1, -1);
 
         // Assert that our expected list contains our expected RelationshipType and nothing more
         assertThat(found, notNullValue());

@@ -766,7 +766,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         // Delete bitstream logo
         setLogo(context, collection, null);
 
-        Iterator<WorkspaceItem> workspaceItems = workspaceItemService.findByCollection(context, collection).iterator();
+        Iterator<WorkspaceItem> workspaceItems
+                = workspaceItemService.findByCollection(context.getSession(), collection).iterator();
         while (workspaceItems.hasNext()) {
             WorkspaceItem workspaceItem = workspaceItems.next();
             workspaceItems.remove();
@@ -840,8 +841,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     }
 
     @Override
-    public Collection findByGroup(Context context, Group group) throws SQLException {
-        return collectionDAO.findByGroup(context.getSession(), group);
+    public Collection findByGroup(Session session, Group group) throws SQLException {
+        return collectionDAO.findByGroup(session, group);
     }
 
     @Override

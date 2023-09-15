@@ -94,7 +94,7 @@ public class RelationshipBuilder extends AbstractBuilder<Relationship, Relations
     public static void deleteRelationship(Integer id) throws SQLException, IOException {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
-            Relationship relationship = relationshipService.find(c, id);
+            Relationship relationship = relationshipService.find(c.getSession(), id);
             if (relationship != null) {
                 try {
                     relationshipService.delete(c, relationship);

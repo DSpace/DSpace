@@ -51,7 +51,8 @@ public class EntityTypeServiceImplTest   {
         when(entityTypeDAO.findByEntityType(context.getSession(), "TestType")).thenReturn(entityType);
 
         // The EntityType reported from our TestType parameter should match our mocked EntityType
-        assertEquals("TestFindByEntityType 0", entityType, entityTypeService.findByEntityType(context, "TestType"));
+        assertEquals("TestFindByEntityType 0", entityType,
+                entityTypeService.findByEntityType(context.getSession(), "TestType"));
     }
 
 
@@ -61,7 +62,7 @@ public class EntityTypeServiceImplTest   {
         List<EntityType> entityTypeList = new ArrayList<>();
 
         // The EntityType(s) reported from our mocked state should match our entityTypeList
-        assertEquals("TestFindAll 0", entityTypeList, entityTypeService.findAll(context));
+        assertEquals("TestFindAll 0", entityTypeList, entityTypeService.findAll(context.getSession()));
     }
 
 
@@ -89,7 +90,7 @@ public class EntityTypeServiceImplTest   {
         when(entityTypeDAO.findByID(context.getSession(), EntityType.class, 0)).thenReturn(entityType);
 
         // The reported EntityType should match our mocked entityType
-        assertEquals("TestFind 0", entityType, entityTypeService.find(context, 0));
+        assertEquals("TestFind 0", entityType, entityTypeService.find(context.getSession(), 0));
     }
 
     @Test

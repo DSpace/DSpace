@@ -115,7 +115,8 @@ public class RestartWorkflow {
 
 
             WorkflowServiceFactory workflowServiceFactory = WorkflowServiceFactory.getInstance();
-            List<WorkflowItem> workflowItems = workflowServiceFactory.getWorkflowItemService().findAll(context);
+            List<WorkflowItem> workflowItems = workflowServiceFactory.getWorkflowItemService()
+                    .findAll(context.getSession());
             WorkflowService workflowService = workflowServiceFactory.getWorkflowService();
             int i = 0;
             for (WorkflowItem workflowItem : workflowItems) {

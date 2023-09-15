@@ -456,7 +456,7 @@ public class Utils {
                 })
                 .map(id -> {
                     try {
-                        return bitstreamFormatService.find(context, parseInt(id));
+                        return bitstreamFormatService.find(context.getSession(), parseInt(id));
                     } catch (SQLException | NumberFormatException e) {
                         log.error("Could not find bitstream format for id: " + id, e);
                         return null;

@@ -80,7 +80,7 @@ public class WorkflowRestPermissionEvaluatorPlugin extends RestObjectPermissionE
                 return false;
             }
             int dsoId = Integer.parseInt(targetId.toString());
-            XmlWorkflowItem workflowItem = workflowItemService.find(context, dsoId);
+            XmlWorkflowItem workflowItem = workflowItemService.find(context.getSession(), dsoId);
             // submitter can see their inprogress submission
             if (ePerson.equals(workflowItem.getSubmitter())) {
                 return true;
@@ -90,7 +90,7 @@ public class WorkflowRestPermissionEvaluatorPlugin extends RestObjectPermissionE
                 return true;
             }
 
-            if (claimedTaskService.findByWorkflowIdAndEPerson(context, workflowItem, ePerson) != null) {
+            if (claimedTaskService.findByWorkflowIdAndEPerson(context.getSession(), workflowItem, ePerson) != null) {
                 return true;
             }
 

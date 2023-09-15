@@ -16,6 +16,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.dao.RegistrationDataDAO;
 import org.dspace.eperson.service.RegistrationDataService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -40,13 +41,13 @@ public class RegistrationDataServiceImpl implements RegistrationDataService {
 
 
     @Override
-    public RegistrationData findByToken(Context context, String token) throws SQLException {
-        return registrationDataDAO.findByToken(context.getSession(), token);
+    public RegistrationData findByToken(Session session, String token) throws SQLException {
+        return registrationDataDAO.findByToken(session, token);
     }
 
     @Override
-    public RegistrationData findByEmail(Context context, String email) throws SQLException {
-        return registrationDataDAO.findByEmail(context.getSession(), email);
+    public RegistrationData findByEmail(Session session, String email) throws SQLException {
+        return registrationDataDAO.findByEmail(session, email);
     }
 
     @Override
@@ -56,8 +57,8 @@ public class RegistrationDataServiceImpl implements RegistrationDataService {
     }
 
     @Override
-    public RegistrationData find(Context context, int id) throws SQLException {
-        return registrationDataDAO.findByID(context.getSession(), RegistrationData.class, id);
+    public RegistrationData find(Session session, int id) throws SQLException {
+        return registrationDataDAO.findByID(session.getSession(), RegistrationData.class, id);
     }
 
     @Override

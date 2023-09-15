@@ -42,8 +42,9 @@ public class GoogleBitstreamComparator implements Comparator<Bitstream> {
         int priority = 1;
         for (String s : shortDescriptions) {
             try {
-                BitstreamFormat format = ContentServiceFactory.getInstance().getBitstreamFormatService()
-                                                              .findByShortDescription(context, s);
+                BitstreamFormat format = ContentServiceFactory.getInstance()
+                        .getBitstreamFormatService()
+                        .findByShortDescription(context.getSession(), s);
                 if (format != null) {
                     priorityMap.put(format.getMIMEType(), priority);
                 } else {
@@ -79,6 +80,7 @@ public class GoogleBitstreamComparator implements Comparator<Bitstream> {
      * @param b2 second bitstream
      * @return
      */
+    @Override
     public int compare(Bitstream b1, Bitstream b2) {
         int priority1 = getPriorityFromBitstream(b1);
         int priority2 = getPriorityFromBitstream(b2);

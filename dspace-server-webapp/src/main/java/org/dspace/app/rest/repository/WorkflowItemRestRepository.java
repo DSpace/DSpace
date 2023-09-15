@@ -120,7 +120,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     public WorkflowItemRest findOne(Context context, Integer id) {
         XmlWorkflowItem witem = null;
         try {
-            witem = wis.find(context, id);
+            witem = wis.find(context.getSession(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -135,7 +135,8 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     public Page<WorkflowItemRest> findAll(Context context, Pageable pageable) {
         try {
             long total = wis.countAll(context);
-            List<XmlWorkflowItem> witems = wis.findAll(context, pageable.getPageNumber(), pageable.getPageSize());
+            List<XmlWorkflowItem> witems = wis.findAll(context.getSession(),
+                    pageable.getPageNumber(), pageable.getPageSize());
             return converter.toRestPage(witems, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException("SQLException in " + this.getClass() + "#findAll trying to retrieve all " +
@@ -150,7 +151,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
             Context context = obtainContext();
             EPerson ep = epersonService.find(context.getSession(), submitterID);
             long total = wis.countBySubmitter(context, ep);
-            List<XmlWorkflowItem> witems = wis.findBySubmitter(context, ep, pageable.getPageNumber(),
+            List<XmlWorkflowItem> witems = wis.findBySubmitter(context.getSession(), ep, pageable.getPageNumber(),
                     pageable.getPageSize());
             return converter.toRestPage(witems, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
@@ -194,7 +195,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
 
         Context context = obtainContext();
         WorkflowItemRest wsi = findOne(context, id);
-        XmlWorkflowItem source = wis.find(context, id);
+        XmlWorkflowItem source = wis.find(context.getSession(), id);
 
         this.checkIfEditMetadataAllowedInCurrentStep(context, source);
         List<ErrorRest> errors = submissionService.uploadFileToInprogressSubmission(context, request, wsi, source,
@@ -214,7 +215,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
                       Patch patch) throws SQLException, AuthorizeException {
         List<Operation> operations = patch.getOperations();
         WorkflowItemRest wsi = findOne(context, id);
-        XmlWorkflowItem source = wis.find(context, id);
+        XmlWorkflowItem source = wis.find(context.getSession(), id);
 
         this.checkIfEditMetadataAllowedInCurrentStep(context, source);
 
@@ -240,7 +241,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     protected void delete(Context context, Integer id) {
         XmlWorkflowItem witem = null;
         try {
-            witem = wis.find(context, id);
+            witem = wis.find(context.getSession(), id);
             if (witem == null) {
                 throw new ResourceNotFoundException("WorkflowItem ID " + id + " not found");
             }
@@ -264,8 +265,8 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
      */
     private void checkIfEditMetadataAllowedInCurrentStep(Context context, XmlWorkflowItem xmlWorkflowItem) {
         try {
-            ClaimedTask claimedTask = claimedTaskService.findByWorkflowIdAndEPerson(context, xmlWorkflowItem,
-                context.getCurrentUser());
+            ClaimedTask claimedTask = claimedTaskService.findByWorkflowIdAndEPerson(context.getSession(),
+                    xmlWorkflowItem, context.getCurrentUser());
             if (claimedTask == null) {
                 throw new UnprocessableEntityException("WorkflowItem with id " + xmlWorkflowItem.getID()
                     + " has not been claimed yet.");
@@ -301,7 +302,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         try {
             Context context = obtainContext();
             Item item = itemService.find(context.getSession(), itemUuid);
-            XmlWorkflowItem xmlWorkflowItem = wis.findByItem(context, item);
+            XmlWorkflowItem xmlWorkflowItem = wis.findByItem(context.getSession(), item);
             if (xmlWorkflowItem == null) {
                 return null;
             }

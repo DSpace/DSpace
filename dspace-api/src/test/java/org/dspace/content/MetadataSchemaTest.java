@@ -154,7 +154,7 @@ public class MetadataSchemaTest extends AbstractUnitTest {
         String name = "name";
         metadataSchemaService.create(context, name, namespace);
 
-        MetadataSchema found = metadataSchemaService.findByNamespace(context, namespace);
+        MetadataSchema found = metadataSchemaService.findByNamespace(context.getSession(), namespace);
         assertThat("testCreateAuth 0", found, notNullValue());
     }
 
@@ -189,7 +189,7 @@ public class MetadataSchemaTest extends AbstractUnitTest {
     @Test
     public void testFindByNamespace() throws Exception {
         log.info(">>" + ms.getNamespace() + " " + ms.getName());
-        MetadataSchema found = metadataSchemaService.findByNamespace(context, ms.getNamespace());
+        MetadataSchema found = metadataSchemaService.findByNamespace(context.getSession(), ms.getNamespace());
         assertThat("testFindByNamespace 0", found, notNullValue());
         assertThat("testFindByNamespace 1", found.getID(), equalTo(ms.getID()));
     }
@@ -208,7 +208,7 @@ public class MetadataSchemaTest extends AbstractUnitTest {
 
         metadataSchemaService.update(context, metadataSchema);
 
-        MetadataSchema found = metadataSchemaService.findByNamespace(context, namespace);
+        MetadataSchema found = metadataSchemaService.findByNamespace(context.getSession(), namespace);
         assertThat("testUpdateAuth 0", found.getID(), equalTo(metadataSchema.getID()));
     }
 
@@ -253,7 +253,7 @@ public class MetadataSchemaTest extends AbstractUnitTest {
 
         metadataSchemaService.delete(context, m);
 
-        MetadataSchema found = metadataSchemaService.findByNamespace(context, namespace);
+        MetadataSchema found = metadataSchemaService.findByNamespace(context.getSession(), namespace);
         assertThat("testDeleteAuth 0", found, nullValue());
     }
 
@@ -275,7 +275,7 @@ public class MetadataSchemaTest extends AbstractUnitTest {
      */
     @Test
     public void testFindAll() throws Exception {
-        List<MetadataSchema> found = metadataSchemaService.findAll(context);
+        List<MetadataSchema> found = metadataSchemaService.findAll(context.getSession());
         assertThat("testFindAll 0", found, notNullValue());
         assertTrue("testFindAll 1", found.size() >= 1);
 

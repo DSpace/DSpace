@@ -98,7 +98,7 @@ public class PoolTaskIndexFactoryImpl extends IndexFactoryImpl<IndexablePoolTask
 
     @Override
     public Optional<IndexablePoolTask> findIndexableObject(Context context, String id) throws SQLException {
-        final PoolTask poolTask = poolTaskService.find(context, Integer.parseInt(id));
+        final PoolTask poolTask = poolTaskService.find(context.getSession(), Integer.parseInt(id));
         return poolTask == null ? Optional.empty() : Optional.of(new IndexablePoolTask(poolTask));
     }
 }

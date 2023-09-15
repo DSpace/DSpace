@@ -642,7 +642,7 @@ public class ItemServiceTest extends AbstractIntegrationTestWithDatabase {
         // create a new version, which results in a non-latest relationship attached person 1.
         Version newVersion = versioningService.createNewVersion(context, publication1);
         Item newPublication1 = newVersion.getItem();
-        WorkspaceItem newPublication1WSI = workspaceItemService.findByItem(context, newPublication1);
+        WorkspaceItem newPublication1WSI = workspaceItemService.findByItem(context.getSession(), newPublication1);
         installItemService.installItem(context, newPublication1WSI);
         context.dispatchEvents();
 

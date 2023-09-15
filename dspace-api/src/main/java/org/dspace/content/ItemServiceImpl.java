@@ -547,7 +547,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Override
     public void removeLicenses(Context context, Item item) throws SQLException, AuthorizeException, IOException {
         // Find the License format
-        BitstreamFormat bf = bitstreamFormatService.findByShortDescription(context, "License");
+        BitstreamFormat bf = bitstreamFormatService.findByShortDescription(context.getSession(), "License");
         int licensetype = bf.getID();
 
         // search through bundles, looking for bitstream type license
@@ -1199,8 +1199,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
      */
     @Override
     public boolean isInProgressSubmission(Context context, Item item) throws SQLException {
-        return workspaceItemService.findByItem(context, item) != null
-            || workflowItemService.findByItem(context, item) != null;
+        return workspaceItemService.findByItem(context.getSession(), item) != null
+            || workflowItemService.findByItem(context.getSession(), item) != null;
     }
 
     /*
@@ -1258,7 +1258,7 @@ prevent the generation of resource policy entry values with null dspace_object a
      * @throws SQLException If something goes wrong retrieving the RP on the DSO
      */
     private boolean isNotAlreadyACustomRPOfThisTypeOnDSO(Context context, DSpaceObject dso) throws SQLException {
-        List<ResourcePolicy> readRPs = resourcePolicyService.find(context, dso, Constants.READ);
+        List<ResourcePolicy> readRPs = resourcePolicyService.find(context.getSession(), dso, Constants.READ);
         for (ResourcePolicy readRP : readRPs) {
             if (readRP.getRpType() != null && readRP.getRpType().equals(ResourcePolicy.TYPE_CUSTOM)) {
                 return false;
@@ -1280,7 +1280,7 @@ prevent the generation of resource policy entry values with null dspace_object a
      */
     private boolean shouldBeAppended(Context context, DSpaceObject dso, ResourcePolicy defaultPolicy)
             throws SQLException {
-        boolean hasCustomPolicy = resourcePolicyService.find(context, dso, Constants.READ)
+        boolean hasCustomPolicy = resourcePolicyService.find(context.getSession(), dso, Constants.READ)
                                                        .stream()
                                                        .filter(rp -> (Objects.nonNull(rp.getRpType()) &&
                                                             Objects.equals(rp.getRpType(), ResourcePolicy.TYPE_CUSTOM)))
@@ -1419,11 +1419,12 @@ prevent the generation of resource policy entry values with null dspace_object a
         if (ownCollection != null) {
             return ownCollection;
         } else {
-            InProgressSubmission inprogress = ContentServiceFactory.getInstance().getWorkspaceItemService()
-                                                                   .findByItem(context,
-                                                                               item);
+            InProgressSubmission inprogress = ContentServiceFactory.getInstance()
+                    .getWorkspaceItemService()
+                    .findByItem(context.getSession(), item);
             if (inprogress == null) {
-                inprogress = WorkflowServiceFactory.getInstance().getWorkflowItemService().findByItem(context, item);
+                inprogress = WorkflowServiceFactory.getInstance().getWorkflowItemService()
+                        .findByItem(context.getSession(), item);
             }
 
             if (inprogress != null) {
@@ -1650,7 +1651,7 @@ prevent the generation of resource policy entry values with null dspace_object a
         if (rr instanceof RelationshipMetadataValue) {
             try {
                 //Retrieve the applicable relationship
-                Relationship rs = relationshipService.find(context,
+                Relationship rs = relationshipService.find(context.getSession(),
                         ((RelationshipMetadataValue) rr).getRelationshipId());
                 if (rs.getLeftItem() == dso) {
                     rs.setLeftPlace(place);
@@ -1719,7 +1720,7 @@ prevent the generation of resource policy entry values with null dspace_object a
             return null;
         }
 
-        return entityTypeService.findByEntityType(context, entityTypeString);
+        return entityTypeService.findByEntityType(context.getSession(), entityTypeString);
     }
 
     private void removeOrcidSynchronizationStuff(Context context, Item item) throws SQLException, AuthorizeException {

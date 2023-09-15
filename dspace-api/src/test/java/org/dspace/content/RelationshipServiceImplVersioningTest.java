@@ -107,7 +107,7 @@ public class RelationshipServiceImplVersioningTest extends AbstractIntegrationTe
         );
         context.restoreAuthSystemState();
         assertEquals(Relationship.LatestVersionStatus.BOTH, relationship1.getLatestVersionStatus());
-        Relationship relationship2 = relationshipService.find(context, relationship1.getID());
+        Relationship relationship2 = relationshipService.find(context.getSession(), relationship1.getID());
         assertEquals(Relationship.LatestVersionStatus.BOTH, relationship2.getLatestVersionStatus());
 
         // create method #2
@@ -117,7 +117,7 @@ public class RelationshipServiceImplVersioningTest extends AbstractIntegrationTe
         );
         context.restoreAuthSystemState();
         assertEquals(Relationship.LatestVersionStatus.BOTH, relationship3.getLatestVersionStatus());
-        Relationship relationship4 = relationshipService.find(context, relationship3.getID());
+        Relationship relationship4 = relationshipService.find(context.getSession(), relationship3.getID());
         assertEquals(Relationship.LatestVersionStatus.BOTH, relationship4.getLatestVersionStatus());
 
         // create method #3
@@ -129,7 +129,7 @@ public class RelationshipServiceImplVersioningTest extends AbstractIntegrationTe
         Relationship relationship5 = relationshipService.create(context, inputRelationship);
         context.restoreAuthSystemState();
         assertEquals(Relationship.LatestVersionStatus.BOTH, relationship5.getLatestVersionStatus());
-        Relationship relationship6 = relationshipService.find(context, relationship5.getID());
+        Relationship relationship6 = relationshipService.find(context.getSession(), relationship5.getID());
         assertEquals(Relationship.LatestVersionStatus.BOTH, relationship6.getLatestVersionStatus());
 
         // clean up
@@ -150,7 +150,7 @@ public class RelationshipServiceImplVersioningTest extends AbstractIntegrationTe
         );
         context.restoreAuthSystemState();
         assertEquals(Relationship.LatestVersionStatus.BOTH, relationship1.getLatestVersionStatus());
-        Relationship relationship2 = relationshipService.find(context, relationship1.getID());
+        Relationship relationship2 = relationshipService.find(context.getSession(), relationship1.getID());
         assertEquals(Relationship.LatestVersionStatus.BOTH, relationship2.getLatestVersionStatus());
 
         // create method #2
@@ -163,7 +163,7 @@ public class RelationshipServiceImplVersioningTest extends AbstractIntegrationTe
         Relationship relationship3 = relationshipService.create(context, inputRelationship);
         context.restoreAuthSystemState();
         assertEquals(Relationship.LatestVersionStatus.BOTH, relationship3.getLatestVersionStatus());
-        Relationship relationship4 = relationshipService.find(context, relationship3.getID());
+        Relationship relationship4 = relationshipService.find(context.getSession(), relationship3.getID());
         assertEquals(Relationship.LatestVersionStatus.BOTH, relationship4.getLatestVersionStatus());
 
         // clean up
@@ -183,7 +183,7 @@ public class RelationshipServiceImplVersioningTest extends AbstractIntegrationTe
         );
         context.restoreAuthSystemState();
         assertEquals(Relationship.LatestVersionStatus.LEFT_ONLY, relationship1.getLatestVersionStatus());
-        Relationship relationship2 = relationshipService.find(context, relationship1.getID());
+        Relationship relationship2 = relationshipService.find(context.getSession(), relationship1.getID());
         assertEquals(Relationship.LatestVersionStatus.LEFT_ONLY, relationship2.getLatestVersionStatus());
 
         // create method #2
@@ -196,7 +196,7 @@ public class RelationshipServiceImplVersioningTest extends AbstractIntegrationTe
         Relationship relationship3 = relationshipService.create(context, inputRelationship);
         context.restoreAuthSystemState();
         assertEquals(Relationship.LatestVersionStatus.LEFT_ONLY, relationship3.getLatestVersionStatus());
-        Relationship relationship4 = relationshipService.find(context, relationship3.getID());
+        Relationship relationship4 = relationshipService.find(context.getSession(), relationship3.getID());
         assertEquals(Relationship.LatestVersionStatus.LEFT_ONLY, relationship4.getLatestVersionStatus());
 
         // clean up
@@ -216,7 +216,7 @@ public class RelationshipServiceImplVersioningTest extends AbstractIntegrationTe
         );
         context.restoreAuthSystemState();
         assertEquals(Relationship.LatestVersionStatus.RIGHT_ONLY, relationship1.getLatestVersionStatus());
-        Relationship relationship2 = relationshipService.find(context, relationship1.getID());
+        Relationship relationship2 = relationshipService.find(context.getSession(), relationship1.getID());
         assertEquals(Relationship.LatestVersionStatus.RIGHT_ONLY, relationship2.getLatestVersionStatus());
 
         // create method #2
@@ -229,7 +229,7 @@ public class RelationshipServiceImplVersioningTest extends AbstractIntegrationTe
         Relationship relationship3 = relationshipService.create(context, inputRelationship);
         context.restoreAuthSystemState();
         assertEquals(Relationship.LatestVersionStatus.RIGHT_ONLY, relationship3.getLatestVersionStatus());
-        Relationship relationship4 = relationshipService.find(context, relationship3.getID());
+        Relationship relationship4 = relationshipService.find(context.getSession(), relationship3.getID());
         assertEquals(Relationship.LatestVersionStatus.RIGHT_ONLY, relationship4.getLatestVersionStatus());
 
         // clean up

@@ -136,11 +136,11 @@ public class VersioningServiceImpl implements VersioningService {
                 // new versions. To avoid authorithation problems we need to
                 // check whether a corresponding workspaceItem exists.
                 if (!item.isArchived()) {
-                    WorkspaceItem wsi = workspaceItemService.findByItem(c, item);
+                    WorkspaceItem wsi = workspaceItemService.findByItem(c.getSession(), item);
                     if (wsi != null) {
                         workspaceItemService.deleteAll(c, wsi);
                     } else {
-                        WorkflowItem wfi = workflowItemService.findByItem(c, item);
+                        WorkflowItem wfi = workflowItemService.findByItem(c.getSession(), item);
                         if (wfi != null) {
                             workflowItemService.delete(c, wfi);
                         }

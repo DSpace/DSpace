@@ -43,12 +43,12 @@ public interface MetadataSchemaService {
     /**
      * Get the schema object corresponding to this namespace URI.
      *
-     * @param context   DSpace context
+     * @param session   current request's database context.
      * @param namespace namespace URI to match
      * @return metadata schema object or null if none found.
      * @throws SQLException if database error
      */
-    public MetadataSchema findByNamespace(Context context, String namespace) throws SQLException;
+    public MetadataSchema findByNamespace(Session session, String namespace) throws SQLException;
 
     /**
      * Update the metadata schema in the database.
@@ -76,11 +76,11 @@ public interface MetadataSchemaService {
     /**
      * Return all metadata schemas.
      *
-     * @param context DSpace context
+     * @param session DSpace context
      * @return array of metadata schemas
      * @throws SQLException if database error
      */
-    public List<MetadataSchema> findAll(Context context) throws SQLException;
+    public List<MetadataSchema> findAll(Session session) throws SQLException;
 
     /**
      * Get the schema corresponding with this numeric ID.

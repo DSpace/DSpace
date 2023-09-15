@@ -287,7 +287,7 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
 
     public void canEdit(Context context, Community community) throws AuthorizeException, SQLException;
 
-    public Community findByAdminGroup(Context context, Group group) throws SQLException;
+    public Community findByAdminGroup(Session session, Group group) throws SQLException;
 
     public List<Community> findAuthorized(Context context, List<Integer> actions) throws SQLException;
 

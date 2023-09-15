@@ -63,12 +63,12 @@ public class WorkflowItemStepLinkRepository extends AbstractDSpaceRestRepository
 
         Context context = obtainContext();
         try {
-            XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.find(context, workflowItemId);
+            XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.find(context.getSession(), workflowItemId);
             if (xmlWorkflowItem == null) {
                 throw new ResourceNotFoundException("XmlWorkflowItem with id: " + workflowItemId + " wasn't found");
             }
             List<PoolTask> poolTasks = poolTaskService.find(context, xmlWorkflowItem);
-            List<ClaimedTask> claimedTasks = claimedTaskService.find(context, xmlWorkflowItem);
+            List<ClaimedTask> claimedTasks = claimedTaskService.find(context.getSession(), xmlWorkflowItem);
             for (PoolTask poolTask : poolTasks) {
                 return converter.toRest(xmlWorkflowFactory.getStepByName(poolTask.getStepID()), projection);
             }

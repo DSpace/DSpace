@@ -58,6 +58,7 @@ public class SimpleFileIngester implements SWORDIngester {
      * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
      * @throws SWORDErrorException  on generic SWORD exception
      */
+    @Override
     public DepositResult ingest(SWORDService service, Deposit deposit,
                                 DSpaceObject target)
         throws DSpaceSWORDException, SWORDErrorException {
@@ -106,7 +107,7 @@ public class SimpleFileIngester implements SWORDIngester {
             swordService.message("File created in item with filename " + fn);
 
             BitstreamFormat bf = bitstreamFormatService.findByMIMEType(
-                context, deposit.getContentType());
+                context.getSession(), deposit.getContentType());
             if (bf != null) {
                 bs.setFormat(context, bf);
             }

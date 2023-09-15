@@ -15,6 +15,7 @@ import org.dspace.checker.ChecksumResultCode;
 import org.dspace.checker.MostRecentChecksum;
 import org.dspace.content.Bitstream;
 import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the MostRecentChecksum object.
@@ -27,23 +28,52 @@ public interface MostRecentChecksumService {
 
     public MostRecentChecksum getNonPersistedObject();
 
-    public MostRecentChecksum findByBitstream(Context context, Bitstream bitstream) throws SQLException;
+    public MostRecentChecksum findByBitstream(Session session, Bitstream bitstream) throws SQLException;
 
-    public List<MostRecentChecksum> findNotProcessedBitstreamsReport(Context context, Date startDate, Date endDate)
+    /**
+     * Find all bitstreams that were set to not be processed for the specified
+     * date range.
+     *
+     * @param session   current request's database context.
+     * @param startDate the start of the date range
+     * @param endDate   the end of the date range
+     * @return a list of BitstreamHistoryInfo objects
+     * @throws SQLException if database error
+     */
+    public List<MostRecentChecksum> findNotProcessedBitstreamsReport(Session session, Date startDate, Date endDate)
         throws SQLException;
 
-    public List<MostRecentChecksum> findBitstreamResultTypeReport(Context context, Date startDate, Date endDate,
+    /**
+     * Select the most recent bitstream for a given date range with the
+     * specified status.
+     *
+     * @param session    current request's database context.
+     * @param startDate  the start date range
+     * @param endDate    the end date range.
+     * @param resultCode the result code
+     * @return a list of BitstreamHistoryInfo objects
+     * @throws SQLException if database error
+     */
+    public List<MostRecentChecksum> findBitstreamResultTypeReport(Session session, Date startDate, Date endDate,
                                                                   ChecksumResultCode resultCode) throws SQLException;
 
     public void updateMissingBitstreams(Context context) throws SQLException;
 
     public void deleteByBitstream(Context context, Bitstream bitstream) throws SQLException;
 
-    public MostRecentChecksum findOldestRecord(Context context) throws SQLException;
+    /**
+     * Get the oldest most recent checksum record. If more than
+     * one found the first one in the result set is returned.
+     *
+     * @param session current request's database context.
+     * @return the oldest MostRecentChecksum or NULL if the table is empty
+     * @throws SQLException if database error
+     */
+    public MostRecentChecksum findOldestRecord(Session session) throws SQLException;
 
-    public MostRecentChecksum findOldestRecord(Context context, Date lessThanDate) throws SQLException;
+    public MostRecentChecksum findOldestRecord(Session session, Date lessThanDate) throws SQLException;
 
-    public List<MostRecentChecksum> findNotInHistory(Context context) throws SQLException;
+    public List<MostRecentChecksum> findNotInHistory(Session session) throws SQLException;
 
     public void update(Context context, MostRecentChecksum mostRecentChecksum) throws SQLException;
 }

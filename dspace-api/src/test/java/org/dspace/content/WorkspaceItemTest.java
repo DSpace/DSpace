@@ -152,7 +152,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
     @Test
     public void testFind() throws Exception {
         int id = wi.getID();
-        WorkspaceItem found = workspaceItemService.find(context, id);
+        WorkspaceItem found = workspaceItemService.find(context.getSession(), id);
         assertThat("testFind 0", found, notNullValue());
         assertThat("testFind 1", found.getID(), equalTo(id));
         assertThat("testFind 2", found, equalTo(wi));
@@ -199,7 +199,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
     @Test
     public void testFindByEPerson() throws Exception {
         EPerson ep = context.getCurrentUser();
-        List<WorkspaceItem> found = workspaceItemService.findByEPerson(context, ep);
+        List<WorkspaceItem> found = workspaceItemService.findByEPerson(context.getSession(), ep);
         assertThat("testFindByEPerson 0", found, notNullValue());
         assertTrue("testFindByEPerson 1", found.size() >= 1);
         boolean exists = false;
@@ -217,7 +217,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
     @Test
     public void testFindByCollection() throws Exception {
         Collection c = wi.getCollection();
-        List<WorkspaceItem> found = workspaceItemService.findByCollection(context, c);
+        List<WorkspaceItem> found = workspaceItemService.findByCollection(context.getSession(), c);
         assertThat("testFindByCollection 0", found, notNullValue());
         assertTrue("testFindByCollection 1", found.size() >= 1);
         assertThat("testFindByCollection 2", found.get(0).getID(), equalTo(wi.getID()));
@@ -230,7 +230,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
      */
     @Test
     public void testFindAll() throws Exception {
-        List<WorkspaceItem> found = workspaceItemService.findAll(context);
+        List<WorkspaceItem> found = workspaceItemService.findAll(context.getSession());
         assertTrue("testFindAll 0", found.size() >= 1);
         boolean added = false;
         for (WorkspaceItem f : found) {
@@ -298,7 +298,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
         workspaceItemService.update(context, wi);
 
         // Reload our WorkspaceItem
-        wi = workspaceItemService.find(context, wi.getID());
+        wi = workspaceItemService.find(context.getSession(), wi.getID());
         assertTrue("testUpdate", pBefore != wi.isPublishedBefore());
     }
 
@@ -341,7 +341,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
         int id = wi.getID();
         //we are the user that created it (same context) so we can delete
         workspaceItemService.deleteAll(context, wi);
-        WorkspaceItem found = workspaceItemService.find(context, id);
+        WorkspaceItem found = workspaceItemService.find(context.getSession(), id);
         assertThat("testDeleteAllAuth 0", found, nullValue());
     }
 
@@ -376,7 +376,7 @@ public class WorkspaceItemTest extends AbstractUnitTest {
         workspaceItemService.deleteWrapper(context, wi);
         Item found = itemService.find(context.getSession(), itemid);
         assertThat("testDeleteWrapperAuth 0", found, notNullValue());
-        WorkspaceItem wfound = workspaceItemService.find(context, id);
+        WorkspaceItem wfound = workspaceItemService.find(context.getSession(), id);
         assertThat("testDeleteWrapperAuth 1", wfound, nullValue());
     }
 

@@ -86,7 +86,7 @@ public class CanDeleteVersionFeatureIT extends AbstractControllerIntegrationTest
                                .build();
 
         Version version = VersionBuilder.createVersion(context, item, "My test summary").build();
-        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, version.getItem());
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context.getSession(), version.getItem());
         installItemService.installItem(context, workspaceItem);
 
         context.restoreAuthSystemState();
@@ -171,7 +171,7 @@ public class CanDeleteVersionFeatureIT extends AbstractControllerIntegrationTest
                                .build();
 
         Version version = VersionBuilder.createVersion(context, item, "My test summary").build();
-        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, version.getItem());
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context.getSession(), version.getItem());
         installItemService.installItem(context, workspaceItem);
 
         context.restoreAuthSystemState();
@@ -229,7 +229,7 @@ public class CanDeleteVersionFeatureIT extends AbstractControllerIntegrationTest
                                .build();
 
         Version version = VersionBuilder.createVersion(context, item, "My test summary").build();
-        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, version.getItem());
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context.getSession(), version.getItem());
 
         context.restoreAuthSystemState();
 
@@ -276,7 +276,7 @@ public class CanDeleteVersionFeatureIT extends AbstractControllerIntegrationTest
                                 .build();
 
         Version version = VersionBuilder.createVersion(context, itemA, "My test summary").build();
-        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, version.getItem());
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context.getSession(), version.getItem());
         installItemService.installItem(context, workspaceItem);
 
         context.restoreAuthSystemState();

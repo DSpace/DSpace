@@ -103,7 +103,7 @@ public class XmlWorkflowCuratorServiceImpl
     @Override
     public boolean curate(Curator curator, Context c, String wfId)
             throws AuthorizeException, IOException, SQLException {
-        XmlWorkflowItem wfi = workflowItemService.find(c, Integer.parseInt(wfId));
+        XmlWorkflowItem wfi = workflowItemService.find(c.getSession(), Integer.parseInt(wfId));
         if (wfi != null) {
             return curate(curator, c, wfi);
         } else {
@@ -182,7 +182,7 @@ public class XmlWorkflowCuratorServiceImpl
      */
     protected FlowStep getFlowStep(Context c, XmlWorkflowItem wfi)
             throws SQLException, IOException {
-        if (claimedTaskService.find(c, wfi).isEmpty()) { // No claimed tasks:  assume first step
+        if (claimedTaskService.find(c.getSession(), wfi).isEmpty()) { // No claimed tasks:  assume first step
             Collection coll = wfi.getCollection();
             String taskSetName = curationTaskConfig.containsKey(coll.getHandle()) ?
                     coll.getHandle() : CurationTaskConfig.DEFAULT_TASKSET_NAME;
@@ -190,7 +190,7 @@ public class XmlWorkflowCuratorServiceImpl
             return ts.steps.isEmpty() ? null : ts.steps.get(0);
         }
         ClaimedTask claimedTask
-                = claimedTaskService.findByWorkflowIdAndEPerson(c, wfi, c.getCurrentUser());
+                = claimedTaskService.findByWorkflowIdAndEPerson(c.getSession(), wfi, c.getCurrentUser());
         if (claimedTask != null) {
             Collection coll = wfi.getCollection();
             String taskSetName = curationTaskConfig.containsKey(coll.getHandle()) ?
@@ -247,7 +247,8 @@ public class XmlWorkflowCuratorServiceImpl
             // decode contacts
             if ("$flowgroup".equals(contact)) {
                 // special literal for current flowgoup
-                ClaimedTask claimedTask = claimedTaskService.findByWorkflowIdAndEPerson(c, wfi, c.getCurrentUser());
+                ClaimedTask claimedTask
+                        = claimedTaskService.findByWorkflowIdAndEPerson(c.getSession(), wfi, c.getCurrentUser());
                 String stepID = claimedTask.getStepID();
                 Step step;
                 try {

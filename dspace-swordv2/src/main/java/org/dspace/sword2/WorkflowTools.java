@@ -51,7 +51,7 @@ public class WorkflowTools {
     public boolean isItemInWorkflow(Context context, Item item)
         throws DSpaceSwordException {
         try {
-            return workflowItemService.findByItem(context, item) != null;
+            return workflowItemService.findByItem(context.getSession(), item) != null;
         } catch (SQLException e) {
             throw new DSpaceSwordException(e);
         }
@@ -71,7 +71,7 @@ public class WorkflowTools {
     public boolean isItemInWorkspace(Context context, Item item)
         throws DSpaceSwordException {
         try {
-            return workspaceItemService.findByItem(context, item) != null;
+            return workspaceItemService.findByItem(context.getSession(), item) != null;
         } catch (SQLException e) {
             throw new DSpaceSwordException(e);
         }
@@ -91,7 +91,7 @@ public class WorkflowTools {
     public WorkflowItem getWorkflowItem(Context context, Item item)
         throws DSpaceSwordException {
         try {
-            return workflowItemService.findByItem(context, item);
+            return workflowItemService.findByItem(context.getSession(), item);
         } catch (SQLException e) {
             throw new DSpaceSwordException(e);
         }
@@ -111,7 +111,7 @@ public class WorkflowTools {
     public WorkspaceItem getWorkspaceItem(Context context, Item item)
         throws DSpaceSwordException {
         try {
-            return workspaceItemService.findByItem(context, item);
+            return workspaceItemService.findByItem(context.getSession(), item);
         } catch (SQLException e) {
             throw new DSpaceSwordException(e);
         }

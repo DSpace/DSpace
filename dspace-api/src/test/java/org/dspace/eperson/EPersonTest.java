@@ -945,7 +945,7 @@ public class EPersonTest extends AbstractUnitTest {
         context.commit();
 
         try {
-            WorkspaceItem restoredWsi = workspaceItemService.find(context, wsi.getID());
+            WorkspaceItem restoredWsi = workspaceItemService.find(context.getSession(), wsi.getID());
             Item restoredItem = itemService.find(context.getSession(), item.getID());
             assertNull("An unsubmited WorkspaceItem wasn't deleted while cascading deleting the submitter.",
                        restoredWsi);
@@ -1001,7 +1001,8 @@ public class EPersonTest extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
 
         // check that the workflow item exists.
-        assertNotNull("Cannot find currently created WorkflowItem!", workflowItemService.find(context, wfiID));
+        assertNotNull("Cannot find currently created WorkflowItem!",
+                workflowItemService.find(context.getSession(), wfiID));
 
         // delete the submitter
         try {
@@ -1023,7 +1024,7 @@ public class EPersonTest extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
 
         // check whether the workflow item still exists.
-        WorkflowItem wfi = workflowItemService.find(context, wfiID);
+        WorkflowItem wfi = workflowItemService.find(context.getSession(), wfiID);
         assertNotNull("Could not load WorkflowItem after cascading deletion of the submitter.", wfi);
         assertNull("Cascading deletion of an EPerson did not set the submitter of an submitted WorkflowItem null.",
                 wfi.getSubmitter());

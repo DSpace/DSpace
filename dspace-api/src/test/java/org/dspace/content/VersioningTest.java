@@ -86,7 +86,7 @@ public class VersioningTest extends AbstractUnitTest {
             originalItem = installItemService.installItem(context, is);
 
             Version version = versionService.createNewVersion(context, originalItem, summary);
-            WorkspaceItem wsi = workspaceItemService.findByItem(context, version.getItem());
+            WorkspaceItem wsi = workspaceItemService.findByItem(context.getSession(), version.getItem());
 
             versionedItem = installItemService.installItem(context, wsi);
             context.restoreAuthSystemState();

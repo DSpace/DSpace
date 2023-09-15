@@ -183,7 +183,7 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
     public RegistrationRest findByToken(@Parameter(value = "token", required = true) String token)
         throws SQLException, AuthorizeException {
         Context context = obtainContext();
-        RegistrationData registrationData = registrationDataService.findByToken(context, token);
+        RegistrationData registrationData = registrationDataService.findByToken(context.getSession(), token);
         if (registrationData == null) {
             throw new ResourceNotFoundException("The token: " + token + " couldn't be found");
         }

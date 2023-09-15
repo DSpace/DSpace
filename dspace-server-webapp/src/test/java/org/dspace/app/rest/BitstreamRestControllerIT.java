@@ -152,7 +152,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                 .withFormat("test format")
                 .build();
 
-        unknownFormat = bitstreamFormatService.findUnknown(context);
+        unknownFormat = bitstreamFormatService.findUnknown(context.getSession());
 
         knownFormat = createBitstreamFormat(context)
                                             .withMimeType("known test mime type")

@@ -42,7 +42,7 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
 
     @Test
     public void findAllRelationshipTypesTest() throws SQLException {
-        assertEquals(12, relationshipTypeService.findAll(context).size());
+        assertEquals(12, relationshipTypeService.findAll(context.getSession()).size());
     }
 
     @Test
@@ -120,13 +120,14 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
     private void checkRelationshipType(String leftType, String rightType, String leftwardType, String rightwardType)
         throws SQLException {
         RelationshipType relationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, leftType),
-                                  entityTypeService.findByEntityType(context, rightType),
-                                  leftwardType, rightwardType);
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), leftType),
+                    entityTypeService.findByEntityType(context.getSession(), rightType),
+                    leftwardType, rightwardType);
         assertNotNull(relationshipType);
-        assertEquals(entityTypeService.findByEntityType(context, leftType),
+        assertEquals(entityTypeService.findByEntityType(context.getSession(), leftType),
                      relationshipType.getLeftType());
-        assertEquals(entityTypeService.findByEntityType(context, rightType),
+        assertEquals(entityTypeService.findByEntityType(context.getSession(), rightType),
                      relationshipType.getRightType());
         assertEquals(leftwardType, relationshipType.getLeftwardType());
         assertEquals(rightwardType, relationshipType.getRightwardType());
@@ -135,7 +136,7 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
     @Test
     public void getAllRelationshipTypesEndpointTest() throws Exception {
         //When we call this facets endpoint
-        List<RelationshipType> relationshipTypes = relationshipTypeService.findAll(context);
+        List<RelationshipType> relationshipTypes = relationshipTypeService.findAll(context.getSession());
 
         getClient().perform(get("/api/core/relationshiptypes").param("projection", "full"))
 
@@ -165,7 +166,7 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
     @Test
     public void entityTypeForPublicationPersonRelationshipTypeTest() throws Exception {
 
-        List<RelationshipType> relationshipTypes = relationshipTypeService.findAll(context);
+        List<RelationshipType> relationshipTypes = relationshipTypeService.findAll(context.getSession());
 
         RelationshipType foundRelationshipType = null;
         for (RelationshipType relationshipType : relationshipTypes) {
@@ -192,8 +193,10 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
     @Test
     public void cardinalityOnAuthorPublicationRelationshipTypesTest() throws Exception {
         RelationshipType relationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
-                                  entityTypeService.findByEntityType(context, "Person"), "isAuthorOfPublication",
+            .findbyTypesAndTypeName(context.getSession(),
+                                  entityTypeService.findByEntityType(context.getSession(), "Publication"),
+                                  entityTypeService.findByEntityType(context.getSession(), "Person"),
+                                  "isAuthorOfPublication",
                                   "isPublicationOfAuthor");
         assertEquals(((Integer) 0), relationshipType.getLeftMinCardinality());
         assertEquals(((Integer) 0), relationshipType.getRightMinCardinality());
@@ -211,7 +214,7 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
     @Test
     public void entityTypeForIssueJournalRelationshipTypeTest() throws Exception {
 
-        List<RelationshipType> relationshipTypes = relationshipTypeService.findAll(context);
+        List<RelationshipType> relationshipTypes = relationshipTypeService.findAll(context.getSession());
 
         RelationshipType foundRelationshipType = null;
         for (RelationshipType relationshipType : relationshipTypes) {
@@ -238,9 +241,9 @@ public class RelationshipTypeRestRepositoryIT extends AbstractEntityIntegrationT
     @Test
     public void cardinalityOnIssueJournalJournalVolumeRelationshipTypesTest() throws Exception {
         RelationshipType relationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "JournalVolume"),
-                                  entityTypeService.findByEntityType(context, "JournalIssue"), "isIssueOfJournalVolume",
-                                  "isJournalVolumeOfIssue");
+            .findbyTypesAndTypeName(context.getSession(), entityTypeService.findByEntityType(context.getSession(), "JournalVolume"),
+                                  entityTypeService.findByEntityType(context.getSession(), "JournalIssue"),
+                                  "isIssueOfJournalVolume", "isJournalVolumeOfIssue");
         assertEquals(((Integer) 0), relationshipType.getLeftMinCardinality());
         assertEquals(((Integer) 1), relationshipType.getRightMinCardinality());
         assertNull(relationshipType.getLeftMaxCardinality());

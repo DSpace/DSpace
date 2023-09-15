@@ -380,7 +380,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                     " on " + DCDate.getCurrent() + " (GMT).");
             b.setDescription(context, formatFilter.getDescription());
             // Set the format of the bitstream
-            BitstreamFormat bf = bitstreamFormatService.findByShortDescription(context,
+            BitstreamFormat bf = bitstreamFormatService.findByShortDescription(context.getSession(),
                     formatFilter.getFormatString());
             bitstreamService.setFormat(context, b, bf);
             bitstreamService.update(context, b);

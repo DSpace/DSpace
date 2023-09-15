@@ -43,6 +43,7 @@ import org.dspace.identifier.service.DOIService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -76,20 +77,14 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     }
 
     @Override
-    public WorkspaceItem find(Context context, int id) throws SQLException {
+    public WorkspaceItem find(Session session, int id) throws SQLException {
         WorkspaceItem workspaceItem
-                = workspaceItemDAO.findByID(context.getSession(), WorkspaceItem.class, id);
+                = workspaceItemDAO.findByID(session, WorkspaceItem.class, id);
 
         if (workspaceItem == null) {
-            if (log.isDebugEnabled()) {
-                log.debug(LogHelper.getHeader(context, "find_workspace_item",
-                                               "not_found,workspace_item_id=" + id));
-            }
+            log.debug("find_workspace_item not_found,workspace_item_id={}", id);
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug(LogHelper.getHeader(context, "find_workspace_item",
-                                               "workspace_item_id=" + id));
-            }
+            log.debug("find_workspace_item workspace_item_id={}", id);
         }
         return workspaceItem;
     }
@@ -224,34 +219,34 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     }
 
     @Override
-    public List<WorkspaceItem> findByEPerson(Context context, EPerson ep) throws SQLException {
-        return workspaceItemDAO.findByEPerson(context.getSession(), ep);
+    public List<WorkspaceItem> findByEPerson(Session session, EPerson ep) throws SQLException {
+        return workspaceItemDAO.findByEPerson(session, ep);
     }
 
     @Override
-    public List<WorkspaceItem> findByEPerson(Context context, EPerson ep, Integer limit, Integer offset)
+    public List<WorkspaceItem> findByEPerson(Session session, EPerson ep, Integer limit, Integer offset)
         throws SQLException {
-        return workspaceItemDAO.findByEPerson(context.getSession(), ep, limit, offset);
+        return workspaceItemDAO.findByEPerson(session, ep, limit, offset);
     }
 
     @Override
-    public List<WorkspaceItem> findByCollection(Context context, Collection collection) throws SQLException {
-        return workspaceItemDAO.findByCollection(context.getSession(), collection);
+    public List<WorkspaceItem> findByCollection(Session session, Collection collection) throws SQLException {
+        return workspaceItemDAO.findByCollection(session, collection);
     }
 
     @Override
-    public WorkspaceItem findByItem(Context context, Item item) throws SQLException {
-        return workspaceItemDAO.findByItem(context.getSession(), item);
+    public WorkspaceItem findByItem(Session session, Item item) throws SQLException {
+        return workspaceItemDAO.findByItem(session, item);
     }
 
     @Override
-    public List<WorkspaceItem> findAll(Context context) throws SQLException {
-        return workspaceItemDAO.findAll(context.getSession());
+    public List<WorkspaceItem> findAll(Session session) throws SQLException {
+        return workspaceItemDAO.findAll(session);
     }
 
     @Override
-    public List<WorkspaceItem> findAll(Context context, Integer limit, Integer offset) throws SQLException {
-        return workspaceItemDAO.findAll(context.getSession(), limit, offset);
+    public List<WorkspaceItem> findAll(Session session, Integer limit, Integer offset) throws SQLException {
+        return workspaceItemDAO.findAll(session, limit, offset);
     }
 
     @Override

@@ -32,7 +32,7 @@ public class EntityTypeLabelRestControllerIT extends AbstractEntityIntegrationTe
     @Test
     public void testGetEntityTypeByLabel_ExistingLabel() throws Exception {
         String testLabel = "Person";
-        EntityType entityType = entityTypeService.findByEntityType(context, testLabel);
+        EntityType entityType = entityTypeService.findByEntityType(context.getSession(), testLabel);
         getClient().perform(get("/api/core/entitytypes/label/" + testLabel))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(entityType.getID())))

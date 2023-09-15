@@ -22,6 +22,7 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.event.Event;
 import org.dspace.supervision.dao.SupervisionOrderDao;
 import org.dspace.supervision.service.SupervisionOrderService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -50,8 +51,8 @@ public class SupervisionOrderServiceImpl implements SupervisionOrderService {
     }
 
     @Override
-    public SupervisionOrder find(Context context, int id) throws SQLException {
-        return supervisionDao.findByID(context.getSession(), SupervisionOrder.class, id);
+    public SupervisionOrder find(Session session, int id) throws SQLException {
+        return supervisionDao.findByID(session, SupervisionOrder.class, id);
     }
 
     @Override

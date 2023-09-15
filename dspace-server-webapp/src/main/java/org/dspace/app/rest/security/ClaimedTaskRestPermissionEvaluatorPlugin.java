@@ -63,7 +63,7 @@ public class ClaimedTaskRestPermissionEvaluatorPlugin extends RestObjectPermissi
                 return false;
             }
             int dsoId = Integer.parseInt(targetId.toString());
-            ClaimedTask claimedTask = claimedTaskService.find(context, dsoId);
+            ClaimedTask claimedTask = claimedTaskService.find(context.getSession(), dsoId);
             // If the claimed task is null then we give permission so we can throw another status code instead
             if (claimedTask == null) {
                 return true;

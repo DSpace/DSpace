@@ -335,7 +335,7 @@ public class MetadataSchemaRestRepositoryIT extends AbstractControllerIntegratio
 
         // Determine number of schemas from database
         int numberOfSchema = ContentServiceFactory.getInstance()
-                                                   .getMetadataSchemaService().findAll(context).size();
+                                                   .getMetadataSchemaService().findAll(context.getSession()).size();
         // If we return 6 schema per page, determine number of pages we expect
         int pageSize = 6;
         int numberOfPages = (int) Math.ceil((double) numberOfSchema / pageSize);

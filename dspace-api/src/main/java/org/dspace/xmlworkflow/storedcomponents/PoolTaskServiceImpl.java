@@ -24,6 +24,7 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.xmlworkflow.storedcomponents.dao.PoolTaskDAO;
 import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -154,8 +155,8 @@ public class PoolTaskServiceImpl implements PoolTaskService {
     }
 
     @Override
-    public PoolTask find(Context context, int id) throws SQLException {
-        return poolTaskDAO.findByID(context.getSession(), PoolTask.class, id);
+    public PoolTask find(Session session, int id) throws SQLException {
+        return poolTaskDAO.findByID(session, PoolTask.class, id);
     }
 
     @Override

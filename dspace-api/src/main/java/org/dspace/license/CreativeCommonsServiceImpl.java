@@ -49,7 +49,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
     /**
      * log4j category
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(CreativeCommonsServiceImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     /**
      * The Bundle Name
@@ -134,7 +134,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
             throws SQLException, AuthorizeException, IOException {
         List<Bundle> bundles = itemService.getBundles(item, CC_BUNDLE_NAME);
 
-        if ((bundles.size() > 0) && (bundles.get(0) != null)) {
+        if ((!bundles.isEmpty()) && (bundles.get(0) != null)) {
             itemService.removeBundle(context, item, bundles.get(0));
         }
         return bundleService.create(context, item, CC_BUNDLE_NAME);
@@ -146,7 +146,8 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
             AuthorizeException {
         Bundle bundle = getCcBundle(context, item);
         // set the format
-        BitstreamFormat bs_rdf_format = bitstreamFormatService.findByShortDescription(context, "RDF XML");
+        BitstreamFormat bs_rdf_format
+                = bitstreamFormatService.findByShortDescription(context.getSession(), "RDF XML");
         // set the RDF bitstream
         setBitstreamFromBytes(context, item, bundle, BSN_LICENSE_RDF, bs_rdf_format, licenseRdf.getBytes());
     }
@@ -161,11 +162,11 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
         // set the format
         BitstreamFormat bs_format;
         if (mimeType.equalsIgnoreCase("text/xml")) {
-            bs_format = bitstreamFormatService.findByShortDescription(context, "CC License");
+            bs_format = bitstreamFormatService.findByShortDescription(context.getSession(), "CC License");
         } else if (mimeType.equalsIgnoreCase("text/rdf")) {
-            bs_format = bitstreamFormatService.findByShortDescription(context, "RDF XML");
+            bs_format = bitstreamFormatService.findByShortDescription(context.getSession(), "RDF XML");
         } else {
-            bs_format = bitstreamFormatService.findByShortDescription(context, "License");
+            bs_format = bitstreamFormatService.findByShortDescription(context.getSession(), "License");
         }
 
         Bitstream bs = bitstreamService.create(context, bundle, licenseStm);
@@ -194,7 +195,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
         // remove CC license bundle if one exists
         List<Bundle> bundles = itemService.getBundles(item, CC_BUNDLE_NAME);
 
-        if ((bundles.size() > 0) && (bundles.get(0) != null)) {
+        if ((!bundles.isEmpty()) && (bundles.get(0) != null)) {
             itemService.removeBundle(context, item, bundles.get(0));
         }
     }
@@ -355,7 +356,7 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
         try {
             List<Bundle> bundles = itemService.getBundles(item, CC_BUNDLE_NAME);
 
-            if ((bundles != null) && (bundles.size() > 0)) {
+            if ((bundles != null) && (!bundles.isEmpty())) {
                 cc_bundle = bundles.get(0);
             } else {
                 return null;

@@ -200,7 +200,7 @@ public class PackageUtils {
         //Create the License bitstream
         Bitstream lbs = bitstreamService.create(context, lb, lis);
         lis.close();
-        BitstreamFormat bf = bitstreamFormatService.findByShortDescription(context, "License");
+        BitstreamFormat bf = bitstreamFormatService.findByShortDescription(context.getSession(), "License");
         if (bf == null) {
             bf = bitstreamFormatService.guessFormat(context, lbs);
         }
@@ -373,7 +373,7 @@ public class PackageUtils {
                                                               String shortDesc, String MIMEType, String desc,
                                                               int supportLevel, boolean internal)
         throws SQLException, AuthorizeException {
-        BitstreamFormat bsf = bitstreamFormatService.findByShortDescription(context,
+        BitstreamFormat bsf = bitstreamFormatService.findByShortDescription(context.getSession(),
                                                                             shortDesc);
         // not found, try to create one
         if (bsf == null) {
@@ -402,7 +402,7 @@ public class PackageUtils {
         throws SQLException, IOException, AuthorizeException {
         // get license format ID
         int licenseFormatId = -1;
-        BitstreamFormat bf = bitstreamFormatService.findByShortDescription(context,
+        BitstreamFormat bf = bitstreamFormatService.findByShortDescription(context.getSession(),
                                                                            "License");
         if (bf != null) {
             licenseFormatId = bf.getID();

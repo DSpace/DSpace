@@ -170,11 +170,11 @@ public class RegistryLoader {
         String[] extensions = getRepeatedElementData(node, "extension");
 
         // Check if this format already exists in our registry (by mime type)
-        BitstreamFormat exists = bitstreamFormatService.findByMIMEType(context, mimeType);
+        BitstreamFormat exists = bitstreamFormatService.findByMIMEType(context.getSession(), mimeType);
 
         // If not found by mimeType, check by short description (since this must also be unique)
         if (exists == null) {
-            exists = bitstreamFormatService.findByShortDescription(context, shortDesc);
+            exists = bitstreamFormatService.findByShortDescription(context.getSession(), shortDesc);
         }
 
         // If it doesn't exist, create it..otherwise skip it.

@@ -36,7 +36,8 @@ public class WorkspaceItemIndexFactoryImpl
 
     @Override
     public Iterator<IndexableWorkspaceItem> findAll(Context context) throws SQLException {
-        final Iterator<WorkspaceItem> workspaceItems = workspaceItemService.findAll(context).iterator();
+        final Iterator<WorkspaceItem> workspaceItems
+                = workspaceItemService.findAll(context.getSession()).iterator();
 
         return new Iterator<IndexableWorkspaceItem>() {
             @Override
@@ -85,7 +86,7 @@ public class WorkspaceItemIndexFactoryImpl
 
     @Override
     public Optional<IndexableWorkspaceItem> findIndexableObject(Context context, String id) throws SQLException {
-        final WorkspaceItem workspaceItem = workspaceItemService.find(context, Integer.parseInt(id));
+        final WorkspaceItem workspaceItem = workspaceItemService.find(context.getSession(), Integer.parseInt(id));
         return workspaceItem == null ? Optional.empty() : Optional.of(new IndexableWorkspaceItem(workspaceItem));
     }
 }

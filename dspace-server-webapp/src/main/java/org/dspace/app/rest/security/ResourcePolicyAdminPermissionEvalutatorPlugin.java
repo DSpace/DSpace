@@ -65,7 +65,7 @@ public class ResourcePolicyAdminPermissionEvalutatorPlugin extends RestObjectPer
 
         try {
             int resourcePolicyID = Integer.parseInt(targetId.toString());
-            ResourcePolicy resourcePolicy =  resourcePolicyService.find(context, resourcePolicyID);
+            ResourcePolicy resourcePolicy =  resourcePolicyService.find(context.getSession(), resourcePolicyID);
             if (resourcePolicy == null) {
                 throw new ResourceNotFoundException(
                         ResourcePolicyRest.CATEGORY + "." + ResourcePolicyRest.NAME +

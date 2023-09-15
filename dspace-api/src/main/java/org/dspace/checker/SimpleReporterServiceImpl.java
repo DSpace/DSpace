@@ -65,7 +65,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService {
                                          OutputStreamWriter osw) throws IOException, SQLException {
         // get all the bitstreams marked deleted for today
         List<MostRecentChecksum> recentChecksums = mostRecentChecksumService
-            .findBitstreamResultTypeReport(context, startDate,
+            .findBitstreamResultTypeReport(context.getSession(), startDate,
                                            endDate, ChecksumResultCode.BITSTREAM_MARKED_DELETED);
 
         osw.write("\n");
@@ -105,7 +105,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService {
                                         OutputStreamWriter osw) throws IOException, SQLException {
         // get all the bitstreams marked deleted for today
         List<MostRecentChecksum> history =
-            mostRecentChecksumService.findBitstreamResultTypeReport(context, startDate, endDate,
+            mostRecentChecksumService.findBitstreamResultTypeReport(context.getSession(), startDate, endDate,
                                                                     ChecksumResultCode.CHECKSUM_NO_MATCH);
 
         osw.write("\n");
@@ -147,7 +147,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService {
                                           OutputStreamWriter osw) throws IOException, SQLException {
         // get all the bitstreams marked deleted for today
         List<MostRecentChecksum> history =
-            mostRecentChecksumService.findBitstreamResultTypeReport(context, startDate, endDate,
+            mostRecentChecksumService.findBitstreamResultTypeReport(context.getSession(), startDate, endDate,
                                                                     ChecksumResultCode.BITSTREAM_NOT_FOUND);
 
         osw.write("\n");
@@ -189,7 +189,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService {
                                          OutputStreamWriter osw) throws IOException, SQLException {
         // get all the bitstreams marked deleted for today
         List<MostRecentChecksum> mostRecentChecksums = mostRecentChecksumService
-            .findNotProcessedBitstreamsReport(context, startDate,
+            .findNotProcessedBitstreamsReport(context.getSession(), startDate,
                                               endDate);
 
         osw.write("\n");

@@ -82,8 +82,8 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
     }
 
     @Override
-    public MetadataSchema findByNamespace(Context context, String namespace) throws SQLException {
-        return metadataSchemaDAO.findByNamespace(context.getSession(), namespace);
+    public MetadataSchema findByNamespace(Session session, String namespace) throws SQLException {
+        return metadataSchemaDAO.findByNamespace(session, namespace);
     }
 
     @Override
@@ -131,8 +131,8 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
     }
 
     @Override
-    public List<MetadataSchema> findAll(Context context) throws SQLException {
-        return metadataSchemaDAO.findAll(context.getSession(), MetadataSchema.class);
+    public List<MetadataSchema> findAll(Session session) throws SQLException {
+        return metadataSchemaDAO.findAll(session, MetadataSchema.class);
     }
 
     @Override

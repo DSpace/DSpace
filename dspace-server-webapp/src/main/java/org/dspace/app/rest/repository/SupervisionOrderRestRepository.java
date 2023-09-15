@@ -77,7 +77,7 @@ public class SupervisionOrderRestRepository extends DSpaceRestRepository<Supervi
     @Override
     public SupervisionOrderRest findOne(Context context, Integer id) {
         try {
-            SupervisionOrder supervisionOrder = supervisionOrderService.find(context, id);
+            SupervisionOrder supervisionOrder = supervisionOrderService.find(context.getSession(), id);
             if (Objects.isNull(supervisionOrder)) {
                 throw new ResourceNotFoundException("Couldn't find supervision order for id: " + id);
             }
@@ -141,7 +141,7 @@ public class SupervisionOrderRestRepository extends DSpaceRestRepository<Supervi
         throws AuthorizeException, RepositoryMethodNotImplementedException {
 
         try {
-            SupervisionOrder supervisionOrder = supervisionOrderService.find(context, id);
+            SupervisionOrder supervisionOrder = supervisionOrderService.find(context.getSession(), id);
             if (Objects.isNull(supervisionOrder)) {
                 throw new ResourceNotFoundException(
                     SupervisionOrderRest.CATEGORY + "." + SupervisionOrderRest.NAME +

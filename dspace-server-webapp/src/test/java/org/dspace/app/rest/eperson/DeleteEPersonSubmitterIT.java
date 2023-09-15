@@ -249,7 +249,7 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
         //TODO: Replace this with a REST call when possible
         Version version1 = versioningService.createNewVersion(context, item);
         Integer version1ID = version1.getID();
-        WorkspaceItem version1WorkspaceItem = workspaceItemService.findByItem(context, version1.getItem());
+        WorkspaceItem version1WorkspaceItem = workspaceItemService.findByItem(context.getSession(), version1.getItem());
         installItemService.installItem(context, version1WorkspaceItem);
 
         assertDeletionOfEperson(submitter);
@@ -263,7 +263,7 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
 
         Version version2 = versioningService.createNewVersion(context, item);
         Integer version2ID = version2.getID();
-        WorkspaceItem version2WorkspaceItem = workspaceItemService.findByItem(context, version2.getItem());
+        WorkspaceItem version2WorkspaceItem = workspaceItemService.findByItem(context.getSession(), version2.getItem());
         installItemService.installItem(context, version2WorkspaceItem);
         Item version2Item = retrieveVersionItem(version2ID);
         assertEquals(submitterForVersion1.getID(), retrieveItemSubmitter(version2Item.getID()).getID());

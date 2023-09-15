@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.dspace.checker.ChecksumResult;
 import org.dspace.checker.ChecksumResultCode;
-import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the ChecksumResult object.
@@ -23,7 +23,7 @@ import org.dspace.core.Context;
  */
 public interface ChecksumResultService {
 
-    public ChecksumResult findByCode(Context context, ChecksumResultCode code) throws SQLException;
+    public ChecksumResult findByCode(Session session, ChecksumResultCode code) throws SQLException;
 
-    public List<ChecksumResult> findAll(Context context) throws SQLException;
+    public List<ChecksumResult> findAll(Session session) throws SQLException;
 }

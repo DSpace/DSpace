@@ -46,7 +46,7 @@ public class WorkflowItemIndexFactoryImpl
 
     @Override
     public Iterator<IndexableWorkflowItem> findAll(Context context) throws SQLException {
-        final Iterator<XmlWorkflowItem> workflowItems = workflowItemService.findAll(context).iterator();
+        final Iterator<XmlWorkflowItem> workflowItems = workflowItemService.findAll(context.getSession()).iterator();
 
         return new Iterator<IndexableWorkflowItem>() {
             @Override
@@ -99,7 +99,7 @@ public class WorkflowItemIndexFactoryImpl
             results.add(new IndexablePoolTask(poolTask));
         }
 
-        List<ClaimedTask> claimedTasks = claimedTaskService.find(context, object);
+        List<ClaimedTask> claimedTasks = claimedTaskService.find(context.getSession(), object);
         for (ClaimedTask claimedTask : claimedTasks) {
             results.add(new IndexableClaimedTask(claimedTask));
         }
@@ -109,7 +109,7 @@ public class WorkflowItemIndexFactoryImpl
 
     @Override
     public Optional<IndexableWorkflowItem> findIndexableObject(Context context, String id) throws SQLException {
-        final XmlWorkflowItem xmlWorkflowItem = workflowItemService.find(context, Integer.parseInt(id));
+        final XmlWorkflowItem xmlWorkflowItem = workflowItemService.find(context.getSession(), Integer.parseInt(id));
         return xmlWorkflowItem == null ? Optional.empty() : Optional.of(new IndexableWorkflowItem(xmlWorkflowItem));
     }
 }

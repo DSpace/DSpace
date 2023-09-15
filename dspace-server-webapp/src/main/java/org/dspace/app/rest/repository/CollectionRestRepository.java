@@ -241,7 +241,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
           throws SearchServiceException {
         try {
             Context context = obtainContext();
-            EntityType entityType = this.entityTypeService.findByEntityType(context, entityTypeLabel);
+            EntityType entityType = this.entityTypeService.findByEntityType(context.getSession(), entityTypeLabel);
             if (entityType == null) {
                 throw new ResourceNotFoundException("There was no entityType found with label: " + entityTypeLabel);
             }
@@ -273,7 +273,7 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
            Pageable pageable) {
         try {
             Context context = obtainContext();
-            EntityType entityType = entityTypeService.findByEntityType(context, entityTypeLabel);
+            EntityType entityType = entityTypeService.findByEntityType(context.getSession(), entityTypeLabel);
             if (Objects.isNull(entityType)) {
                 throw new ResourceNotFoundException("There was no entityType found with label: " + entityTypeLabel);
             }

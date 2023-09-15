@@ -33,7 +33,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * This class is used to verify the behavior of the {@link org.dspace.app.util.InitializeEntities} script
+ * This class is used to verify the behavior of the {@link org.dspace.app.util.InitializeEntities} script.
  * It will take the relationship-types.xml as initial input and check if all the objects that created properly.
  * It will then also update and verify these objects by using a second XML to verify the update behaviour
  * of this script.
@@ -71,8 +71,8 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
     public void destroy() throws Exception {
         //Clean up the database for the next test
         context.turnOffAuthorisationSystem();
-        List<RelationshipType> relationshipTypeList = relationshipTypeService.findAll(context);
-        List<EntityType> entityTypeList = entityTypeService.findAll(context);
+        List<RelationshipType> relationshipTypeList = relationshipTypeService.findAll(context.getSession());
+        List<EntityType> entityTypeList = entityTypeService.findAll(context.getSession());
         List<Relationship> relationships = relationshipService.findAll(context.getSession());
 
         for (Relationship relationship : relationships) {
@@ -99,7 +99,7 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
      */
     @Test
     public void getAllRelationshipTypesTest() throws Exception {
-        List<RelationshipType> relationshipTypes = relationshipTypeService.findAll(context);
+        List<RelationshipType> relationshipTypes = relationshipTypeService.findAll(context.getSession());
 
         getClient().perform(get("/api/core/relationshiptypes")
                 .param("projection", "full"))
@@ -135,7 +135,7 @@ public class InitializeEntitiesIT extends AbstractControllerIntegrationTest {
      */
     @Test
     public void updateRelationshipTypesTest() throws Exception {
-        List<RelationshipType> relationshipTypes = relationshipTypeService.findAll(context);
+        List<RelationshipType> relationshipTypes = relationshipTypeService.findAll(context.getSession());
 
         //Update the relationships using a different test XML with the initialize-entities script
         String pathToFile = configurationService.getProperty("dspace.dir") +

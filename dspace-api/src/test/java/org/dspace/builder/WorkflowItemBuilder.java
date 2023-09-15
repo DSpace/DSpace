@@ -104,7 +104,7 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
         if (dso != null) {
             // if we still have a reference to an item it could be an approved workflow or a rejected one. In the
             // last case we need to remove the "new" workspaceitem
-            WorkspaceItem wi = workspaceItemService.findByItem(c, item);
+            WorkspaceItem wi = workspaceItemService.findByItem(c.getSession(), item);
             if (wi != null) {
                 workspaceItemService.deleteAll(c, wi);
             } else {
@@ -267,7 +267,7 @@ public class WorkflowItemBuilder extends AbstractBuilder<XmlWorkflowItem, XmlWor
             throws SQLException, IOException, SearchServiceException {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
-            XmlWorkflowItem wi = workflowItemService.find(c, id);
+            XmlWorkflowItem wi = workflowItemService.find(c.getSession(), id);
             if (wi != null) {
                 try {
                     workflowItemService.delete(c, wi);

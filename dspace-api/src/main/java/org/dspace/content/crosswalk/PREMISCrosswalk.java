@@ -165,7 +165,7 @@ public class PREMISCrosswalk
                 // get it from that, otherwise try to divine from file extension
                 // (guessFormat() looks at bitstream Name, which we just set)
                 BitstreamFormat bf = (MIMEType == null) ? null :
-                    bitstreamFormatService.findByMIMEType(context, MIMEType);
+                    bitstreamFormatService.findByMIMEType(context.getSession(), MIMEType);
                 if (bf == null) {
                     bf = bitstreamFormatService.guessFormat(context, bitstream);
                 }
@@ -227,9 +227,9 @@ public class PREMISCrosswalk
         String handle = null;
         // get handle of parent Item of this bitstream, if there is one:
         List<Bundle> bn = bitstream.getBundles();
-        if (bn.size() > 0) {
+        if (!bn.isEmpty()) {
             List<Item> bi = bn.get(0).getItems();
-            if (bi.size() > 0) {
+            if (!bi.isEmpty()) {
                 handle = bi.get(0).getHandle();
             }
         }
@@ -237,7 +237,7 @@ public class PREMISCrosswalk
         String bsName = bitstream.getName();
         if (bsName == null) {
             List<String> ext = bitstream.getFormat(context).getExtensions();
-            bsName = "bitstream_" + sid + (ext.size() > 0 ? ext.get(0) : "");
+            bsName = "bitstream_" + sid + (!ext.isEmpty() ? ext.get(0) : "");
         }
         if (handle != null && baseUrl != null) {
             oiv.setText(baseUrl

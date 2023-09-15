@@ -120,8 +120,8 @@ public class RDFConsumer implements Consumer {
             for (Bundle b : bundles) {
                 List<Item> items = b.getItems();
                 for (Item i : items) {
-                    if (workspaceItemService.findByItem(ctx, i) != null
-                        || workflowItemService.findByItem(ctx, i) != null) {
+                    if (workspaceItemService.findByItem(ctx.getSession(), i) != null
+                        || workflowItemService.findByItem(ctx.getSession(), i) != null) {
                         log.debug(
                             "Ignoring Item " + i.getID() + " as a corresponding workspace or workflow item exists.");
                         continue;
@@ -165,8 +165,8 @@ public class RDFConsumer implements Consumer {
             }
             List<Item> items = bundle.getItems();
             for (Item i : items) {
-                if (workspaceItemService.findByItem(ctx, i) != null
-                    || workflowItemService.findByItem(ctx, i) != null) {
+                if (workspaceItemService.findByItem(ctx.getSession(), i) != null
+                    || workflowItemService.findByItem(ctx.getSession(), i) != null) {
                     log.debug("Ignoring Item " + i.getID() + " as a corresponding workspace or workflow item exists.");
                     continue;
                 }
@@ -232,8 +232,8 @@ public class RDFConsumer implements Consumer {
             // has an workspace item. The item flag "in_archive" doesn't help us
             // here as this is also set to false if a newer version was submitted.
             if (dso instanceof Item) {
-                if (workspaceItemService.findByItem(ctx, (Item) dso) != null
-                    || workflowItemService.findByItem(ctx, (Item) dso) != null) {
+                if (workspaceItemService.findByItem(ctx.getSession(), (Item) dso) != null
+                    || workflowItemService.findByItem(ctx.getSession(), (Item) dso) != null) {
                     log.debug(
                         "Ignoring Item " + dso.getID() + " as a corresponding workspace or workflow item exists.");
                     return;

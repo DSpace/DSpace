@@ -15,6 +15,7 @@ import org.dspace.content.EntityType;
 import org.dspace.content.RelationshipType;
 import org.dspace.core.Context;
 import org.dspace.service.DSpaceCRUDService;
+import org.hibernate.Session;
 
 /**
  * This Service uses DAOs to access information on the database objects for the RelationshipTypes
@@ -33,7 +34,7 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
 
     /**
      * Retrieves a RelationshipType for which the given parameters all match the one in the returned RelationshipType
-     * @param context       The relevant DSpace context
+     * @param session       The current request's database context.
      * @param leftType      The rightType EntityType that needs to match for the returned RelationshipType
      * @param rightType     The rightType EntityType that needs to match for the returned RelationshipType
      * @param leftwardType     The leftwardType String that needs to match for the returned RelationshipType
@@ -41,82 +42,82 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
      * @return
      * @throws SQLException If something goes wrong
      */
-    RelationshipType findbyTypesAndTypeName(Context context, EntityType leftType, EntityType rightType,
+    RelationshipType findbyTypesAndTypeName(Session session, EntityType leftType, EntityType rightType,
                                           String leftwardType, String rightwardType)
                                             throws SQLException;
 
     /**
      * Retrieves all RelationshipType objects currently in the system
-     * @param context   The relevant DSpace context
+     * @param session   The current request's database context.
      * @return          The list of all RelationshipType objects currently in the system
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> findAll(Context context) throws SQLException;
+    List<RelationshipType> findAll(Session session) throws SQLException;
 
     /**
      * Retrieves all RelationshipType objects currently in the system
-     * @param context   The relevant DSpace context
+     * @param session   The current request's database context.
      * @param limit     paging limit
      * @param offset    paging offset
      * @return          The list of all RelationshipType objects currently in the system
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> findAll(Context context, Integer limit, Integer offset) throws SQLException;
+    List<RelationshipType> findAll(Session session, Integer limit, Integer offset) throws SQLException;
 
     /**
      * Retrieves all RelationshipType objects that have a left or right type that is
-     * equal to the given String
-     * @param context   The relevant DSpace context
-     * @param typeName     The label that has to match
+     * equal to the given String.
+     * @param session   The current request's database context.
+     * @param typeName  The label that has to match
      * @return          The list of all RelationshipType objects that have a left or right label
-     *                  that is equal to the given label param
+     *                  that is equal to the given label parameter
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String typeName) throws SQLException;
+    List<RelationshipType> findByLeftwardOrRightwardTypeName(Session session, String typeName) throws SQLException;
 
     /**
      * Retrieves all RelationshipType objects that have a left or right label that is
-     * equal to the given String
-     * @param context   The relevant DSpace context
+     * equal to the given String.
+     * @param session   The current request's database context.
      * @param typeName  The typeName that has to match
      * @param limit     paging limit
      * @param offset    paging offset
      * @return          The list of all RelationshipType objects that have a left or right label
-     *                  that is equal to the given label param
+     *                  that is equal to the given label parameter
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String typeName, Integer limit,
+    List<RelationshipType> findByLeftwardOrRightwardTypeName(Session session, String typeName, Integer limit,
                                                              Integer offset)
             throws SQLException;
 
     /**
      * Returns a list of RelationshipType objects for which the given EntityType is equal to either the leftType
      * or the rightType
-     * @param context       The relevant DSpace context
+     * @param session       The current request's database context.
      * @param entityType    The EntityType object used to check the leftType and rightType properties
      * @return  A list of RelationshipType objects for which the leftType or rightType property are equal to the
      *          given EntityType object
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> findByEntityType(Context context, EntityType entityType) throws SQLException;
+    List<RelationshipType> findByEntityType(Session session, EntityType entityType) throws SQLException;
 
     /**
      * Returns a list of relationship types that matches provided EntityType object on any side of relationship
-     * 
-     * @param context            The relevant DSpace context
+     *
+     * @param session            The current request's database context.
      * @param entityType         The EntityType object that will be used to check on
      * @param limit              Paging limit
      * @param offset             Paging offset
      * @return
      * @throws SQLException      If database error
      */
-    List<RelationshipType> findByEntityType(Context context, EntityType entityType, Integer limit, Integer offset)
+    List<RelationshipType> findByEntityType(Session session, EntityType entityType, Integer limit, Integer offset)
             throws SQLException;
 
     /**
      * Count all RelationshipType objects for which the given EntityType
      * is equal to either the leftType or the rightType
-     * 
+     *
      * @param context        DSpace context object
      * @param entityType     The EntityType object used to check the leftType and rightType properties
      * @return               Total RelationshipType objects
@@ -127,7 +128,7 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
     /**
      * This method will return a list of RelationshipType objects for which the given EntityType object is equal
      * to the leftType or rightType
-     * @param context       The relevant DSpace context
+     * @param session       The current request's database context.
      * @param entityType    The EntityType object that will be used to check on
      * @param isLeft        Boolean value used to filter by left_type or right_type. If true left_type results only
      *                      else right_type results.
@@ -135,14 +136,14 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
      *          as either a leftType or rightType
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> findByEntityType(Context context, EntityType entityType, boolean isLeft)
+    List<RelationshipType> findByEntityType(Session session, EntityType entityType, boolean isLeft)
             throws SQLException;
 
 
     /**
      * This method will return a list of RelationshipType objects for which the given EntityType object is equal
      * to the leftType or rightType
-     * @param context       The relevant DSpace context
+     * @param session       The current request's database context.
      * @param entityType    The EntityType object that will be used to check on
      * @param isLeft        Boolean value used to filter by left_type or right_type. If true left_type results only
      *                      else right_type results.
@@ -152,7 +153,7 @@ public interface RelationshipTypeService extends DSpaceCRUDService<RelationshipT
      *          as either a leftType or rightType
      * @throws SQLException If something goes wrong
      */
-    List<RelationshipType> findByEntityType(Context context, EntityType entityType, boolean isLeft,
+    List<RelationshipType> findByEntityType(Session session, EntityType entityType, boolean isLeft,
                                             Integer limit, Integer offset)
             throws SQLException;
 

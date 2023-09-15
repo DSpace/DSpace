@@ -18,6 +18,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.service.DSpaceCRUDService;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the ResourcePolicy object.
@@ -28,28 +29,27 @@ import org.dspace.service.DSpaceCRUDService;
  */
 public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy> {
 
+    public List<ResourcePolicy> find(Session s, DSpaceObject o) throws SQLException;
 
-    public List<ResourcePolicy> find(Context c, DSpaceObject o) throws SQLException;
+    public List<ResourcePolicy> find(Session s, DSpaceObject o, String type) throws SQLException;
 
-    public List<ResourcePolicy> find(Context c, DSpaceObject o, String type) throws SQLException;
+    public List<ResourcePolicy> find(Session s, DSpaceObject o, int actionId) throws SQLException;
 
-    public List<ResourcePolicy> find(Context c, DSpaceObject o, int actionId) throws SQLException;
+    public List<ResourcePolicy> find(Session s, DSpaceObject dso, Group group, int action) throws SQLException;
 
-    public List<ResourcePolicy> find(Context c, DSpaceObject dso, Group group, int action) throws SQLException;
-
-    public List<ResourcePolicy> find(Context context, Group group) throws SQLException;
+    public List<ResourcePolicy> find(Session session, Group group) throws SQLException;
 
     /**
      * Retrieve a list of ResourcePolicies by EPerson
      *
-     * @param c         context
+     * @param s         current request's database context.
      * @param ePerson   the EPerson for which to look up the resource policies
      * @return a list of ResourcePolicies for the provided EPerson
      * @throws SQLException if there's a database problem
      */
-    public List<ResourcePolicy> find(Context c, EPerson ePerson) throws SQLException;
+    public List<ResourcePolicy> find(Session s, EPerson ePerson) throws SQLException;
 
-    public List<ResourcePolicy> find(Context c, EPerson e, List<Group> groups, int action, int type_id)
+    public List<ResourcePolicy> find(Session s, EPerson e, List<Group> groups, int action, int type_id)
         throws SQLException;
 
     /**
@@ -57,7 +57,7 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
      * IDs with a specific PolicyID. This method can be used to detect duplicate
      * ResourcePolicies.
      *
-     * @param context current DSpace session.
+     * @param session current request's database context.
      * @param dso find policies for this object.
      * @param group find policies referring to this group.
      * @param action find policies for this action.
@@ -67,7 +67,7 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
      *         action but other policyID.
      * @throws SQLException passed through.
      */
-    public List<ResourcePolicy> findByTypeGroupActionExceptId(Context context, DSpaceObject dso, Group group,
+    public List<ResourcePolicy> findByTypeGroupActionExceptId(Session session, DSpaceObject dso, Group group,
                                                               int action, int notPolicyID)
         throws SQLException;
 
@@ -120,32 +120,32 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
     /**
      * Return a list of policies for an object that match the action except the record labeled with the rpType
      *
-     * @param c        context
+     * @param s        current request's database context.
      * @param o        DSpaceObject policies relate to
      * @param actionID action (defined in class Constants)
      * @param rpType   the resource policy type
      * @return list of resource policies
      * @throws SQLException if there's a database problem
      */
-    public List<ResourcePolicy> findExceptRpType(Context c, DSpaceObject o, int actionID, String rpType)
+    public List<ResourcePolicy> findExceptRpType(Session s, DSpaceObject o, int actionID, String rpType)
             throws SQLException;
 
     /**
      * Return a paginated list of policies that belong to an EPerson
-     * 
-     * @param context       DSpace context object
+     *
+     * @param session       current request's database context.
      * @param ePerson       ePerson whose policies want to find
      * @param offset        the position of the first result to return
      * @param limit         paging limit
      * @return some of the policies referring to {@code ePerson}.
      * @throws SQLException if database error
      */
-    public List<ResourcePolicy> findByEPerson(Context context, EPerson ePerson, int offset, int limit)
+    public List<ResourcePolicy> findByEPerson(Session session, EPerson ePerson, int offset, int limit)
         throws SQLException;
 
     /**
      * Count all the resource policies of the ePerson
-     * 
+     *
      * @param context        DSpace context object
      * @param ePerson        ePerson whose policies want to count
      * @return               total resource policies of the ePerson
@@ -155,8 +155,8 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
 
     /**
      * Return a paginated list of policies related to a resourceUuid belong to an ePerson
-     * 
-     * @param context        DSpace context object
+     *
+     * @param session        current request's database context.
      * @param ePerson        ePerson whose policies want to find
      * @param resourceUuid   the uuid of an DSpace resource
      * @param offset         the position of the first result to return
@@ -164,12 +164,12 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
      * @return               list of resource policies
      * @throws SQLException  if database error
      */
-    public List<ResourcePolicy> findByEPersonAndResourceUuid(Context context, EPerson ePerson, UUID resourceUuid,
+    public List<ResourcePolicy> findByEPersonAndResourceUuid(Session session, EPerson ePerson, UUID resourceUuid,
         int offset, int limit) throws SQLException;
 
     /**
      * Count all the policies related to a resourceUuid belong to an ePerson
-     * 
+     *
      * @param context        DSpace context object
      * @param resourceUuid   the uuid of an DSpace resource
      * @param ePerson        ePerson whose policies want to find
@@ -181,8 +181,8 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
 
     /**
      * Return a paginated list of policies related to a DSpace resource filter by actionId
-     * 
-     * @param context        DSpace context object
+     *
+     * @param session        current request's database context.
      * @param resourceUuid   the uuid of an DSpace resource
      * @param actionId       id relative to action as READ, WRITE, DELITE etc.
      * @param offset         the position of the first result to return
@@ -190,12 +190,12 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
      * @return               list of resource policies
      * @throws SQLException  if database error
      */
-    public List<ResourcePolicy> findByResouceUuidAndActionId(Context context, UUID resourceUuid, int actionId,
+    public List<ResourcePolicy> findByResouceUuidAndActionId(Session session, UUID resourceUuid, int actionId,
         int offset, int limit) throws SQLException;
 
     /**
      * Count all the policies related to a resourceUuid and actionId
-     * 
+     *
      * @param context        DSpace context object
      * @param resourceUuid   the uuid of an DSpace resource
      * @param actionId       id relative to action as READ, WRITE, DELITE etc.
@@ -206,20 +206,20 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
 
     /**
      * Return a paginated list of policies related to a DSpace resource
-     * 
-     * @param context        DSpace context object
+     *
+     * @param session        current request's database context.
      * @param resourceUuid   the uuid of an DSpace resource
      * @param offset         the position of the first result to return
      * @param limit          paging limit
      * @return               list of resource policies
      * @throws SQLException  if database error
      */
-    public List<ResourcePolicy> findByResouceUuid(Context context, UUID resourceUuid, int offset, int limit)
+    public List<ResourcePolicy> findByResouceUuid(Session session, UUID resourceUuid, int offset, int limit)
         throws SQLException;
 
     /**
      * Count all the policies by resourceUuid
-     * 
+     *
      * @param context        DSpace context object
      * @param resourceUuid   the uuid of an DSpace resource
      * @return               total policies
@@ -229,19 +229,19 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
 
     /**
      * Return a paginated list of policies related to a group
-     * 
-     * @param context        DSpace context object
+     *
+     * @param session        current request's database context.
      * @param group          DSpace group
      * @param offset         the position of the first result to return
      * @param limit          paging limit
      * @return               list of resource policies
      * @throws SQLException  if database error
      */
-    public List<ResourcePolicy> findByGroup(Context context, Group group, int offset, int limit) throws SQLException;
+    public List<ResourcePolicy> findByGroup(Session session, Group group, int offset, int limit) throws SQLException;
 
     /**
      * Count all the resource policies of the group
-     * 
+     *
      * @param context        DSpace context object
      * @param group          DSpace group
      * @return               total policies
@@ -251,8 +251,8 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
 
     /**
      * Return a paginated list of policies related to a group and related to a resourceUuid
-     * 
-     * @param context        DSpace context object
+     *
+     * @param session        current request's database context.
      * @param group          DSpace group
      * @param resourceUuid   the uuid of an DSpace resource
      * @param offset         the position of the first result to return
@@ -260,12 +260,12 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
      * @return               list of resource policies
      * @throws SQLException  if database error
      */
-    public List<ResourcePolicy> findByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid,
+    public List<ResourcePolicy> findByGroupAndResourceUuid(Session session, Group group, UUID resourceUuid,
         int offset, int limit) throws SQLException;
 
     /**
      * Count all the resource policies of the group and of the resourceUuid
-     * 
+     *
      * @param context        DSpace context object
      * @param group          DSpace group
      * @param resourceUuid   the uuid of an DSpace resource
@@ -276,7 +276,7 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
 
     /**
      * Check if the resource policy identified with (id) belong to ePerson
-     * 
+     *
      * @param context           DSpace context object
      * @param eperson           ePerson
      * @param id                id of resource policy

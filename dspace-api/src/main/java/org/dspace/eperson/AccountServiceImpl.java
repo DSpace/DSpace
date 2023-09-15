@@ -157,7 +157,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public String getEmail(Context context, String token)
         throws SQLException {
-        RegistrationData registrationData = registrationDataService.findByToken(context, token);
+        RegistrationData registrationData = registrationDataService.findByToken(context.getSession(), token);
 
         if (registrationData == null) {
             return null;
@@ -209,7 +209,7 @@ public class AccountServiceImpl implements AccountService {
                                         boolean isRegister, boolean send) throws SQLException, IOException,
         MessagingException, AuthorizeException {
         // See if a registration token already exists for this user
-        RegistrationData rd = registrationDataService.findByEmail(context, email);
+        RegistrationData rd = registrationDataService.findByEmail(context.getSession(), email);
 
 
         // If it already exists, just re-issue it

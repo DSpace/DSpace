@@ -47,7 +47,7 @@ public class WorkspaceItemSupervisionOrdersLinkRepository
                                                            Projection projection) {
         try {
             Context context = obtainContext();
-            WorkspaceItem workspaceItem = workspaceItemService.find(context, id);
+            WorkspaceItem workspaceItem = workspaceItemService.find(context.getSession(), id);
             if (workspaceItem == null) {
                 throw new ResourceNotFoundException("No such workspace item: " + id);
             }
