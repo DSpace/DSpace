@@ -84,16 +84,16 @@ public class SystemWideAlertServiceTest {
         List<SystemWideAlert> systemWideAlertList = new ArrayList<>();
 
         // The SystemWideAlert(s) reported from our mocked state should match our systemWideAlertList
-        assertEquals("TestFindAll 0", systemWideAlertList, systemWideAlertService.findAll(context));
+        assertEquals("TestFindAll 0", systemWideAlertList, systemWideAlertService.findAll(context.getSession()));
     }
 
     @Test
     public void testFind() throws Exception {
         // Mock DAO to return our mocked SystemWideAlert
-        when(systemWideAlertService.find(context, 0)).thenReturn(systemWideAlert);
+        when(systemWideAlertService.find(context.getSession(), 0)).thenReturn(systemWideAlert);
 
         // The SystemWideAlert reported from our ID should match our mocked SystemWideAlert
-        assertEquals("TestFind 0", systemWideAlert, systemWideAlertService.find(context, 0));
+        assertEquals("TestFind 0", systemWideAlert, systemWideAlertService.find(context.getSession(), 0));
     }
 
     @Test
@@ -102,7 +102,8 @@ public class SystemWideAlertServiceTest {
         List<SystemWideAlert> systemWideAlertList = new ArrayList<>();
 
         // The SystemWideAlert(s) reported from our mocked state should match our systemWideAlertList
-        assertEquals("TestFindAllActive 0", systemWideAlertList, systemWideAlertService.findAllActive(context, 10, 0));
+        assertEquals("TestFindAllActive 0", systemWideAlertList,
+                systemWideAlertService.findAllActive(context.getSession(), 10, 0));
     }
 
 

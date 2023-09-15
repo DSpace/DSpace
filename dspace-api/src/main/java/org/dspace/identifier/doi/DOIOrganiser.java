@@ -378,7 +378,7 @@ public class DOIOrganiser {
 
         try {
             List<DOI> doiList = doiService.getDOIsByStatus(context, Arrays.asList(status));
-            if (0 < doiList.size()) {
+            if (!doiList.isEmpty()) {
                 out.println("DOIs queued for " + processName + ": ");
             } else {
                 out.println("There are no DOIs queued for " + processName + ".");
@@ -630,7 +630,7 @@ public class DOIOrganiser {
             doi = doiService.formatIdentifier(identifier);
 
             // If there's no exception: we found a valid DOI. :)
-            doiRow = doiService.findByDoi(context,
+            doiRow = doiService.findByDoi(context.getSession(),
                                           doi.substring(DOI.SCHEME.length()));
 
             if (null == doiRow) {
@@ -696,12 +696,12 @@ public class DOIOrganiser {
             DSpaceObject dso = itemService.find(context.getSession(), UUID.fromString(identifier));
 
             if (null != dso) {
-                doiRow = doiService.findDOIByDSpaceObject(context, dso);
+                doiRow = doiService.findDOIByDSpaceObject(context.getSession(), dso);
 
                 //Check if this Item has an Identifier, mint one if it doesn't
                 if (null == doiRow) {
                     doi = provider.mint(context, dso, this.filter);
-                    doiRow = doiService.findByDoi(context,
+                    doiRow = doiService.findByDoi(context.getSession(),
                                                   doi.substring(DOI.SCHEME.length()));
                     return doiRow;
                 }
@@ -721,11 +721,11 @@ public class DOIOrganiser {
                         + "Cannot process specified handle as it does not identify an Item.");
             }
 
-            doiRow = doiService.findDOIByDSpaceObject(context, dso);
+            doiRow = doiService.findDOIByDSpaceObject(context.getSession(), dso);
 
             if (null == doiRow) {
                 doi = provider.mint(context, dso, this.filter);
-                doiRow = doiService.findByDoi(context,
+                doiRow = doiService.findByDoi(context.getSession(),
                                               doi.substring(DOI.SCHEME.length()));
             }
             return doiRow;
@@ -734,7 +734,7 @@ public class DOIOrganiser {
         try {
             doi = doiService.formatIdentifier(identifier);
             // If there's no exception: we found a valid DOI. :)
-            doiRow = doiService.findByDoi(context,
+            doiRow = doiService.findByDoi(context.getSession(),
                                           doi.substring(DOI.SCHEME.length()));
             if (null == doiRow) {
                 throw new IllegalStateException("You specified a valid DOI, that is not stored in our database.");

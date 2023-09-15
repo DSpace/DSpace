@@ -782,13 +782,13 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 }
 
                 // find the handle, and output to map file
-                myhandle = handleService.findHandle(c, myitem);
+                myhandle = handleService.findHandle(c.getSession(), myitem);
 
                 mapOutputString = itemname + " " + myhandle;
             }
 
             // set permissions if specified in contents file
-            if (options.size() > 0) {
+            if (!options.isEmpty()) {
                 logInfo("Processing options");
                 processOptions(c, myitem, options);
             }

@@ -122,7 +122,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
                     previous = versionHistoryService.getPrevious(context, history, version);
                     if (previous != null) {
                         previousIsFirstVersion = versionHistoryService.isFirstVersion(context, history, previous);
-                        previousItemHandle = handleService.findHandle(context, previous.getItem());
+                        previousItemHandle = handleService.findHandle(context.getSession(), previous.getItem());
                     }
                 } catch (SQLException ex) {
                     throw new RuntimeException("A problem with the database connection occured.", ex);
@@ -336,7 +336,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
         throws IdentifierNotFoundException, IdentifierNotResolvableException {
 
         try {
-            return handleService.findHandle(context, dso);
+            return handleService.findHandle(context.getSession(), dso);
         } catch (SQLException sqe) {
             throw new IdentifierNotResolvableException(sqe.getMessage(), sqe);
         }

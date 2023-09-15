@@ -20,6 +20,7 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -62,24 +63,24 @@ public class SystemWideAlertServiceImpl implements SystemWideAlertService {
     }
 
     @Override
-    public SystemWideAlert find(final Context context, final int alertId) throws SQLException {
-        return systemWideAlertDAO.findByID(context.getSession(), SystemWideAlert.class, alertId);
+    public SystemWideAlert find(final Session session, final int alertId) throws SQLException {
+        return systemWideAlertDAO.findByID(session, SystemWideAlert.class, alertId);
     }
 
     @Override
-    public List<SystemWideAlert> findAll(final Context context) throws SQLException {
-        return systemWideAlertDAO.findAll(context.getSession(), SystemWideAlert.class);
+    public List<SystemWideAlert> findAll(final Session session) throws SQLException {
+        return systemWideAlertDAO.findAll(session, SystemWideAlert.class);
     }
 
     @Override
-    public List<SystemWideAlert> findAll(final Context context, final int limit, final int offset) throws SQLException {
-        return systemWideAlertDAO.findAll(context.getSession(), limit, offset);
+    public List<SystemWideAlert> findAll(final Session session, final int limit, final int offset) throws SQLException {
+        return systemWideAlertDAO.findAll(session.getSession(), limit, offset);
     }
 
     @Override
-    public List<SystemWideAlert> findAllActive(final Context context, final int limit, final int offset)
+    public List<SystemWideAlert> findAllActive(final Session session, final int limit, final int offset)
             throws SQLException {
-        return systemWideAlertDAO.findAllActive(context.getSession(), limit, offset);
+        return systemWideAlertDAO.findAllActive(session.getSession(), limit, offset);
     }
 
     @Override
@@ -108,7 +109,7 @@ public class SystemWideAlertServiceImpl implements SystemWideAlertService {
 
     @Override
     public boolean canNonAdminUserLogin(Context context) throws SQLException {
-        List<SystemWideAlert> active = findAllActive(context, 1, 0);
+        List<SystemWideAlert> active = findAllActive(context.getSession(), 1, 0);
         if (active == null || active.isEmpty()) {
             return true;
         }
@@ -120,7 +121,7 @@ public class SystemWideAlertServiceImpl implements SystemWideAlertService {
         if (authorizeService.isAdmin(context, ePerson)) {
             return true;
         }
-        List<SystemWideAlert> active = findAllActive(context, 1, 0);
+        List<SystemWideAlert> active = findAllActive(context.getSession(), 1, 0);
         if (active == null || active.isEmpty()) {
             return true;
         }
