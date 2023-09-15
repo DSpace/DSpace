@@ -256,8 +256,9 @@ public class RelationshipMetadataServiceImpl implements RelationshipMetadataServ
                 String wardLabel = isLeftwards ? relationship.getLeftwardValue() : relationship.getRightwardValue();
                 if (wardLabel != null) {
                     resultingMetadataValueList.add(
-                        constructRelationshipMetadataValue(context.getSession(), item, relationship.getID(), place, key, virtualBean,
-                                                           wardLabel));
+                        constructRelationshipMetadataValue(context.getSession(),
+                                item, relationship.getID(), place, key,
+                                virtualBean, wardLabel));
                 } else {
                     resultingMetadataValueList.addAll(
                             findRelationshipMetadataValueFromBean(context, item, otherItem, relationship, place, key,
