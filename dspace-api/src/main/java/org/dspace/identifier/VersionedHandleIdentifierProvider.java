@@ -314,7 +314,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider implem
         throws IdentifierNotFoundException, IdentifierNotResolvableException {
 
         try {
-            return handleService.findHandle(context, dso);
+            return handleService.findHandle(context.getSession(), dso);
         } catch (SQLException sqe) {
             throw new IdentifierNotResolvableException(sqe.getMessage(), sqe);
         }

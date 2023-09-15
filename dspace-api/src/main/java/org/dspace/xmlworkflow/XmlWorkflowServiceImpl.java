@@ -657,7 +657,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                 Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_archive"));
 
                 // Get the item handle to email to user
-                String handle = handleService.findHandle(context, item);
+                String handle = handleService.findHandle(context.getSession(), item);
 
                 // Get title
                 List<MetadataValue> titles = itemService
@@ -668,7 +668,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                 } catch (MissingResourceException e) {
                     title = "Untitled";
                 }
-                if (titles.size() > 0) {
+                if (!titles.isEmpty()) {
                     title = titles.iterator().next().getValue();
                 }
 

@@ -153,7 +153,7 @@ public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRes
         try {
             DSpaceObject dso = itemService.find(context.getSession(), UUID.fromString(uuid));
             String handle = dso.getHandle();
-            DOI doi = doiService.findDOIByDSpaceObject(context, dso);
+            DOI doi = doiService.findDOIByDSpaceObject(context.getSession(), dso);
             if (doi != null) {
                 String doiUrl = doiService.DOIToExternalForm(doi.getDoi());
                 results.add(new IdentifierRest(doiUrl, "doi", DOIIdentifierProvider.statusText[doi.getStatus()]));
@@ -200,7 +200,7 @@ public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRes
             }
             // Does this item have a DOI already? If the DOI doesn't exist or has a null, MINTED or PENDING status
             // then we proceed with a typical create operation and return 201 success with the object
-            DOI doi = doiService.findDOIByDSpaceObject(context, item);
+            DOI doi = doiService.findDOIByDSpaceObject(context.getSession(), item);
             if (doi == null || null == doi.getStatus() || DOIIdentifierProvider.MINTED.equals(doi.getStatus())
                     || DOIIdentifierProvider.PENDING.equals(doi.getStatus())) {
                 // Proceed with creation
@@ -237,7 +237,7 @@ public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRes
                 String doiValue = doiIdentifierProvider.register(context, item, new TrueFilter());
                 identifierRest.setValue(doiValue);
                 // Get new status
-                DOI doi = doiService.findByDoi(context, doiValue);
+                DOI doi = doiService.findByDoi(context.getSession(), doiValue);
                 if (doi != null) {
                     identifierRest.setIdentifierStatus(DOIIdentifierProvider.statusText[doi.getStatus()]);
                 }

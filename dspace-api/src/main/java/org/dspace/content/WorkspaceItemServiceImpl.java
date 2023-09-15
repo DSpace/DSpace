@@ -177,7 +177,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
                 Map<Class<? extends Identifier>, Filter> filters = FilterUtils.getIdentifierFilters(true);
                 IdentifierServiceFactory.getInstance().getIdentifierService().register(context, item, filters);
                 // Look for a DOI and move it to PENDING
-                DOI doi = doiService.findDOIByDSpaceObject(context, item);
+                DOI doi = doiService.findDOIByDSpaceObject(context.getSession(), item);
                 if (doi != null) {
                     doi.setStatus(DOIIdentifierProvider.PENDING);
                     doiService.update(context, doi);

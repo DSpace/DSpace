@@ -18,6 +18,7 @@ import org.dspace.identifier.dao.DOIDAO;
 import org.dspace.identifier.doi.DOIIdentifierException;
 import org.dspace.identifier.service.DOIService;
 import org.dspace.services.ConfigurationService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -58,19 +59,19 @@ public class DOIServiceImpl implements DOIService {
     }
 
     @Override
-    public DOI findByDoi(Context context, String doi) throws SQLException {
-        return doiDAO.findByDoi(context.getSession(), doi);
+    public DOI findByDoi(Session session, String doi) throws SQLException {
+        return doiDAO.findByDoi(session, doi);
     }
 
     @Override
-    public DOI findDOIByDSpaceObject(Context context, DSpaceObject dso) throws SQLException {
-        return doiDAO.findDOIByDSpaceObject(context.getSession(), dso);
+    public DOI findDOIByDSpaceObject(Session session, DSpaceObject dso) throws SQLException {
+        return doiDAO.findDOIByDSpaceObject(session, dso);
     }
 
     @Override
-    public DOI findDOIByDSpaceObject(Context context, DSpaceObject dso, List<Integer> statusToExclude)
+    public DOI findDOIByDSpaceObject(Session session, DSpaceObject dso, List<Integer> statusToExclude)
         throws SQLException {
-        return doiDAO.findDOIByDSpaceObject(context.getSession(), dso, statusToExclude);
+        return doiDAO.findDOIByDSpaceObject(session, dso, statusToExclude);
     }
 
     @Override

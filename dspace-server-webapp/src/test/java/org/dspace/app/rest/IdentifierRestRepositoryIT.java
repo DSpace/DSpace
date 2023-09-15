@@ -168,7 +168,7 @@ public class IdentifierRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(status().isBadRequest());
 
         // Get the doi we minted and queued for registration
-        DOI doi = doiService.findDOIByDSpaceObject(context, publicItem1);
+        DOI doi = doiService.findDOIByDSpaceObject(context.getSession(), publicItem1);
         // The DOI should not be null
         assertNotNull(doi);
         // The DOI status should be TO_BE_REGISTERED
@@ -213,7 +213,7 @@ public class IdentifierRestRepositoryIT extends AbstractControllerIntegrationTes
 
         // Use the DOI service to directly manipulate the DOI on this object so that we can predict and
         // test values via the REST request
-        DOI doi = doiService.findDOIByDSpaceObject(context, publicItem1);
+        DOI doi = doiService.findDOIByDSpaceObject(context.getSession(), publicItem1);
 
         // Assert non-null DOI, since we should be minting them automatically here
         assertNotNull(doi);
@@ -285,7 +285,7 @@ public class IdentifierRestRepositoryIT extends AbstractControllerIntegrationTes
 
         // Use the DOI service to directly manipulate the DOI on this object so that we can predict and
         // test values via the REST request
-        DOI doi = doiService.findDOIByDSpaceObject(context, publicItem1);
+        DOI doi = doiService.findDOIByDSpaceObject(context.getSession(), publicItem1);
 
         // Assert non-null DOI, since we should be minting them automatically here
         assertNotNull(doi);

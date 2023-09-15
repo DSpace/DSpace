@@ -490,10 +490,10 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         // Use the default filter unless we find the object
         Filter updateFilter = this.filter;
 
-        if (doiService.findDOIByDSpaceObject(context, dso) != null) {
+        if (doiService.findDOIByDSpaceObject(context.getSession(), dso) != null) {
             // We can skip the filter here since we know the DOI already exists for the item
             log.debug("updateMetadata: found DOIByDSpaceObject: " +
-                doiService.findDOIByDSpaceObject(context, dso).getDoi());
+                doiService.findDOIByDSpaceObject(context.getSession(), dso).getDoi());
             updateFilter = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(
                     "always_true_filter", TrueFilter.class);
         }
@@ -542,7 +542,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         // ensure DOI belongs to dso regarding our db
         DOI doiRow = null;
         try {
-            doiRow = doiService.findByDoi(context, doi.substring(DOI.SCHEME.length()));
+            doiRow = doiService.findByDoi(context.getSession(), doi.substring(DOI.SCHEME.length()));
         } catch (SQLException sqle) {
             log.warn("SQLException while searching a DOI in our db.", sqle);
             throw new RuntimeException("Unable to retrieve information about a DOI out of database.", sqle);
@@ -757,7 +757,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         DOI doiRow = null;
 
         try {
-            doiRow = doiService.findByDoi(context, doi.substring(DOI.SCHEME.length()));
+            doiRow = doiService.findByDoi(context.getSession(), doi.substring(DOI.SCHEME.length()));
         } catch (SQLException sqle) {
             throw new RuntimeException(sqle);
         }
@@ -816,7 +816,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         DOI doiRow = null;
 
         try {
-            doiRow = doiService.findByDoi(context, doi.substring(DOI.SCHEME.length()));
+            doiRow = doiService.findByDoi(context.getSession(), doi.substring(DOI.SCHEME.length()));
         } catch (SQLException sqle) {
             throw new RuntimeException(sqle);
         }
@@ -856,7 +856,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     public DSpaceObject getObjectByDOI(Context context, String identifier)
             throws SQLException, DOIIdentifierException, IllegalArgumentException {
         String doi = doiService.formatIdentifier(identifier);
-        DOI doiRow = doiService.findByDoi(context, doi.substring(DOI.SCHEME.length()));
+        DOI doiRow = doiService.findByDoi(context.getSession(), doi.substring(DOI.SCHEME.length()));
 
         if (null == doiRow) {
             return null;
@@ -884,7 +884,8 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
 //        String sql = "SELECT * FROM Doi WHERE resource_type_id = ? " +
 //                "AND resource_id = ? AND ((status != ? AND status != ?) OR status IS NULL)";
 
-        DOI doiRow = doiService.findDOIByDSpaceObject(context, dso, Arrays.asList(DELETED, TO_BE_DELETED));
+        DOI doiRow = doiService.findDOIByDSpaceObject(context.getSession(), dso,
+                Arrays.asList(DELETED, TO_BE_DELETED));
         if (null == doiRow) {
             return null;
         }
@@ -949,7 +950,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
             doiIdentifier = doiIdentifier.substring(DOI.SCHEME.length());
 
             // check if DOI is already in Database
-            doi = doiService.findByDoi(context, doiIdentifier);
+            doi = doiService.findByDoi(context.getSession(), doiIdentifier);
             if (null != doi) {
                 if (doi.getDSpaceObject() == null) {
                     // doi was deleted, check resource type

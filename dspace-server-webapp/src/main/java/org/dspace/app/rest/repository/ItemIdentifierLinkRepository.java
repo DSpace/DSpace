@@ -64,8 +64,8 @@ public class ItemIdentifierLinkRepository extends AbstractDSpaceRestRepository i
         }
         IdentifiersRest identifiersRest = new IdentifiersRest();
         List<IdentifierRest> identifierRestList = new ArrayList<>();
-        DOI doi = doiService.findDOIByDSpaceObject(context, item);
-        String handle = HandleServiceFactory.getInstance().getHandleService().findHandle(context, item);
+        DOI doi = doiService.findDOIByDSpaceObject(context.getSession(), item);
+        String handle = HandleServiceFactory.getInstance().getHandleService().findHandle(context.getSession(), item);
         try {
             if (doi != null) {
                 String doiUrl = doiService.DOIToExternalForm(doi.getDoi());

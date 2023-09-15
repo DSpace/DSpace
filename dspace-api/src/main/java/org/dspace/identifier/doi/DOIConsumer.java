@@ -95,7 +95,7 @@ public class DOIConsumer implements Consumer {
         }
         DOI doi = null;
         try {
-            doi = doiService.findDOIByDSpaceObject(ctx, dso);
+            doi = doiService.findDOIByDSpaceObject(ctx.getSession(), dso);
         } catch (SQLException ex) {
             // nothing to do here, next if clause will stop us from processing
             // items without dois.
@@ -105,7 +105,7 @@ public class DOIConsumer implements Consumer {
             // it passes the workspace filter. We also need to update status to PENDING straight after.
             if (inProgress) {
                 provider.mint(ctx, dso, workspaceFilter);
-                DOI newDoi = doiService.findDOIByDSpaceObject(ctx, dso);
+                DOI newDoi = doiService.findDOIByDSpaceObject(ctx.getSession(), dso);
                 if (newDoi != null) {
                     newDoi.setStatus(DOIIdentifierProvider.PENDING);
                     doiService.update(ctx, newDoi);

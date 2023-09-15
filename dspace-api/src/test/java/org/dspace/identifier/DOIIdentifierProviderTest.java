@@ -614,7 +614,7 @@ public class DOIIdentifierProviderTest
 
         provider.reserve(context, item, doi);
 
-        DOI doiRow = doiService.findByDoi(context, doi.substring(DOI.SCHEME.length()));
+        DOI doiRow = doiService.findByDoi(context.getSession(), doi.substring(DOI.SCHEME.length()));
         assumeNotNull(doiRow);
 
         assertTrue("Reservation of DOI did not set the corret DOI status.",
@@ -630,7 +630,7 @@ public class DOIIdentifierProviderTest
 
         provider.register(context, item, doi);
 
-        DOI doiRow = doiService.findByDoi(context, doi.substring(DOI.SCHEME.length()));
+        DOI doiRow = doiService.findByDoi(context.getSession(), doi.substring(DOI.SCHEME.length()));
         assumeNotNull(doiRow);
 
         assertTrue("Registration of DOI did not set the corret DOI status.",
@@ -646,7 +646,7 @@ public class DOIIdentifierProviderTest
 
         provider.register(context, item, doi);
 
-        DOI doiRow = doiService.findByDoi(context, doi.substring(DOI.SCHEME.length()));
+        DOI doiRow = doiService.findByDoi(context.getSession(), doi.substring(DOI.SCHEME.length()));
         assumeNotNull(doiRow);
 
         assertTrue("Registration of DOI did not set the corret DOI status.",
@@ -669,7 +669,7 @@ public class DOIIdentifierProviderTest
         String formated_doi = doiService.formatIdentifier(doi);
         assertTrue("DOI was not in the expected format!", doi.equals(formated_doi));
 
-        DOI doiRow = doiService.findByDoi(context, doi.substring(DOI.SCHEME.length()));
+        DOI doiRow = doiService.findByDoi(context.getSession(), doi.substring(DOI.SCHEME.length()));
         assertNotNull("Created DOI was not stored in database.", doiRow);
 
         assertTrue("Registration of DOI did not set the corret DOI status.",
@@ -707,12 +707,12 @@ public class DOIIdentifierProviderTest
         assertFalse("Cannot remove DOI from item metadata.", foundDOI1);
         assertTrue("Removed wrong DOI from item metadata.", foundDOI2);
 
-        DOI doiRow1 = doiService.findByDoi(context, doi1.substring(DOI.SCHEME.length()));
+        DOI doiRow1 = doiService.findByDoi(context.getSession(), doi1.substring(DOI.SCHEME.length()));
         assumeNotNull(doiRow1);
         assertTrue("Status of deleted DOI was not set correctly.",
                    DOIIdentifierProvider.TO_BE_DELETED.equals(doiRow1.getStatus()));
 
-        DOI doiRow2 = doiService.findByDoi(context, doi2.substring(DOI.SCHEME.length()));
+        DOI doiRow2 = doiService.findByDoi(context.getSession(), doi2.substring(DOI.SCHEME.length()));
         assumeNotNull(doiRow2);
         assertTrue("While deleting a DOI the status of another changed.",
                    DOIIdentifierProvider.IS_REGISTERED.equals(doiRow2.getStatus()));
@@ -749,12 +749,12 @@ public class DOIIdentifierProviderTest
         assertFalse("Cannot remove DOI from item metadata.", foundDOI1);
         assertFalse("Did not removed all DOIs from item metadata.", foundDOI2);
 
-        DOI doiRow1 = doiService.findByDoi(context, doi1.substring(DOI.SCHEME.length()));
+        DOI doiRow1 = doiService.findByDoi(context.getSession(), doi1.substring(DOI.SCHEME.length()));
         assumeNotNull(doiRow1);
         assertTrue("Status of deleted DOI was not set correctly.",
                    DOIIdentifierProvider.TO_BE_DELETED.equals(doiRow1.getStatus()));
 
-        DOI doiRow2 = doiService.findByDoi(context, doi1.substring(DOI.SCHEME.length()));
+        DOI doiRow2 = doiService.findByDoi(context.getSession(), doi1.substring(DOI.SCHEME.length()));
         assumeNotNull(doiRow2);
         assertTrue("Did not set the status of all deleted DOIs as expected.",
                    DOIIdentifierProvider.TO_BE_DELETED.equals(doiRow2.getStatus()));
@@ -773,7 +773,7 @@ public class DOIIdentifierProviderTest
         // But if the DOI is just pending, it should return without changing anything.
         provider.updateMetadata(context, item, doi1);
         // Get the DOI from the service
-        DOI doi = doiService.findDOIByDSpaceObject(context, item);
+        DOI doi = doiService.findDOIByDSpaceObject(context.getSession(), item);
         // Ensure it is still PENDING
         assertEquals("Status of updated DOI did not remain PENDING",
                 DOIIdentifierProvider.PENDING, doi.getStatus());
@@ -792,7 +792,7 @@ public class DOIIdentifierProviderTest
         // remove the item
         itemService.delete(context, item1);
         // Get the DOI from the service
-        DOI doi = doiService.findDOIByDSpaceObject(context, item1);
+        DOI doi = doiService.findDOIByDSpaceObject(context.getSession(), item1);
         // ensure DOI has no state
         assertNull("Orphaned DOI was not set deleted", doi);
         // create a new item and a new DOI
@@ -833,7 +833,7 @@ public class DOIIdentifierProviderTest
         // But if the DOI is just minted, it should return without changing anything.
         provider.updateMetadata(context, item, doi1);
         // Get the DOI from the service
-        DOI doi = doiService.findDOIByDSpaceObject(context, item);
+        DOI doi = doiService.findDOIByDSpaceObject(context.getSession(), item);
         // Ensure it is still MINTED
         assertEquals("Status of updated DOI did not remain PENDING",
                 DOIIdentifierProvider.MINTED, doi.getStatus());
@@ -848,11 +848,11 @@ public class DOIIdentifierProviderTest
         // Mint a DOI without an explicit reserve or register context
         String mintedDoi = provider.mint(context, item, DSpaceServicesFactory.getInstance()
                 .getServiceManager().getServiceByName("always_true_filter", TrueFilter.class));
-        DOI doi = doiService.findByDoi(context, mintedDoi.substring(DOI.SCHEME.length()));
+        DOI doi = doiService.findByDoi(context.getSession(), mintedDoi.substring(DOI.SCHEME.length()));
         // This should be minted
         assertEquals("DOI is not of 'minted' status", DOIIdentifierProvider.MINTED, doi.getStatus());
         provider.updateMetadata(context, item, mintedDoi);
-        DOI secondFind = doiService.findByDoi(context, mintedDoi.substring(DOI.SCHEME.length()));
+        DOI secondFind = doiService.findByDoi(context.getSession(), mintedDoi.substring(DOI.SCHEME.length()));
         // After an update, this should still be minted
         assertEquals("DOI is not of 'minted' status",
                 DOIIdentifierProvider.MINTED, secondFind.getStatus());

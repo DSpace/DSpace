@@ -796,7 +796,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // hibernate will throw a foreign constraint exception.
         // Here we use the DOI service directly as it is able to manage DOIs even without any configured
         // consumer or provider.
-        DOI doi = doiService.findDOIByDSpaceObject(context, item);
+        DOI doi = doiService.findDOIByDSpaceObject(context.getSession(), item);
         if (doi != null) {
             doi.setDSpaceObject(null);
         }

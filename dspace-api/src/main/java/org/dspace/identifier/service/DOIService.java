@@ -15,6 +15,7 @@ import org.dspace.core.Context;
 import org.dspace.identifier.DOI;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.doi.DOIIdentifierException;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the {@link DOI} object.
@@ -46,34 +47,34 @@ public interface DOIService {
     /**
      * Find a specific DOI in storage.
      *
-     * @param context current DSpace session.
+     * @param session current request's database context.
      * @param doi string representation of the DOI.
      * @return the DOI object found.
      * @throws SQLException passed through, can mean none found.
      */
-    public DOI findByDoi(Context context, String doi) throws SQLException;
+    public DOI findByDoi(Session session, String doi) throws SQLException;
 
     /**
      * Find the DOI assigned to a given DSpace Object.
      *
-     * @param context current DSpace session.
+     * @param session current request's database context.
      * @param dso The DSpace Object.
      * @return the DSO's DOI.
      * @throws SQLException passed through.
      */
-    public DOI findDOIByDSpaceObject(Context context, DSpaceObject dso) throws SQLException;
+    public DOI findDOIByDSpaceObject(Session session, DSpaceObject dso) throws SQLException;
 
     /**
      * Find the DOI assigned to a given DSpace Object, unless it has one of a
      * given set of statuses.
      *
-     * @param context current DSpace context.
+     * @param session current request's database context.
      * @param dso the DSpace Object.
      * @param statusToExclude uninteresting statuses.
      * @return the DSO's DOI.
      * @throws SQLException passed through.
      */
-    public DOI findDOIByDSpaceObject(Context context, DSpaceObject dso, List<Integer> statusToExclude)
+    public DOI findDOIByDSpaceObject(Session session, DSpaceObject dso, List<Integer> statusToExclude)
         throws SQLException;
 
     /**
