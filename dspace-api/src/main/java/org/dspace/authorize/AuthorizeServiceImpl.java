@@ -284,8 +284,8 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             // the isArchived check is fast and would exclude the possibility that the item
             // is a workspace or workflow without further queries
             if (!((Item) o).isArchived() &&
-                    (workspaceItemService.findByItem(c, (Item) o) != null ||
-                    workflowItemService.findByItem(c, (Item) o) != null)) {
+                    (workspaceItemService.findByItem(c.getSession(), (Item) o) != null ||
+                    workflowItemService.findByItem(c.getSession(), (Item) o) != null)) {
                 ignoreCustomPolicies = true;
             }
         }
@@ -346,8 +346,8 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         throws SQLException {
         for (Bundle bundle : bundles) {
             for (Item item : bundle.getItems()) {
-                if (workspaceItemService.findByItem(ctx, item) == null
-                    && workflowItemService.findByItem(ctx, item) == null) {
+                if (workspaceItemService.findByItem(ctx.getSession(), item) == null
+                    && workflowItemService.findByItem(ctx.getSession(), item) == null) {
                     return true;
                 }
             }
@@ -486,25 +486,25 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     @Override
     public List<ResourcePolicy> getPolicies(Context c, DSpaceObject o)
         throws SQLException {
-        return resourcePolicyService.find(c, o);
+        return resourcePolicyService.find(c.getSession(), o);
     }
 
     @Override
     public List<ResourcePolicy> findPoliciesByDSOAndType(Context c, DSpaceObject o, String type)
         throws SQLException {
-        return resourcePolicyService.find(c, o, type);
+        return resourcePolicyService.find(c.getSession(), o, type);
     }
 
     @Override
     public List<ResourcePolicy> getPoliciesForGroup(Context c, Group g)
         throws SQLException {
-        return resourcePolicyService.find(c, g);
+        return resourcePolicyService.find(c.getSession(), g);
     }
 
     @Override
     public List<ResourcePolicy> getPoliciesActionFilter(Context c, DSpaceObject o,
                                                         int actionID) throws SQLException {
-        return resourcePolicyService.find(c, o, actionID);
+        return resourcePolicyService.find(c.getSession(), o, actionID);
     }
 
     @Override
@@ -640,13 +640,13 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     @Override
     public boolean isAnIdenticalPolicyAlreadyInPlace(Context c, DSpaceObject dso, Group group, int action, int policyID)
         throws SQLException {
-        return !resourcePolicyService.findByTypeGroupActionExceptId(c, dso, group, action, policyID).isEmpty();
+        return !resourcePolicyService.findByTypeGroupActionExceptId(c.getSession(), dso, group, action, policyID).isEmpty();
     }
 
     @Override
     public ResourcePolicy findByTypeGroupAction(Context c, DSpaceObject dso, Group group, int action)
         throws SQLException {
-        List<ResourcePolicy> policies = resourcePolicyService.find(c, dso, group, action);
+        List<ResourcePolicy> policies = resourcePolicyService.find(c.getSession(), dso, group, action);
 
         if (CollectionUtils.isNotEmpty(policies)) {
             return policies.iterator().next();
@@ -693,7 +693,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         ResourcePolicy policyTemp = null;
         if (policy != null) {
             List<ResourcePolicy> duplicates = resourcePolicyService
-                .findByTypeGroupActionExceptId(context, dso, group, action, policy.getID());
+                .findByTypeGroupActionExceptId(context.getSession(), dso, group, action, policy.getID());
             if (!duplicates.isEmpty()) {
                 policy = duplicates.get(0);
             }
@@ -727,7 +727,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     @Override
     public List<ResourcePolicy> getPoliciesActionFilterExceptRpType(Context c, DSpaceObject o, int actionID,
                                                                     String rpType) throws SQLException {
-        return resourcePolicyService.findExceptRpType(c, o, actionID, rpType);
+        return resourcePolicyService.findExceptRpType(c.getSession(), o, actionID, rpType);
     }
 
     /**

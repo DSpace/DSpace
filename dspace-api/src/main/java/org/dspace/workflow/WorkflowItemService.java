@@ -17,6 +17,7 @@ import org.dspace.content.Item;
 import org.dspace.content.service.InProgressSubmissionService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the Workflow items.
@@ -43,53 +44,53 @@ public interface WorkflowItemService<T extends WorkflowItem> extends InProgressS
     /**
      * Get a workflow item from the database.
      *
-     * @param context The relevant DSpace Context.
+     * @param session current request's database context.
      * @param id      ID of the workflow item
      * @return the workflow item, or null if the ID is invalid.
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public T find(Context context, int id) throws SQLException;
+    public T find(Session session, int id) throws SQLException;
 
     /**
      * return all workflowitems
      *
-     * @param context The relevant DSpace Context.
+     * @param session current request's database context.
      * @return List of all workflowItems in system
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<T> findAll(Context context) throws SQLException;
+    public List<T> findAll(Session session) throws SQLException;
 
     /**
      * Get all workflow items for a particular collection.
      *
-     * @param context    The relevant DSpace Context.
+     * @param session    current request's database context.
      * @param collection the collection
      * @return array of the corresponding workflow items
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<T> findByCollection(Context context, Collection collection) throws SQLException;
+    public List<T> findByCollection(Session session, Collection collection) throws SQLException;
 
     /**
      * Check to see if a particular item is currently under Workflow.
      * If so, its WorkflowItem is returned.  If not, null is returned
      *
-     * @param context The relevant DSpace Context.
+     * @param session current request's database context.
      * @param item    the item
      * @return workflow item corresponding to the item, or null
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public T findByItem(Context context, Item item) throws SQLException;
+    public T findByItem(Session session, Item item) throws SQLException;
 
     /**
      * Get all workflow items that were original submissions by a particular
      * e-person.
      *
-     * @param context The relevant DSpace Context.
+     * @param session current request's database context.
      * @param ep      the eperson
      * @return the corresponding workflow items
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<T> findBySubmitter(Context context, EPerson ep) throws SQLException;
+    public List<T> findBySubmitter(Session session, EPerson ep) throws SQLException;
 
     /**
      * Delete all workflow items present in the specified collection.

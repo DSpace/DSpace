@@ -73,14 +73,16 @@ public class ExtractorOfAInprogressSubmissionInformations {
         Context context = getContext(request);
         if (Objects.nonNull(versionHistoryId)) {
             try {
-                VersionHistory versionHistory = versionHistoryService.find(context, versionHistoryId);
+                VersionHistory versionHistory = versionHistoryService.find(context.getSession(), versionHistoryId);
                 if (Objects.nonNull(versionHistory)) {
                     Version oldestVersion = versionHistoryService.getLatestVersion(context, versionHistory);
-                    WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, oldestVersion.getItem());
+                    WorkspaceItem workspaceItem
+                            = workspaceItemService.findByItem(context.getSession(), oldestVersion.getItem());
                     if (Objects.nonNull(workspaceItem)) {
                         return workspaceItem.getID();
                     }
-                    WorkflowItem workflowItem = workflowItemService.findByItem(context, oldestVersion.getItem());
+                    WorkflowItem workflowItem
+                            = workflowItemService.findByItem(context.getSession(), oldestVersion.getItem());
                     if (Objects.nonNull(workflowItem)) {
                         return workflowItem.getID();
                     }
@@ -105,13 +107,15 @@ public class ExtractorOfAInprogressSubmissionInformations {
         Context context = getContext(request);
         if (Objects.nonNull(versionHistoryId)) {
             try {
-                VersionHistory versionHistory = versionHistoryService.find(context, versionHistoryId);
+                VersionHistory versionHistory = versionHistoryService.find(context.getSession(), versionHistoryId);
                 if (Objects.nonNull(versionHistory)) {
                     Version oldestVersion = versionHistoryService.getLatestVersion(context, versionHistory);
-                    if (Objects.nonNull(workspaceItemService.findByItem(context, oldestVersion.getItem()))) {
+                    if (Objects.nonNull(workspaceItemService.findByItem(context.getSession(),
+                            oldestVersion.getItem()))) {
                         return WorkspaceItemRest.NAME;
                     }
-                    if (Objects.nonNull(workflowItemService.findByItem(context, oldestVersion.getItem()))) {
+                    if (Objects.nonNull(workflowItemService.findByItem(context.getSession(),
+                            oldestVersion.getItem()))) {
                         return WorkflowItemRest.NAME;
                     }
                 }

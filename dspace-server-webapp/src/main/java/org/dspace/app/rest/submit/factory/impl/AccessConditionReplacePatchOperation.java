@@ -67,7 +67,8 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
         } catch (NumberFormatException e) {
             throw new UnprocessableEntityException("The provided index format is not correct! Must be a number!");
         }
-        List<ResourcePolicy> policies = resourcePolicyService.find(context, item, ResourcePolicy.TYPE_CUSTOM);
+        List<ResourcePolicy> policies = resourcePolicyService.find(context.getSession(),
+                item, ResourcePolicy.TYPE_CUSTOM);
         if (idxToReplace < 0 || idxToReplace >= policies.size()) {
             throw new UnprocessableEntityException("The provided index:" + idxToReplace + " is not supported,"
                     + " currently the are " + policies.size() + " access conditions");

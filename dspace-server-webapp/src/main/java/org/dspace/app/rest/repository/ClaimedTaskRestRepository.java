@@ -102,7 +102,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
     public ClaimedTaskRest findOne(Context context, Integer id) {
         ClaimedTask task = null;
         try {
-            task = claimedTaskService.find(context, id);
+            task = claimedTaskService.find(context.getSession(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -126,7 +126,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
             }
             if (authorizeService.isAdmin(context) || userID.equals(currentUser.getID())) {
                 EPerson ep = epersonService.find(context.getSession(), userID);
-                List<ClaimedTask> tasks = claimedTaskService.findByEperson(context, ep);
+                List<ClaimedTask> tasks = claimedTaskService.findByEperson(context.getSession(), ep);
                 return converter.toRestPage(tasks, pageable, utils.obtainProjection());
             } else {
                 throw new RESTAuthorizationException("Only administrators can search for claimed tasks of other users");
@@ -147,11 +147,11 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
             if (item == null) {
                 throw new UnprocessableEntityException("There is no Item with uuid provided, uuid:" + itemUUID);
             }
-            XmlWorkflowItem xmlWFI = xmlWorkflowItemService.findByItem(context, item);
+            XmlWorkflowItem xmlWFI = xmlWorkflowItemService.findByItem(context.getSession(), item);
             if (xmlWFI == null) {
                 return null;
             } else {
-                tasks = claimedTaskService.findByWorkflowItem(context, xmlWFI);
+                tasks = claimedTaskService.findByWorkflowItem(context.getSession(), xmlWFI);
             }
             return converter.toRestPage(tasks, pageable, utils.obtainProjection());
         } catch (SQLException e) {
@@ -169,11 +169,12 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
             if (item == null) {
                 throw new UnprocessableEntityException("There is no Item with uuid provided, uuid:" + itemUUID);
             }
-            XmlWorkflowItem xmlWFI = xmlWorkflowItemService.findByItem(context, item);
+            XmlWorkflowItem xmlWFI = xmlWorkflowItemService.findByItem(context.getSession(), item);
             if (xmlWFI == null) {
                 return null;
             } else {
-                claimedTask = claimedTaskService.findByWorkflowIdAndEPerson(context, xmlWFI, context.getCurrentUser());
+                claimedTask = claimedTaskService.findByWorkflowIdAndEPerson(context.getSession(),
+                        xmlWFI, context.getCurrentUser());
             }
             if (claimedTask == null) {
                 return null;
@@ -194,7 +195,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
     protected ClaimedTaskRest action(Context context, HttpServletRequest request, Integer id)
         throws SQLException, IOException {
         ClaimedTask task = null;
-        task = claimedTaskService.find(context, id);
+        task = claimedTaskService.find(context.getSession(), id);
         if (task == null) {
             throw new ResourceNotFoundException("ClaimedTask ID " + id + " not found");
         }
@@ -238,7 +239,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
     protected void delete(Context context, Integer id) {
         ClaimedTask task = null;
         try {
-            task = claimedTaskService.find(context, id);
+            task = claimedTaskService.find(context.getSession(), id);
             if (task == null) {
                 throw new ResourceNotFoundException("ClaimedTask ID " + id + " not found");
             }
@@ -274,7 +275,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
             WorkflowActionConfig currentActionConfig = step.getActionConfig(task.getActionID());
             workflowService.doState(context, context.getCurrentUser(), request, task.getWorkflowItem().getID(),
                     workflow, currentActionConfig);
-            claimedTask = claimedTaskService.findByWorkflowIdAndEPerson(context,
+            claimedTask = claimedTaskService.findByWorkflowIdAndEPerson(context.getSession(),
                                              task.getWorkflowItem(), context.getCurrentUser());
         } catch (AuthorizeException e) {
             throw new RESTAuthorizationException(e);

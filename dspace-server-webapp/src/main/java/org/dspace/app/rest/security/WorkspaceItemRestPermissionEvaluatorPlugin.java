@@ -77,7 +77,7 @@ public class WorkspaceItemRestPermissionEvaluatorPlugin extends RestObjectPermis
                 return false;
             }
 
-            witem = wis.find(context, dsoId);
+            witem = wis.find(context.getSession(), dsoId);
 
              // If the dso is null then we give permission so we can throw another status
             // code instead

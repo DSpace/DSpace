@@ -71,7 +71,7 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
 
     @Before
     public void setup() throws Exception {
-        metadataSchema = metadataSchemaService.findAll(context).get(0);
+        metadataSchema = metadataSchemaService.findAll(context.getSession()).get(0);
     }
 
     @Test

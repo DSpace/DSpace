@@ -17,6 +17,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.xmlworkflow.storedcomponents.dao.InProgressUserDAO;
 import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -67,8 +68,8 @@ public class InProgressUserServiceImpl implements InProgressUserService {
     }
 
     @Override
-    public InProgressUser find(Context context, int id) throws SQLException {
-        return inProgressUserDAO.findByID(context.getSession(), InProgressUser.class, id);
+    public InProgressUser find(Session session, int id) throws SQLException {
+        return inProgressUserDAO.findByID(session.getSession(), InProgressUser.class, id);
     }
 
     @Override

@@ -322,7 +322,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
                             }
                             WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance()
                                                                         .getWorkspaceItemService();
-                            WorkspaceItem wsi = workspaceItemService.findByItem(context, item);
+                            WorkspaceItem wsi = workspaceItemService.findByItem(context.getSession(), item);
 
                             if (null != wsi) {
                                 workspaceItemService.deleteAll(context, wsi);
@@ -343,7 +343,8 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
                         WorkflowRequirementsService workflowRequirementsService = XmlWorkflowServiceFactory
                                                                        .getInstance().getWorkflowRequirementsService();
 
-                        List<ClaimedTask> claimedTasks = claimedTaskService.findByEperson(context, ePerson);
+                        List<ClaimedTask> claimedTasks
+                                = claimedTaskService.findByEperson(context.getSession(), ePerson);
 
                         for (ClaimedTask task : claimedTasks) {
                             xmlWorkflowService.deleteClaimedTask(context, task.getWorkflowItem(), task);
@@ -526,13 +527,13 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         }
 
         WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-        List<WorkspaceItem> workspaceBySubmitter = workspaceItemService.findByEPerson(context, ePerson);
+        List<WorkspaceItem> workspaceBySubmitter = workspaceItemService.findByEPerson(context.getSession(), ePerson);
         if (!workspaceBySubmitter.isEmpty()) {
             tableList.add("workspaceitem");
         }
 
         ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
-        if (!resourcePolicyService.find(context, ePerson).isEmpty()) {
+        if (!resourcePolicyService.find(context.getSession(), ePerson).isEmpty()) {
             tableList.add("resourcepolicy");
         }
 

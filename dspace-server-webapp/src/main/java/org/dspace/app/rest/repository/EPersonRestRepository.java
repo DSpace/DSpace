@@ -161,7 +161,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             throw new DSpaceBadRequestException(
                 "Registration is disabled, you are not authorized to create a new Authorization");
         }
-        RegistrationData registrationData = registrationDataService.findByToken(context, token);
+        RegistrationData registrationData = registrationDataService.findByToken(context.getSession(), token);
         if (registrationData == null) {
             throw new DSpaceBadRequestException("The token given as parameter: " + token + " does not exist" +
                                                 " in the database");

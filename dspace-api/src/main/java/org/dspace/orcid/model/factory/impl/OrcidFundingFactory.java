@@ -156,7 +156,7 @@ public class OrcidFundingFactory implements OrcidEntityFactory {
 
         try {
 
-            return relationshipTypeService.findByLeftwardOrRightwardTypeName(context,
+            return relationshipTypeService.findByLeftwardOrRightwardTypeName(context.getSession(),
                 fieldMapping.getOrganizationRelationshipType()).stream()
                 .flatMap(relationshipType -> getRelationships(context, item, relationshipType))
                 .map(relationship -> getRelatedItem(item, relationship))

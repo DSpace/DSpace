@@ -67,7 +67,7 @@ public class FormatIdentifierTest extends AbstractUnitTest {
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream bs;
         BitstreamFormat result;
-        BitstreamFormat pdf = bitstreamFormatService.findByShortDescription(context, "Adobe PDF");
+        BitstreamFormat pdf = bitstreamFormatService.findByShortDescription(context.getSession(), "Adobe PDF");
 
         //test null filename
         //TODO: the check if filename is null is wrong, as it checks after using a toLowerCase

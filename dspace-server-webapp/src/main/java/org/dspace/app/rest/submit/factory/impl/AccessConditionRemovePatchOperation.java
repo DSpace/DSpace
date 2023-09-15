@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Submission "remove" operation to remove custom resource policies.
- * 
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  */
 public class AccessConditionRemovePatchOperation extends RemovePatchOperation<AccessConditionDTO> {
@@ -54,7 +54,8 @@ public class AccessConditionRemovePatchOperation extends RemovePatchOperation<Ac
                 throw new UnprocessableEntityException("The provided index format is not correct! Must be a number!");
             }
 
-            List<ResourcePolicy> policies = resourcePolicyService.find(context, item, ResourcePolicy.TYPE_CUSTOM);
+            List<ResourcePolicy> policies = resourcePolicyService.find(context.getSession(),
+                    item, ResourcePolicy.TYPE_CUSTOM);
             if (idxToDelete < 0 || idxToDelete >= policies.size()) {
                 throw new UnprocessableEntityException("The provided index:" + idxToDelete + " is not supported,"
                         + " currently the are " + policies.size() + " access conditions");

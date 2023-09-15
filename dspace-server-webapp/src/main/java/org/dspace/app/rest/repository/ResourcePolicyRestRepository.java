@@ -81,7 +81,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     public ResourcePolicyRest findOne(Context context, Integer id) {
         ResourcePolicy source = null;
         try {
-            source = resourcePolicyService.find(context, id);
+            source = resourcePolicyService.find(context.getSession(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -122,12 +122,13 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
             Context context = obtainContext();
             if (action != null) {
                 int actionId = Constants.getActionID(action);
-                resourcePolisies = resourcePolicyService.findByResouceUuidAndActionId(context, resourceUuid, actionId,
-                    Math.toIntExact(pageable.getOffset()),
-                    Math.toIntExact(pageable.getPageSize()));
+                resourcePolisies = resourcePolicyService.findByResouceUuidAndActionId(context.getSession(),
+                        resourceUuid, actionId,
+                        Math.toIntExact(pageable.getOffset()),
+                        Math.toIntExact(pageable.getPageSize()));
                 total = resourcePolicyService.countByResouceUuidAndActionId(context, resourceUuid, actionId);
             } else {
-                resourcePolisies = resourcePolicyService.findByResouceUuid(context, resourceUuid,
+                resourcePolisies = resourcePolicyService.findByResouceUuid(context.getSession(), resourceUuid,
                     Math.toIntExact(pageable.getOffset()),
                     Math.toIntExact(pageable.getPageSize()));
                 total = resourcePolicyService.countByResourceUuid(context, resourceUuid);
@@ -161,13 +162,14 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
                 return null;
             }
             if (resourceUuid != null) {
-                resourcePolisies = resourcePolicyService.findByEPersonAndResourceUuid(context, eperson, resourceUuid,
-                    Math.toIntExact(pageable.getOffset()),
-                    Math.toIntExact(pageable.getPageSize()));
+                resourcePolisies = resourcePolicyService.findByEPersonAndResourceUuid(context.getSession(),
+                        eperson, resourceUuid,
+                        Math.toIntExact(pageable.getOffset()),
+                        Math.toIntExact(pageable.getPageSize()));
                 total = resourcePolicyService.countResourcePoliciesByEPersonAndResourceUuid(context,
                     eperson, resourceUuid);
             } else {
-                resourcePolisies = resourcePolicyService.findByEPerson(context, eperson,
+                resourcePolisies = resourcePolicyService.findByEPerson(context.getSession(), eperson,
                     Math.toIntExact(pageable.getOffset()),
                     Math.toIntExact(pageable.getPageSize()));
                 total = resourcePolicyService.countByEPerson(context, eperson);
@@ -204,12 +206,13 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
                 return null;
             }
             if (resourceUuid != null) {
-                resourcePolisies = resourcePolicyService.findByGroupAndResourceUuid(context, group, resourceUuid,
-                    Math.toIntExact(pageable.getOffset()),
-                    Math.toIntExact(pageable.getPageSize()));
+                resourcePolisies = resourcePolicyService.findByGroupAndResourceUuid(context.getSession(),
+                        group, resourceUuid,
+                        Math.toIntExact(pageable.getOffset()),
+                        Math.toIntExact(pageable.getPageSize()));
                 total = resourcePolicyService.countByGroupAndResourceUuid(context, group, resourceUuid);
             } else {
-                resourcePolisies = resourcePolicyService.findByGroup(context, group,
+                resourcePolisies = resourcePolicyService.findByGroup(context.getSession(), group,
                     Math.toIntExact(pageable.getOffset()),
                     Math.toIntExact(pageable.getPageSize()));
                 total = resourcePolicyService.countResourcePolicyByGroup(context, group);
@@ -297,7 +300,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     protected void delete(Context context, Integer id) throws AuthorizeException {
         ResourcePolicy resourcePolicy = null;
         try {
-            resourcePolicy = resourcePolicyService.find(context, id);
+            resourcePolicy = resourcePolicyService.find(context.getSession(), id);
             if (resourcePolicy == null) {
                 throw new ResourceNotFoundException(
                     ResourcePolicyRest.CATEGORY + "." + ResourcePolicyRest.NAME + " with id: " + id + " not found");
@@ -312,7 +315,7 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     @PreAuthorize("hasPermission(#id, 'resourcepolicy', 'ADMIN')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id,
                          Patch patch) throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException {
-        ResourcePolicy resourcePolicy = resourcePolicyService.find(context, id);
+        ResourcePolicy resourcePolicy = resourcePolicyService.find(context.getSession(), id);
         if (resourcePolicy == null) {
             throw new ResourceNotFoundException(
                 ResourcePolicyRest.CATEGORY + "." + ResourcePolicyRest.NAME + " with id: " + id + " not found");

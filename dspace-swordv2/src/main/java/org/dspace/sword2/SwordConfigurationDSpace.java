@@ -82,7 +82,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration {
     /**
      * Accepted formats
      */
-    private List<String> swordaccepts;
+    private final List<String> swordaccepts;
 
     /**
      * Initialise the sword configuration.  It is at this stage that the
@@ -122,7 +122,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration {
         // Get the accepted formats
         String[] acceptsFormats = configurationService
             .getArrayProperty("swordv2-server.accepts");
-        swordaccepts = new ArrayList<String>();
+        swordaccepts = new ArrayList<>();
         if (ArrayUtils.isEmpty(acceptsFormats)) {
             acceptsFormats = new String[] {"application/zip"};
         }
@@ -175,50 +175,61 @@ public class SwordConfigurationDSpace implements SwordConfiguration {
     // Required by the SwordConfiguration interface
     //////////////////////////////////////////////////////////////////////////////////
 
+    @Override
     public boolean returnDepositReceipt() {
         return true;
     }
 
+    @Override
     public boolean returnStackTraceInError() {
         return configurationService.getBooleanProperty("swordv2-server.verbose-description.error.enable");
     }
 
+    @Override
     public boolean returnErrorBody() {
         return true;
     }
 
+    @Override
     public String generator() {
         return this.getStringProperty("swordv2-server.generator.url",
                                       DSpaceUriRegistry.DSPACE_SWORD_NS);
     }
 
+    @Override
     public String generatorVersion() {
         return this.getStringProperty("swordv2-server.generator.version",
                                       "2.0");
     }
 
+    @Override
     public String administratorEmail() {
         return this.getStringProperty("mail.admin", null);
     }
 
+    @Override
     public String getAuthType() {
         return this.getStringProperty("swordv2-server.auth-type", "Basic",
                                       new String[] {"Basic", "None"});
     }
 
+    @Override
     public boolean storeAndCheckBinary() {
         return true;
     }
 
+    @Override
     public String getTempDirectory() {
         return this.getStringProperty("swordv2-server.upload.tempdir", null);
     }
 
+    @Override
     public String getAlternateUrl() {
         return configurationService
             .getProperty("swordv2-server.error.alternate.url");
     }
 
+    @Override
     public String getAlternateUrlContentType() {
         return configurationService
             .getProperty("swordv2-server.error.alternate.content-type");
@@ -235,7 +246,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration {
 
     public List<String> getDisseminatePackaging()
         throws DSpaceSwordException, SwordError {
-        List<String> dps = new ArrayList<String>();
+        List<String> dps = new ArrayList<>();
         List<String> packagingFormats = configurationService.getPropertyKeys("swordv2-server.disseminate-packaging");
         for (String key : packagingFormats) {
             String value = configurationService.getProperty(key);
@@ -308,6 +319,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration {
      *
      * @return max upload size
      */
+    @Override
     public int getMaxUploadSize() {
         return maxUploadSize;
     }
@@ -407,7 +419,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration {
     public List<String> getAccepts(Context context, DSpaceObject dso)
         throws DSpaceSwordException {
         try {
-            List<String> accepts = new ArrayList<String>();
+            List<String> accepts = new ArrayList<>();
             if (dso instanceof Collection) {
                 for (String format : swordaccepts) {
                     accepts.add(format);
@@ -416,7 +428,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration {
                 // items will take any of the bitstream formats registered, plus
                 // any swordaccepts mimetypes
                 List<BitstreamFormat> bfs = bitstreamFormatService
-                    .findNonInternal(context);
+                    .findNonInternal(context.getSession());
                 for (BitstreamFormat bf : bfs) {
                     accepts.add(bf.getMIMEType());
                 }
@@ -440,7 +452,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration {
      * @throws DSpaceSwordException can be thrown by the internals of the DSpace SWORD implementation
      */
     public List<String> getCollectionAccepts() throws DSpaceSwordException {
-        List<String> accepts = new ArrayList<String>();
+        List<String> accepts = new ArrayList<>();
         for (String format : swordaccepts) {
             accepts.add(format);
         }
@@ -467,7 +479,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration {
         // accept-packaging.METSDSpaceSIP = http://purl.org/net/sword-types/METSDSpaceSIP
         // accept-packaging.[handle].METSDSpaceSIP = http://purl.org/net/sword-types/METSDSpaceSIP
         String handle = col.getHandle();
-        List<String> aps = new ArrayList<String>();
+        List<String> aps = new ArrayList<>();
 
         // build the holding maps of identifiers
         String acceptPackagingPrefix = "swordv2-server.accept-packaging.collection";
@@ -486,7 +498,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration {
 
             // is there NO handle
             boolean general = false;
-            if (suffix.indexOf(".") == -1) {
+            if (!suffix.contains(".")) {
                 // a handle would be separated from the identifier of the package type
                 general = true;
             }
@@ -501,7 +513,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration {
     }
 
     public List<String> getItemAcceptPackaging() {
-        List<String> aps = new ArrayList<String>();
+        List<String> aps = new ArrayList<>();
 
         // build the holding maps of identifiers
         String acceptPackagingPrefix = "swordv2-server.accept-packaging.item";
@@ -611,6 +623,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration {
             .getProperty("swordv2-server.state." + state + ".description");
     }
 
+    @Override
     public boolean allowUnauthenticatedMediaAccess() {
         return false;
     }

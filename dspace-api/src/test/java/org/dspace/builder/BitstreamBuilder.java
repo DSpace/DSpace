@@ -113,7 +113,7 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
     }
 
     public BitstreamBuilder withMimeType(String mimeType) throws SQLException {
-        BitstreamFormat bf = bitstreamFormatService.findByMIMEType(context, mimeType);
+        BitstreamFormat bf = bitstreamFormatService.findByMIMEType(context.getSession(), mimeType);
 
         if (bf != null) {
             bitstream.setFormat(context, bf);

@@ -17,6 +17,7 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.dao.RelationshipTypeDAO;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Context;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class RelationshipTypeServiceImpl implements RelationshipTypeService {
@@ -47,58 +48,57 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
     }
 
     @Override
-    public RelationshipType findbyTypesAndTypeName(Context context,
+    public RelationshipType findbyTypesAndTypeName(Session session,
             EntityType leftType, EntityType rightType,
             String leftwardType,String rightwardType) throws SQLException {
-        return relationshipTypeDAO.findbyTypesAndTypeName(context.getSession(),
+        return relationshipTypeDAO.findbyTypesAndTypeName(session,
                 leftType, rightType, leftwardType, rightwardType);
     }
 
     @Override
-    public List<RelationshipType> findAll(Context context) throws SQLException {
-        return findAll(context, -1, -1);
+    public List<RelationshipType> findAll(Session session) throws SQLException {
+        return findAll(session, -1, -1);
     }
 
     @Override
-    public List<RelationshipType> findAll(Context context, Integer limit, Integer offset) throws SQLException {
-
-        return relationshipTypeDAO.findAll(context.getSession(), RelationshipType.class, limit, offset);
+    public List<RelationshipType> findAll(Session session, Integer limit, Integer offset) throws SQLException {
+        return relationshipTypeDAO.findAll(session, RelationshipType.class, limit, offset);
     }
 
     @Override
-    public List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String typeName)
+    public List<RelationshipType> findByLeftwardOrRightwardTypeName(Session session, String typeName)
             throws SQLException {
-        return findByLeftwardOrRightwardTypeName(context, typeName, -1, -1);
+        return findByLeftwardOrRightwardTypeName(session, typeName, -1, -1);
     }
 
     @Override
-    public List<RelationshipType> findByLeftwardOrRightwardTypeName(Context context, String typeName, Integer limit,
+    public List<RelationshipType> findByLeftwardOrRightwardTypeName(Session session, String typeName, Integer limit,
                                                                     Integer offset)
             throws SQLException {
-        return relationshipTypeDAO.findByLeftwardOrRightwardTypeName(context.getSession(), typeName, limit, offset);
+        return relationshipTypeDAO.findByLeftwardOrRightwardTypeName(session, typeName, limit, offset);
     }
 
     @Override
-    public List<RelationshipType> findByEntityType(Context context, EntityType entityType) throws SQLException {
-        return findByEntityType(context, entityType, -1, -1);
+    public List<RelationshipType> findByEntityType(Session session, EntityType entityType) throws SQLException {
+        return findByEntityType(session, entityType, -1, -1);
     }
 
     @Override
-    public List<RelationshipType> findByEntityType(Context context, EntityType entityType,
+    public List<RelationshipType> findByEntityType(Session session, EntityType entityType,
                                                    Integer limit, Integer offset) throws SQLException {
-        return relationshipTypeDAO.findByEntityType(context.getSession(), entityType, limit, offset);
+        return relationshipTypeDAO.findByEntityType(session, entityType, limit, offset);
     }
 
     @Override
-    public List<RelationshipType> findByEntityType(Context context, EntityType entityType, boolean isLeft)
+    public List<RelationshipType> findByEntityType(Session session, EntityType entityType, boolean isLeft)
             throws SQLException {
-        return findByEntityType(context, entityType, isLeft, -1, -1);
+        return findByEntityType(session, entityType, isLeft, -1, -1);
     }
 
     @Override
-    public List<RelationshipType> findByEntityType(Context context, EntityType entityType, boolean isLeft,
+    public List<RelationshipType> findByEntityType(Session session, EntityType entityType, boolean isLeft,
                                                    Integer limit, Integer offset) throws SQLException {
-        return relationshipTypeDAO.findByEntityType(context.getSession(), entityType, isLeft, limit, offset);
+        return relationshipTypeDAO.findByEntityType(session, entityType, isLeft, limit, offset);
     }
 
     @Override
@@ -142,8 +142,8 @@ public class RelationshipTypeServiceImpl implements RelationshipTypeService {
     }
 
     @Override
-    public RelationshipType find(Context context,int id) throws SQLException {
-        return relationshipTypeDAO.findByID(context.getSession(), RelationshipType.class, id);
+    public RelationshipType find(Session session,int id) throws SQLException {
+        return relationshipTypeDAO.findByID(session, RelationshipType.class, id);
     }
 
     @Override

@@ -65,7 +65,7 @@ public class ResourcePolicyEPersonReplaceRestController {
                                         "The EPerson doesn't exist or the data cannot be resolved to an EPerson.");
         }
 
-        ResourcePolicy resourcePolicy = resourcePolicyService.find(context, id);
+        ResourcePolicy resourcePolicy = resourcePolicyService.find(context.getSession(), id);
         if (Objects.isNull(resourcePolicy)) {
             throw new ResourceNotFoundException("ResourcePolicy with id: " + id + " not found");
         }

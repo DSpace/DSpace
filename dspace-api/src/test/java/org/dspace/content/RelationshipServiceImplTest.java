@@ -162,7 +162,7 @@ public class RelationshipServiceImplTest {
                 .thenReturn(relationship);
 
         // The reported Relationship should match our mocked relationship
-        assertEquals("TestFind 0", relationship, relationshipService.find(context, relationship.getID()));
+        assertEquals("TestFind 0", relationship, relationshipService.find(context.getSession(), relationship.getID()));
     }
 
     @Test
@@ -251,7 +251,7 @@ public class RelationshipServiceImplTest {
                 .thenReturn(leftTypelist);
         when(relationshipService.findByItemAndRelationshipType(context.getSession(), rightItem, testRel, false))
                 .thenReturn(rightTypelist);
-        when(relationshipService.find(context,0)).thenReturn(relationship);
+        when(relationshipService.find(context.getSession(),0)).thenReturn(relationship);
 
         // Invoke delete()
         relationshipService.delete(context, relationship);

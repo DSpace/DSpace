@@ -450,11 +450,11 @@ public class BitstreamResource extends Resource {
 
             dspaceBitstream.setDescription(context, bitstream.getDescription());
             if (getMimeType(bitstream.getName()) == null) {
-                BitstreamFormat unknownFormat = bitstreamFormatService.findUnknown(context);
+                BitstreamFormat unknownFormat = bitstreamFormatService.findUnknown(context.getSession());
                 bitstreamService.setFormat(context, dspaceBitstream, unknownFormat);
             } else {
                 BitstreamFormat guessedFormat = bitstreamFormatService
-                    .findByMIMEType(context, getMimeType(bitstream.getName()));
+                    .findByMIMEType(context.getSession(), getMimeType(bitstream.getName()));
                 bitstreamService.setFormat(context, dspaceBitstream, guessedFormat);
             }
             dspaceBitstream.setName(context, bitstream.getName());
@@ -676,7 +676,7 @@ public class BitstreamResource extends Resource {
             writeStats(dspaceBitstream, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers,
                        request, context);
 
-            org.dspace.authorize.ResourcePolicy resourcePolicy = resourcePolicyService.find(context, policyId);
+            org.dspace.authorize.ResourcePolicy resourcePolicy = resourcePolicyService.find(context.getSession(), policyId);
             if (resourcePolicy.getdSpaceObject().getID().equals(dspaceBitstream.getID()) && authorizeService
                 .authorizeActionBoolean(context, dspaceBitstream, org.dspace.core.Constants.REMOVE)) {
 

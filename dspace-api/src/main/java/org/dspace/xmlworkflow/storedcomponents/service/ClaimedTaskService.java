@@ -16,6 +16,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.service.DSpaceCRUDService;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the ClaimedTask object.
@@ -26,43 +27,43 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  */
 public interface ClaimedTaskService extends DSpaceCRUDService<ClaimedTask> {
 
-    public List<ClaimedTask> findByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException;
+    public List<ClaimedTask> findByWorkflowItem(Session session, XmlWorkflowItem workflowItem) throws SQLException;
 
     /**
      * Find the single task for a given workflow item claimed by a given EPerson.
-     * @param context
+     * @param session the current request's database context.
      * @param workflowItem find task for this item.
      * @param ePerson find task claimed by this EPerson.
      * @return the single matching task, or null if none.
      * @throws SQLException passed through.
      */
-    public ClaimedTask findByWorkflowIdAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
+    public ClaimedTask findByWorkflowIdAndEPerson(Session session, XmlWorkflowItem workflowItem, EPerson ePerson)
         throws SQLException;
 
-    public List<ClaimedTask> findByEperson(Context context, EPerson ePerson) throws SQLException;
+    public List<ClaimedTask> findByEperson(Session session, EPerson ePerson) throws SQLException;
 
-    public List<ClaimedTask> find(Context context, XmlWorkflowItem workflowItem, String stepID) throws SQLException;
+    public List<ClaimedTask> find(Session session, XmlWorkflowItem workflowItem, String stepID) throws SQLException;
 
-    public ClaimedTask find(Context context, EPerson ePerson, XmlWorkflowItem workflowItem, String stepID,
+    public ClaimedTask find(Session session, EPerson ePerson, XmlWorkflowItem workflowItem, String stepID,
                             String actionID) throws SQLException;
 
-    public List<ClaimedTask> find(Context context, XmlWorkflowItem workflowItem, String stepID, String actionID)
+    public List<ClaimedTask> find(Session session, XmlWorkflowItem workflowItem, String stepID, String actionID)
         throws SQLException;
 
     /**
      * Find all claimed tasks for a given workflow item.
      *
-     * @param context current DSpace session.
+     * @param session current request's database context.
      * @param workflowItem the given workflow item.
      * @return all claimed tasks for that item.
      * @throws SQLException passed through.
      */
-    public List<ClaimedTask> find(Context context, XmlWorkflowItem workflowItem) throws SQLException;
+    public List<ClaimedTask> find(Session session, XmlWorkflowItem workflowItem) throws SQLException;
 
-    public List<ClaimedTask> findAllInStep(Context context, String stepID) throws SQLException;
+    public List<ClaimedTask> findAllInStep(Session session, String stepID) throws SQLException;
 
     public void deleteByWorkflowItem(Context context, XmlWorkflowItem workflowItem)
         throws SQLException, AuthorizeException;
 
-    List<ClaimedTask> findAll(Context context) throws SQLException;
+    List<ClaimedTask> findAll(Session session) throws SQLException;
 }

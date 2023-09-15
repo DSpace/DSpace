@@ -141,7 +141,7 @@ public class SupervisionOrderServiceIT extends AbstractIntegrationTestWithDataba
         context.restoreAuthSystemState();
 
         SupervisionOrder supervisionOrder =
-            supervisionOrderService.find(context, supervisionOrderOne.getID());
+            supervisionOrderService.find(context.getSession(), supervisionOrderOne.getID());
 
         assertThat(supervisionOrder, notNullValue());
         assertThat(supervisionOrder.getID(), is(supervisionOrderOne.getID()));

@@ -382,7 +382,7 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
 
         Version v2 = VersionBuilder.createVersion(context, item, "test").build();
         VersionHistory vh = versionHistoryService.findByItem(context, item);
-        WorkspaceItem witem = workspaceItemService.findByItem(context, v2.getItem());
+        WorkspaceItem witem = workspaceItemService.findByItem(context.getSession(), v2.getItem());
         context.turnOffAuthorisationSystem();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
@@ -553,7 +553,7 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
 
         Version v2 = VersionBuilder.createVersion(context, item, "test").build();
         VersionHistory vh = versionHistoryService.findByItem(context, item);
-        WorkspaceItem witem = workspaceItemService.findByItem(context, v2.getItem());
+        WorkspaceItem witem = workspaceItemService.findByItem(context.getSession(), v2.getItem());
         context.turnOffAuthorisationSystem();
 
         String ePersonToken = getAuthToken(eperson.getEmail(), password);

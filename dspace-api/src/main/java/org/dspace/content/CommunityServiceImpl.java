@@ -631,8 +631,8 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     }
 
     @Override
-    public Community findByAdminGroup(Context context, Group group) throws SQLException {
-        return communityDAO.findByAdminGroup(context.getSession(), group);
+    public Community findByAdminGroup(Session session, Group group) throws SQLException {
+        return communityDAO.findByAdminGroup(session, group);
     }
 
     @Override

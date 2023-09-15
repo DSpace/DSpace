@@ -26,6 +26,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -51,14 +52,14 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     /**
      * Get an ResourcePolicy from the database.
      *
-     * @param context DSpace context object
+     * @param session current request's database context.
      * @param id      ID of the ResourcePolicy
      * @return the ResourcePolicy format, or null if the ID is invalid.
      * @throws SQLException if database error
      */
     @Override
-    public ResourcePolicy find(Context context, int id) throws SQLException {
-        return resourcePolicyDAO.findByID(context.getSession(), ResourcePolicy.class, id);
+    public ResourcePolicy find(Session session, int id) throws SQLException {
+        return resourcePolicyDAO.findByID(session.getSession(), ResourcePolicy.class, id);
     }
 
     /**
@@ -78,47 +79,47 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     }
 
     @Override
-    public List<ResourcePolicy> find(Context c, DSpaceObject o) throws SQLException {
-        return resourcePolicyDAO.findByDso(c.getSession(), o);
+    public List<ResourcePolicy> find(Session s, DSpaceObject o) throws SQLException {
+        return resourcePolicyDAO.findByDso(s, o);
     }
 
 
     @Override
-    public List<ResourcePolicy> find(Context c, DSpaceObject o, String type) throws SQLException {
-        return resourcePolicyDAO.findByDsoAndType(c.getSession(), o, type);
+    public List<ResourcePolicy> find(Session s, DSpaceObject o, String type) throws SQLException {
+        return resourcePolicyDAO.findByDsoAndType(s, o, type);
     }
 
     @Override
-    public List<ResourcePolicy> find(Context context, Group group) throws SQLException {
-        return resourcePolicyDAO.findByGroup(context.getSession(), group);
+    public List<ResourcePolicy> find(Session session, Group group) throws SQLException {
+        return resourcePolicyDAO.findByGroup(session, group);
     }
 
     @Override
-    public List<ResourcePolicy> find(Context c, DSpaceObject o, int actionId) throws SQLException {
-        return resourcePolicyDAO.findByDSoAndAction(c.getSession(), o, actionId);
+    public List<ResourcePolicy> find(Session s, DSpaceObject o, int actionId) throws SQLException {
+        return resourcePolicyDAO.findByDSoAndAction(s, o, actionId);
     }
 
     @Override
-    public List<ResourcePolicy> find(Context c, DSpaceObject dso, Group group, int action) throws SQLException {
-        return resourcePolicyDAO.findByTypeGroupAction(c.getSession(), dso, group, action);
+    public List<ResourcePolicy> find(Session s, DSpaceObject dso, Group group, int action) throws SQLException {
+        return resourcePolicyDAO.findByTypeGroupAction(s, dso, group, action);
     }
 
     @Override
-    public List<ResourcePolicy> find(Context c, EPerson e, List<Group> groups, int action, int type_id)
+    public List<ResourcePolicy> find(Session s, EPerson e, List<Group> groups, int action, int type_id)
         throws SQLException {
-        return resourcePolicyDAO.findByEPersonGroupTypeIdAction(c.getSession(), e, groups, action, type_id);
+        return resourcePolicyDAO.findByEPersonGroupTypeIdAction(s, e, groups, action, type_id);
     }
 
     @Override
-    public List<ResourcePolicy> find(Context context, EPerson ePerson) throws SQLException {
-        return resourcePolicyDAO.findByEPerson(context.getSession(), ePerson);
+    public List<ResourcePolicy> find(Session session, EPerson ePerson) throws SQLException {
+        return resourcePolicyDAO.findByEPerson(session, ePerson);
     }
 
     @Override
-    public List<ResourcePolicy> findByTypeGroupActionExceptId(Context context, DSpaceObject dso, Group group,
+    public List<ResourcePolicy> findByTypeGroupActionExceptId(Session session, DSpaceObject dso, Group group,
                                                               int action, int notPolicyID)
         throws SQLException {
-        return resourcePolicyDAO.findByTypeGroupActionExceptId(context.getSession(),
+        return resourcePolicyDAO.findByTypeGroupActionExceptId(session,
                 dso, group, action, notPolicyID);
     }
 
@@ -329,15 +330,15 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     }
 
     @Override
-    public List<ResourcePolicy> findExceptRpType(Context c, DSpaceObject o, int actionID, String rpType)
+    public List<ResourcePolicy> findExceptRpType(Session s, DSpaceObject o, int actionID, String rpType)
         throws SQLException {
-        return resourcePolicyDAO.findByDSoAndActionExceptRpType(c.getSession(), o, actionID, rpType);
+        return resourcePolicyDAO.findByDSoAndActionExceptRpType(s.getSession(), o, actionID, rpType);
     }
 
     @Override
-    public List<ResourcePolicy> findByEPerson(Context context, EPerson ePerson, int offset, int limit)
+    public List<ResourcePolicy> findByEPerson(Session session, EPerson ePerson, int offset, int limit)
         throws SQLException {
-        return resourcePolicyDAO.findByEPerson(context.getSession(), ePerson, offset, limit);
+        return resourcePolicyDAO.findByEPerson(session, ePerson, offset, limit);
     }
 
     @Override
@@ -346,9 +347,9 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     }
 
     @Override
-    public List<ResourcePolicy> findByEPersonAndResourceUuid(Context context, EPerson eperson, UUID resourceUuid,
+    public List<ResourcePolicy> findByEPersonAndResourceUuid(Session session, EPerson eperson, UUID resourceUuid,
         int offset, int limit) throws SQLException {
-        return resourcePolicyDAO.findByEPersonAndResourceUuid(context.getSession(),
+        return resourcePolicyDAO.findByEPersonAndResourceUuid(session,
                 eperson, resourceUuid, offset, limit);
     }
 
@@ -359,9 +360,9 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     }
 
     @Override
-    public List<ResourcePolicy> findByResouceUuidAndActionId(Context context, UUID resourceUuid, int actionId,
+    public List<ResourcePolicy> findByResouceUuidAndActionId(Session session, UUID resourceUuid, int actionId,
         int offset, int limit) throws SQLException {
-        return resourcePolicyDAO.findByResouceUuidAndActionId(context.getSession(),
+        return resourcePolicyDAO.findByResouceUuidAndActionId(session,
                 resourceUuid, actionId, offset, limit);
     }
 
@@ -371,9 +372,9 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     }
 
     @Override
-    public List<ResourcePolicy> findByResouceUuid(Context context, UUID resourceUuid, int offset, int limit)
+    public List<ResourcePolicy> findByResouceUuid(Session session, UUID resourceUuid, int offset, int limit)
         throws SQLException {
-        return resourcePolicyDAO.findByResouceUuid(context.getSession(), resourceUuid, offset, limit);
+        return resourcePolicyDAO.findByResouceUuid(session, resourceUuid, offset, limit);
     }
 
     @Override
@@ -382,8 +383,8 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     }
 
     @Override
-    public List<ResourcePolicy> findByGroup(Context context, Group group, int offset, int limit) throws SQLException {
-        return resourcePolicyDAO.findByGroup(context.getSession(), group, offset, limit);
+    public List<ResourcePolicy> findByGroup(Session session, Group group, int offset, int limit) throws SQLException {
+        return resourcePolicyDAO.findByGroup(session, group, offset, limit);
     }
 
     @Override
@@ -392,9 +393,9 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
     }
 
     @Override
-    public List<ResourcePolicy> findByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid,
+    public List<ResourcePolicy> findByGroupAndResourceUuid(Session session, Group group, UUID resourceUuid,
         int offset, int limit) throws SQLException {
-        return resourcePolicyDAO.findByGroupAndResourceUuid(context.getSession(), group, resourceUuid, offset, limit);
+        return resourcePolicyDAO.findByGroupAndResourceUuid(session, group, resourceUuid, offset, limit);
     }
 
     @Override

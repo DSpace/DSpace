@@ -69,27 +69,27 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
     @Test
     public void findAllRelationshipTypesForPublications() throws Exception {
 
-        EntityType publicationEntityType = entityTypeService.findByEntityType(context, "Publication");
-        EntityType personEntityType = entityTypeService.findByEntityType(context, "Person");
-        EntityType projectEntityType = entityTypeService.findByEntityType(context, "Project");
-        EntityType orgunitEntityType = entityTypeService.findByEntityType(context, "OrgUnit");
-        EntityType journalIssueEntityType = entityTypeService.findByEntityType(context, "journalIssue");
+        EntityType publicationEntityType = entityTypeService.findByEntityType(context.getSession(), "Publication");
+        EntityType personEntityType = entityTypeService.findByEntityType(context.getSession(), "Person");
+        EntityType projectEntityType = entityTypeService.findByEntityType(context.getSession(), "Project");
+        EntityType orgunitEntityType = entityTypeService.findByEntityType(context.getSession(), "OrgUnit");
+        EntityType journalIssueEntityType = entityTypeService.findByEntityType(context.getSession(), "journalIssue");
 
         RelationshipType relationshipType1 = relationshipTypeService
-            .findbyTypesAndTypeName(context, publicationEntityType, personEntityType, "isAuthorOfPublication",
-                                  "isPublicationOfAuthor");
+            .findbyTypesAndTypeName(context.getSession(), publicationEntityType, personEntityType,
+                    "isAuthorOfPublication", "isPublicationOfAuthor");
         RelationshipType relationshipType2 = relationshipTypeService
-            .findbyTypesAndTypeName(context, publicationEntityType, projectEntityType, "isProjectOfPublication",
-                                  "isPublicationOfProject");
+            .findbyTypesAndTypeName(context.getSession(), publicationEntityType, projectEntityType,
+                    "isProjectOfPublication", "isPublicationOfProject");
         RelationshipType relationshipType3 = relationshipTypeService
-            .findbyTypesAndTypeName(context, publicationEntityType, orgunitEntityType, "isOrgUnitOfPublication",
-                                  "isPublicationOfOrgUnit");
+            .findbyTypesAndTypeName(context.getSession(), publicationEntityType, orgunitEntityType,
+                    "isOrgUnitOfPublication", "isPublicationOfOrgUnit");
         RelationshipType relationshipType4 = relationshipTypeService
-            .findbyTypesAndTypeName(context, journalIssueEntityType, publicationEntityType,
+            .findbyTypesAndTypeName(context.getSession(), journalIssueEntityType, publicationEntityType,
                     "isPublicationOfJournalIssue", "isJournalIssueOfPublication");
         RelationshipType relationshipType5 = relationshipTypeService
-            .findbyTypesAndTypeName(context, publicationEntityType, orgunitEntityType, "isAuthorOfPublication",
-                                  "isPublicationOfAuthor");
+            .findbyTypesAndTypeName(context.getSession(), publicationEntityType, orgunitEntityType,
+                    "isAuthorOfPublication", "isPublicationOfAuthor");
         getClient().perform(get("/api/core/entitytypes/" + publicationEntityType.getID() + "/relationshiptypes"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.relationshiptypes", containsInAnyOrder(
@@ -121,21 +121,21 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
     @Test
     public void findAllRelationshipTypesForPublicationsPaginationTest() throws Exception {
 
-        EntityType person = entityTypeService.findByEntityType(context, "Person");
-        EntityType orgunit = entityTypeService.findByEntityType(context, "OrgUnit");
-        EntityType project = entityTypeService.findByEntityType(context, "Project");
-        EntityType publication = entityTypeService.findByEntityType(context, "Publication");
-        EntityType journalIssue = entityTypeService.findByEntityType(context, "journalIssue");
+        EntityType person = entityTypeService.findByEntityType(context.getSession(), "Person");
+        EntityType orgunit = entityTypeService.findByEntityType(context.getSession(), "OrgUnit");
+        EntityType project = entityTypeService.findByEntityType(context.getSession(), "Project");
+        EntityType publication = entityTypeService.findByEntityType(context.getSession(), "Publication");
+        EntityType journalIssue = entityTypeService.findByEntityType(context.getSession(), "journalIssue");
 
-        RelationshipType relationshipType1 = relationshipTypeService.findbyTypesAndTypeName(context,
+        RelationshipType relationshipType1 = relationshipTypeService.findbyTypesAndTypeName(context.getSession(),
                              publication, person, "isAuthorOfPublication", "isPublicationOfAuthor");
-        RelationshipType relationshipType2 = relationshipTypeService.findbyTypesAndTypeName(context,
+        RelationshipType relationshipType2 = relationshipTypeService.findbyTypesAndTypeName(context.getSession(),
                           publication, project, "isProjectOfPublication", "isPublicationOfProject");
-        RelationshipType relationshipType3 = relationshipTypeService.findbyTypesAndTypeName(context,
+        RelationshipType relationshipType3 = relationshipTypeService.findbyTypesAndTypeName(context.getSession(),
                           publication, orgunit, "isOrgUnitOfPublication", "isPublicationOfOrgUnit");
-        RelationshipType relationshipType4 = relationshipTypeService.findbyTypesAndTypeName(context,
+        RelationshipType relationshipType4 = relationshipTypeService.findbyTypesAndTypeName(context.getSession(),
            journalIssue, publication, "isPublicationOfJournalIssue", "isJournalIssueOfPublication");
-        RelationshipType relationshipType5 = relationshipTypeService.findbyTypesAndTypeName(context,
+        RelationshipType relationshipType5 = relationshipTypeService.findbyTypesAndTypeName(context.getSession(),
                              publication, orgunit, "isAuthorOfPublication","isPublicationOfAuthor");
 
         getClient().perform(get("/api/core/entitytypes/" + publication.getID() + "/relationshiptypes")
@@ -176,27 +176,27 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
     @Test
     public void findAllRelationshipTypesForPublicationsEmbedTest() throws Exception {
 
-        EntityType publicationEntityType = entityTypeService.findByEntityType(context, "Publication");
-        EntityType personEntityType = entityTypeService.findByEntityType(context, "Person");
-        EntityType projectEntityType = entityTypeService.findByEntityType(context, "Project");
-        EntityType orgunitEntityType = entityTypeService.findByEntityType(context, "OrgUnit");
-        EntityType journalIssueEntityType = entityTypeService.findByEntityType(context, "journalIssue");
+        EntityType publicationEntityType = entityTypeService.findByEntityType(context.getSession(), "Publication");
+        EntityType personEntityType = entityTypeService.findByEntityType(context.getSession(), "Person");
+        EntityType projectEntityType = entityTypeService.findByEntityType(context.getSession(), "Project");
+        EntityType orgunitEntityType = entityTypeService.findByEntityType(context.getSession(), "OrgUnit");
+        EntityType journalIssueEntityType = entityTypeService.findByEntityType(context.getSession(), "journalIssue");
 
         RelationshipType relationshipType1 = relationshipTypeService
-            .findbyTypesAndTypeName(context, publicationEntityType, personEntityType, "isAuthorOfPublication",
-                                  "isPublicationOfAuthor");
+            .findbyTypesAndTypeName(context.getSession(), publicationEntityType, personEntityType,
+                    "isAuthorOfPublication", "isPublicationOfAuthor");
         RelationshipType relationshipType2 = relationshipTypeService
-            .findbyTypesAndTypeName(context, publicationEntityType, projectEntityType, "isProjectOfPublication",
-                                  "isPublicationOfProject");
+            .findbyTypesAndTypeName(context.getSession(), publicationEntityType, projectEntityType,
+                    "isProjectOfPublication", "isPublicationOfProject");
         RelationshipType relationshipType3 = relationshipTypeService
-            .findbyTypesAndTypeName(context, publicationEntityType, orgunitEntityType, "isOrgUnitOfPublication",
-                                  "isPublicationOfOrgUnit");
+            .findbyTypesAndTypeName(context.getSession(), publicationEntityType, orgunitEntityType,
+                    "isOrgUnitOfPublication", "isPublicationOfOrgUnit");
         RelationshipType relationshipType4 = relationshipTypeService
-            .findbyTypesAndTypeName(context, journalIssueEntityType, publicationEntityType,
+            .findbyTypesAndTypeName(context.getSession(), journalIssueEntityType, publicationEntityType,
                     "isPublicationOfJournalIssue", "isJournalIssueOfPublication");
         RelationshipType relationshipType5 = relationshipTypeService
-            .findbyTypesAndTypeName(context, publicationEntityType, orgunitEntityType, "isAuthorOfPublication",
-                                  "isPublicationOfAuthor");
+            .findbyTypesAndTypeName(context.getSession(), publicationEntityType, orgunitEntityType,
+                    "isAuthorOfPublication", "isPublicationOfAuthor");
 
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/core/relationships?embed=relationshipType"))
@@ -274,17 +274,20 @@ public class RelationshipTypeRestControllerIT extends AbstractEntityIntegrationT
                                        .build();
 
         RelationshipType isOrgUnitOfPersonRelationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Person"),
-                                  entityTypeService.findByEntityType(context, "OrgUnit"),
-                                  "isOrgUnitOfPerson", "isPersonOfOrgUnit");
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), "Person"),
+                    entityTypeService.findByEntityType(context.getSession(), "OrgUnit"),
+                    "isOrgUnitOfPerson", "isPersonOfOrgUnit");
         RelationshipType isOrgUnitOfProjectRelationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Project"),
-                                  entityTypeService.findByEntityType(context, "OrgUnit"),
-                                  "isOrgUnitOfProject", "isProjectOfOrgUnit");
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), "Project"),
+                    entityTypeService.findByEntityType(context.getSession(), "OrgUnit"),
+                    "isOrgUnitOfProject", "isProjectOfOrgUnit");
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
-                                  entityTypeService.findByEntityType(context, "Person"),
-                                  "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), "Publication"),
+                    entityTypeService.findByEntityType(context.getSession(), "Person"),
+                    "isAuthorOfPublication", "isPublicationOfAuthor");
 
         Relationship relationship1 = RelationshipBuilder
             .createRelationshipBuilder(context, publication, author1, isAuthorOfPublicationRelationshipType).build();

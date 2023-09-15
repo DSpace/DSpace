@@ -220,14 +220,16 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                               .build();
 
         isAuthorOfPublicationRelationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
-                                  entityTypeService.findByEntityType(context, "Person"),
-                                  "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), "Publication"),
+                    entityTypeService.findByEntityType(context.getSession(), "Person"),
+                    "isAuthorOfPublication", "isPublicationOfAuthor");
 
         isOrgUnitOfPersonRelationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Person"),
-                                  entityTypeService.findByEntityType(context, "OrgUnit"),
-                                  "isOrgUnitOfPerson", "isPersonOfOrgUnit");
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), "Person"),
+                    entityTypeService.findByEntityType(context.getSession(), "OrgUnit"),
+                    "isOrgUnitOfPerson", "isPersonOfOrgUnit");
 
         user1 = EPersonBuilder.createEPerson(context)
                               .withNameInMetadata("first", "last")
@@ -246,17 +248,20 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         RelationshipType isOrgUnitOfPersonRelationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Person"),
-                                  entityTypeService.findByEntityType(context, "OrgUnit"),
-                                  "isOrgUnitOfPerson", "isPersonOfOrgUnit");
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), "Person"),
+                    entityTypeService.findByEntityType(context.getSession(), "OrgUnit"),
+                    "isOrgUnitOfPerson", "isPersonOfOrgUnit");
         RelationshipType isOrgUnitOfProjectRelationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Project"),
-                                  entityTypeService.findByEntityType(context, "OrgUnit"),
-                                  "isOrgUnitOfProject", "isProjectOfOrgUnit");
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), "Project"),
+                    entityTypeService.findByEntityType(context.getSession(), "OrgUnit"),
+                    "isOrgUnitOfProject", "isProjectOfOrgUnit");
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
-                                  entityTypeService.findByEntityType(context, "Person"),
-                                  "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), "Publication"),
+                    entityTypeService.findByEntityType(context.getSession(), "Person"),
+                    "isAuthorOfPublication", "isPublicationOfAuthor");
 
         Relationship relationship1 = RelationshipBuilder
             .createRelationshipBuilder(context, author1, orgUnit1, isOrgUnitOfPersonRelationshipType).build();
@@ -779,10 +784,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                        .build();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
-                                  entityTypeService.findByEntityType(context, "Person"),
-                                  "isAuthorOfPublication", "isPublicationOfAuthor");
-
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), "Publication"),
+                    entityTypeService.findByEntityType(context.getSession(), "Person"),
+                    "isAuthorOfPublication", "isPublicationOfAuthor");
 
         String adminToken = getAuthToken(admin.getEmail(), password);
 
@@ -2248,17 +2253,20 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         RelationshipType isOrgUnitOfPersonRelationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Person"),
-                                  entityTypeService.findByEntityType(context, "OrgUnit"),
-                                  "isOrgUnitOfPerson", "isPersonOfOrgUnit");
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), "Person"),
+                    entityTypeService.findByEntityType(context.getSession(), "OrgUnit"),
+                    "isOrgUnitOfPerson", "isPersonOfOrgUnit");
         RelationshipType isOrgUnitOfProjectRelationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Project"),
-                                  entityTypeService.findByEntityType(context, "OrgUnit"),
-                                  "isOrgUnitOfProject", "isProjectOfOrgUnit");
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), "Project"),
+                    entityTypeService.findByEntityType(context.getSession(), "OrgUnit"),
+                    "isOrgUnitOfProject", "isProjectOfOrgUnit");
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
-                                  entityTypeService.findByEntityType(context, "Person"),
-                                  "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), "Publication"),
+                    entityTypeService.findByEntityType(context.getSession(), "Person"),
+                    "isAuthorOfPublication", "isPublicationOfAuthor");
 
         // We're creating a Relationship of type isOrgUnitOfPerson between an author and an orgunit
         Relationship relationship1 = RelationshipBuilder
@@ -2387,9 +2395,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
-                                  entityTypeService.findByEntityType(context, "Person"),
-                                  "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), "Publication"),
+                    entityTypeService.findByEntityType(context.getSession(), "Person"),
+                    "isAuthorOfPublication", "isPublicationOfAuthor");
 
         Relationship relationship3 = RelationshipBuilder
             .createRelationshipBuilder(context, publication1, author1, isAuthorOfPublicationRelationshipType)
@@ -2425,9 +2434,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
-                                  entityTypeService.findByEntityType(context, "Person"),
-                                  "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), "Publication"),
+                    entityTypeService.findByEntityType(context.getSession(), "Person"),
+                    "isAuthorOfPublication", "isPublicationOfAuthor");
 
         Relationship relationship3 = RelationshipBuilder
             .createRelationshipBuilder(context, publication1, author3, isAuthorOfPublicationRelationshipType)
@@ -2466,9 +2476,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
-                                  entityTypeService.findByEntityType(context, "Person"),
-                                  "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), "Publication"),
+                    entityTypeService.findByEntityType(context.getSession(), "Person"),
+                    "isAuthorOfPublication", "isPublicationOfAuthor");
 
         Item author1 = ItemBuilder.createItem(context, col1)
                                   .withTitle("Author1")
@@ -2521,9 +2532,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
-                                  entityTypeService.findByEntityType(context, "Person"),
-                                  "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), "Publication"),
+                    entityTypeService.findByEntityType(context.getSession(), "Person"),
+                    "isAuthorOfPublication", "isPublicationOfAuthor");
 
         Relationship relationship3 = RelationshipBuilder
             .createRelationshipBuilder(context, publication1, author3, isAuthorOfPublicationRelationshipType)
@@ -2702,9 +2714,9 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     @Test
     public void orgUnitAndOrgUnitRelationshipVirtualMetadataTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        EntityType orgUnit = entityTypeService.findByEntityType(context, "OrgUnit");
+        EntityType orgUnit = entityTypeService.findByEntityType(context.getSession(), "OrgUnit");
         RelationshipType isParentOrgUnitOf = relationshipTypeService
-            .findbyTypesAndTypeName(context, orgUnit, orgUnit, "isParentOrgUnitOf", "isChildOrgUnitOf");
+            .findbyTypesAndTypeName(context.getSession(), orgUnit, orgUnit, "isParentOrgUnitOf", "isChildOrgUnitOf");
 
         MetadataSchema metadataSchema = metadataSchemaService.find(context.getSession(), "relation");
         MetadataFieldBuilder.createMetadataField(context, metadataSchema, "isParentOrgUnitOf", null, null).build();
@@ -2751,9 +2763,9 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     @Test
     public void orgUnitFindByLabelParentChildOfCountTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        EntityType orgUnit = entityTypeService.findByEntityType(context, "OrgUnit");
+        EntityType orgUnit = entityTypeService.findByEntityType(context.getSession(), "OrgUnit");
         RelationshipType isParentOrgUnitOf = relationshipTypeService
-            .findbyTypesAndTypeName(context, orgUnit, orgUnit, "isParentOrgUnitOf", "isChildOrgUnitOf");
+            .findbyTypesAndTypeName(context.getSession(), orgUnit, orgUnit, "isParentOrgUnitOf", "isChildOrgUnitOf");
 
         MetadataSchema metadataSchema = metadataSchemaService.find(context.getSession(), "relation");
         MetadataFieldBuilder.createMetadataField(context, metadataSchema, "isParentOrgUnitOf", null, null).build();
@@ -2816,9 +2828,9 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     @Test
     public void orgUnitLeftMaxCardinalityTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        EntityType orgUnit = entityTypeService.findByEntityType(context, "OrgUnit");
+        EntityType orgUnit = entityTypeService.findByEntityType(context.getSession(), "OrgUnit");
         RelationshipType isParentOrgUnitOf = relationshipTypeService
-            .findbyTypesAndTypeName(context, orgUnit, orgUnit, "isParentOrgUnitOf", "isChildOrgUnitOf");
+            .findbyTypesAndTypeName(context.getSession(), orgUnit, orgUnit, "isParentOrgUnitOf", "isChildOrgUnitOf");
 
         MetadataSchema metadataSchema = metadataSchemaService.find(context.getSession(), "relation");
         MetadataFieldBuilder.createMetadataField(context, metadataSchema, "isParentOrgUnitOf", null, null).build();
@@ -2877,26 +2889,26 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     public void testVirtualMdInRESTAndSolrDoc() throws Exception {
         context.turnOffAuthorisationSystem();
         // Create entity types if needed
-        EntityType journalEntityType = entityTypeService.findByEntityType(context, "Journal");
+        EntityType journalEntityType = entityTypeService.findByEntityType(context.getSession(), "Journal");
         if (journalEntityType == null) {
             journalEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Journal").build();
         }
-        EntityType journalVolumeEntityType = entityTypeService.findByEntityType(context, "JournalVolume");
+        EntityType journalVolumeEntityType = entityTypeService.findByEntityType(context.getSession(), "JournalVolume");
         if (journalVolumeEntityType == null) {
             journalVolumeEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "JournalVolume").build();
         }
-        EntityType journalIssueEntityType = entityTypeService.findByEntityType(context, "JournalIssue");
+        EntityType journalIssueEntityType = entityTypeService.findByEntityType(context.getSession(), "JournalIssue");
         if (journalIssueEntityType == null) {
             journalIssueEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "JournalIssue").build();
         }
-        EntityType publicationEntityType = entityTypeService.findByEntityType(context, "Publication");
+        EntityType publicationEntityType = entityTypeService.findByEntityType(context.getSession(), "Publication");
         if (publicationEntityType == null) {
             publicationEntityType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         }
 
         // Create relationship types if needed
         RelationshipType isPublicationOfJournalIssue = relationshipTypeService
-            .findbyTypesAndTypeName(context, journalIssueEntityType, publicationEntityType,
+            .findbyTypesAndTypeName(context.getSession(), journalIssueEntityType, publicationEntityType,
                 "isPublicationOfJournalIssue", "isJournalIssueOfPublication");
         if (isPublicationOfJournalIssue == null) {
             isPublicationOfJournalIssue = RelationshipTypeBuilder.createRelationshipTypeBuilder(context,
@@ -2904,7 +2916,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                 "isJournalIssueOfPublication", null, null, null, null).build();
         }
         RelationshipType isIssueOfJournalVolume = relationshipTypeService
-            .findbyTypesAndTypeName(context, journalVolumeEntityType, journalIssueEntityType,
+            .findbyTypesAndTypeName(context.getSession(), journalVolumeEntityType, journalIssueEntityType,
                 "isIssueOfJournalVolume", "isJournalVolumeOfIssue");
         if (isIssueOfJournalVolume == null) {
             isIssueOfJournalVolume = RelationshipTypeBuilder.createRelationshipTypeBuilder(context,
@@ -2916,7 +2928,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
             isIssueOfJournalVolume.setRightMinCardinality(0);
         }
         RelationshipType isVolumeOfJournal = relationshipTypeService
-            .findbyTypesAndTypeName(context, journalEntityType, journalVolumeEntityType,
+            .findbyTypesAndTypeName(context.getSession(), journalEntityType, journalVolumeEntityType,
                 "isVolumeOfJournal", "isJournalOfVolume");
         if (isVolumeOfJournal == null) {
             isVolumeOfJournal = RelationshipTypeBuilder.createRelationshipTypeBuilder(context,
@@ -3105,9 +3117,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
-                                  entityTypeService.findByEntityType(context, "Person"),
-                                  "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), "Publication"),
+                    entityTypeService.findByEntityType(context.getSession(), "Person"),
+                    "isAuthorOfPublication", "isPublicationOfAuthor");
 
         Relationship relationship1 = RelationshipBuilder.createRelationshipBuilder(context, publication1, author3,
                                                          isAuthorOfPublicationRelationshipType)
@@ -3156,9 +3169,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
-                                             entityTypeService.findByEntityType(context, "Person"),
-                                             "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), "Publication"),
+                    entityTypeService.findByEntityType(context.getSession(), "Person"),
+                    "isAuthorOfPublication", "isPublicationOfAuthor");
 
         RelationshipBuilder.createRelationshipBuilder(context, publication1, author3,
                             isAuthorOfPublicationRelationshipType)
@@ -3212,9 +3226,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
-                                  entityTypeService.findByEntityType(context, "Person"),
-                                  "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), "Publication"),
+                    entityTypeService.findByEntityType(context.getSession(), "Person"),
+                    "isAuthorOfPublication", "isPublicationOfAuthor");
 
         RelationshipBuilder.createRelationshipBuilder(context, publication1, author3,
                             isAuthorOfPublicationRelationshipType)
@@ -3243,9 +3258,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
-                                             entityTypeService.findByEntityType(context, "Person"),
-                                             "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), "Publication"),
+                    entityTypeService.findByEntityType(context.getSession(), "Person"),
+                    "isAuthorOfPublication", "isPublicationOfAuthor");
 
         RelationshipBuilder.createRelationshipBuilder(context, publication1, author3,
                             isAuthorOfPublicationRelationshipType)
@@ -3288,9 +3304,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         RelationshipType isAuthorOfPublicationRelationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
-                                             entityTypeService.findByEntityType(context, "Person"),
-                                             "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), "Publication"),
+                    entityTypeService.findByEntityType(context.getSession(), "Person"),
+                    "isAuthorOfPublication", "isPublicationOfAuthor");
 
         Relationship relationship1 = RelationshipBuilder.createRelationshipBuilder(context, publication1, author3,
                                                          isAuthorOfPublicationRelationshipType)

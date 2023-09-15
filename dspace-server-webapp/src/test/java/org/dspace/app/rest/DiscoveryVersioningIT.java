@@ -253,7 +253,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         context.commit();
 
         // archive the new version, this implies that VersioningConsumer will unarchive the previous version
-        installItemService.installItem(context, workspaceItemService.findByItem(context, newItem));
+        installItemService.installItem(context, workspaceItemService.findByItem(context.getSession(), newItem));
         context.commit();
         indexingService.commit();
 
@@ -1207,7 +1207,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         context.commit();
         indexingService.commit();
         Assert.assertNotEquals(pub1_1, pub1_2);
-        installItemService.installItem(context, workspaceItemService.findByItem(context, pub1_2));
+        installItemService.installItem(context, workspaceItemService.findByItem(context.getSession(), pub1_2));
         context.commit();
         indexingService.commit();
         context.restoreAuthSystemState();
@@ -1514,7 +1514,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // archive project 1.2
         context.turnOffAuthorisationSystem();
-        installItemService.installItem(context, workspaceItemService.findByItem(context, pro1_2));
+        installItemService.installItem(context, workspaceItemService.findByItem(context.getSession(), pro1_2));
         context.commit();
         indexingService.commit();
         context.restoreAuthSystemState();
@@ -1794,7 +1794,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         context.commit();
         indexingService.commit();
         Assert.assertNotEquals(pub1_1, pub1_2);
-        installItemService.installItem(context, workspaceItemService.findByItem(context, pub1_2));
+        installItemService.installItem(context, workspaceItemService.findByItem(context.getSession(), pub1_2));
         context.commit();
         indexingService.commit();
         context.restoreAuthSystemState();
@@ -2108,7 +2108,7 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
 
         // archive project 1.2
         context.turnOffAuthorisationSystem();
-        installItemService.installItem(context, workspaceItemService.findByItem(context, pro1_2));
+        installItemService.installItem(context, workspaceItemService.findByItem(context.getSession(), pro1_2));
         context.commit();
         indexingService.commit();
         context.restoreAuthSystemState();

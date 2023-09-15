@@ -83,7 +83,7 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
     public PoolTaskRest findOne(Context context, Integer id) {
         PoolTask task = null;
         try {
-            task = poolTaskService.find(context, id);
+            task = poolTaskService.find(context.getSession(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -146,7 +146,7 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
             if (item == null) {
                 throw new UnprocessableEntityException("There is no Item with uuid provided, uuid:" + itemUUID);
             }
-            XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.findByItem(context, item);
+            XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.findByItem(context.getSession(), item);
             if (xmlWorkflowItem == null) {
                 return null;
             } else {
@@ -168,7 +168,7 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
             if (item == null) {
                 throw new UnprocessableEntityException("There is no Item with uuid provided, uuid:" + itemUUID);
             }
-            XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.findByItem(context, item);
+            XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.findByItem(context.getSession(), item);
             if (xmlWorkflowItem == null) {
                 return null;
             } else {

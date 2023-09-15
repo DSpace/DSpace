@@ -186,7 +186,7 @@ public class MetadataExporter {
             saveSchema(document, mdSchema);
         } else {
             // Find all schemas
-            List<MetadataSchema> mdSchemas = metadataSchemaService.findAll(context);
+            List<MetadataSchema> mdSchemas = metadataSchemaService.findAll(context.getSession());
 
             for (MetadataSchema mdSchema : mdSchemas) {
                 saveSchema(document, mdSchema);

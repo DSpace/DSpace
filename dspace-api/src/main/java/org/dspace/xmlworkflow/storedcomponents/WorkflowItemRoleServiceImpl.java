@@ -18,6 +18,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.xmlworkflow.storedcomponents.dao.WorkflowItemRoleDAO;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -79,8 +80,8 @@ public class WorkflowItemRoleServiceImpl implements WorkflowItemRoleService {
     }
 
     @Override
-    public WorkflowItemRole find(Context context, int id) throws SQLException {
-        return workflowItemRoleDAO.findByID(context.getSession(), WorkflowItemRole.class, id);
+    public WorkflowItemRole find(Session session, int id) throws SQLException {
+        return workflowItemRoleDAO.findByID(session, WorkflowItemRole.class, id);
     }
 
     @Override

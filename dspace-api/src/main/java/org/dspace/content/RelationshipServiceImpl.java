@@ -603,8 +603,8 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     @Override
-    public Relationship find(Context context, int id) throws SQLException {
-        Relationship relationship = relationshipDAO.findByID(context.getSession(), Relationship.class, id);
+    public Relationship find(Session session, int id) throws SQLException {
+        Relationship relationship = relationshipDAO.findByID(session, Relationship.class, id);
         return relationship;
     }
 
@@ -757,11 +757,11 @@ public class RelationshipServiceImpl implements RelationshipService {
             itemsToUpdate.add(relationship.getRightItem());
 
             if (containsVirtualMetadata(relationship.getRelationshipType().getLeftwardType())) {
-                findModifiedDiscoveryItemsForCurrentItem(context, relationship.getLeftItem(),
+                findModifiedDiscoveryItemsForCurrentItem(context.getSession(), relationship.getLeftItem(),
                                            itemsToUpdate, max, 0, maxDepth);
             }
             if (containsVirtualMetadata(relationship.getRelationshipType().getRightwardType())) {
-                findModifiedDiscoveryItemsForCurrentItem(context, relationship.getRightItem(),
+                findModifiedDiscoveryItemsForCurrentItem(context.getSession(), relationship.getRightItem(),
                                             itemsToUpdate, max, 0, maxDepth);
             }
 
@@ -780,7 +780,7 @@ public class RelationshipServiceImpl implements RelationshipService {
      * It starts from the given item, excludes items already in itemsToUpdate (they're already handled),
      * and can be limited in amount of items or depth to update
      */
-    private void findModifiedDiscoveryItemsForCurrentItem(Context context, Item item, List<Item> itemsToUpdate,
+    private void findModifiedDiscoveryItemsForCurrentItem(Session session, Item item, List<Item> itemsToUpdate,
                                                           int max, int currentDepth, int maxDepth)
         throws SQLException {
         if (itemsToUpdate.size() >= max) {
@@ -794,9 +794,11 @@ public class RelationshipServiceImpl implements RelationshipService {
             return;
         }
         String entityTypeStringFromMetadata = itemService.getEntityTypeLabel(item);
-        EntityType actualEntityType = entityTypeService.findByEntityType(context, entityTypeStringFromMetadata);
+        EntityType actualEntityType
+                = entityTypeService.findByEntityType(session, entityTypeStringFromMetadata);
         // Get all types of relations for the current item
-        List<RelationshipType> relationshipTypes = relationshipTypeService.findByEntityType(context, actualEntityType);
+        List<RelationshipType> relationshipTypes
+                = relationshipTypeService.findByEntityType(session, actualEntityType);
         for (RelationshipType relationshipType : relationshipTypes) {
             //are we searching for items where the current item is on the left
             boolean isLeft = relationshipType.getLeftType().equals(actualEntityType);
@@ -813,7 +815,7 @@ public class RelationshipServiceImpl implements RelationshipService {
                 // we have a relationship type where the items attached to the current item will inherit
                 // virtual metadata from the current item
                 // retrieving the actual relationships so the related items can be updated
-                List<Relationship> list = findByItemAndRelationshipType(context.getSession(),
+                List<Relationship> list = findByItemAndRelationshipType(session,
                         item, relationshipType, isLeft);
                 for (Relationship foundRelationship : list) {
                     Item nextItem;
@@ -828,7 +830,7 @@ public class RelationshipServiceImpl implements RelationshipService {
                     if (!itemsToUpdate.contains(nextItem)) {
                         itemsToUpdate.add(nextItem);
                         // continue the process for the next item, it may also inherit item from the current item
-                        findModifiedDiscoveryItemsForCurrentItem(context, nextItem,
+                        findModifiedDiscoveryItemsForCurrentItem(session, nextItem,
                                 itemsToUpdate, max, currentDepth + 1, maxDepth);
                     }
                 }
@@ -947,7 +949,7 @@ public class RelationshipServiceImpl implements RelationshipService {
                          " off the given relationship was null");
             return false;
         }
-        if (this.find(context, relationship.getID()) == null) {
+        if (this.find(context.getSession(), relationship.getID()) == null) {
             log.warn("The relationship has been deemed invalid since the relationship" +
                          " is not present in the DB with the current ID");
             logRelationshipTypeDetailsForError(relationship.getRelationshipType());

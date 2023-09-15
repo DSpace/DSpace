@@ -692,13 +692,13 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
             return List.of(new IndexableItem(item));
         }
 
-        final WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, item);
+        final WorkspaceItem workspaceItem = workspaceItemService.findByItem(context.getSession(), item);
         if (workspaceItem != null) {
             // a workspace item is linked to the given item
             return List.copyOf(workspaceItemIndexFactory.getIndexableObjects(context, workspaceItem));
         }
 
-        final XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.findByItem(context, item);
+        final XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.findByItem(context.getSession(), item);
         if (xmlWorkflowItem != null) {
             // a workflow item is linked to the given item
             return List.copyOf(workflowItemIndexFactory.getIndexableObjects(context, xmlWorkflowItem));

@@ -188,7 +188,7 @@ public class CollectionDepositor extends Depositor {
                 bitstream.setDescription(context, "SWORD deposit package");
 
                 BitstreamFormat bf = bitstreamFormatService.findByMIMEType(
-                    context, deposit.getContentType());
+                    context.getSession(), deposit.getContentType());
                 if (bf != null) {
                     bitstreamService.setFormat(context, bitstream, bf);
                 }

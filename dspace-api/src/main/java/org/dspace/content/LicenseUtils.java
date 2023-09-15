@@ -150,7 +150,7 @@ public class LicenseUtils {
         }
         b.setAcceptanceDate(context, acceptanceDCDate);
         // Find the License format
-        BitstreamFormat bf = bitstreamFormat.findByShortDescription(context,
+        BitstreamFormat bf = bitstreamFormat.findByShortDescription(context.getSession(),
                                                                     "License");
         b.setFormat(bf);
 

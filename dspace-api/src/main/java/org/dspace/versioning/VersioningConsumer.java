@@ -363,7 +363,7 @@ public class VersioningConsumer implements Consumer {
      */
     protected List<RelationshipType> getRelationshipTypes(Context ctx, EntityType entityType) {
         try {
-            return relationshipTypeService.findByEntityType(ctx, entityType);
+            return relationshipTypeService.findByEntityType(ctx.getSession(), entityType);
         } catch (SQLException e) {
             log.error(
                 "Exception occurred when trying to obtain relationship types via entity type with id {}, label {}",

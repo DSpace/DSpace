@@ -107,7 +107,7 @@ public class MetadataRegistryResource extends Resource {
         try {
             context = createContext();
 
-            List<org.dspace.content.MetadataSchema> schemas = metadataSchemaService.findAll(context);
+            List<org.dspace.content.MetadataSchema> schemas = metadataSchemaService.findAll(context.getSession());
             metadataSchemas = new ArrayList<>();
             for (org.dspace.content.MetadataSchema schema : schemas) {
                 metadataSchemas.add(new MetadataSchema(schema, expand, context));

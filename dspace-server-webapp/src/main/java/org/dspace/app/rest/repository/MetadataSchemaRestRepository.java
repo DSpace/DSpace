@@ -62,7 +62,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
     @Override
     public Page<MetadataSchemaRest> findAll(Context context, Pageable pageable) {
         try {
-            List<MetadataSchema> metadataSchemas = metadataSchemaService.findAll(context);
+            List<MetadataSchema> metadataSchemas = metadataSchemaService.findAll(context.getSession());
             return converter.toRestPage(metadataSchemas, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);

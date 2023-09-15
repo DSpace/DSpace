@@ -22,6 +22,7 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 import org.dspace.curate.Distributive;
+import org.hibernate.Session;
 
 /**
  * ProfileFormats is a task that creates a distribution table of Bitstream
@@ -32,16 +33,10 @@ import org.dspace.curate.Distributive;
 @Distributive
 public class ProfileFormats extends AbstractCurationTask {
     // map of formats to occurrences
-    protected Map<String, Integer> fmtTable = new HashMap<String, Integer>();
+    protected Map<String, Integer> fmtTable = new HashMap<>();
     protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance()
                                                                                    .getBitstreamFormatService();
 
-    /**
-     * Perform the curation task upon passed DSO
-     *
-     * @param dso the DSpace object
-     * @throws IOException if IO error
-     */
     @Override
     public int perform(DSpaceObject dso) throws IOException {
         fmtTable.clear();
@@ -69,8 +64,9 @@ public class ProfileFormats extends AbstractCurationTask {
     private void formatResults() throws IOException {
         try {
             StringBuilder sb = new StringBuilder();
+            Session session = Curator.curationContext().getSession();
             for (String fmt : fmtTable.keySet()) {
-                BitstreamFormat bsf = bitstreamFormatService.findByShortDescription(Curator.curationContext(), fmt);
+                BitstreamFormat bsf = bitstreamFormatService.findByShortDescription(session, fmt);
                 sb.append(String.format("%6d", fmtTable.get(fmt))).append(" (").
                     append(bitstreamFormatService.getSupportLevelText(bsf).charAt(0)).append(") ").
                       append(bsf.getDescription()).append("\n");

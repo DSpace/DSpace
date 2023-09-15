@@ -18,6 +18,7 @@ import org.dspace.checker.service.MostRecentChecksumService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -51,41 +52,20 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService 
     }
 
     @Override
-    public MostRecentChecksum findByBitstream(Context context, Bitstream bitstream) throws SQLException {
-        return mostRecentChecksumDAO.findByBitstream(context.getSession(), bitstream);
+    public MostRecentChecksum findByBitstream(Session session, Bitstream bitstream) throws SQLException {
+        return mostRecentChecksumDAO.findByBitstream(session, bitstream);
     }
 
-    /**
-     * Find all bitstreams that were set to not be processed for the specified
-     * date range.
-     *
-     * @param context   Context
-     * @param startDate the start of the date range
-     * @param endDate   the end of the date range
-     * @return a list of BitstreamHistoryInfo objects
-     * @throws SQLException if database error
-     */
     @Override
-    public List<MostRecentChecksum> findNotProcessedBitstreamsReport(Context context, Date startDate, Date endDate)
+    public List<MostRecentChecksum> findNotProcessedBitstreamsReport(Session session, Date startDate, Date endDate)
         throws SQLException {
-        return mostRecentChecksumDAO.findByNotProcessedInDateRange(context.getSession(), startDate, endDate);
+        return mostRecentChecksumDAO.findByNotProcessedInDateRange(session, startDate, endDate);
     }
 
-    /**
-     * Select the most recent bitstream for a given date range with the
-     * specified status.
-     *
-     * @param context    Context
-     * @param startDate  the start date range
-     * @param endDate    the end date range.
-     * @param resultCode the result code
-     * @return a list of BitstreamHistoryInfo objects
-     * @throws SQLException if database error
-     */
     @Override
-    public List<MostRecentChecksum> findBitstreamResultTypeReport(Context context, Date startDate, Date endDate,
+    public List<MostRecentChecksum> findBitstreamResultTypeReport(Session session, Date startDate, Date endDate,
                                                                   ChecksumResultCode resultCode) throws SQLException {
-        return mostRecentChecksumDAO.findByResultTypeInDateRange(context.getSession(), startDate, endDate, resultCode);
+        return mostRecentChecksumDAO.findByResultTypeInDateRange(session, startDate, endDate, resultCode);
     }
 
     /**
@@ -138,9 +118,11 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService 
             mostRecentChecksum.setMatchedPrevChecksum(true);
             ChecksumResult checksumResult;
             if (bitstream.isDeleted()) {
-                checksumResult = checksumResultService.findByCode(context, ChecksumResultCode.BITSTREAM_MARKED_DELETED);
+                checksumResult = checksumResultService.findByCode(context.getSession(),
+                        ChecksumResultCode.BITSTREAM_MARKED_DELETED);
             } else {
-                checksumResult = checksumResultService.findByCode(context, ChecksumResultCode.CHECKSUM_MATCH);
+                checksumResult = checksumResultService.findByCode(context.getSession(),
+                        ChecksumResultCode.CHECKSUM_MATCH);
             }
             mostRecentChecksum.setChecksumResult(checksumResult);
             mostRecentChecksumDAO.create(context.getSession(), mostRecentChecksum);
@@ -153,36 +135,28 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService 
         mostRecentChecksumDAO.deleteByBitstream(context.getSession(), bitstream);
     }
 
-    /**
-     * Get the oldest most recent checksum record. If more than
-     * one found the first one in the result set is returned.
-     *
-     * @param context COntext
-     * @return the oldest MostRecentChecksum or NULL if the table is empty
-     * @throws SQLException if database error
-     */
     @Override
-    public MostRecentChecksum findOldestRecord(Context context) throws SQLException {
-        return mostRecentChecksumDAO.getOldestRecord(context.getSession());
+    public MostRecentChecksum findOldestRecord(Session session) throws SQLException {
+        return mostRecentChecksumDAO.getOldestRecord(session);
     }
 
     /**
      * Returns the oldest bitstream that in the set of bitstreams that are less
      * than the specified date. If no bitstreams are found -1 is returned.
      *
-     * @param context      context
+     * @param session      context
      * @param lessThanDate date
-     * @return id of olded bitstream or -1 if not bitstreams are found
+     * @return id of oldest bitstream or -1 if no bitstreams are found
      * @throws SQLException if database error
      */
     @Override
-    public MostRecentChecksum findOldestRecord(Context context, Date lessThanDate) throws SQLException {
-        return mostRecentChecksumDAO.getOldestRecord(context.getSession(), lessThanDate);
+    public MostRecentChecksum findOldestRecord(Session session, Date lessThanDate) throws SQLException {
+        return mostRecentChecksumDAO.getOldestRecord(session, lessThanDate);
     }
 
     @Override
-    public List<MostRecentChecksum> findNotInHistory(Context context) throws SQLException {
-        return mostRecentChecksumDAO.findNotInHistory(context.getSession());
+    public List<MostRecentChecksum> findNotInHistory(Session session) throws SQLException {
+        return mostRecentChecksumDAO.findNotInHistory(session);
     }
 
     @Override

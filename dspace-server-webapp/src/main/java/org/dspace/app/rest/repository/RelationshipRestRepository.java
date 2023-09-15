@@ -79,7 +79,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
     @PreAuthorize("permitAll()")
     public RelationshipRest findOne(Context context, Integer integer) {
         try {
-            Relationship relationship = relationshipService.find(context, integer);
+            Relationship relationship = relationshipService.find(context.getSession(), integer);
 
             if (relationship == null) {
                 return null;
@@ -117,7 +117,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             Item leftItem = (Item) list.get(0);
             Item rightItem = (Item) list.get(1);
             RelationshipType relationshipType = relationshipTypeService
-                .find(context, Integer.parseInt(req.getParameter("relationshipType")));
+                .find(context.getSession(), Integer.parseInt(req.getParameter("relationshipType")));
 
             String leftwardValue = req.getParameter("leftwardValue");
             String rightwardValue = req.getParameter("rightwardValue");
@@ -159,7 +159,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
 
         Relationship relationship;
         try {
-            relationship = relationshipService.find(context, id);
+            relationship = relationshipService.find(context.getSession(), id);
         } catch (SQLException e) {
             throw new ResourceNotFoundException(contextPath + " with id: " + id + " not found");
         }
@@ -219,7 +219,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
 
         Relationship relationship;
         try {
-            relationship = relationshipService.find(context, id);
+            relationship = relationshipService.find(context.getSession(), id);
         } catch (SQLException e) {
             throw new ResourceNotFoundException("Relationship" + " with id: " + id + " not found");
         }
@@ -293,7 +293,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
 
         Relationship relationship = null;
         try {
-            relationship = relationshipService.find(context, id);
+            relationship = relationshipService.find(context.getSession(), id);
             if (relationship != null) {
                 try {
                     switch (copyVirtual) {
@@ -342,7 +342,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         Context context = obtainContext();
 
         List<RelationshipType> relationshipTypeList =
-            relationshipTypeService.findByLeftwardOrRightwardTypeName(context, label);
+            relationshipTypeService.findByLeftwardOrRightwardTypeName(context.getSession(), label);
         List<Relationship> relationships = new LinkedList<>();
         int total = 0;
         if (dsoId != null) {
@@ -398,7 +398,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
         Context context = obtainContext();
         int total = 0;
         List<Relationship> relationships = new LinkedList<>();
-        RelationshipType relationshipType = relationshipTypeService.find(context, typeId);
+        RelationshipType relationshipType = relationshipTypeService.find(context.getSession(), typeId);
         if (Objects.nonNull(relationshipType)) {
             if (!relationshipType.getLeftwardType().equals(label) &&
                 !relationshipType.getRightwardType().equals(label)) {

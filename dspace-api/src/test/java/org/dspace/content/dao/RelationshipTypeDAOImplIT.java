@@ -51,7 +51,7 @@ public class RelationshipTypeDAOImplIT extends AbstractIntegrationTest {
 
     private RelationshipType relationshipType;
 
-    private List<RelationshipType> relationshipTypeList = new ArrayList<>();
+    private final List<RelationshipType> relationshipTypeList = new ArrayList<>();
 
     private EntityType entityTypeOne;
 
@@ -101,7 +101,7 @@ public class RelationshipTypeDAOImplIT extends AbstractIntegrationTest {
     }
 
     /**
-     * Delete all initalized DSpace objects after each test
+     * Delete all initialized DSpace objects after each test
      */
     @After
     @Override
@@ -132,7 +132,7 @@ public class RelationshipTypeDAOImplIT extends AbstractIntegrationTest {
     @Test
     public void testFindByTypesAndLabels() throws Exception {
         assertEquals("TestFindbyTypesAndLabels 0", relationshipType, relationshipTypeService
-                .findbyTypesAndTypeName(context, entityTypeTwo, entityTypeOne, "isAuthorOfPublication",
+                .findbyTypesAndTypeName(context.getSession(), entityTypeTwo, entityTypeOne, "isAuthorOfPublication",
                         "isPublicationOfAuthor"));
     }
 
@@ -144,7 +144,7 @@ public class RelationshipTypeDAOImplIT extends AbstractIntegrationTest {
     @Test
     public void testFindByLeftOrRightLabel() throws Exception {
         assertEquals("TestFindByLeftOrRightLabel 0", relationshipTypeList, relationshipTypeService.
-                findByLeftwardOrRightwardTypeName(context, "isAuthorOfPublication", -1, -1));
+                findByLeftwardOrRightwardTypeName(context.getSession(), "isAuthorOfPublication", -1, -1));
     }
 
     /**
@@ -155,7 +155,7 @@ public class RelationshipTypeDAOImplIT extends AbstractIntegrationTest {
      */
     @Test
     public void testFindByEntityType() throws Exception {
-        assertEquals("TestFindByEntityType 0", relationshipTypeList, relationshipTypeService.findByEntityType(context,
-                entityTypeOne));
+        assertEquals("TestFindByEntityType 0", relationshipTypeList,
+                relationshipTypeService.findByEntityType(context.getSession(), entityTypeOne));
     }
 }

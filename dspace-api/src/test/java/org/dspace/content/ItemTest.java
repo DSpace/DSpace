@@ -72,11 +72,12 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     private Item it;
 
-    private MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance()
-                                                                               .getMetadataSchemaService();
-    private BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance()
-                                                                                 .getBitstreamFormatService();
-    private MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
+    private final MetadataSchemaService metadataSchemaService
+            = ContentServiceFactory.getInstance().getMetadataSchemaService();
+    private final BitstreamFormatService bitstreamFormatService
+            = ContentServiceFactory.getInstance().getBitstreamFormatService();
+    private final MetadataFieldService metadataFieldService
+            = ContentServiceFactory.getInstance().getMetadataFieldService();
 
     private Collection collection;
     private Community owningCommunity;
@@ -1037,7 +1038,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String bsname = "License";
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), it, bsname);
-        bitstreamService.setFormat(context, result, bitstreamFormatService.findByShortDescription(context, bsname));
+        bitstreamService.setFormat(context, result,
+                bitstreamFormatService.findByShortDescription(context.getSession(), bsname));
         bundleService.addBitstream(context, created, result);
         context.restoreAuthSystemState();
 
@@ -1071,7 +1073,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String bsname = "License";
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), it, bsname);
-        bitstreamService.setFormat(context, result, bitstreamFormatService.findByShortDescription(context, bsname));
+        bitstreamService.setFormat(context, result,
+                bitstreamFormatService.findByShortDescription(context.getSession(), bsname));
         bundleService.addBitstream(context, created, result);
         context.restoreAuthSystemState();
 
@@ -1280,10 +1283,11 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String bsname = "License";
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), it, bsname);
-        bitstreamService.setFormat(context, result, bitstreamFormatService.findByShortDescription(context, bsname));
+        bitstreamService.setFormat(context, result,
+                bitstreamFormatService.findByShortDescription(context.getSession(), bsname));
         bundleService.addBitstream(context, created, result);
 
-        List<ResourcePolicy> newpolicies = new ArrayList<ResourcePolicy>();
+        List<ResourcePolicy> newpolicies = new ArrayList<>();
         newpolicies.add(resourcePolicyService.create(context));
         newpolicies.add(resourcePolicyService.create(context));
         newpolicies.add(resourcePolicyService.create(context));
@@ -1291,7 +1295,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
         itemService.replaceAllBitstreamPolicies(context, it, newpolicies);
 
-        List<ResourcePolicy> retrieved = new ArrayList<ResourcePolicy>();
+        List<ResourcePolicy> retrieved = new ArrayList<>();
         List<Bundle> bundles = it.getBundles();
         for (Bundle b : bundles) {
             retrieved.addAll(authorizeService.getPolicies(context, b));
@@ -1340,7 +1344,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
         List<ResourcePolicy> defaultCollectionPolicies =
             authorizeService.getPoliciesActionFilter(context, c, Constants.DEFAULT_BITSTREAM_READ);
-        List<ResourcePolicy> newPolicies = new ArrayList<ResourcePolicy>();
+        List<ResourcePolicy> newPolicies = new ArrayList<>();
         for (ResourcePolicy collRp : defaultCollectionPolicies) {
             ResourcePolicy rp = resourcePolicyService.clone(context, collRp);
             rp.setAction(Constants.READ);
@@ -1356,7 +1360,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String bsname = "License";
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), it, bsname);
-        bitstreamService.setFormat(context, result, bitstreamFormatService.findByShortDescription(context, bsname));
+        bitstreamService.setFormat(context, result,
+                bitstreamFormatService.findByShortDescription(context.getSession(), bsname));
         bundleService.addBitstream(context, created, result);
 
         context.restoreAuthSystemState();

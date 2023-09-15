@@ -250,7 +250,7 @@ public class SubmissionService {
         int id = 0;
         try {
             id = Integer.parseInt(split[1]);
-            wsi = workspaceItemService.find(context, id);
+            wsi = workspaceItemService.find(context.getSession(), id);
         } catch (NumberFormatException e) {
             throw new UnprocessableEntityException("The provided workspaceitem URI is not valid", e);
         }

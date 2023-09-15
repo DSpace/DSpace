@@ -195,11 +195,11 @@ public class InitializeEntities {
                                           Boolean copyToLeft, Boolean copyToRight, RelationshipType.Tilted tilted)
         throws SQLException, AuthorizeException {
 
-        EntityType leftEntityType = entityTypeService.findByEntityType(context,leftType);
+        EntityType leftEntityType = entityTypeService.findByEntityType(context.getSession(),leftType);
         if (leftEntityType == null) {
             leftEntityType = entityTypeService.create(context, leftType);
         }
-        EntityType rightEntityType = entityTypeService.findByEntityType(context, rightType);
+        EntityType rightEntityType = entityTypeService.findByEntityType(context.getSession(), rightType);
         if (rightEntityType == null) {
             rightEntityType = entityTypeService.create(context, rightType);
         }
@@ -228,7 +228,8 @@ public class InitializeEntities {
             rightCardinalityMaxInteger = null;
         }
         RelationshipType relationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, leftEntityType, rightEntityType, leftwardType, rightwardType);
+            .findbyTypesAndTypeName(context.getSession(), leftEntityType, rightEntityType,
+                    leftwardType, rightwardType);
         if (relationshipType == null) {
             relationshipTypeService.create(context, leftEntityType, rightEntityType, leftwardType, rightwardType,
                                            leftCardinalityMinInteger, leftCardinalityMaxInteger,

@@ -51,7 +51,7 @@ public class PoolTaskStepLinkRepository extends AbstractDSpaceRestRepository imp
 
         Context context = obtainContext();
         try {
-            PoolTask poolTask = poolTaskService.find(context, poolTaskId);
+            PoolTask poolTask = poolTaskService.find(context.getSession(), poolTaskId);
             if (poolTask == null) {
                 throw new ResourceNotFoundException("ClaimedTask with id: " + poolTaskId + " wasn't found");
             }

@@ -38,7 +38,7 @@ public class DOIConsumer implements Consumer {
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DOIConsumer.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     ConfigurationService configurationService;
 
@@ -76,8 +76,10 @@ public class DOIConsumer implements Consumer {
         }
         Item item = (Item) dso;
         DOIIdentifierProvider provider = new DSpace().getSingletonService(DOIIdentifierProvider.class);
-        boolean inProgress = (ContentServiceFactory.getInstance().getWorkspaceItemService().findByItem(ctx, item)
-                != null || WorkflowServiceFactory.getInstance().getWorkflowItemService().findByItem(ctx, item) != null);
+        boolean inProgress = (ContentServiceFactory.getInstance().getWorkspaceItemService()
+                .findByItem(ctx.getSession(), item)
+                != null || WorkflowServiceFactory.getInstance().getWorkflowItemService()
+                        .findByItem(ctx.getSession(), item) != null);
         boolean identifiersInSubmission = configurationService.getBooleanProperty("identifiers.submission.register",
                 false);
         DOIService doiService = IdentifierServiceFactory.getInstance().getDOIService();

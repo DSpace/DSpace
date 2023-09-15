@@ -224,7 +224,7 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
             //           relatives.
             List<Integer> relationshipIds = parseVirtualMetadataTypes(copyVirtual);
             for (Integer relationshipId : relationshipIds) {
-                RelationshipType relationshipType = relationshipTypeService.find(context, relationshipId);
+                RelationshipType relationshipType = relationshipTypeService.find(context.getSession(), relationshipId);
                 for (Relationship relationship : relationshipService
                     .findByItemAndRelationshipType(context.getSession(), item, relationshipType)) {
 

@@ -144,7 +144,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     @Override
     public List<String> getEPersonDeleteConstraints(Context context, EPerson ePerson) throws SQLException {
         List<String> constraints = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(claimedTaskService.findByEperson(context, ePerson))) {
+        if (CollectionUtils.isNotEmpty(claimedTaskService.findByEperson(context.getSession(), ePerson))) {
             constraints.add("cwf_claimtask");
         }
         if (CollectionUtils.isNotEmpty(poolTaskService.findByEPerson(context, ePerson))) {
@@ -353,7 +353,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             WorkflowActionConfig currentActionConfig)
             throws SQLException, AuthorizeException, IOException,
             MessagingException, WorkflowException {
-        XmlWorkflowItem wi = xmlWorkflowItemService.find(c, workflowItemId);
+        XmlWorkflowItem wi = xmlWorkflowItemService.find(c.getSession(), workflowItemId);
 
         // Check for curation tasks.
         //
@@ -460,7 +460,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                         return nextActionConfig;
                     }
                 } else {
-                    ClaimedTask task = claimedTaskService.findByWorkflowIdAndEPerson(c, wfi, user);
+                    ClaimedTask task = claimedTaskService.findByWorkflowIdAndEPerson(c.getSession(), wfi, user);
 
                     //Check if we have a task for this action (might not be the case with automatic steps)
                     //First add it to our list of finished users, since no more actions remain
@@ -529,7 +529,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                 workflowStepString = workflowId + "." + newStep.getId() + "." + newActionConfig.getId();
 
                 //Retrieve the current owners of the task
-                List<ClaimedTask> claimedTasks = claimedTaskService.find(c, wfi, newStep.getId());
+                List<ClaimedTask> claimedTasks = claimedTaskService.find(c.getSession(), wfi, newStep.getId());
                 List<PoolTask> pooledTasks = poolTaskService.find(c, wfi);
                 for (PoolTask poolTask : pooledTasks) {
                     if (poolTask.getEperson() != null) {
@@ -745,7 +745,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     public void deleteAllTasks(Context context, XmlWorkflowItem wi) throws SQLException, AuthorizeException {
         deleteAllPooledTasks(context, wi);
 
-        Iterator<ClaimedTask> allClaimedTasks = claimedTaskService.findByWorkflowItem(context, wi).iterator();
+        Iterator<ClaimedTask> allClaimedTasks
+                = claimedTaskService.findByWorkflowItem(context.getSession(), wi).iterator();
         while (allClaimedTasks.hasNext()) {
             ClaimedTask task = allClaimedTasks.next();
             allClaimedTasks.remove();
@@ -998,7 +999,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         String workflowID = null;
         String currentStepId = null;
         String currentActionConfigId = null;
-        ClaimedTask claimedTask = claimedTaskService.findByWorkflowIdAndEPerson(context, wi, e);
+        ClaimedTask claimedTask
+                = claimedTaskService.findByWorkflowIdAndEPerson(context.getSession(), wi, e);
         if (claimedTask != null) {
             //Log it
             workflowID = claimedTask.getWorkflowID();

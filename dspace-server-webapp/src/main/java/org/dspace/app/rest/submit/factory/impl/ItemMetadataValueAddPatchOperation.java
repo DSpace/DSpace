@@ -130,6 +130,7 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
 
     }
 
+    @Override
     protected void replaceValue(Context context, Item source, String target, List<MetadataValueRest> list)
             throws SQLException {
         String[] metadata = Utils.tokenize(target);
@@ -192,11 +193,11 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
      */
     private Map<Integer, Relationship> preExistentRelationships(Context context,
             List<MetadataValue> preExistentMetadata) throws SQLException {
-        Map<Integer, Relationship> relationshipsMap = new HashMap<Integer, Relationship>();
+        Map<Integer, Relationship> relationshipsMap = new HashMap<>();
         for (MetadataValue ll : preExistentMetadata) {
             if (ll instanceof RelationshipMetadataValue) {
                 Relationship relationship = relationshipService
-                        .find(context, ((RelationshipMetadataValue) ll).getRelationshipId());
+                        .find(context.getSession(), ((RelationshipMetadataValue) ll).getRelationshipId());
                 if (relationship != null) {
                     relationshipsMap.put(relationship.getID(), relationship);
                 }

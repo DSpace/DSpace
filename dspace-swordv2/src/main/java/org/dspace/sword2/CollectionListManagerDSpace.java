@@ -120,7 +120,7 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI
 
             // now get the ones out of the workspace
             List<WorkspaceItem> wsis = workspaceItemService
-                .findByEPerson(sc.getContext(), person);
+                .findByEPerson(sc.getContext().getSession(), person);
             for (WorkspaceItem wsi : wsis) {
                 Item item = wsi.getItem();
 
@@ -141,7 +141,7 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI
             }
 
             // finally get the ones out of the workflow
-            List wfis = workflowItemService.findBySubmitter(sc.getContext(),
+            List wfis = workflowItemService.findBySubmitter(sc.getContext().getSession(),
                                                             person);
             for (Object found : wfis) {
                 if (found instanceof WorkflowItem) {

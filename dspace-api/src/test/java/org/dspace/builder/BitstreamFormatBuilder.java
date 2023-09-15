@@ -120,7 +120,7 @@ public class BitstreamFormatBuilder extends AbstractCRUDBuilder<BitstreamFormat>
     public static void deleteBitstreamFormat(int id) throws SQLException, IOException {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
-            BitstreamFormat bitstreamFormat = bitstreamFormatService.find(c, id);
+            BitstreamFormat bitstreamFormat = bitstreamFormatService.find(c.getSession(), id);
             if (bitstreamFormat != null) {
                 try {
                     bitstreamFormatService.delete(c, bitstreamFormat);

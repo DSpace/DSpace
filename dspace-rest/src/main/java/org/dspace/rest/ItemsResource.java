@@ -485,10 +485,10 @@ public class ItemsResource extends Resource {
             // Set bitstream name and description
             if (name != null) {
                 if (BitstreamResource.getMimeType(name) == null) {
-                    dspaceBitstream.setFormat(context, bitstreamFormatService.findUnknown(context));
+                    dspaceBitstream.setFormat(context, bitstreamFormatService.findUnknown(context.getSession()));
                 } else {
                     bitstreamService.setFormat(context, dspaceBitstream, bitstreamFormatService
-                        .findByMIMEType(context, BitstreamResource.getMimeType(name)));
+                        .findByMIMEType(context.getSession(), BitstreamResource.getMimeType(name)));
                 }
 
                 dspaceBitstream.setName(context, name);

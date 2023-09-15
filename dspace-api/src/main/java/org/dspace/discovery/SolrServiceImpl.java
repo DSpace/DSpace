@@ -598,14 +598,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                                                          .allMemberGroups(context, context.getCurrentUser());
 
             List<ResourcePolicy> communitiesPolicies = AuthorizeServiceFactory.getInstance().getResourcePolicyService()
-                                                                              .find(context, context.getCurrentUser(),
-                                                                                    groupList, Constants.ADMIN,
-                                                                                    Constants.COMMUNITY);
+                    .find(context.getSession(), context.getCurrentUser(),
+                            groupList, Constants.ADMIN, Constants.COMMUNITY);
 
             List<ResourcePolicy> collectionsPolicies = AuthorizeServiceFactory.getInstance().getResourcePolicyService()
-                                                                              .find(context, context.getCurrentUser(),
-                                                                                    groupList, Constants.ADMIN,
-                                                                                    Constants.COLLECTION);
+                    .find(context.getSession(), context.getCurrentUser(),
+                            groupList, Constants.ADMIN, Constants.COLLECTION);
 
             List<Collection> allCollections = new ArrayList<>();
 

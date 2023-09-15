@@ -156,7 +156,7 @@ public class CanSubscribeFeatureIT extends AbstractControllerIntegrationTest {
                                .withTitle("Test item")
                                .build();
 
-        cleanUpPermissions(resourcePolicyService.find(context, item));
+        cleanUpPermissions(resourcePolicyService.find(context.getSession(), item));
         setPermissions(item, groupWithReadPermission, Constants.READ);
 
         ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
@@ -203,7 +203,7 @@ public class CanSubscribeFeatureIT extends AbstractControllerIntegrationTest {
                                                     .addMember(eperson)
                                                     .build();
 
-        cleanUpPermissions(resourcePolicyService.find(context, collectionAuthorized));
+        cleanUpPermissions(resourcePolicyService.find(context.getSession(), collectionAuthorized));
         setPermissions(collectionAuthorized, groupWithReadPermission, Constants.READ);
 
         CollectionRest collectionRest = collectionConverter.convert(collectionAuthorized, Projection.DEFAULT);
@@ -252,7 +252,7 @@ public class CanSubscribeFeatureIT extends AbstractControllerIntegrationTest {
                 .addMember(eperson)
                 .build();
 
-        cleanUpPermissions(resourcePolicyService.find(context, communityAuthorized));
+        cleanUpPermissions(resourcePolicyService.find(context.getSession(), communityAuthorized));
         setPermissions(communityAuthorized, groupWithReadPermission, Constants.READ);
 
         CommunityRest communityRest = communityConverter.convert(communityAuthorized, Projection.DEFAULT);

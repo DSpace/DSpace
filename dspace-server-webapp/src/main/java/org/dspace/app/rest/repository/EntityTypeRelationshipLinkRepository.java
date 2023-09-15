@@ -57,12 +57,12 @@ public class EntityTypeRelationshipLinkRepository extends AbstractDSpaceRestRepo
         try {
             Context context = obtainContext();
             Pageable pageable = utils.getPageable(optionalPageable);
-            EntityType entityType = entityTypeService.find(context, id);
+            EntityType entityType = entityTypeService.find(context.getSession(), id);
             if (Objects.isNull(entityType)) {
                 throw new ResourceNotFoundException("No such EntityType: " + id);
             }
             int total = relationshipTypeService.countByEntityType(context, entityType);
-            List<RelationshipType> list = relationshipTypeService.findByEntityType(context, entityType,
+            List<RelationshipType> list = relationshipTypeService.findByEntityType(context.getSession(), entityType,
                                           pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
             return converter.toRestPage(list, pageable, total, projection);
         } catch (SQLException e) {

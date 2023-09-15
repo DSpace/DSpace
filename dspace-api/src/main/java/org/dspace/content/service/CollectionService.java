@@ -331,12 +331,12 @@ public interface CollectionService
 
     /**
      *
-     * @param context DSpace Context
+     * @param session current request's database context.
      * @param group EPerson Group
      * @return the collection, if any, that has the specified group as administrators or submitters
      * @throws SQLException
      */
-    public Collection findByGroup(Context context, Group group) throws SQLException;
+    public Collection findByGroup(Session session, Group group) throws SQLException;
 
     List<Collection> findCollectionsWithSubscribers(Session session) throws SQLException;
 

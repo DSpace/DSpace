@@ -637,7 +637,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     metadataValue.setPlace(mvPlace);
                     String authority = metadataValue.getAuthority();
                     String relationshipId = StringUtils.split(authority, "::")[1];
-                    Relationship relationship = relationshipService.find(context, Integer.parseInt(relationshipId));
+                    Relationship relationship = relationshipService.find(context.getSession(),
+                            Integer.parseInt(relationshipId));
                     if (relationship.getLeftItem().equals(dso)) {
                         relationship.setLeftPlace(mvPlace);
                     } else {

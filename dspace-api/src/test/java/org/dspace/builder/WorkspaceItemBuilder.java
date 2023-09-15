@@ -91,7 +91,7 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
     public static void deleteWorkspaceItem(Integer id) throws SQLException, IOException {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
-            WorkspaceItem workspaceItem = workspaceItemService.find(c, id);
+            WorkspaceItem workspaceItem = workspaceItemService.find(c.getSession(), id);
             if (workspaceItem != null) {
                 try {
                     workspaceItemService.deleteAll(c, workspaceItem);
@@ -115,7 +115,7 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
             } else {
                 item = c.reloadEntity(item);
                 // check if the wsi has been pushed to the workflow
-                XmlWorkflowItem wfi = workflowItemService.findByItem(c, item);
+                XmlWorkflowItem wfi = workflowItemService.findByItem(c.getSession(), item);
                 if (wfi != null) {
                     workflowItemService.delete(c, wfi);
                 }

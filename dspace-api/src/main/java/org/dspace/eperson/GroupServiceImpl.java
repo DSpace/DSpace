@@ -173,7 +173,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context, group);
         if (!collectionRoles.isEmpty()) {
             List<PoolTask> poolTasks = poolTaskService.findByGroup(context, group);
-            List<ClaimedTask> claimedTasks = claimedTaskService.findByEperson(context, ePerson);
+            List<ClaimedTask> claimedTasks = claimedTaskService.findByEperson(context.getSession(), ePerson);
             for (ClaimedTask claimedTask : claimedTasks) {
                 Step stepByName = workflowFactory.getStepByName(claimedTask.getStepID());
                 Role role = stepByName.getRole();
@@ -689,7 +689,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             || AuthorizeConfiguration
             .canCommunityAdminManageCollectionWorkflows()) {
             // is this a collection related group?
-            org.dspace.content.Collection collection = collectionService.findByGroup(context, group);
+            org.dspace.content.Collection collection = collectionService.findByGroup(context.getSession(), group);
 
             if (collection != null) {
                 if (group.equals(collection.getSubmitters())) {
@@ -731,8 +731,9 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                             || AuthorizeConfiguration.canCommunityAdminManageCollectionWorkflows()) {
                             List<Group> groups = new ArrayList<>();
                             groups.add(group);
-                            List<ResourcePolicy> policies = resourcePolicyService.find(context, null, groups,
-                                                            Constants.DEFAULT_ITEM_READ, Constants.COLLECTION);
+                            List<ResourcePolicy> policies = resourcePolicyService.find(context.getSession(),
+                                    null, groups,
+                                    Constants.DEFAULT_ITEM_READ, Constants.COLLECTION);
 
                             Optional<ResourcePolicy> defaultPolicy = policies.stream().filter(p -> StringUtils.equals(
                                     collectionService.getDefaultReadGroupName((Collection) p.getdSpaceObject(), "ITEM"),
@@ -741,7 +742,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                             if (defaultPolicy.isPresent()) {
                                 return defaultPolicy.get().getdSpaceObject();
                             }
-                            policies = resourcePolicyService.find(context, null, groups,
+                            policies = resourcePolicyService.find(context.getSession(), null, groups,
                                                              Constants.DEFAULT_BITSTREAM_READ, Constants.COLLECTION);
 
                             defaultPolicy = policies.stream()
@@ -758,7 +759,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                 if (AuthorizeConfiguration.canCommunityAdminManageAdminGroup()) {
                     // is the group related to a community and community administrator allowed
                     // to manage it?
-                    return communityService.findByAdminGroup(context, group);
+                    return communityService.findByAdminGroup(context.getSession(), group);
                 }
             }
         }

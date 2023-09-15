@@ -485,7 +485,7 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
         // final step: find or create bitstream format since it
         // takes the accumulation of a few values:
         if (type == Constants.BITSTREAM && bsfShortName != null) {
-            BitstreamFormat bsf = bitstreamFormatService.findByShortDescription(context, bsfShortName);
+            BitstreamFormat bsf = bitstreamFormatService.findByShortDescription(context.getSession(), bsfShortName);
             if (bsf == null && bsfMIMEType != null) {
                 bsf = PackageUtils.findOrCreateBitstreamFormat(context,
                                                                bsfShortName,

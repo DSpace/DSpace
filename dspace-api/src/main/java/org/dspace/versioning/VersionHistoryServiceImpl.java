@@ -23,6 +23,7 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.dao.VersionHistoryDAO;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -54,8 +55,8 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
     }
 
     @Override
-    public VersionHistory find(Context context, int id) throws SQLException {
-        return versionHistoryDAO.findByID(context.getSession(), VersionHistory.class, id);
+    public VersionHistory find(Session session, int id) throws SQLException {
+        return versionHistoryDAO.findByID(session, VersionHistory.class, id);
     }
 
     @Override
@@ -146,7 +147,7 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
         throws SQLException {
         List<Version> versions = versionHistory.getVersions();
         if (versions == null) {
-            versions = new ArrayList<Version>();
+            versions = new ArrayList<>();
         }
         versions.add(0, version);
     }

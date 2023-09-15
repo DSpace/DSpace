@@ -114,7 +114,7 @@ public class DeleteFeature implements AuthorizationFeature {
             parentObject = item.getOwningCollection();
             WorkspaceItem byItem = ContentServiceFactory.getInstance()
                                         .getWorkspaceItemService()
-                                        .findByItem(context, item);
+                                        .findByItem(context.getSession(), item);
             if (byItem != null) {
                 parentObject = byItem.getCollection();
             }

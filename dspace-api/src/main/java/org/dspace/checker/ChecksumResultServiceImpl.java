@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.dspace.checker.dao.ChecksumResultDAO;
 import org.dspace.checker.service.ChecksumResultService;
-import org.dspace.core.Context;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -34,25 +34,25 @@ public class ChecksumResultServiceImpl implements ChecksumResultService {
     /**
      * Get the result description for the given result code
      *
-     * @param context Context
+     * @param session Context
      * @param code    to get the description for.
      * @return the found description.
      * @throws SQLException if database error
      */
     @Override
-    public ChecksumResult findByCode(Context context, ChecksumResultCode code) throws SQLException {
-        return checksumResultDAO.findByCode(context.getSession(), code);
+    public ChecksumResult findByCode(Session session, ChecksumResultCode code) throws SQLException {
+        return checksumResultDAO.findByCode(session, code);
     }
 
     /**
      * Get a list of all the possible result codes.
      *
-     * @param context Context
+     * @param session Context
      * @return a list of all the result codes
      * @throws SQLException if database error
      */
     @Override
-    public List<ChecksumResult> findAll(Context context) throws SQLException {
-        return checksumResultDAO.findAll(context.getSession(), ChecksumResult.class);
+    public List<ChecksumResult> findAll(Session session) throws SQLException {
+        return checksumResultDAO.findAll(session, ChecksumResult.class);
     }
 }

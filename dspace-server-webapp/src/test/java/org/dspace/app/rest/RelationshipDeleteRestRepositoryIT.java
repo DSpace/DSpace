@@ -159,9 +159,10 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
             .withPersonIdentifierLastName("familyName")
             .build();
         relationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
-                entityTypeService.findByEntityType(context, "Person"),
-                "isAuthorOfPublication", "isPublicationOfAuthor");
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), "Publication"),
+                    entityTypeService.findByEntityType(context.getSession(), "Person"),
+                    "isAuthorOfPublication", "isPublicationOfAuthor");
         relationship = RelationshipBuilder.createRelationshipBuilder(context, leftItem, rightItem, relationshipType)
             .withLeftPlace(0)
             .build();
@@ -181,9 +182,10 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
             .withPublicationVolumeNumber("30")
             .build();
         relationshipType = relationshipTypeService
-            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "JournalIssue"),
-                entityTypeService.findByEntityType(context, "JournalVolume"),
-                "isJournalVolumeOfIssue", "isIssueOfJournalVolume");
+            .findbyTypesAndTypeName(context.getSession(),
+                    entityTypeService.findByEntityType(context.getSession(), "JournalIssue"),
+                    entityTypeService.findByEntityType(context.getSession(), "JournalVolume"),
+                    "isJournalVolumeOfIssue", "isIssueOfJournalVolume");
         relationship = RelationshipBuilder.createRelationshipBuilder(context, leftItem, rightItem, relationshipType)
             .withLeftPlace(0)
             .build();
@@ -204,14 +206,14 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
         publicationItem = ItemBuilder.createItem(context, collection)
             .withTitle("Publication 1")
             .build();
-        personProjectRelationshipType = relationshipTypeService.findbyTypesAndTypeName(context,
-            entityTypeService.findByEntityType(context, "Person"),
-            entityTypeService.findByEntityType(context, "Project"),
+        personProjectRelationshipType = relationshipTypeService.findbyTypesAndTypeName(context.getSession(),
+            entityTypeService.findByEntityType(context.getSession(), "Person"),
+            entityTypeService.findByEntityType(context.getSession(), "Project"),
             "isProjectOfPerson",
             "isPersonOfProject");
-        publicationPersonRelationshipType = relationshipTypeService.findbyTypesAndTypeName(context,
-            entityTypeService.findByEntityType(context, "Publication"),
-            entityTypeService.findByEntityType(context, "Person"),
+        publicationPersonRelationshipType = relationshipTypeService.findbyTypesAndTypeName(context.getSession(),
+            entityTypeService.findByEntityType(context.getSession(), "Publication"),
+            entityTypeService.findByEntityType(context.getSession(), "Person"),
             "isAuthorOfPublication",
             "isPublicationOfAuthor");
         RelationshipBuilder

@@ -365,7 +365,8 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     @Test
     public void testGetFormat() throws SQLException {
         assertThat("testGetFormat 0", bs.getFormat(context), notNullValue());
-        assertThat("testGetFormat 1", bs.getFormat(context), equalTo(bitstreamFormatService.findUnknown(context)));
+        assertThat("testGetFormat 1", bs.getFormat(context),
+                equalTo(bitstreamFormatService.findUnknown(context.getSession())));
     }
 
     /**
@@ -374,10 +375,11 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     @Test
     public void testSetFormat() throws SQLException {
         int id = 3;
-        BitstreamFormat format = bitstreamFormatService.find(context, id);
+        BitstreamFormat format = bitstreamFormatService.find(context.getSession(), id);
         bs.setFormat(format);
         assertThat("testSetFormat 0", bs.getFormat(context), notNullValue());
-        assertThat("testSetFormat 1", bs.getFormat(context), equalTo(bitstreamFormatService.find(context, id)));
+        assertThat("testSetFormat 1", bs.getFormat(context),
+                equalTo(bitstreamFormatService.find(context.getSession(), id)));
     }
 
     /**
