@@ -211,7 +211,7 @@ public class SupervisionOrderServiceIT extends AbstractIntegrationTestWithDataba
 
         context.restoreAuthSystemState();
 
-        assertThat(supervisionOrderService.findAll(context), hasSize(3));
+        assertThat(supervisionOrderService.findAll(context.getSession()), hasSize(3));
     }
 
     @Test
@@ -265,8 +265,8 @@ public class SupervisionOrderServiceIT extends AbstractIntegrationTestWithDataba
 
         context.restoreAuthSystemState();
 
-        assertThat(supervisionOrderService.findByItem(context, workspaceItem.getItem()), hasSize(2));
-        assertThat(supervisionOrderService.findByItem(context, workspaceItemTwo.getItem()), hasSize(1));
+        assertThat(supervisionOrderService.findByItem(context.getSession(), workspaceItem.getItem()), hasSize(2));
+        assertThat(supervisionOrderService.findByItem(context.getSession(), workspaceItemTwo.getItem()), hasSize(1));
 
     }
 
@@ -315,14 +315,14 @@ public class SupervisionOrderServiceIT extends AbstractIntegrationTestWithDataba
         context.restoreAuthSystemState();
 
         SupervisionOrder supervisionOrderA =
-            supervisionOrderService.findByItemAndGroup(context, item, groupA);
+            supervisionOrderService.findByItemAndGroup(context.getSession(), item, groupA);
 
         assertThat(supervisionOrderA, notNullValue());
         assertThat(supervisionOrderA.getItem().getID(), is(item.getID()));
         assertThat(supervisionOrderA.getGroup().getID(), is(groupA.getID()));
 
         // no supervision order on item and groupB
-        assertThat(supervisionOrderService.findByItemAndGroup(context, item, groupB), nullValue());
+        assertThat(supervisionOrderService.findByItemAndGroup(context.getSession(), item, groupB), nullValue());
 
     }
 

@@ -92,7 +92,7 @@ public class SupervisionOrderRestRepository extends DSpaceRestRepository<Supervi
     @Override
     public Page<SupervisionOrderRest> findAll(Context context, Pageable pageable) {
         try {
-            List<SupervisionOrder> supervisionOrders = supervisionOrderService.findAll(context);
+            List<SupervisionOrder> supervisionOrders = supervisionOrderService.findAll(context.getSession());
             return converterService.toRestPage(supervisionOrders, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             log.error("Something went wrong with getting supervision orders", e);
@@ -125,7 +125,7 @@ public class SupervisionOrderRestRepository extends DSpaceRestRepository<Supervi
             throw new UnprocessableEntityException("Group with uuid: " + groupId + " not found");
         }
 
-        supervisionOrder = supervisionOrderService.findByItemAndGroup(context, item, group);
+        supervisionOrder = supervisionOrderService.findByItemAndGroup(context.getSession(), item, group);
         if (Objects.nonNull(supervisionOrder)) {
             throw new ResourceAlreadyExistsException(
                 "A supervision order already exists with itemId <" + itemId + "> and groupId <" + groupId + ">");
@@ -166,7 +166,7 @@ public class SupervisionOrderRestRepository extends DSpaceRestRepository<Supervi
             if (Objects.isNull(item)) {
                 throw new ResourceNotFoundException("no item is found for the uuid < " + itemId + " >");
             }
-            return converterService.toRestPage(supervisionOrderService.findByItem(context, item),
+            return converterService.toRestPage(supervisionOrderService.findByItem(context.getSession(), item),
                 pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);

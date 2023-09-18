@@ -26,6 +26,7 @@ import org.dspace.orcid.model.OrcidEntityType;
 import org.dspace.orcid.service.OrcidHistoryService;
 import org.dspace.orcid.service.OrcidQueueService;
 import org.dspace.profile.OrcidEntitySyncPreference;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -49,8 +50,8 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     private RelationshipService relationshipService;
 
     @Override
-    public List<OrcidQueue> findByProfileItemId(Context context, UUID profileItemId) throws SQLException {
-        return orcidQueueDAO.findByProfileItemId(context.getSession(), profileItemId, -1, 0);
+    public List<OrcidQueue> findByProfileItemId(Session session, UUID profileItemId) throws SQLException {
+        return orcidQueueDAO.findByProfileItemId(session, profileItemId, -1, 0);
     }
 
     @Override
@@ -60,14 +61,14 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     }
 
     @Override
-    public List<OrcidQueue> findByProfileItemAndEntity(Context context, Item profileItem, Item entity)
+    public List<OrcidQueue> findByProfileItemAndEntity(Session session, Item profileItem, Item entity)
         throws SQLException {
-        return orcidQueueDAO.findByProfileItemAndEntity(context.getSession(), profileItem, entity);
+        return orcidQueueDAO.findByProfileItemAndEntity(session, profileItem, entity);
     }
 
     @Override
-    public List<OrcidQueue> findByProfileItemOrEntity(Context context, Item item) throws SQLException {
-        return orcidQueueDAO.findByProfileItemOrEntity(context.getSession(), item);
+    public List<OrcidQueue> findByProfileItemOrEntity(Session session, Item item) throws SQLException {
+        return orcidQueueDAO.findByProfileItemOrEntity(session, item);
     }
 
     @Override
@@ -76,13 +77,13 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     }
 
     @Override
-    public List<OrcidQueue> findAll(Context context) throws SQLException {
-        return orcidQueueDAO.findAll(context.getSession(), OrcidQueue.class);
+    public List<OrcidQueue> findAll(Session session) throws SQLException {
+        return orcidQueueDAO.findAll(session, OrcidQueue.class);
     }
 
     @Override
     public OrcidQueue create(Context context, Item profileItem, Item entity) throws SQLException {
-        Optional<String> putCode = orcidHistoryService.findLastPutCode(context, profileItem, entity);
+        Optional<String> putCode = orcidHistoryService.findLastPutCode(context.getSession(), profileItem, entity);
         if (putCode.isPresent()) {
             return createEntityUpdateRecord(context, profileItem, entity, putCode.get());
         } else {
@@ -163,8 +164,8 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     }
 
     @Override
-    public List<OrcidQueue> findByAttemptsLessThan(Context context, int attempts) throws SQLException {
-        return orcidQueueDAO.findByAttemptsLessThan(context.getSession(), attempts);
+    public List<OrcidQueue> findByAttemptsLessThan(Session session, int attempts) throws SQLException {
+        return orcidQueueDAO.findByAttemptsLessThan(session, attempts);
     }
 
     @Override
@@ -192,8 +193,8 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     }
 
     @Override
-    public OrcidQueue find(Context context, int id) throws SQLException {
-        return orcidQueueDAO.findByID(context.getSession(), OrcidQueue.class, id);
+    public OrcidQueue find(Session session, int id) throws SQLException {
+        return orcidQueueDAO.findByID(session, OrcidQueue.class, id);
     }
 
     @Override

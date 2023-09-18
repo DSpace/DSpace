@@ -47,7 +47,7 @@ public class OrcidQueueRestRepository extends DSpaceRestRepository<OrcidQueueRes
     public OrcidQueueRest findOne(Context context, Integer id) {
         OrcidQueue orcidQueue = null;
         try {
-            orcidQueue = orcidQueueService.find(context, id);
+            orcidQueue = orcidQueueService.find(context.getSession(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -67,7 +67,7 @@ public class OrcidQueueRestRepository extends DSpaceRestRepository<OrcidQueueRes
     protected void delete(Context context, Integer id) throws AuthorizeException {
         OrcidQueue orcidQueue = null;
         try {
-            orcidQueue = orcidQueueService.find(context, id);
+            orcidQueue = orcidQueueService.find(context.getSession(), id);
             if (orcidQueue == null) {
                 throw new ResourceNotFoundException(
                     OrcidQueueRest.CATEGORY + "." + OrcidQueueRest.NAME + " with id: " + id + " not found");

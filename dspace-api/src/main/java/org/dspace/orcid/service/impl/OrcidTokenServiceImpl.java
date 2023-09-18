@@ -16,6 +16,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.orcid.OrcidToken;
 import org.dspace.orcid.dao.OrcidTokenDAO;
 import org.dspace.orcid.service.OrcidTokenService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -48,15 +49,15 @@ public class OrcidTokenServiceImpl implements OrcidTokenService {
     }
 
     @Override
-    public OrcidToken findByEPerson(Context context, EPerson ePerson)
+    public OrcidToken findByEPerson(Session session, EPerson ePerson)
             throws SQLException {
-        return orcidTokenDAO.findByEPerson(context.getSession(), ePerson);
+        return orcidTokenDAO.findByEPerson(session, ePerson);
     }
 
     @Override
-    public OrcidToken findByProfileItem(Context context, Item profileItem)
+    public OrcidToken findByProfileItem(Session session, Item profileItem)
             throws SQLException {
-        return orcidTokenDAO.findByProfileItem(context.getSession(), profileItem);
+        return orcidTokenDAO.findByProfileItem(session, profileItem);
     }
 
     @Override
@@ -85,7 +86,7 @@ public class OrcidTokenServiceImpl implements OrcidTokenService {
     @Override
     public void deleteByEPerson(Context context, EPerson ePerson)
             throws SQLException {
-        OrcidToken orcidToken = findByEPerson(context, ePerson);
+        OrcidToken orcidToken = findByEPerson(context.getSession(), ePerson);
         if (orcidToken != null) {
             delete(context, orcidToken);
         }
@@ -94,7 +95,7 @@ public class OrcidTokenServiceImpl implements OrcidTokenService {
     @Override
     public void deleteByProfileItem(Context context, Item profileItem)
             throws SQLException {
-        OrcidToken orcidToken = findByProfileItem(context, profileItem);
+        OrcidToken orcidToken = findByProfileItem(context.getSession(), profileItem);
         if (orcidToken != null) {
             delete(context, orcidToken);
         }

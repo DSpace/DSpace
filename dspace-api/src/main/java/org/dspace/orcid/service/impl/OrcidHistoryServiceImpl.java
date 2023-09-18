@@ -49,6 +49,7 @@ import org.dspace.orcid.service.OrcidEntityFactoryService;
 import org.dspace.orcid.service.OrcidHistoryService;
 import org.dspace.orcid.service.OrcidProfileSectionFactoryService;
 import org.dspace.orcid.service.OrcidTokenService;
+import org.hibernate.Session;
 import org.orcid.jaxb.model.v3.release.record.Activity;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -91,18 +92,18 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     private OrcidTokenService orcidTokenService;
 
     @Override
-    public OrcidHistory find(Context context, int id) throws SQLException {
-        return orcidHistoryDAO.findByID(context.getSession(), OrcidHistory.class, id);
+    public OrcidHistory find(Session session, int id) throws SQLException {
+        return orcidHistoryDAO.findByID(session, OrcidHistory.class, id);
     }
 
     @Override
-    public List<OrcidHistory> findAll(Context context) throws SQLException {
-        return orcidHistoryDAO.findAll(context.getSession(), OrcidHistory.class);
+    public List<OrcidHistory> findAll(Session session) throws SQLException {
+        return orcidHistoryDAO.findAll(session, OrcidHistory.class);
     }
 
     @Override
-    public List<OrcidHistory> findByProfileItemOrEntity(Context context, Item profileItem) throws SQLException {
-        return orcidHistoryDAO.findByProfileItemOrEntity(context.getSession(), profileItem);
+    public List<OrcidHistory> findByProfileItemOrEntity(Session session, Item profileItem) throws SQLException {
+        return orcidHistoryDAO.findByProfileItemOrEntity(session, profileItem);
     }
 
     @Override
@@ -126,19 +127,19 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     }
 
     @Override
-    public Optional<String> findLastPutCode(Context context, Item profileItem, Item entity) throws SQLException {
+    public Optional<String> findLastPutCode(Session session, Item profileItem, Item entity) throws SQLException {
         List<OrcidHistory> records
-                = orcidHistoryDAO.findByProfileItemAndEntity(context.getSession(),
+                = orcidHistoryDAO.findByProfileItemAndEntity(session,
                         profileItem.getID(),
                         entity.getID());
         return findLastPutCode(records, profileItem);
     }
 
     @Override
-    public Map<Item, String> findLastPutCodes(Context context, Item entity) throws SQLException {
+    public Map<Item, String> findLastPutCodes(Session session, Item entity) throws SQLException {
         Map<Item, String> profileItemAndPutCodeMap = new HashMap<>();
 
-        List<OrcidHistory> orcidHistoryRecords = findByEntity(context, entity);
+        List<OrcidHistory> orcidHistoryRecords = findByEntity(session, entity);
         for (OrcidHistory orcidHistoryRecord : orcidHistoryRecords) {
             Item profileItem = orcidHistoryRecord.getProfileItem();
             if (profileItemAndPutCodeMap.containsKey(profileItem)) {
@@ -153,8 +154,8 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     }
 
     @Override
-    public List<OrcidHistory> findByEntity(Context context, Item entity) throws SQLException {
-        return orcidHistoryDAO.findByEntity(context.getSession(), entity);
+    public List<OrcidHistory> findByEntity(Session session, Item entity) throws SQLException {
+        return orcidHistoryDAO.findByEntity(session, entity);
     }
 
     @Override
@@ -327,7 +328,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
 
     private Optional<String> getAccessToken(Context context, Item item) {
         try {
-            return ofNullable(orcidTokenService.findByProfileItem(context, item))
+            return ofNullable(orcidTokenService.findByProfileItem(context.getSession(), item))
                     .map(orcidToken -> orcidToken.getAccessToken());
         } catch (SQLException ex) {
             LOGGER.error("Unable to get ORCiD access token for Item {}", item::getID, () -> ex);

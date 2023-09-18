@@ -54,7 +54,7 @@ public class ProcessFileTypesLinkRepository extends AbstractDSpaceRestRepository
                                                         Projection projection) throws SQLException, AuthorizeException {
 
         Context context = obtainContext();
-        Process process = processService.find(context, processId);
+        Process process = processService.find(context.getSession(), processId);
         if (process == null) {
             throw new ResourceNotFoundException("Process with id " + processId + " was not found");
         }

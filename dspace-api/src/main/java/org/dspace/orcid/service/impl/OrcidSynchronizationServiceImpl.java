@@ -236,7 +236,7 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
     private void setAccessToken(Context context, Item profile, EPerson ePerson, String accessToken) {
         OrcidToken orcidToken;
         try {
-            orcidToken = orcidTokenService.findByEPerson(context, ePerson);
+            orcidToken = orcidTokenService.findByEPerson(context.getSession(), ePerson);
         } catch (SQLException ex) {
             LOGGER.error("Failed looking up ORCiD access token for EPerson {}",
                     ePerson::getID, () -> ex);
@@ -283,7 +283,7 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
 
     private Optional<String> getOrcidAccessToken(Context context, Item item) {
         try {
-            return ofNullable(orcidTokenService.findByProfileItem(context, item))
+            return ofNullable(orcidTokenService.findByProfileItem(context.getSession(), item))
                     .map(orcidToken -> orcidToken.getAccessToken());
         } catch (SQLException ex) {
             LOGGER.error("Could not get ORCiD access token for Item {}",

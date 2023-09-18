@@ -22,8 +22,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * This class extends the {@link ExternalSourceEntryItemUriListHandler} abstract class and implements it specifically
- * for the List<OrcidQueue> objects.
- * 
+ * for the {@code List<OrcidQueue>} objects.
+ *
  * @author mykhaylo boychuk (mykhaylo.boychuk at 4science.it)
  */
 @Component
@@ -66,7 +66,7 @@ public class ExternalSourceEntryOrcidQueueUriListHandler
         String id = matcher.group(1);
         int queueId = Integer.parseInt(id);
         try {
-            orcidQueue = orcidQueueService.find(context, queueId);
+            orcidQueue = orcidQueueService.find(context.getSession(), queueId);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

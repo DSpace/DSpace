@@ -22,6 +22,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.dao.WebAppDAO;
 import org.dspace.app.util.service.WebAppService;
 import org.dspace.core.Context;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -60,8 +61,8 @@ public class WebAppServiceImpl implements WebAppService {
     }
 
     @Override
-    public List<WebApp> findAll(Context context) throws SQLException {
-        return webAppDAO.findAll(context.getSession(), WebApp.class);
+    public List<WebApp> findAll(Session session) throws SQLException {
+        return webAppDAO.findAll(session, WebApp.class);
     }
 
     @Override
@@ -72,7 +73,7 @@ public class WebAppServiceImpl implements WebAppService {
         HttpHead method = null;
         try {
             context = new Context();
-            List<WebApp> webApps = findAll(context);
+            List<WebApp> webApps = findAll(context.getSession());
 
             for (WebApp app : webApps) {
                 method = new HttpHead(app.getUrl());

@@ -78,7 +78,7 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider implem
 
         VersionHistory history = null;
         try {
-            history = versionHistoryService.findByItem(context, item);
+            history = versionHistoryService.findByItem(context.getSession(), item);
         } catch (SQLException ex) {
             throw new RuntimeException("A problem occurred while accessing the database.", ex);
         }

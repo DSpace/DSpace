@@ -84,7 +84,12 @@ public class RequestItemRepository
     @PreAuthorize("permitAll()")
     @Override
     public RequestItemRest findOne(Context context, String token) {
-        RequestItem requestItem = requestItemService.findByToken(context, token);
+        RequestItem requestItem = null;
+        try {
+            requestItem = requestItemService.findByToken(context.getSession(), token);
+        } catch (SQLException e) {
+            LOG.debug("Item request token {} not found:  {}", token, e.getMessage());
+        }
         if (null == requestItem) {
             return null;
         } else {
@@ -185,7 +190,7 @@ public class RequestItemRepository
                 allFiles, email, username, message);
 
         // Some fields are given values during creation, so return created request.
-        RequestItem ri = requestItemService.findByToken(ctx, token);
+        RequestItem ri = requestItemService.findByToken(ctx.getSession(), token);
         ri.setAccept_request(false); // Not accepted yet.  Must set:  DS-4032
         requestItemService.update(ctx, ri);
 
@@ -221,7 +226,12 @@ public class RequestItemRepository
     public RequestItemRest put(Context context, HttpServletRequest request,
             String apiCategory, String model, String token, JsonNode requestBody)
             throws AuthorizeException {
-        RequestItem ri = requestItemService.findByToken(context, token);
+        RequestItem ri = null;
+        try {
+            ri = requestItemService.findByToken(context.getSession(), token);
+        } catch (SQLException e) {
+            LOG.debug("Item request {} not found:  {}", token, e.getMessage());
+        }
         if (null == ri) {
             throw new UnprocessableEntityException("Item request not found");
         }

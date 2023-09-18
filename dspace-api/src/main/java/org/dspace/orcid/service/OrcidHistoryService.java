@@ -17,6 +17,7 @@ import org.dspace.core.Context;
 import org.dspace.orcid.OrcidHistory;
 import org.dspace.orcid.OrcidQueue;
 import org.dspace.orcid.exception.OrcidValidationException;
+import org.hibernate.Session;
 
 /**
  * Interface of service to manage OrcidHistory.
@@ -29,42 +30,42 @@ public interface OrcidHistoryService {
     /**
      * Get an OrcidHistory from the database.
      *
-     * @param context  DSpace context object
+     * @param session  current request's database context.
      * @param id       ID of the OrcidHistory
      * @return         the OrcidHistory format, or null if the ID is invalid.
      * @throws         SQLException if database error
      */
-    public OrcidHistory find(Context context, int id) throws SQLException;
+    public OrcidHistory find(Session session, int id) throws SQLException;
 
     /**
      * Find all the ORCID history records.
      *
-     * @param  context      DSpace context object
+     * @param  session      current request's database context.
      * @return              the ORCID history records
      * @throws SQLException if an SQL error occurs
      */
-    public List<OrcidHistory> findAll(Context context) throws SQLException;
+    public List<OrcidHistory> findAll(Session session) throws SQLException;
 
     /**
      * Get the OrcidHistory records where the given item is the profile item OR the
      * entity
      *
-     * @param  context      DSpace context object
+     * @param  session      current request's database context.
      * @param  item         the item to search for
      * @return              the found OrcidHistory entities
      * @throws SQLException if database error
      */
-    public List<OrcidHistory> findByProfileItemOrEntity(Context context, Item item) throws SQLException;
+    public List<OrcidHistory> findByProfileItemOrEntity(Session session, Item item) throws SQLException;
 
     /**
      * Find the OrcidHistory records related to the given entity item.
      *
-     * @param  context      DSpace context object
+     * @param  session      current request's database context.
      * @param  entity       the entity item
      * @return              the found put codes
      * @throws SQLException if database error
      */
-    public List<OrcidHistory> findByEntity(Context context, Item entity) throws SQLException;
+    public List<OrcidHistory> findByEntity(Session session, Item entity) throws SQLException;
 
     /**
      * Create a new OrcidHistory records related to the given profileItem and entity
@@ -99,25 +100,25 @@ public interface OrcidHistoryService {
     /**
      * Find the last put code related to the given profileItem and entity item.
      *
-     * @param  context      DSpace context object
+     * @param  session      current request's database context.
      * @param  profileItem  the profileItem item
      * @param  entity       the entity item
      * @return              the found put code, if any
      * @throws SQLException if database error
      */
-    public Optional<String> findLastPutCode(Context context, Item profileItem, Item entity) throws SQLException;
+    public Optional<String> findLastPutCode(Session session, Item profileItem, Item entity) throws SQLException;
 
     /**
      * Find all the last put code related to the entity item each associated with
      * the profileItem to which it refers.
      *
-     * @param  context      DSpace context object
+     * @param  session      current request's database context.
      * @param  entity       the entity item
      * @return              a map that relates the profileItems with the identified
      *                      putCode
      * @throws SQLException if database error
      */
-    public Map<Item, String> findLastPutCodes(Context context, Item entity) throws SQLException;
+    public Map<Item, String> findLastPutCodes(Session session, Item entity) throws SQLException;
 
     /**
      * Find all the successfully Orcid history records with the given record type

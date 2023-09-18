@@ -52,7 +52,7 @@ public class WorkspaceItemSupervisionOrdersLinkRepository
                 throw new ResourceNotFoundException("No such workspace item: " + id);
             }
             return converter.toRestPage(
-                supervisionOrderService.findByItem(context, workspaceItem.getItem()),
+                supervisionOrderService.findByItem(context.getSession(), workspaceItem.getItem()),
                 optionalPageable, projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);

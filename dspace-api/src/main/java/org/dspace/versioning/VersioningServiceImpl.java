@@ -67,7 +67,7 @@ public class VersioningServiceImpl implements VersioningService {
     @Override
     public Version createNewVersion(Context c, Item item, String summary) {
         try {
-            VersionHistory vh = versionHistoryService.findByItem(c, item);
+            VersionHistory vh = versionHistoryService.findByItem(c.getSession(), item);
             if (vh == null) {
                 // first time: create 2 versions: old and new one
                 vh = versionHistoryService.create(c);
@@ -216,7 +216,7 @@ public class VersioningServiceImpl implements VersioningService {
     }
 
     private boolean isVersionExist(Context context, Item item, int versionNumber) throws SQLException {
-        VersionHistory history = versionHistoryService.findByItem(context, item);
+        VersionHistory history = versionHistoryService.findByItem(context.getSession(), item);
         if (Objects.isNull(history)) {
             return false;
         }

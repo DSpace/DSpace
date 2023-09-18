@@ -45,7 +45,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * This is the Repository that takes care of the operations on the {@link VersionRest} objects
- * 
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 @Component(VersionRest.CATEGORY + "." + VersionRest.NAME)
@@ -120,7 +120,7 @@ public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Int
 
         WorkflowItem workflowItem = null;
         WorkspaceItem workspaceItem = null;
-        VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
+        VersionHistory versionHistory = versionHistoryService.findByItem(context.getSession(), item);
         if (Objects.nonNull(versionHistory)) {
             Version lastVersion = versionHistoryService.getLatestVersion(context, versionHistory);
             if (Objects.nonNull(lastVersion)) {

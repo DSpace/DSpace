@@ -90,7 +90,7 @@ public class OrcidHistoryBuilder extends  AbstractBuilder<OrcidHistory, OrcidHis
         }
 
         try (Context c = new Context()) {
-            OrcidHistory orcidHistory = orcidHistoryService.find(c, id);
+            OrcidHistory orcidHistory = orcidHistoryService.find(c.getSession(), id);
             if (orcidHistory != null) {
                 orcidHistoryService.delete(c, orcidHistory);
             }

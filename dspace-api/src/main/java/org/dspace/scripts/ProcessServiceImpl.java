@@ -47,6 +47,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.service.ProcessService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -100,28 +101,28 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public Process find(Context context, int processId) throws SQLException {
-        return processDAO.findByID(context.getSession(), Process.class, processId);
+    public Process find(Session session, int processId) throws SQLException {
+        return processDAO.findByID(session, Process.class, processId);
     }
 
     @Override
-    public List<Process> findAll(Context context) throws SQLException {
-        return processDAO.findAll(context.getSession(), Process.class);
+    public List<Process> findAll(Session session) throws SQLException {
+        return processDAO.findAll(session, Process.class);
     }
 
     @Override
-    public List<Process> findAll(Context context, int limit, int offset) throws SQLException {
-        return processDAO.findAll(context.getSession(), limit, offset);
+    public List<Process> findAll(Session session, int limit, int offset) throws SQLException {
+        return processDAO.findAll(session.getSession(), limit, offset);
     }
 
     @Override
-    public List<Process> findAllSortByScript(Context context) throws SQLException {
-        return processDAO.findAllSortByScript(context.getSession());
+    public List<Process> findAllSortByScript(Session session) throws SQLException {
+        return processDAO.findAllSortByScript(session);
     }
 
     @Override
-    public List<Process> findAllSortByStartTime(Context context) throws SQLException {
-        List<Process> processes = findAll(context);
+    public List<Process> findAllSortByStartTime(Session session) throws SQLException {
+        List<Process> processes = findAll(session);
         Comparator<Process> comparing = Comparator
             .comparing(Process::getStartTime, Comparator.nullsLast(Comparator.naturalOrder()));
         comparing = comparing.thenComparing(Process::getID);
@@ -130,8 +131,8 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public List<Process> findByUser(Context context, EPerson eperson, int limit, int offset) throws SQLException {
-        return processDAO.findByUser(context.getSession(), eperson, limit, offset);
+    public List<Process> findByUser(Session session, EPerson eperson, int limit, int offset) throws SQLException {
+        return processDAO.findByUser(session, eperson, limit, offset);
     }
 
     @Override
@@ -312,9 +313,9 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public List<Process> findByStatusAndCreationTimeOlderThan(Context context, List<ProcessStatus> statuses,
+    public List<Process> findByStatusAndCreationTimeOlderThan(Session session, List<ProcessStatus> statuses,
         Date date) throws SQLException {
-        return this.processDAO.findByStatusAndCreationTimeOlderThan(context.getSession(), statuses, date);
+        return this.processDAO.findByStatusAndCreationTimeOlderThan(session, statuses, date);
     }
 
     @Override
