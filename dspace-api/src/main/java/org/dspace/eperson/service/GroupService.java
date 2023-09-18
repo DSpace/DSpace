@@ -189,9 +189,11 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
     Set<Group> allMemberGroupsSet(Context context, EPerson ePerson) throws SQLException;
 
     /**
-     * Get all of the epeople who are a member of the
-     * specified group, or a member of a sub-group of the
+     * Get all of the EPerson objects who are a member of the specified group, or a member of a subgroup of the
      * specified group, etc.
+     * <P>
+     * WARNING: This method may have bad performance for Groups with a very large number of members, as it will load
+     * all member EPerson objects into memory. Only use if you need access to *every* EPerson object at once.
      *
      * @param context The relevant DSpace Context.
      * @param group   Group object
@@ -199,6 +201,18 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      * @throws SQLException if error
      */
     public List<EPerson> allMembers(Context context, Group group) throws SQLException;
+
+    /**
+     * Count all of the EPerson objects who are a member of the specified group, or a member of a subgroup of the
+     * specified group, etc.
+     * In other words, this will return the size of "allMembers()" without having to load all EPerson objects into
+     * memory.
+     * @param context current DSpace context
+     * @param group Group object
+     * @return count of EPerson object members
+     * @throws SQLException if error
+     */
+    int countAllMembers(Context context, Group group) throws SQLException;
 
     /**
      * Find the group by its name - assumes name is unique

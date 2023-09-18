@@ -607,6 +607,30 @@ public class GroupTest extends AbstractUnitTest {
     }
 
     @Test
+    public void countAllMembers() throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
+        List<EPerson> allEPeopleAdded = new ArrayList<>();
+        try {
+            context.turnOffAuthorisationSystem();
+            allEPeopleAdded.add(createEPersonAndAddToGroup("allMemberGroups1@dspace.org", topGroup));
+            allEPeopleAdded.add(createEPersonAndAddToGroup("allMemberGroups2@dspace.org", level1Group));
+            allEPeopleAdded.add(createEPersonAndAddToGroup("allMemberGroups3@dspace.org", level2Group));
+            context.restoreAuthSystemState();
+
+            assertEquals(3, groupService.countAllMembers(context, topGroup));
+            assertEquals(2, groupService.countAllMembers(context, level1Group));
+            assertEquals(1, groupService.countAllMembers(context, level2Group));
+        } finally {
+            // Remove all the people added (in order to not impact other tests)
+            context.turnOffAuthorisationSystem();
+            for (EPerson ePerson : allEPeopleAdded) {
+                ePersonService.delete(context, ePerson);
+            }
+            context.restoreAuthSystemState();
+        }
+    }
+
+
+    @Test
     public void isEmpty() throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
         assertTrue(groupService.isEmpty(topGroup));
         assertTrue(groupService.isEmpty(level1Group));
@@ -624,6 +648,7 @@ public class GroupTest extends AbstractUnitTest {
 
     @Test
     public void findAndCountByParent() throws SQLException, AuthorizeException, IOException {
+
         // Create a parent group with 3 child groups
         Group parentGroup = createGroup("parentGroup");
         Group childGroup = createGroup("childGroup");
@@ -634,22 +659,25 @@ public class GroupTest extends AbstractUnitTest {
         groupService.addMember(context, parentGroup, child3Group);
         groupService.update(context, parentGroup);
 
-        // Assert that findByParent is the same list of groups as getMemberGroups() when pagination is ignored
-        // (NOTE: Pagination is tested in GroupRestRepositoryIT)
-        // NOTE: isEqualCollection() must be used for comparison because Hibernate's "PersistentBag" cannot be compared
-        // directly to a List. See https://stackoverflow.com/a/57399383/3750035
-        assertTrue(CollectionUtils.isEqualCollection(parentGroup.getMemberGroups(),
-                                                     groupService.findByParent(context, parentGroup, -1, -1)));
-        // Assert countBy parent is the same as the size of group members
-        assertEquals(parentGroup.getMemberGroups().size(), groupService.countByParent(context, parentGroup));
-
-        // Clean up our data
-        context.turnOffAuthorisationSystem();
-        groupService.delete(context, parentGroup);
-        groupService.delete(context, childGroup);
-        groupService.delete(context, child2Group);
-        groupService.delete(context, child3Group);
-        context.restoreAuthSystemState();
+        try {
+            // Assert that findByParent is the same list of groups as getMemberGroups() when pagination is ignored
+            // (NOTE: Pagination is tested in GroupRestRepositoryIT)
+            // NOTE: isEqualCollection() must be used for comparison because Hibernate's "PersistentBag" cannot be
+            // compared directly to a List. See https://stackoverflow.com/a/57399383/3750035
+            assertTrue(
+                CollectionUtils.isEqualCollection(parentGroup.getMemberGroups(),
+                                                  groupService.findByParent(context, parentGroup, -1, -1)));
+            // Assert countBy parent is the same as the size of group members
+            assertEquals(parentGroup.getMemberGroups().size(), groupService.countByParent(context, parentGroup));
+        } finally {
+            // Clean up our data
+            context.turnOffAuthorisationSystem();
+            groupService.delete(context, parentGroup);
+            groupService.delete(context, childGroup);
+            groupService.delete(context, child2Group);
+            groupService.delete(context, child3Group);
+            context.restoreAuthSystemState();
+        }
     }
 
 

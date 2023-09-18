@@ -382,6 +382,21 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     }
 
     @Override
+    public int countAllMembers(Context context, Group group) throws SQLException {
+        // Get all groups which are a member of this group
+        List<Group2GroupCache> group2GroupCaches = group2GroupCacheDAO.findByParent(context, group);
+        Set<Group> groups = new HashSet<>();
+        for (Group2GroupCache group2GroupCache : group2GroupCaches) {
+            groups.add(group2GroupCache.getChild());
+        }
+        // Append current group as well
+        groups.add(group);
+
+        // Return total number of unique EPerson objects in any of these groups
+        return ePersonService.countByGroups(context, groups);
+    }
+
+    @Override
     public Group find(Context context, UUID id) throws SQLException {
         if (id == null) {
             return null;
