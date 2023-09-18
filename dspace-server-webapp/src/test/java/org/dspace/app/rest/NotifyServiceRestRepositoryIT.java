@@ -32,6 +32,8 @@ import javax.ws.rs.core.MediaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomUtils;
 import org.dspace.app.ldn.NotifyServiceEntity;
+import org.dspace.app.rest.model.NotifyServiceInboundPatternRest;
+import org.dspace.app.rest.model.NotifyServiceOutboundPatternRest;
 import org.dspace.app.rest.model.NotifyServiceRest;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
@@ -148,11 +150,26 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
     public void createTest() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
 
+        NotifyServiceInboundPatternRest inboundPatternRestOne = new NotifyServiceInboundPatternRest();
+        inboundPatternRestOne.setPattern("patternA");
+        inboundPatternRestOne.setConstraint("itemFilterA");
+        inboundPatternRestOne.setAutomatic(true);
+
+        NotifyServiceInboundPatternRest inboundPatternRestTwo = new NotifyServiceInboundPatternRest();
+        inboundPatternRestTwo.setPattern("patternB");
+        inboundPatternRestTwo.setAutomatic(false);
+
+        NotifyServiceOutboundPatternRest outboundPatternRest = new NotifyServiceOutboundPatternRest();
+        outboundPatternRest.setPattern("patternC");
+        outboundPatternRest.setConstraint("itemFilterC");
+
         NotifyServiceRest notifyServiceRest = new NotifyServiceRest();
         notifyServiceRest.setName("service name");
         notifyServiceRest.setDescription("service description");
         notifyServiceRest.setUrl("service url");
         notifyServiceRest.setLdnUrl("service ldn url");
+        notifyServiceRest.setNotifyServiceInboundPatterns(List.of(inboundPatternRestOne, inboundPatternRestTwo));
+        notifyServiceRest.setNotifyServiceOutboundPatterns(List.of(outboundPatternRest));
 
         AtomicReference<Integer> idRef = new AtomicReference<Integer>();
         String authToken = getAuthToken(admin.getEmail(), password);
@@ -168,9 +185,19 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         getClient(authToken)
             .perform(get("/api/ldn/ldnservices/" + idRef.get()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$",
+            .andExpect(jsonPath("$.notifyServiceInboundPatterns", hasSize(2)))
+            .andExpect(jsonPath("$.notifyServiceOutboundPatterns", hasSize(1)))
+            .andExpect(jsonPath("$", allOf(
                 matchNotifyService(idRef.get(), "service name", "service description",
-                    "service url", "service ldn url")));
+                    "service url", "service ldn url"),
+                hasJsonPath("$.notifyServiceInboundPatterns", containsInAnyOrder(
+                    matchNotifyServicePattern("patternA", "itemFilterA", true),
+                    matchNotifyServicePattern("patternB", null, false)
+                )),
+                hasJsonPath("$.notifyServiceOutboundPatterns", contains(
+                    matchNotifyServicePattern("patternC", "itemFilterC")
+                )))
+            ));
     }
 
     @Test
