@@ -309,7 +309,7 @@ public class OrcidQueueConsumer implements Consumer {
     }
 
     private boolean isAlreadyQueued(Context context, Item profileItem, Item entity) throws SQLException {
-        return isNotEmpty(orcidQueueService.findByProfileItemAndEntity(context, profileItem, entity));
+        return isNotEmpty(orcidQueueService.findByProfileItemAndEntity(context.getSession(), profileItem, entity));
     }
 
     private boolean isNotLinkedToOrcid(Context context, Item profileItemItem) {
@@ -319,7 +319,7 @@ public class OrcidQueueConsumer implements Consumer {
 
     private boolean hasNotOrcidAccessToken(Context context, Item profileItemItem) {
         try {
-            return orcidTokenService.findByProfileItem(context, profileItemItem) == null;
+            return orcidTokenService.findByProfileItem(context.getSession(), profileItemItem) == null;
         } catch (SQLException ex) {
             LOGGER.error("Could not check ORCiD access token of Item {}", profileItemItem::getID, () -> ex);
             return true;

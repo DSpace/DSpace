@@ -184,7 +184,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
      * @return true if the item is the latest version, false otherwise.
      */
     protected boolean isLatestVersion(Context context, Item item) throws SQLException {
-        VersionHistory history = versionHistoryService.findByItem(context, item);
+        VersionHistory history = versionHistoryService.findByItem(context.getSession(), item);
         if (history == null) {
             // not all items have a version history
             // if an item does not have a version history, it is by definition the latest version

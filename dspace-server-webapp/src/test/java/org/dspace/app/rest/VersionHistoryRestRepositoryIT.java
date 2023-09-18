@@ -153,7 +153,7 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
                                .build();
 
         VersionBuilder.createVersion(context, item, "test").build();
-        VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
+        VersionHistory versionHistory = versionHistoryService.findByItem(context.getSession(), item);
         context.turnOffAuthorisationSystem();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -206,7 +206,7 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
                                .build();
 
         Version version2 = VersionBuilder.createVersion(context, item, "test").build();
-        VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
+        VersionHistory versionHistory = versionHistoryService.findByItem(context.getSession(), item);
         Version version = versioningService.getVersion(context, item);
         context.turnOffAuthorisationSystem();
 
@@ -251,7 +251,7 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
                                .build();
 
         VersionBuilder.createVersion(context, item, "test").build();
-        VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
+        VersionHistory versionHistory = versionHistoryService.findByItem(context.getSession(), item);
         context.turnOffAuthorisationSystem();
 
         getClient().perform(get("/api/versioning/versionhistories/" + versionHistory.getID() + "/versions"))
@@ -277,7 +277,7 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
                                .build();
 
         Version version = VersionBuilder.createVersion(context, item, "test").build();
-        VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
+        VersionHistory versionHistory = versionHistoryService.findByItem(context.getSession(), item);
         Version version2 = versioningService.getVersion(context, item);
         context.turnOffAuthorisationSystem();
 
@@ -309,7 +309,7 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
                                .build();
 
         Version v2 = VersionBuilder.createVersion(context, item, "test").build();
-        VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
+        VersionHistory versionHistory = versionHistoryService.findByItem(context.getSession(), item);
         Version v1 = versioningService.getVersion(context, item);
         Version v3 = VersionBuilder.createVersion(context, item, "test3").build();
         context.turnOffAuthorisationSystem();
@@ -381,7 +381,7 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
                                .build();
 
         Version v2 = VersionBuilder.createVersion(context, item, "test").build();
-        VersionHistory vh = versionHistoryService.findByItem(context, item);
+        VersionHistory vh = versionHistoryService.findByItem(context.getSession(), item);
         WorkspaceItem witem = workspaceItemService.findByItem(context.getSession(), v2.getItem());
         context.turnOffAuthorisationSystem();
 
@@ -412,7 +412,7 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
                                .build();
 
         VersionBuilder.createVersion(context, item, "test").build();
-        VersionHistory vh = versionHistoryService.findByItem(context, item);
+        VersionHistory vh = versionHistoryService.findByItem(context.getSession(), item);
         context.turnOffAuthorisationSystem();
 
         getClient().perform(get("/api/versioning/versionhistories/" + vh.getID() + "/draftVersion"))
@@ -471,10 +471,10 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
                                .build();
 
         Version version = VersionBuilder.createVersion(context, item, "test").build();
-        VersionHistory vh = versionHistoryService.findByItem(context, version.getItem());
+        VersionHistory vh = versionHistoryService.findByItem(context.getSession(), version.getItem());
         context.turnOffAuthorisationSystem();
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
 
         // retrieve the workspace item
@@ -522,7 +522,7 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
 
         Version version = VersionBuilder.createVersion(context, item, "test").build();
         version.setItem(witem.getItem());
-        VersionHistory vh = versionHistoryService.findByItem(context, version.getItem());
+        VersionHistory vh = versionHistoryService.findByItem(context.getSession(), version.getItem());
         context.turnOffAuthorisationSystem();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
@@ -552,7 +552,7 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
                                .build();
 
         Version v2 = VersionBuilder.createVersion(context, item, "test").build();
-        VersionHistory vh = versionHistoryService.findByItem(context, item);
+        VersionHistory vh = versionHistoryService.findByItem(context.getSession(), item);
         WorkspaceItem witem = workspaceItemService.findByItem(context.getSession(), v2.getItem());
         context.turnOffAuthorisationSystem();
 
@@ -605,12 +605,12 @@ public class VersionHistoryRestRepositoryIT extends AbstractControllerIntegratio
                                .build();
 
         Version v2 = VersionBuilder.createVersion(context, item, "test").build();
-        VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
+        VersionHistory versionHistory = versionHistoryService.findByItem(context.getSession(), item);
         Item lastVersionItem = v2.getItem();
         Version v1 = versioningService.getVersion(context, item);
 
         context.restoreAuthSystemState();
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
         String adminToken = getAuthToken(admin.getEmail(), password);
         Integer versionID = v2.getID();
         Item versionItem = v2.getItem();

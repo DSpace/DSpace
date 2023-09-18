@@ -17,6 +17,7 @@ import org.dspace.core.Context;
 import org.dspace.orcid.OrcidQueue;
 import org.dspace.orcid.model.OrcidEntityType;
 import org.dspace.profile.OrcidEntitySyncPreference;
+import org.hibernate.Session;
 
 /**
  * Service that handles ORCID queue records.
@@ -112,21 +113,21 @@ public interface OrcidQueueService {
     /**
      * Find all the ORCID queue records.
      *
-     * @param  context      DSpace context object
+     * @param  session      current request's database context.
      * @return              the ORCID queue records
      * @throws SQLException if an SQL error occurs
      */
-    public List<OrcidQueue> findAll(Context context) throws SQLException;
+    public List<OrcidQueue> findAll(Session session) throws SQLException;
 
     /**
      * Get the orcid queue records by the profileItem id.
      *
-     * @param  context       DSpace context object
+     * @param  session       current request's database context.
      * @param  profileItemId the profileItem item id
      * @return               the orcid queue records
      * @throws SQLException  if an SQL error occurs
      */
-    public List<OrcidQueue> findByProfileItemId(Context context, UUID profileItemId) throws SQLException;
+    public List<OrcidQueue> findByProfileItemId(Session session, UUID profileItemId) throws SQLException;
 
     /**
      * Get the orcid queue records by the profileItem id.
@@ -144,35 +145,35 @@ public interface OrcidQueueService {
     /**
      * Get the orcid queue records by the profileItem and entity.
      *
-     * @param  context      DSpace context object
+     * @param  session      current request's database context.
      * @param  profileItem  the profileItem item
      * @param  entity       the entity item
      * @return              the found OrcidQueue records
      * @throws SQLException if an SQL error occurs
      */
-    public List<OrcidQueue> findByProfileItemAndEntity(Context context, Item profileItem, Item entity)
+    public List<OrcidQueue> findByProfileItemAndEntity(Session session, Item profileItem, Item entity)
         throws SQLException;
 
     /**
      * Get the OrcidQueue records where the given item is the profileItem OR the
      * entity
      *
-     * @param  context      DSpace context object
+     * @param  session      current request's database context.
      * @param  item         the item to search for
      * @return              the found OrcidQueue records
      * @throws SQLException if database error
      */
-    public List<OrcidQueue> findByProfileItemOrEntity(Context context, Item item) throws SQLException;
+    public List<OrcidQueue> findByProfileItemOrEntity(Session session, Item item) throws SQLException;
 
     /**
      * Get all the OrcidQueue records with attempts less than the given attempts.
      *
-     * @param  context      DSpace context object
+     * @param  session      current request's database context.
      * @param  attempts     the maximum value of attempts
      * @return              the found OrcidQueue records
      * @throws SQLException if database error
      */
-    public List<OrcidQueue> findByAttemptsLessThan(Context context, int attempts) throws SQLException;
+    public List<OrcidQueue> findByAttemptsLessThan(Session session, int attempts) throws SQLException;
 
     /**
      * Returns the number of records on the OrcidQueue associated with the given
@@ -228,12 +229,12 @@ public interface OrcidQueueService {
     /**
      * Get an OrcidQueue from the database.
      *
-     * @param  context      DSpace context object
+     * @param  session      current request's database context.
      * @param  id           ID of the OrcidQueue
      * @return              the OrcidQueue format, or null if the ID is invalid.
      * @throws SQLException if database error
      */
-    public OrcidQueue find(Context context, int id) throws SQLException;
+    public OrcidQueue find(Session session, int id) throws SQLException;
 
     /**
      * Update the OrcidQueue

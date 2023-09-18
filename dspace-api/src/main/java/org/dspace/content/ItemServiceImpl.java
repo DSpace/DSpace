@@ -815,7 +815,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             harvestedItemService.delete(context, hi);
         }
 
-        OrcidToken orcidToken = orcidTokenService.findByProfileItem(context, item);
+        OrcidToken orcidToken = orcidTokenService.findByProfileItem(context.getSession(), item);
         if (orcidToken != null) {
             orcidToken.setProfileItem(null);
         }
@@ -829,7 +829,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     protected void removeRequest(Context context, Item item) throws SQLException {
-        Iterator<RequestItem> requestItems = requestItemService.findByItem(context, item);
+        Iterator<RequestItem> requestItems = requestItemService.findByItem(context.getSession(), item);
         while (requestItems.hasNext()) {
             RequestItem requestItem = requestItems.next();
             requestItemService.delete(context, requestItem);
@@ -1756,7 +1756,7 @@ prevent the generation of resource policy entry values with null dspace_object a
             return;
         }
 
-        Map<Item, String> profileAndPutCodeMap = orcidHistoryService.findLastPutCodes(context, entity);
+        Map<Item, String> profileAndPutCodeMap = orcidHistoryService.findLastPutCodes(context.getSession(), entity);
         for (Item profile : profileAndPutCodeMap.keySet()) {
             if (orcidSynchronizationService.isSynchronizationAllowed(profile, entity)) {
                 String putCode = profileAndPutCodeMap.get(profile);
@@ -1768,7 +1768,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     private void deleteOrcidHistoryRecords(Context context, Item item) throws SQLException {
-        List<OrcidHistory> historyRecords = orcidHistoryService.findByProfileItemOrEntity(context, item);
+        List<OrcidHistory> historyRecords = orcidHistoryService.findByProfileItemOrEntity(context.getSession(), item);
         for (OrcidHistory historyRecord : historyRecords) {
             if (historyRecord.getProfileItem().equals(item)) {
                 orcidHistoryService.delete(context, historyRecord);
@@ -1780,7 +1780,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     private void deleteOrcidQueueRecords(Context context, Item item) throws SQLException {
-        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findByProfileItemOrEntity(context, item);
+        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findByProfileItemOrEntity(context.getSession(), item);
         for (OrcidQueue orcidQueueRecord : orcidQueueRecords) {
             orcidQueueService.delete(context, orcidQueueRecord);
         }

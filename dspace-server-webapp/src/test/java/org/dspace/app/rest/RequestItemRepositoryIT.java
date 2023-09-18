@@ -229,7 +229,7 @@ public class RequestItemRepositoryIT
                         // verify the body is empty
                         .andExpect(jsonPath("$").doesNotExist());
         } finally {
-                Iterator<RequestItem> itemRequests = requestItemService.findByItem(context, item);
+                Iterator<RequestItem> itemRequests = requestItemService.findByItem(context.getSession(), item);
                 String token = null;
                 for (Iterator<RequestItem> it = itemRequests; it.hasNext();) {
                         RequestItem requestItem = it.next();
@@ -281,7 +281,7 @@ public class RequestItemRepositoryIT
                         // verify the body is empty
                         .andExpect(jsonPath("$").doesNotExist());
         } finally {
-                Iterator<RequestItem> itemRequests = requestItemService.findByItem(context, item);
+                Iterator<RequestItem> itemRequests = requestItemService.findByItem(context.getSession(), item);
                 String token = null;
                 for (Iterator<RequestItem> it = itemRequests; it.hasNext();) {
                         RequestItem requestItem = it.next();
@@ -512,7 +512,7 @@ public class RequestItemRepositoryIT
                 .andDo((var result) -> requestTokenRef.set(
                         read(result.getResponse().getContentAsString(), "token")));
         RequestItem foundRequest
-                = requestItemService.findByToken(context, requestTokenRef.get());
+                = requestItemService.findByToken(context.getSession(), requestTokenRef.get());
         assertTrue("acceptRequest should be true", foundRequest.isAccept_request());
         assertThat("decision_date must be within a minute of now",
                 foundRequest.getDecision_date(),

@@ -312,7 +312,8 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
                         while (itemIterator.hasNext()) {
                             Item item = itemIterator.next();
 
-                            VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
+                            VersionHistory versionHistory
+                                    = versionHistoryService.findByItem(context.getSession(), item);
                             if (null != versionHistory) {
                                 for (Version version : versioningService.getVersionsByHistory(context,
                                                                                               versionHistory)) {

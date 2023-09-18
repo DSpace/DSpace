@@ -16,6 +16,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.service.DSpaceCRUDService;
 import org.dspace.supervision.SupervisionOrder;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the SupervisionOrder object.
@@ -38,33 +39,33 @@ public interface SupervisionOrderService extends DSpaceCRUDService<SupervisionOr
     /**
      * Find all supervision orders currently stored
      *
-     * @param context The DSpace context
+     * @param session current request's database context.
      * @return all Supervision Orders
      * @throws SQLException If something goes wrong in the database
      */
-    List<SupervisionOrder> findAll(Context context) throws SQLException;
+    List<SupervisionOrder> findAll(Session session) throws SQLException;
 
     /**
      * Find all supervision orders for a given Item
      *
-     * @param context The DSpace context
+     * @param session current request's database context.
      * @param item the item
      * @return all Supervision Orders related to the item
      * @throws SQLException If something goes wrong in the database
      */
-    List<SupervisionOrder> findByItem(Context context, Item item) throws SQLException;
+    List<SupervisionOrder> findByItem(Session session, Item item) throws SQLException;
 
     /**
      *
      * Find a supervision order depending on given Item and Group
      *
-     * @param context The DSpace context
+     * @param session The DSpace context
      * @param item the item
      * @param group the group
      * @return the Supervision Order of the item and group
      * @throws SQLException If something goes wrong in the database
      */
-    SupervisionOrder findByItemAndGroup(Context context, Item item, Group group) throws SQLException;
+    SupervisionOrder findByItemAndGroup(Session session, Item item, Group group) throws SQLException;
 
     /**
      *

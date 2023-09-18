@@ -96,7 +96,7 @@ public class VersioningConsumer implements Consumer {
         }
 
         // get version history
-        VersionHistory history = versionHistoryService.findByItem(ctx, item);
+        VersionHistory history = versionHistoryService.findByItem(ctx.getSession(), item);
         if (history == null) {
             return;
         }

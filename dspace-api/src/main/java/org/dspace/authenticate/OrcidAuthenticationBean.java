@@ -269,7 +269,7 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
             ePersonService.addMetadata(context, person, "eperson", "orcid", "scope", null, scope);
         }
 
-        OrcidToken orcidToken = orcidTokenService.findByEPerson(context, person);
+        OrcidToken orcidToken = orcidTokenService.findByEPerson(context.getSession(), person);
         if (orcidToken == null) {
             orcidTokenService.create(context, person, accessToken);
         } else {

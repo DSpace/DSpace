@@ -100,10 +100,10 @@ public class RequestItemBuilder
             token = requestItemService.createRequest(context, bitstream, item,
                     (null == bitstream),
                     REQ_EMAIL, REQ_NAME, REQ_MESSAGE);
+            requestItem = requestItemService.findByToken(context.getSession(), token);
         } catch (SQLException ex) {
             return handleException(ex);
         }
-        requestItem = requestItemService.findByToken(context, token);
         requestItem.setAccept_request(accepted);
         requestItem.setDecision_date(decisionDate);
 
@@ -149,7 +149,7 @@ public class RequestItemBuilder
                 .withLocation()
                 .log("Delete RequestItem with token {}", token);
         try (Context context = new Context()) {
-            RequestItem request = requestItemService.findByToken(context, token);
+            RequestItem request = requestItemService.findByToken(context.getSession(), token);
             if (null == request) {
                 return;
             }

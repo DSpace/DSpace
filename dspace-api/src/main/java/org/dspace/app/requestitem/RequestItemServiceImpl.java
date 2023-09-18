@@ -26,6 +26,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.core.Utils;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -77,15 +78,15 @@ public class RequestItemServiceImpl implements RequestItemService {
     }
 
     @Override
-    public List<RequestItem> findAll(Context context)
+    public List<RequestItem> findAll(Session session)
             throws SQLException {
-        return requestItemDAO.findAll(context.getSession(), RequestItem.class);
+        return requestItemDAO.findAll(session, RequestItem.class);
     }
 
     @Override
-    public RequestItem findByToken(Context context, String token) {
+    public RequestItem findByToken(Session session, String token) {
         try {
-            return requestItemDAO.findByToken(context.getSession(), token);
+            return requestItemDAO.findByToken(session, token);
         } catch (SQLException e) {
             log.error(e.getMessage());
             return null;
@@ -93,8 +94,8 @@ public class RequestItemServiceImpl implements RequestItemService {
     }
 
     @Override
-    public Iterator<RequestItem> findByItem(Context context, Item item) throws SQLException {
-        return requestItemDAO.findByItem(context.getSession(), item);
+    public Iterator<RequestItem> findByItem(Session session, Item item) throws SQLException {
+        return requestItemDAO.findByItem(session, item);
     }
 
     @Override

@@ -135,7 +135,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider implem
                 // get history
                 VersionHistory history = null;
                 try {
-                    history = versionHistoryService.findByItem(context, item);
+                    history = versionHistoryService.findByItem(context.getSession(), item);
                 } catch (SQLException ex) {
                     throw new RuntimeException("Unable to create handle '"
                                                    + identifier + "' for "
@@ -226,7 +226,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider implem
     protected VersionHistory getHistory(Context context, String identifier) throws SQLException {
         DSpaceObject item = this.resolve(context, identifier);
         if (item != null) {
-            VersionHistory history = versionHistoryService.findByItem(context, (Item) item);
+            VersionHistory history = versionHistoryService.findByItem(context.getSession(), (Item) item);
             return history;
         }
         return null;
@@ -237,7 +237,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider implem
         createNewIdentifier(context, item, identifier);
         populateHandleMetadata(context, item, identifier);
 
-        VersionHistory vh = versionHistoryService.findByItem(context, item);
+        VersionHistory vh = versionHistoryService.findByItem(context.getSession(), item);
         if (vh == null) {
             vh = versionHistoryService.create(context);
         }
@@ -279,7 +279,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider implem
             String handleId = null;
             VersionHistory history = null;
             if (dso instanceof Item) {
-                history = versionHistoryService.findByItem(context, (Item) dso);
+                history = versionHistoryService.findByItem(context.getSession(), (Item) dso);
             }
 
             if (history != null) {

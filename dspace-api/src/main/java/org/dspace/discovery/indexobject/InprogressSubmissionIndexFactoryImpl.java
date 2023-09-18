@@ -93,7 +93,7 @@ public abstract class InprogressSubmissionIndexFactoryImpl
     }
 
     private void addSupervisedByFacetIndex(Context context, Item item, SolrInputDocument doc) throws SQLException {
-        List<SupervisionOrder> supervisionOrders = supervisionOrderService.findByItem(context, item);
+        List<SupervisionOrder> supervisionOrders = supervisionOrderService.findByItem(context.getSession(), item);
         for (SupervisionOrder supervisionOrder : supervisionOrders) {
             addFacetIndex(doc, "supervisedBy", supervisionOrder.getGroup().getID().toString(),
                 supervisionOrder.getGroup().getName());

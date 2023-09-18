@@ -88,23 +88,23 @@ public class SupervisionOrderServiceImpl implements SupervisionOrderService {
     }
 
     @Override
-    public List<SupervisionOrder> findAll(Context context) throws SQLException {
-        return supervisionDao.findAll(context.getSession(), SupervisionOrder.class);
+    public List<SupervisionOrder> findAll(Session session) throws SQLException {
+        return supervisionDao.findAll(session, SupervisionOrder.class);
     }
 
     @Override
-    public List<SupervisionOrder> findByItem(Context context, Item item) throws SQLException {
-        return supervisionDao.findByItem(context.getSession(), item);
+    public List<SupervisionOrder> findByItem(Session session, Item item) throws SQLException {
+        return supervisionDao.findByItem(session, item);
     }
 
     @Override
-    public SupervisionOrder findByItemAndGroup(Context context, Item item, Group group) throws SQLException {
-        return supervisionDao.findByItemAndGroup(context.getSession(), item, group);
+    public SupervisionOrder findByItemAndGroup(Session session, Item item, Group group) throws SQLException {
+        return supervisionDao.findByItemAndGroup(session, item, group);
     }
 
     @Override
     public boolean isSupervisor(Context context, EPerson ePerson, Item item) throws SQLException {
-        List<SupervisionOrder> supervisionOrders = findByItem(context, item);
+        List<SupervisionOrder> supervisionOrders = findByItem(context.getSession(), item);
 
         if (CollectionUtils.isEmpty(supervisionOrders)) {
             return false;

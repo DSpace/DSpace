@@ -74,7 +74,7 @@ public class BulkAccessControlScriptIT extends AbstractEntityIntegrationTest {
     @After
     @Override
     public void destroy() throws Exception {
-        List<Process> processes = processService.findAll(context);
+        List<Process> processes = processService.findAll(context.getSession());
         for (Process process : processes) {
             ProcessBuilder.deleteProcess(process.getID());
         }

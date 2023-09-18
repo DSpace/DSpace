@@ -139,7 +139,7 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
     @Override
     public boolean hasVersionHistory(Context context, Item item)
         throws SQLException {
-        return findByItem(context, item) != null;
+        return findByItem(context.getSession(), item) != null;
     }
 
     @Override
@@ -180,7 +180,7 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
 
     @Override
     public boolean isFirstVersion(Context context, Item item) throws SQLException {
-        VersionHistory vh = findByItem(context, item);
+        VersionHistory vh = findByItem(context.getSession(), item);
         if (vh == null) {
             return true;
         }
@@ -196,7 +196,7 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
 
     @Override
     public boolean isLastVersion(Context context, Item item) throws SQLException {
-        VersionHistory vh = findByItem(context, item);
+        VersionHistory vh = findByItem(context.getSession(), item);
         if (vh == null) {
             return true;
         }
@@ -217,8 +217,8 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
     }
 
     @Override
-    public VersionHistory findByItem(Context context, Item item) throws SQLException {
-        return versionHistoryDAO.findByItem(context.getSession(), item);
+    public VersionHistory findByItem(Session session, Item item) throws SQLException {
+        return versionHistoryDAO.findByItem(session, item);
     }
 
     @Override

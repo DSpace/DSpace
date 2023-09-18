@@ -559,13 +559,13 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
 
     private String getOrcidAccessToken(EPerson ePerson)
             throws SQLException {
-        OrcidToken orcidToken = orcidTokenService.findByEPerson(context, ePerson);
+        OrcidToken orcidToken = orcidTokenService.findByEPerson(context.getSession(), ePerson);
         return orcidToken != null ? orcidToken.getAccessToken() : null;
     }
 
     private String getOrcidAccessToken(Item item)
             throws SQLException {
-        OrcidToken orcidToken = orcidTokenService.findByProfileItem(context, item);
+        OrcidToken orcidToken = orcidTokenService.findByProfileItem(context.getSession(), item);
         return orcidToken != null ? orcidToken.getAccessToken() : null;
     }
 }

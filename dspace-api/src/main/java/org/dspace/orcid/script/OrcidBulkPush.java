@@ -130,17 +130,17 @@ public class OrcidBulkPush extends DSpaceRunnable<OrcidBulkPushScriptConfigurati
     }
 
     /**
-     * If the current script execution is configued to ignore the max attemps,
+     * If the current script execution is configured to ignore the max attempts,
      * returns all the ORCID Queue records, otherwise returns the ORCID Queue
      * records that has an attempts value less than the configured max attempts
      * value.
      */
     private List<OrcidQueue> findQueueRecords() throws SQLException {
         if (ignoreMaxAttempts) {
-            return orcidQueueService.findAll(context);
+            return orcidQueueService.findAll(context.getSession());
         } else {
             int attempts = configurationService.getIntProperty("orcid.bulk-synchronization.max-attempts");
-            return orcidQueueService.findByAttemptsLessThan(context, attempts);
+            return orcidQueueService.findByAttemptsLessThan(context.getSession(), attempts);
         }
     }
 

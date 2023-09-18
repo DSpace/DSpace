@@ -3829,8 +3829,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(delete("/api/core/items/" + profile.getID()))
             .andExpect(status().is(204));
 
-        assertThat(orcidQueueService.findAll(context), empty());
-        assertThat(orcidHistoryService.findAll(context), empty());
+        assertThat(orcidQueueService.findAll(context.getSession()), empty());
+        assertThat(orcidHistoryService.findAll(context.getSession()), empty());
 
     }
 
@@ -3909,7 +3909,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(delete("/api/core/items/" + publication.getID()))
             .andExpect(status().is(204));
 
-        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
+        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context.getSession());
         assertThat(orcidQueueRecords, hasSize(2));
         assertThat(orcidQueueRecords, hasItem(matches(firstProfile, null, "Publication", "12345", DELETE)));
         assertThat(orcidQueueRecords, hasItem(matches(thirdProfile, null, "Publication", "98765", DELETE)));
@@ -3996,7 +3996,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(delete("/api/core/items/" + funding.getID()))
             .andExpect(status().is(204));
 
-        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
+        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context.getSession());
         assertThat(orcidQueueRecords, hasSize(1));
         assertThat(orcidQueueRecords, hasItem(matches(firstProfile, null, "Project", "12345", DELETE)));
 

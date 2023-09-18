@@ -57,7 +57,7 @@ public class ProcessRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
 
         try {
             int processId = Integer.parseInt(targetId.toString());
-            Process process = processService.find(context, processId);
+            Process process = processService.find(context.getSession(), processId);
             if (process == null) {
                 return true;
             }

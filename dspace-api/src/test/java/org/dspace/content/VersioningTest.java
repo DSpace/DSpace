@@ -117,7 +117,7 @@ public class VersioningTest extends AbstractUnitTest {
 
     @Test
     public void testVersionFind() throws SQLException {
-        VersionHistory versionHistory = versionHistoryService.findByItem(context, originalItem);
+        VersionHistory versionHistory = versionHistoryService.findByItem(context.getSession(), originalItem);
         assertThat("testFindVersionHistory", versionHistory, notNullValue());
         Version version = versionHistoryService.getVersion(context, versionHistory, versionedItem);
         assertThat("testFindVersion", version, notNullValue());
@@ -129,7 +129,7 @@ public class VersioningTest extends AbstractUnitTest {
     @Test
     public void testVersionSummary() throws Exception {
         //Start by creating a new item !
-        VersionHistory versionHistory = versionHistoryService.findByItem(context, originalItem);
+        VersionHistory versionHistory = versionHistoryService.findByItem(context.getSession(), originalItem);
         Version version = versionHistoryService.getVersion(context, versionHistory, versionedItem);
         assertThat("Test_version_summary", summary, equalTo(version.getSummary()));
     }

@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Class that evaluate DELETE and READ permissions
- * 
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 @Component
@@ -106,10 +106,10 @@ public class OrcidQueueAndHistoryRestPermissionEvaluatorPlugin extends RestObjec
     private Item findProfileItem(Context context, Integer orcidObjectId, boolean isOrcidQueueRecord)
         throws SQLException {
         if (isOrcidQueueRecord) {
-            OrcidQueue orcidQueue = orcidQueueService.find(context, orcidObjectId);
+            OrcidQueue orcidQueue = orcidQueueService.find(context.getSession(), orcidObjectId);
             return orcidQueue != null ? orcidQueue.getProfileItem() : null;
         } else {
-            OrcidHistory orcidHistory = orcidHistoryService.find(context, orcidObjectId);
+            OrcidHistory orcidHistory = orcidHistoryService.find(context.getSession(), orcidObjectId);
             return orcidHistory != null ? orcidHistory.getProfileItem() : null;
         }
     }

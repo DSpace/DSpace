@@ -70,7 +70,7 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
     @PreAuthorize("hasPermission(#id, 'PROCESS', 'READ')")
     public ProcessRest findOne(Context context, Integer id) {
         try {
-            Process process = processService.find(context, id);
+            Process process = processService.find(context.getSession(), id);
             if (process == null) {
                 return null;
             }
@@ -86,7 +86,7 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
     public Page<ProcessRest> findAll(Context context, Pageable pageable) {
         try {
             int total = processService.countTotal(context);
-            List<Process> processes = processService.findAll(context, pageable.getPageSize(),
+            List<Process> processes = processService.findAll(context.getSession(), pageable.getPageSize(),
                     Math.toIntExact(pageable.getOffset()));
             return converter.toRestPage(processes, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
@@ -101,7 +101,7 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
         try {
             Context context = obtainContext();
             long total = processService.countByUser(context, context.getCurrentUser());
-            List<Process> processes = processService.findByUser(context, context.getCurrentUser(),
+            List<Process> processes = processService.findByUser(context.getSession(), context.getCurrentUser(),
                                                                 pageable.getPageSize(),
                                                                 Math.toIntExact(pageable.getOffset()));
             return converter.toRestPage(processes, pageable, total, utils.obtainProjection());
@@ -127,7 +127,7 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
     }
 
     private Process getProcess(Integer processId, Context context) throws SQLException, AuthorizeException {
-        Process process = processService.find(context, processId);
+        Process process = processService.find(context.getSession(), processId);
         if (process == null) {
             throw new ResourceNotFoundException("Process with id " + processId + " was not found");
         }
@@ -160,7 +160,7 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
     protected void delete(Context context, Integer integer)
         throws AuthorizeException, RepositoryMethodNotImplementedException {
         try {
-            processService.delete(context, processService.find(context, integer));
+            processService.delete(context, processService.find(context.getSession(), integer));
         } catch (SQLException | IOException e) {
             log.error("Something went wrong trying to find Process with id: " + integer, e);
             throw new RuntimeException(e.getMessage(), e);

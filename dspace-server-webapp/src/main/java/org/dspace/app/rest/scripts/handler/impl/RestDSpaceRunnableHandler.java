@@ -90,7 +90,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
     public void start() {
         Context context = new Context();
         try {
-            Process process = processService.find(context, processId);
+            Process process = processService.find(context.getSession(), processId);
             processService.start(context, process);
             context.complete();
             logInfo("The script has started");
@@ -107,7 +107,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
     public void handleCompletion() {
         Context context = new Context();
         try {
-            Process process = processService.find(context, processId);
+            Process process = processService.find(context.getSession(), processId);
             processService.complete(context, process);
             logInfo("The script has completed");
 
@@ -144,7 +144,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
 
         Context context = new Context();
         try {
-            Process process = processService.find(context, processId);
+            Process process = processService.find(context.getSession(), processId);
             processService.fail(context, process);
 
             addLogBitstreamToProcess(context);
@@ -232,7 +232,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
     public Optional<InputStream> getFileStream(Context context, String fileName) throws IOException,
         AuthorizeException {
         try {
-            Process process = processService.find(context, processId);
+            Process process = processService.find(context.getSession(), processId);
             Bitstream bitstream = processService.getBitstreamByName(context, process, fileName);
             InputStream inputStream = bitstreamService.retrieve(context, bitstream);
             if (inputStream == null) {
@@ -249,7 +249,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
     @Override
     public void writeFilestream(Context context, String fileName, InputStream inputStream, String type)
         throws IOException, SQLException, AuthorizeException {
-        Process process = processService.find(context, processId);
+        Process process = processService.find(context.getSession(), processId);
         processService.appendFile(context, process, inputStream, type, fileName);
     }
 
@@ -260,7 +260,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
      */
     public Process getProcess(Context context) {
         try {
-            return processService.find(context, processId);
+            return processService.find(context.getSession(), processId);
         } catch (SQLException e) {
             log.error("RestDSpaceRunnableHandler with process: " + processId + " could not be found", e);
         }
@@ -277,7 +277,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
                                                 .getServiceByName("dspaceRunnableThreadExecutor", TaskExecutor.class);
         Context context = new Context();
         try {
-            Process process = processService.find(context, processId);
+            Process process = processService.find(context.getSession(), processId);
             process.setProcessStatus(ProcessStatus.SCHEDULED);
             processService.update(context, process);
             context.complete();
@@ -302,7 +302,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
     private void addLogBitstreamToProcess(Context context) throws SQLException, IOException, AuthorizeException {
         try {
             EPerson ePerson = ePersonService.find(context.getSession(), ePersonId);
-            Process process = processService.find(context, processId);
+            Process process = processService.find(context.getSession(), processId);
 
             context.setCurrentUser(ePerson);
             processService.createLogBitstream(context, process);
@@ -316,7 +316,7 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
         Context context = new Context();
         List<UUID> specialGroups = new ArrayList<>();
         try {
-            Process process = processService.find(context, processId);
+            Process process = processService.find(context.getSession(), processId);
             for (Group group : process.getGroups()) {
                 specialGroups.add(group.getID());
             }

@@ -270,7 +270,7 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
 
     private Optional<String> getAccessToken(Item item) {
         try {
-            return ofNullable(orcidTokenService.findByProfileItem(getContext(), item))
+            return ofNullable(orcidTokenService.findByProfileItem(getContext().getSession(), item))
                     .map(OrcidToken::getAccessToken);
         } catch (SQLException ex) {
             LOGGER.error("Could not fetch access token for Item {}", item::getID, () -> ex);

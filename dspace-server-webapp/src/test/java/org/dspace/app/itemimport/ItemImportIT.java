@@ -246,7 +246,7 @@ public class ItemImportIT extends AbstractEntityIntegrationTest {
                 .andDo(result -> idRef
                         .set(read(result.getResponse().getContentAsString(), "$.processId")));
 
-            process = processService.find(context, idRef.get());
+            process = processService.find(context.getSession(), idRef.get());
             checkProcess(process);
         } finally {
             ProcessBuilder.deleteProcess(process.getID());

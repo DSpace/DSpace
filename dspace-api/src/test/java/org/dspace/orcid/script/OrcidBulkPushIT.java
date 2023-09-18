@@ -117,7 +117,7 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
 
     @After
     public void after() throws SQLException {
-        List<OrcidHistory> records = orcidHistoryService.findAll(context);
+        List<OrcidHistory> records = orcidHistoryService.findAll(context.getSession());
         for (OrcidHistory record : records) {
             orcidHistoryService.delete(context, record);
         }
@@ -201,12 +201,12 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
 
         verifyNoMoreInteractions(orcidClientMock);
 
-        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
+        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context.getSession());
         assertThat(queueRecords, hasSize(2));
         assertThat(queueRecords, hasItem(matches(secondProfileItem, thirdEntity, "Publication", INSERT, 0)));
         assertThat(queueRecords, hasItem(matches(secondProfileItem, fourthEntity, "Publication", INSERT, 0)));
 
-        List<OrcidHistory> historyRecords = orcidHistoryService.findAll(context);
+        List<OrcidHistory> historyRecords = orcidHistoryService.findAll(context.getSession());
         assertThat(historyRecords, hasSize(4));
         assertThat(historyRecords, hasItem(matches(history(firstProfileItem, firstEntity, 201, INSERT))));
         assertThat(historyRecords, hasItem(matches(history(firstProfileItem, secondEntity, 200, UPDATE))));
@@ -265,7 +265,7 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
 
         verifyNoMoreInteractions(orcidClientMock);
 
-        List<OrcidHistory> historyRecords = orcidHistoryService.findAll(context);
+        List<OrcidHistory> historyRecords = orcidHistoryService.findAll(context.getSession());
         assertThat(historyRecords, hasSize(2));
         assertThat(historyRecords, hasItem(matches(history(firstProfileItem, firstEntity, 201, INSERT))));
         assertThat(historyRecords, hasItem(matches(history(firstProfileItem, 204, DELETE))));
@@ -314,11 +314,11 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
         verify(orcidClientMock).push(any(), eq("1111-2222-3333-4444"), any());
         verifyNoMoreInteractions(orcidClientMock);
 
-        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
+        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context.getSession());
         assertThat(queueRecords, hasSize(1));
         assertThat(queueRecords, hasItem(matches(firstProfileItem, secondEntity, "Publication", UPDATE, 1)));
 
-        List<OrcidHistory> historyRecords = orcidHistoryService.findAll(context);
+        List<OrcidHistory> historyRecords = orcidHistoryService.findAll(context.getSession());
         assertThat(historyRecords, hasSize(2));
         assertThat(historyRecords, hasItem(matches(history(firstProfileItem, firstEntity, 201, INSERT))));
         assertThat(historyRecords, hasItem(matches(history(secondProfileItem, thirdEntity, 201, INSERT))));
@@ -360,11 +360,11 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
         verify(orcidClientMock).push(any(), eq("0000-1111-2222-3333"), any());
         verifyNoMoreInteractions(orcidClientMock);
 
-        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
+        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context.getSession());
         assertThat(queueRecords, hasSize(1));
         assertThat(queueRecords, hasItem(matches(secondProfileItem, secondEntity, "Publication", INSERT, 1)));
 
-        List<OrcidHistory> historyRecords = orcidHistoryService.findAll(context);
+        List<OrcidHistory> historyRecords = orcidHistoryService.findAll(context.getSession());
         assertThat(historyRecords, hasSize(1));
         assertThat(historyRecords, hasItem(matches(history(firstProfileItem, firstEntity, 201, INSERT))));
 
@@ -407,11 +407,11 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
         verify(orcidClientMock).push(any(), eq("1111-2222-3333-4444"), any());
         verifyNoMoreInteractions(orcidClientMock);
 
-        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
+        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context.getSession());
         assertThat(queueRecords, hasSize(1));
         assertThat(queueRecords, hasItem(matches(firstProfileItem, firstEntity, "Publication", INSERT, 1)));
 
-        List<OrcidHistory> historyRecords = orcidHistoryService.findAll(context);
+        List<OrcidHistory> historyRecords = orcidHistoryService.findAll(context.getSession());
         assertThat(historyRecords, hasSize(2));
         assertThat(historyRecords, hasItem(matches(history(firstProfileItem, firstEntity, 400, INSERT))));
         assertThat(historyRecords, hasItem(matches(history(secondProfileItem, secondEntity, 201, INSERT))));
@@ -439,11 +439,11 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
         assertThat(handler.getErrorMessages(), empty());
         assertThat(handler.getWarningMessages(), empty());
 
-        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
+        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context.getSession());
         assertThat(queueRecords, hasSize(1));
         assertThat(queueRecords, hasItem(matches(profileItem, entity, "Publication", INSERT, 1)));
 
-        List<OrcidHistory> historyRecords = orcidHistoryService.findAll(context);
+        List<OrcidHistory> historyRecords = orcidHistoryService.findAll(context.getSession());
         assertThat(historyRecords, hasSize(1));
         assertThat(historyRecords, hasItem(matches(history(profileItem, entity, 400, INSERT))));
 
@@ -454,11 +454,11 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
         assertThat(handler.getErrorMessages(), empty());
         assertThat(handler.getWarningMessages(), empty());
 
-        queueRecords = orcidQueueService.findAll(context);
+        queueRecords = orcidQueueService.findAll(context.getSession());
         assertThat(queueRecords, hasSize(1));
         assertThat(queueRecords, hasItem(matches(profileItem, entity, "Publication", INSERT, 2)));
 
-        historyRecords = orcidHistoryService.findAll(context);
+        historyRecords = orcidHistoryService.findAll(context.getSession());
         assertThat(historyRecords, hasSize(2));
         assertThat(historyRecords, contains(matches(history(profileItem, entity, 400, INSERT)),
             matches(history(profileItem, entity, 400, INSERT))));
@@ -470,11 +470,11 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
         assertThat(handler.getErrorMessages(), empty());
         assertThat(handler.getWarningMessages(), empty());
 
-        queueRecords = orcidQueueService.findAll(context);
+        queueRecords = orcidQueueService.findAll(context.getSession());
         assertThat(queueRecords, hasSize(1));
         assertThat(queueRecords, hasItem(matches(profileItem, entity, "Publication", INSERT, 2)));
 
-        historyRecords = orcidHistoryService.findAll(context);
+        historyRecords = orcidHistoryService.findAll(context.getSession());
         assertThat(historyRecords, hasSize(2));
         assertThat(historyRecords, contains(matches(history(profileItem, entity, 400, INSERT)),
             matches(history(profileItem, entity, 400, INSERT))));
@@ -486,11 +486,11 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
         assertThat(handler.getErrorMessages(), empty());
         assertThat(handler.getWarningMessages(), empty());
 
-        queueRecords = orcidQueueService.findAll(context);
+        queueRecords = orcidQueueService.findAll(context.getSession());
         assertThat(queueRecords, hasSize(1));
         assertThat(queueRecords, hasItem(matches(profileItem, entity, "Publication", INSERT, 3)));
 
-        historyRecords = orcidHistoryService.findAll(context);
+        historyRecords = orcidHistoryService.findAll(context.getSession());
         assertThat(historyRecords, hasSize(3));
         assertThat(historyRecords, contains(matches(history(profileItem, entity, 400, INSERT)),
             matches(history(profileItem, entity, 400, INSERT)),

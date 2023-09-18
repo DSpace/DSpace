@@ -58,7 +58,7 @@ public class OrcidMetadataCopyingAction implements AfterResearcherProfileCreatio
         copyMetadataValues(context, owner, "eperson.orcid", item, "person.identifier.orcid");
         copyMetadataValues(context, owner, "eperson.orcid.scope", item, "dspace.orcid.scope");
 
-        OrcidToken orcidToken = orcidTokenService.findByEPerson(context, owner);
+        OrcidToken orcidToken = orcidTokenService.findByEPerson(context.getSession(), owner);
         if (orcidToken != null) {
             orcidToken.setProfileItem(item);
         }
