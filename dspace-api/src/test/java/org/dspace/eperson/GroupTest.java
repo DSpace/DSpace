@@ -22,10 +22,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.builder.GroupBuilder;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
@@ -636,15 +636,20 @@ public class GroupTest extends AbstractUnitTest {
 
         // Assert that findByParent is the same list of groups as getMemberGroups() when pagination is ignored
         // (NOTE: Pagination is tested in GroupRestRepositoryIT)
-        assertEquals(parentGroup.getMemberGroups(), groupService.findByParent(context, parentGroup, -1, -1));
+        // NOTE: isEqualCollection() must be used for comparison because Hibernate's "PersistentBag" cannot be compared
+        // directly to a List. See https://stackoverflow.com/a/57399383/3750035
+        assertTrue(CollectionUtils.isEqualCollection(parentGroup.getMemberGroups(),
+                                                     groupService.findByParent(context, parentGroup, -1, -1)));
         // Assert countBy parent is the same as the size of group members
         assertEquals(parentGroup.getMemberGroups().size(), groupService.countByParent(context, parentGroup));
 
         // Clean up our data
+        context.turnOffAuthorisationSystem();
         groupService.delete(context, parentGroup);
         groupService.delete(context, childGroup);
         groupService.delete(context, child2Group);
         groupService.delete(context, child3Group);
+        context.restoreAuthSystemState();
     }
 
 

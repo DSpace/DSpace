@@ -10,6 +10,7 @@ package org.dspace.eperson;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -20,6 +21,7 @@ import java.util.Set;
 import javax.mail.MessagingException;
 
 import org.apache.commons.codec.DecoderException;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
@@ -1041,7 +1043,10 @@ public class EPersonTest extends AbstractUnitTest {
 
         // Assert that findByGroup is the same list of EPersons as getMembers() when pagination is ignored
         // (NOTE: Pagination is tested in GroupRestRepositoryIT)
-        assertEquals(group.getMembers(), ePersonService.findByGroups(context, Set.of(group), -1, -1));
+        // NOTE: isEqualCollection() must be used for comparison because Hibernate's "PersistentBag" cannot be compared
+        // directly to a List. See https://stackoverflow.com/a/57399383/3750035
+        assertTrue(CollectionUtils.isEqualCollection(group.getMembers(),
+                                                     ePersonService.findByGroups(context, Set.of(group), -1, -1)));
         // Assert countByGroups is the same as the size of members
         assertEquals(group.getMembers().size(), ePersonService.countByGroups(context, Set.of(group)));
 
@@ -1058,12 +1063,14 @@ public class EPersonTest extends AbstractUnitTest {
         assertEquals(4, ePersonService.countByGroups(context, Set.of(group, group2)));
 
         // Clean up our data
+        context.turnOffAuthorisationSystem();
         groupService.delete(context, group);
         groupService.delete(context, group2);
         ePersonService.delete(context, eperson1);
         ePersonService.delete(context, eperson2);
         ePersonService.delete(context, eperson3);
         ePersonService.delete(context, eperson4);
+        context.restoreAuthSystemState();
     }
 
     /**
