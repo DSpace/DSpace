@@ -179,8 +179,10 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                 for (CollectionRole collectionRole : collectionRoles) {
                     if (StringUtils.equals(collectionRole.getRoleId(), role.getId())
                             && claimedTask.getWorkflowItem().getCollection() == collectionRole.getCollection()) {
-                        List<EPerson> ePeople = allMembers(context, group);
-                        if (ePeople.size() == 1 && ePeople.contains(ePerson)) {
+                        //  Get total number of unique EPerson objs who are a member of this group (or subgroup)
+                        int totalMembers = countAllMembers(context, group);
+                        // If only one EPerson is a member, then we cannot delete the last member of this group.
+                        if (totalMembers == 1) {
                             throw new IllegalStateException(
                                     "Refused to remove user " + ePerson
                                             .getID() + " from workflow group because the group " + group
@@ -191,8 +193,10 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                 }
             }
             if (!poolTasks.isEmpty()) {
-                List<EPerson> ePeople = allMembers(context, group);
-                if (ePeople.size() == 1 && ePeople.contains(ePerson)) {
+                //  Get total number of unique EPerson objs who are a member of this group (or subgroup)
+                int totalMembers = countAllMembers(context, group);
+                // If only one EPerson is a member, then we cannot delete the last member of this group.
+                if (totalMembers == 1) {
                     throw new IllegalStateException(
                             "Refused to remove user " + ePerson
                                     .getID() + " from workflow group because the group " + group
@@ -212,9 +216,10 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         if (!collectionRoles.isEmpty()) {
             List<PoolTask> poolTasks = poolTaskService.findByGroup(context, groupParent);
             if (!poolTasks.isEmpty()) {
-                List<EPerson> parentPeople = allMembers(context, groupParent);
-                List<EPerson> childPeople = allMembers(context, childGroup);
-                if (childPeople.containsAll(parentPeople)) {
+                // Count number of Groups which have this groupParent as a direct parent
+                int totalChildren = countByParent(context, groupParent);
+                // If only one group has this as a parent, we cannot delete the last child group
+                if (totalChildren == 1) {
                     throw new IllegalStateException(
                             "Refused to remove sub group " + childGroup
                                     .getID() + " from workflow group because the group " + groupParent
