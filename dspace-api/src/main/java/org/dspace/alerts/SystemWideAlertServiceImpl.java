@@ -74,13 +74,13 @@ public class SystemWideAlertServiceImpl implements SystemWideAlertService {
 
     @Override
     public List<SystemWideAlert> findAll(final Session session, final int limit, final int offset) throws SQLException {
-        return systemWideAlertDAO.findAll(session.getSession(), limit, offset);
+        return systemWideAlertDAO.findAll(session, limit, offset);
     }
 
     @Override
     public List<SystemWideAlert> findAllActive(final Session session, final int limit, final int offset)
             throws SQLException {
-        return systemWideAlertDAO.findAllActive(session.getSession(), limit, offset);
+        return systemWideAlertDAO.findAllActive(session, limit, offset);
     }
 
     @Override

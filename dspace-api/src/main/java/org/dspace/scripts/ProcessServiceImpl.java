@@ -112,7 +112,7 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Override
     public List<Process> findAll(Session session, int limit, int offset) throws SQLException {
-        return processDAO.findAll(session.getSession(), limit, offset);
+        return processDAO.findAll(session, limit, offset);
     }
 
     @Override

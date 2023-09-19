@@ -137,7 +137,7 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
 
     @Override
     public MetadataSchema find(Session session, int id) throws SQLException {
-        return metadataSchemaDAO.findByID(session.getSession(), MetadataSchema.class, id);
+        return metadataSchemaDAO.findByID(session, MetadataSchema.class, id);
     }
 
     @Override
@@ -146,7 +146,7 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
         if (shortName == null) {
             return null;
         }
-        return metadataSchemaDAO.find(session.getSession(), shortName);
+        return metadataSchemaDAO.find(session, shortName);
     }
 
 

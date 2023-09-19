@@ -69,7 +69,7 @@ public class InProgressUserServiceImpl implements InProgressUserService {
 
     @Override
     public InProgressUser find(Session session, int id) throws SQLException {
-        return inProgressUserDAO.findByID(session.getSession(), InProgressUser.class, id);
+        return inProgressUserDAO.findByID(session, InProgressUser.class, id);
     }
 
     @Override

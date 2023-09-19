@@ -208,7 +208,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Override
     public Item find(Session session, UUID id) throws SQLException {
-        Item item = itemDAO.findByID(session.getSession(), Item.class, id);
+        Item item = itemDAO.findByID(session, Item.class, id);
         if (item == null) {
             if (log.isDebugEnabled()) {
                 log.debug("find_item not_found, item_id={}", id);
@@ -1311,9 +1311,9 @@ prevent the generation of resource policy entry values with null dspace_object a
         }
 
         if (Item.ANY.equals(value)) {
-            return itemDAO.findByMetadataField(session.getSession(), mdf, null, true);
+            return itemDAO.findByMetadataField(session, mdf, null, true);
         } else {
-            return itemDAO.findByMetadataField(session.getSession(), mdf, value, true);
+            return itemDAO.findByMetadataField(session, mdf, value, true);
         }
     }
 
