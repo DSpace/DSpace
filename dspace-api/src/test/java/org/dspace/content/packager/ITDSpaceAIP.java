@@ -266,7 +266,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
 
             // Delete the Eperson created to submit test items
             EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-            EPerson eperson = ePersonService.findByEmail(context, submitterEmail);
+            EPerson eperson = ePersonService.findByEmail(context.getSession(), submitterEmail);
             if (eperson != null) {
                 log.info("tearDownClass() - DESTROY TEST EPERSON");
                 context.turnOffAuthorisationSystem();
@@ -300,7 +300,9 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
         try {
             context = new Context();
             context.setCurrentUser(
-                EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, submitterEmail));
+                EPersonServiceFactory.getInstance()
+                        .getEPersonService()
+                        .findByEmail(context.getSession(), submitterEmail));
         } catch (SQLException ex) {
             log.error("SQL Error in init()", ex);
             fail("SQL Error in init(): " + ex.getMessage());
@@ -328,7 +330,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
         DSpaceObject parent = communityService.getParentObject(context, topCommunity);
 
         // Save basic info about top community (and children) to an infoMap
-        HashMap<String, String> infoMap = new HashMap<String, String>();
+        HashMap<String, String> infoMap = new HashMap<>();
         saveObjectInfo(topCommunity, infoMap);
 
         // Export community & child AIPs
@@ -553,7 +555,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
         Community parent = (Community) collectionService.getParentObject(context, testCollection);
 
         // Save basic info about collection (and children) to an infoMap
-        HashMap<String, String> infoMap = new HashMap<String, String>();
+        HashMap<String, String> infoMap = new HashMap<>();
         saveObjectInfo(testCollection, infoMap);
 
         // Export collection & child AIPs
@@ -753,7 +755,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
         String bitstreamName = null;
         String bitstreamCheckSum = null;
         List<Bundle> bundles = itemService.getBundles(testItem, Constants.CONTENT_BUNDLE_NAME);
-        if (bundles.size() > 0) {
+        if (!bundles.isEmpty()) {
             List<Bitstream> bitstreams = bundles.get(0).getBitstreams();
             bitstreamCount = bitstreams.size();
             if (bitstreamCount > 0) {

@@ -227,7 +227,7 @@ public class LDAPAuthentication
         // Locate the eperson
         EPerson eperson = null;
         try {
-            eperson = ePersonService.findByNetid(context, netid.toLowerCase());
+            eperson = ePersonService.findByNetid(context.getSession(), netid.toLowerCase());
         } catch (SQLException e) {
             // ignore
         }
@@ -308,7 +308,7 @@ public class LDAPAuthentication
 
                 if (StringUtils.isNotEmpty(email)) {
                     try {
-                        eperson = ePersonService.findByEmail(context, email);
+                        eperson = ePersonService.findByEmail(context.getSession(), email);
                         if (eperson != null) {
                             log.info(LogHelper.getHeader(context,
                                                           "type=ldap-login", "type=ldap_but_already_email"));

@@ -142,7 +142,7 @@ public class AccountServiceImpl implements AccountService {
             return null;
         }
 
-        return ePersonService.findByEmail(context, email);
+        return ePersonService.findByEmail(context.getSession(), email);
     }
 
     /**

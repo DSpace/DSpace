@@ -80,7 +80,9 @@ public class Resource {
                                                              .getID());
             }
             context.setCurrentUser(
-                EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, authentication.getName()));
+                EPersonServiceFactory.getInstance()
+                        .getEPersonService().
+                        findByEmail(context.getSession(), authentication.getName()));
         }
 
         return context;

@@ -85,7 +85,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     public SubscriptionRest findOne(Context context, Integer id) {
         Subscription subscription = null;
         try {
-            subscription = subscribeService.findById(context, id);
+            subscription = subscribeService.findById(context.getSession(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -96,7 +96,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<SubscriptionRest> findAll(Context context, Pageable pageable) {
         try {
-            List<Subscription> subscriptionList = subscribeService.findAll(context, null,
+            List<Subscription> subscriptionList = subscribeService.findAll(context.getSession(), null,
                                                            Math.toIntExact(pageable.getPageSize()),
                                                            Math.toIntExact(pageable.getOffset()));
             Long total = subscribeService.countAll(context);
@@ -115,7 +115,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
         try {
             Context context = obtainContext();
             EPerson ePerson = ePersonService.find(context.getSession(), epersonId);
-            subscriptions = subscribeService.findSubscriptionsByEPerson(context, ePerson,
+            subscriptions = subscribeService.findSubscriptionsByEPerson(context.getSession(), ePerson,
                                                  Math.toIntExact(pageable.getPageSize()),
                                                  Math.toIntExact(pageable.getOffset()));
             total = subscribeService.countSubscriptionsByEPerson(context, ePerson);
@@ -136,9 +136,10 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
             Context context = obtainContext();
             DSpaceObject dSpaceObject = dspaceObjectUtil.findDSpaceObject(context, dsoId);
             EPerson ePerson = ePersonService.find(context.getSession(), epersonId);
-            subscriptions = subscribeService.findSubscriptionsByEPersonAndDso(context, ePerson, dSpaceObject,
-                                                                    Math.toIntExact(pageable.getPageSize()),
-                                                                    Math.toIntExact(pageable.getOffset()));
+            subscriptions = subscribeService.findSubscriptionsByEPersonAndDso(context.getSession(),
+                    ePerson, dSpaceObject,
+                    Math.toIntExact(pageable.getPageSize()),
+                    Math.toIntExact(pageable.getOffset()));
             total = subscribeService.countByEPersonAndDSO(context, ePerson, dSpaceObject);
         } catch (SQLException e) {
             throw new SQLException(e.getMessage(), e);
@@ -237,7 +238,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
             throw new UnprocessableEntityException("Error parsing subscription json: " + e.getMessage(), e);
         }
 
-        Subscription subscription = subscribeService.findById(context, id);
+        Subscription subscription = subscribeService.findById(context.getSession(), id);
         if (Objects.isNull(subscription)) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
         }
@@ -260,7 +261,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     @PreAuthorize("hasPermission(#id, 'subscription', 'DELETE')")
     protected void delete(Context context, Integer id) {
         try {
-            Subscription subscription = subscribeService.findById(context, id);
+            Subscription subscription = subscribeService.findById(context.getSession(), id);
             if (Objects.isNull(subscription)) {
                 throw new ResourceNotFoundException(CATEGORY + "." + NAME + " with id: " + id + " not found");
             }

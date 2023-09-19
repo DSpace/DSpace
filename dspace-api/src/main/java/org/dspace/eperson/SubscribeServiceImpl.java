@@ -25,6 +25,7 @@ import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.dao.SubscriptionDAO;
 import org.dspace.eperson.service.SubscribeService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -44,14 +45,14 @@ public class SubscribeServiceImpl implements SubscribeService {
     private CollectionService collectionService;
 
     @Override
-    public List<Subscription> findAll(Context context, String resourceType, Integer limit, Integer offset)
+    public List<Subscription> findAll(Session session, String resourceType, Integer limit, Integer offset)
             throws Exception {
         if (StringUtils.isBlank(resourceType)) {
-            return subscriptionDAO.findAllOrderedByDSO(context.getSession(), limit, offset);
+            return subscriptionDAO.findAllOrderedByDSO(session, limit, offset);
         } else {
             if (resourceType.equals(Collection.class.getSimpleName()) ||
                 resourceType.equals(Community.class.getSimpleName())) {
-                return subscriptionDAO.findAllOrderedByIDAndResourceType(context.getSession(),
+                return subscriptionDAO.findAllOrderedByIDAndResourceType(session,
                         resourceType, limit, offset);
             } else {
                 log.error("Resource type must be Collection or Community");
@@ -104,16 +105,17 @@ public class SubscribeServiceImpl implements SubscribeService {
     }
 
     @Override
-    public List<Subscription> findSubscriptionsByEPerson(Context context, EPerson eperson, Integer limit,Integer offset)
+    public List<Subscription> findSubscriptionsByEPerson(Session session,
+            EPerson eperson, Integer limit,Integer offset)
             throws SQLException {
-        return subscriptionDAO.findByEPerson(context.getSession(), eperson, limit, offset);
+        return subscriptionDAO.findByEPerson(session, eperson, limit, offset);
     }
 
     @Override
-    public List<Subscription> findSubscriptionsByEPersonAndDso(Context context, EPerson eperson,
+    public List<Subscription> findSubscriptionsByEPersonAndDso(Session session, EPerson eperson,
                                                                DSpaceObject dSpaceObject,
                                                                Integer limit, Integer offset) throws SQLException {
-        return subscriptionDAO.findByEPersonAndDso(context.getSession(), eperson, dSpaceObject, limit, offset);
+        return subscriptionDAO.findByEPersonAndDso(session, eperson, dSpaceObject, limit, offset);
     }
 
     @Override
@@ -145,8 +147,8 @@ public class SubscribeServiceImpl implements SubscribeService {
     }
 
     @Override
-    public Subscription findById(Context context, int id) throws SQLException {
-        return subscriptionDAO.findByID(context.getSession(), Subscription.class, id);
+    public Subscription findById(Session session, int id) throws SQLException {
+        return subscriptionDAO.findByID(session, Subscription.class, id);
     }
 
     @Override
@@ -185,9 +187,9 @@ public class SubscribeServiceImpl implements SubscribeService {
     }
 
     @Override
-    public List<Subscription> findAllSubscriptionsBySubscriptionTypeAndFrequency(Context context,
+    public List<Subscription> findAllSubscriptionsBySubscriptionTypeAndFrequency(Session session,
             String subscriptionType, String frequencyValue) throws SQLException {
-        return subscriptionDAO.findAllSubscriptionsBySubscriptionTypeAndFrequency(context.getSession(),
+        return subscriptionDAO.findAllSubscriptionsBySubscriptionTypeAndFrequency(session,
                 subscriptionType, frequencyValue);
     }
 

@@ -129,29 +129,29 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     }
 
     @Override
-    public EPerson findByEmail(Context context, String email) throws SQLException {
+    public EPerson findByEmail(Session session, String email) throws SQLException {
         if (email == null) {
             return null;
         }
 
         // All email addresses are stored as lowercase, so ensure that the email address is lowercased for the lookup
-        return ePersonDAO.findByEmail(context.getSession(), email);
+        return ePersonDAO.findByEmail(session, email);
     }
 
     @Override
-    public EPerson findByNetid(Context context, String netId) throws SQLException {
+    public EPerson findByNetid(Session session, String netId) throws SQLException {
         if (netId == null) {
             return null;
         }
 
-        return ePersonDAO.findByNetid(context.getSession(), netId);
+        return ePersonDAO.findByNetid(session, netId);
     }
 
     @Override
     public List<EPerson> search(Context context, String query) throws SQLException {
         if (StringUtils.isBlank(query)) {
             //If we don't have a query, just return everything.
-            return findAll(context, EPerson.EMAIL);
+            return findAll(context.getSession(), EPerson.EMAIL);
         }
         return search(context, query, -1, -1);
     }
@@ -191,12 +191,12 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     }
 
     @Override
-    public List<EPerson> findAll(Context context, int sortField) throws SQLException {
-        return findAll(context, sortField, -1, -1);
+    public List<EPerson> findAll(Session session, int sortField) throws SQLException {
+        return findAll(session, sortField, -1, -1);
     }
 
     @Override
-    public List<EPerson> findAll(Context context, int sortField, int pageSize, int offset) throws SQLException {
+    public List<EPerson> findAll(Session session, int sortField, int pageSize, int offset) throws SQLException {
         String sortColumn = null;
         MetadataField metadataFieldSort = null;
         switch (sortField) {
@@ -209,7 +209,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
                 break;
 
             case EPerson.LANGUAGE:
-                metadataFieldSort = metadataFieldService.findByElement(context.getSession(),
+                metadataFieldSort = metadataFieldService.findByElement(session,
                         "eperson", "language", null);
                 break;
             case EPerson.NETID:
@@ -217,10 +217,10 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
                 break;
 
             default:
-                metadataFieldSort = metadataFieldService.findByElement(context.getSession(),
+                metadataFieldSort = metadataFieldService.findByElement(session,
                         "eperson", "lastname", null);
         }
-        return ePersonDAO.findAll(context.getSession(), metadataFieldSort, sortColumn, pageSize, offset);
+        return ePersonDAO.findAll(session, metadataFieldSort, sortColumn, pageSize, offset);
     }
 
     @Override
@@ -548,18 +548,18 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     }
 
     @Override
-    public List<EPerson> findByGroups(Context c, Set<Group> groups) throws SQLException {
+    public List<EPerson> findByGroups(Session session, Set<Group> groups) throws SQLException {
         //Make sure we at least have one group, if not don't even bother searching.
         if (CollectionUtils.isNotEmpty(groups)) {
-            return ePersonDAO.findByGroups(c.getSession(), groups);
+            return ePersonDAO.findByGroups(session, groups);
         } else {
             return new ArrayList<>();
         }
     }
 
     @Override
-    public List<EPerson> findEPeopleWithSubscription(Context context) throws SQLException {
-        return ePersonDAO.findAllSubscribers(context.getSession());
+    public List<EPerson> findEPeopleWithSubscription(Session session) throws SQLException {
+        return ePersonDAO.findAllSubscribers(session);
     }
 
     @Override
@@ -574,13 +574,13 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     }
 
     @Override
-    public List<EPerson> findUnsalted(Context context) throws SQLException {
-        return ePersonDAO.findWithPasswordWithoutDigestAlgorithm(context.getSession());
+    public List<EPerson> findUnsalted(Session session) throws SQLException {
+        return ePersonDAO.findWithPasswordWithoutDigestAlgorithm(session);
     }
 
     @Override
-    public List<EPerson> findNotActiveSince(Context context, Date date) throws SQLException {
-        return ePersonDAO.findNotActiveSince(context.getSession(), date);
+    public List<EPerson> findNotActiveSince(Session session, Date date) throws SQLException {
+        return ePersonDAO.findNotActiveSince(session, date);
     }
 
     @Override
@@ -589,12 +589,12 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     }
 
     @Override
-    public EPerson findByProfileItem(Context context, Item profile) throws SQLException {
+    public EPerson findByProfileItem(Session session, Item profile) throws SQLException {
         List<MetadataValue> owners = itemService.getMetadata(profile, "dspace", "object", "owner", ANY);
         if (CollectionUtils.isEmpty(owners)) {
             return null;
         }
-        return find(context.getSession(), UUIDUtils.fromString(owners.get(0).getAuthority()));
+        return find(session, UUIDUtils.fromString(owners.get(0).getAuthority()));
     }
 
     @Override

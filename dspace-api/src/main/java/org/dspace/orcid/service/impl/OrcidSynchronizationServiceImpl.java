@@ -81,7 +81,7 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
     @Override
     public void linkProfile(Context context, Item profile, OrcidTokenResponseDTO token) throws SQLException {
 
-        EPerson ePerson = ePersonService.findByProfileItem(context, profile);
+        EPerson ePerson = ePersonService.findByProfileItem(context.getSession(), profile);
         if (ePerson == null) {
             throw new IllegalArgumentException(
                 "The given profile item is not related to any eperson. Item id: " + profile.getID());
@@ -104,7 +104,7 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
 
         setAccessToken(context, profile, ePerson, accessToken);
 
-        EPerson ePersonByOrcid = ePersonService.findByNetid(context, orcid);
+        EPerson ePersonByOrcid = ePersonService.findByNetid(context.getSession(), orcid);
         if (ePersonByOrcid == null && isBlank(ePerson.getNetid())) {
             ePerson.setNetid(orcid);
             updateEPerson(context, ePerson);

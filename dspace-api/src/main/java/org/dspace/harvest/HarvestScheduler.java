@@ -129,7 +129,7 @@ public class HarvestScheduler implements Runnable {
         harvestAdmin = null;
         if (harvestAdminParam != null && harvestAdminParam.length() > 0) {
             harvestAdmin = EPersonServiceFactory.getInstance().getEPersonService()
-                                                .findByEmail(mainContext, harvestAdminParam);
+                                                .findByEmail(mainContext.getSession(), harvestAdminParam);
         }
 
         harvestThreads = new Stack<>();

@@ -272,14 +272,14 @@ public class XmlWorkflowCuratorServiceImpl
                     epList.addAll(groupService.allMembers(c, adGroup));
                 }
             } else if ("$siteadmin".equals(contact)) {
-                EPerson siteEp = ePersonService.findByEmail(c,
+                EPerson siteEp = ePersonService.findByEmail(c.getSession(),
                         configurationService.getProperty("mail.admin"));
                 if (siteEp != null) {
                     epList.add(siteEp);
                 }
             } else if (contact.indexOf("@") > 0) {
                 // little shaky heuristic here - assume an eperson email name
-                EPerson ep = ePersonService.findByEmail(c, contact);
+                EPerson ep = ePersonService.findByEmail(c.getSession(), contact);
                 if (ep != null) {
                     epList.add(ep);
                 }

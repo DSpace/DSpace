@@ -29,7 +29,7 @@ public class HarvestCli extends Harvest {
             String ePersonEmail = this.commandLine.getOptionValue('e');
             this.context = new Context(Context.Mode.BATCH_EDIT);
             try {
-                EPerson ePerson = ePersonService.findByEmail(this.context, ePersonEmail);
+                EPerson ePerson = ePersonService.findByEmail(this.context.getSession(), ePersonEmail);
                 if (ePerson == null) {
                     super.handler.logError("EPerson not found: " + ePersonEmail);
                     throw new IllegalArgumentException("Unable to find a user with email: " + ePersonEmail);

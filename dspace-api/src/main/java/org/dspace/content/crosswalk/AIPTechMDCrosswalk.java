@@ -390,7 +390,7 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
 
                         // item submitter
                         if (dcField.equals("creator")) {
-                            EPerson sub = ePersonService.findByEmail(context, value);
+                            EPerson sub = ePersonService.findByEmail(context.getSession(), value);
 
                             // if eperson doesn't exist yet, optionally create it:
                             if (sub == null) {

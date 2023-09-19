@@ -375,7 +375,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         }
 
 
-        Set<EPerson> childGroupChildren = new HashSet<>(ePersonService.findByGroups(c, groups));
+        Set<EPerson> childGroupChildren = new HashSet<>(ePersonService.findByGroups(c.getSession(), groups));
         //Don't forget to add our direct children
         childGroupChildren.addAll(g.getMembers());
 

@@ -85,7 +85,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
             StringUtils.equals(
                 itemService.getMetadata(importedItem, "dc", "contributor", "author", Item.ANY).get(0).getValue(),
                 "Donald, SmithImported"));
-        eperson = ePersonService.findByEmail(context, eperson.getEmail());
+        eperson = ePersonService.findByEmail(context.getSession(), eperson.getEmail());
         assertEquals(importedItem.getSubmitter(), eperson);
 
         context.turnOffAuthorisationSystem();
@@ -103,7 +103,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
                               .get(0).getValue(), "Donald, SmithImported"));
         assertTrue(StringUtils.equals(itemService.getMetadata(importedItem, "dspace", "entity", "type", Item.ANY)
                               .get(0).getValue(), "Publication"));
-        eperson = ePersonService.findByEmail(context, eperson.getEmail());
+        eperson = ePersonService.findByEmail(context.getSession(), eperson.getEmail());
         assertEquals(importedItem.getSubmitter(), eperson);
 
         context.turnOffAuthorisationSystem();
@@ -121,7 +121,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
             .get(0).getValue(), "Donald, SmithImported"));
         assertEquals(0, itemService.getMetadata(importedItem, "dspace", "entity", "type", Item.ANY)
             .size());
-        eperson = ePersonService.findByEmail(context, eperson.getEmail());
+        eperson = ePersonService.findByEmail(context.getSession(), eperson.getEmail());
         assertEquals(importedItem.getSubmitter(), eperson);
 
         context.turnOffAuthorisationSystem();

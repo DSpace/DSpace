@@ -161,9 +161,9 @@ public class LoadLastLogin {
             String name = (String) stamp.getKey();
             Date date = (Date) stamp.getValue();
             EPerson ePerson;
-            ePerson = ePersonService.findByEmail(ctx, name);
+            ePerson = ePersonService.findByEmail(ctx.getSession(), name);
             if (null == ePerson) {
-                ePerson = ePersonService.findByNetid(ctx, name);
+                ePerson = ePersonService.findByNetid(ctx.getSession(), name);
             }
             if (null == ePerson) {
                 System.err.println("Skipping unknown user:  " + name);

@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * {@link RestPermissionEvaluatorPlugin} class that evaluate READ, WRITE and DELETE permissions over a Subscription
- * 
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  */
 @Component
@@ -73,7 +73,8 @@ public class SubscriptionRestPermissionEvaluatorPlugin extends RestObjectPermiss
                 return true;
             }
 
-            Subscription subscription = subscribeService.findById(context, Integer.parseInt(targetId.toString()));
+            Subscription subscription = subscribeService.findById(context.getSession(),
+                    Integer.parseInt(targetId.toString()));
             return Objects.nonNull(subscription) ? currentUser.equals(subscription.getEPerson()) : false;
         } catch (SQLException e) {
             log.error(e.getMessage(), e);

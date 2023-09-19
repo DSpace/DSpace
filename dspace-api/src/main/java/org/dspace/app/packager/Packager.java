@@ -39,10 +39,6 @@ import org.dspace.workflow.WorkflowException;
 /**
  * Command-line interface to the Packager plugin.
  * <p>
- * This class ONLY exists to provide a CLI for the packager plugins. It does not
- * "manage" the plugins and it is not called from within DSpace, but the name
- * follows a DSpace convention.
- * <p>
  * It can invoke one of the Submission (SIP) packagers to create a new DSpace
  * Item out of a package, or a Dissemination (DIP) packager to write an Item out
  * as a package.
@@ -309,7 +305,7 @@ public class Packager {
         // find the EPerson, assign to context
         Context context = new Context();
         EPerson myEPerson = null;
-        myEPerson = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, eperson);
+        myEPerson = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context.getSession(), eperson);
         if (myEPerson == null) {
             usageError("Error, eperson cannot be found: " + eperson);
         }

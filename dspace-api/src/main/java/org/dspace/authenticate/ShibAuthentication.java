@@ -592,7 +592,7 @@ public class ShibAuthentication implements AuthenticationMethod {
 
             if (netid != null) {
                 foundNetID = true;
-                eperson = ePersonService.findByNetid(context, netid);
+                eperson = ePersonService.findByNetid(context.getSession(), netid);
 
                 if (eperson == null) {
                     log.info(
@@ -613,7 +613,7 @@ public class ShibAuthentication implements AuthenticationMethod {
             if (email != null) {
                 foundEmail = true;
                 email = email.toLowerCase();
-                eperson = ePersonService.findByEmail(context, email);
+                eperson = ePersonService.findByEmail(context.getSession(), email);
 
                 if (eperson == null) {
                     log.info(
@@ -646,7 +646,7 @@ public class ShibAuthentication implements AuthenticationMethod {
             if (email != null) {
                 foundRemoteUser = true;
                 email = email.toLowerCase();
-                eperson = ePersonService.findByEmail(context, email);
+                eperson = ePersonService.findByEmail(context.getSession(), email);
 
                 if (eperson == null) {
                     log.info("Unable to identify EPerson based upon Tomcat's remote user: '" + email + "'.");
@@ -902,7 +902,7 @@ public class ShibAuthentication implements AuthenticationMethod {
         throws SQLException {
 
         log.debug("Shibboleth Sword compatibility activated.");
-        EPerson eperson = ePersonService.findByEmail(context, username.toLowerCase());
+        EPerson eperson = ePersonService.findByEmail(context.getSession(), username.toLowerCase());
 
         if (eperson == null) {
             // lookup failed.

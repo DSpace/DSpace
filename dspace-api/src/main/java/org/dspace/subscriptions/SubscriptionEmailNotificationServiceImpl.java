@@ -63,6 +63,7 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
         this.subscriptionType2generators = subscriptionType2generators;
     }
 
+    @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void perform(Context context, DSpaceRunnableHandler handler, String subscriptionType, String frequency) {
         List<IndexableObject> communityItems = new ArrayList<>();
@@ -131,7 +132,7 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
     @SuppressWarnings("rawtypes")
     private List<IndexableObject> getItems(Context context, EPerson ePerson, List<IndexableObject> indexableItems)
             throws SQLException {
-        List<IndexableObject> items = new ArrayList<IndexableObject>();
+        List<IndexableObject> items = new ArrayList<>();
         for (IndexableObject indexableitem : indexableItems) {
             Item item = (Item) indexableitem.getIndexedObject();
             if (authorizeService.authorizeActionBoolean(context, ePerson, item, READ, true)) {
@@ -144,7 +145,7 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
     /**
      * Return all Subscriptions by subscriptionType and frequency ordered by ePerson ID
      * if there are none it returns an empty list
-     * 
+     *
      * @param context            DSpace context
      * @param subscriptionType   Could be "content" or "statistics". NOTE: in DSpace we have only "content"
      * @param frequency          Could be "D" stand for Day, "W" stand for Week, and "M" stand for Month
@@ -153,15 +154,15 @@ public class SubscriptionEmailNotificationServiceImpl implements SubscriptionEma
     private List<Subscription> findAllSubscriptionsBySubscriptionTypeAndFrequency(Context context,
              String subscriptionType, String frequency) {
         try {
-            return subscribeService.findAllSubscriptionsBySubscriptionTypeAndFrequency(context, subscriptionType,
-                                    frequency)
-                                   .stream()
-                                   .sorted(Comparator.comparing(s -> s.getEPerson().getID()))
-                                   .collect(Collectors.toList());
+            return subscribeService.findAllSubscriptionsBySubscriptionTypeAndFrequency(context.getSession(),
+                    subscriptionType, frequency)
+                    .stream()
+                    .sorted(Comparator.comparing(s -> s.getEPerson().getID()))
+                    .collect(Collectors.toList());
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
         }
-        return new ArrayList<Subscription>();
+        return new ArrayList<>();
     }
 
     @Override

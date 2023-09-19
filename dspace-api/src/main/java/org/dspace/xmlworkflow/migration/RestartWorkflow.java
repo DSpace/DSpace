@@ -28,7 +28,7 @@ import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 /**
- * A utility class that will send all the worklfow items
+ * A utility class that will send all the workflow items
  * back to their submitters.
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
@@ -94,7 +94,7 @@ public class RestartWorkflow {
 
             if (eperson.indexOf('@') != -1) {
                 // @ sign, must be an email
-                myEPerson = ePersonService.findByEmail(context, eperson);
+                myEPerson = ePersonService.findByEmail(context.getSession(), eperson);
             } else {
                 myEPerson = ePersonService.find(context.getSession(), UUID.fromString(eperson));
             }

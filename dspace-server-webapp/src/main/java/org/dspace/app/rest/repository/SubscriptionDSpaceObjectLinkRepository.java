@@ -36,7 +36,7 @@ public class SubscriptionDSpaceObjectLinkRepository extends AbstractDSpaceRestRe
     public DSpaceObjectRest getDSpaceObject(@Nullable HttpServletRequest request, Integer subscriptionId,
                                             @Nullable Pageable optionalPageable, Projection projection) {
         try {
-            Subscription subscription = subscribeService.findById(obtainContext(), subscriptionId);
+            Subscription subscription = subscribeService.findById(obtainContext().getSession(), subscriptionId);
             if (Objects.isNull(subscription)) {
                 throw new ResourceNotFoundException("No such subscription: " + subscriptionId);
             }

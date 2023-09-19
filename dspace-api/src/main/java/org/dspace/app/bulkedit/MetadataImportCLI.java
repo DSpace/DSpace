@@ -44,7 +44,9 @@ public class MetadataImportCLI extends MetadataImport {
                 EPerson eperson;
                 String e = commandLine.getOptionValue('e');
                 if (e.indexOf('@') != -1) {
-                    eperson = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, e);
+                    eperson = EPersonServiceFactory.getInstance()
+                            .getEPersonService()
+                            .findByEmail(context.getSession(), e);
                 } else {
                     eperson = EPersonServiceFactory.getInstance()
                             .getEPersonService()

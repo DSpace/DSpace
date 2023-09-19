@@ -1008,7 +1008,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/netid", "newNetId");
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1041,7 +1041,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
 
         // String should be converted to boolean.
         ReplaceOperation replaceOperation = new ReplaceOperation("/canLogin", "true");
@@ -1085,7 +1085,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/netid", "newNetId");
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1122,7 +1122,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/netid", newId);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1135,7 +1135,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(jsonPath("$.netid", Matchers.is(newId)));
 
 
-        List<Operation> ops2 = new ArrayList<Operation>();
+        List<Operation> ops2 = new ArrayList<>();
         ReplaceOperation replaceOperation2 = new ReplaceOperation("/netid", null);
         ops2.add(replaceOperation2);
         patchBody = getPatchContent(ops2);
@@ -2550,7 +2550,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                                .contentType(MediaType.APPLICATION_JSON))
                                                   .andExpect(status().isBadRequest());
 
-            EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmailTwo);
+            EPerson createdEPerson = ePersonService.findByEmail(context.getSession(), newRegisterEmailTwo);
             assertNull(createdEPerson);
             assertNotNull(registrationDataService.findByToken(context.getSession(), newRegisterToken));
             assertNotNull(registrationDataService.findByToken(context.getSession(), newRegisterTokenTwo));
@@ -2601,7 +2601,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .contentType(MediaType.APPLICATION_JSON))
                             .andExpect(status().isBadRequest());
 
-            EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
+            EPerson createdEPerson = ePersonService.findByEmail(context.getSession(), newRegisterEmail);
             assertNull(createdEPerson);
             assertNotNull(registrationDataService.findByToken(context.getSession(), newRegisterToken));
         } finally {
@@ -2651,7 +2651,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                                .contentType(MediaType.APPLICATION_JSON))
                                                   .andExpect(status().isBadRequest());
 
-            EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
+            EPerson createdEPerson = ePersonService.findByEmail(context.getSession(), newRegisterEmail);
             assertNull(createdEPerson);
             assertNotNull(registrationDataService.findByToken(context.getSession(), newRegisterToken));
         } finally {
@@ -2719,7 +2719,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                             )))
                             .andExpect(status().reason(not(startsWith("[PL]"))));
 
-            EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
+            EPerson createdEPerson = ePersonService.findByEmail(context.getSession(), newRegisterEmail);
             assertNull(createdEPerson);
             assertNotNull(registrationDataService.findByToken(context.getSession(), newRegisterToken));
         } finally {
@@ -2788,7 +2788,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                             )))
                             .andExpect(status().reason(not(startsWith("[PL]"))));
 
-            EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
+            EPerson createdEPerson = ePersonService.findByEmail(context.getSession(), newRegisterEmail);
             assertNull(createdEPerson);
             assertNotNull(registrationDataService.findByToken(context.getSession(), newRegisterToken));
         } finally {
@@ -2836,7 +2836,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .contentType(MediaType.APPLICATION_JSON))
                             .andExpect(status().isBadRequest());
 
-            EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
+            EPerson createdEPerson = ePersonService.findByEmail(context.getSession(), newRegisterEmail);
             assertNull(createdEPerson);
             assertNotNull(registrationDataService.findByToken(context.getSession(), newRegisterToken));
         } finally {
@@ -2885,7 +2885,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .contentType(MediaType.APPLICATION_JSON))
                             .andExpect(status().isBadRequest());
 
-            EPerson createdEPerson = ePersonService.findByEmail(context, newEmail);
+            EPerson createdEPerson = ePersonService.findByEmail(context.getSession(), newEmail);
             assertNull(createdEPerson);
             assertNotNull(registrationDataService.findByToken(context.getSession(), forgotPasswordToken));
         } finally {
