@@ -165,7 +165,7 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
 
     @Override
     public XmlWorkflowItem findByItem(Session session, Item item) throws SQLException {
-        return xmlWorkflowItemDAO.findByItem(session.getSession(), item);
+        return xmlWorkflowItemDAO.findByItem(session, item);
     }
 
     @Override

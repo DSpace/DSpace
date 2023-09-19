@@ -387,7 +387,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         if (id == null) {
             return null;
         } else {
-            return groupDAO.findByID(session.getSession(), Group.class, id);
+            return groupDAO.findByID(session, Group.class, id);
         }
     }
 
@@ -814,7 +814,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Override
     public Group findByLegacyId(Session session, int id) throws SQLException {
-        return groupDAO.findByLegacyId(session.getSession(), id, Group.class);
+        return groupDAO.findByLegacyId(session, id, Group.class);
     }
 
     @Override
@@ -825,7 +825,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     @Override
     public List<Group> findByMetadataField(final Session session, final String searchValue,
                                            final MetadataField metadataField) throws SQLException {
-        return groupDAO.findByMetadataField(session.getSession(), searchValue, metadataField);
+        return groupDAO.findByMetadataField(session, searchValue, metadataField);
     }
 
     @Override

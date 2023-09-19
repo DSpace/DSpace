@@ -58,7 +58,7 @@ public class RegistrationDataServiceImpl implements RegistrationDataService {
 
     @Override
     public RegistrationData find(Session session, int id) throws SQLException {
-        return registrationDataDAO.findByID(session.getSession(), RegistrationData.class, id);
+        return registrationDataDAO.findByID(session, RegistrationData.class, id);
     }
 
     @Override

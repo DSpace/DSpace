@@ -71,7 +71,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
     @Override
     public Bitstream find(Session session, UUID id) throws SQLException {
-        Bitstream bitstream = bitstreamDAO.findByID(session.getSession(), Bitstream.class, id);
+        Bitstream bitstream = bitstreamDAO.findByID(session, Bitstream.class, id);
 
         if (bitstream == null) {
             if (log.isDebugEnabled()) {
@@ -112,7 +112,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
     @Override
     public Iterator<Bitstream> findAll(Session session, int limit, int offset) throws SQLException {
-        return bitstreamDAO.findAll(session.getSession(), limit, offset);
+        return bitstreamDAO.findAll(session, limit, offset);
     }
 
     @Override
@@ -455,7 +455,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
     @Override
     public Bitstream findByLegacyId(Session session, int id) throws SQLException {
-        return bitstreamDAO.findByLegacyId(session.getSession(), id, Bitstream.class);
+        return bitstreamDAO.findByLegacyId(session, id, Bitstream.class);
 
     }
 

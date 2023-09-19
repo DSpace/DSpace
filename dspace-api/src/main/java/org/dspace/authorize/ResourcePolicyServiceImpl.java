@@ -59,7 +59,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
      */
     @Override
     public ResourcePolicy find(Session session, int id) throws SQLException {
-        return resourcePolicyDAO.findByID(session.getSession(), ResourcePolicy.class, id);
+        return resourcePolicyDAO.findByID(session, ResourcePolicy.class, id);
     }
 
     /**

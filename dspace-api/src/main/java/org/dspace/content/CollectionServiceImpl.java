@@ -201,7 +201,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                 "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".title' doesn't exist!");
         }
 
-        return collectionDAO.findAll(session.getSession(), nameField);
+        return collectionDAO.findAll(session, nameField);
     }
 
     @Override
@@ -213,7 +213,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                 "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".title' doesn't exist!");
         }
 
-        return collectionDAO.findAll(session.getSession(), nameField, limit, offset);
+        return collectionDAO.findAll(session, nameField, limit, offset);
     }
 
     @Override
@@ -908,7 +908,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public Collection findByLegacyId(Session session, int id) throws SQLException {
-        return collectionDAO.findByLegacyId(session.getSession(), id, Collection.class);
+        return collectionDAO.findByLegacyId(session, id, Collection.class);
     }
 
     @Override

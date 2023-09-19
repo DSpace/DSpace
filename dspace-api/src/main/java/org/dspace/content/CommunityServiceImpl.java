@@ -706,7 +706,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     @Override
     public Community findByLegacyId(Session session, int id) throws SQLException {
-        return communityDAO.findByLegacyId(session.getSession(), id, Community.class);
+        return communityDAO.findByLegacyId(session, id, Community.class);
     }
 
     @Override
