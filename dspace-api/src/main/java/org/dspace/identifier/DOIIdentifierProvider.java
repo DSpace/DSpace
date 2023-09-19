@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.PostConstruct;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -67,13 +68,14 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
 
     static final String CFG_PREFIX = "identifier.doi.prefix";
     static final String CFG_NAMESPACE_SEPARATOR = "identifier.doi.namespaceseparator";
+    static final String DOI_METADATA = "identifier.doi.metadata";
     static final char SLASH = '/';
 
     // Metadata field name elements
     // TODO: move these to MetadataSchema or some such?
-    public static final String MD_SCHEMA = "dc";
-    public static final String DOI_ELEMENT = "identifier";
-    public static final String DOI_QUALIFIER = "doi";
+    public String MD_SCHEMA = "dc";
+    public String DOI_ELEMENT = "identifier";
+    public String DOI_QUALIFIER = "doi";
     // The DOI is queued for registered with the service provider
     public static final Integer TO_BE_REGISTERED = 1;
     // The DOI is queued for reservation with the service provider
@@ -168,6 +170,17 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
             }
         }
         return this.NAMESPACE_SEPARATOR;
+    }
+
+    @PostConstruct
+    protected void setDoiMetadata() {
+        String doiMetadata = this.configurationService.getProperty(DOI_METADATA);
+        if (doiMetadata != null) {
+            String[] parts = doiMetadata.split("\\.");
+            this.MD_SCHEMA = parts[0];
+            this.DOI_ELEMENT = parts[1];
+            this.DOI_QUALIFIER = parts[2];
+        }
     }
 
     /**
