@@ -261,7 +261,7 @@ public final class CreateAdministrator {
         }
 
         // Create the administrator e-person
-        EPerson eperson = ePersonService.findByEmail(context, email);
+        EPerson eperson = ePersonService.findByEmail(context.getSession(), email);
 
         // check if the email belongs to a registered user,
         // if not create a new user with this email

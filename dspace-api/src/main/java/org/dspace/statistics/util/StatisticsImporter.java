@@ -347,7 +347,9 @@ public class StatisticsImporter {
                 }
 
                 // Get the eperson details
-                EPerson eperson = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, user);
+                EPerson eperson = EPersonServiceFactory.getInstance()
+                        .getEPersonService()
+                        .findByEmail(context.getSession(), user);
                 UUID epersonId = null;
                 if (eperson != null) {
                     epersonId = eperson.getID();

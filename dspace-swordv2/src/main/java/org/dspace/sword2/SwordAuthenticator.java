@@ -202,9 +202,9 @@ public class SwordAuthenticator {
                 // authentication process fails
                 EPerson epObo = null;
                 if (obo != null) {
-                    epObo = ePersonService.findByEmail(context, obo);
+                    epObo = ePersonService.findByEmail(context.getSession(), obo);
                     if (epObo == null) {
-                        epObo = ePersonService.findByNetid(context, obo);
+                        epObo = ePersonService.findByNetid(context.getSession(), obo);
                     }
 
                     if (epObo != null) {

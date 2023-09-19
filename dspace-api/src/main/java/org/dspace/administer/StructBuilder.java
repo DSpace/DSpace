@@ -208,7 +208,7 @@ public class StructBuilder {
         // set the context.
         String eperson = line.getOptionValue('e');
         try {
-            context.setCurrentUser(ePersonService.findByEmail(context, eperson));
+            context.setCurrentUser(ePersonService.findByEmail(context.getSession(), eperson));
         } catch (SQLException ex) {
             System.err.format("That user could not be found:  %s%n", ex.getMessage());
             System.exit(1);

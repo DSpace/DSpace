@@ -96,7 +96,7 @@ public class RoleIngester implements PackageIngester {
                     continue; // Cannot operate on my own EPerson!
                 }
                 identity = email;
-                collider = ePersonService.findByEmail(context, identity);
+                collider = ePersonService.findByEmail(context.getSession(), identity);
                 // collider = EPerson.find(context, userID);
             } else if (netids.getLength() > 0) {
                 netid = netids.item(0).getTextContent();
@@ -104,7 +104,7 @@ public class RoleIngester implements PackageIngester {
                     continue; // Cannot operate on my own EPerson!
                 }
                 identity = netid;
-                collider = ePersonService.findByNetid(context, identity);
+                collider = ePersonService.findByNetid(context.getSession(), identity);
             } else {
                 throw new PackageException("EPerson has neither email nor netid.");
             }
@@ -315,7 +315,7 @@ public class RoleIngester implements PackageIngester {
             for (int memberx = 0; memberx < members.getLength(); memberx++) {
                 Element member = (Element) members.item(memberx);
                 String memberName = member.getAttribute(RoleDisseminator.NAME);
-                EPerson memberEPerson = ePersonService.findByEmail(context, memberName);
+                EPerson memberEPerson = ePersonService.findByEmail(context.getSession(), memberName);
                 if (null != memberEPerson) {
                     groupService.addMember(context, groupObj, memberEPerson);
                 } else {

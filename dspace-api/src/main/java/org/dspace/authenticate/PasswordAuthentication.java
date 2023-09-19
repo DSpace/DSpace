@@ -204,7 +204,7 @@ public class PasswordAuthentication
             EPerson eperson = null;
             log.info(LogHelper.getHeader(context, "authenticate", "attempting password auth of user=" + username));
             eperson = EPersonServiceFactory.getInstance().getEPersonService()
-                                           .findByEmail(context, username.toLowerCase());
+                                           .findByEmail(context.getSession(), username.toLowerCase());
 
             if (eperson == null) {
                 // lookup failed.

@@ -166,7 +166,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             throw new DSpaceBadRequestException("The token given as parameter: " + token + " does not exist" +
                                                 " in the database");
         }
-        if (es.findByEmail(context, registrationData.getEmail()) != null) {
+        if (es.findByEmail(context.getSession(), registrationData.getEmail()) != null) {
             throw new DSpaceBadRequestException("The token given already contains an email address that resolves" +
                                                 " to an eperson");
         }
@@ -232,7 +232,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     public Page<EPersonRest> findAll(Context context, Pageable pageable) {
         try {
             long total = es.countTotal(context);
-            List<EPerson> epersons = es.findAll(context, EPerson.EMAIL, pageable.getPageSize(),
+            List<EPerson> epersons = es.findAll(context.getSession(), EPerson.EMAIL, pageable.getPageSize(),
                     Math.toIntExact(pageable.getOffset()));
             return converter.toRestPage(epersons, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
@@ -253,7 +253,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         EPerson eperson = null;
         try {
             Context context = obtainContext();
-            eperson = es.findByEmail(context, email);
+            eperson = es.findByEmail(context.getSession(), email);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

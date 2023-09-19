@@ -51,7 +51,7 @@ import org.springframework.stereotype.Component;
 @Component(RegistrationRest.CATEGORY + "." + RegistrationRest.NAME)
 public class RegistrationRestRepository extends DSpaceRestRepository<RegistrationRest, Integer> {
 
-    private static Logger log = LogManager.getLogger(RegistrationRestRepository.class);
+    private static final Logger log = LogManager.getLogger(RegistrationRestRepository.class);
 
     public static final String TYPE_QUERY_PARAM = "accountRequestType";
     public static final String TYPE_REGISTER = "register";
@@ -121,7 +121,7 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
         }
         EPerson eperson = null;
         try {
-            eperson = ePersonService.findByEmail(context, registrationRest.getEmail());
+            eperson = ePersonService.findByEmail(context.getSession(), registrationRest.getEmail());
         } catch (SQLException e) {
             log.error("Something went wrong retrieving EPerson for email: " + registrationRest.getEmail(), e);
         }

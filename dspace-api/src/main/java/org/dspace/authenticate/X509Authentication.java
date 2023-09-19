@@ -525,7 +525,7 @@ public class X509Authentication implements AuthenticationMethod {
                 String email = getEmail(certs[0]);
                 EPerson eperson = null;
                 if (email != null) {
-                    eperson = ePersonService.findByEmail(context, email);
+                    eperson = ePersonService.findByEmail(context.getSession(), email);
                 }
                 if (eperson == null) {
                     // Cert is valid, but no record.

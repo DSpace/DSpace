@@ -254,7 +254,7 @@ public class AuthorizeUtil {
             && AuthorizeConfiguration
             .canCommunityAdminManageCollectionTemplateItem()) {
             List<Community> communities = collection.getCommunities();
-            Community parent = communities != null && communities.size() > 0 ? communities.get(0)
+            Community parent = communities != null && !communities.isEmpty() ? communities.get(0)
                 : null;
             authorizeService.authorizeAction(context, parent, Constants.ADMIN);
         } else if (!isAuthorized && !authorizeService.isAdmin(context)) {
@@ -367,7 +367,7 @@ public class AuthorizeUtil {
         List<Community> parentCommunities = collection.getCommunities();
         if (AuthorizeConfiguration
             .canCommunityAdminManageCollectionAdminGroup()
-            && parentCommunities != null && parentCommunities.size() > 0) {
+            && parentCommunities != null && !parentCommunities.isEmpty()) {
             authorizeService.authorizeAction(context, collection
                 .getCommunities().get(0), Constants.ADMIN);
         } else if (!authorizeService.isAdmin(context)) {
@@ -419,7 +419,7 @@ public class AuthorizeUtil {
         AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         List<Community> parentCommunities = community.getParentCommunities();
         Community parentCommunity = null;
-        if (0 < parentCommunities.size()) {
+        if (!parentCommunities.isEmpty()) {
             parentCommunity = parentCommunities.get(0);
         }
         if (AuthorizeConfiguration.canCommunityAdminManageAdminGroup()
@@ -643,7 +643,9 @@ public class AuthorizeUtil {
      */
     public static boolean authorizeUpdatePassword(Context context, String email) {
         try {
-            EPerson eperson = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, email);
+            EPerson eperson = EPersonServiceFactory.getInstance()
+                    .getEPersonService()
+                    .findByEmail(context.getSession(), email);
             if (eperson != null && eperson.canLogIn()) {
                 HttpServletRequest request = new DSpace().getRequestService().getCurrentRequest()
                                                          .getHttpServletRequest();

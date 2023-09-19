@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * {@link RestPermissionEvaluatorPlugin} class that evaluate READ, WRITE and DELETE permissions over a ResourcePolicy
- * 
+ *
  * @author Mykhaylo Boychuk (4science.it)
  */
 @Component
@@ -66,7 +66,7 @@ public class ResourcePolicyRestPermissionEvaluatorPlugin extends RestObjectPermi
         EPerson ePerson = null;
 
         try {
-            ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
+            ePerson = ePersonService.findByEmail(context.getSession(), (String) authentication.getPrincipal());
             Integer dsoId = Integer.parseInt(targetId.toString());
 
             // anonymous user

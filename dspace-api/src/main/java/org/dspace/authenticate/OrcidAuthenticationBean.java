@@ -166,7 +166,7 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
 
         String orcid = token.getOrcid();
 
-        EPerson ePerson = ePersonService.findByNetid(context, orcid);
+        EPerson ePerson = ePersonService.findByNetid(context.getSession(), orcid);
         if (ePerson != null) {
             return ePerson.canLogIn() ? logInEPerson(context, token, ePerson) : BAD_ARGS;
         }
@@ -178,7 +178,7 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
 
         String email = getEmail(person).orElse(null);
 
-        ePerson = ePersonService.findByEmail(context, email);
+        ePerson = ePersonService.findByEmail(context.getSession(), email);
         if (ePerson != null) {
             return ePerson.canLogIn() ? logInEPerson(context, token, ePerson) : BAD_ARGS;
         }

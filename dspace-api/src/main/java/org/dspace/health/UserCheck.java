@@ -39,7 +39,7 @@ public class UserCheck extends Check {
         String ret = "";
         Map<String, Integer> info = new HashMap<>();
         try {
-            List<EPerson> epersons = ePersonService.findAll(context, EPerson.LASTNAME);
+            List<EPerson> epersons = ePersonService.findAll(context.getSession(), EPerson.LASTNAME);
             info.put("Count", epersons.size());
             info.put("Can log in (password)", 0);
             info.put("Have email", 0);
@@ -100,7 +100,7 @@ public class UserCheck extends Check {
             }
 
             //subscribers
-            List<EPerson> subscribers = ePersonService.findEPeopleWithSubscription(context);
+            List<EPerson> subscribers = ePersonService.findEPeopleWithSubscription(context.getSession());
             ret += String.format(
                 "Subscribers: #%d [%s]\n",
                 subscribers.size(), formatIds(subscribers));

@@ -567,7 +567,7 @@ public class RoleDisseminator implements PackageDisseminator {
     protected List<EPerson> findAssociatedPeople(Context context, DSpaceObject object)
         throws SQLException {
         if (object.getType() == Constants.SITE) {
-            return ePersonService.findAll(context, EPerson.EMAIL);
+            return ePersonService.findAll(context.getSession(), EPerson.EMAIL);
         }
 
         //by default, return nothing

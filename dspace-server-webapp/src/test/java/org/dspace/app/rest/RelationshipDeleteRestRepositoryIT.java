@@ -82,7 +82,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
 
         context.turnOffAuthorisationSystem();
 
-        collectionAdmin = ePersonService.findByEmail(context, "collectionAdminTest@email.com");
+        collectionAdmin = ePersonService.findByEmail(context.getSession(), "collectionAdminTest@email.com");
         if (collectionAdmin == null) {
             // This EPerson creation should only happen once (i.e. for first test run)
             collectionAdmin = ePersonService.create(context);
@@ -137,7 +137,7 @@ public class RelationshipDeleteRestRepositoryIT extends AbstractEntityIntegratio
     public void destroy() throws Exception {
         try {
             context.turnOffAuthorisationSystem();
-            collectionAdmin = ePersonService.findByEmail(context, "collectionAdminTest@email.com");
+            collectionAdmin = ePersonService.findByEmail(context.getSession(), "collectionAdminTest@email.com");
             if (collectionAdmin != null) {
                 ePersonService.delete(context, collectionAdmin);
             }

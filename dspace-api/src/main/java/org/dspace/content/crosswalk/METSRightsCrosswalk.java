@@ -524,12 +524,12 @@ public class METSRightsCrosswalk
                         String personEmail = element.getChildTextTrim("UserName", METSRights_NS);
 
                         //Check if this person exists in DSpace already
-                        EPerson person = ePersonService.findByEmail(context, personEmail);
+                        EPerson person = ePersonService.findByEmail(context.getSession(), personEmail);
 
                         //If cannot find by email, try by netID
                         //(though METSRights should contain email if it was exported by DSpace)
                         if (person == null) {
-                            person = ePersonService.findByNetid(context, personEmail);
+                            person = ePersonService.findByNetid(context.getSession(), personEmail);
                         }
 
                         //if not found, throw an error -- user should restore person from the SITE AIP

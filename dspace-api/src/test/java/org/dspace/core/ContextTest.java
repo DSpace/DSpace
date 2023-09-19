@@ -343,7 +343,7 @@ public class ContextTest extends AbstractUnitTest {
 
         // Open a new context, let's make sure that EPerson isn't there
         Context newInstance = new Context();
-        EPerson found = ePersonService.findByEmail(newInstance, createdEmail);
+        EPerson found = ePersonService.findByEmail(newInstance.getSession(), createdEmail);
         assertThat("testAbort 1", found, nullValue());
 
         // Cleanup our contexts
@@ -374,7 +374,7 @@ public class ContextTest extends AbstractUnitTest {
 
         // Open a new context, let's make sure that EPerson isn't there
         Context newInstance = new Context();
-        EPerson found = ePersonService.findByEmail(newInstance, createdEmail);
+        EPerson found = ePersonService.findByEmail(newInstance.getSession(), createdEmail);
         assertThat("testClose 0", found, nullValue());
 
         // Cleanup our contexts
