@@ -28,8 +28,8 @@ import org.springframework.stereotype.Component;
 @Component
 public final class NotifyServicePatchUtils {
 
-    public static final String NOTIFY_SERVICE_OUTBOUND_PATTERNS = "notifyservices_outbound_patterns";
-    public static final String NOTIFY_SERVICE_INBOUND_PATTERNS = "notifyservices_inbound_patterns";
+    public static final String NOTIFY_SERVICE_OUTBOUND_PATTERNS = "notifyServiceOutboundPatterns";
+    public static final String NOTIFY_SERVICE_INBOUND_PATTERNS = "notifyServiceInboundPatterns";
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
