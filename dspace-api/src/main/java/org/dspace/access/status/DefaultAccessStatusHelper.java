@@ -173,11 +173,14 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
      * @return an access status value
      */
     @Override
-    public String getEmbargoFromItem(Context context, Item item)
+    public String getEmbargoFromItem(Context context, Item item, Date threshold)
             throws SQLException {
-        Date embargoedDate;
+        Date embargoDate;
 
-        if (item == null) {
+        // If Item status is not "embargo" then return a null embargo date.
+        String accessStatus = getAccessStatusFromItem(context, item, threshold);
+
+        if (item == null || !accessStatus.equals(EMBARGO)) {
             return null;
         }
         // Consider only the original bundles.
@@ -202,9 +205,9 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
             return null;
         }
 
-        embargoedDate = this.retrieveShortestEmbargo(context, bitstream);
+        embargoDate = this.retrieveShortestEmbargo(context, bitstream);
 
-        return embargoedDate != null ? embargoedDate.toString() : null;
+        return embargoDate != null ? embargoDate.toString() : null;
     }
 
     /**
