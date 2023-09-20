@@ -179,10 +179,13 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                 for (CollectionRole collectionRole : collectionRoles) {
                     if (StringUtils.equals(collectionRole.getRoleId(), role.getId())
                             && claimedTask.getWorkflowItem().getCollection() == collectionRole.getCollection()) {
-                        //  Get total number of unique EPerson objs who are a member of this group (or subgroup)
-                        int totalMembers = countAllMembers(context, group);
-                        // If only one EPerson is a member, then we cannot delete the last member of this group.
-                        if (totalMembers == 1) {
+                        // Count number of EPersons who are *direct* members of this group
+                        int totalDirectEPersons = ePersonService.countByGroups(context, Set.of(group));
+                        // Count number of Groups which have this groupParent as a direct parent
+                        int totalChildGroups = countByParent(context, group);
+                        // If this group has only one direct EPerson and *zero* child groups, then we cannot delete the
+                        // EPerson or we will leave this group empty.
+                        if (totalDirectEPersons == 1 && totalChildGroups == 0) {
                             throw new IllegalStateException(
                                     "Refused to remove user " + ePerson
                                             .getID() + " from workflow group because the group " + group
@@ -193,10 +196,13 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                 }
             }
             if (!poolTasks.isEmpty()) {
-                //  Get total number of unique EPerson objs who are a member of this group (or subgroup)
-                int totalMembers = countAllMembers(context, group);
-                // If only one EPerson is a member, then we cannot delete the last member of this group.
-                if (totalMembers == 1) {
+                // Count number of EPersons who are *direct* members of this group
+                int totalDirectEPersons = ePersonService.countByGroups(context, Set.of(group));
+                // Count number of Groups which have this groupParent as a direct parent
+                int totalChildGroups = countByParent(context, group);
+                // If this group has only one direct EPerson and *zero* child groups, then we cannot delete the
+                // EPerson or we will leave this group empty.
+                if (totalDirectEPersons == 1 && totalChildGroups == 0) {
                     throw new IllegalStateException(
                             "Refused to remove user " + ePerson
                                     .getID() + " from workflow group because the group " + group
@@ -217,9 +223,12 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             List<PoolTask> poolTasks = poolTaskService.findByGroup(context, groupParent);
             if (!poolTasks.isEmpty()) {
                 // Count number of Groups which have this groupParent as a direct parent
-                int totalChildren = countByParent(context, groupParent);
-                // If only one group has this as a parent, we cannot delete the last child group
-                if (totalChildren == 1) {
+                int totalChildGroups = countByParent(context, groupParent);
+                // Count number of EPersons who are *direct* members of this group
+                int totalDirectEPersons = ePersonService.countByGroups(context, Set.of(groupParent));
+                // If this group has only one childGroup and *zero* direct EPersons, then we cannot delete the
+                // childGroup or we will leave this group empty.
+                if (totalChildGroups == 1 && totalDirectEPersons == 0) {
                     throw new IllegalStateException(
                             "Refused to remove sub group " + childGroup
                                     .getID() + " from workflow group because the group " + groupParent
