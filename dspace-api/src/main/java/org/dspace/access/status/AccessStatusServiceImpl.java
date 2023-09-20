@@ -66,6 +66,6 @@ public class AccessStatusServiceImpl implements AccessStatusService {
 
     @Override
     public String getEmbargoFromItem(Context context, Item item) throws SQLException {
-        return helper.getEmbargoFromItem(context, item);
+        return helper.getEmbargoFromItem(context, item, forever_date);
     }
 }
