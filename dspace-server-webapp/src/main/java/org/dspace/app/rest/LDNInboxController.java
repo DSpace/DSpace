@@ -11,7 +11,10 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.ldn.LDNMessageEntity;
+import org.dspace.app.ldn.LDNRouter;
 import org.dspace.app.ldn.model.Notification;
+import org.dspace.app.ldn.processor.LDNProcessor;
 import org.dspace.app.ldn.service.LDNMessageService;
 import org.dspace.app.rest.exception.InvalidLDNMessageException;
 import org.dspace.core.Context;
@@ -36,6 +39,9 @@ public class LDNInboxController {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     @Autowired
+    private LDNRouter router;
+
+    @Autowired
     private LDNMessageService ldnMessageService;
 
     /**
@@ -49,9 +55,21 @@ public class LDNInboxController {
     public ResponseEntity<Object> inbox(@RequestBody Notification notification) throws Exception {
         Context context = ContextUtil.obtainCurrentRequestContext();
         validate(notification);
-        ldnMessageService.create(context, notification);
+
         log.info("stored notification {} {}", notification.getId(), notification.getType());
         context.commit();
+
+        LDNMessageEntity ldnMsgEntity = ldnMessageService.create(context, notification);
+        LDNProcessor processor = router.route(ldnMsgEntity);
+        if (processor == null) {
+            log.error(String.format("No processor found for type %s", notification.getType()));
+            /*
+             * return ResponseEntity.badRequest()
+            .body(String.format("No processor found for type %s", notification.getType()));
+            */
+        } else {
+            processor.process(notification);
+        }
         return ResponseEntity.accepted()
             .body(String.format("Successfully stored notification %s %s",
                 notification.getId(), notification.getType()));

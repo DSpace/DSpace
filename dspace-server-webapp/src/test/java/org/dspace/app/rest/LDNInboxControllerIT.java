@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.content.QAEvent.OPENAIRE_SOURCE;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -23,7 +26,11 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.matcher.QASourceMatcher;
+import org.dspace.matcher.QATopicMatcher;
+import org.dspace.qaevent.service.QAEventService;
 import org.dspace.services.ConfigurationService;
+import org.dspace.utils.DSpace;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -32,6 +39,8 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private ConfigurationService configurationService;
+
+    private QAEventService qaEventService = new DSpace().getSingletonService(QAEventService.class);
 
     @Test
     public void ldnInboxEndorsementActionTest() throws Exception {
@@ -70,6 +79,26 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
                 .contentType("application/ld+json")
                 .content(message))
             .andExpect(status().isAccepted());
+    }
+
+
+    @Test
+    public void ldnInboxAnnounceReviewTest() throws Exception {
+        InputStream announceReviewStream = getClass().getResourceAsStream("ldn_announce_review.json");
+        String message = IOUtils.toString(announceReviewStream, Charset.defaultCharset());
+        announceReviewStream.close();
+        ObjectMapper mapper = new ObjectMapper();
+        Notification notification = mapper.readValue(message, Notification.class);
+        getClient(getAuthToken(admin.getEmail(), password))
+            .perform(post("/ldn/inbox")
+                .contentType("application/ld+json")
+                .content(message))
+            .andExpect(status().isAccepted());
+        assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 1L)));
+
+        assertThat(qaEventService.findAllTopics(0, 20), contains(
+            QATopicMatcher.with("ENRICH/MORE/REVIEW", 1L)));
+
     }
 
     @Test
