@@ -412,7 +412,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
         Set<Group> groups = groupService.allMemberGroupsSet(context, ePerson);
         for (Group group: groups) {
-            List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context, group);
+            List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context.getSession(), group);
             if (!collectionRoles.isEmpty()) {
                 workFlowGroups.add(group);
             }

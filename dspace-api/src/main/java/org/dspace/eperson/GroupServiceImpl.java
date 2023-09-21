@@ -170,9 +170,9 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
      */
     @Override
     public void removeMember(Context context, Group group, EPerson ePerson) throws SQLException {
-        List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context, group);
+        List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context.getSession(), group);
         if (!collectionRoles.isEmpty()) {
-            List<PoolTask> poolTasks = poolTaskService.findByGroup(context, group);
+            List<PoolTask> poolTasks = poolTaskService.findByGroup(context.getSession(), group);
             List<ClaimedTask> claimedTasks = claimedTaskService.findByEperson(context.getSession(), ePerson);
             for (ClaimedTask claimedTask : claimedTasks) {
                 Step stepByName = workflowFactory.getStepByName(claimedTask.getStepID());
@@ -209,9 +209,9 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Override
     public void removeMember(Context context, Group groupParent, Group childGroup) throws SQLException {
-        List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context, groupParent);
+        List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context.getSession(), groupParent);
         if (!collectionRoles.isEmpty()) {
-            List<PoolTask> poolTasks = poolTaskService.findByGroup(context, groupParent);
+            List<PoolTask> poolTasks = poolTaskService.findByGroup(context.getSession(), groupParent);
             if (!poolTasks.isEmpty()) {
                 List<EPerson> parentPeople = allMembers(context, groupParent);
                 List<EPerson> childPeople = allMembers(context, childGroup);
@@ -711,7 +711,8 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                         || AuthorizeConfiguration.canCommunityAdminManageCollectionWorkflows()) {
                     // if the group is used for one or more roles on a single collection,
                     // admins can eventually manage it
-                    List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context, group);
+                    List<CollectionRole> collectionRoles
+                            = collectionRoleService.findByGroup(context.getSession(), group);
                     if (collectionRoles != null && !collectionRoles.isEmpty()) {
                         Set<Collection> colls = new HashSet<>();
                         for (CollectionRole cr : collectionRoles) {

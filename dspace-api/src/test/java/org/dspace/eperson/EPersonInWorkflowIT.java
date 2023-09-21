@@ -87,6 +87,7 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
      *
      * Other methods can be annotated with @Before here or in subclasses but no
      * execution order is guaranteed
+     * @throws java.lang.Exception passed through from superclass.
      */
     @Before
     @Override
@@ -1470,7 +1471,7 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
 
 
     private void addUserToWorkflowGroup(EPerson ePerson, Collection collection, String roleName) throws SQLException {
-        List<CollectionRole> roles = collectionRoleService.findByCollection(context, collection);
+        List<CollectionRole> roles = collectionRoleService.findByCollection(context.getSession(), collection);
         for (CollectionRole role : roles) {
             if (StringUtils.equals(role.getRoleId(), roleName)) {
                 Group group = role.getGroup();
@@ -1495,7 +1496,7 @@ public class EPersonInWorkflowIT extends AbstractIntegrationTestWithDatabase {
         boolean deleteError = false;
 
         try {
-            List<CollectionRole> roles = collectionRoleService.findByCollection(context, collection);
+            List<CollectionRole> roles = collectionRoleService.findByCollection(context.getSession(), collection);
             for (CollectionRole role : roles) {
                 if (StringUtils.equals(role.getRoleId(), roleName)) {
                     Group group = role.getGroup();

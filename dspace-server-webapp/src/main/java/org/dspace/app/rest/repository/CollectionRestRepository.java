@@ -695,14 +695,14 @@ public class CollectionRestRepository extends DSpaceObjectRestRepository<Collect
                                            String workflowRole)
         throws SQLException, WorkflowConfigurationException, AuthorizeException, WorkflowException, IOException {
         Group group = workflowService.getWorkflowRoleGroup(context, collection, workflowRole, null);
-        if (!poolTaskService.findByGroup(context, group).isEmpty()) {
+        if (!poolTaskService.findByGroup(context.getSession(), group).isEmpty()) {
             // todo: also handle claimed tasks that would become associated with this group once returned to the pool
             throw new GroupHasPendingWorkflowTasksException();
         }
         if (group == null) {
             throw new ResourceNotFoundException("The requested Group was not found");
         }
-        List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context, group);
+        List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context.getSession(), group);
         if (!collectionRoles.isEmpty()) {
             collectionRoles.stream().forEach(collectionRole -> {
                 try {

@@ -147,7 +147,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         if (CollectionUtils.isNotEmpty(claimedTaskService.findByEperson(context.getSession(), ePerson))) {
             constraints.add("cwf_claimtask");
         }
-        if (CollectionUtils.isNotEmpty(poolTaskService.findByEPerson(context, ePerson))) {
+        if (CollectionUtils.isNotEmpty(poolTaskService.findByEPerson(context.getSession(), ePerson))) {
             constraints.add("cwf_pooltask");
         }
         if (CollectionUtils.isNotEmpty(workflowItemRoleService.findByEPerson(context, ePerson))) {
@@ -530,7 +530,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
                 //Retrieve the current owners of the task
                 List<ClaimedTask> claimedTasks = claimedTaskService.find(c.getSession(), wfi, newStep.getId());
-                List<PoolTask> pooledTasks = poolTaskService.find(c, wfi);
+                List<PoolTask> pooledTasks = poolTaskService.find(c.getSession(), wfi);
                 for (PoolTask poolTask : pooledTasks) {
                     if (poolTask.getEperson() != null) {
                         currentEpersonOwners.add(poolTask.getEperson());
@@ -756,7 +756,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
     @Override
     public void deleteAllPooledTasks(Context context, XmlWorkflowItem wi) throws SQLException, AuthorizeException {
-        Iterator<PoolTask> allPooledTasks = poolTaskService.find(context, wi).iterator();
+        Iterator<PoolTask> allPooledTasks = poolTaskService.find(context.getSession(), wi).iterator();
         while (allPooledTasks.hasNext()) {
             PoolTask poolTask = allPooledTasks.next();
             allPooledTasks.remove();

@@ -15,6 +15,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.xmlworkflow.storedcomponents.dao.CollectionRoleDAO;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -35,23 +36,23 @@ public class CollectionRoleServiceImpl implements CollectionRoleService {
 
 
     @Override
-    public CollectionRole find(Context context, int id) throws SQLException {
-        return collectionRoleDAO.findByID(context.getSession(), CollectionRole.class, id);
+    public CollectionRole find(Session session, int id) throws SQLException {
+        return collectionRoleDAO.findByID(session, CollectionRole.class, id);
     }
 
     @Override
-    public CollectionRole find(Context context, Collection collection, String role) throws SQLException {
-        return collectionRoleDAO.findByCollectionAndRole(context.getSession(), collection, role);
+    public CollectionRole find(Session session, Collection collection, String role) throws SQLException {
+        return collectionRoleDAO.findByCollectionAndRole(session, collection, role);
     }
 
     @Override
-    public List<CollectionRole> findByCollection(Context context, Collection collection) throws SQLException {
-        return collectionRoleDAO.findByCollection(context.getSession(), collection);
+    public List<CollectionRole> findByCollection(Session session, Collection collection) throws SQLException {
+        return collectionRoleDAO.findByCollection(session, collection);
     }
 
     @Override
-    public List<CollectionRole> findByGroup(Context context, Group group) throws SQLException {
-        return collectionRoleDAO.findByGroup(context.getSession(), group);
+    public List<CollectionRole> findByGroup(Session session, Group group) throws SQLException {
+        return collectionRoleDAO.findByGroup(session, group);
     }
 
     @Override

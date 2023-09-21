@@ -437,7 +437,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                 throw new IllegalArgumentException("Illegal step count: " + step);
         }
 
-        CollectionRole colRole = collectionRoleService.find(context, collection, roleId);
+        CollectionRole colRole = collectionRoleService.find(context.getSession(), collection, roleId);
         if (colRole == null) {
             if (group != null) {
                 colRole = collectionRoleService.create(context, collection, roleId, group);
@@ -473,7 +473,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         CollectionRole colRole;
         try {
-            colRole = collectionRoleService.find(context, collection, roleId);
+            colRole = collectionRoleService.find(context.getSession(), collection, roleId);
             if (colRole != null) {
                 return colRole.getGroup();
             }

@@ -150,7 +150,7 @@ public class PoolTaskRestRepository extends DSpaceRestRepository<PoolTaskRest, I
             if (xmlWorkflowItem == null) {
                 return null;
             } else {
-                poolTasks = poolTaskService.find(context, xmlWorkflowItem);
+                poolTasks = poolTaskService.find(context.getSession(), xmlWorkflowItem);
             }
             return converter.toRestPage(poolTasks, pageable, utils.obtainProjection());
         } catch (SQLException e) {

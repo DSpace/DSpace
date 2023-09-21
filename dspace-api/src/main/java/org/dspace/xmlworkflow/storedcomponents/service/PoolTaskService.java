@@ -18,6 +18,7 @@ import org.dspace.eperson.Group;
 import org.dspace.service.DSpaceCRUDService;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the PoolTask object.
@@ -28,12 +29,14 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  */
 public interface PoolTaskService extends DSpaceCRUDService<PoolTask> {
 
-    public List<PoolTask> findAll(Context context) throws SQLException;
+    public List<PoolTask> find(Session session, XmlWorkflowItem workflowItem) throws SQLException;
+
+    public List<PoolTask> findAll(Session session) throws SQLException;
+
+    public List<PoolTask> findByEPerson(Session session, EPerson ePerson) throws SQLException;
 
     public List<PoolTask> findByEperson(Context context, EPerson ePerson)
         throws SQLException, AuthorizeException, IOException;
-
-    public List<PoolTask> find(Context context, XmlWorkflowItem workflowItem) throws SQLException;
 
     public PoolTask findByWorkflowIdAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
         throws SQLException, AuthorizeException, IOException;
@@ -43,14 +46,12 @@ public interface PoolTaskService extends DSpaceCRUDService<PoolTask> {
 
     public void deleteByEperson(Context context, EPerson ePerson) throws SQLException, AuthorizeException, IOException;
 
-    public List<PoolTask> findByEPerson(Context context, EPerson ePerson) throws SQLException;
-
     /**
-     * This method will return a list of PoolTask for the given group
-     * @param context   The relevant DSpace context
+     * This method will return a list of PoolTask for the given group.
+     * @param session   current request's database context.
      * @param group     The Group to be searched on
      * @return          The list of PoolTask objects
      * @throws SQLException If something goes wrong
      */
-    public List<PoolTask> findByGroup(Context context, Group group) throws SQLException;
+    public List<PoolTask> findByGroup(Session session, Group group) throws SQLException;
 }

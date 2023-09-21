@@ -39,7 +39,7 @@ public class PoolTaskIndexFactoryImpl extends IndexFactoryImpl<IndexablePoolTask
 
     @Override
     public Iterator<IndexablePoolTask> findAll(Context context) throws SQLException {
-        final Iterator<PoolTask> pooledTasks = poolTaskService.findAll(context).iterator();
+        final Iterator<PoolTask> pooledTasks = poolTaskService.findAll(context.getSession()).iterator();
         return new Iterator<IndexablePoolTask>() {
             @Override
             public boolean hasNext() {
