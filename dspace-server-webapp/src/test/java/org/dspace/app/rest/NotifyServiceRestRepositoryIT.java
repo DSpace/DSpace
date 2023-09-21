@@ -153,6 +153,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         notifyServiceRest.setDescription("service description");
         notifyServiceRest.setUrl("service url");
         notifyServiceRest.setLdnUrl("service ldn url");
+        notifyServiceRest.setStatus(false);
 
         AtomicReference<Integer> idRef = new AtomicReference<Integer>();
         String authToken = getAuthToken(admin.getEmail(), password);
@@ -161,7 +162,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                                 .contentType(contentType))
                             .andExpect(status().isCreated())
                             .andExpect(jsonPath("$", matchNotifyService("service name", "service description",
-                                "service url", "service ldn url")))
+                                "service url", "service ldn url", false)))
                             .andDo(result ->
                                 idRef.set((read(result.getResponse().getContentAsString(), "$.id"))));
 
@@ -170,7 +171,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isOk())
             .andExpect(jsonPath("$",
                 matchNotifyService(idRef.get(), "service name", "service description",
-                    "service url", "service ldn url")));
+                    "service url", "service ldn url", false)));
     }
 
     @Test
@@ -239,6 +240,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                                 .withName("service name")
                                 .withUrl("service url")
                                 .withLdnUrl("service ldn url")
+                                .withStatus(false)
                                 .build();
         context.restoreAuthSystemState();
 
@@ -255,7 +257,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
-                "add service description", "service url", "service ldn url"))
+                "add service description", "service url", "service ldn url", false))
             );
     }
 
@@ -313,7 +315,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
-                "service description replaced", "service url", "service ldn url"))
+                "service description replaced", "service url", "service ldn url", true))
             );
     }
 
@@ -328,6 +330,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                                 .withDescription("service description")
                                 .withUrl("service url")
                                 .withLdnUrl("service ldn url")
+                                .withStatus(false)
                                 .build();
         context.restoreAuthSystemState();
 
@@ -344,7 +347,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
-                null, "service url", "service ldn url"))
+                null, "service url", "service ldn url", false))
             );
     }
 
@@ -402,7 +405,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
-                "service description", "add service url", "service ldn url"))
+                "service description", "add service url", "service ldn url", true))
             );
     }
 
@@ -460,7 +463,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
-                "service description", "service url replaced", "service ldn url"))
+                "service description", "service url replaced", "service ldn url", true))
             );
     }
 
@@ -3184,6 +3187,64 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                         matchNotifyServicePattern("patternB", "itemFilterB")
                     ))
                 )));
+    }
+
+    @Test
+    public void NotifyServiceStatusReplaceOperationTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("service ldn url")
+                                .withStatus(true)
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("/status", "false");
+        ops.add(inboundReplaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.notifyServiceInboundPatterns", empty()))
+            .andExpect(jsonPath("$.notifyServiceOutboundPatterns", empty()))
+            .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
+                "service description", "service url", "service ldn url", false)));
+    }
+
+    @Test
+    public void NotifyServiceStatusReplaceOperationTestBadRequestTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("service ldn url")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("/status", "test");
+        ops.add(inboundReplaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        // patch not boolean value
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isBadRequest());
     }
 
 }

@@ -53,6 +53,9 @@ public class NotifyServiceEntity implements ReloadableEntity<Integer> {
     @OneToMany(mappedBy = "notifyService")
     private List<NotifyServiceOutboundPattern> outboundPatterns;
 
+    @Column(name = "status")
+    private Boolean status = true;
+
     public void setId(Integer id) {
         this.id = id;
     }
@@ -117,5 +120,13 @@ public class NotifyServiceEntity implements ReloadableEntity<Integer> {
     @Override
     public Integer getID() {
         return id;
+    }
+
+    public Boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
     }
 }

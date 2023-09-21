@@ -125,4 +125,9 @@ public class NotifyServiceBuilder extends AbstractBuilder<NotifyServiceEntity, N
         return this;
     }
 
+    public NotifyServiceBuilder withStatus(boolean status) {
+        notifyServiceEntity.setStatus(status);
+        return this;
+    }
+
 }

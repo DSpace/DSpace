@@ -26,6 +26,7 @@ public class NotifyServiceRest extends BaseObjectRest<Integer> {
     private String description;
     private String url;
     private String ldnUrl;
+    private boolean status;
 
     private List<NotifyServiceInboundPatternRest> notifyServiceInboundPatterns;
     private List<NotifyServiceOutboundPatternRest> notifyServiceOutboundPatterns;
@@ -77,6 +78,13 @@ public class NotifyServiceRest extends BaseObjectRest<Integer> {
         this.ldnUrl = ldnUrl;
     }
 
+    public boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
     public List<NotifyServiceInboundPatternRest> getNotifyServiceInboundPatterns() {
         return notifyServiceInboundPatterns;
     }

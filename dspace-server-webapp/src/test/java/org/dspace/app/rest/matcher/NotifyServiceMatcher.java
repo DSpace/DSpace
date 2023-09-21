@@ -37,11 +37,33 @@ public class NotifyServiceMatcher {
         );
     }
 
+    public static Matcher<? super Object> matchNotifyService(String name, String description, String url,
+                                                             String ldnUrl, boolean status) {
+        return allOf(
+            hasJsonPath("$.name", is(name)),
+            hasJsonPath("$.description", is(description)),
+            hasJsonPath("$.url", is(url)),
+            hasJsonPath("$.ldnUrl", is(ldnUrl)),
+            hasJsonPath("$.status", is(status)),
+            hasJsonPath("$._links.self.href", containsString("/api/ldn/ldnservices/"))
+        );
+    }
+
     public static Matcher<? super Object> matchNotifyService(int id, String name, String description,
                                                              String url, String ldnUrl) {
         return allOf(
             hasJsonPath("$.id", is(id)),
             matchNotifyService(name, description, url, ldnUrl),
+            hasJsonPath("$._links.self.href", startsWith(REST_SERVER_URL)),
+            hasJsonPath("$._links.self.href", endsWith("/api/ldn/ldnservices/" + id))
+        );
+    }
+
+    public static Matcher<? super Object> matchNotifyService(int id, String name, String description,
+                                                             String url, String ldnUrl, boolean status) {
+        return allOf(
+            hasJsonPath("$.id", is(id)),
+            matchNotifyService(name, description, url, ldnUrl, status),
             hasJsonPath("$._links.self.href", startsWith(REST_SERVER_URL)),
             hasJsonPath("$._links.self.href", endsWith("/api/ldn/ldnservices/" + id))
         );
