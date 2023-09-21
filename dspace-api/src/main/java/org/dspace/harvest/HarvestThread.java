@@ -49,7 +49,7 @@ public class HarvestThread extends Thread {
         try {
             context = new Context();
             dso = collectionService.find(context.getSession(), collectionId);
-            hc = harvestedCollectionService.find(context, dso);
+            hc = harvestedCollectionService.find(context.getSession(), dso);
             try {
 
                 dso = hc.getCollection();

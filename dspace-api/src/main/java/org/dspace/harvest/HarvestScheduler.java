@@ -168,7 +168,9 @@ public class HarvestScheduler implements Runnable {
                         case HARVESTER_INTERRUPT_INSERT_THREAD:
                             interrupt = HARVESTER_INTERRUPT_NONE;
                             addThread(mainContext, harvestedCollectionService
-                                .find(mainContext, collectionService.find(mainContext.getSession(), interruptValue)));
+                                .find(mainContext.getSession(),
+                                        collectionService.find(mainContext.getSession(),
+                                                interruptValue)));
                             interruptValue = null;
                             break;
                         case HARVESTER_INTERRUPT_PAUSE:
@@ -197,7 +199,7 @@ public class HarvestScheduler implements Runnable {
                 status = HARVESTER_STATUS_RUNNING;
 
                 // Stage #1: if something is ready for harvest, push it onto the ready stack, mark it as "queued"
-                List<HarvestedCollection> cids = harvestedCollectionService.findReady(mainContext);
+                List<HarvestedCollection> cids = harvestedCollectionService.findReady(mainContext.getSession());
                 log.info("Collections ready for immediate harvest: " + cids.toString());
 
                 for (HarvestedCollection harvestedCollection : cids) {
@@ -247,7 +249,7 @@ public class HarvestScheduler implements Runnable {
             // Stage #3: figure out how long until the next iteration and wait
             try {
                 Context tempContext = new Context();
-                HarvestedCollection hc = harvestedCollectionService.findOldestHarvest(tempContext);
+                HarvestedCollection hc = harvestedCollectionService.findOldestHarvest(tempContext.getSession());
 
                 int harvestInterval = configurationService.getIntProperty("oai.harvester.harvestFrequency");
                 if (harvestInterval == 0) {

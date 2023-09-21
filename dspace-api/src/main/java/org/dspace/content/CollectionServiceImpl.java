@@ -732,7 +732,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
                                       "collection_id=" + collection.getID()));
 
         // remove harvested collections.
-        HarvestedCollection hc = harvestedCollectionService.find(context, collection);
+        HarvestedCollection hc = harvestedCollectionService.find(context.getSession(), collection);
         if (hc != null) {
             harvestedCollectionService.delete(context, hc);
         }

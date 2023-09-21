@@ -543,7 +543,7 @@ public class OAIHarvester {
             log.debug("Item " + item.getHandle() + " was found locally. Using it to harvest " + itemOaiID + ".");
 
             // FIXME: check for null pointer if for some odd reason we don't have a matching hi
-            hi = harvestedItemService.find(ourContext, item);
+            hi = harvestedItemService.find(ourContext.getSession(), item);
 
             // Compare last-harvest on the item versus the last time the item was updated on the OAI provider side
             // If ours is more recent, forgo this item, since it's probably a left-over from a previous harvesting

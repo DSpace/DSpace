@@ -38,20 +38,21 @@ public class WorkflowItemRoleServiceImpl implements WorkflowItemRoleService {
     }
 
     @Override
-    public List<WorkflowItemRole> find(Context context, XmlWorkflowItem workflowItem, String role) throws SQLException {
-        return workflowItemRoleDAO.findByWorkflowItemAndRole(context.getSession(), workflowItem, role);
+    public List<WorkflowItemRole> find(Session session, XmlWorkflowItem workflowItem, String role) throws SQLException {
+        return workflowItemRoleDAO.findByWorkflowItemAndRole(session, workflowItem, role);
     }
 
     @Override
-    public List<WorkflowItemRole> findByWorkflowItem(Context context, XmlWorkflowItem xmlWorkflowItem)
+    public List<WorkflowItemRole> findByWorkflowItem(Session session, XmlWorkflowItem xmlWorkflowItem)
         throws SQLException {
-        return workflowItemRoleDAO.findByWorkflowItem(context.getSession(), xmlWorkflowItem);
+        return workflowItemRoleDAO.findByWorkflowItem(session, xmlWorkflowItem);
     }
 
     @Override
     public void deleteForWorkflowItem(Context context, XmlWorkflowItem xmlWorkflowItem)
         throws SQLException, AuthorizeException {
-        Iterator<WorkflowItemRole> workflowItemRoles = findByWorkflowItem(context, xmlWorkflowItem).iterator();
+        Iterator<WorkflowItemRole> workflowItemRoles
+                = findByWorkflowItem(context.getSession(), xmlWorkflowItem).iterator();
         while (workflowItemRoles.hasNext()) {
             WorkflowItemRole workflowItemRole = workflowItemRoles.next();
             workflowItemRoles.remove();
@@ -61,7 +62,7 @@ public class WorkflowItemRoleServiceImpl implements WorkflowItemRoleService {
 
     @Override
     public void deleteByEPerson(Context context, EPerson ePerson) throws SQLException, AuthorizeException {
-        Iterator<WorkflowItemRole> workflowItemRoles = findByEPerson(context, ePerson).iterator();
+        Iterator<WorkflowItemRole> workflowItemRoles = findByEPerson(context.getSession(), ePerson).iterator();
         while (workflowItemRoles.hasNext()) {
             WorkflowItemRole workflowItemRole = workflowItemRoles.next();
             workflowItemRoles.remove();
@@ -70,8 +71,8 @@ public class WorkflowItemRoleServiceImpl implements WorkflowItemRoleService {
     }
 
     @Override
-    public List<WorkflowItemRole> findByEPerson(Context context, EPerson ePerson) throws SQLException {
-        return workflowItemRoleDAO.findByEPerson(context.getSession(), ePerson);
+    public List<WorkflowItemRole> findByEPerson(Session session, EPerson ePerson) throws SQLException {
+        return workflowItemRoleDAO.findByEPerson(session, ePerson);
     }
 
     @Override

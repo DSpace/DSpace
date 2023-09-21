@@ -14,6 +14,7 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.harvest.dao.HarvestedItemDAO;
 import org.dspace.harvest.service.HarvestedItemService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -33,8 +34,8 @@ public class HarvestedItemServiceImpl implements HarvestedItemService {
     }
 
     @Override
-    public HarvestedItem find(Context context, Item item) throws SQLException {
-        return harvestedItemDAO.findByItem(context.getSession(), item);
+    public HarvestedItem find(Session session, Item item) throws SQLException {
+        return harvestedItemDAO.findByItem(session, item);
     }
 
     @Override

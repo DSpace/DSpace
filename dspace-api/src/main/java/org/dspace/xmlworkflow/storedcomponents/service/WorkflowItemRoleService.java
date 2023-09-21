@@ -16,6 +16,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.service.DSpaceCRUDService;
 import org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the WorkflowItemRole object.
@@ -26,14 +27,14 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  */
 public interface WorkflowItemRoleService extends DSpaceCRUDService<WorkflowItemRole> {
 
-    public List<WorkflowItemRole> find(Context context, XmlWorkflowItem workflowItem, String role) throws SQLException;
+    public List<WorkflowItemRole> find(Session session, XmlWorkflowItem workflowItem, String role) throws SQLException;
 
-    public List<WorkflowItemRole> findByWorkflowItem(Context context, XmlWorkflowItem xmlWorkflowItem)
+    public List<WorkflowItemRole> findByWorkflowItem(Session session, XmlWorkflowItem xmlWorkflowItem)
         throws SQLException;
 
     public void deleteForWorkflowItem(Context context, XmlWorkflowItem wfi) throws SQLException, AuthorizeException;
 
     public void deleteByEPerson(Context context, EPerson ePerson) throws SQLException, AuthorizeException;
 
-    public List<WorkflowItemRole> findByEPerson(Context context, EPerson ePerson) throws SQLException;
+    public List<WorkflowItemRole> findByEPerson(Session session, EPerson ePerson) throws SQLException;
 }

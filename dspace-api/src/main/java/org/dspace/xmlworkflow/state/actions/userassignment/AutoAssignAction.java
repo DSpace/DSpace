@@ -68,7 +68,8 @@ public class AutoAssignAction extends UserSelectionAction {
                 }
 
                 if (nextAction != null) {
-                    List<WorkflowItemRole> workflowItemRoles = workflowItemRoleService.find(c, wfi, role.getId());
+                    List<WorkflowItemRole> workflowItemRoles
+                            = workflowItemRoleService.find(c.getSession(), wfi, role.getId());
                     for (WorkflowItemRole workflowItemRole : workflowItemRoles) {
                         if (workflowItemRole.getEPerson() != null) {
                             createTaskForEPerson(c, wfi, step, nextAction, workflowItemRole.getEPerson());
@@ -153,7 +154,8 @@ public class AutoAssignAction extends UserSelectionAction {
         //This is an automatic assign action, it can never have a user interface
         Role role = getParent().getStep().getRole();
         if (role != null) {
-            List<WorkflowItemRole> workflowItemRoles = workflowItemRoleService.find(context, wfi, role.getId());
+            List<WorkflowItemRole> workflowItemRoles
+                    = workflowItemRoleService.find(context.getSession(), wfi, role.getId());
             if (workflowItemRoles.isEmpty()) {
                 throw new WorkflowConfigurationException(
                     "The next step is invalid, since it doesn't have any individual item roles");
