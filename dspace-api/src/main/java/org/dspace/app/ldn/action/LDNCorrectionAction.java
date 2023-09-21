@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
-import java.util.SortedSet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,12 +46,12 @@ public class LDNCorrectionAction implements LDNAction {
         if (notificationType == null) {
             return result;
         }
-        ArrayList<String> arrayList = new ArrayList<String>(notificationType);
+        ArrayList<String> notificationTypeArrayList = new ArrayList<String>(notificationType);
         // sorting the list
-        Collections.sort(arrayList);
+        Collections.sort(notificationTypeArrayList);
         //String[] notificationTypeArray = notificationType.stream().toArray(String[]::new);
-        this.setActivityStreamType(arrayList.get(0));
-        this.setCoarNotifyType(arrayList.get(1));
+        this.setActivityStreamType(notificationTypeArrayList.get(0));
+        this.setCoarNotifyType(notificationTypeArrayList.get(1));
         if (this.getActivityStreamType() == null || this.getCoarNotifyType() == null) {
             if (this.getActivityStreamType() == null) {
                 log.warn("Correction Action can't be executed: activityStreamType is null");

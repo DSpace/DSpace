@@ -78,8 +78,9 @@ public class QAEventActionServiceImpl implements QAEventActionService {
             if (qaevent.getRelated() != null) {
                 related = itemService.find(context, UUID.fromString(qaevent.getRelated()));
             }
-            if(topicsToActions.get(qaevent.getTopic()) == null) {
-                String msg = "Unable to manage QA Event typed " + qaevent.getTopic() + ". Managed types are: "+topicsToActions;
+            if (topicsToActions.get(qaevent.getTopic()) == null) {
+                String msg = "Unable to manage QA Event typed " + qaevent.getTopic()
+                    + ". Managed types are: " + topicsToActions;
                 log.error(msg);
                 throw new RuntimeException(msg);
             }
