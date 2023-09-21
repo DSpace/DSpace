@@ -13,6 +13,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.harvest.HarvestedItem;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the HarvestedItem object.
@@ -26,12 +27,12 @@ public interface HarvestedItemService {
     /**
      * Find the harvest parameters corresponding to the specified DSpace item
      *
-     * @param context The relevant DSpace Context.
+     * @param session current request's database context.
      * @param item    target item
      * @return a HarvestedItem object corresponding to this item, null if not found.
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public HarvestedItem find(Context context, Item item) throws SQLException;
+    public HarvestedItem find(Session session, Item item) throws SQLException;
 
     /**
      * Retrieve a DSpace Item that corresponds to this particular combination of owning collection and OAI ID.

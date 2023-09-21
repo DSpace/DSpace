@@ -101,7 +101,7 @@ public class Role implements BeanNameAware {
             }
             return new RoleMembers();
         } else {
-            List<WorkflowItemRole> roles = workflowItemRoleService.find(context, wfi, id);
+            List<WorkflowItemRole> roles = workflowItemRoleService.find(context.getSession(), wfi, id);
             RoleMembers assignees = new RoleMembers();
             for (WorkflowItemRole itemRole : roles) {
                 EPerson user = itemRole.getEPerson();

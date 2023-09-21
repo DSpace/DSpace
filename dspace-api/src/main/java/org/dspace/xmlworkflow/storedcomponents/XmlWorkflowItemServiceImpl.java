@@ -182,7 +182,7 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
 
     @Override
     public void deleteWrapper(Context context, XmlWorkflowItem workflowItem) throws SQLException, AuthorizeException {
-        List<WorkflowItemRole> roles = workflowItemRoleService.findByWorkflowItem(context, workflowItem);
+        List<WorkflowItemRole> roles = workflowItemRoleService.findByWorkflowItem(context.getSession(), workflowItem);
         Iterator<WorkflowItemRole> workflowItemRoleIterator = roles.iterator();
         while (workflowItemRoleIterator.hasNext()) {
             WorkflowItemRole workflowItemRole = workflowItemRoleIterator.next();

@@ -182,7 +182,7 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
                 throw new UnsupportedOperationException("An eperson must be provided");
             }
 
-            List<HarvestedCollection> harvestedCollections = harvestedCollectionService.findAll(context);
+            List<HarvestedCollection> harvestedCollections = harvestedCollectionService.findAll(context.getSession());
             for (HarvestedCollection harvestedCollection : harvestedCollections) {
                 handler.logInfo(
                         "Purging the following collections (deleting items and resetting harvest status): " +
@@ -297,7 +297,7 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
         handler.logInfo(String.valueOf(collection.getID()));
 
         try {
-            HarvestedCollection hc = harvestedCollectionService.find(context, collection);
+            HarvestedCollection hc = harvestedCollectionService.find(context.getSession(), collection);
             if (hc == null) {
                 hc = harvestedCollectionService.create(context, collection);
             }
@@ -347,7 +347,7 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
                 }
             }
 
-            HarvestedCollection hc = harvestedCollectionService.find(context, collection);
+            HarvestedCollection hc = harvestedCollectionService.find(context.getSession(), collection);
             if (hc != null) {
                 hc.setLastHarvested(null);
                 hc.setHarvestMessage("");
@@ -376,7 +376,7 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
         OAIHarvester harvester = null;
         try {
             Collection collection = resolveCollection(context, collectionID);
-            HarvestedCollection hc = harvestedCollectionService.find(context, collection);
+            HarvestedCollection hc = harvestedCollectionService.find(context.getSession(), collection);
             harvester = new OAIHarvester(context, collection, hc);
             handler.logInfo("Initialized the harvester successfully");
         } catch (HarvestingException hex) {
@@ -407,7 +407,7 @@ public class Harvest extends DSpaceRunnable<HarvestScriptConfiguration> {
         handler.logInfo("Resetting harvest status flag on all collections... ");
 
         try {
-            List<HarvestedCollection> harvestedCollections = harvestedCollectionService.findAll(context);
+            List<HarvestedCollection> harvestedCollections = harvestedCollectionService.findAll(context.getSession());
             for (HarvestedCollection harvestedCollection : harvestedCollections) {
                 //hc.setHarvestResult(null,"");
                 harvestedCollection.setHarvestStartTime(null);

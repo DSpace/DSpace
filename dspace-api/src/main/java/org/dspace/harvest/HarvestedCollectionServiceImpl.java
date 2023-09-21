@@ -27,6 +27,7 @@ import org.dspace.harvest.dao.HarvestedCollectionDAO;
 import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.hibernate.Session;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
@@ -56,8 +57,8 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
     }
 
     @Override
-    public HarvestedCollection find(Context context, Collection collection) throws SQLException {
-        return harvestedCollectionDAO.findByCollection(context.getSession(), collection);
+    public HarvestedCollection find(Session session, Collection collection) throws SQLException {
+        return harvestedCollectionDAO.findByCollection(session, collection);
     }
 
     @Override
@@ -72,7 +73,7 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
 
     @Override
     public boolean isHarvestable(Context context, Collection collection) throws SQLException {
-        HarvestedCollection hc = find(context, collection);
+        HarvestedCollection hc = find(context.getSession(), collection);
         if (hc != null && hc.getHarvestType() > 0 && hc.getOaiSource() != null && hc.getOaiSetId() != null &&
             hc.getHarvestStatus() != HarvestedCollection.STATUS_UNKNOWN_ERROR) {
             return true;
@@ -93,7 +94,7 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
 
     @Override
     public boolean isReady(Context context, Collection collection) throws SQLException {
-        HarvestedCollection hc = find(context, collection);
+        HarvestedCollection hc = find(context.getSession(), collection);
         return isReady(hc);
     }
 
@@ -109,12 +110,12 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
     }
 
     @Override
-    public List<HarvestedCollection> findAll(Context context) throws SQLException {
-        return harvestedCollectionDAO.findAll(context.getSession(), HarvestedCollection.class);
+    public List<HarvestedCollection> findAll(Session session) throws SQLException {
+        return harvestedCollectionDAO.findAll(session, HarvestedCollection.class);
     }
 
     @Override
-    public List<HarvestedCollection> findReady(Context context) throws SQLException {
+    public List<HarvestedCollection> findReady(Session session) throws SQLException {
         ConfigurationService configurationService
                 = DSpaceServicesFactory.getInstance().getConfigurationService();
         int harvestInterval = configurationService.getIntProperty("oai.harvester.harvestFrequency");
@@ -141,28 +142,28 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
 
         int[] statuses = new int[] {HarvestedCollection.STATUS_READY, HarvestedCollection.STATUS_OAI_ERROR};
         return harvestedCollectionDAO
-            .findByLastHarvestedAndHarvestTypeAndHarvestStatusesAndHarvestTime(context.getSession(), startTime,
+            .findByLastHarvestedAndHarvestTypeAndHarvestStatusesAndHarvestTime(session, startTime,
                                                                                HarvestedCollection.TYPE_NONE, statuses,
                                                                                HarvestedCollection.STATUS_BUSY,
                                                                                expirationTime);
     }
 
     @Override
-    public List<HarvestedCollection> findByStatus(Context context, int status) throws SQLException {
-        return harvestedCollectionDAO.findByStatus(context.getSession(), status);
+    public List<HarvestedCollection> findByStatus(Session session, int status) throws SQLException {
+        return harvestedCollectionDAO.findByStatus(session, status);
     }
 
     @Override
-    public HarvestedCollection findOldestHarvest(Context context) throws SQLException {
+    public HarvestedCollection findOldestHarvest(Session session) throws SQLException {
         return harvestedCollectionDAO
-            .findByStatusAndMinimalTypeOrderByLastHarvestedAsc(context.getSession(), HarvestedCollection.STATUS_READY,
+            .findByStatusAndMinimalTypeOrderByLastHarvestedAsc(session, HarvestedCollection.STATUS_READY,
                                                                HarvestedCollection.TYPE_NONE, 1);
     }
 
     @Override
-    public HarvestedCollection findNewestHarvest(Context context) throws SQLException {
+    public HarvestedCollection findNewestHarvest(Session session) throws SQLException {
         return harvestedCollectionDAO
-            .findByStatusAndMinimalTypeOrderByLastHarvestedDesc(context.getSession(), HarvestedCollection.STATUS_READY,
+            .findByStatusAndMinimalTypeOrderByLastHarvestedDesc(session, HarvestedCollection.STATUS_READY,
                                                                 HarvestedCollection.TYPE_NONE, 1);
     }
 

@@ -809,7 +809,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         removeOrcidSynchronizationStuff(context, item);
 
         // Also delete the item if it appears in a harvested collection.
-        HarvestedItem hi = harvestedItemService.find(context, item);
+        HarvestedItem hi = harvestedItemService.find(context.getSession(), item);
 
         if (hi != null) {
             harvestedItemService.delete(context, hi);

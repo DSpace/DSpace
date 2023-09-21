@@ -51,7 +51,7 @@ public class HarvestedCollectionRestRepository extends AbstractDSpaceRestReposit
             return null;
         }
 
-        HarvestedCollection harvestedCollection = harvestedCollectionService.find(context, collection);
+        HarvestedCollection harvestedCollection = harvestedCollectionService.find(context.getSession(), collection);
         List<Map<String,String>> configs = OAIHarvester.getAvailableMetadataFormats();
         return harvestedCollectionConverter.fromModel(harvestedCollection, collection, configs,
                 utils.obtainProjection());
@@ -69,7 +69,7 @@ public class HarvestedCollectionRestRepository extends AbstractDSpaceRestReposit
                                       HttpServletRequest request,
                                       Collection collection) throws SQLException {
         HarvestedCollectionRest harvestedCollectionRest = parseHarvestedCollectionRest(context, request, collection);
-        HarvestedCollection harvestedCollection = harvestedCollectionService.find(context, collection);
+        HarvestedCollection harvestedCollection = harvestedCollectionService.find(context.getSession(), collection);
 
         // Delete harvestedCollectionService object if harvest type is not set
         if (harvestedCollectionRest.getHarvestType() == HarvestTypeEnum.NONE.getValue()
@@ -80,13 +80,13 @@ public class HarvestedCollectionRestRepository extends AbstractDSpaceRestReposit
         } else if (harvestedCollectionRest.getHarvestType() != HarvestTypeEnum.NONE.getValue()) {
             List<String> errors = testHarvestSettings(harvestedCollectionRest);
 
-            if (errors.size() == 0) {
+            if (errors.isEmpty()) {
                 if (harvestedCollection == null) {
                     harvestedCollection = harvestedCollectionService.create(context, collection);
                 }
 
                 updateCollectionHarvestSettings(context, harvestedCollection, harvestedCollectionRest);
-                harvestedCollection = harvestedCollectionService.find(context, collection);
+                harvestedCollection = harvestedCollectionService.find(context.getSession(), collection);
                 List<Map<String,String>> configs = OAIHarvester.getAvailableMetadataFormats();
 
                 return harvestedCollectionConverter.fromModel(harvestedCollection, collection, configs,

@@ -150,7 +150,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         if (CollectionUtils.isNotEmpty(poolTaskService.findByEPerson(context.getSession(), ePerson))) {
             constraints.add("cwf_pooltask");
         }
-        if (CollectionUtils.isNotEmpty(workflowItemRoleService.findByEPerson(context, ePerson))) {
+        if (CollectionUtils.isNotEmpty(workflowItemRoleService.findByEPerson(context.getSession(), ePerson))) {
             constraints.add("cwf_workflowitemrole");
         }
         return constraints;
