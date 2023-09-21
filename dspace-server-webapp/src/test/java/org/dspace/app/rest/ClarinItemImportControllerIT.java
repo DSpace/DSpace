@@ -410,4 +410,64 @@ public class ClarinItemImportControllerIT extends AbstractControllerIntegrationT
         ItemBuilder.deleteItem(uuid);
         context.restoreAuthSystemState();
     }
+
+    @Test
+    public void testImportAuthorityAndConfidenceInMetadata() throws Exception {
+        String DC_RELATION_METADATA_FIELD = "dc.relation";
+        String DC_RELATION_METADATA_VALUE = "this is metadata value";
+        int CONFIDENCE = 300;
+        int AUTHORITY = 20000;
+
+        context.turnOffAuthorisationSystem();
+        ObjectNode node = jsonNodeFactory.objectNode();
+        node.set("withdrawn", jsonNodeFactory.textNode("false"));
+        node.set("inArchive", jsonNodeFactory.textNode("false"));
+        node.set("discoverable", jsonNodeFactory.textNode("false"));
+
+        // Metadata which should be kept after installing the new Item.
+        ObjectNode metadataNode = jsonNodeFactory.objectNode();
+
+        // `dc.relation` metadata added into `metadata` of the ItemRest object
+        ObjectNode dcRelationMetadataNode = jsonNodeFactory.objectNode();
+        dcRelationMetadataNode.set("value", jsonNodeFactory.textNode(DC_RELATION_METADATA_VALUE));
+        dcRelationMetadataNode.set("language", jsonNodeFactory.textNode("en_US"));
+        dcRelationMetadataNode.set("authority", jsonNodeFactory.numberNode(AUTHORITY));
+        dcRelationMetadataNode.set("confidence", jsonNodeFactory.numberNode(CONFIDENCE));
+        metadataNode.set(DC_RELATION_METADATA_FIELD, jsonNodeFactory.arrayNode()
+                .add(dcRelationMetadataNode));
+
+        node.set("metadata", metadataNode);
+        context.restoreAuthSystemState();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String token = getAuthToken(admin.getEmail(), password);
+
+        UUID uuid = UUID.fromString(read(getClient(token).perform(post("/api/clarin/import/item")
+                                .content(mapper.writeValueAsBytes(node))
+                                .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                                .param("owningCollection", col.getID().toString())
+                                .param("epersonUUID", submitter.getID().toString()))
+                        .andExpect(status().isOk()).andReturn().getResponse().getContentAsString(),
+                "$.id"));
+
+        // workspaceitem should nt exist
+        List<WorkspaceItem> workflowItems = workspaceItemService.findAll(context);
+        assertEquals(workflowItems.size(), 0);
+        // controlling of the created item
+        Item item = itemService.find(context, uuid);
+        assertFalse(item.isWithdrawn());
+        assertFalse(item.isArchived());
+        assertFalse(item.isDiscoverable());
+        assertEquals(item.getSubmitter().getID(), submitter.getID());
+        assertEquals(item.getOwningCollection().getID(), col.getID());
+
+        // get all `dc.contributor.author`metadata values
+        List<MetadataValue> dcRelationValues =
+                itemService.getMetadata(item, "dc", "relation", null, "en_US");
+        assertEquals(dcRelationValues.size(), 1);
+
+        MetadataValue dcRelationValue = dcRelationValues.get(0);
+        assertEquals(dcRelationValue.getAuthority(), String.valueOf(AUTHORITY));
+        assertEquals(dcRelationValue.getConfidence(), CONFIDENCE);
+    }
 }
