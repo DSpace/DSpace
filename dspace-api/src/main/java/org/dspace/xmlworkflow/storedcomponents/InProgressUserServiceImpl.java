@@ -37,19 +37,19 @@ public class InProgressUserServiceImpl implements InProgressUserService {
     }
 
     @Override
-    public InProgressUser findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
+    public InProgressUser findByWorkflowItemAndEPerson(Session session, XmlWorkflowItem workflowItem, EPerson ePerson)
         throws SQLException {
-        return inProgressUserDAO.findByWorkflowItemAndEPerson(context.getSession(), workflowItem, ePerson);
+        return inProgressUserDAO.findByWorkflowItemAndEPerson(session, workflowItem, ePerson);
     }
 
     @Override
-    public List<InProgressUser> findByEperson(Context context, EPerson ePerson) throws SQLException {
-        return inProgressUserDAO.findByEperson(context.getSession(), ePerson);
+    public List<InProgressUser> findByEperson(Session session, EPerson ePerson) throws SQLException {
+        return inProgressUserDAO.findByEperson(session, ePerson);
     }
 
     @Override
-    public List<InProgressUser> findByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException {
-        return inProgressUserDAO.findByWorkflowItem(context.getSession(), workflowItem);
+    public List<InProgressUser> findByWorkflowItem(Session session, XmlWorkflowItem workflowItem) throws SQLException {
+        return inProgressUserDAO.findByWorkflowItem(session, workflowItem);
     }
 
     @Override

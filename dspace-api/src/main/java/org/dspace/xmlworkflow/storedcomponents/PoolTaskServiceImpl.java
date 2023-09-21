@@ -49,8 +49,8 @@ public class PoolTaskServiceImpl implements PoolTaskService {
     }
 
     @Override
-    public List<PoolTask> findAll(Context context) throws SQLException {
-        return poolTaskDAO.findAll(context.getSession(), PoolTask.class);
+    public List<PoolTask> findAll(Session session) throws SQLException {
+        return poolTaskDAO.findAll(session, PoolTask.class);
     }
 
     @Override
@@ -59,17 +59,18 @@ public class PoolTaskServiceImpl implements PoolTaskService {
         List<PoolTask> result = poolTaskDAO.findByEPerson(context.getSession(), ePerson);
         //Get all PoolTasks for groups of which this eperson is a member
         List<Group> groups = groupService.allMemberGroups(context, ePerson);
-        result.addAll(findByGroups(context, ePerson, groups));
+        result.addAll(findByGroups(context.getSession(), ePerson, groups));
         return result;
     }
 
-    protected List<PoolTask> findByGroups(Context context, EPerson ePerson, List<Group> groups) throws SQLException {
+    protected List<PoolTask> findByGroups(Session session, EPerson ePerson, List<Group> groups) throws SQLException {
         List<PoolTask> result = new ArrayList<>();
         for (Group group : groups) {
-            List<PoolTask> groupTasks = poolTaskDAO.findByGroup(context.getSession(), group);
+            List<PoolTask> groupTasks = poolTaskDAO.findByGroup(session, group);
             for (PoolTask poolTask : groupTasks) {
                 XmlWorkflowItem workflowItem = poolTask.getWorkflowItem();
-                if (inProgressUserService.findByWorkflowItemAndEPerson(context, workflowItem, ePerson) == null) {
+                if (inProgressUserService.findByWorkflowItemAndEPerson(session,
+                        workflowItem, ePerson) == null) {
                     result.add(poolTask);
                 }
             }
@@ -79,8 +80,8 @@ public class PoolTaskServiceImpl implements PoolTaskService {
 
 
     @Override
-    public List<PoolTask> find(Context context, XmlWorkflowItem workflowItem) throws SQLException {
-        return poolTaskDAO.findByWorkflowItem(context.getSession(), workflowItem);
+    public List<PoolTask> find(Session session, XmlWorkflowItem workflowItem) throws SQLException {
+        return poolTaskDAO.findByWorkflowItem(session, workflowItem);
     }
 
     @Override
@@ -95,7 +96,8 @@ public class PoolTaskServiceImpl implements PoolTaskService {
             //If the user has a is processing or has finished the step for a workflowitem, there is no need to look
             // for pooltasks for one of their
             //groups because the user already has the task claimed
-            if (inProgressUserService.findByWorkflowItemAndEPerson(context, workflowItem, ePerson) != null) {
+            if (inProgressUserService.findByWorkflowItemAndEPerson(context.getSession(),
+                    workflowItem, ePerson) != null) {
                 return null;
             } else {
                 //If the user does not have a claimedtask yet, see whether one of the groups of the user has pooltasks
@@ -116,7 +118,7 @@ public class PoolTaskServiceImpl implements PoolTaskService {
     @Override
     public void deleteByWorkflowItem(Context context, XmlWorkflowItem xmlWorkflowItem)
         throws SQLException, AuthorizeException {
-        List<PoolTask> tasks = find(context, xmlWorkflowItem);
+        List<PoolTask> tasks = find(context.getSession(), xmlWorkflowItem);
         //Use an iterator to remove the tasks !
         Iterator<PoolTask> iterator = tasks.iterator();
         while (iterator.hasNext()) {
@@ -140,13 +142,13 @@ public class PoolTaskServiceImpl implements PoolTaskService {
     }
 
     @Override
-    public List<PoolTask> findByEPerson(Context context, EPerson ePerson) throws SQLException {
-        return poolTaskDAO.findByEPerson(context.getSession(), ePerson);
+    public List<PoolTask> findByEPerson(Session session, EPerson ePerson) throws SQLException {
+        return poolTaskDAO.findByEPerson(session, ePerson);
     }
 
     @Override
-    public List<PoolTask> findByGroup(Context context, Group group) throws SQLException {
-        return poolTaskDAO.findByGroup(context.getSession(), group);
+    public List<PoolTask> findByGroup(Session session, Group group) throws SQLException {
+        return poolTaskDAO.findByGroup(session, group);
     }
 
     @Override

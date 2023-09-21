@@ -585,7 +585,8 @@ public class AuthorizeUtil {
             }
 
 
-            List<CollectionRole> collectionRoles = collectionRoleService.findByCollection(context, collection);
+            List<CollectionRole> collectionRoles
+                    = collectionRoleService.findByCollection(context.getSession(), collection);
             for (CollectionRole role : collectionRoles) {
                 if (group.equals(role.getGroup())) {
                     authorizeManageWorkflowsGroup(context, collection);

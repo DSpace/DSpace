@@ -93,7 +93,7 @@ public class Role implements BeanNameAware {
                 return assignees;
             }
         } else if (scope == Scope.COLLECTION) {
-            CollectionRole collectionRole = collectionRoleService.find(context, wfi.getCollection(), id);
+            CollectionRole collectionRole = collectionRoleService.find(context.getSession(), wfi.getCollection(), id);
             if (collectionRole != null) {
                 RoleMembers assignees = new RoleMembers();
                 assignees.addGroup(collectionRole.getGroup());

@@ -94,7 +94,7 @@ public class WorkflowItemIndexFactoryImpl
         List<IndexableObject> results = new ArrayList<>();
         results.add(new IndexableWorkflowItem(object));
 
-        List<PoolTask> pools = poolTaskService.find(context, object);
+        List<PoolTask> pools = poolTaskService.find(context.getSession(), object);
         for (PoolTask poolTask : pools) {
             results.add(new IndexablePoolTask(poolTask));
         }

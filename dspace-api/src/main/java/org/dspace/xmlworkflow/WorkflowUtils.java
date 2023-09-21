@@ -233,7 +233,7 @@ public class WorkflowUtils extends Util {
         Workflow workflow = xmlWorkflowFactory.getWorkflow(collection);
         Role role = workflow.getRoles().get(roleID);
         if (role.getScope() == Role.Scope.COLLECTION) {
-            CollectionRole ass = collectionRoleService.find(context, collection, roleID);
+            CollectionRole ass = collectionRoleService.find(context.getSession(), collection, roleID);
             collectionRoleService.delete(context, ass);
         }
     }
@@ -306,7 +306,7 @@ public class WorkflowUtils extends Util {
         if (role.getScope() == Role.Scope.REPOSITORY) {
             return groupService.findByName(context.getSession(), role.getName());
         } else if (role.getScope() == Role.Scope.COLLECTION) {
-            CollectionRole collectionRole = collectionRoleService.find(context, collection, role.getId());
+            CollectionRole collectionRole = collectionRoleService.find(context.getSession(), collection, role.getId());
             if (collectionRole == null) {
                 return null;
             }

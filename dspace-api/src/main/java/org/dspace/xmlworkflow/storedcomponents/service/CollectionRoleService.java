@@ -14,6 +14,7 @@ import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the CollectionRole object.
@@ -42,22 +43,22 @@ public interface CollectionRoleService {
      */
     public final String LEGACY_WORKFLOW_STEP3_NAME = "finaleditor";
 
-    public CollectionRole find(Context context, int id) throws SQLException;
+    public CollectionRole find(Session session, int id) throws SQLException;
 
-    public CollectionRole find(Context context, Collection collection, String role) throws SQLException;
+    public CollectionRole find(Session session, Collection collection, String role) throws SQLException;
 
     /**
-     * 
-     * @param context
-     *            DSpace context
+     *
+     * @param session
+     *            current request's database context.
      * @param group
      *            EPerson Group
      * @return the list of CollectionRole assigned to the specified group
      * @throws SQLException
      */
-    public List<CollectionRole> findByGroup(Context context, Group group) throws SQLException;
+    public List<CollectionRole> findByGroup(Session session, Group group) throws SQLException;
 
-    public List<CollectionRole> findByCollection(Context context, Collection collection) throws SQLException;
+    public List<CollectionRole> findByCollection(Session session, Collection collection) throws SQLException;
 
     public CollectionRole create(Context context, Collection collection, String roleId, Group group)
         throws SQLException;
