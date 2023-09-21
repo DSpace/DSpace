@@ -28,8 +28,7 @@ public class LDNCorrectionAction implements LDNAction {
 
     private static final Logger log = LogManager.getLogger(LDNEmailAction.class);
 
-    private String activityStreamType;
-    private String coarNotifyType;
+    private String qaEventTopic;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -42,67 +41,23 @@ public class LDNCorrectionAction implements LDNAction {
     public ActionStatus execute(Notification notification, Item item) throws Exception {
         ActionStatus result = ActionStatus.ABORT;
         Context context = ContextUtil.obtainCurrentRequestContext();
-        Set<String> notificationType = notification.getType();
-        if (notificationType == null) {
-            return result;
-        }
-        ArrayList<String> notificationTypeArrayList = new ArrayList<String>(notificationType);
-        // sorting the list
-        Collections.sort(notificationTypeArrayList);
-        //String[] notificationTypeArray = notificationType.stream().toArray(String[]::new);
-        this.setActivityStreamType(notificationTypeArrayList.get(0));
-        this.setCoarNotifyType(notificationTypeArrayList.get(1));
-        if (this.getActivityStreamType() == null || this.getCoarNotifyType() == null) {
-            if (this.getActivityStreamType() == null) {
-                log.warn("Correction Action can't be executed: activityStreamType is null");
-            }
-            if (this.getCoarNotifyType() == null) {
-                log.warn("Correction Action can't be executed: coarNotifyType is null");
-            }
-            return result;
-        }
-        if ("Announce".equalsIgnoreCase(this.getActivityStreamType())) {
-            if (this.getCoarNotifyType().equalsIgnoreCase("coar-notify:ReviewAction")) {
-                /* new qa event ENRICH/MORE/REVIEW
-                 * itemService.addMetadata(context, item, "datacite",
-                    "relation", "isReviewedBy", null, this.getIsReviewedBy());
-                */
-                QAEvent qaEvent = new QAEvent(QAEvent.OPENAIRE_SOURCE,
-                    notification.getObject().getId(), item.getID().toString(), item.getName(),
-                    "ENRICH/MORE/REVIEW", 0d,
-                    "{\"abstracts[0]\": \"" + notification.getObject().getIetfCiteAs() + "\"}"
-                    , new Date());
-                qaEventService.store(context, qaEvent);
-                result = ActionStatus.CONTINUE;
-            }
-            if (this.getCoarNotifyType().equalsIgnoreCase("coar-notify:EndorsementAction")) {
-                // new qa event ENRICH/MORE/ENDORSEMENT
-                QAEvent qaEvent = new QAEvent(QAEvent.OPENAIRE_SOURCE,
-                    notification.getObject().getId(), item.getID().toString(), item.getName(),
-                    "ENRICH/MORE/ENDORSEMENT", 0d,
-                    "{\"abstracts[0]\": \"" + notification.getObject().getIetfCiteAs() + "\"}"
-                    , new Date());
-                qaEventService.store(context, qaEvent);
-                result = ActionStatus.CONTINUE;
-            }
-        }
+        QAEvent qaEvent = new QAEvent(QAEvent.COAR_NOTIFY,
+            notification.getObject().getId(), item.getID().toString(), item.getName(),
+            this.getQaEventTopic(), 0d,
+            "{\"abstracts[0]\": \"" + notification.getObject().getIetfCiteAs() + "\"}"
+            , new Date());
+        qaEventService.store(context, qaEvent);
+        result = ActionStatus.CONTINUE;
+
         return result;
     }
-
-    public String getActivityStreamType() {
-        return activityStreamType;
+    
+    public String getQaEventTopic() {
+        return qaEventTopic;
     }
 
-    public void setActivityStreamType(String activityStreamType) {
-        this.activityStreamType = activityStreamType;
-    }
-
-    public String getCoarNotifyType() {
-        return coarNotifyType;
-    }
-
-    public void setCoarNotifyType(String coarNotifyType) {
-        this.coarNotifyType = coarNotifyType;
+    public void setQaEventTopic(String qaEventTopic) {
+        this.qaEventTopic = qaEventTopic;
     }
 
 }

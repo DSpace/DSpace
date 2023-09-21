@@ -105,7 +105,9 @@
                     <property name="actionSendFilter" value="william_welling@harvard.edu" />
                     <property name="actionSendEmailTextFile" value="coar_notify_reviewed" />
                 </bean>
-                <bean class="org.dspace.app.ldn.action.LDNCorrectionAction"></bean>
+                <bean class="org.dspace.app.ldn.action.LDNCorrectionAction">
+                	<property name="qaEventTopic" value="ENRICH/MORE/REVIEW"/>
+                </bean>
             </list>
         </property>
     </bean>
@@ -140,7 +142,9 @@
                     <property name="actionSendFilter" value="william_welling@harvard.edu" />
                     <property name="actionSendEmailTextFile" value="coar_notify_endorsed" />
                 </bean>
-                <bean class="org.dspace.app.ldn.action.LDNCorrectionAction"></bean>                
+                <bean class="org.dspace.app.ldn.action.LDNCorrectionAction">
+                	<property name="qaEventTopic" value="ENRICH/MORE/ENDORSEMENT"/>
+                </bean>                
             </list>
         </property>
     </bean>
