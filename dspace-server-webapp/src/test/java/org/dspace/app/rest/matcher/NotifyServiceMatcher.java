@@ -38,13 +38,13 @@ public class NotifyServiceMatcher {
     }
 
     public static Matcher<? super Object> matchNotifyService(String name, String description, String url,
-                                                             String ldnUrl, boolean status) {
+                                                             String ldnUrl, boolean enabled) {
         return allOf(
             hasJsonPath("$.name", is(name)),
             hasJsonPath("$.description", is(description)),
             hasJsonPath("$.url", is(url)),
             hasJsonPath("$.ldnUrl", is(ldnUrl)),
-            hasJsonPath("$.status", is(status)),
+            hasJsonPath("$.enabled", is(enabled)),
             hasJsonPath("$._links.self.href", containsString("/api/ldn/ldnservices/"))
         );
     }
@@ -60,10 +60,10 @@ public class NotifyServiceMatcher {
     }
 
     public static Matcher<? super Object> matchNotifyService(int id, String name, String description,
-                                                             String url, String ldnUrl, boolean status) {
+                                                             String url, String ldnUrl, boolean enabled) {
         return allOf(
             hasJsonPath("$.id", is(id)),
-            matchNotifyService(name, description, url, ldnUrl, status),
+            matchNotifyService(name, description, url, ldnUrl, enabled),
             hasJsonPath("$._links.self.href", startsWith(REST_SERVER_URL)),
             hasJsonPath("$._links.self.href", endsWith("/api/ldn/ldnservices/" + id))
         );

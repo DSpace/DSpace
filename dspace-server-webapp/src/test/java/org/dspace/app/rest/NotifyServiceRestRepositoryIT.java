@@ -153,7 +153,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         notifyServiceRest.setDescription("service description");
         notifyServiceRest.setUrl("service url");
         notifyServiceRest.setLdnUrl("service ldn url");
-        notifyServiceRest.setStatus(false);
+        notifyServiceRest.setEnabled(false);
 
         AtomicReference<Integer> idRef = new AtomicReference<Integer>();
         String authToken = getAuthToken(admin.getEmail(), password);
@@ -240,7 +240,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                                 .withName("service name")
                                 .withUrl("service url")
                                 .withLdnUrl("service ldn url")
-                                .withStatus(false)
+                                .isEnabled(false)
                                 .build();
         context.restoreAuthSystemState();
 
@@ -330,7 +330,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                                 .withDescription("service description")
                                 .withUrl("service url")
                                 .withLdnUrl("service ldn url")
-                                .withStatus(false)
+                                .isEnabled(false)
                                 .build();
         context.restoreAuthSystemState();
 
@@ -3199,12 +3199,12 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                                 .withDescription("service description")
                                 .withUrl("service url")
                                 .withLdnUrl("service ldn url")
-                                .withStatus(true)
+                                .isEnabled(true)
                                 .build();
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("/status", "false");
+        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("/enabled", "false");
         ops.add(inboundReplaceOperation);
         String patchBody = getPatchContent(ops);
 
@@ -3234,7 +3234,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("/status", "test");
+        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("/enabled", "test");
         ops.add(inboundReplaceOperation);
         String patchBody = getPatchContent(ops);
 

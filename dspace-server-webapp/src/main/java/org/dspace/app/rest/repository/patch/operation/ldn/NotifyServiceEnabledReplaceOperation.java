@@ -19,19 +19,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Implementation for NotifyService Status Replace patches.
+ * Implementation for NotifyService Enabled Replace patches.
  *
  * Example: <code>
  * curl -X PATCH http://${dspace.server.url}/api/ldn/ldnservices/<:id-notifyService> -H "
  * Content-Type: application/json" -d '
  * [{
  *  "op": "replace",
- *  "path": "/status"
+ *  "path": "/enabled"
  *  }]'
  * </code>
  */
 @Component
-public class NotifyServiceStatusReplaceOperation extends PatchOperation<NotifyServiceEntity> {
+public class NotifyServiceEnabledReplaceOperation extends PatchOperation<NotifyServiceEntity> {
 
     @Autowired
     private NotifyService notifyService;
@@ -39,21 +39,21 @@ public class NotifyServiceStatusReplaceOperation extends PatchOperation<NotifySe
     @Autowired
     private NotifyServicePatchUtils notifyServicePatchUtils;
 
-    private static final String OPERATION_PATH = "/status";
+    private static final String OPERATION_PATH = "/enabled";
 
     @Override
     public NotifyServiceEntity perform(Context context, NotifyServiceEntity notifyServiceEntity, Operation operation)
         throws SQLException {
         checkOperationValue(operation.getValue());
-        Boolean status = getBooleanOperationValue(operation.getValue());
+        Boolean enabled = getBooleanOperationValue(operation.getValue());
 
         if (supports(notifyServiceEntity, operation)) {
-            notifyServiceEntity.setStatus(status);
+            notifyServiceEntity.setEnabled(enabled);
             notifyService.update(context, notifyServiceEntity);
             return notifyServiceEntity;
         } else {
             throw new DSpaceBadRequestException(
-                "NotifyServiceStatusReplaceOperation does not support this operation");
+                "NotifyServiceEnabledReplaceOperation does not support this operation");
         }
     }
 

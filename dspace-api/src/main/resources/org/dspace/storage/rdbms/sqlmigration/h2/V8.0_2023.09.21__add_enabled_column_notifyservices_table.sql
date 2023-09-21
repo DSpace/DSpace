@@ -7,7 +7,7 @@
 --
 
 -----------------------------------------------------------------------------------
--- edit notifyservice table add status column
+-- edit notifyservice table add enabled column
 -----------------------------------------------------------------------------------
 
-ALTER TABLE notifyservice ADD COLUMN status BOOLEAN DEFAULT TRUE NOT NULL;
+ALTER TABLE notifyservice ADD COLUMN enabled BOOLEAN DEFAULT TRUE NOT NULL;

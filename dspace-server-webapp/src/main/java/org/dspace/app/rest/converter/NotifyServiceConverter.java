@@ -37,7 +37,7 @@ public class NotifyServiceConverter implements DSpaceConverter<NotifyServiceEnti
         notifyServiceRest.setDescription(obj.getDescription());
         notifyServiceRest.setUrl(obj.getUrl());
         notifyServiceRest.setLdnUrl(obj.getLdnUrl());
-        notifyServiceRest.setStatus(obj.getStatus());
+        notifyServiceRest.setEnabled(obj.isEnabled());
 
         if (obj.getInboundPatterns() != null) {
             notifyServiceRest.setNotifyServiceInboundPatterns(

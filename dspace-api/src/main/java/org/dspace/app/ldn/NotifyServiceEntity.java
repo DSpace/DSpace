@@ -53,8 +53,8 @@ public class NotifyServiceEntity implements ReloadableEntity<Integer> {
     @OneToMany(mappedBy = "notifyService")
     private List<NotifyServiceOutboundPattern> outboundPatterns;
 
-    @Column(name = "status")
-    private Boolean status = true;
+    @Column(name = "enabled")
+    private Boolean enabled = true;
 
     public void setId(Integer id) {
         this.id = id;
@@ -122,11 +122,11 @@ public class NotifyServiceEntity implements ReloadableEntity<Integer> {
         return id;
     }
 
-    public Boolean getStatus() {
-        return status;
+    public Boolean isEnabled() {
+        return enabled;
     }
 
-    public void setStatus(boolean status) {
-        this.status = status;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }
