@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.authorization.impl;
 
+import java.sql.SQLException;
+
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.model.BaseObjectRest;
@@ -16,8 +18,6 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.sql.SQLException;
 
 @Component
 @AuthorizationFeatureDocumentation(name = CoarNotifyLdnEnabled.NAME,
@@ -35,6 +35,6 @@ public class CoarNotifyLdnEnabled implements AuthorizationFeature {
 
     @Override
     public String[] getSupportedTypes() {
-        return new String[]{SiteRest.CATEGORY+"."+SiteRest.NAME};
+        return new String[]{SiteRest.CATEGORY + "." + SiteRest.NAME};
     }
 }
