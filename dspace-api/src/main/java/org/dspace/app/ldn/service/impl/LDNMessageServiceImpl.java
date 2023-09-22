@@ -8,6 +8,8 @@
 package org.dspace.app.ldn.service.impl;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -93,20 +95,15 @@ public class LDNMessageServiceImpl implements LDNMessageService {
         }
         ldnMessage.setType(StringUtils.joinWith(",", notification.getType()));
         Set<String> notificationType = notification.getType();
-        if (notificationType != null) {
-            String[] notificationTypeArray = notificationType.stream().toArray(String[]::new);
-            if (notificationTypeArray.length >= 2) {
-                ldnMessage.setActivityStreamType(notificationTypeArray[0]);
-                ldnMessage.setCoarNotifyType(notificationTypeArray[1]);
-            } else {
-                log.warn("LDN Message from Notification won't be typed because notification has incorrect "
-                    + "Type attribute");
-                log.warn(message);
-            }
-        } else {
-            log.warn("LDN Message from Notification won't be typed because notification has incorrect Type attribute");
-            log.warn(message);
+        if (notificationType == null) {
+            log.error("Notification has no notificationType attribute! " + notification);
+            return null;
         }
+        ArrayList<String> notificationTypeArrayList = new ArrayList<String>(notificationType);
+        // sorting the list
+        Collections.sort(notificationTypeArrayList);
+        ldnMessage.setActivityStreamType(notificationTypeArrayList.get(0));
+        ldnMessage.setCoarNotifyType(notificationTypeArrayList.get(1));
         ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_QUEUED);
         ldnMessage.setQueueTimeout(new Date());
 
@@ -138,7 +135,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
 
         return null;
     }
-    
+
     private NotifyServiceEntity findNotifyService(Context context, Service service) throws SQLException {
         return notifyServiceDao.findByLdnUrl(context, service.getInbox());
     }

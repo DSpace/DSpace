@@ -451,6 +451,29 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
     }
 
+    @Test
+    public void testImportFromFileEventMoreReview() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item firstItem = createItem("Test item", "123456789/99998");
+        Item secondItem = createItem("Test item 2", "123456789/99999");
+
+        context.restoreAuthSystemState();
+
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+
+        String[] args = new String[] { "import-openaire-events", "-f", getFileLocation("event-more-review.json") };
+        ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl);
+
+        assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 1L)));
+
+        assertThat(qaEventService.findAllTopics(0, 20), contains(
+            QATopicMatcher.with("ENRICH/MORE/REVIEW", 1L)));
+
+        verifyNoInteractions(mockBrokerClient);
+    }
+
     private Item createItem(String title, String handle) {
         return ItemBuilder.createItem(context, collection)
             .withTitle(title)

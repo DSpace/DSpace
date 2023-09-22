@@ -41,7 +41,11 @@ public class SuggestionTarget {
      * @return the source:uuid of the wrapped item
      */
     public String getID() {
-        return source + ":" + target.getID();
+        if (target != null) {
+            return source + ":" + target.getID();
+        } else {
+            return source + ":null";
+        }
     }
 
     public Item getTarget() {

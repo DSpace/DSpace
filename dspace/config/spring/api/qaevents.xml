@@ -23,6 +23,8 @@
                <entry key="ENRICH/MORE/PROJECT" value-ref="ProjectLinkedEntityAction" />
                <entry key="ENRICH/MISSING/PROJECT" value-ref="ProjectLinkedEntityAction" />
                <entry key="ENRICH/MISSING/ABSTRACT" value-ref="AbstractMetadataAction" />
+               <entry key="ENRICH/MORE/REVIEW" value-ref="AddReviewMetadataAction" />
+               <entry key="ENRICH/MORE/ENDORSEMENT" value-ref="AddEndorsedMetadataAction"/>
                <entry key="ENRICH/MORE/PID" value-ref="PIDMetadataAction" />
                <entry key="ENRICH/MISSING/PID" value-ref="PIDMetadataAction" />
             </map>   
@@ -51,6 +53,12 @@
      </bean>
      <bean id="AbstractMetadataAction" class="org.dspace.qaevent.action.QAOpenaireSimpleMetadataAction">
         <property name="metadata" value="dc.description.abstract" />
+     </bean>
+     <bean id="AddReviewMetadataAction" class="org.dspace.qaevent.action.QAOpenaireSimpleMetadataAction">
+        <property name="metadata" value="datacite.relation.isReviewedBy" />
+     </bean>
+     <bean id="AddEndorsedMetadataAction" class="org.dspace.qaevent.action.QAOpenaireSimpleMetadataAction">
+        <property name="metadata" value="notify.relation.endorsedBy"/>
      </bean>
      <!-- Add a new identifier to the given item, using the defined types mapping -->
      <bean id="PIDMetadataAction" class="org.dspace.qaevent.action.QAOpenaireMetadataMapAction">

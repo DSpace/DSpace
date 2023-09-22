@@ -30,6 +30,7 @@ public class QAEvent {
     public static final String DISCARDED = "discarded";
 
     public static final String OPENAIRE_SOURCE = "openaire";
+    public static final String COAR_NOTIFY = "coar-notify";
 
     private String source;
 
