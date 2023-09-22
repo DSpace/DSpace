@@ -53,14 +53,19 @@ public class SubmissionConfigConsumer implements Consumer {
                     // that info isn't indexed yet, we need to force it
                     DSpaceObject subject = event.getSubject(ctx);
                     Collection collectionFromDSOSubject = (Collection) subject;
-
                     indexer.indexContent(ctx, new IndexableCollection (collectionFromDSOSubject), true, false, false);
                     indexer.commit();
+
+                    log.debug("SubmissionConfigConsumer occured: " + event.toString());
+                    // reload submission configurations
+                    SubmissionServiceFactory.getInstance().getSubmissionConfigService().reload();
+                    break;
+
                 default:
                     log.debug("SubmissionConfigConsumer occured: " + event.toString());
                     // reload submission configurations
                     SubmissionServiceFactory.getInstance().getSubmissionConfigService().reload();
-                break;
+                    break;
             }
         }
     }
