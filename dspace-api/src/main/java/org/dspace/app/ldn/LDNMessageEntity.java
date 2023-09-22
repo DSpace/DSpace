@@ -21,7 +21,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.ReloadableEntity;
 
 /**
- * Class representing ldnMessages stored in the DSpace system and, when locally resolvable, 
+ * Class representing ldnMessages stored in the DSpace system and, when locally resolvable,
  * some information are stored as dedicated attributes.
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
@@ -190,7 +190,7 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
 
     /**
      * 
-     * @return This property is used when the notification is a direct response to a previous notification; 
+     * @return This property is used when the notification is a direct response to a previous notification;
      * contains an {@link org.dspace.app.ldn.LDNMessageEntity#inReplyTo id}
      */
     public LDNMessageEntity getInReplyTo() {

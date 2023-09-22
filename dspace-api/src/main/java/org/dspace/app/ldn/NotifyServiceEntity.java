@@ -54,7 +54,7 @@ public class NotifyServiceEntity implements ReloadableEntity<Integer> {
     private List<NotifyServiceOutboundPattern> outboundPatterns;
 
     @Column(name = "enabled")
-    private Boolean enabled = true;
+    private boolean enabled = false;
 
     public void setId(Integer id) {
         this.id = id;
@@ -122,7 +122,7 @@ public class NotifyServiceEntity implements ReloadableEntity<Integer> {
         return id;
     }
 
-    public Boolean isEnabled() {
+    public boolean isEnabled() {
         return enabled;
     }
 

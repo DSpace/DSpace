@@ -315,7 +315,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
-                "service description replaced", "service url", "service ldn url", true))
+                "service description replaced", "service url", "service ldn url", false))
             );
     }
 
@@ -405,7 +405,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
-                "service description", "add service url", "service ldn url", true))
+                "service description", "add service url", "service ldn url", false))
             );
     }
 
@@ -447,6 +447,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                                 .withDescription("service description")
                                 .withUrl("service url")
                                 .withLdnUrl("service ldn url")
+                                .isEnabled(true)
                                 .build();
         context.restoreAuthSystemState();
 

@@ -10,4 +10,4 @@
 -- edit notifyservice table add enabled column
 -----------------------------------------------------------------------------------
 
-ALTER TABLE notifyservice ADD COLUMN enabled BOOLEAN DEFAULT TRUE NOT NULL;
+ALTER TABLE notifyservice ADD COLUMN enabled BOOLEAN NOT NULL;
