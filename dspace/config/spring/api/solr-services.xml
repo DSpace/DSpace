@@ -33,7 +33,7 @@
 
     <bean id='SolrStatisticsCore'
 	  class='org.dspace.statistics.SolrStatisticsCore'
-	  autowire-candidate='true'/>
+	  autowire-candidate='true'>
         <description>
           Store and access DSpace usage statistics records in Solr.
         </description>
