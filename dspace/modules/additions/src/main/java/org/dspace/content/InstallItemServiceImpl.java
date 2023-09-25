@@ -206,12 +206,12 @@ public class InstallItemServiceImpl implements InstallItemService {
         // set owning collection
         item.setOwningCollection(is.getCollection());
 
-        // Begin UMD customization
+        // UMD Customization
         // add additional mapped collections
         for (Collection collection : is.getMappedCollections()) {
             collectionService.addItem(c, collection, item);
         }
-        // End UMD customization
+        // End UMD Customization
 
 
         // set in_archive=true

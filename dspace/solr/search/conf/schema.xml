@@ -272,12 +272,12 @@
     <field name="location.comm" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
     <field name="location.coll" type="lowerCaseSort" indexed="true" stored="true" multiValued="true" required="false" omitNorms="true" />
     <field name="location.parent" type="lowerCaseSort" indexed="true" stored="true" multiValued="false" required="false" omitNorms="true" />
-      
-    <!-- Begin UMD Customization for LIBDRUM-664 -->
+
+    <!-- UMD Customization -->
     <!-- Community Group information of Community objects -->
     <field name="community_group" type="lowerCaseSort" indexed="true" stored="true" multiValued="false" required="false" omitNorms="true" />
-    <!-- End UMD Customization for LIBDRUM-664 -->
-    
+    <!-- End UMD Customization -->
+
     <field name="a_spell" type="textSpell" />
     <copyField source="fulltext" dest="a_spell" />
     <copyField source="fulltext" dest="fulltext_hl" />

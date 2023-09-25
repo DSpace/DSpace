@@ -562,6 +562,7 @@
                                     </descriptors>
                                 </configuration>
                             </execution>
+                            <!-- UMD Customization -->
                             <!--
                                 Test configuration for dspace/modules/additions.
                                 This "additions" module needs a separate test environment because it
@@ -580,6 +581,7 @@
                                     </descriptors>
                                 </configuration>
                             </execution>
+                            <!-- End UMD Customization -->
                         </executions>
                         <inherited>false</inherited>
                     </plugin>

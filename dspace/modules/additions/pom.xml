@@ -57,6 +57,7 @@
                </execution>
             </executions>
          </plugin>
+         <!-- UMD Customization -->
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-compiler-plugin</artifactId>
@@ -80,6 +81,7 @@
                </annotationProcessorPaths>
             </configuration>
          </plugin>
+         <!-- End UMD Customization -->
       </plugins>
    </build>
 
@@ -112,10 +114,12 @@
          </activation>
          <build>
             <plugins>
+               <!-- UMD Customization -->
                <!-- Unit Testing setup: This plugin unzips the
                    'testEnvironment-additions.zip' file (created by dspace-parent POM), into
                    the 'target/testing/' folder, to create a test
                    install of DSpace, against which Tests can be run. -->
+               <!-- End UMD Customization -->
                <plugin>
                   <artifactId>maven-dependency-plugin</artifactId>
                   <configuration>
@@ -126,7 +130,9 @@
                            <artifactId>dspace-parent</artifactId>
                            <version>${project.version}</version>
                            <type>zip</type>
+                           <!-- UMD Customization -->
                            <classifier>testEnvironment-additions</classifier>
+                           <!-- End UMD Customization -->
                         </artifactItem>
                      </artifactItems>
                   </configuration>
@@ -181,10 +187,12 @@
          </activation>
          <build>
             <plugins>
+               <!-- UMD Customization -->
                <!-- Integration Testing setup: This plugin unzips the
                     'testEnvironment-additions.zip' file (created by dspace-parent POM), into
                     the 'target/testing/' folder, to essentially create a test
                     install of DSpace, against which Tests can be run. -->
+               <!-- End UMD Customization -->
                <plugin>
                   <artifactId>maven-dependency-plugin</artifactId>
                   <configuration>
@@ -195,7 +203,9 @@
                            <artifactId>dspace-parent</artifactId>
                            <version>${project.version}</version>
                            <type>zip</type>
+                           <!-- UMD Customization -->
                            <classifier>testEnvironment-additions</classifier>
+                           <!-- End UMD Customization -->
                         </artifactItem>
                      </artifactItems>
                   </configuration>
@@ -277,6 +287,7 @@
             </exclusion>
          </exclusions>
       </dependency>
+      <!-- UMD Customization -->
       <dependency>
          <groupId>dom4j</groupId>
          <artifactId>dom4j</artifactId>
@@ -293,6 +304,7 @@
             </exclusion>
           </exclusions>
       </dependency>
+      <!-- End UMD Customization -->
       <dependency>
          <groupId>org.apache.solr</groupId>
          <artifactId>solr-solrj</artifactId>
@@ -313,11 +325,13 @@
             </exclusion>
          </exclusions>
       </dependency>
+      <!-- UMD Customization -->
       <dependency>
          <groupId>org.marc4j</groupId>
          <artifactId>marc4j</artifactId>
          <version>2.9.2</version>
       </dependency>
+      <!-- End UMD Customization -->
       <dependency>
          <groupId>org.apache.lucene</groupId>
          <artifactId>lucene-analyzers-icu</artifactId>
@@ -340,7 +354,9 @@
       </dependency>
       <dependency>
          <groupId>org.hamcrest</groupId>
+         <!-- UMD Customization -->
          <artifactId>hamcrest-all</artifactId>
+         <!-- End UMD Customization -->
          <scope>test</scope>
       </dependency>
       <dependency>
@@ -353,11 +369,13 @@
          <artifactId>mockito-inline</artifactId>
          <scope>test</scope>
       </dependency>
+      <!-- UMD Customization -->
       <dependency>
          <groupId>org.springframework</groupId>
          <artifactId>spring-test</artifactId>
          <scope>test</scope>
       </dependency>
+      <!-- End UMD Customization -->
    </dependencies>
 
 </project>

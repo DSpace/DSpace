@@ -18,13 +18,13 @@
     <!-- for handle "default". -->
     <submission-map>
         <!-- Default submission process -->
-        <!-- UMD customization -->
+        <!-- UMD Customization -->
         <!-- <name-map collection-handle="default" submission-name="traditional"/> -->
         <name-map collection-handle="default" submission-name="umd-submission"/>
 
         <!-- Enable separate submisson process for  "Minority Health and Health Equity Archive" collection -->
         <name-map collection-handle="1903/21769" submission-name="MHHEA-submission" />
-        <!-- End UMD customization -->
+        <!-- End UMD Customization -->
 
         <!-- Sample Entities Collection configuration based on the demo Entities dataset available at:
              https://github.com/DSpace-Labs/AIP-Files/releases/tag/demo-entities-data
@@ -216,7 +216,7 @@
             <type>sherpaPolicy</type>
         </step-definition>
 
-        <!-- UMD customization -->
+        <!-- UMD Customization -->
         <step-definition id="umdDescribe" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
@@ -237,7 +237,7 @@
             <type>submission-form</type>
             <scope>submission</scope>
         </step-definition>
-        <!-- End UMD customization -->
+        <!-- End UMD Customization -->
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -394,7 +394,7 @@
             <step id="openAIREOrganizationForm"/>
         </submission-process>
 
-        <!-- UMD customization -->
+        <!-- UMD Customization -->
         <!-- UMD default submission process -->
         <submission-process name="umd-submission">
             <step id="collection"/>
@@ -415,7 +415,7 @@
             <step id="cclicense"/>
             <step id="license"/>
         </submission-process> -->
-        <!-- End UMD customization -->
+        <!-- End UMD Customization -->
     </submission-definitions>
 
 </item-submission>

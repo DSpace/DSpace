@@ -1712,7 +1712,7 @@
                 </field>
             </row>
         </form>
-        <!-- End UMD customization -->
+        <!-- End UMD Customization -->
 
     </form-definitions>
 
@@ -2352,7 +2352,7 @@
             </pair>
         </value-pairs>
 
-        <!--  UMD customization -->
+        <!--  UMD Customization -->
         <value-pairs value-pairs-name="yes_no" dc-term="type">
             <pair>
                 <displayed-value>Yes</displayed-value>
@@ -2425,7 +2425,7 @@
                 <stored-value>Other</stored-value>
             </pair>
         </value-pairs>
-        <!-- End UMD customization -->
+        <!-- End UMD Customization -->
 
     </form-value-pairs>
 

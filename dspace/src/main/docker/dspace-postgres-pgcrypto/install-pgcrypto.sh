@@ -16,7 +16,9 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<-EOSQL
   CREATE EXTENSION pgcrypto SCHEMA extensions;
   -- Update your database's "search_path" to also search the new "extensions" schema.
   -- You are just appending it on the end of the existing comma-separated list.
+  -- UMD Customization
   ALTER DATABASE drum SET search_path TO "\$user",public,extensions;
+  -- End UMD Customization
   -- Grant rights to call functions in the extensions schema to your dspace user
   GRANT USAGE ON SCHEMA extensions TO $POSTGRES_USER;
 EOSQL

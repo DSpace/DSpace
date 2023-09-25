@@ -76,9 +76,9 @@
         <property name="map">
             <map>
                 <entry key="upload" value-ref="uploadConfigurationDefault" />
-                <!-- Customization for LIBDRUM-684 -->
+                <!-- UMD Customization -->
                 <entry key="optionalUpload" value-ref="uploadConfigurationOptional" />
-                <!-- Customization for LIBDRUM-684 -->
+                <!-- End UMD Customization -->
             </map>
         </property>
     </bean>

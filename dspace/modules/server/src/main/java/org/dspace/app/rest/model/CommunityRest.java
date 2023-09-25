@@ -15,14 +15,32 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-                @LinkRest(name = CommunityRest.COLLECTIONS, method = "getCollections"),
-                @LinkRest(name = CommunityRest.LOGO, method = "getLogo"),
-                @LinkRest(name = CommunityRest.SUBCOMMUNITIES, method = "getSubcommunities"),
-                @LinkRest(name = CommunityRest.PARENT_COMMUNITY, method = "getParentCommunity"),
-                // UMD Customization
-                @LinkRest(name = CommunityRest.COMMUNITY_GROUP, method = "getCommunityGroup"),
-                // End UMD CustomizationE
-                @LinkRest(name = CommunityRest.ADMIN_GROUP, method = "getAdminGroup")
+        @LinkRest(
+                name = CommunityRest.COLLECTIONS,
+                method = "getCollections"
+        ),
+        @LinkRest(
+                name = CommunityRest.LOGO,
+                method = "getLogo"
+        ),
+        @LinkRest(
+                name = CommunityRest.SUBCOMMUNITIES,
+                method = "getSubcommunities"
+        ),
+        @LinkRest(
+                name = CommunityRest.PARENT_COMMUNITY,
+                method = "getParentCommunity"
+        ),
+        // UMD Customization
+        @LinkRest(
+                name = CommunityRest.COMMUNITY_GROUP,
+                method = "getCommunityGroup"
+        ),
+        // End UMD Customization
+        @LinkRest(
+                name = CommunityRest.ADMIN_GROUP,
+                method = "getAdminGroup"
+        )
 })
 public class CommunityRest extends DSpaceObjectRest {
     public static final String NAME = "community";
@@ -34,9 +52,9 @@ public class CommunityRest extends DSpaceObjectRest {
     public static final String SUBCOMMUNITIES = "subcommunities";
     public static final String PARENT_COMMUNITY = "parentCommunity";
     public static final String ADMIN_GROUP = "adminGroup";
-    // UMD Customization for LIBDRUM-701
+    // UMD Customization
     public static final String COMMUNITY_GROUP = "communityGroup";
-    // End UMD Customization for LIBDRUM-701
+    // End UMD Customization
 
     @Override
     public String getCategory() {

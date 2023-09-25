@@ -9,9 +9,13 @@ package org.dspace.content;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+// UMD Customization
 import java.util.HashSet;
+// End UMD Customization
 import java.util.List;
+// UMD Customization
 import java.util.Set;
+// End UMD Customization
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -65,7 +69,7 @@ public class WorkspaceItem
     @JoinColumn(name = "collection_id")
     private Collection collection;
 
-    // Begin UMD Customization
+    // UMD Customization
     // To support mapping multiple collection
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "collection2workspaceitem", joinColumns = {
@@ -76,10 +80,10 @@ public class WorkspaceItem
     @Column(name = "multiple_titles")
     private boolean multipleTitles = false;
 
-    // Customization for LIBDRUM-628
+    // UMD Customization
     @Column(name = "is_dataset")
     private boolean isDataset = false;
-    // End customization for LIBDRUM-628
+    // UMD Customization
 
     @Column(name = "published_before")
     private boolean publishedBefore = false;
@@ -231,7 +235,7 @@ public class WorkspaceItem
         multipleTitles = b;
     }
 
-//    // Customization for LIBDRUM-628
+//    // UMD Customization
 //    @Override
 //    public boolean isDataset() {
 //        return isDataset;
@@ -241,7 +245,7 @@ public class WorkspaceItem
 //    public void setDataset(boolean b) {
 //        isDataset = b;
 //    }
-//    // End customization for LIBDRUM-628
+//    // End UMD Customization
 
     @Override
     public boolean isPublishedBefore() {
@@ -265,7 +269,7 @@ public class WorkspaceItem
         supervisorGroups.add(group);
     }
 
-    // Begin UMD Customization
+    // UMD Customization
     @Override
     public List<Collection> getMappedCollections() {
         return new ArrayList<>(mappedCollections);

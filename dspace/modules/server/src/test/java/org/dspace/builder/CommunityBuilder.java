@@ -168,10 +168,10 @@ public class CommunityBuilder extends AbstractDSpaceObjectBuilder<Community> {
         }
     }
 
-    // UMD Customization for LIBDRUM-664
+    // UMD Customization
     public CommunityBuilder withCommunityGroup(final int communityGroupId) {
         community.setGroupID(communityGroupId);
         return this;
     }
-    // End UMD Customization for LIBDRUM-664
+    // End UMD Customization
 }

@@ -7,7 +7,9 @@
 #
 
 # This will be deployed as dspace/dspace-postgres-pgcrpyto:latest
+# UMD Customization
 FROM postgres:12.14
+# End UMD Customization
 
 ENV POSTGRES_DB dspace
 ENV POSTGRES_USER dspace

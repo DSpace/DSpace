@@ -93,7 +93,7 @@
         <mapping class="org.dspace.orcid.OrcidHistory" />
         <mapping class="org.dspace.orcid.OrcidToken"/>
 
-        <!-- Begin UMD Customization -->
+        <!-- UMD Customization -->
         <!-- Mappings for UMD entities -->
         <mapping class="org.dspace.content.EtdUnit"/>
         <mapping class="org.dspace.eperson.Unit"/>

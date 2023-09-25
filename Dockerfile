@@ -8,7 +8,9 @@
 ARG JDK_VERSION=11
 
 # Step 1 - Run Maven Build
+# UMD Customization
 FROM docker.lib.umd.edu/drum-dependencies-7_x:latest as build
+# End UMD Customization
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 # The dspace-installer directory will be written to /install
@@ -55,12 +57,15 @@ COPY --from=ant_build /dspace $DSPACE_INSTALL
 # Expose Tomcat port and AJP port
 EXPOSE 8080 8009
 # Give java extra memory (2GB)
+# UMD Customization
 ENV DSPACE_INSTALL=/dspace \
     JAVA_OPTS=-Xmx2000m \
     TZ=America/New_York
+# End UMD Customization
 
 # Link the DSpace 'server' webapp into Tomcat's webapps directory.
 # This ensures that when we start Tomcat, it runs from /server path (e.g. http://localhost:8080/server/)
+# UMD Customization
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
         rsync \
@@ -76,6 +81,7 @@ RUN apt-get update && \
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
     rm -rf /usr/local/tomcat/webapps/* && \
     ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/server
+# End UMD Customization
 # If you wish to run "server" webapp off the ROOT path, then comment out the above RUN, and uncomment the below RUN.
 # You also MUST update the 'dspace.server.url' configuration to match.
 # Please note that server webapp should only run on one path at a time.

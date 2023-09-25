@@ -32,9 +32,11 @@
 # Windows note: Please remember to use forward slashes for all paths (e.g. C:/dspace)
 dspace.dir=/dspace
 
+# UMD Customization
 dspace.hostname = localhost
 dspace.baseUrl = http://localhost:8080
 dspace.url = ${dspace.baseUrl}
+# End UMD Customization
 
 # Public URL of DSpace backend ('server' webapp). May require a port number if not using standard ports (80 or 443)
 # DO NOT end it with '/'.
@@ -42,7 +44,9 @@ dspace.url = ${dspace.baseUrl}
 # NOTE: This URL must be accessible to all DSpace users (should not use 'localhost' in Production)
 # and is usually "synced" with the "rest" section in the DSpace User Interface's config.*.yml.
 # It corresponds to the URL that you would type into your browser to access the REST API.
+# UMD Customization
 dspace.server.url = ${dspace.baseUrl}/server
+# End UMD Customization
 
 # Public URL of DSpace frontend (Angular UI). May require a port number if not using standard ports (80 or 443)
 # DO NOT end it with '/'.
@@ -52,15 +56,18 @@ dspace.server.url = ${dspace.baseUrl}/server
 dspace.ui.url = http://localhost:4000
 
 # Name of the site
+# UMD Customization
 dspace.name = Digital Repository at the University of Maryland (DRUM)
+# End UMD Customization
 
 # Assetstore configurations have moved to config/modules/assetstore.cfg
 # and config/spring/api/bitstore.xml.
 # Additional storage options (e.g. Amazon S3) are available in `assetstore.cfg`
 # assetstore.dir = ${dspace.dir}/assetstore
 
-# UMD Customization - Overriding assetstore.dir and assetstore.index.primary
-# properties here, to avoid having to modify config/modules/assetstore.cfg
+# UMD Customization
+# Overriding assetstore.dir and assetstore.index.primary properties here,
+# to avoid having to modify config/modules/assetstore.cfg
 assetstore.dir.1 = ${dspace.dir}/assetstore1
 assetstore.dir.2 = ${dspace.dir}/assetstore2
 assetstore.dir.3 = ${dspace.dir}/assetstore3
@@ -75,7 +82,9 @@ assetstore.index.primary = 0
 # Solr server/webapp.
 # DSpace uses Solr for all search/browse capability (and for usage statistics).
 # Since DSpace 7, SOLR must be installed as a stand-alone service
+# UMD Customization
 solr.server=http://dspacesolr:8983/solr
+# End UMD Customization
 
 # Solr core name prefix.
 # If you connect multiple instances of DSpace to a single Solr instance, you
@@ -92,7 +101,9 @@ solr.server=http://dspacesolr:8983/solr
 # URL for connecting to database
 #    * Postgres template: jdbc:postgresql://localhost:5432/dspace
 #    * Oracle template (DEPRECATED): jdbc:oracle:thin:@//localhost:1521/xe
+# UMD Customization
 db.url=jdbc:postgresql://dspacedb:5432/drum
+# End UMD Customization
 
 # JDBC Driver
 #    * For Postgres: org.postgresql.Driver
@@ -105,8 +116,10 @@ db.driver = org.postgresql.Driver
 db.dialect = org.hibernate.dialect.PostgreSQL94Dialect
 
 # Database username and password
+# UMD Customization
 db.username=drum
 db.password=drum
+# End UMD Customization
 
 # Database Schema name
 #    * For Postgres, this is often "public" (default schema)
@@ -133,35 +146,49 @@ db.schema = public
 #######################
 
 # SMTP mail server (allows DSpace to send email notifications)
+# UMD Customization
 mail.server = localhost
+# End UMD Customization
 
 # SMTP mail server authentication username and password (if required)
 #mail.server.username = myusername
 #mail.server.password = mypassword
 
 # SMTP mail server alternate port (defaults to 25)
+# UMD Customization
 mail.server.port = 25
+# End UMD Customization
 
 # From address for mail
 # All mail from the DSpace site will use this 'from' address
+# UMD Customization
 mail.from.address = drum@drumlocal
+# End UMD Customization
 
 # When feedback is submitted via the Feedback form, it is sent to this address
 # Currently limited to one recipient!
+# UMD Customization
 feedback.recipient = mohideen@umd.edu
+# End UMD Customization
 
 # General site administration (Webmaster) e-mail
+# UMD Customization
 mail.admin = mohideen@umd.edu
+# End UMD Customization
 
 # Helpdesk E-mail
 #mail.helpdesk = ${mail.admin}
 #mail.helpdesk.name = Help Desk
 
 # Recipient for server errors and alerts (defaults to mail.admin)
+# UMD Customization
 alert.recipient = mohideen@umd.edu
+# End UMD Customization
 
 # Recipient for new user registration emails (defaults to unspecified)
+# UMD Customization
 registration.notify = mohideen@umd.edu
+# End UMD Customization
 
 
 ########################
@@ -179,15 +206,20 @@ registration.notify = mohideen@umd.edu
 # after registering with handle.net by uncommenting one of the following
 # lines, depending if you prefer to use https or http:
 # handle.canonical.prefix = https://hdl.handle.net/
+# UMD Customization
 handle.canonical.prefix = http://hdl.handle.net/
+# End UMD Customization
+
 #
 # Note that this will not alter dc.identifier.uri metadata for existing
 # items (only for subsequent submissions).
 
 # CNRI Handle prefix
 # (Defaults to the reserved dummy/fake prefix of 123456789)
+# UMD Customization
 handle.prefix = 123456789
 handle.dir = ${dspace.dir}/handle-server
+# End UMD Customization
 
 #######################
 # PROXY CONFIGURATION #
@@ -214,11 +246,13 @@ handle.dir = ${dspace.dir}/handle-server
 # You may also copy default settings from the corresponding authentication-*.cfg
 # configuration file and override them in this local.cfg.
 
+# UMD Customization
 # IP-based authentication/authorization. See authentication-ip.cfg for default configuration.
 plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.IPAuthentication
 
 # UMD-custom CAS authentication/authorization
 plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.CASAuthentication
+# End UMD Customization
 
 # LDAP authentication/authorization. See authentication-ldap.cfg for default configuration.
 #plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.LDAPAuthentication
@@ -238,8 +272,11 @@ plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authen
 
 # Authentication by Password (encrypted in DSpace's database). See authentication-password.cfg for default configuration.
 # Enabled by default in authentication.cfg
+# UMD Customization
 plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.PasswordAuthentication
+# End UMD Customization
 
+# UMD Customization
 ################################
 # AUTHENTICATION CONFIGURATION #
 ################################
@@ -268,6 +305,7 @@ drum.ldap.connect.timeout = 1000
 drum.ldap.read.timeout = 5000
 # Expiration time, in milliseconds, for the in-memory LDAP cache.
 drum.ldap.cacheTimeout = 300000
+# End UMD Customization
 
 #####################
 # REST API SETTINGS #
@@ -299,6 +337,7 @@ drum.ldap.cacheTimeout = 300000
 # Maximum size of a multipart request (i.e. max total size of all files in one request)
 #spring.servlet.multipart.max-request-size = 512MB
 
+# UMD Customization
 #####################
 # DOI CONFIGURATION #
 #####################
@@ -408,3 +447,4 @@ data.community.handle = 1903/27669
 # Equitable Access Policy
 # The handle for the "Equitable Access Policy" community
 equitable_access_policy.community.handle = 1903/29474
+# End UMD Customization

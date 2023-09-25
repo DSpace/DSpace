@@ -15,13 +15,17 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
+// UMD Customization
 import org.dspace.content.service.CommunityGroupService;
+// End UMD Customization
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.EntityService;
 import org.dspace.content.service.EntityTypeService;
+// UMD Customization
 import org.dspace.content.service.EtdUnitService;
+// End UMD Customization
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
@@ -185,7 +189,7 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
         return relationshipMetadataService;
     }
 
-    // Begin UMD Customization
+    // UMD Customization
     // Add EtdUnitService to the factory
     @Autowired(required = true)
     private EtdUnitService etdunitService;

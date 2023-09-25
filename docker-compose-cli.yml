@@ -2,7 +2,9 @@ version: "3.7"
 
 services:
   dspace-cli:
+    # UMD Customization
     image: "docker.lib.umd.edu/drum-cli:${DSPACE_VER:-7_x}"
+    # End UMD Customization
     container_name: dspace-cli
     build:
       context: .
@@ -15,7 +17,9 @@ services:
       # dspace.dir: Must match with Dockerfile's DSPACE_INSTALL directory.
       dspace__P__dir: /dspace
       # db.url: Ensure we are using the 'dspacedb' image for our database
+      # UMD Customization
       db__P__url: 'jdbc:postgresql://dspacedb:5432/drum'
+      # End UMD Customization
       # solr.server: Ensure we are using the 'dspacesolr' image for Solr
       solr__P__server: http://dspacesolr:8983/solr
     volumes:
@@ -24,7 +28,9 @@ services:
     # Mount local [src]/dspace/config/ to container. This syncs your local configs with container
     # NOTE: Environment variables specified above will OVERRIDE any configs in local.cfg or dspace.cfg
     - ./dspace/config:/dspace/config
+    # UMD Customization
     - ./dspace/src/main/docker-compose/local.cfg:/dspace/config/local.cfg
+    # End UMD Customization
     entrypoint: /dspace/bin/dspace
     command: help
     networks:

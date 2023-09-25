@@ -14,7 +14,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+// UMD Customization
 import org.apache.commons.lang.RandomStringUtils;
+// End UMD Customization
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;

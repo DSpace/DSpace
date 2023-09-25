@@ -705,7 +705,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         return communityDAO.countRows(context);
     }
 
-    // Begin UMD Customization
+    // UMD Customization
     @Override
     public List<Community> findByCommunityGroupTop(Context context, CommunityGroup group) throws SQLException {
         List<Community> topCommunities = findAllTop(context);

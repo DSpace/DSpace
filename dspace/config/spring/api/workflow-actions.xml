@@ -94,7 +94,7 @@
         <property name="requiresUI" value="false"/>
     </bean>
 
-    <!-- UMD customization -->
+    <!-- UMD Customization -->
     <bean id="equitableAccessCollectionMappingAPI"
         class="edu.umd.lib.dspace.xmlworkflow.state.actions.EquitableAccessCollectionMappingAction"
         scope="prototype"/>
@@ -114,5 +114,5 @@
         <property name="processingAction" ref="dataCommunityCollectionMappingAPI"/>
         <property name="requiresUI" value="false"/>
     </bean>
-    <!-- End UMD customization -->
+    <!-- End UMD Customization -->
 </beans>

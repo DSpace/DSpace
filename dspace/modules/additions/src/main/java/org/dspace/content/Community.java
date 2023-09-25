@@ -52,7 +52,7 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     @Column(name = "community_id", insertable = false, updatable = false)
     private Integer legacyId;
 
-    // Begin UMD Customization
+    // UMD Customization
     @Column(name = "group_id")
     private Integer groupId;
     // End UMD Customization
@@ -86,10 +86,10 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     @Transient
     protected transient CommunityService communityService;
 
-    // UMD Customization for LIBDRUM-701
+    // UMD Customization
     @Transient
     protected transient CommunityGroupService communityGroupService;
-    // End UMD Customization for LIBDRUM-701
+    // End UMD Customization
 
     /**
      * Protected constructor, create object using:
@@ -275,7 +275,7 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
         return communityService;
     }
 
-    // Begin UMD Customization
+    // UMD Customization
     // Customization to support finding top level community by CommunityGroup
     // Used in EditCommunityMetadataForm.java, FlowContainerUtils.java, CommunityGroup.java
     public int getGroupID() {
@@ -287,7 +287,6 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
         setModified();
     }
 
-    // UMD Customization for LIBDRUM-701
     private CommunityGroupService getCommunityGroupService() {
         if (communityGroupService == null) {
             communityGroupService = ContentServiceFactory.getInstance().getCommunityGroupService();

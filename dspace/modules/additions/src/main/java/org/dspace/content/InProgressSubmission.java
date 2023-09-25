@@ -82,7 +82,7 @@ public interface InProgressSubmission extends ReloadableEntity<Integer> {
      */
     void setMultipleTitles(boolean b);
 
-//    // Customization for LIBDRUM-628
+//    // UMD Customization
 //    /**
 //     * Find out if the submission is a dataset
 //     *
@@ -97,7 +97,7 @@ public interface InProgressSubmission extends ReloadableEntity<Integer> {
 //     *          if <code>true</code>, submission is a dataset
 //     */
 //    void setDataset(boolean b);
-//    // End customization for LIBDRUM-628
+//    // End UMD Customization
 
     /**
      * Find out if the submission has been published or publicly distributed
@@ -115,7 +115,7 @@ public interface InProgressSubmission extends ReloadableEntity<Integer> {
      */
     void setPublishedBefore(boolean b);
 
-    // Begin UMD Customization
+    // UMD Customization
     /**
      * Map the given collections to the InProgressSubmission item.
      *

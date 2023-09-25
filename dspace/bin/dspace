@@ -29,7 +29,7 @@ if [ "$ADDITIONS_JAR" != "" ]; then
     CLASSPATH=$CLASSPATH:$ADDITIONS_JAR
   fi
 fi
-# End UMD Customiztion
+# End UMD Customization
 
 # Get the JARs in $DSPACEDIR/lib
 JARS="$DSPACEDIR/lib/*"

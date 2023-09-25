@@ -18,10 +18,14 @@ import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.EPersonRest;
+// UMD Customization
 import org.dspace.app.rest.model.EtdUnitRest;
+// End UMD Customization
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.ItemRest;
+// UMD Customization
 import org.dspace.app.rest.model.UnitRest;
+// End UMD Customization
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.security.DSpaceRestPermission;
 import org.dspace.app.rest.utils.Utils;
@@ -95,7 +99,9 @@ public class DeleteFeature implements AuthorizationFeature {
                 case WorkspaceItemRest.NAME:
                 case EPersonRest.NAME:
                 case GroupRest.NAME:
+                // UMD Customization
                 case UnitRest.NAME:
+                // End UMD Customization
                 default:
                     if (parentObject != null) {
                         return authorizeService.authorizeActionBoolean(context, context.getCurrentUser(), parentObject,
@@ -135,9 +141,11 @@ public class DeleteFeature implements AuthorizationFeature {
             BitstreamRest.CATEGORY + "." + BitstreamRest.NAME,
             WorkspaceItemRest.CATEGORY + "." + WorkspaceItemRest.NAME,
             EPersonRest.CATEGORY + "." + EPersonRest.NAME,
+            // UMD Customization
             GroupRest.CATEGORY + "." + GroupRest.NAME,
             UnitRest.CATEGORY + "." + UnitRest.NAME,
             EtdUnitRest.CATEGORY + "." + EtdUnitRest.NAME
+            // End UMD Customization
         };
     }
 }

@@ -24,12 +24,12 @@ import org.dspace.app.rest.RestResourceController;
                 name = EPersonRest.GROUPS,
                 method = "getGroups"
         ),
-        // Customization for LIBDRUM-660
+        // UMD Customization
         @LinkRest(
                 name = EPersonRest.LDAP,
                 method = "getLdap"
         )
-        // End Customization for LIBDRUM-660
+        // End UMD Customization
 })
 public class EPersonRest extends DSpaceObjectRest {
     public static final String NAME = "eperson";
@@ -37,9 +37,9 @@ public class EPersonRest extends DSpaceObjectRest {
 
     public static final String GROUPS = "groups";
 
-    // Customization for LIBDRUM-660
+    // UMD Customization
     public static final String LDAP = "ldap";
-    // End Customization for LIBDRUM-660
+    // End UMD Customization
 
     private String netid;
 

@@ -17,13 +17,17 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
+// UMD Customization
 import org.dspace.content.service.CommunityGroupService;
+// End UMD Customization
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.EntityService;
 import org.dspace.content.service.EntityTypeService;
+// UMD Customization
 import org.dspace.content.service.EtdUnitService;
+// End UMD Customization
 import org.dspace.content.service.InProgressSubmissionService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
@@ -152,7 +156,7 @@ public abstract class ContentServiceFactory {
                                     .getServiceByName("contentServiceFactory", ContentServiceFactory.class);
     }
 
-    // Begin UMD Customization
+    // UMD Customization
     public abstract EtdUnitService getEtdUnitService();
     public abstract CommunityGroupService getCommunityGroupService();
     // End UMD Customization
