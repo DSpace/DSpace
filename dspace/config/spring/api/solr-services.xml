@@ -31,8 +31,13 @@
         <description>Store and access DSpace usage statistics records in Solr.</description>
     </bean>
 
-    <bean class="org.dspace.statistics.SolrStatisticsCore"
-          autowire-candidate="true"/>
+    <bean id='SolrStatisticsCore'
+	  class='org.dspace.statistics.SolrStatisticsCore'
+	  autowire-candidate='true'/>
+        <description>
+          Store and access DSpace usage statistics records in Solr.
+        </description>
+    </bean>
 
     <bean id='HttpSolrClientFactory'
           class='org.dspace.statistics.HttpSolrClientFactory'>
