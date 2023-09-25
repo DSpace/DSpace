@@ -777,9 +777,9 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             @Override
             public void process(SolrInputDocument doc)
                     throws IOException, SolrServerException {
-                String clientIP = (String) doc.getField("ip").getValue();
-                String hostname = (String) doc.getField("dns").getValue();
-                String agent = (String) doc.getField("userAgent").getValue();
+                String clientIP = (String) doc.getFieldValue("ip");
+                String hostname = (String) doc.getFieldValue("dns");
+                String agent = (String) doc.getFieldValue("userAgent");
                 if (SpiderDetector.isSpider(clientIP, null, hostname, agent)) {
                     doc.removeField("isBot");
                     doc.addField("isBot", true);
