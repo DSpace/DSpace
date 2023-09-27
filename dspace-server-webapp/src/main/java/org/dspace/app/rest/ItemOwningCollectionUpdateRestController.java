@@ -39,6 +39,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -69,6 +70,8 @@ public class ItemOwningCollectionUpdateRestController {
      * moving the item to the new collection.
      *
      * @param uuid The UUID of the item that will be moved
+     * @param inheritCollectionPolicies   Boolean flag whether to inherit the target collection policies when
+     *                                    moving the item
      * @param response The response object
      * @param request  The request object
      * @return The wrapped resource containing the new owning collection or null when the item was not moved
@@ -79,7 +82,10 @@ public class ItemOwningCollectionUpdateRestController {
     @RequestMapping(method = RequestMethod.PUT, consumes = {"text/uri-list"})
     @PreAuthorize("hasPermission(#uuid, 'ITEM','WRITE')")
     @PostAuthorize("returnObject != null")
-    public CollectionRest move(@PathVariable UUID uuid, HttpServletResponse response,
+    public CollectionRest move(@PathVariable UUID uuid,
+                               @RequestParam(name = "inheritPolicies", defaultValue = "false")
+                               Boolean inheritCollectionPolicies,
+                               HttpServletResponse response,
                                HttpServletRequest request)
             throws SQLException, IOException, AuthorizeException {
         Context context = ContextUtil.obtainContext(request);
@@ -91,7 +97,8 @@ public class ItemOwningCollectionUpdateRestController {
                                                            "or the data cannot be resolved to a collection.");
         }
 
-        Collection targetCollection = performItemMove(context, uuid, (Collection) dsoList.get(0));
+        Collection targetCollection = performItemMove(context, uuid, (Collection) dsoList.get(0),
+                inheritCollectionPolicies);
 
         if (targetCollection == null) {
             return null;
@@ -107,17 +114,19 @@ public class ItemOwningCollectionUpdateRestController {
      * @param item              The item to be moved
      * @param currentCollection The current owning collection of the item
      * @param targetCollection  The target collection of the item
+     * @param inheritPolicies   Boolean flag whether to inherit the target collection policies when moving the item
      * @return The target collection
      * @throws SQLException       If something goes wrong
      * @throws IOException        If something goes wrong
      * @throws AuthorizeException If the user is not authorized to perform the move action
      */
     private Collection moveItem(final Context context, final Item item, final Collection currentCollection,
-                                final Collection targetCollection)
+                                final Collection targetCollection,
+                                final boolean inheritPolicies)
             throws SQLException, IOException, AuthorizeException {
-        itemService.move(context, item, currentCollection, targetCollection);
-        //Necessary because Controller does not pass through general RestResourceController, and as such does not do its
-        //  commit in DSpaceRestRepository.createAndReturn() or similar
+        itemService.move(context, item, currentCollection, targetCollection, inheritPolicies);
+        // Necessary because Controller does not pass through general RestResourceController, and as such does not do
+        // its commit in DSpaceRestRepository.createAndReturn() or similar
         context.commit();
 
         return context.reloadEntity(targetCollection);
@@ -129,12 +138,14 @@ public class ItemOwningCollectionUpdateRestController {
      * @param context          The context Object
      * @param itemUuid         The uuid of the item to be moved
      * @param targetCollection The target collection
+     * @param inheritPolicies  Whether to inherit the target collection policies when moving the item
      * @return The new owning collection of the item when authorized or null when not authorized
      * @throws SQLException       If something goes wrong
      * @throws IOException        If something goes wrong
      * @throws AuthorizeException If the user is not authorized to perform the move action
      */
-    private Collection performItemMove(final Context context, final UUID itemUuid, final Collection targetCollection)
+    private Collection performItemMove(final Context context, final UUID itemUuid, final Collection targetCollection,
+                                       boolean inheritPolicies)
             throws SQLException, IOException, AuthorizeException {
 
         Item item = itemService.find(context, itemUuid);
@@ -153,7 +164,7 @@ public class ItemOwningCollectionUpdateRestController {
 
         if (authorizeService.authorizeActionBoolean(context, currentCollection, Constants.ADMIN)) {
 
-            return moveItem(context, item, currentCollection, targetCollection);
+            return moveItem(context, item, currentCollection, targetCollection, inheritPolicies);
         }
 
         return null;

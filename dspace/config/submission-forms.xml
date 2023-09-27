@@ -910,9 +910,9 @@
             </row>
             <row>
                 <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>dcterms</dc-element>
-                    <dc-qualifier>references</dc-qualifier>
+                    <dc-schema>dcterms</dc-schema>
+                    <dc-element>references</dc-element>
+                    <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
                     <label>Related Dataset</label>
                     <input-type>onebox</input-type>

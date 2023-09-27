@@ -23,6 +23,7 @@ public class ViewEventRest extends BaseObjectRest<UUID> {
 
     private UUID targetId;
     private String targetType;
+    private String referrer;
 
     @Override
     @JsonIgnore
@@ -44,6 +45,14 @@ public class ViewEventRest extends BaseObjectRest<UUID> {
 
     public void setTargetType(String targetType) {
         this.targetType = targetType;
+    }
+
+    public String getReferrer() {
+        return referrer;
+    }
+
+    public void setReferrer(String referrer) {
+        this.referrer = referrer;
     }
 
     public String getCategory() {

@@ -138,6 +138,10 @@ public class ClaimAction extends UserSelectionAction {
                 RoleMembers roleMembers = role.getMembers(context, wfi);
 
                 ArrayList<EPerson> epersons = roleMembers.getAllUniqueMembers(context);
+                if (epersons.isEmpty() || step.getRequiredUsers() > epersons.size()) {
+                    log.warn(String.format("There must be at least %s ePerson(s) in the group",
+                                           step.getRequiredUsers()));
+                }
                 return !(epersons.isEmpty() || step.getRequiredUsers() > epersons.size());
             } else {
                 // We don't have a role and do have a UI so throw a workflow exception

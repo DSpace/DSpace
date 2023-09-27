@@ -24,6 +24,8 @@ import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.browse.ItemCountException;
+import org.dspace.browse.ItemCounter;
 import org.dspace.content.dao.CommunityDAO;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
@@ -36,6 +38,7 @@ import org.dspace.core.I18nUtil;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
@@ -73,10 +76,11 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     protected SiteService siteService;
     @Autowired(required = true)
     protected IdentifierService identifierService;
+    @Autowired(required = true)
+    protected SubscribeService subscribeService;
 
     protected CommunityServiceImpl() {
         super();
-
     }
 
     @Override
@@ -217,12 +221,12 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
     @Override
     public Bitstream setLogo(Context context, Community community, InputStream is)
-        throws AuthorizeException, IOException, SQLException {
+            throws AuthorizeException, IOException, SQLException {
         // Check authorisation
         // authorized to remove the logo when DELETE rights
         // authorized when canEdit
         if (!((is == null) && authorizeService.authorizeActionBoolean(
-            context, community, Constants.DELETE))) {
+                context, community, Constants.DELETE))) {
             canEdit(context, community);
         }
 
@@ -242,7 +246,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
             // now create policy for logo bitstream
             // to match our READ policy
             List<ResourcePolicy> policies = authorizeService
-                .getPoliciesActionFilter(context, community, Constants.READ);
+                    .getPoliciesActionFilter(context, community, Constants.READ);
             authorizeService.addPolicies(context, policies, newLogo);
 
             log.info(LogHelper.getHeader(context, "set_logo",
@@ -549,6 +553,8 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
         context.addEvent(new Event(Event.DELETE, Constants.COMMUNITY, community.getID(), community.getHandle(),
                                    getIdentifiers(context, community)));
 
+        subscribeService.deleteByDspaceObject(context, community);
+
         // Remove collections
         Iterator<Collection> collections = community.getCollections().iterator();
 
@@ -703,5 +709,17 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     @Override
     public int countTotal(Context context) throws SQLException {
         return communityDAO.countRows(context);
+    }
+
+    /**
+     * Returns total community archived items
+     *
+     * @param community       Community
+     * @return                total community archived items
+     * @throws ItemCountException
+     */
+    @Override
+    public int countArchivedItems(Community community) throws ItemCountException {
+        return ItemCounter.getInstance().getCount(community);
     }
 }

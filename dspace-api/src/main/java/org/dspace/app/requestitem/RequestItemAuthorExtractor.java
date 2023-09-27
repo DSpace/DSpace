@@ -31,5 +31,5 @@ public interface RequestItemAuthorExtractor {
      */
     @NonNull
     public List<RequestItemAuthor> getRequestItemAuthor(Context context, Item item)
-        throws SQLException;
+            throws SQLException;
 }

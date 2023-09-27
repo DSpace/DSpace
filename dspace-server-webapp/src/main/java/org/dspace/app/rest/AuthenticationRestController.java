@@ -34,7 +34,6 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.security.RestAuthenticationService;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.service.ClientInfoService;
 import org.slf4j.Logger;
@@ -210,33 +209,7 @@ public class AuthenticationRestController implements InitializingBean {
     }
 
     /**
-     * This method will generate a short lived token to be used for bitstream downloads among other things.
-     *
-     * For security reasons, this endpoint only responds to a explicitly defined list of ips.
-     *
-     * curl -v -X GET https://{dspace-server.url}/api/authn/shortlivedtokens -H "Authorization: Bearer eyJhbG...COdbo"
-     *
-     * Example:
-     * <pre>
-     * {@code
-     * curl -v -X GET https://{dspace-server.url}/api/authn/shortlivedtokens -H "Authorization: Bearer eyJhbG...COdbo"
-     * }
-     * </pre>
-     * @param request The StandardMultipartHttpServletRequest
-     * @return        The created short lived token
-     */
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    @RequestMapping(value = "/shortlivedtokens", method = RequestMethod.GET)
-    public AuthenticationTokenResource shortLivedTokenViaGet(HttpServletRequest request) throws AuthorizeException {
-        if (!clientInfoService.isRequestFromTrustedProxy(request.getRemoteAddr())) {
-            throw new AuthorizeException("Requests to this endpoint should be made from a trusted IP address.");
-        }
-
-        return shortLivedTokenResponse(request);
-    }
-
-    /**
-     * See {@link #shortLivedToken} and {@link #shortLivedTokenViaGet}
+     * See {@link #shortLivedToken}
      */
     private AuthenticationTokenResource shortLivedTokenResponse(HttpServletRequest request) {
         Projection projection = utils.obtainProjection();

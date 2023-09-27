@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -95,6 +96,13 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     protected void handleWrongRequestException(HttpServletRequest request, HttpServletResponse response,
                                                   Exception ex) throws IOException {
         sendErrorResponse(request, response, ex, "Request is invalid or incorrect", HttpServletResponse.SC_BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    protected void handleMaxUploadSizeExceededException(HttpServletRequest request, HttpServletResponse response,
+                                               Exception ex) throws IOException {
+        sendErrorResponse(request, response, ex, "Request entity is too large",
+                          HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
     }
 
     @ExceptionHandler(SQLException.class)
@@ -166,6 +174,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         GroupNameNotProvidedException.class,
         GroupHasPendingWorkflowTasksException.class,
         PasswordNotValidException.class,
+        RESTBitstreamNotFoundException.class
     })
     protected void handleCustomUnprocessableEntityException(HttpServletRequest request, HttpServletResponse response,
                                                             TranslatableException ex) throws IOException {

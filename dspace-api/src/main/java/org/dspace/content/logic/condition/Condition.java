@@ -22,7 +22,6 @@ import org.dspace.core.Context;
  * operator is not a condition but also a logical statement.
  *
  * @author Kim Shepherd
- * @version $Revision$
  */
 public interface Condition extends LogicalStatement {
 

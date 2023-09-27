@@ -30,6 +30,7 @@
         <entry key-ref="crossref.volume" value-ref="crossrefVolume" />
         <entry key-ref="crossref.issue" value-ref="crossrefIssue" />
         <entry key-ref="crossref.abstract" value-ref="crossrefAbstract" />
+        <entry key-ref="crossref.publisher" value-ref="crossrefPublisher" />
     </util:map>
 
     <bean id="crossrefIDContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
@@ -69,8 +70,11 @@
 
     <bean id="crossrefYearContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
         <property name="field" ref="crossref.year"/>
-        <property name="query" value="/issued/date-parts/0/0"/>
+        <property name="metadataProcessor" ref="crossrefDateMetadataProcessor"></property>
     </bean>
+	<bean name="crossrefDateMetadataProcessor" class="org.dspace.importer.external.crossref.CrossRefDateMetadataProcessor">
+	    <property name="pathToArray" value="/issued/date-parts"></property>
+	</bean>
     <bean id="crossref.year" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.date.issued"/>
     </bean>
@@ -132,6 +136,14 @@
     </bean>
     <bean id="crossref.abstract" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.description.abstract"/>
+    </bean>
+
+    <bean id="crossrefPublisher" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="crossref.publisher"/>
+        <property name="query" value="/publisher"/>
+    </bean>
+    <bean id="crossref.publisher" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.publisher"/>
     </bean>
 
     <bean class="java.lang.Integer" id="maxRetry">

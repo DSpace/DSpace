@@ -41,13 +41,14 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
     }
 
     @Override
-    public List<Bitstream> findDeletedBitstreams(Context context) throws SQLException {
+    public List<Bitstream> findDeletedBitstreams(Context context, int limit, int offset) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Bitstream.class);
         Root<Bitstream> bitstreamRoot = criteriaQuery.from(Bitstream.class);
         criteriaQuery.select(bitstreamRoot);
+        criteriaQuery.orderBy(criteriaBuilder.desc(bitstreamRoot.get(Bitstream_.ID)));
         criteriaQuery.where(criteriaBuilder.equal(bitstreamRoot.get(Bitstream_.deleted), true));
-        return list(context, criteriaQuery, false, Bitstream.class, -1, -1);
+        return list(context, criteriaQuery, false, Bitstream.class, limit, offset);
 
     }
 
