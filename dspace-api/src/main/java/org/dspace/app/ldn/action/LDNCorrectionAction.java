@@ -7,10 +7,7 @@
  */
 package org.dspace.app.ldn.action;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,17 +38,32 @@ public class LDNCorrectionAction implements LDNAction {
     public ActionStatus execute(Notification notification, Item item) throws Exception {
         ActionStatus result = ActionStatus.ABORT;
         Context context = ContextUtil.obtainCurrentRequestContext();
-        QAEvent qaEvent = new QAEvent(QAEvent.COAR_NOTIFY,
-            notification.getObject().getId(), item.getID().toString(), item.getName(),
-            this.getQaEventTopic(), 0d,
-            "{\"abstracts[0]\": \"" + notification.getObject().getIetfCiteAs() + "\"}"
-            , new Date());
+        String itemName = itemService.getName(item);
+        String value = "";
+        QAEvent qaEvent = null;
+        if (notification.getObject().getIetfCiteAs() != null) {
+            value = notification.getObject().getIetfCiteAs();
+            qaEvent = new QAEvent(QAEvent.COAR_NOTIFY,
+                notification.getObject().getId(), item.getID().toString(), itemName,
+                this.getQaEventTopic(), 0d,
+                "{\"abstracts[0]\": \"" + value + "\"}"
+                , new Date());
+        } else if (notification.getObject().getAsRelationship() != null) {
+            String type = notification.getObject().getAsRelationship();
+            value = notification.getObject().getAsObject();
+            qaEvent = new QAEvent(QAEvent.COAR_NOTIFY,
+                notification.getObject().getId(), item.getID().toString(), itemName,
+                this.getQaEventTopic(), 0d,
+                "{\"pids[0].value\":\"" + value + "\"," +
+                "\"pids[0].type\":\"" +  type + "\"}"
+                , new Date());
+        }
         qaEventService.store(context, qaEvent);
         result = ActionStatus.CONTINUE;
 
         return result;
     }
-    
+
     public String getQaEventTopic() {
         return qaEventTopic;
     }

@@ -38,6 +38,19 @@
         <element>relation</element>
         <qualifier>isReviewedBy</qualifier>
         <scope_note>Reviewd by</scope_note>
-    </dc-type>
-
+    </dc-type>    
+    
+    <dc-type>
+        <schema>datacite</schema>
+        <element>relation</element>
+    	<qualifier>isReferencedBy</qualifier>
+		<scope_note>Referenced by</scope_note>
+	</dc-type>	
+	
+    <dc-type>
+        <schema>datacite</schema>
+        <element>relation</element>
+    	<qualifier>isSupplementedBy</qualifier>
+		<scope_note>Supplemented by</scope_note>
+	</dc-type>
 </dspace-dc-types>

@@ -27,6 +27,7 @@
                <entry key="ENRICH/MORE/ENDORSEMENT" value-ref="AddEndorsedMetadataAction"/>
                <entry key="ENRICH/MORE/PID" value-ref="PIDMetadataAction" />
                <entry key="ENRICH/MISSING/PID" value-ref="PIDMetadataAction" />
+               <entry key="ENRICH/MORE/RELEASE" value-ref="RelationMetadataAction" />
             </map>   
         </property>
      </bean>
@@ -72,5 +73,12 @@
 	         </map>
 	     </property>    
      </bean>
-     
+     <bean id="RelationMetadataAction" class="org.dspace.qaevent.action.QAOpenaireMetadataMapAction">
+	     <property name="types">
+	         <map>
+               <entry key="default" value="datacite.relation.isReferencedBy" />
+               <entry key="http://purl.org/vocab/frbr/core#supplement" value="datacite.relation.isSupplementedBy" />
+	         </map>
+	     </property>    
+     </bean>
  </beans>

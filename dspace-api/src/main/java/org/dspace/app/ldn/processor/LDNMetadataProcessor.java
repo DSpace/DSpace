@@ -106,7 +106,7 @@ public class LDNMetadataProcessor implements LDNProcessor {
     private Item doProcess(Notification notification) throws Exception {
         log.info("Processing notification {} {}", notification.getId(), notification.getType());
         Context context = ContextUtil.obtainCurrentRequestContext();
-
+        boolean updated = false;
         VelocityContext velocityContext = prepareTemplateContext(notification);
 
         Item item = lookupItem(context, notification);
@@ -132,7 +132,6 @@ public class LDNMetadataProcessor implements LDNProcessor {
                         add.getQualifier(),
                         add.getLanguage(),
                         value);
-
                 itemService.addMetadata(
                         context,
                         item,
@@ -141,7 +140,7 @@ public class LDNMetadataProcessor implements LDNProcessor {
                         add.getQualifier(),
                         add.getLanguage(),
                         value);
-
+                updated = true;
             } else if (change instanceof LDNMetadataRemove) {
                 LDNMetadataRemove remove = (LDNMetadataRemove) change;
 
@@ -178,14 +177,17 @@ public class LDNMetadataProcessor implements LDNProcessor {
 
         if (!metadataValuesToRemove.isEmpty()) {
             itemService.removeMetadataValues(context, item, metadataValuesToRemove);
+            updated = true;
         }
 
-        context.turnOffAuthorisationSystem();
-        try {
-            itemService.update(context, item);
-            context.commit();
-        } finally {
-            context.restoreAuthSystemState();
+        if (updated) {
+            context.turnOffAuthorisationSystem();
+            try {
+                itemService.update(context, item);
+                context.commit();
+            } finally {
+                context.restoreAuthSystemState();
+            }
         }
 
         return item;

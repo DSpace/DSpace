@@ -73,7 +73,6 @@ public class LDNEmailAction implements LDNAction {
     @Override
     public ActionStatus execute(Notification notification, Item item) throws Exception {
         Context context = ContextUtil.obtainCurrentRequestContext();
-
         try {
             Locale supportedLocale = I18nUtil.getEPersonLocale(context.getCurrentUser());
             Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, actionSendEmailTextFile));
