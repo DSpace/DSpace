@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -3183,6 +3184,98 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                         matchNotifyServicePattern("patternC", "itemFilterC"),
                         matchNotifyServicePattern("patternB", "itemFilterB")
                     ))
+                )));
+    }
+
+    @Test
+    public void findManualServicesByInboundPatternUnAuthorizedTest() throws Exception {
+        getClient().perform(get("/api/ldn/ldnservices/search/byInboundPattern")
+                       .param("pattern", "pattern"))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void findManualServicesByInboundPatternBadRequestTest() throws Exception {
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken)
+            .perform(get("/api/ldn/ldnservices/search/byInboundPattern"))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findManualServicesByInboundPatternTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntityOne =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name one")
+                                .withDescription("service description one")
+                                .withUrl("service url one")
+                                .withLdnUrl("service ldn url one")
+                                .build();
+
+        NotifyServiceEntity notifyServiceEntityTwo =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name two")
+                                .withDescription("service description two")
+                                .withUrl("service url two")
+                                .withLdnUrl("service ldn url two")
+                                .build();
+
+        NotifyServiceEntity notifyServiceEntityThree =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name three")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("service ldn url three")
+                                .build();
+
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        AddOperation inboundAddOperationOne = new AddOperation("notifyservices_inbound_patterns/-",
+            "{\"pattern\":\"review\",\"constraint\":\"itemFilterA\",\"automatic\":\"false\"}");
+
+        AddOperation inboundAddOperationTwo = new AddOperation("notifyservices_inbound_patterns/-",
+            "{\"pattern\":\"review\",\"constraint\":\"itemFilterB\",\"automatic\":\"true\"}");
+
+        ops.add(inboundAddOperationOne);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntityOne.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk());
+
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntityTwo.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk());
+
+        ops.clear();
+        ops.add(inboundAddOperationTwo);
+        patchBody = getPatchContent(ops);
+
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntityThree.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk());
+
+        getClient(authToken)
+            .perform(get("/api/ldn/ldnservices/search/byInboundPattern")
+                .param("pattern", "review"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.page.totalElements", is(2)))
+            .andExpect(jsonPath("$._embedded.ldnservices", containsInAnyOrder(
+                matchNotifyService(notifyServiceEntityOne.getID(), "service name one", "service description one",
+                "service url one", "service ldn url one"),
+                matchNotifyService(notifyServiceEntityTwo.getID(), "service name two", "service description two",
+                    "service url two", "service ldn url two")
                 )));
     }
 
