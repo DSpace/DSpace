@@ -27,7 +27,7 @@
                <entry key="ENRICH/MORE/ENDORSEMENT" value-ref="AddEndorsedMetadataAction"/>
                <entry key="ENRICH/MORE/PID" value-ref="PIDMetadataAction" />
                <entry key="ENRICH/MISSING/PID" value-ref="PIDMetadataAction" />
-               <entry key="ENRICH/MORE/RELEASE" value-ref="RelationMetadataAction" />
+               <entry key="ENRICH/MORE/LINK" value-ref="RelationMetadataAction" />
             </map>   
         </property>
      </bean>

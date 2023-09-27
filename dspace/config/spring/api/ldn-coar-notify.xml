@@ -193,7 +193,7 @@
                     <property name="actionSendEmailTextFile" value="coar_notify_relationship" />
                 </bean>
                 <bean class="org.dspace.app.ldn.action.LDNCorrectionAction">
-                	<property name="qaEventTopic" value="ENRICH/MORE/RELEASE"/>
+                	<property name="qaEventTopic" value="ENRICH/MORE/LINK"/>
                 </bean>
             </list>
         </property>
