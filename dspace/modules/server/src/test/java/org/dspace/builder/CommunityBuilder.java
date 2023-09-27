@@ -32,27 +32,38 @@ public class CommunityBuilder extends AbstractDSpaceObjectBuilder<Community> {
 
     private Community community;
 
+
     protected CommunityBuilder(Context context) {
         super(context);
     }
 
     public static CommunityBuilder createCommunity(final Context context) {
         CommunityBuilder builder = new CommunityBuilder(context);
-        return builder.create();
+        return builder.create(null);
+    }
+    public static CommunityBuilder createCommunity(final Context context, String handle) {
+        CommunityBuilder builder = new CommunityBuilder(context);
+        return builder.create(handle);
     }
 
-    private CommunityBuilder create() {
-        return createSubCommunity(context, null);
+    private CommunityBuilder create(String handle) {
+        return createSubCommunity(context, null, handle);
     }
 
     public static CommunityBuilder createSubCommunity(final Context context, final Community parent) {
         CommunityBuilder builder = new CommunityBuilder(context);
-        return builder.createSub(parent);
+        return builder.createSub(parent, null);
     }
 
-    private CommunityBuilder createSub(final Community parent) {
+    public static CommunityBuilder createSubCommunity(final Context context, final Community parent,
+                                                      final String handle) {
+        CommunityBuilder builder = new CommunityBuilder(context);
+        return builder.createSub(parent, handle);
+    }
+
+    private CommunityBuilder createSub(final Community parent, String handle) {
         try {
-            community = communityService.create(parent, context);
+            community = communityService.create(parent, context, handle);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -102,6 +113,7 @@ public class CommunityBuilder extends AbstractDSpaceObjectBuilder<Community> {
     @Override
     public Community build() {
         try {
+
             communityService.update(context, community);
             context.dispatchEvents();
 
