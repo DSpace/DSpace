@@ -8,7 +8,9 @@
 package org.dspace.content;
 
 import java.sql.SQLException;
+// UMD Customization
 import java.util.List;
+// End UMD Customization
 
 import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
@@ -81,23 +83,6 @@ public interface InProgressSubmission extends ReloadableEntity<Integer> {
      *          title.
      */
     void setMultipleTitles(boolean b);
-
-//    // UMD Customization
-//    /**
-//     * Find out if the submission is a dataset
-//     *
-//     * @return <code>true</code> if it is a dataset
-//     */
-//    boolean isDataset();
-//
-//    /**
-//     * Indicate whether the submission is intended to contain a dataset.
-//     *
-//     * @param b
-//     *          if <code>true</code>, submission is a dataset
-//     */
-//    void setDataset(boolean b);
-//    // End UMD Customization
 
     /**
      * Find out if the submission has been published or publicly distributed

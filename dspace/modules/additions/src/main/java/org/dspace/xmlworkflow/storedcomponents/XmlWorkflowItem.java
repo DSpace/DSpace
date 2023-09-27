@@ -59,11 +59,6 @@ public class XmlWorkflowItem implements WorkflowItem {
     @Column(name = "multiple_titles")
     private boolean multipleTitles = false;
 
-//    // UMD Customization
-//    @Column(name = "is_dataset")
-//    private boolean isDataset = false;
-//    // End UMD Customization
-
     @Column(name = "published_before")
     private boolean publishedBefore = false;
 
@@ -132,20 +127,6 @@ public class XmlWorkflowItem implements WorkflowItem {
         this.multipleTitles = b;
     }
 
-//    // UMD Customization
-//    @Override
-//    public boolean isDataset()
-//    {
-//        return this.isDataset;
-//    }
-//
-//    @Override
-//    public void setDataset(boolean b)
-//    {
-//        this.isDataset = b;
-//    }
-//    // End UMD Customization
-
     @Override
     public boolean isPublishedBefore() {
         return this.publishedBefore;
@@ -180,5 +161,4 @@ public class XmlWorkflowItem implements WorkflowItem {
     public void removeMappedCollections() {
     }
     // End UMD Customization
-
 }

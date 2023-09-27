@@ -12,7 +12,6 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.eperson.service.SubscribeService;
-import org.dspace.eperson.service.SupervisorService;
 // UMD Customization
 import org.dspace.eperson.service.UnitService;
 // End UMD Customization
@@ -35,8 +34,6 @@ public abstract class EPersonServiceFactory {
     public abstract AccountService getAccountService();
 
     public abstract SubscribeService getSubscribeService();
-
-    public abstract SupervisorService getSupervisorService();
 
     public static EPersonServiceFactory getInstance() {
         return DSpaceServicesFactory.getInstance().getServiceManager()

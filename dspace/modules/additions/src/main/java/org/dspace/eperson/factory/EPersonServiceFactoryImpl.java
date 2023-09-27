@@ -12,7 +12,6 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.eperson.service.SubscribeService;
-import org.dspace.eperson.service.SupervisorService;
 // UMD Customization
 import org.dspace.eperson.service.UnitService;
 // End UMD Customization
@@ -36,8 +35,6 @@ public class EPersonServiceFactoryImpl extends EPersonServiceFactory {
     private AccountService accountService;
     @Autowired(required = true)
     private SubscribeService subscribeService;
-    @Autowired(required = true)
-    private SupervisorService supervisorService;
 
     @Override
     public EPersonService getEPersonService() {
@@ -62,11 +59,6 @@ public class EPersonServiceFactoryImpl extends EPersonServiceFactory {
     @Override
     public SubscribeService getSubscribeService() {
         return subscribeService;
-    }
-
-    @Override
-    public SupervisorService getSupervisorService() {
-        return supervisorService;
     }
 
     // UMD Customization
