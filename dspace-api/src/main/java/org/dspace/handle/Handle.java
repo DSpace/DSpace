@@ -8,6 +8,7 @@
 package org.dspace.handle;
 
 import java.util.Date;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -146,6 +147,9 @@ public class Handle implements ReloadableEntity<Integer> {
     }
 
     public Boolean getDead() {
+        if (Objects.isNull(dead)) {
+            return false;
+        }
         return dead;
     }
 

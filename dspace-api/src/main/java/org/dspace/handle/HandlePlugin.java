@@ -62,8 +62,8 @@ import org.springframework.stereotype.Component;
  *
  * @author Peter Breton
  * modified for LINDAT/CLARIN
- * @version $Revision$
  * @author Milan Majchrak (milan.majchrak at dataquest.sk)
+ * @version $Revision$
  */
 @Component
 public class HandlePlugin implements HandleStorage {
@@ -144,7 +144,7 @@ public class HandlePlugin implements HandleStorage {
      */
     @Override
     public void setHaveNA(byte[] theHandle, boolean haveit)
-        throws HandleException {
+            throws HandleException {
         // Not implemented
         if (log.isInfoEnabled()) {
             log.info("Called setHaveNA (not implemented)");
@@ -156,7 +156,7 @@ public class HandlePlugin implements HandleStorage {
      */
     @Override
     public void createHandle(byte[] theHandle, HandleValue[] values)
-        throws HandleException {
+            throws HandleException {
         // Not implemented
         if (log.isInfoEnabled()) {
             log.info("Called createHandle (not implemented)");
@@ -181,7 +181,7 @@ public class HandlePlugin implements HandleStorage {
      */
     @Override
     public void updateValue(byte[] theHandle, HandleValue[] values)
-        throws HandleException {
+            throws HandleException {
         // Not implemented
         if (log.isInfoEnabled()) {
             log.info("Called updateValue (not implemented)");
@@ -212,7 +212,7 @@ public class HandlePlugin implements HandleStorage {
 
     /**
      * HandleStorage interface shutdown() method.
-     * <P>
+     * <p>
      * For DSpace, we need to destroy the kernel created in init().
      */
     @Override
@@ -301,7 +301,7 @@ public class HandlePlugin implements HandleStorage {
 
                 String[] alternativePrefixes = PIDConfiguration.getAlternativePrefixes(handle_parts[0]);
 
-                for ( String alternativePrefix : alternativePrefixes ) {
+                for (String alternativePrefix : alternativePrefixes) {
                     String alternativeHandle = handleClarinService.completeHandle(
                             alternativePrefix, handle_parts[1]);
                     url = handleClarinService.resolveToURL(context, alternativeHandle);
@@ -321,7 +321,7 @@ public class HandlePlugin implements HandleStorage {
 
             ResolvedHandle rh = null;
             if (url.startsWith(MAGIC_BEAN)) {
-                String[] splits = url.split(MAGIC_BEAN,10);
+                String[] splits = url.split(MAGIC_BEAN, 10);
                 if (splits.length < 8) {
                     throw new RuntimeException("Cannot resolve external handle with magicLindat string, " +
                             "because the external handle do not have enough information.");
@@ -374,6 +374,7 @@ public class HandlePlugin implements HandleStorage {
         if (log.isInfoEnabled()) {
             log.info("Called haveNA");
         }
+        loadServices();
 
         /*
          * Naming authority Handles are in the form: 0.NA/1721.1234
@@ -420,9 +421,9 @@ public class HandlePlugin implements HandleStorage {
      */
     @Override
     public Enumeration getHandlesForNA(byte[] theNAHandle)
-        throws HandleException {
+            throws HandleException {
         String naHandle = Util.decodeString(theNAHandle);
-
+        loadServices();
         if (log.isInfoEnabled()) {
             log.info("Called getHandlesForNA for NA " + naHandle);
         }
@@ -466,20 +467,26 @@ public class HandlePlugin implements HandleStorage {
      */
     private static void loadServices() {
         // services are loaded
-        if (Objects.nonNull(handleService) && Objects.nonNull(configurationService) &&
-            Objects.nonNull(itemService) && Objects.nonNull(handleClarinService)) {
-            return;
+        if (Objects.nonNull(handleService)) {
+            handleService = HandleServiceFactory.getInstance().getHandleService();
         }
 
-        // Get a reference to the HandleService & ConfigurationService
-        handleService = HandleServiceFactory.getInstance().getHandleService();
-        configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-        itemService = ContentServiceFactory.getInstance().getItemService();
-        handleClarinService = ContentServiceFactory.getInstance().getHandleClarinService();
+        if (Objects.nonNull(configurationService)) {
+            configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        }
+
+        if (Objects.nonNull(itemService)) {
+            itemService = ContentServiceFactory.getInstance().getItemService();
+        }
+
+        if (Objects.nonNull(handleClarinService)) {
+            handleClarinService = ContentServiceFactory.getInstance().getHandleClarinService();
+        }
     }
 
     /**
      * Load the repository email from the configuration. The mail is in the property `help.mail`.
+     *
      * @return configured repository mail as String or return null if it is not configured
      */
     public static String getRepositoryEmail() {
@@ -510,6 +517,7 @@ public class HandlePlugin implements HandleStorage {
 
     /**
      * Load the repository name from the configuration. The name is in the property `dspace.name`.
+     *
      * @return configured repository name as String or return null if it is not configured
      */
     public static String getRepositoryName() {
@@ -538,6 +546,7 @@ public class HandlePlugin implements HandleStorage {
 
     /**
      * Load the canonical handle prefix from the configuration. The prefix is in the property `handle.canonical.prefix`.
+     *
      * @return canonical handle prefix as String or return DEFAULT_CANONICAL_HANDLE_PREFIX = `http://hdl.handle.net/`
      */
     public static String getCanonicalHandlePrefix() {
@@ -619,7 +628,7 @@ class ResolvedHandle {
         init(url, title, repository, submitdate, reportemail);
     }
 
-    private <K,V> V getOrDefault (Map<K,V> map, K key, V defaultValue) {
+    private <K, V> V getOrDefault(Map<K, V> map, K key, V defaultValue) {
         if (map.containsKey(key)) {
             return map.get(key);
         } else {
