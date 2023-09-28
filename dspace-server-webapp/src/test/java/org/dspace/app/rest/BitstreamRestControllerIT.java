@@ -1086,8 +1086,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
         context.turnOffAuthorisationSystem();
 
-        createResourcePolicy(context)
-                .withUser(eperson)
+        createResourcePolicy(context, eperson, null)
                 .withAction(WRITE)
                 .withDspaceObject(bitstream)
                 .build();

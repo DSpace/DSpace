@@ -205,10 +205,9 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         // ** WHEN **
         context.turnOffAuthorisationSystem();
         authorizeService.removeAllPolicies(context, itemNotVisitedWithBitstreams);
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
                              .withDspaceObject(itemNotVisitedWithBitstreams)
-                             .withAction(Constants.READ)
-                             .withUser(eperson).build();
+                             .withAction(Constants.READ).build();
 
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
                                          .withEmail("eperson1@mail.com")
@@ -239,10 +238,9 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
         context.turnOffAuthorisationSystem();
         authorizeService.removeAllPolicies(context, itemNotVisitedWithBitstreams);
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
                              .withDspaceObject(itemNotVisitedWithBitstreams)
-                             .withAction(Constants.READ)
-                             .withUser(eperson).build();
+                             .withAction(Constants.READ).build();
 
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
                                          .withEmail("eperson1@mail.com")
@@ -1150,10 +1148,9 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         // ** WHEN **
         context.turnOffAuthorisationSystem();
         authorizeService.removeAllPolicies(context, itemNotVisitedWithBitstreams);
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
                              .withDspaceObject(itemNotVisitedWithBitstreams)
-                             .withAction(Constants.READ)
-                             .withUser(eperson).build();
+                             .withAction(Constants.READ).build();
 
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
                                          .withEmail("eperson1@mail.com")

@@ -668,8 +668,7 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
 
     @Test
     public void testFindAndCountItemsWithEditEPerson() throws Exception {
-        ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context)
-            .withUser(eperson)
+        ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
             .withDspaceObject(item)
             .withAction(Constants.WRITE)
             .build();
@@ -682,8 +681,7 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
 
     @Test
     public void testFindAndCountItemsWithAdminEPerson() throws Exception {
-         ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context)
-            .withUser(eperson)
+         ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
             .withDspaceObject(item)
             .withAction(Constants.ADMIN)
             .build();
@@ -702,8 +700,7 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
             .build();
         context.restoreAuthSystemState();
 
-        ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context)
-            .withGroup(group)
+        ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context, null, group)
             .withDspaceObject(item)
             .withAction(Constants.WRITE)
             .build();
@@ -722,8 +719,7 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
             .build();
         context.restoreAuthSystemState();
 
-        ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context)
-            .withGroup(group)
+        ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context, null, group)
             .withDspaceObject(item)
             .withAction(Constants.ADMIN)
             .build();
