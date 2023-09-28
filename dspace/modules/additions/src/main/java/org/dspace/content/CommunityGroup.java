@@ -63,8 +63,6 @@ public class CommunityGroup {
     /**
      * Get the short name of this community group.
      *
-     * @param group_id the group id
-     *
      * @return the name of the group
      */
     public String getShortName() {

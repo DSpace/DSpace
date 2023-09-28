@@ -80,25 +80,25 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     public static final String MD_SCHEMA = "dc";
     public static final String DOI_ELEMENT = "identifier";
     public static final String DOI_QUALIFIER = "uri";
-// The DOI is queued for registered with the service provider
+    // The DOI is queued for registered with the service provider
     public static final Integer TO_BE_REGISTERED = 1;
-// The DOI is queued for reservation with the service provider
+    // The DOI is queued for reservation with the service provider
     public static final Integer TO_BE_RESERVED = 2;
-// The DOI has been registered online
+    // The DOI has been registered online
     public static final Integer IS_REGISTERED = 3;
-// The DOI has been reserved online
+    // The DOI has been reserved online
     public static final Integer IS_RESERVED = 4;
-// The DOI is reserved and requires an updated metadata record to be sent to the service provider
+    // The DOI is reserved and requires an updated metadata record to be sent to the service provider
     public static final Integer UPDATE_RESERVED = 5;
-// The DOI is registered and requires an updated metadata record to be sent to the service provider
+    // The DOI is registered and requires an updated metadata record to be sent to the service provider
     public static final Integer UPDATE_REGISTERED = 6;
-// The DOI metadata record should be updated before performing online registration
+    // The DOI metadata record should be updated before performing online registration
     public static final Integer UPDATE_BEFORE_REGISTRATION = 7;
-// The DOI will be deleted locally and marked as deleted in the DOI service provider
+    // The DOI will be deleted locally and marked as deleted in the DOI service provider
     public static final Integer TO_BE_DELETED = 8;
-// The DOI has been deleted and is no longer associated with an item
+    // The DOI has been deleted and is no longer associated with an item
     public static final Integer DELETED = 9;
-// The DOI is created in the database and is waiting for either successful filter check on item install or
+    // The DOI is created in the database and is waiting for either successful filter check on item install or
     // manual intervention by an administrator to proceed to reservation or registration
     public static final Integer PENDING = 10;
     // The DOI is created in the database, but no more context is known
@@ -295,7 +295,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @throws IdentifierException
      */
     @Override
-    public void register(Context context, DSpaceObject dso, String identifier, boolean skipFilter)
+    public void register(Context context, DSpaceObject dso, String identifier, Filter filter)
         throws IdentifierException {
         if (!(dso instanceof Item)) {
             // DOI are currently assigned only to Item
@@ -318,7 +318,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
                 + "is marked as DELETED.", DOIIdentifierException.DOI_IS_DELETED);
         }
 
-                if (IS_REGISTERED.equals(doiRow.getStatus())) {
+        if (IS_REGISTERED.equals(doiRow.getStatus())) {
             return;
         }
 
@@ -425,11 +425,11 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @throws IllegalArgumentException
      * @throws SQLException
      */
-    public void reserveOnline(Context context, DSpaceObject dso, String identifier, boolean skipFilter)
+    public void reserveOnline(Context context, DSpaceObject dso, String identifier, Filter filter)
             throws IdentifierException, IllegalArgumentException, SQLException {
         String doi = doiService.formatIdentifier(identifier);
         // get TableRow and ensure DOI belongs to dso regarding our db
-        DOI doiRow = loadOrCreateDOI(context, dso, doi, skipFilter);
+        DOI doiRow = loadOrCreateDOI(context, dso, doi, filter);
 
         if (DELETED.equals(doiRow.getStatus()) || TO_BE_DELETED.equals(doiRow.getStatus())) {
             throw new DOIIdentifierException("You tried to reserve a DOI that "
@@ -469,7 +469,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
      * @throws IllegalArgumentException
      * @throws SQLException
      */
-    public void registerOnline(Context context, DSpaceObject dso, String identifier, boolean skipFilter)
+    public void registerOnline(Context context, DSpaceObject dso, String identifier, Filter filter)
             throws IdentifierException, IllegalArgumentException, SQLException {
 
         String doi = doiService.formatIdentifier(identifier);

@@ -121,7 +121,7 @@ public abstract class ContentServiceFactory {
 
     public <T extends DSpaceObject> DSpaceObjectService<T> getDSpaceObjectService(T dso) {
         return getDSpaceObjectService(dso.getType());
-            }
+    }
 
     @SuppressWarnings("unchecked")
     public <T extends DSpaceObject> DSpaceObjectService<T> getDSpaceObjectService(int type) {

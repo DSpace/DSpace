@@ -28,7 +28,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.browse.ItemCountException;
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
+// UMD Customization
 import org.dspace.content.service.CommunityGroupService;
+// End UMD Customization
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
