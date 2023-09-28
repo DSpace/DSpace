@@ -81,6 +81,11 @@ public class ClarinUserRegistrationServiceImpl implements ClarinUserRegistration
     }
 
     @Override
+    public List<ClarinUserRegistration> findByEmail(Context context, String email) throws SQLException {
+        return clarinUserRegistrationDAO.findByEmail(context, email);
+    }
+
+    @Override
     public void delete(Context context, ClarinUserRegistration clarinUserRegistration)
             throws SQLException, AuthorizeException {
         if (!authorizeService.isAdmin(context)) {

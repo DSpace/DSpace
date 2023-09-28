@@ -25,6 +25,8 @@ public interface ClarinUserRegistrationService {
     ClarinUserRegistration find(Context context, int valueId) throws SQLException;
     List<ClarinUserRegistration> findAll(Context context) throws SQLException, AuthorizeException;
     List<ClarinUserRegistration> findByEPersonUUID(Context context, UUID epersonUUID) throws SQLException;
+
+    List<ClarinUserRegistration> findByEmail(Context context, String email) throws SQLException;
     void delete(Context context, ClarinUserRegistration clarinUserRegistration) throws SQLException, AuthorizeException;
     void update(Context context, ClarinUserRegistration clarinUserRegistration) throws SQLException, AuthorizeException;
 }

@@ -18,4 +18,6 @@ import org.dspace.core.GenericDAO;
 public interface ClarinUserRegistrationDAO extends GenericDAO<ClarinUserRegistration> {
 
     List<ClarinUserRegistration> findByEPersonUUID(Context context, UUID epersonUUID) throws SQLException;
+
+    List<ClarinUserRegistration> findByEmail(Context context, String email) throws SQLException;
 }

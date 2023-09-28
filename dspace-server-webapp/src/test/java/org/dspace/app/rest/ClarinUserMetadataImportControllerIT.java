@@ -211,6 +211,66 @@ public class ClarinUserMetadataImportControllerIT extends AbstractEntityIntegrat
         ClarinUserMetadataBuilder.deleteClarinUserMetadata(clarinUserRegistration.getID());
     }
 
+    // The user metadata shouldn't be updated, but it should be added
+    @Test
+    public void importTwoTimesUserMetadataWithEpersonTest() throws Exception {
+        this.prepareEnvironment("NAME");
+        context.turnOffAuthorisationSystem();
+        ClarinUserRegistration clarinUserRegistration = ClarinUserRegistrationBuilder
+                .createClarinUserRegistration(context).withEPersonID(admin.getID()).build();
+        context.restoreAuthSystemState();
+        ObjectMapper mapper = new ObjectMapper();
+        ClarinUserMetadataRest clarinUserMetadata1 = new ClarinUserMetadataRest();
+        clarinUserMetadata1.setMetadataKey("NAME");
+        clarinUserMetadata1.setMetadataValue("Test");
+
+        List<ClarinUserMetadataRest> clarinUserMetadataRestList = new ArrayList<>();
+        clarinUserMetadataRestList.add(clarinUserMetadata1);
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // There should exist record in the UserRegistration table
+        getClient(adminToken).perform(get("/api/core/clarinuserregistrations")
+                        .contentType(contentType))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        // Manage UserMetadata and get token
+        getClient(adminToken).perform(post("/api/clarin/import/usermetadata")
+                        .content(mapper.writeValueAsBytes(clarinUserMetadataRestList.toArray()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("userRegistrationId", clarinUserRegistration.getID().toString())
+                        .param("bitstreamUUID", bitstream.getID().toString())
+                        .param("createdOn", "2012-09-19T10:30:03.741633")
+                        .param("token", "111"))
+                .andExpect(status().isOk());
+
+        getClient(adminToken).perform(post("/api/clarin/import/usermetadata")
+                        .content(mapper.writeValueAsBytes(clarinUserMetadataRestList.toArray()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("userRegistrationId", clarinUserRegistration.getID().toString())
+                        .param("bitstreamUUID", bitstream.getID().toString())
+                        .param("createdOn", "2012-09-19T10:30:03.741633")
+                        .param("token", "111"))
+                .andExpect(status().isOk());
+
+        List<ClarinUserMetadata> allUserMetadata = clarinUserMetadataService.findAll(context);
+        // UserMetadata should be created and not updated
+        assertEquals(2, allUserMetadata.size());
+
+        // get first created data and check it
+        ClarinUserMetadata clarinUserMetadata = allUserMetadata.get(0);
+        assertEquals(clarinUserMetadata.getMetadataKey(), "NAME");
+        assertEquals(clarinUserMetadata.getMetadataValue(), "Test");
+        assertEquals(clarinUserMetadata.getEperson().getPersonID(), admin.getID());
+        assertEquals(clarinUserMetadata.getTransaction().getCreatedOn().getTime(),
+                getDateFromString("2012-09-19T10:30:03.741633").getTime());
+        assertEquals(clarinUserMetadata.getTransaction().getToken(), "111");
+
+        //clean all
+        ClarinUserMetadataBuilder.deleteClarinUserMetadata(clarinUserRegistration.getID());
+    }
+
     /**
      * Create Workspace item with file.
      */
