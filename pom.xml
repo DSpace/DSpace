@@ -1062,7 +1062,7 @@
             <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>additions</artifactId>
-                <version>7.4-drum-0-SNAPSHOT</version>
+                <version>7.6-drum-0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
