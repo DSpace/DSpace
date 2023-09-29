@@ -467,19 +467,19 @@ public class HandlePlugin implements HandleStorage {
      */
     private static void loadServices() {
         // services are loaded
-        if (Objects.nonNull(handleService)) {
+        if (Objects.isNull(handleService)) {
             handleService = HandleServiceFactory.getInstance().getHandleService();
         }
 
-        if (Objects.nonNull(configurationService)) {
+        if (Objects.isNull(configurationService)) {
             configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         }
 
-        if (Objects.nonNull(itemService)) {
+        if (Objects.isNull(itemService)) {
             itemService = ContentServiceFactory.getInstance().getItemService();
         }
 
-        if (Objects.nonNull(handleClarinService)) {
+        if (Objects.isNull(handleClarinService)) {
             handleClarinService = ContentServiceFactory.getInstance().getHandleClarinService();
         }
     }
