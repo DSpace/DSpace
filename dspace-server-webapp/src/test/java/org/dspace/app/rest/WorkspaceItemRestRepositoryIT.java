@@ -6719,7 +6719,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                                   .build();
         witem.getItem().setDiscoverable(false);
 
-ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
+        ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup).withDspaceObject(witem.getItem())
+                             .withPolicyType(TYPE_CUSTOM)
+                             .withName("administrator")
                              .build();
 
         ResourcePolicyBuilder.createResourcePolicy(context, null, anonymousGroup)
@@ -7116,7 +7118,10 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                              .build();
 
 ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
-                             .build();
+                     .withDspaceObject(witem.getItem())
+                     .withPolicyType(TYPE_CUSTOM)
+                     .withName("administrator")
+                     .build();
 
         Calendar calendar = Calendar.getInstance();
 
@@ -7195,7 +7200,10 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                              .build();
 
 ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
-                             .build();
+                     .withDspaceObject(witem.getItem())
+                     .withPolicyType(TYPE_CUSTOM)
+                     .withName("administrator")
+                     .build();
 
         context.restoreAuthSystemState();
 
@@ -7255,7 +7263,10 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                              .build();
 
 ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
-                             .build();
+                     .withDspaceObject(witem.getItem())
+                     .withPolicyType(TYPE_CUSTOM)
+                     .withName("administrator")
+                     .build();
 
         context.restoreAuthSystemState();
 
@@ -7317,7 +7328,10 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                              .build();
 
 ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
-                             .build();
+                     .withDspaceObject(witem.getItem())
+                     .withPolicyType(TYPE_CUSTOM)
+                     .withName("administrator")
+                     .build();
 
         context.restoreAuthSystemState();
 
@@ -7379,7 +7393,10 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                              .build();
 
 ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
-                             .build();
+                     .withDspaceObject(witem.getItem())
+                     .withPolicyType(TYPE_CUSTOM)
+                     .withName("administrator")
+                     .build();
 
         context.restoreAuthSystemState();
 

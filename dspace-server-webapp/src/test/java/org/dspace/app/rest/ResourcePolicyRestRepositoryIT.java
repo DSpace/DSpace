@@ -998,7 +998,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         AtomicReference<Integer> idRef = new AtomicReference<Integer>();
         try {
             Community community = CommunityBuilder.createCommunity(context)
-                .withName("My commynity")
+                .withName("My community")
                 .build();
 
             EPerson eperson1 = EPersonBuilder.createEPerson(context)
@@ -1044,6 +1044,98 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         } finally {
             ResourcePolicyBuilder.delete(idRef.get());
         }
+    }
+    @Test
+    public void createWithGroupTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        try {
+            Community community = CommunityBuilder.createCommunity(context)
+                .withName("My community")
+                .build();
+
+            EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+            Group group1 = GroupBuilder.createGroup(context)
+                                       .withName("Group 1")
+                                       .addMember(eperson1)
+                                       .build();
+
+            context.restoreAuthSystemState();
+
+            ObjectMapper mapper = new ObjectMapper();
+            ResourcePolicyRest resourcePolicyRest = new ResourcePolicyRest();
+
+            resourcePolicyRest.setPolicyType(ResourcePolicy.TYPE_SUBMISSION);
+            resourcePolicyRest.setAction(Constants.actionText[Constants.READ]);
+
+            String authToken = getAuthToken(admin.getEmail(), password);
+            getClient(authToken)
+                .perform(post("/api/authz/resourcepolicies")
+                    .content(mapper.writeValueAsBytes(resourcePolicyRest))
+                    .param("resource", community.getID().toString())
+                    .param("group", group1.getID().toString())
+                    .param("projections", "full")
+                    .contentType(contentType))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", ResourcePolicyMatcher.matchFullEmbeds()))
+                .andExpect(jsonPath("$", Matchers.allOf(
+                    hasJsonPath("$.name", is(resourcePolicyRest.getName())),
+                    hasJsonPath("$.description", is(resourcePolicyRest.getDescription())),
+                    hasJsonPath("$.policyType", is(resourcePolicyRest.getPolicyType())),
+                    hasJsonPath("$.action", is(resourcePolicyRest.getAction())),
+                    hasJsonPath("$.startDate", is(resourcePolicyRest.getStartDate())),
+                    hasJsonPath("$.endDate", is(resourcePolicyRest.getEndDate())),
+                    hasJsonPath("$.type", is(resourcePolicyRest.getType())))))
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            String authToken1 = getAuthToken(eperson1.getEmail(), "qwerty01");
+            getClient(authToken1).perform(get("/api/authz/resourcepolicies/" + idRef.get()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._links.self.href",
+                    Matchers.containsString("/api/authz/resourcepolicies/" + idRef.get())));
+        } finally {
+            ResourcePolicyBuilder.delete(idRef.get());
+        }
+    }
+
+    @Test
+    public void createWithoutGroupOrPersonTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context)
+                                              .withName("My commynity")
+                                              .build();
+
+
+        context.restoreAuthSystemState();
+
+        ObjectMapper mapper = new ObjectMapper();
+        ResourcePolicyRest resourcePolicyRest = new ResourcePolicyRest();
+
+        resourcePolicyRest.setPolicyType(ResourcePolicy.TYPE_SUBMISSION);
+        resourcePolicyRest.setAction(Constants.actionText[Constants.ADMIN]);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(post("/api/authz/resourcepolicies")
+                                    .content(mapper.writeValueAsBytes(resourcePolicyRest))
+                                    .param("resource", community.getID().toString())
+                                    .contentType(contentType))
+                   .andExpect(status().isBadRequest());
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/search/resource")
+                                             .param("uuid", community.getID().toString())
+                                             .param("action", "ADMIN"))
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$._links.self.href",
+                                                Matchers.containsString("api/authz/resourcepolicies/search/resource")))
+                            .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
