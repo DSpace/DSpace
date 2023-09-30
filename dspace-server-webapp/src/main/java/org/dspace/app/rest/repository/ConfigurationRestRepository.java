@@ -7,15 +7,18 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.PropertyRest;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -48,8 +51,8 @@ public class ConfigurationRestRepository extends DSpaceRestRepository<PropertyRe
      * }
      * </pre>
      *
-     * @param property
-     * @return
+     * @param property the name of the property to check for
+     * @return the property value
      */
     @Override
     @PreAuthorize("permitAll()")
@@ -70,6 +73,31 @@ public class ConfigurationRestRepository extends DSpaceRestRepository<PropertyRe
     @Override
     public Page<PropertyRest> findAll(Context context, Pageable pageable) {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed", "");
+    }
+
+    /**
+     * Gets the value of all configuration properties exposed via REST
+     * @param pageable
+     * @return
+     */
+    @SearchRestMethod(name = "exposed")
+    public Page<PropertyRest> findAllExposed(Pageable pageable) {
+        List<PropertyRest> restProperties = new ArrayList<>();
+        int total = this.exposedProperties.size();
+
+        for (String property: this.exposedProperties) {
+            if (!configurationService.hasProperty(property)) {
+                continue;
+            }
+            String[] propertyValues = configurationService.getArrayProperty(property);
+            PropertyRest propertyRest = new PropertyRest();
+            propertyRest.setName(property);
+            propertyRest.setValues(Arrays.asList(propertyValues));
+
+            restProperties.add(propertyRest);
+        }
+
+        return new PageImpl<>(restProperties, pageable, total);
     }
 
     @Override
