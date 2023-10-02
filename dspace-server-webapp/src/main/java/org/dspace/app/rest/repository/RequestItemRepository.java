@@ -173,11 +173,10 @@ public class RequestItemRepository
             username = user.getFullName();
         } else { // An anonymous session may provide a name.
             // Escape username to evade nasty XSS attempts
-            username = StringEscapeUtils.escapeHtml4(rir.getRequestName());
+            username = rir.getRequestName();
         }
 
-        // Requester's message text, escaped to evade nasty XSS attempts
-        String message = StringEscapeUtils.escapeHtml4(rir.getRequestMessage());
+        String message = rir.getRequestMessage();
 
         // Create the request.
         String token;
