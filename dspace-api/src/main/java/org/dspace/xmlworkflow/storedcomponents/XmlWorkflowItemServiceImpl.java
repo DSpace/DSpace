@@ -26,6 +26,7 @@ import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -55,7 +56,7 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     /*
      * The current step in the workflow system in which this workflow item is present
      */
-    private Logger log = org.apache.logging.log4j.LogManager.getLogger(XmlWorkflowItemServiceImpl.class);
+    private final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
 
     protected XmlWorkflowItemServiceImpl() {
@@ -65,84 +66,78 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     @Override
     public XmlWorkflowItem create(Context context, Item item, Collection collection)
         throws SQLException, AuthorizeException {
-        XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemDAO.create(context, new XmlWorkflowItem());
+        XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemDAO.create(context.getSession(), new XmlWorkflowItem());
         xmlWorkflowItem.setItem(item);
         xmlWorkflowItem.setCollection(collection);
         return xmlWorkflowItem;
     }
 
     @Override
-    public XmlWorkflowItem find(Context context, int id) throws SQLException {
-        XmlWorkflowItem workflowItem = xmlWorkflowItemDAO.findByID(context, XmlWorkflowItem.class, id);
+    public XmlWorkflowItem find(Session session, int id) throws SQLException {
+        XmlWorkflowItem workflowItem = xmlWorkflowItemDAO.findByID(session, XmlWorkflowItem.class, id);
 
         if (workflowItem == null) {
-            if (log.isDebugEnabled()) {
-                log.debug(LogHelper.getHeader(context, "find_workflow_item",
-                                               "not_found,workflowitem_id=" + id));
-            }
+            log.debug("find_workflow_item not_found,workflowitem_id={}", id);
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug(LogHelper.getHeader(context, "find_workflow_item",
-                                               "workflowitem_id=" + id));
-            }
+            log.debug("find_workflow_item workflowitem_id={}", id);
         }
         return workflowItem;
     }
 
     @Override
-    public List<XmlWorkflowItem> findAll(Context context) throws SQLException {
-        return xmlWorkflowItemDAO.findAll(context, XmlWorkflowItem.class);
+    public List<XmlWorkflowItem> findAll(Session session) throws SQLException {
+        return xmlWorkflowItemDAO.findAll(session, XmlWorkflowItem.class);
     }
 
     @Override
-    public List<XmlWorkflowItem> findAll(Context context, Integer page, Integer pagesize) throws SQLException {
-        return findAllInCollection(context, page, pagesize, null);
+    public List<XmlWorkflowItem> findAll(Session session, Integer page, Integer pagesize) throws SQLException {
+        return findAllInCollection(session, page, pagesize, null);
     }
 
     @Override
-    public List<XmlWorkflowItem> findAllInCollection(Context context, Integer page, Integer pagesize,
+    public List<XmlWorkflowItem> findAllInCollection(Session session, Integer page, Integer pagesize,
                                                      Collection collection) throws SQLException {
         Integer offset = null;
         if (page != null && pagesize != null) {
             offset = page * pagesize;
         }
-        return xmlWorkflowItemDAO.findAllInCollection(context, offset, pagesize, collection);
+        return xmlWorkflowItemDAO.findAllInCollection(session, offset, pagesize, collection);
     }
 
     @Override
     public int countAll(Context context) throws SQLException {
-        return xmlWorkflowItemDAO.countAll(context);
+        return xmlWorkflowItemDAO.countAll(context.getSession());
     }
 
     @Override
     public int countAllInCollection(Context context, Collection collection) throws SQLException {
-        return xmlWorkflowItemDAO.countAllInCollection(context, collection);
+        return xmlWorkflowItemDAO.countAllInCollection(context.getSession(), collection);
     }
 
     @Override
-    public List<XmlWorkflowItem> findBySubmitter(Context context, EPerson ep) throws SQLException {
-        return xmlWorkflowItemDAO.findBySubmitter(context, ep);
+    public List<XmlWorkflowItem> findBySubmitter(Session session, EPerson ep) throws SQLException {
+        return xmlWorkflowItemDAO.findBySubmitter(session, ep);
     }
 
     @Override
-    public List<XmlWorkflowItem> findBySubmitter(Context context, EPerson ep, Integer pageNumber, Integer pageSize)
+    public List<XmlWorkflowItem> findBySubmitter(Session session, EPerson ep, Integer pageNumber, Integer pageSize)
             throws SQLException {
         Integer offset = null;
         if (pageNumber != null && pageSize != null) {
             offset = pageNumber * pageSize;
         }
-        return xmlWorkflowItemDAO.findBySubmitter(context, ep, pageNumber, pageSize);
+        return xmlWorkflowItemDAO.findBySubmitter(session, ep, pageNumber, pageSize);
     }
 
     @Override
     public int countBySubmitter(Context context, EPerson ep) throws SQLException {
-        return xmlWorkflowItemDAO.countBySubmitter(context, ep);
+        return xmlWorkflowItemDAO.countBySubmitter(context.getSession(), ep);
     }
 
     @Override
     public void deleteByCollection(Context context, Collection collection)
         throws SQLException, IOException, AuthorizeException {
-        List<XmlWorkflowItem> xmlWorkflowItems = findByCollection(context, collection);
+        List<XmlWorkflowItem> xmlWorkflowItems = findByCollection(context.getSession(), collection);
         Iterator<XmlWorkflowItem> iterator = xmlWorkflowItems.iterator();
         while (iterator.hasNext()) {
             XmlWorkflowItem workflowItem = iterator.next();
@@ -164,13 +159,13 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
     }
 
     @Override
-    public List<XmlWorkflowItem> findByCollection(Context context, Collection collection) throws SQLException {
-        return xmlWorkflowItemDAO.findByCollection(context, collection);
+    public List<XmlWorkflowItem> findByCollection(Session session, Collection collection) throws SQLException {
+        return xmlWorkflowItemDAO.findByCollection(session, collection);
     }
 
     @Override
-    public XmlWorkflowItem findByItem(Context context, Item item) throws SQLException {
-        return xmlWorkflowItemDAO.findByItem(context, item);
+    public XmlWorkflowItem findByItem(Session session, Item item) throws SQLException {
+        return xmlWorkflowItemDAO.findByItem(session, item);
     }
 
     @Override
@@ -182,12 +177,12 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
         // Update the item
         itemService.update(context, workflowItem.getItem());
 
-        xmlWorkflowItemDAO.save(context, workflowItem);
+        xmlWorkflowItemDAO.save(context.getSession(), workflowItem);
     }
 
     @Override
     public void deleteWrapper(Context context, XmlWorkflowItem workflowItem) throws SQLException, AuthorizeException {
-        List<WorkflowItemRole> roles = workflowItemRoleService.findByWorkflowItem(context, workflowItem);
+        List<WorkflowItemRole> roles = workflowItemRoleService.findByWorkflowItem(context.getSession(), workflowItem);
         Iterator<WorkflowItemRole> workflowItemRoleIterator = roles.iterator();
         while (workflowItemRoleIterator.hasNext()) {
             WorkflowItemRole workflowItemRole = workflowItemRoleIterator.next();
@@ -200,9 +195,8 @@ public class XmlWorkflowItemServiceImpl implements XmlWorkflowItemService {
         claimedTaskService.deleteByWorkflowItem(context, workflowItem);
 
         // FIXME - auth?
-        xmlWorkflowItemDAO.delete(context, workflowItem);
+        xmlWorkflowItemDAO.delete(context.getSession(), workflowItem);
     }
-
 
     @Override
     public void move(Context context, XmlWorkflowItem inProgressSubmission, Collection fromCollection,

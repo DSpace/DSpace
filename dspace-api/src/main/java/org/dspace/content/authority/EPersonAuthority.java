@@ -40,9 +40,9 @@ public class EPersonAuthority implements ChoiceAuthority {
      **/
     private String authorityName;
 
-    private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    private final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
-    private AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    private final AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
     @Override
     public Choices getBestMatch(String text, String locale) {
@@ -59,7 +59,7 @@ public class EPersonAuthority implements ChoiceAuthority {
 
         List<EPerson> ePersons = searchEPersons(context, text, start, limit);
 
-        List<Choice> choiceList = new ArrayList<Choice>();
+        List<Choice> choiceList = new ArrayList<>();
         for (EPerson eperson : ePersons) {
             choiceList.add(new Choice(eperson.getID().toString(), eperson.getFullName(), eperson.getFullName()));
         }
@@ -78,7 +78,7 @@ public class EPersonAuthority implements ChoiceAuthority {
 
         Context context = getContext();
         try {
-            EPerson ePerson = ePersonService.find(context, uuid);
+            EPerson ePerson = ePersonService.find(context.getSession(), uuid);
             return ePerson != null ? ePerson.getFullName() : null;
         } catch (SQLException e) {
             log.error(e.getMessage(), e);

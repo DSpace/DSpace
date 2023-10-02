@@ -19,7 +19,7 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.BitstreamFormat_;
 import org.dspace.content.dao.BitstreamFormatDAO;
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the BitstreamFormat object.
@@ -39,8 +39,8 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
      * If more than one bitstream format has the same MIME type, the
      * one returned is unpredictable.
      *
-     * @param context
-     *            DSpace context object
+     * @param session
+     *            The current request's database context.
      * @param mimeType
      *            MIME type value
      * @param includeInternal whether to include internal mimetypes
@@ -50,11 +50,11 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
      * @throws SQLException if database error
      */
     @Override
-    public BitstreamFormat findByMIMEType(Context context, String mimeType, boolean includeInternal)
+    public BitstreamFormat findByMIMEType(Session session, String mimeType, boolean includeInternal)
         throws SQLException {
         // NOTE: Avoid internal formats since e.g. "License" also has
         // a MIMEtype of text/plain.
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, BitstreamFormat.class);
         Root<BitstreamFormat> bitstreamFormatRoot = criteriaQuery.from(BitstreamFormat.class);
         criteriaQuery.select(bitstreamFormatRoot);
@@ -63,14 +63,14 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
             criteriaBuilder.like(bitstreamFormatRoot.get(BitstreamFormat_.mimetype), mimeType)
                             )
         );
-        return singleResult(context, criteriaQuery);
+        return singleResult(session, criteriaQuery);
     }
 
     /**
      * Find a bitstream format by its (unique) short description
      *
-     * @param context
-     *            DSpace context object
+     * @param session
+     *            The current request's database context.
      * @param desc
      *            the short description
      *
@@ -79,21 +79,21 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
      * @throws SQLException if database error
      */
     @Override
-    public BitstreamFormat findByShortDescription(Context context,
+    public BitstreamFormat findByShortDescription(Session session,
                                                   String desc) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, BitstreamFormat.class);
         Root<BitstreamFormat> bitstreamFormatRoot = criteriaQuery.from(BitstreamFormat.class);
         criteriaQuery.select(bitstreamFormatRoot);
         criteriaQuery.where(criteriaBuilder.equal(bitstreamFormatRoot.get(BitstreamFormat_.shortDescription), desc));
-        return uniqueResult(context, criteriaQuery, false, BitstreamFormat.class);
+        return uniqueResult(session, criteriaQuery, false, BitstreamFormat.class);
     }
 
     @Override
-    public int updateRemovedBitstreamFormat(Context context, BitstreamFormat deletedBitstreamFormat,
+    public int updateRemovedBitstreamFormat(Session session, BitstreamFormat deletedBitstreamFormat,
                                             BitstreamFormat newBitstreamFormat) throws SQLException {
         // Set bitstreams with this format to "unknown"
-        Query query = createQuery(context,
+        Query query = createQuery(session,
                                   "update Bitstream set bitstreamFormat = :unknown_format where bitstreamFormat = " +
                                       ":deleted_format");
         query.setParameter("unknown_format", newBitstreamFormat);
@@ -103,9 +103,9 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
     }
 
     @Override
-    public List<BitstreamFormat> findNonInternal(Context context) throws SQLException {
+    public List<BitstreamFormat> findNonInternal(Session session) throws SQLException {
 
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, BitstreamFormat.class);
         Root<BitstreamFormat> bitstreamFormatRoot = criteriaQuery.from(BitstreamFormat.class);
         criteriaQuery.select(bitstreamFormatRoot);
@@ -125,23 +125,23 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
         criteriaQuery.orderBy(orderList);
 
 
-        return list(context, criteriaQuery, false, BitstreamFormat.class, -1, -1);
+        return list(session, criteriaQuery, false, BitstreamFormat.class, -1, -1);
 
     }
 
     @Override
-    public List<BitstreamFormat> findByFileExtension(Context context, String extension) throws SQLException {
+    public List<BitstreamFormat> findByFileExtension(Session session, String extension) throws SQLException {
 
-        Query query = createQuery(context, "from BitstreamFormat bf where :extension in elements(bf.fileExtensions)");
+        Query query = createQuery(session, "from BitstreamFormat bf where :extension in elements(bf.fileExtensions)");
         query.setParameter("extension", extension);
 
         return list(query);
     }
 
     @Override
-    public List<BitstreamFormat> findAll(Context context, Class clazz) throws SQLException {
+    public List<BitstreamFormat> findAll(Session session, Class clazz) throws SQLException {
 
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, BitstreamFormat.class);
         Root<BitstreamFormat> bitstreamFormatRoot = criteriaQuery.from(BitstreamFormat.class);
         criteriaQuery.select(bitstreamFormatRoot);
@@ -150,7 +150,7 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
         orderList.add(criteriaBuilder.asc(bitstreamFormatRoot.get(BitstreamFormat_.id)));
         criteriaQuery.orderBy(orderList);
 
-        return list(context, criteriaQuery, false, BitstreamFormat.class, -1, -1);
+        return list(session, criteriaQuery, false, BitstreamFormat.class, -1, -1);
     }
 
 }

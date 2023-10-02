@@ -77,7 +77,7 @@ public class SubmitFeatureIT extends AbstractControllerIntegrationTest {
         });
         submitFeature = authorizationFeatureService.find(SubmitFeature.NAME);
 
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
     }

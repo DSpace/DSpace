@@ -15,6 +15,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowItemService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the XmlWorkflowItem object.
@@ -28,25 +29,25 @@ public interface XmlWorkflowItemService extends WorkflowItemService<XmlWorkflowI
     /**
      * return all workflowitems for a certain page
      *
-     * @param context  The relevant DSpace Context.
+     * @param session  current request's database context.
      * @param page     paging: page number
      * @param pagesize paging: items per page
      * @return WorkflowItem list of all the workflow items in system
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<XmlWorkflowItem> findAll(Context context, Integer page, Integer pagesize) throws SQLException;
+    public List<XmlWorkflowItem> findAll(Session session, Integer page, Integer pagesize) throws SQLException;
 
     /**
      * return all workflowitems for a certain page with a certain collection
      *
-     * @param context    The relevant DSpace Context.
+     * @param session    current request's database context.
      * @param page       paging: page number
      * @param pagesize   paging: items per page
      * @param collection restrict to this collection
      * @return WorkflowItem list of all the workflow items in system
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<XmlWorkflowItem> findAllInCollection(Context context, Integer page, Integer pagesize,
+    public List<XmlWorkflowItem> findAllInCollection(Session session, Integer page, Integer pagesize,
                                                      Collection collection) throws SQLException;
 
     /**
@@ -71,8 +72,8 @@ public interface XmlWorkflowItemService extends WorkflowItemService<XmlWorkflowI
     /**
      * Return all the workflow items from a specific submitter respecting the pagination parameters
      * 
-     * @param context
-     *            The relevant DSpace Context.
+     * @param session
+     *            current request's database context.
      * @param ep
      *            the eperson that has submitted the item
      * @param pageNumber
@@ -82,7 +83,7 @@ public interface XmlWorkflowItemService extends WorkflowItemService<XmlWorkflowI
      * @return
      * @throws SQLException
      */
-    public List<XmlWorkflowItem> findBySubmitter(Context context, EPerson ep, Integer pageNumber, Integer pageSize)
+    public List<XmlWorkflowItem> findBySubmitter(Session session, EPerson ep, Integer pageNumber, Integer pageSize)
             throws SQLException;
 
     /**

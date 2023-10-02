@@ -151,7 +151,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                             .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
 
             GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-            Group group = groupService.find(context, idRef.get());
+            Group group = groupService.find(context.getSession(), idRef.get());
 
             assertEquals(
                     groupService.getMetadata(group, "dc.description"),
@@ -670,7 +670,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void patchPermanentGroupUnprocessable() throws Exception {
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-        final Group group = groupService.findByName(context, Group.ANONYMOUS);
+        final Group group = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         final String name = group.getName();
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -1906,7 +1906,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void deletePermanentGroupUnprocessableTest() throws Exception {
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-        final Group group = groupService.findByName(context, Group.ANONYMOUS);
+        final Group group = groupService.findByName(context.getSession(), Group.ANONYMOUS);
 
         String authToken = getAuthToken(admin.getEmail(), password);
 
@@ -3123,7 +3123,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                                            .withSubmitterGroup(eperson)
                                            .build();
 
-        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        Group adminGroup = groupService.findByName(context.getSession(), Group.ADMIN);
         ResourcePolicyBuilder.createResourcePolicy(context).withAction(Constants.DEFAULT_ITEM_READ)
                 .withGroup(adminGroup).withDspaceObject(child1).build();
         ResourcePolicyBuilder.createResourcePolicy(context).withAction(Constants.DEFAULT_ITEM_READ)
@@ -3186,7 +3186,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                                            .withSubmitterGroup(eperson)
                                            .build();
 
-        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        Group adminGroup = groupService.findByName(context.getSession(), Group.ADMIN);
         ResourcePolicyBuilder.createResourcePolicy(context).withAction(Constants.DEFAULT_BITSTREAM_READ)
                 .withGroup(adminGroup).withDspaceObject(child1).build();
         ResourcePolicyBuilder.createResourcePolicy(context).withAction(Constants.DEFAULT_BITSTREAM_READ)
@@ -3224,7 +3224,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void anonymousGroupParentObjectTest() throws Exception {
 
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-        Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
+        Group anonGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)

@@ -131,7 +131,7 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
             return NO_SUCH_USER;
         }
 
-        EPerson ePerson = ePersonService.findByEmail(context, email);
+        EPerson ePerson = ePersonService.findByEmail(context.getSession(), email);
         if (ePerson != null) {
             request.setAttribute(OIDC_AUTHENTICATED, true);
             return ePerson.canLogIn() ? logInEPerson(context, ePerson) : BAD_ARGS;

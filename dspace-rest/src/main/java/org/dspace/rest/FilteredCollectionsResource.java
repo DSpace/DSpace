@@ -45,7 +45,7 @@ public class FilteredCollectionsResource extends Resource {
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(FilteredCollectionsResource.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     /**
      * Return array of all collections in DSpace. You can add more properties
@@ -97,7 +97,7 @@ public class FilteredCollectionsResource extends Resource {
 
         log.info("Reading all filtered collections.(offset=" + offset + ",limit=" + limit + ")");
         org.dspace.core.Context context = null;
-        List<FilteredCollection> collections = new ArrayList<FilteredCollection>();
+        List<FilteredCollection> collections = new ArrayList<>();
 
         try {
             context = createContext();
@@ -108,7 +108,8 @@ public class FilteredCollectionsResource extends Resource {
                 offset = 0;
             }
 
-            List<org.dspace.content.Collection> dspaceCollections = collectionService.findAll(context, limit, offset);
+            List<org.dspace.content.Collection> dspaceCollections
+                    = collectionService.findAll(context.getSession(), limit, offset);
             for (org.dspace.content.Collection dspaceCollection : dspaceCollections) {
                 if (authorizeService
                     .authorizeActionBoolean(context, dspaceCollection, org.dspace.core.Constants.READ)) {
@@ -192,7 +193,8 @@ public class FilteredCollectionsResource extends Resource {
         try {
             context = createContext();
 
-            org.dspace.content.Collection collection = collectionService.findByIdOrLegacyId(context, collection_id);
+            org.dspace.content.Collection collection
+                    = collectionService.findByIdOrLegacyId(context.getSession(), collection_id);
             if (authorizeService.authorizeActionBoolean(context, collection, org.dspace.core.Constants.READ)) {
                 writeStats(collection, UsageEvent.Action.VIEW, user_ip,
                            user_agent, xforwardedfor, headers, request, context);

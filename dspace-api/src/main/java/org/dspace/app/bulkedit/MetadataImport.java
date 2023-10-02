@@ -268,7 +268,9 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         UUID uuid = getEpersonIdentifier();
         if (uuid != null) {
             try {
-                EPerson ePerson = EPersonServiceFactory.getInstance().getEPersonService().find(context, uuid);
+                EPerson ePerson = EPersonServiceFactory.getInstance()
+                        .getEPersonService()
+                        .find(context.getSession(), uuid);
                 context.setCurrentUser(ePerson);
             } catch (SQLException e) {
                 log.error("Something went wrong trying to fetch the eperson for uuid: " + uuid, e);
@@ -294,7 +296,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                                                                  MetadataImportScriptConfiguration.class);
     }
 
-
+    @Override
     public void setup() throws ParseException {
         useTemplate = false;
         filename = null;
@@ -337,6 +339,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
      * Run an import. The import can either be read-only to detect changes, or
      * can write changes as it goes.
      *
+     * @param c              current DSpace session.
      * @param change         Whether or not to write the changes to the database
      * @param useWorkflow    Whether the workflows should be used when creating new items
      * @param workflowNotify If the workflows should be used, whether to send notifications or not
@@ -377,7 +380,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             // Is this an existing item?
             if (id != null) {
                 // Get the item
-                item = itemService.find(c, id);
+                item = itemService.find(c.getSession(), id);
                 if (item == null) {
                     throw new MetadataImportException("Unknown item ID " + id);
                 }
@@ -389,7 +392,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 List<String> collections = line.get("collection");
                 if (collections != null) {
                     // Sanity check we're not orphaning it
-                    if (collections.size() == 0) {
+                    if (collections.isEmpty()) {
                         throw new MetadataImportException("Missing collection from item " + item.getHandle());
                     }
                     List<Collection> actualCollections = item.getCollections();
@@ -810,10 +813,10 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
 
             if (StringUtils.equals(schema, MetadataSchemaEnum.RELATION.getName())) {
                 List<RelationshipType> relationshipTypeList = relationshipTypeService
-                    .findByLeftwardOrRightwardTypeName(c, element);
+                    .findByLeftwardOrRightwardTypeName(c.getSession(), element);
                 for (RelationshipType relationshipType : relationshipTypeList) {
                     for (Relationship relationship : relationshipService
-                        .findByItemAndRelationshipType(c, item, relationshipType)) {
+                        .findByItemAndRelationshipType(c.getSession(), item, relationshipType)) {
                         relationshipService.delete(c, relationship);
                         relationshipService.update(c, relationship);
                     }
@@ -860,7 +863,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         UUID uuid = resolveEntityRef(context, targetReference);
         // At this point, we have a uuid, so we can get an entity
         try {
-            entity = entityService.findByItemId(context, uuid);
+            entity = entityService.findByItemId(context.getSession(), uuid);
             if (entity.getItem() == null) {
                 throw new IllegalArgumentException("No item found in repository with uuid: " + uuid);
             }
@@ -898,7 +901,8 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                                                               "type", Item.ANY).get(0).getValue();
 
         // Get the correct RelationshipType based on typeName
-        List<RelationshipType> relType = relationshipTypeService.findByLeftwardOrRightwardTypeName(c, typeName);
+        List<RelationshipType> relType
+                = relationshipTypeService.findByLeftwardOrRightwardTypeName(c.getSession(), typeName);
         RelationshipType foundRelationshipType = matchRelationshipType(relType,
                                                                        relationEntityRelationshipType,
                                                                        itemRelationshipType, typeName);
@@ -1219,8 +1223,8 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             List<BulkEditMetadataValue> removes = change.getRemoves();
             List<Collection> newCollections = change.getNewMappedCollections();
             List<Collection> oldCollections = change.getOldMappedCollections();
-            if ((adds.size() > 0) || (removes.size() > 0) ||
-                (newCollections.size() > 0) || (oldCollections.size() > 0) ||
+            if ((!adds.isEmpty()) || (!removes.isEmpty()) ||
+                (!newCollections.isEmpty()) || (!oldCollections.isEmpty()) ||
                 (change.getNewOwningCollection() != null) || (change.getOldOwningCollection() != null) ||
                 (change.isDeleted()) || (change.isWithdrawn()) || (change.isReinstated())) {
                 // Show the item
@@ -1384,9 +1388,11 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
     }
 
     /**
-     * Gets a copy of the given csv line with all entity target references resolved to UUID strings.
-     * Keys being iterated over represent metadatafields or special columns to be processed.
+     * Gets a copy of the given csv line with all entity target references
+     * resolved to UUID strings.  Keys being iterated over represent metadata
+     * fields or special columns to be processed.
      *
+     * @param c current DSpace session.
      * @param line the csv line to process.
      * @return a copy, with all references resolved.
      * @throws MetadataImportException if there is an error resolving any entity target reference.
@@ -1397,7 +1403,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         for (String key : line.keys()) {
             // If a key represents a relation field attempt to resolve the target reference from the csvRefMap
             if (key.split("\\.")[0].equalsIgnoreCase("relation")) {
-                if (line.get(key).size() > 0) {
+                if (!line.get(key).isEmpty()) {
                     for (String val : line.get(key)) {
                         // Attempt to resolve the relation target reference
                         // These can be a UUID, metadata target reference or rowName target reference
@@ -1411,7 +1417,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                     newLine.add(key, null);
                 }
             } else {
-                if (line.get(key).size() > 0) {
+                if (!line.get(key).isEmpty()) {
                     for (String value : line.get(key)) {
                         newLine.add(key, value);
                     }
@@ -1425,8 +1431,8 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
     }
 
     /**
-     * Populate the entityRelationMap with all target references and it's asscoiated typeNames
-     * to their respective origins
+     * Populate the entityRelationMap with all target references and it's associated typeNames
+     * to their respective origins.
      *
      * @param refUUID the target reference UUID for the relation
      * @param relationField the field of the typeNames to relate from
@@ -1488,7 +1494,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 }
             }
             //Populate entityTypeMap
-            if (key.equalsIgnoreCase("dspace.entity.type") && line.get(key).size() > 0) {
+            if (key.equalsIgnoreCase("dspace.entity.type") && !line.get(key).isEmpty()) {
                 if (uuid == null) {
                     entityTypeMap.put(new UUID(0, rowCount), line.get(key).get(0));
                 } else {
@@ -1540,8 +1546,10 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             String element = mf[1];
             String qualifier = mf.length == 2 ? null : mf[2];
             try {
-                MetadataField mfo = metadataFieldService.findByElement(context, schema, element, qualifier);
-                Iterator<MetadataValue> mdv = metadataValueService.findByFieldAndValue(context, mfo, mfValue);
+                MetadataField mfo
+                        = metadataFieldService.findByElement(context.getSession(), schema, element, qualifier);
+                Iterator<MetadataValue> mdv
+                        = metadataValueService.findByFieldAndValue(context.getSession(), mfo, mfValue);
                 if (mdv.hasNext()) {
                     MetadataValue mdvVal = mdv.next();
                     uuid = mdvVal.getDSpaceObject().getID();
@@ -1641,23 +1649,22 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             try {
                 // Get the type of reference. Attempt lookup in processed map first before looking in archive.
                 if (entityTypeMap.get(UUID.fromString(targetUUID)) != null) {
-                    targetType = entityTypeService.
-                                                      findByEntityType(c,
+                    targetType = entityTypeService.findByEntityType(c.getSession(),
                                                                        entityTypeMap.get(UUID.fromString(targetUUID)))
                                                   .getLabel();
                 } else {
                     // Target item may be archived; check there.
                     // Add to errors if Realtionship.type cannot be derived
                     Item targetItem = null;
-                    if (itemService.find(c, UUID.fromString(targetUUID)) != null) {
-                        targetItem = itemService.find(c, UUID.fromString(targetUUID));
+                    if (itemService.find(c.getSession(), UUID.fromString(targetUUID)) != null) {
+                        targetItem = itemService.find(c.getSession(), UUID.fromString(targetUUID));
                         List<MetadataValue> relTypes = itemService.
                                                                       getMetadata(targetItem, "dspace", "entity",
                                                                                   "type", Item.ANY);
                         String relTypeValue = null;
-                        if (relTypes.size() > 0) {
+                        if (!relTypes.isEmpty()) {
                             relTypeValue = relTypes.get(0).getValue();
-                            targetType = entityTypeService.findByEntityType(c, relTypeValue).getLabel();
+                            targetType = entityTypeService.findByEntityType(c.getSession(), relTypeValue).getLabel();
                         } else {
                             relationValidationErrors.add("Cannot resolve Entity type for target UUID: " +
                                                              targetUUID);
@@ -1694,21 +1701,22 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                             // Origin item may be archived; check there.
                             // Add to errors if Realtionship.type cannot be derived.
                             Item originItem = null;
-                            if (itemService.find(c, UUID.fromString(targetUUID)) != null) {
+                            if (itemService.find(c.getSession(), UUID.fromString(targetUUID)) != null) {
                                 DSpaceCSVLine dSpaceCSVLine = this.csv.getCSVLines()
-                                                                      .get(Integer.valueOf(originRow) - 1);
+                                                                      .get(Integer.parseInt(originRow) - 1);
                                 List<String> relTypes = dSpaceCSVLine.get("dspace.entity.type");
                                 if (relTypes == null || relTypes.isEmpty()) {
                                     dSpaceCSVLine.get("dspace.entity.type[]");
                                 }
 
-                                if (relTypes != null && relTypes.size() > 0) {
+                                if (relTypes != null && !relTypes.isEmpty()) {
                                     String relTypeValue = relTypes.get(0);
                                     relTypeValue = StringUtils.remove(relTypeValue, "\"").trim();
-                                    originType = entityTypeService.findByEntityType(c, relTypeValue).getLabel();
+                                    originType = entityTypeService.findByEntityType(c.getSession(), relTypeValue)
+                                            .getLabel();
                                     validateTypesByTypeByTypeName(c, targetType, originType, typeName, originRow);
                                 } else {
-                                    originItem = itemService.find(c, UUID.fromString(originRefererUUID));
+                                    originItem = itemService.find(c.getSession(), UUID.fromString(originRefererUUID));
                                     if (originItem != null) {
                                         List<MetadataValue> mdv = itemService.getMetadata(originItem,
                                                                                           "dspace",
@@ -1716,7 +1724,9 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                                                                                           Item.ANY);
                                         if (!mdv.isEmpty()) {
                                             String relTypeValue = mdv.get(0).getValue();
-                                            originType = entityTypeService.findByEntityType(c, relTypeValue).getLabel();
+                                            originType = entityTypeService.findByEntityType(c.getSession(),
+                                                    relTypeValue)
+                                                    .getLabel();
                                             validateTypesByTypeByTypeName(c, targetType, originType, typeName,
                                                                           originRow);
                                         } else {
@@ -1767,9 +1777,9 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         throws MetadataImportException {
         try {
             RelationshipType foundRelationshipType = null;
-            List<RelationshipType> relationshipTypeList = relationshipTypeService.
-                                                                                     findByLeftwardOrRightwardTypeName(
-                                                                                         c, typeName.split("\\.")[1]);
+            List<RelationshipType> relationshipTypeList
+                    = relationshipTypeService.findByLeftwardOrRightwardTypeName(
+                            c.getSession(), typeName.split("\\.")[1]);
             // Validate described relationship form the CSV.
             foundRelationshipType = matchRelationshipType(relationshipTypeList, targetType, originType, typeName);
             if (foundRelationshipType == null) {

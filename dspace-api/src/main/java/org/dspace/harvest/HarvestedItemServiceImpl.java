@@ -14,6 +14,7 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.harvest.dao.HarvestedItemDAO;
 import org.dspace.harvest.service.HarvestedItemService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -33,13 +34,14 @@ public class HarvestedItemServiceImpl implements HarvestedItemService {
     }
 
     @Override
-    public HarvestedItem find(Context context, Item item) throws SQLException {
-        return harvestedItemDAO.findByItem(context, item);
+    public HarvestedItem find(Session session, Item item) throws SQLException {
+        return harvestedItemDAO.findByItem(session, item);
     }
 
     @Override
     public Item getItemByOAIId(Context context, String itemOaiID, Collection collection) throws SQLException {
-        HarvestedItem harvestedItem = harvestedItemDAO.findByOAIId(context, itemOaiID, collection);
+        HarvestedItem harvestedItem
+                = harvestedItemDAO.findByOAIId(context.getSession(), itemOaiID, collection);
         if (harvestedItem != null) {
             return harvestedItem.getItem();
         } else {
@@ -49,7 +51,7 @@ public class HarvestedItemServiceImpl implements HarvestedItemService {
 
     @Override
     public HarvestedItem create(Context context, Item item, String itemOAIid) throws SQLException {
-        HarvestedItem harvestedItem = harvestedItemDAO.create(context, new HarvestedItem());
+        HarvestedItem harvestedItem = harvestedItemDAO.create(context.getSession(), new HarvestedItem());
         harvestedItem.setItem(item);
         harvestedItem.setOaiId(itemOAIid);
         update(context, harvestedItem);
@@ -58,12 +60,12 @@ public class HarvestedItemServiceImpl implements HarvestedItemService {
 
     @Override
     public void update(Context context, HarvestedItem harvestedItem) throws SQLException {
-        harvestedItemDAO.save(context, harvestedItem);
+        harvestedItemDAO.save(context.getSession(), harvestedItem);
     }
 
     @Override
     public void delete(Context context, HarvestedItem harvestedItem) throws SQLException {
-        harvestedItemDAO.delete(context, harvestedItem);
+        harvestedItemDAO.delete(context.getSession(), harvestedItem);
     }
 
 

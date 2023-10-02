@@ -14,12 +14,12 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole;
 import org.dspace.xmlworkflow.storedcomponents.WorkflowItemRole_;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.dao.WorkflowItemRoleDAO;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the WorkflowItemRole object.
@@ -35,10 +35,10 @@ public class WorkflowItemRoleDAOImpl extends AbstractHibernateDAO<WorkflowItemRo
     }
 
     @Override
-    public List<WorkflowItemRole> findByWorkflowItemAndRole(Context context,
+    public List<WorkflowItemRole> findByWorkflowItemAndRole(Session session,
                                                             XmlWorkflowItem workflowItem,
                                                             String role) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkflowItemRole.class);
         Root<WorkflowItemRole> workflowItemRoleRoot = criteriaQuery.from(WorkflowItemRole.class);
         criteriaQuery.select(workflowItemRoleRoot);
@@ -50,28 +50,28 @@ public class WorkflowItemRoleDAOImpl extends AbstractHibernateDAO<WorkflowItemRo
                                                            role)
                             )
         );
-        return list(context, criteriaQuery, false, WorkflowItemRole.class, -1, -1);
+        return list(session, criteriaQuery, false, WorkflowItemRole.class, -1, -1);
     }
 
     @Override
-    public List<WorkflowItemRole> findByWorkflowItem(Context context,
+    public List<WorkflowItemRole> findByWorkflowItem(Session session,
                                                      XmlWorkflowItem workflowItem) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkflowItemRole.class);
         Root<WorkflowItemRole> workflowItemRoleRoot = criteriaQuery.from(WorkflowItemRole.class);
         criteriaQuery.select(workflowItemRoleRoot);
         criteriaQuery.where(criteriaBuilder.equal(workflowItemRoleRoot.get(WorkflowItemRole_.workflowItem),
                                                   workflowItem));
-        return list(context, criteriaQuery, false, WorkflowItemRole.class, -1, -1);
+        return list(session, criteriaQuery, false, WorkflowItemRole.class, -1, -1);
     }
 
     @Override
-    public List<WorkflowItemRole> findByEPerson(Context context, EPerson ePerson) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public List<WorkflowItemRole> findByEPerson(Session session, EPerson ePerson) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkflowItemRole.class);
         Root<WorkflowItemRole> workflowItemRoleRoot = criteriaQuery.from(WorkflowItemRole.class);
         criteriaQuery.select(workflowItemRoleRoot);
         criteriaQuery.where(criteriaBuilder.equal(workflowItemRoleRoot.get(WorkflowItemRole_.ePerson), ePerson));
-        return list(context, criteriaQuery, false, WorkflowItemRole.class, -1, -1);
+        return list(session, criteriaQuery, false, WorkflowItemRole.class, -1, -1);
     }
 }

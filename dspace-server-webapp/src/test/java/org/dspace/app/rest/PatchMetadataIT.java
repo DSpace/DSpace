@@ -174,16 +174,16 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
                                                        .withTitle("Publication 1")
                                                        .withEntityType("Publication")
                                                        .build();
-        publicationPersonRelationshipType = relationshipTypeService.findbyTypesAndTypeName(context,
-                entityTypeService.findByEntityType(context, "Publication"),
-                entityTypeService.findByEntityType(context, "Person"),
+        publicationPersonRelationshipType = relationshipTypeService.findbyTypesAndTypeName(context.getSession(),
+                entityTypeService.findByEntityType(context.getSession(), "Publication"),
+                entityTypeService.findByEntityType(context.getSession(), "Person"),
                 "isAuthorOfPublication",
                 "isPublicationOfAuthor");
 
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         // Make sure we grab the latest instance of the Item from the database before adding a regular author
-        WorkspaceItem publication = workspaceItemService.find(context, publicationWorkspaceItem.getID());
+        WorkspaceItem publication = workspaceItemService.find(context.getSession(), publicationWorkspaceItem.getID());
         itemService.addMetadata(context, publication.getItem(),
                 "dc", "contributor", "author", Item.ANY, authorsOriginalOrder.get(0));
         workspaceItemService.update(context, publication);
@@ -204,7 +204,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
 
         // Add two more regular authors
         List<String> regularMetadata = new ArrayList<>();
-        publication = workspaceItemService.find(context, publicationWorkspaceItem.getID());
+        publication = workspaceItemService.find(context.getSession(), publicationWorkspaceItem.getID());
         regularMetadata.add(authorsOriginalOrder.get(2));
         regularMetadata.add(authorsOriginalOrder.get(3));
         itemService.addMetadata(context, publication.getItem(),
@@ -224,7 +224,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
                 .andExpect(status().isCreated())
                              .andDo(result -> idRef2.set(read(result.getResponse().getContentAsString(), "$.id")));
 
-        publication = workspaceItemService.find(context, publicationWorkspaceItem.getID());
+        publication = workspaceItemService.find(context.getSession(), publicationWorkspaceItem.getID());
         authorsMetadataOriginalOrder =
                 itemService.getMetadata(publication.getItem(), "dc", "contributor", "author", Item.ANY);
         assertEquals(authorsMetadataOriginalOrder.size(), 5);
@@ -312,14 +312,14 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
                                                        .build();
 
         // Make sure we grab the latest instance of the Item from the database before adding a regular author
-        WorkspaceItem publication = workspaceItemService.find(context, publicationWorkspaceItem.getID());
+        WorkspaceItem publication = workspaceItemService.find(context.getSession(), publicationWorkspaceItem.getID());
         itemService.addMetadata(context, publication.getItem(),
                                 "dc", "contributor", "author", Item.ANY, authorsOriginalOrder);
         workspaceItemService.update(context, publication);
 
         context.restoreAuthSystemState();
 
-        publication = workspaceItemService.find(context, publicationWorkspaceItem.getID());
+        publication = workspaceItemService.find(context.getSession(), publicationWorkspaceItem.getID());
         List<MetadataValue> publicationAuthorList =
                 itemService.getMetadata(publication.getItem(), "dc", "contributor", "author", Item.ANY);
         assertEquals(publicationAuthorList.size(), 5);

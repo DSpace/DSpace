@@ -12,9 +12,9 @@ import java.util.List;
 
 import org.dspace.content.Community;
 import org.dspace.content.MetadataField;
-import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.hibernate.Session;
 
 /**
  * Database Access Object interface class for the Community object.
@@ -26,19 +26,19 @@ import org.dspace.eperson.Group;
  */
 public interface CommunityDAO extends DSpaceObjectLegacySupportDAO<Community> {
 
-    public List<Community> findAll(Context context, MetadataField sortField) throws SQLException;
+    public List<Community> findAll(Session session, MetadataField sortField) throws SQLException;
 
-    public List<Community> findAll(Context context, MetadataField sortField, Integer limit, Integer offset)
+    public List<Community> findAll(Session session, MetadataField sortField, Integer limit, Integer offset)
         throws SQLException;
 
-    public Community findByAdminGroup(Context context, Group group) throws SQLException;
+    public Community findByAdminGroup(Session session, Group group) throws SQLException;
 
-    public List<Community> findAllNoParent(Context context, MetadataField sortField) throws SQLException;
+    public List<Community> findAllNoParent(Session session, MetadataField sortField) throws SQLException;
 
-    public List<Community> findAuthorized(Context context, EPerson ePerson, List<Integer> actions) throws SQLException;
+    public List<Community> findAuthorized(Session session, EPerson ePerson, List<Integer> actions) throws SQLException;
 
-    public List<Community> findAuthorizedByGroup(Context context, EPerson currentUser, List<Integer> actions)
+    public List<Community> findAuthorizedByGroup(Session session, EPerson currentUser, List<Integer> actions)
         throws SQLException;
 
-    int countRows(Context context) throws SQLException;
+    int countRows(Session session) throws SQLException;
 }

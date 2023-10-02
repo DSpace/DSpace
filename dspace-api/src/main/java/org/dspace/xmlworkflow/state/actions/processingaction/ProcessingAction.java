@@ -50,7 +50,7 @@ public abstract class ProcessingAction extends Action {
     public boolean isAuthorized(Context context, HttpServletRequest request, XmlWorkflowItem wfi) throws SQLException {
         ClaimedTask task = null;
         if (context.getCurrentUser() != null) {
-            task = claimedTaskService.findByWorkflowIdAndEPerson(context, wfi, context.getCurrentUser());
+            task = claimedTaskService.findByWorkflowIdAndEPerson(context.getSession(), wfi, context.getCurrentUser());
         }
         //Check if we have claimed the current task
         return task != null &&

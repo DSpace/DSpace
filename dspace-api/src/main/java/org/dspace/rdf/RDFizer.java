@@ -245,7 +245,7 @@ public class RDFizer {
     public void convertAll()
         throws SQLException {
         report("Starting conversion of all DSpaceItems, this may take a while...");
-        this.convert(contentServiceFactory.getSiteService().findSite(context), true);
+        this.convert(contentServiceFactory.getSiteService().findSite(context.getSession()), true);
         report("Conversion ended.");
     }
 
@@ -397,7 +397,7 @@ public class RDFizer {
         }
 
         if (dso instanceof Site) {
-            List<Community> communities = communityService.findAllTop(context);
+            List<Community> communities = communityService.findAllTop(context.getSession());
             for (Community community : communities) {
                 this.dspaceDFS(community, callback, check, false);
             }
@@ -416,7 +416,7 @@ public class RDFizer {
         }
 
         if (dso instanceof Collection) {
-            Iterator<Item> items = itemService.findAllByCollection(context, (Collection) dso);
+            Iterator<Item> items = itemService.findAllByCollection(context.getSession(), (Collection) dso);
             while (items.hasNext()) {
                 Item item = items.next();
                 this.dspaceDFS(item, callback, check, false);

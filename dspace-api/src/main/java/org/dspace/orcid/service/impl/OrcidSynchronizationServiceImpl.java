@@ -25,6 +25,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.codec.binary.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
@@ -56,6 +58,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  */
 public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationService {
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired
     private ItemService itemService;
@@ -78,7 +81,7 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
     @Override
     public void linkProfile(Context context, Item profile, OrcidTokenResponseDTO token) throws SQLException {
 
-        EPerson ePerson = ePersonService.findByProfileItem(context, profile);
+        EPerson ePerson = ePersonService.findByProfileItem(context.getSession(), profile);
         if (ePerson == null) {
             throw new IllegalArgumentException(
                 "The given profile item is not related to any eperson. Item id: " + profile.getID());
@@ -101,7 +104,7 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
 
         setAccessToken(context, profile, ePerson, accessToken);
 
-        EPerson ePersonByOrcid = ePersonService.findByNetid(context, orcid);
+        EPerson ePersonByOrcid = ePersonService.findByNetid(context.getSession(), orcid);
         if (ePersonByOrcid == null && isBlank(ePerson.getNetid())) {
             ePerson.setNetid(orcid);
             updateEPerson(context, ePerson);
@@ -231,7 +234,14 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
     }
 
     private void setAccessToken(Context context, Item profile, EPerson ePerson, String accessToken) {
-        OrcidToken orcidToken = orcidTokenService.findByEPerson(context, ePerson);
+        OrcidToken orcidToken;
+        try {
+            orcidToken = orcidTokenService.findByEPerson(context.getSession(), ePerson);
+        } catch (SQLException ex) {
+            LOGGER.error("Failed looking up ORCiD access token for EPerson {}",
+                    ePerson::getID, () -> ex);
+            return;
+        }
         if (orcidToken == null) {
             orcidTokenService.create(context, ePerson, profile, accessToken);
         } else {
@@ -272,8 +282,14 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
     }
 
     private Optional<String> getOrcidAccessToken(Context context, Item item) {
-        return ofNullable(orcidTokenService.findByProfileItem(context, item))
-            .map(orcidToken -> orcidToken.getAccessToken());
+        try {
+            return ofNullable(orcidTokenService.findByProfileItem(context.getSession(), item))
+                    .map(orcidToken -> orcidToken.getAccessToken());
+        } catch (SQLException ex) {
+            LOGGER.error("Could not get ORCiD access token for Item {}",
+                    item::getID, () -> ex);
+            return Optional.ofNullable(null);
+        }
     }
 
     public Optional<String> getOrcid(Item item) {

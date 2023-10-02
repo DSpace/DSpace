@@ -77,7 +77,7 @@ public class EPersonConsumer implements Consumer {
                 if (et == Event.CREATE) {
                     // Notify of new user registration
                     String notifyRecipient = configurationService.getProperty("registration.notify");
-                    EPerson eperson = ePersonService.find(context, id);
+                    EPerson eperson = ePersonService.find(context.getSession(), id);
                     if (notifyRecipient == null) {
                         notifyRecipient = "";
                     }

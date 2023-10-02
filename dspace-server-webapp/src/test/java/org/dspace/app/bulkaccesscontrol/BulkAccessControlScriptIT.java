@@ -74,7 +74,7 @@ public class BulkAccessControlScriptIT extends AbstractEntityIntegrationTest {
     @After
     @Override
     public void destroy() throws Exception {
-        List<Process> processes = processService.findAll(context);
+        List<Process> processes = processService.findAll(context.getSession());
         for (Process process : processes) {
             ProcessBuilder.deleteProcess(process.getID());
         }
@@ -406,7 +406,7 @@ public class BulkAccessControlScriptIT extends AbstractEntityIntegrationTest {
             itemTwo = context.reloadEntity(itemTwo);
             itemThree = context.reloadEntity(itemThree);
 
-            Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+            Group anonymousGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
 
             assertThat(itemOne.getResourcePolicies(), hasSize(1));
             assertThat(itemTwo.getResourcePolicies(), hasSize(1));

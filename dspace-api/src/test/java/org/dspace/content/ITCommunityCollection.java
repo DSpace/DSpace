@@ -232,26 +232,26 @@ public class ITCommunityCollection extends AbstractIntegrationTest {
         UUID itemId = item2.getID();
         itemService.delete(context, item2);
         assertThat("Community Admin unable to delete sub-Item",
-                   itemService.find(context, itemId), nullValue());
+                   itemService.find(context.getSession(), itemId), nullValue());
 
         // Test deletion of single Collection as a Community Admin
         UUID collId = grandchildCol.getID();
         collectionService.delete(context, grandchildCol);
         assertThat("Community Admin unable to delete sub-Collection",
-                   collectionService.find(context, collId), nullValue());
+                   collectionService.find(context.getSession(), collId), nullValue());
 
         // Test deletion of single Sub-Community as a Community Admin
         UUID commId = child2.getID();
         communityService.delete(context, child2);
         assertThat("Community Admin unable to delete sub-Community",
-                   communityService.find(context, commId), nullValue());
+                   communityService.find(context.getSession(), commId), nullValue());
 
         // Test deletion of single Sub-Community with own admin group
         communityService.createAdministrators(context, child3);
         commId = child3.getID();
         communityService.delete(context, child3);
         assertThat("Community Admin unable to delete sub-Community",
-                communityService.find(context, commId), nullValue());
+                communityService.find(context.getSession(), commId), nullValue());
 
         // Test deletion of Sub-Community Hierarchy as a Community Admin
         commId = child.getID();
@@ -259,11 +259,11 @@ public class ITCommunityCollection extends AbstractIntegrationTest {
         itemId = item.getID();
         communityService.delete(context, child);
         assertThat("Community Admin unable to delete sub-Community in hierarchy",
-                   communityService.find(context, commId), nullValue());
+                   communityService.find(context.getSession(), commId), nullValue());
         assertThat("Community Admin unable to delete sub-Collection in hierarchy",
-                   collectionService.find(context, collId), nullValue());
+                   collectionService.find(context.getSession(), collId), nullValue());
         assertThat("Community Admin unable to delete sub-Item in hierarchy",
-                   itemService.find(context, itemId), nullValue());
+                   itemService.find(context.getSession(), itemId), nullValue());
     }
 
     /**
@@ -314,16 +314,16 @@ public class ITCommunityCollection extends AbstractIntegrationTest {
         UUID bundleId = bundle2.getID();
         bundleService.delete(context, bundle2);
         assertThat("Collection Admin unable to delete Bundle",
-                   bundleService.find(context, bundleId), nullValue());
+                   bundleService.find(context.getSession(), bundleId), nullValue());
 
         // Test deletion of single Item as a Collection Admin
         UUID itemId = item.getID();
         bundleId = bundle.getID();
         itemService.delete(context, item);
         assertThat("Collection Admin unable to delete sub-Item",
-                   itemService.find(context, itemId), nullValue());
+                   itemService.find(context.getSession(), itemId), nullValue());
         assertThat("Collection Admin unable to delete sub-Bundle",
-                   bundleService.find(context, bundleId), nullValue());
+                   bundleService.find(context.getSession(), bundleId), nullValue());
         assertTrue("Collection Admin unable to flag sub-Bitstream as deleted",
                    bitstream.isDeleted());
     }

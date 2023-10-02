@@ -150,7 +150,7 @@ public class LoginAsEPersonIT extends AbstractControllerIntegrationTest {
         EPerson testEperson = EPersonBuilder.createEPerson(context).withEmail("loginasuseradmin@test.com").build();
 
 
-        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        Group adminGroup = groupService.findByName(context.getSession(), Group.ADMIN);
         groupService.addMember(context, adminGroup, testEperson);
         context.restoreAuthSystemState();
 

@@ -68,7 +68,7 @@ public class MetadataSchemaTest extends AbstractUnitTest {
     public void init() {
         super.init();
         try {
-            this.ms = metadataSchemaService.find(context, MetadataSchemaEnum.DC.getName());
+            this.ms = metadataSchemaService.find(context.getSession(), MetadataSchemaEnum.DC.getName());
 
             // Initialize our spy of the autowired (global) authorizeService bean.
             // This allows us to customize the bean's method return values in tests below
@@ -138,7 +138,8 @@ public class MetadataSchemaTest extends AbstractUnitTest {
     @Test
     public void testGetSchemaID() throws SQLException {
         assertThat("testGetSchemaID 0", ms.getID(),
-                   equalTo(metadataSchemaService.find(context, MetadataSchemaEnum.DC.getName()).getID()));
+                   equalTo(metadataSchemaService.find(context.getSession(),
+                           MetadataSchemaEnum.DC.getName()).getID()));
     }
 
     /**
@@ -153,7 +154,7 @@ public class MetadataSchemaTest extends AbstractUnitTest {
         String name = "name";
         metadataSchemaService.create(context, name, namespace);
 
-        MetadataSchema found = metadataSchemaService.findByNamespace(context, namespace);
+        MetadataSchema found = metadataSchemaService.findByNamespace(context.getSession(), namespace);
         assertThat("testCreateAuth 0", found, notNullValue());
     }
 
@@ -188,7 +189,7 @@ public class MetadataSchemaTest extends AbstractUnitTest {
     @Test
     public void testFindByNamespace() throws Exception {
         log.info(">>" + ms.getNamespace() + " " + ms.getName());
-        MetadataSchema found = metadataSchemaService.findByNamespace(context, ms.getNamespace());
+        MetadataSchema found = metadataSchemaService.findByNamespace(context.getSession(), ms.getNamespace());
         assertThat("testFindByNamespace 0", found, notNullValue());
         assertThat("testFindByNamespace 1", found.getID(), equalTo(ms.getID()));
     }
@@ -207,7 +208,7 @@ public class MetadataSchemaTest extends AbstractUnitTest {
 
         metadataSchemaService.update(context, metadataSchema);
 
-        MetadataSchema found = metadataSchemaService.findByNamespace(context, namespace);
+        MetadataSchema found = metadataSchemaService.findByNamespace(context.getSession(), namespace);
         assertThat("testUpdateAuth 0", found.getID(), equalTo(metadataSchema.getID()));
     }
 
@@ -252,7 +253,7 @@ public class MetadataSchemaTest extends AbstractUnitTest {
 
         metadataSchemaService.delete(context, m);
 
-        MetadataSchema found = metadataSchemaService.findByNamespace(context, namespace);
+        MetadataSchema found = metadataSchemaService.findByNamespace(context.getSession(), namespace);
         assertThat("testDeleteAuth 0", found, nullValue());
     }
 
@@ -274,7 +275,7 @@ public class MetadataSchemaTest extends AbstractUnitTest {
      */
     @Test
     public void testFindAll() throws Exception {
-        List<MetadataSchema> found = metadataSchemaService.findAll(context);
+        List<MetadataSchema> found = metadataSchemaService.findAll(context.getSession());
         assertThat("testFindAll 0", found, notNullValue());
         assertTrue("testFindAll 1", found.size() >= 1);
 
@@ -292,7 +293,7 @@ public class MetadataSchemaTest extends AbstractUnitTest {
      */
     @Test
     public void testFind_Context_int() throws Exception {
-        MetadataSchema found = metadataSchemaService.find(context, ms.getID());
+        MetadataSchema found = metadataSchemaService.find(context.getSession(), ms.getID());
         assertThat("testFind_Context_int 0", found, notNullValue());
         assertThat("testFind_Context_int 1", found.getID(), equalTo(ms.getID()));
         assertThat("testFind_Context_int 2", found.getName(), equalTo(ms.getName()));
@@ -305,13 +306,13 @@ public class MetadataSchemaTest extends AbstractUnitTest {
     @Test
     public void testFind_Context_String() throws Exception {
         String shortName = ms.getName();
-        MetadataSchema found = metadataSchemaService.find(context, shortName);
+        MetadataSchema found = metadataSchemaService.find(context.getSession(), shortName);
         assertThat("testFind_Context_String 0", found, notNullValue());
         assertThat("testFind_Context_String 1", found.getID(), equalTo(ms.getID()));
         assertThat("testFind_Context_String 2", found.getName(), equalTo(ms.getName()));
         assertThat("testFind_Context_String 3", found.getNamespace(), equalTo(ms.getNamespace()));
 
-        found = metadataSchemaService.find(context, null);
+        found = metadataSchemaService.find(context.getSession(), null);
         assertThat("testFind_Context_String 4", found, nullValue());
     }
 

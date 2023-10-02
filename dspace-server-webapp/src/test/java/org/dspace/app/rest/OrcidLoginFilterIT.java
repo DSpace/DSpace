@@ -85,7 +85,7 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
 
     private OrcidClient originalOrcidClient;
 
-    private OrcidClient orcidClientMock = mock(OrcidClient.class);
+    private final OrcidClient orcidClientMock = mock(OrcidClient.class);
 
     private EPerson createdEperson;
 
@@ -153,7 +153,7 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
 
         String ePersonId = getEPersonIdFromAuthorizationCookie(mvcResult);
 
-        createdEperson = ePersonService.find(context, UUIDUtils.fromString(ePersonId));
+        createdEperson = ePersonService.find(context.getSession(), UUIDUtils.fromString(ePersonId));
         assertThat(createdEperson, notNullValue());
         assertThat(createdEperson.getEmail(), equalTo("test@email.it"));
         assertThat(createdEperson.getFullName(), equalTo("Test User"));
@@ -437,7 +437,7 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
         assertThat(ePersonId, equalTo(ePerson.getID().toString()));
 
         String profileItemId = getItemIdByProfileId(ePersonToken, ePersonId);
-        Item profileItem = itemService.find(context, UUID.fromString(profileItemId));
+        Item profileItem = itemService.find(context.getSession(), UUID.fromString(profileItemId));
         assertThat(profileItem, notNullValue());
         assertThat(profileItem.getMetadata(), hasItem(with("person.identifier.orcid", ORCID)));
         assertThat(profileItem.getMetadata(), hasItem(with("dspace.orcid.scope", ORCID_SCOPES[0], 0)));
@@ -557,13 +557,15 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
         return JsonPath.read(result.getResponse().getContentAsString(), "$.id");
     }
 
-    private String getOrcidAccessToken(EPerson ePerson) {
-        OrcidToken orcidToken = orcidTokenService.findByEPerson(context, ePerson);
+    private String getOrcidAccessToken(EPerson ePerson)
+            throws SQLException {
+        OrcidToken orcidToken = orcidTokenService.findByEPerson(context.getSession(), ePerson);
         return orcidToken != null ? orcidToken.getAccessToken() : null;
     }
 
-    private String getOrcidAccessToken(Item item) {
-        OrcidToken orcidToken = orcidTokenService.findByProfileItem(context, item);
+    private String getOrcidAccessToken(Item item)
+            throws SQLException {
+        OrcidToken orcidToken = orcidTokenService.findByProfileItem(context.getSession(), item);
         return orcidToken != null ? orcidToken.getAccessToken() : null;
     }
 }

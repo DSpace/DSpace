@@ -16,6 +16,7 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the MetadataField object.
@@ -48,61 +49,61 @@ public interface MetadataFieldService {
      * Find the field corresponding to the given numeric ID.  The ID is
      * a database key internal to DSpace.
      *
-     * @param context context, in case we need to read it in from DB
+     * @param session current request's database context.
      * @param id      the metadata field ID
      * @return the metadata field object
      * @throws SQLException if database error
      */
-    public MetadataField find(Context context, int id) throws SQLException;
+    public MetadataField find(Session session, int id) throws SQLException;
 
     /**
      * Retrieves the metadata field from the database.
      *
-     * @param context        dspace context
+     * @param session        current request's database context.
      * @param metadataSchema schema
      * @param element        element name
      * @param qualifier      qualifier (may be ANY or null)
      * @return recalled metadata field
      * @throws SQLException if database error
      */
-    public MetadataField findByElement(Context context, MetadataSchema metadataSchema, String element, String qualifier)
+    public MetadataField findByElement(Session session, MetadataSchema metadataSchema, String element, String qualifier)
         throws SQLException;
 
-    public MetadataField findByElement(Context context, String metadataSchemaName, String element, String qualifier)
+    public MetadataField findByElement(Session session, String metadataSchemaName, String element, String qualifier)
         throws SQLException;
 
     /**
      * Separates an mdString in schema, element and qualifier parts, separated by a given separator
      *      And returns it's matching metadataField if found
-     * @param context       dspace context
+     * @param session       current request's database context.
      * @param mdString      String being separated to find corresponding mdField (ex dc.contributor)
      * @param separator     Separator being used to separate the mdString
      * @return  Corresponding MetadataField if found
      */
-    public MetadataField findByString(Context context, String mdString, char separator) throws SQLException;
+    public MetadataField findByString(Session session, String mdString, char separator) throws SQLException;
 
-    public List<MetadataField> findFieldsByElementNameUnqualified(Context context, String metadataSchema,
+    public List<MetadataField> findFieldsByElementNameUnqualified(Session session, String metadataSchema,
                                                                   String element)
         throws SQLException;
 
     /**
      * Retrieve all metadata field types from the registry
      *
-     * @param context dspace context
+     * @param session current request's database context.
      * @return an array of all the Dublin Core types
      * @throws SQLException if database error
      */
-    public List<MetadataField> findAll(Context context) throws SQLException;
+    public List<MetadataField> findAll(Session session) throws SQLException;
 
     /**
      * Return all metadata fields that are found in a given schema.
      *
-     * @param context        dspace context
+     * @param session        current request's database context.
      * @param metadataSchema the metadata schema for which we want all our metadata fields
      * @return array of metadata fields
      * @throws SQLException if database error
      */
-    public List<MetadataField> findAllInSchema(Context context, MetadataSchema metadataSchema)
+    public List<MetadataField> findAllInSchema(Session session, MetadataSchema metadataSchema)
         throws SQLException;
 
 

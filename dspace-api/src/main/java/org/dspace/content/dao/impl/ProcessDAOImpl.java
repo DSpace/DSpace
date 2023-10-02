@@ -23,11 +23,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.ProcessStatus;
 import org.dspace.content.dao.ProcessDAO;
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.scripts.Process;
 import org.dspace.scripts.ProcessQueryParameterContainer;
 import org.dspace.scripts.Process_;
+import org.hibernate.Session;
 
 /**
  *
@@ -36,69 +36,67 @@ import org.dspace.scripts.Process_;
 public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements ProcessDAO {
 
     @Override
-    public List<Process> findAllSortByScript(Context context) throws SQLException {
+    public List<Process> findAllSortByScript(Session session) throws SQLException {
 
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);
         Root<Process> processRoot = criteriaQuery.from(Process.class);
         criteriaQuery.select(processRoot);
         criteriaQuery.orderBy(criteriaBuilder.asc(processRoot.get(Process_.name)));
 
-        return list(context, criteriaQuery, false, Process.class, -1, -1);
-
+        return list(session, criteriaQuery, false, Process.class, -1, -1);
     }
 
     @Override
-    public List<Process> findAllSortByStartTime(Context context) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public List<Process> findAllSortByStartTime(Session session) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);
         Root<Process> processRoot = criteriaQuery.from(Process.class);
         criteriaQuery.select(processRoot);
         criteriaQuery.orderBy(criteriaBuilder.desc(processRoot.get(Process_.startTime)),
                               criteriaBuilder.desc(processRoot.get(Process_.processId)));
 
-        return list(context, criteriaQuery, false, Process.class, -1, -1);
+        return list(session, criteriaQuery, false, Process.class, -1, -1);
     }
 
     @Override
-    public List<Process> findAll(Context context, int limit, int offset) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public List<Process> findAll(Session session, int limit, int offset) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);
         Root<Process> processRoot = criteriaQuery.from(Process.class);
         criteriaQuery.select(processRoot);
         criteriaQuery.orderBy(criteriaBuilder.desc(processRoot.get(Process_.processId)));
 
-        return list(context, criteriaQuery, false, Process.class, limit, offset);
+        return list(session, criteriaQuery, false, Process.class, limit, offset);
     }
 
     @Override
-    public int countRows(Context context) throws SQLException {
+    public int countRows(Session session) throws SQLException {
 
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);
         Root<Process> processRoot = criteriaQuery.from(Process.class);
         criteriaQuery.select(processRoot);
 
-        return count(context, criteriaQuery, criteriaBuilder, processRoot);
-
+        return count(session, criteriaQuery, criteriaBuilder, processRoot);
     }
 
     @Override
-    public List<Process> search(Context context, ProcessQueryParameterContainer processQueryParameterContainer,
+    public List<Process> search(Session session, ProcessQueryParameterContainer processQueryParameterContainer,
                                 int limit, int offset) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);
         Root<Process> processRoot = criteriaQuery.from(Process.class);
         criteriaQuery.select(processRoot);
 
         handleProcessQueryParameters(processQueryParameterContainer, criteriaBuilder, criteriaQuery, processRoot);
-        return list(context, criteriaQuery, false, Process.class, limit, offset);
-
+        return list(session, criteriaQuery, false, Process.class, limit, offset);
     }
 
     /**
-     * This method will ensure that the params contained in the {@link ProcessQueryParameterContainer} are transferred
-     * to the ProcessRoot and that the correct conditions apply to the query
+     * This method will ensure that the parameters contained in the
+     * {@link ProcessQueryParameterContainer} are transferred
+     * to the ProcessRoot and that the correct conditions apply to the query.
      * @param processQueryParameterContainer    The object containing the conditions that need to be met
      * @param criteriaBuilder                   The criteriaBuilder to be used
      * @param criteriaQuery                     The criteriaQuery to be used
@@ -139,24 +137,23 @@ public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements Pro
     }
 
     @Override
-    public int countTotalWithParameters(Context context, ProcessQueryParameterContainer processQueryParameterContainer)
+    public int countTotalWithParameters(Session session, ProcessQueryParameterContainer processQueryParameterContainer)
         throws SQLException {
 
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);
         Root<Process> processRoot = criteriaQuery.from(Process.class);
         criteriaQuery.select(processRoot);
 
         addProcessQueryParameters(processQueryParameterContainer, criteriaBuilder, criteriaQuery, processRoot);
-        return count(context, criteriaQuery, criteriaBuilder, processRoot);
+        return count(session, criteriaQuery, criteriaBuilder, processRoot);
     }
 
-
     @Override
-    public List<Process> findByStatusAndCreationTimeOlderThan(Context context, List<ProcessStatus> statuses,
+    public List<Process> findByStatusAndCreationTimeOlderThan(Session session, List<ProcessStatus> statuses,
         Date date) throws SQLException {
 
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery<Process> criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);
 
         Root<Process> processRoot = criteriaQuery.from(Process.class);
@@ -166,12 +163,12 @@ public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements Pro
         Predicate statusIn = processRoot.get(Process_.PROCESS_STATUS).in(statuses);
         criteriaQuery.where(criteriaBuilder.and(creationTimeLessThanGivenDate, statusIn));
 
-        return list(context, criteriaQuery, false, Process.class, -1, -1);
+        return list(session, criteriaQuery, false, Process.class, -1, -1);
     }
 
     @Override
-    public List<Process> findByUser(Context context, EPerson user, int limit, int offset) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public List<Process> findByUser(Session session, EPerson user, int limit, int offset) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery<Process> criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);
 
         Root<Process> processRoot = criteriaQuery.from(Process.class);
@@ -182,20 +179,19 @@ public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements Pro
         orderList.add(criteriaBuilder.desc(processRoot.get(Process_.PROCESS_ID)));
         criteriaQuery.orderBy(orderList);
 
-        return list(context, criteriaQuery, false, Process.class, limit, offset);
+        return list(session, criteriaQuery, false, Process.class, limit, offset);
     }
 
     @Override
-    public int countByUser(Context context, EPerson user) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public int countByUser(Session session, EPerson user) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery<Process> criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);
 
         Root<Process> processRoot = criteriaQuery.from(Process.class);
         criteriaQuery.select(processRoot);
         criteriaQuery.where(criteriaBuilder.equal(processRoot.get(Process_.E_PERSON), user));
-        return count(context, criteriaQuery, criteriaBuilder, processRoot);
+        return count(session, criteriaQuery, criteriaBuilder, processRoot);
     }
-
 }
 
 

@@ -17,11 +17,11 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Group2GroupCache;
 import org.dspace.eperson.Group2GroupCache_;
 import org.dspace.eperson.dao.Group2GroupCacheDAO;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Group2GroupCache object.
@@ -36,18 +36,18 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
     }
 
     @Override
-    public List<Group2GroupCache> findByParent(Context context, Group group) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public List<Group2GroupCache> findByParent(Session session, Group group) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Group2GroupCache.class);
         Root<Group2GroupCache> group2GroupCacheRoot = criteriaQuery.from(Group2GroupCache.class);
         criteriaQuery.select(group2GroupCacheRoot);
         criteriaQuery.where(criteriaBuilder.equal(group2GroupCacheRoot.get(Group2GroupCache_.parent), group));
-        return list(context, criteriaQuery, true, Group2GroupCache.class, -1, -1);
+        return list(session, criteriaQuery, true, Group2GroupCache.class, -1, -1);
     }
 
     @Override
-    public List<Group2GroupCache> findByChildren(Context context, Iterable<Group> groups) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public List<Group2GroupCache> findByChildren(Session session, Iterable<Group> groups) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Group2GroupCache.class);
         Root<Group2GroupCache> group2GroupCacheRoot = criteriaQuery.from(Group2GroupCache.class);
         List<Predicate> eqPredicates = new LinkedList<>();
@@ -57,12 +57,12 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
         Predicate orPredicate = criteriaBuilder.or(eqPredicates.toArray(new Predicate[] {}));
         criteriaQuery.select(group2GroupCacheRoot);
         criteriaQuery.where(orPredicate);
-        return list(context, criteriaQuery, true, Group2GroupCache.class, -1, -1);
+        return list(session, criteriaQuery, true, Group2GroupCache.class, -1, -1);
     }
 
     @Override
-    public Group2GroupCache findByParentAndChild(Context context, Group parent, Group child) throws SQLException {
-        Query query = createQuery(context,
+    public Group2GroupCache findByParentAndChild(Session session, Group parent, Group child) throws SQLException {
+        Query query = createQuery(session,
                                   "FROM Group2GroupCache g WHERE g.parent = :parentGroup AND g.child = :childGroup");
 
         query.setParameter("parentGroup", parent);
@@ -73,8 +73,8 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
     }
 
     @Override
-    public Group2GroupCache find(Context context, Group parent, Group child) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public Group2GroupCache find(Session session, Group parent, Group child) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Group2GroupCache.class);
         Root<Group2GroupCache> group2GroupCacheRoot = criteriaQuery.from(Group2GroupCache.class);
         criteriaQuery.select(group2GroupCacheRoot);
@@ -83,11 +83,11 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
                                 criteriaBuilder.equal(group2GroupCacheRoot.get(Group2GroupCache_.child), child)
             )
         );
-        return uniqueResult(context, criteriaQuery, true, Group2GroupCache.class);
+        return uniqueResult(session, criteriaQuery, true, Group2GroupCache.class);
     }
 
     @Override
-    public void deleteAll(Context context) throws SQLException {
-        createQuery(context, "delete from Group2GroupCache").executeUpdate();
+    public void deleteAll(Session session) throws SQLException {
+        createQuery(session, "delete from Group2GroupCache").executeUpdate();
     }
 }

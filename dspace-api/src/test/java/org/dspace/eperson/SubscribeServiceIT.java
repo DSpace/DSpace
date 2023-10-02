@@ -69,7 +69,7 @@ public class SubscribeServiceIT extends AbstractIntegrationTestWithDatabase {
 
         // unlimited search returns all subscriptions
 
-        List<Subscription> subscriptions = subscribeService.findAll(context, resourceType, 10, 0);
+        List<Subscription> subscriptions = subscribeService.findAll(context.getSession(), resourceType, 10, 0);
         assertThat(subscriptions, containsInAnyOrder(
             asList(matches(firstCollection, subscribingUser, "content",
                            singletonList(weekly())),
@@ -78,7 +78,7 @@ public class SubscribeServiceIT extends AbstractIntegrationTestWithDatabase {
 
         // limited search returns first
 
-        subscriptions = subscribeService.findAll(context, resourceType, 1, 0);
+        subscriptions = subscribeService.findAll(context.getSession(), resourceType, 1, 0);
 
         assertThat(subscriptions, containsInAnyOrder(
             singletonList(matches(firstCollection, subscribingUser, "content",
@@ -86,14 +86,14 @@ public class SubscribeServiceIT extends AbstractIntegrationTestWithDatabase {
 
         // search with offset returns second
 
-        subscriptions = subscribeService.findAll(context, resourceType, 100, 1);
+        subscriptions = subscribeService.findAll(context.getSession(), resourceType, 100, 1);
 
         assertThat(subscriptions, containsInAnyOrder(
             singletonList(matches(secondCollection, subscribingUser, "content",
                                   asList(daily(), annual())))));
 
         // lookup without resource type
-        subscriptions = subscribeService.findAll(context, StringUtils.EMPTY, 100, 0);
+        subscriptions = subscribeService.findAll(context.getSession(), StringUtils.EMPTY, 100, 0);
 
         assertThat(subscriptions, containsInAnyOrder(
             asList(matches(firstCollection, subscribingUser, "content",
@@ -121,7 +121,7 @@ public class SubscribeServiceIT extends AbstractIntegrationTestWithDatabase {
         createSubscription("content", firstCollection, context.getCurrentUser(),
                            weekly());
 
-        subscribeService.findAll(context, resourceType, limit, offset);
+        subscribeService.findAll(context.getSession(), resourceType, limit, offset);
 
     }
 
@@ -185,7 +185,7 @@ public class SubscribeServiceIT extends AbstractIntegrationTestWithDatabase {
                            weekly());
 
         List<Subscription> subscriptions =
-            subscribeService.findSubscriptionsByEPersonAndDso(context, subscribingUser,
+            subscribeService.findSubscriptionsByEPersonAndDso(context.getSession(), subscribingUser,
                                                               secondCollection, 100, 0);
 
         assertEquals(subscriptions.size(), 1);
@@ -195,7 +195,7 @@ public class SubscribeServiceIT extends AbstractIntegrationTestWithDatabase {
         context.setCurrentUser(subscribingUser);
 
         subscriptions =
-            subscribeService.findSubscriptionsByEPersonAndDso(context, subscribingUser,
+            subscribeService.findSubscriptionsByEPersonAndDso(context.getSession(), subscribingUser,
                                                               secondCollection, 100, 0);
 
         assertEquals(subscriptions.size(), 0);
@@ -209,7 +209,7 @@ public class SubscribeServiceIT extends AbstractIntegrationTestWithDatabase {
                            weekly());
 
         List<Subscription> subscriptions =
-            subscribeService.findSubscriptionsByEPersonAndDso(context, subscribingUser,
+            subscribeService.findSubscriptionsByEPersonAndDso(context.getSession(), subscribingUser,
                                                               secondCollection, 100, 0);
 
         assertEquals(subscriptions.size(), 1);
@@ -218,7 +218,7 @@ public class SubscribeServiceIT extends AbstractIntegrationTestWithDatabase {
         subscribeService.unsubscribe(context, subscribingUser, secondCollection);
 
         subscriptions =
-            subscribeService.findSubscriptionsByEPersonAndDso(context, subscribingUser,
+            subscribeService.findSubscriptionsByEPersonAndDso(context.getSession(), subscribingUser,
                                                               secondCollection, 100, 0);
 
         assertEquals(subscriptions.size(), 0);
@@ -265,7 +265,8 @@ public class SubscribeServiceIT extends AbstractIntegrationTestWithDatabase {
             assertThat(updated, is(matches(firstCollection, currentUser, updatedType, updatedParameters)));
 
             List<Subscription> subscriptions =
-                subscribeService.findSubscriptionsByEPersonAndDso(context, currentUser, firstCollection, 10, 0);
+                subscribeService.findSubscriptionsByEPersonAndDso(context.getSession(),
+                        currentUser, firstCollection, 10, 0);
 
             assertThat(subscriptions, contains(
                 matches(firstCollection, currentUser, updatedType, updatedParameters)));
@@ -342,7 +343,7 @@ public class SubscribeServiceIT extends AbstractIntegrationTestWithDatabase {
         }
 
         List<Subscription> firstUserSubscriptions =
-            subscribeService.findSubscriptionsByEPerson(context, firstSubscriber, 100, 0);
+            subscribeService.findSubscriptionsByEPerson(context.getSession(), firstSubscriber, 100, 0);
 
         assertThat(firstUserSubscriptions, containsInAnyOrder(
             matches(firstCollection, firstSubscriber, "type1", asList(daily(),
@@ -354,28 +355,29 @@ public class SubscribeServiceIT extends AbstractIntegrationTestWithDatabase {
         ));
 
         List<Subscription> firstUserSubscriptionsLimited =
-            subscribeService.findSubscriptionsByEPerson(context, firstSubscriber, 1, 0);
+            subscribeService.findSubscriptionsByEPerson(context.getSession(), firstSubscriber, 1, 0);
 
         assertThat(firstUserSubscriptionsLimited.size(), is(1));
 
         List<Subscription> firstUserSubscriptionsWithOffset =
-            subscribeService.findSubscriptionsByEPerson(context, firstSubscriber, 100, 1);
+            subscribeService.findSubscriptionsByEPerson(context.getSession(), firstSubscriber, 100, 1);
 
         assertThat(firstUserSubscriptionsWithOffset.size(), is(2));
 
         subscribeService.deleteByEPerson(context, firstSubscriber);
-        assertThat(subscribeService.findSubscriptionsByEPerson(context, firstSubscriber, 100, 0),
+        assertThat(subscribeService.findSubscriptionsByEPerson(context.getSession(), firstSubscriber, 100, 0),
                    is(List.of()));
 
         List<Subscription> secondSubscriberSecondCollectionSubscriptions =
-            subscribeService.findSubscriptionsByEPersonAndDso(context, secondSubscriber, firstCollection, 10, 0);
+            subscribeService.findSubscriptionsByEPersonAndDso(context.getSession(),
+                    secondSubscriber, firstCollection, 10, 0);
 
         assertThat(secondSubscriberSecondCollectionSubscriptions, contains(
             matches(firstCollection, secondSubscriber, "type1", singletonList(daily()))
         ));
 
         List<Subscription> byTypeAndFrequency =
-            subscribeService.findAllSubscriptionsBySubscriptionTypeAndFrequency(context, "type1",
+            subscribeService.findAllSubscriptionsBySubscriptionTypeAndFrequency(context.getSession(), "type1",
                                                                                 "D");
         assertThat(byTypeAndFrequency, containsInAnyOrder(
             matches(firstCollection, secondSubscriber, "type1", singletonList(

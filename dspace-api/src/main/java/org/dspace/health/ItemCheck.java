@@ -190,7 +190,7 @@ public class ItemCheck extends Check {
         throws SQLException {
 
         List<Map.Entry<String, Integer>> cl = new java.util.ArrayList<>();
-        List<Community> top_communities = communityService.findAllTop(context);
+        List<Community> top_communities = communityService.findAllTop(context.getSession());
         for (Community c : top_communities) {
             cl.add(
                 new java.util.AbstractMap.SimpleEntry<>(c.getName(), itemService.countItems(context, c))

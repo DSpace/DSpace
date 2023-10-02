@@ -103,7 +103,7 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
 
         // Verify the general admin has this feature
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/site/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/site/" + siteService.findSite(context.getSession()).getID()))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='isCommunityAdmin')]")
@@ -116,7 +116,7 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
 
         // Verify the community admin has this feature
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/site/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/site/" + siteService.findSite(context.getSession()).getID()))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='isCommunityAdmin')]")
@@ -129,7 +129,7 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
 
         // Verify the subcommunity admin has this feature
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/site/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/site/" + siteService.findSite(context.getSession()).getID()))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='isCommunityAdmin')]")
@@ -142,7 +142,7 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
 
         // Verify the collection admin doesn't have this feature
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/site/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/site/" + siteService.findSite(context.getSession()).getID()))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='isCommunityAdmin')]")
@@ -155,7 +155,7 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
 
         // Verify a submitter doesn't have this feature
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/site/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/site/" + siteService.findSite(context.getSession()).getID()))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='isCommunityAdmin')]")
@@ -167,7 +167,7 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
         GroupBuilder.createGroup(context)
             .withName("userGroup")
-            .withParent(groupService.findByName(context, Group.ADMIN))
+            .withParent(groupService.findByName(context.getSession(), Group.ADMIN))
             .addMember(eperson)
             .build();
         context.restoreAuthSystemState();
@@ -176,7 +176,7 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
 
         // Verify an ePerson in a subgroup of the site administrators has this feature
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/site/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/site/" + siteService.findSite(context.getSession()).getID()))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='isCommunityAdmin')]")
@@ -188,7 +188,8 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
         GroupBuilder.createGroup(context)
             .withName("userGroup")
-            .withParent(groupService.findByName(context, "COMMUNITY_" + topLevelCommunityA.getID() + "_ADMIN"))
+            .withParent(groupService.findByName(context.getSession(),
+                    "COMMUNITY_" + topLevelCommunityA.getID() + "_ADMIN"))
             .addMember(eperson)
             .build();
         context.restoreAuthSystemState();
@@ -197,7 +198,7 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
 
         // Verify an ePerson in a subgroup of a community admin group has this feature
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/site/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/site/" + siteService.findSite(context.getSession()).getID()))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='isCommunityAdmin')]")
@@ -209,7 +210,8 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
         GroupBuilder.createGroup(context)
             .withName("userGroup")
-            .withParent(groupService.findByName(context, "COMMUNITY_" + subCommunityA.getID() + "_ADMIN"))
+            .withParent(groupService.findByName(context.getSession(),
+                    "COMMUNITY_" + subCommunityA.getID() + "_ADMIN"))
             .addMember(eperson)
             .build();
         context.restoreAuthSystemState();
@@ -218,7 +220,7 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
 
         // Verify an ePerson in a subgroup of a subcommunity admin group has this feature
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/site/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/site/" + siteService.findSite(context.getSession()).getID()))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='isCommunityAdmin')]")
@@ -230,7 +232,8 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
         GroupBuilder.createGroup(context)
             .withName("userGroup")
-            .withParent(groupService.findByName(context, "COLLECTION_" + collectionA.getID() + "_ADMIN"))
+            .withParent(groupService.findByName(context.getSession(),
+                    "COLLECTION_" + collectionA.getID() + "_ADMIN"))
             .addMember(eperson)
             .build();
         context.restoreAuthSystemState();
@@ -239,7 +242,7 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
 
         // Verify an ePerson in a subgroup of a collection admin group doesn't have this feature
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/site/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/site/" + siteService.findSite(context.getSession()).getID()))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='isCommunityAdmin')]")
@@ -251,7 +254,8 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
         GroupBuilder.createGroup(context)
             .withName("userGroup")
-            .withParent(groupService.findByName(context, "COLLECTION_" + collectionA.getID() + "_SUBMIT"))
+            .withParent(groupService.findByName(context.getSession(),
+                    "COLLECTION_" + collectionA.getID() + "_SUBMIT"))
             .addMember(eperson)
             .build();
         context.restoreAuthSystemState();
@@ -260,7 +264,7 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
 
         // Verify an ePerson in a subgroup of submitter group doesn't have this feature
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/site/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/site/" + siteService.findSite(context.getSession()).getID()))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='isCommunityAdmin')]")
@@ -272,7 +276,7 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
         Group groupB = GroupBuilder.createGroup(context)
             .withName("GroupB")
-            .withParent(groupService.findByName(context, Group.ADMIN))
+            .withParent(groupService.findByName(context.getSession(), Group.ADMIN))
             .build();
         GroupBuilder.createGroup(context)
             .withName("GroupA")
@@ -285,7 +289,7 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
 
         // Verify an ePerson in a sub-subgroup of the site administrators has this feature
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/site/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/site/" + siteService.findSite(context.getSession()).getID()))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='isCommunityAdmin')]")
@@ -297,7 +301,8 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
         Group groupB = GroupBuilder.createGroup(context)
             .withName("GroupB")
-            .withParent(groupService.findByName(context, "COMMUNITY_" + topLevelCommunityA.getID() + "_ADMIN"))
+            .withParent(groupService.findByName(context.getSession(),
+                    "COMMUNITY_" + topLevelCommunityA.getID() + "_ADMIN"))
             .build();
         GroupBuilder.createGroup(context)
             .withName("GroupA")
@@ -310,7 +315,7 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
 
         // Verify an ePerson in a sub-subgroup of a community admin group has this feature
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/site/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/site/" + siteService.findSite(context.getSession()).getID()))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='isCommunityAdmin')]")
@@ -322,7 +327,8 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
         Group groupB = GroupBuilder.createGroup(context)
             .withName("GroupB")
-            .withParent(groupService.findByName(context, "COMMUNITY_" + subCommunityA.getID() + "_ADMIN"))
+            .withParent(groupService.findByName(context.getSession(),
+                    "COMMUNITY_" + subCommunityA.getID() + "_ADMIN"))
             .build();
         GroupBuilder.createGroup(context)
             .withName("GroupA")
@@ -335,7 +341,7 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
 
         // Verify an ePerson in a sub-subgroup of a subcommunity admin group has this feature
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/site/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/site/" + siteService.findSite(context.getSession()).getID()))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='isCommunityAdmin')]")
@@ -347,7 +353,8 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
         Group groupB = GroupBuilder.createGroup(context)
             .withName("GroupB")
-            .withParent(groupService.findByName(context, "COLLECTION_" + collectionA.getID() + "_ADMIN"))
+            .withParent(groupService.findByName(context.getSession(),
+                    "COLLECTION_" + collectionA.getID() + "_ADMIN"))
             .build();
         GroupBuilder.createGroup(context)
             .withName("GroupA")
@@ -360,7 +367,7 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
 
         // Verify an ePerson in a sub-subgroup of a collection admin group doesn't have this feature
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/site/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/site/" + siteService.findSite(context.getSession()).getID()))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='isCommunityAdmin')]")
@@ -372,7 +379,8 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
         Group groupB = GroupBuilder.createGroup(context)
             .withName("GroupB")
-            .withParent(groupService.findByName(context, "COLLECTION_" + collectionA.getID() + "_SUBMIT"))
+            .withParent(groupService.findByName(context.getSession(),
+                    "COLLECTION_" + collectionA.getID() + "_SUBMIT"))
             .build();
         GroupBuilder.createGroup(context)
             .withName("GroupA")
@@ -385,7 +393,7 @@ public class CommunityAdminFeatureIT extends AbstractControllerIntegrationTest {
 
         // Verify an ePerson in a sub-subgroup of submitter group doesn't have this feature
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/site/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/site/" + siteService.findSite(context.getSession()).getID()))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='isCommunityAdmin')]")

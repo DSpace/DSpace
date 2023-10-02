@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import org.dspace.core.Context;
 import org.dspace.eperson.RegistrationData;
 import org.dspace.service.DSpaceCRUDService;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the RegistrationData object.
@@ -22,9 +23,9 @@ import org.dspace.service.DSpaceCRUDService;
  */
 public interface RegistrationDataService extends DSpaceCRUDService<RegistrationData> {
 
-    public RegistrationData findByToken(Context context, String token) throws SQLException;
+    public RegistrationData findByToken(Session session, String token) throws SQLException;
 
-    public RegistrationData findByEmail(Context context, String email) throws SQLException;
+    public RegistrationData findByEmail(Session session, String email) throws SQLException;
 
     public void deleteByToken(Context context, String token) throws SQLException;
 

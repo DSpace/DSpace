@@ -161,7 +161,7 @@ public class GroupTest extends AbstractUnitTest {
 
     @Test
     public void findByName() throws SQLException {
-        Group group = groupService.findByName(context, "topGroup");
+        Group group = groupService.findByName(context.getSession(), "topGroup");
         assertThat("findByName 1", group, notNullValue());
         assertThat("findByName 2", group.getName(), notNullValue());
         assertThat("findByName 2", group.getName(), equalTo("topGroup"));
@@ -169,9 +169,9 @@ public class GroupTest extends AbstractUnitTest {
 
     @Test
     public void findAll() throws SQLException {
-        List<Group> groups = groupService.findAll(context, null);
+        List<Group> groups = groupService.findAll(context.getSession(), null);
         assertThat("findAll 1", groups, notNullValue());
-        assertTrue("findAll 2", 0 < groups.size());
+        assertTrue("findAll 2", !groups.isEmpty());
     }
 
     //No longer possible, wouldn't make sense since we are using UUID'S
@@ -196,7 +196,7 @@ public class GroupTest extends AbstractUnitTest {
     @Test
     public void findAllNameSort() throws SQLException {
         // Retrieve groups sorted by name
-        List<Group> groups = groupService.findAll(context, null);
+        List<Group> groups = groupService.findAll(context.getSession(), null);
 
         assertThat("findAllNameSort 1", groups, notNullValue());
 
@@ -507,7 +507,7 @@ public class GroupTest extends AbstractUnitTest {
     @Test
     public void isPermanent()
         throws SQLException {
-        Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+        Group anonymousGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         assertTrue("Anonymous group should be 'permanent'", anonymousGroup.isPermanent());
         assertFalse("topGroup should *not* be 'permanent'", topGroup.isPermanent());
     }

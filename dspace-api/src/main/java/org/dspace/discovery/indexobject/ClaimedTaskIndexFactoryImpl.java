@@ -38,7 +38,7 @@ public class ClaimedTaskIndexFactoryImpl extends IndexFactoryImpl<IndexableClaim
 
     @Override
     public Iterator<IndexableClaimedTask> findAll(Context context) throws SQLException {
-        final Iterator<ClaimedTask> claimedTasks = claimedTaskService.findAll(context).iterator();
+        final Iterator<ClaimedTask> claimedTasks = claimedTaskService.findAll(context.getSession()).iterator();
         return new Iterator<IndexableClaimedTask>() {
             @Override
             public boolean hasNext() {
@@ -93,7 +93,7 @@ public class ClaimedTaskIndexFactoryImpl extends IndexFactoryImpl<IndexableClaim
 
     @Override
     public Optional<IndexableClaimedTask> findIndexableObject(Context context, String id) throws SQLException {
-        final ClaimedTask claimedTask = claimedTaskService.find(context, Integer.parseInt(id));
+        final ClaimedTask claimedTask = claimedTaskService.find(context.getSession(), Integer.parseInt(id));
         return claimedTask == null ? Optional.empty() : Optional.of(new IndexableClaimedTask(claimedTask));
     }
 }

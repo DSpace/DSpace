@@ -11,9 +11,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 import org.dspace.handle.Handle;
+import org.hibernate.Session;
 
 /**
  * Database Access Object interface class for the Handle object.
@@ -25,17 +25,17 @@ import org.dspace.handle.Handle;
  */
 public interface HandleDAO extends GenericDAO<Handle> {
 
-    public Long getNextHandleSuffix(Context context) throws SQLException;
+    public Long getNextHandleSuffix(Session session) throws SQLException;
 
-    public List<Handle> getHandlesByDSpaceObject(Context context, DSpaceObject dso) throws SQLException;
+    public List<Handle> getHandlesByDSpaceObject(Session session, DSpaceObject dso) throws SQLException;
 
-    public Handle findByHandle(Context context, String handle) throws SQLException;
+    public Handle findByHandle(Session session, String handle) throws SQLException;
 
-    public List<Handle> findByPrefix(Context context, String prefix) throws SQLException;
+    public List<Handle> findByPrefix(Session session, String prefix) throws SQLException;
 
-    public long countHandlesByPrefix(Context context, String prefix) throws SQLException;
+    public long countHandlesByPrefix(Session session, String prefix) throws SQLException;
 
-    int updateHandlesWithNewPrefix(Context context, String newPrefix, String oldPrefix) throws SQLException;
+    int updateHandlesWithNewPrefix(Session session, String newPrefix, String oldPrefix) throws SQLException;
 
-    int countRows(Context context) throws SQLException;
+    int countRows(Session session) throws SQLException;
 }

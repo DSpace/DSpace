@@ -783,13 +783,13 @@ public class SupervisionOrderRestRepositoryIT extends AbstractControllerIntegrat
                                  .set(read(result.getResponse().getContentAsString(), "$.id")));
 
         SupervisionOrder supervisionOrderOne =
-            supervisionOrderService.find(context, supervisionOrderIdOne.get());
+            supervisionOrderService.find(context.getSession(), supervisionOrderIdOne.get());
 
         SupervisionOrder supervisionOrderTwo =
-            supervisionOrderService.find(context, supervisionOrderIdTwo.get());
+            supervisionOrderService.find(context.getSession(), supervisionOrderIdTwo.get());
 
         SupervisionOrder supervisionOrderThree =
-            supervisionOrderService.find(context, supervisionOrderIdThree.get());
+            supervisionOrderService.find(context.getSession(), supervisionOrderIdThree.get());
 
         getClient(adminToken).perform(get("/api/core/supervisionorders/" + supervisionOrderOne.getID()))
                              .andExpect(status().isOk())
@@ -1369,7 +1369,7 @@ public class SupervisionOrderRestRepositoryIT extends AbstractControllerIntegrat
                                      witem, "New Title", "2017-10-17", "ExtraEntry"
                                  ))));
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
         try {
             String adminToken = getAuthToken(admin.getEmail(), password);
             String reviewerToken = getAuthToken(reviewer.getEmail(), password);

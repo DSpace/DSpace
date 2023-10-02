@@ -120,7 +120,7 @@ public class TestLogicRunner {
             } else if (line.hasOption("all")) {
                 ItemService itemService = ContentServiceFactory.getInstance().getItemService();
                 try {
-                    Iterator<Item> itemIterator = itemService.findAll(c);
+                    Iterator<Item> itemIterator = itemService.findAll(c.getSession());
                     while (itemIterator.hasNext()) {
                         Item i = itemIterator.next();
                         System.out.println(

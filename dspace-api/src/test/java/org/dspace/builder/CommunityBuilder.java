@@ -162,7 +162,7 @@ public class CommunityBuilder extends AbstractDSpaceObjectBuilder<Community> {
     public static void deleteCommunity(UUID uuid) throws SQLException, IOException {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
-            Community community = communityService.find(c, uuid);
+            Community community = communityService.find(c.getSession(), uuid);
             if (community != null) {
                 try {
                     Group adminGroup = community.getAdministrators();

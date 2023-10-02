@@ -75,7 +75,7 @@ public class WorkflowDefinitionRestRepository extends DSpaceRestRepository<Workf
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public WorkflowDefinitionRest findByCollection(@Parameter(value = "uuid") UUID collectionId) throws SQLException {
         Context context = obtainContext();
-        Collection collectionFromUuid = collectionService.find(context, collectionId);
+        Collection collectionFromUuid = collectionService.find(context.getSession(), collectionId);
         if (collectionFromUuid != null) {
             try {
                 return converter.toRest(xmlWorkflowFactory.getWorkflow(collectionFromUuid), utils.obtainProjection());

@@ -26,7 +26,6 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataSchema_;
 import org.dspace.content.dao.MetadataFieldDAO;
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
 import org.hibernate.Session;
 
 /**
@@ -40,32 +39,32 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataFieldDAOImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     /**
      * Cache for improvement the performance of searching metadata fields
      * This cache only stores IDs, the actual MetadataField is retrieved from hibernate
      */
-    private static Map<String, Integer> cachedFields = new HashMap();
+    private static final Map<String, Integer> cachedFields = new HashMap();
 
     protected MetadataFieldDAOImpl() {
         super();
     }
 
     @Override
-    public MetadataField find(Context context, int metadataFieldId, MetadataSchema metadataSchema, String element,
+    public MetadataField find(Session session, int metadataFieldId, MetadataSchema metadataSchema, String element,
                               String qualifier) throws SQLException {
         Query query;
 
         if (qualifier != null) {
-            query = createQuery(context, "SELECT mf " +
+            query = createQuery(session, "SELECT mf " +
                 "FROM MetadataField mf " +
                 "JOIN FETCH mf.metadataSchema ms " +
                 "WHERE mf.id != :id " +
                 "AND ms.name = :name AND mf.element = :element " +
                 "AND qualifier = :qualifier");
         } else {
-            query = createQuery(context, "SELECT mf " +
+            query = createQuery(session, "SELECT mf " +
                 "FROM MetadataField mf " +
                 "JOIN FETCH mf.metadataSchema ms " +
                 "WHERE mf.id != :id " +
@@ -86,17 +85,16 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
     }
 
     @Override
-    public MetadataField findByElement(Context context, MetadataSchema metadataSchema, String element, String qualifier)
+    public MetadataField findByElement(Session session, MetadataSchema metadataSchema, String element, String qualifier)
         throws SQLException {
-        return findByElement(context, metadataSchema.getName(), element, qualifier);
+        return findByElement(session, metadataSchema.getName(), element, qualifier);
     }
 
     @Override
-    public MetadataField findByElement(Context context, String metadataSchema, String element, String qualifier)
+    public MetadataField findByElement(Session session, String metadataSchema, String element, String qualifier)
         throws SQLException {
         String key = metadataSchema + "." + element + "." + qualifier;
         if (cachedFields.containsKey(key)) {
-            Session session = getHibernateSession(context);
             MetadataField metadataField = null;
             try {
                 metadataField = session.load(MetadataField.class, cachedFields.get(key));
@@ -121,13 +119,13 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
         Query query;
 
         if (StringUtils.isNotBlank(qualifier)) {
-            query = createQuery(context, "SELECT mf " +
+            query = createQuery(session, "SELECT mf " +
                 "FROM MetadataField mf " +
                 "JOIN FETCH mf.metadataSchema ms " +
                 "WHERE ms.name = :name AND mf.element = :element " +
                 "AND qualifier = :qualifier");
         } else {
-            query = createQuery(context, "SELECT mf " +
+            query = createQuery(session, "SELECT mf " +
                 "FROM MetadataField mf " +
                 "JOIN FETCH mf.metadataSchema ms " +
                 "WHERE ms.name = :name AND mf.element = :element " +
@@ -150,9 +148,9 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
     }
 
     @Override
-    public List<MetadataField> findAll(Context context, Class<MetadataField> clazz) throws SQLException {
+    public List<MetadataField> findAll(Session session, Class<MetadataField> clazz) throws SQLException {
 
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, MetadataField.class);
         Root<MetadataField> metadataFieldRoot = criteriaQuery.from(MetadataField.class);
         Join<MetadataField, MetadataSchema> join = metadataFieldRoot.join("metadataSchema");
@@ -164,13 +162,13 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
         orderList.add(criteriaBuilder.asc(metadataFieldRoot.get(MetadataField_.qualifier)));
         criteriaQuery.orderBy(orderList);
 
-        return list(context, criteriaQuery, true, MetadataField.class, -1, -1, false);
+        return list(session, criteriaQuery, true, MetadataField.class, -1, -1, false);
     }
 
     @Override
-    public List<MetadataField> findFieldsByElementNameUnqualified(Context context, String metadataSchema,
+    public List<MetadataField> findFieldsByElementNameUnqualified(Session session, String metadataSchema,
                                                                   String element) throws SQLException {
-        Query query = createQuery(context, "SELECT mf " +
+        Query query = createQuery(session, "SELECT mf " +
             "FROM MetadataField mf " +
             "JOIN FETCH mf.metadataSchema ms " +
             "WHERE ms.name = :name AND mf.element = :element ");
@@ -185,9 +183,9 @@ public class MetadataFieldDAOImpl extends AbstractHibernateDAO<MetadataField> im
 
 
     @Override
-    public List<MetadataField> findAllInSchema(Context context, MetadataSchema metadataSchema) throws SQLException {
+    public List<MetadataField> findAllInSchema(Session session, MetadataSchema metadataSchema) throws SQLException {
 
-        Query query = createQuery(context, "SELECT mf " +
+        Query query = createQuery(session, "SELECT mf " +
             "FROM MetadataField mf " +
             "JOIN FETCH mf.metadataSchema ms " +
             "WHERE ms.name = :name " +

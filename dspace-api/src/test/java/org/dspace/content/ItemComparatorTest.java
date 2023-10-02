@@ -42,15 +42,22 @@ public class ItemComparatorTest extends AbstractUnitTest {
      */
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemComparatorTest.class);
 
-    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
-    protected MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance()
-                                                                                 .getMetadataSchemaService();
-    protected MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
-    private MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
+    protected CommunityService communityService
+            = ContentServiceFactory.getInstance().getCommunityService();
+    protected CollectionService collectionService
+            = ContentServiceFactory.getInstance().getCollectionService();
+    private final ItemService itemService
+            = ContentServiceFactory.getInstance().getItemService();
+    protected WorkspaceItemService workspaceItemService
+            = ContentServiceFactory.getInstance().getWorkspaceItemService();
+    protected InstallItemService installItemService
+            = ContentServiceFactory.getInstance().getInstallItemService();
+    protected MetadataSchemaService metadataSchemaService
+            = ContentServiceFactory.getInstance().getMetadataSchemaService();
+    protected MetadataFieldService metadataFieldService
+            = ContentServiceFactory.getInstance().getMetadataFieldService();
+    private final MetadataValueService metadataValueService
+            = ContentServiceFactory.getInstance().getMetadataValueService();
 
     /**
      * Item instance for the tests
@@ -81,7 +88,7 @@ public class ItemComparatorTest extends AbstractUnitTest {
             super.init();
 
             context.turnOffAuthorisationSystem();
-            MetadataSchema testSchema = metadataSchemaService.find(context, "dc");
+            MetadataSchema testSchema = metadataSchemaService.find(context.getSession(), "dc");
             metadataField = metadataFieldService.create(context, testSchema, "test", "one", null);
             this.owningCommunity = communityService.create(null, context);
             this.collection = collectionService.create(context, owningCommunity);

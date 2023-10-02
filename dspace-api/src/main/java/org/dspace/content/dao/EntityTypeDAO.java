@@ -11,8 +11,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.content.EntityType;
-import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
+import org.hibernate.Session;
 
 /**
  * Database Access Object Interface class for the EntityType object
@@ -25,33 +25,33 @@ public interface EntityTypeDAO extends GenericDAO<EntityType> {
     /**
      * This method returns the EntityType object that has the given entityType String
      * as label
-     * @param context       The relevant DSpace context
+     * @param session       The current request's database context.
      * @param entityType    The entityType String that will be matched on to find
      *                      the correct EntityType
      * @return              The EntityType object that has the entityType String as label
      * @throws SQLException If something goes wrong
      */
-    public EntityType findByEntityType(Context context, String entityType) throws SQLException;
+    public EntityType findByEntityType(Session session, String entityType) throws SQLException;
 
     /**
-     * 
-     * @param context        DSpace context object
+     *
+     * @param session        The current request's database context.
      * @param names          List of Entity type names that you want to retrieve
      * @param limit          paging limit
      * @param offset         the position of the first result to return
      * @return
      * @throws SQLException  if database error
      */
-    public List<EntityType> getEntityTypesByNames(Context context, List<String> names, Integer limit, Integer offset)
+    public List<EntityType> getEntityTypesByNames(Session session, List<String> names, Integer limit, Integer offset)
            throws SQLException;
 
     /**
-     * 
-     * @param context          DSpace context object
+     *
+     * @param session          The current request's database context.
      * @param names            List of Entity type names that you want to retrieve
      * @return
      * @throws SQLException    If database error
      */
-    public int countEntityTypesByNames(Context context, List<String> names) throws SQLException;
+    public int countEntityTypesByNames(Session session, List<String> names) throws SQLException;
 
 }

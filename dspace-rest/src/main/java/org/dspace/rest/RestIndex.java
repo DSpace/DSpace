@@ -44,7 +44,7 @@ import org.dspace.utils.DSpace;
 @Path("/")
 public class RestIndex {
     protected EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(RestIndex.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     /**
      * Return html page with information about REST api. It contains methods all
@@ -282,7 +282,7 @@ public class RestIndex {
 
             if (ePerson != null) {
                 //DB EPerson needed since token won't have full info, need context
-                EPerson dbEPerson = epersonService.findByEmail(context, ePerson.getEmail());
+                EPerson dbEPerson = epersonService.findByEmail(context.getSession(), ePerson.getEmail());
 
                 Status status = new Status(dbEPerson.getEmail(), dbEPerson.getFullName());
                 return status;

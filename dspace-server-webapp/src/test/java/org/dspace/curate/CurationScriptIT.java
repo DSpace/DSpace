@@ -415,7 +415,7 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
                                 .withTitle("Test item to curate").build();
         Item anotherItem = ItemBuilder.createItem(context, anotherCollection)
                                 .withTitle("Another Test item to curate").build();
-        Site site = ContentServiceFactory.getInstance().getSiteService().findSite(context);
+        Site site = ContentServiceFactory.getInstance().getSiteService().findSite(context.getSession());
         context.restoreAuthSystemState();
 
         LinkedList<DSpaceCommandLineParameter> siteParameters = new LinkedList<>();

@@ -23,6 +23,7 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.dao.VersionHistoryDAO;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -50,12 +51,12 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
 
     @Override
     public VersionHistory create(Context context) throws SQLException {
-        return versionHistoryDAO.create(context, new VersionHistory());
+        return versionHistoryDAO.create(context.getSession(), new VersionHistory());
     }
 
     @Override
-    public VersionHistory find(Context context, int id) throws SQLException {
-        return versionHistoryDAO.findByID(context, VersionHistory.class, id);
+    public VersionHistory find(Session session, int id) throws SQLException {
+        return versionHistoryDAO.findByID(session, VersionHistory.class, id);
     }
 
     @Override
@@ -67,14 +68,14 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
     public void update(Context context, List<VersionHistory> versionHistories) throws SQLException, AuthorizeException {
         if (CollectionUtils.isNotEmpty(versionHistories)) {
             for (VersionHistory versionHistory : versionHistories) {
-                versionHistoryDAO.save(context, versionHistory);
+                versionHistoryDAO.save(context.getSession(), versionHistory);
             }
         }
     }
 
     @Override
     public void delete(Context context, VersionHistory versionHistory) throws SQLException, AuthorizeException {
-        versionHistoryDAO.delete(context, new VersionHistory());
+        versionHistoryDAO.delete(context.getSession(), new VersionHistory());
     }
 
     // LIST order: descending
@@ -138,7 +139,7 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
     @Override
     public boolean hasVersionHistory(Context context, Item item)
         throws SQLException {
-        return findByItem(context, item) != null;
+        return findByItem(context.getSession(), item) != null;
     }
 
     @Override
@@ -146,7 +147,7 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
         throws SQLException {
         List<Version> versions = versionHistory.getVersions();
         if (versions == null) {
-            versions = new ArrayList<Version>();
+            versions = new ArrayList<>();
         }
         versions.add(0, version);
     }
@@ -179,7 +180,7 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
 
     @Override
     public boolean isFirstVersion(Context context, Item item) throws SQLException {
-        VersionHistory vh = findByItem(context, item);
+        VersionHistory vh = findByItem(context.getSession(), item);
         if (vh == null) {
             return true;
         }
@@ -195,7 +196,7 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
 
     @Override
     public boolean isLastVersion(Context context, Item item) throws SQLException {
-        VersionHistory vh = findByItem(context, item);
+        VersionHistory vh = findByItem(context.getSession(), item);
         if (vh == null) {
             return true;
         }
@@ -216,8 +217,8 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
     }
 
     @Override
-    public VersionHistory findByItem(Context context, Item item) throws SQLException {
-        return versionHistoryDAO.findByItem(context, item);
+    public VersionHistory findByItem(Session session, Item item) throws SQLException {
+        return versionHistoryDAO.findByItem(session, item);
     }
 
     @Override

@@ -59,7 +59,7 @@ public class ViewEventRestRepository extends AbstractDSpaceRestRepository {
         DSpaceObjectService dSpaceObjectService = ContentServiceFactory.getInstance().getDSpaceObjectService(
             Constants.getTypeID(viewEventRest.getTargetType().toUpperCase(Locale.getDefault())));
 
-        DSpaceObject dSpaceObject = dSpaceObjectService.find(context, viewEventRest.getTargetId());
+        DSpaceObject dSpaceObject = dSpaceObjectService.find(context.getSession(), viewEventRest.getTargetId());
         if (dSpaceObject == null) {
             throw new UnprocessableEntityException(
                 "The given targetId does not resolve to a DSpaceObject: " + viewEventRest.getTargetId());

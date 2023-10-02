@@ -78,7 +78,7 @@ public class SubmissionShowIdentifiersRestIT extends AbstractControllerIntegrati
     @After
     public void after() throws SQLException, IOException, AuthorizeException {
         context.turnOffAuthorisationSystem();
-        workspaceItemService.findAll(context).forEach(this::deleteWorkspaceItem);
+        workspaceItemService.findAll(context.getSession()).forEach(this::deleteWorkspaceItem);
         // Manually restore identifiers configuration
         configurationService.setProperty("identifiers.submission.register", false);
         context.restoreAuthSystemState();

@@ -100,7 +100,7 @@ public class UpdateHandlePrefix {
 
                         String handlePrefix = handleService.getCanonicalPrefix();
                         Iterator<MetadataValue> metadataValues = metadataValueService
-                            .findByValueLike(context, handlePrefix + oldH);
+                            .findByValueLike(context.getSession(), handlePrefix + oldH);
 
                         int updMeta = 0;
                         while (metadataValues.hasNext()) {

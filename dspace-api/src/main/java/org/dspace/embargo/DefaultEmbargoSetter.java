@@ -137,7 +137,7 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
                     .createOrModifyPolicy(null, context, null,
                                           EPersonServiceFactory.getInstance()
                                                                .getGroupService()
-                                                               .findByName(context, Group.ANONYMOUS),
+                                                               .findByName(context.getSession(), Group.ANONYMOUS),
                                           null, embargoDate, Constants.READ, reason, dso);
                 if (rp != null) {
                     getResourcePolicyService().update(context, rp);

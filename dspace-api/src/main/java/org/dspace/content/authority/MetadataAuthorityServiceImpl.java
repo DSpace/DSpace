@@ -111,7 +111,7 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService {
 
 
                     MetadataField metadataField = metadataFieldService
-                        .findByElement(context, schema, element, qualifier);
+                        .findByElement(context.getSession(), schema, element, qualifier);
                     if (metadataField == null) {
                         throw new IllegalStateException(
                             "Error while configuring authority control, metadata field: " + field + " could not " +

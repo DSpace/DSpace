@@ -100,7 +100,7 @@ public class ViewUsageStatisticsFeatureIT extends AbstractControllerIntegrationT
         super.setUp();
         context.turnOffAuthorisationSystem();
 
-        site = siteService.findSite(context);
+        site = siteService.findSite(context.getSession());
         communityA = CommunityBuilder.createCommunity(context)
             .withName("communityA")
             .build();

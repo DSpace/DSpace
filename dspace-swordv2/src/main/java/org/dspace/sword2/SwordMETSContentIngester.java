@@ -159,7 +159,7 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester {
 
             // for some reason, DSpace will not give you the handle automatically,
             // so we have to look it up
-            String handle = handleService.findHandle(context, installedItem);
+            String handle = handleService.findHandle(context.getSession(), installedItem);
 
             verboseDescription.append("Ingest successful");
             verboseDescription.append(

@@ -161,12 +161,12 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             throw new DSpaceBadRequestException(
                 "Registration is disabled, you are not authorized to create a new Authorization");
         }
-        RegistrationData registrationData = registrationDataService.findByToken(context, token);
+        RegistrationData registrationData = registrationDataService.findByToken(context.getSession(), token);
         if (registrationData == null) {
             throw new DSpaceBadRequestException("The token given as parameter: " + token + " does not exist" +
                                                 " in the database");
         }
-        if (es.findByEmail(context, registrationData.getEmail()) != null) {
+        if (es.findByEmail(context.getSession(), registrationData.getEmail()) != null) {
             throw new DSpaceBadRequestException("The token given already contains an email address that resolves" +
                                                 " to an eperson");
         }
@@ -217,7 +217,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     public EPersonRest findOne(Context context, UUID id) {
         EPerson eperson = null;
         try {
-            eperson = es.find(context, id);
+            eperson = es.find(context.getSession(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -232,7 +232,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     public Page<EPersonRest> findAll(Context context, Pageable pageable) {
         try {
             long total = es.countTotal(context);
-            List<EPerson> epersons = es.findAll(context, EPerson.EMAIL, pageable.getPageSize(),
+            List<EPerson> epersons = es.findAll(context.getSession(), EPerson.EMAIL, pageable.getPageSize(),
                     Math.toIntExact(pageable.getOffset()));
             return converter.toRestPage(epersons, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
@@ -253,7 +253,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         EPerson eperson = null;
         try {
             Context context = obtainContext();
-            eperson = es.findByEmail(context, email);
+            eperson = es.findByEmail(context.getSession(), email);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -317,7 +317,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     protected void delete(Context context, UUID id) throws AuthorizeException {
         EPerson eperson = null;
         try {
-            eperson = es.find(context, id);
+            eperson = es.find(context.getSession(), id);
             es.delete(context, eperson);
         } catch (SQLException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);

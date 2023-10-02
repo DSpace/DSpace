@@ -87,7 +87,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
     @After
     @Override
     public void destroy() throws Exception {
-        List<OrcidQueue> records = orcidQueueService.findAll(context);
+        List<OrcidQueue> records = orcidQueueService.findAll(context.getSession());
         for (OrcidQueue record : records) {
             orcidQueueService.delete(context, record);
         }
@@ -114,7 +114,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
+        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context.getSession());
         assertThat(queueRecords, empty());
     }
 
@@ -137,7 +137,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
+        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context.getSession());
         assertThat(queueRecords, empty());
     }
 
@@ -160,7 +160,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
+        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context.getSession());
         assertThat(queueRecords, hasSize(2));
         assertThat(queueRecords, hasItem(matches(profile, profile, "KEYWORDS", null,
             "dc.subject::test", "test", INSERT)));
@@ -171,7 +171,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         addMetadata(profile, "person", "name", "variant", "User Test", null);
         context.commit();
 
-        queueRecords = orcidQueueService.findAll(context);
+        queueRecords = orcidQueueService.findAll(context.getSession());
         assertThat(queueRecords, hasSize(3));
         assertThat(queueRecords, hasItem(
             matches(profile, profile, "KEYWORDS", null, "dc.subject::test", "test", INSERT)));
@@ -214,12 +214,12 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        assertThat(orcidQueueService.findAll(context), empty());
+        assertThat(orcidQueueService.findAll(context.getSession()), empty());
 
         addMetadata(profile, "person", "country", null, "IT", null);
         context.commit();
 
-        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
+        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context.getSession());
         assertThat(queueRecords, hasSize(1));
         assertThat(queueRecords.get(0), matches(profile, "COUNTRY", null, "person.country::IT", "IT", INSERT));
     }
@@ -267,12 +267,12 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        assertThat(orcidQueueService.findAll(context), empty());
+        assertThat(orcidQueueService.findAll(context.getSession()), empty());
 
         addMetadata(profile, "person", "country", null, "IT", null);
         context.commit();
 
-        assertThat(orcidQueueService.findAll(context), empty());
+        assertThat(orcidQueueService.findAll(context.getSession()), empty());
 
     }
 
@@ -310,12 +310,12 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        assertThat(orcidQueueService.findAll(context), empty());
+        assertThat(orcidQueueService.findAll(context.getSession()), empty());
 
         addMetadata(profile, "person", "country", null, "IT", null);
         context.commit();
 
-        assertThat(orcidQueueService.findAll(context), empty());
+        assertThat(orcidQueueService.findAll(context.getSession()), empty());
 
     }
 
@@ -335,14 +335,14 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        List<OrcidQueue> records = orcidQueueService.findAll(context);
+        List<OrcidQueue> records = orcidQueueService.findAll(context.getSession());
         assertThat(records, hasSize(1));
         assertThat(records, hasItem(matches(item, KEYWORDS.name(), null, "dc.subject::Science", "Science", INSERT)));
 
         removeMetadata(item, "dc", "subject", null);
         context.commit();
 
-        assertThat(orcidQueueService.findAll(context), empty());
+        assertThat(orcidQueueService.findAll(context.getSession()), empty());
 
     }
 
@@ -362,7 +362,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        List<OrcidQueue> records = orcidQueueService.findAll(context);
+        List<OrcidQueue> records = orcidQueueService.findAll(context.getSession());
         assertThat(records, hasSize(1));
         assertThat(records, hasItem(matches(item, KEYWORDS.name(), null, "dc.subject::Science", "Science", INSERT)));
 
@@ -378,7 +378,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         removeMetadata(item, "dc", "subject", null);
         context.commit();
 
-        records = orcidQueueService.findAll(context);
+        records = orcidQueueService.findAll(context.getSession());
         assertThat(records, hasSize(1));
         assertThat(records, hasItem(matches(item, KEYWORDS.name(), "12345", "dc.subject::Science", "Science", DELETE)));
 
@@ -400,7 +400,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        List<OrcidQueue> records = orcidQueueService.findAll(context);
+        List<OrcidQueue> records = orcidQueueService.findAll(context.getSession());
         assertThat(records, hasSize(1));
         assertThat(records, hasItem(matches(item, KEYWORDS.name(), null, "dc.subject::Science", "Science", INSERT)));
 
@@ -416,7 +416,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         removeMetadata(item, "dc", "subject", null);
         context.commit();
 
-        assertThat(orcidQueueService.findAll(context), empty());
+        assertThat(orcidQueueService.findAll(context.getSession()), empty());
 
     }
 
@@ -433,7 +433,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        assertThat(orcidQueueService.findAll(context), empty());
+        assertThat(orcidQueueService.findAll(context.getSession()), empty());
     }
 
     @Test
@@ -450,7 +450,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        assertThat(orcidQueueService.findAll(context), empty());
+        assertThat(orcidQueueService.findAll(context.getSession()), empty());
     }
 
     @Test
@@ -483,14 +483,14 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
+        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context.getSession());
         assertThat(orcidQueueRecords, hasSize(1));
         assertThat(orcidQueueRecords.get(0), matches(profile, publication, "Publication", INSERT));
 
         addMetadata(publication, "dc", "contributor", "editor", "Editor", null);
         context.commit();
 
-        List<OrcidQueue> newOrcidQueueRecords = orcidQueueService.findAll(context);
+        List<OrcidQueue> newOrcidQueueRecords = orcidQueueService.findAll(context.getSession());
         assertThat(newOrcidQueueRecords, hasSize(1));
 
         assertThat(orcidQueueRecords.get(0), equalTo(newOrcidQueueRecords.get(0)));
@@ -531,7 +531,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
+        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context.getSession());
         assertThat(orcidQueueRecords, hasSize(1));
         assertThat(orcidQueueRecords.get(0), matches(profile, publication, "Publication", "123456", UPDATE));
     }
@@ -565,13 +565,13 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        assertThat(orcidQueueService.findAll(context), empty());
+        assertThat(orcidQueueService.findAll(context.getSession()), empty());
 
         addMetadata(profile, "dspace", "orcid", "sync-publications", DISABLED.name(), null);
         addMetadata(publication, "dc", "date", "issued", "2021-01-01", null);
         context.commit();
 
-        assertThat(orcidQueueService.findAll(context), empty());
+        assertThat(orcidQueueService.findAll(context.getSession()), empty());
     }
 
     @Test
@@ -607,7 +607,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
+        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context.getSession());
         assertThat(orcidQueueRecords, hasSize(1));
         assertThat(orcidQueueRecords.get(0), matches(profile, project, "Project", "123456", UPDATE));
     }
@@ -641,7 +641,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        assertThat(orcidQueueService.findAll(context), empty());
+        assertThat(orcidQueueService.findAll(context.getSession()), empty());
     }
 
     @Test
@@ -662,7 +662,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        List<OrcidQueue> records = orcidQueueService.findAll(context);
+        List<OrcidQueue> records = orcidQueueService.findAll(context.getSession());
         assertThat(records, hasSize(1));
         assertThat(records, hasItem(matches(profile, "KEYWORDS", null, "dc.subject::Math", "Math", INSERT)));
 
@@ -671,7 +671,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         context.commit();
 
-        records = orcidQueueService.findAll(context);
+        records = orcidQueueService.findAll(context.getSession());
         assertThat(records, hasSize(3));
         assertThat(records, hasItem(matches(profile, "KEYWORDS", null, "dc.subject::Math", "Math", INSERT)));
         assertThat(records, hasItem(matches(profile, "EXTERNAL_IDS", null, "person.identifier.rid::ID", "ID", INSERT)));
@@ -683,7 +683,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         context.commit();
 
-        assertThat(orcidQueueService.findAll(context), empty());
+        assertThat(orcidQueueService.findAll(context.getSession()), empty());
 
     }
 
@@ -703,7 +703,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.restoreAuthSystemState();
         context.commit();
 
-        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context);
+        List<OrcidQueue> queueRecords = orcidQueueService.findAll(context.getSession());
         assertThat(queueRecords, hasSize(1));
         assertThat(queueRecords.get(0), matches(profile, "KEYWORDS", null,
             "dc.subject::Science", "Science", INSERT));
@@ -721,7 +721,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         context.commit();
 
-        queueRecords = orcidQueueService.findAll(context);
+        queueRecords = orcidQueueService.findAll(context.getSession());
         assertThat(queueRecords, hasSize(1));
         assertThat(queueRecords.get(0), matches(profile, "KEYWORDS", "12345",
             "dc.subject::Science", "Science", DELETE));
@@ -738,7 +738,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         context.commit();
 
-        queueRecords = orcidQueueService.findAll(context);
+        queueRecords = orcidQueueService.findAll(context.getSession());
         assertThat(queueRecords, hasSize(1));
         assertThat(queueRecords.get(0), matches(profile, "KEYWORDS", null,
             "dc.subject::Science", "Science", INSERT));
@@ -756,7 +756,7 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
         context.commit();
 
-        queueRecords = orcidQueueService.findAll(context);
+        queueRecords = orcidQueueService.findAll(context.getSession());
         assertThat(queueRecords, hasSize(1));
         assertThat(queueRecords.get(0), matches(profile, "KEYWORDS", "12346",
             "dc.subject::Science", "Science", DELETE));

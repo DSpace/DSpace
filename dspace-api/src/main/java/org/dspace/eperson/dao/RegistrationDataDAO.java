@@ -9,9 +9,9 @@ package org.dspace.eperson.dao;
 
 import java.sql.SQLException;
 
-import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 import org.dspace.eperson.RegistrationData;
+import org.hibernate.Session;
 
 /**
  * Database Access Object interface class for the RegistrationData object.
@@ -23,9 +23,9 @@ import org.dspace.eperson.RegistrationData;
  */
 public interface RegistrationDataDAO extends GenericDAO<RegistrationData> {
 
-    public RegistrationData findByEmail(Context context, String email) throws SQLException;
+    public RegistrationData findByEmail(Session session, String email) throws SQLException;
 
-    public RegistrationData findByToken(Context context, String token) throws SQLException;
+    public RegistrationData findByToken(Session session, String token) throws SQLException;
 
-    public void deleteByToken(Context context, String token) throws SQLException;
+    public void deleteByToken(Session session, String token) throws SQLException;
 }

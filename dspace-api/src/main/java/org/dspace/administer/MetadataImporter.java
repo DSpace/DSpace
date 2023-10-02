@@ -199,7 +199,7 @@ public class MetadataImporter {
         }
 
         // check to see if the schema already exists
-        MetadataSchema s = metadataSchemaService.find(context, name);
+        MetadataSchema s = metadataSchemaService.find(context.getSession(), name);
 
         if (s == null) {
             // Schema does not exist - create
@@ -257,13 +257,13 @@ public class MetadataImporter {
 
 
         // Find the matching schema object
-        MetadataSchema schemaObj = metadataSchemaService.find(context, schema);
+        MetadataSchema schemaObj = metadataSchemaService.find(context.getSession(), schema);
 
         if (schemaObj == null) {
             throw new RegistryImportException("Schema '" + schema + "' is not registered and does not exist.");
         }
 
-        MetadataField mf = metadataFieldService.findByElement(context, schemaObj, element, qualifier);
+        MetadataField mf = metadataFieldService.findByElement(context.getSession(), schemaObj, element, qualifier);
         if (mf != null) {
             // Metadata field already exists, skipping it
             return;

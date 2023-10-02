@@ -99,7 +99,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
             Item item = (Item) dso;
             VersionHistory history = null;
             try {
-                history = versionHistoryService.findByItem(context, (Item) dso);
+                history = versionHistoryService.findByItem(context.getSession(), (Item) dso);
             } catch (SQLException ex) {
                 throw new RuntimeException("A problem with the database connection occured.", ex);
             }
@@ -122,7 +122,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
                     previous = versionHistoryService.getPrevious(context, history, version);
                     if (previous != null) {
                         previousIsFirstVersion = versionHistoryService.isFirstVersion(context, history, previous);
-                        previousItemHandle = handleService.findHandle(context, previous.getItem());
+                        previousItemHandle = handleService.findHandle(context.getSession(), previous.getItem());
                     }
                 } catch (SQLException ex) {
                     throw new RuntimeException("A problem with the database connection occured.", ex);
@@ -204,7 +204,8 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
                     if (canonicalItem == null) {
                         restoreItAsCanonical(context, dso, identifier, item, canonical);
                     } else {
-                        VersionHistory history = versionHistoryService.findByItem(context, (Item) canonicalItem);
+                        VersionHistory history = versionHistoryService.findByItem(context.getSession(),
+                                (Item) canonicalItem);
                         if (history == null) {
                             restoreItAsCanonical(context, dso, identifier, item, canonical);
                         } else {
@@ -232,7 +233,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
     protected VersionHistory getHistory(Context context, String identifier) throws SQLException {
         DSpaceObject item = this.resolve(context, identifier);
         if (item != null) {
-            VersionHistory history = versionHistoryService.findByItem(context, (Item) item);
+            VersionHistory history = versionHistoryService.findByItem(context.getSession(), (Item) item);
             return history;
         }
         return null;
@@ -301,7 +302,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
             String handleId = null;
             VersionHistory history = null;
             if (dso instanceof Item) {
-                history = versionHistoryService.findByItem(context, (Item) dso);
+                history = versionHistoryService.findByItem(context.getSession(), (Item) dso);
             }
 
             if (history != null) {
@@ -336,7 +337,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
         throws IdentifierNotFoundException, IdentifierNotResolvableException {
 
         try {
-            return handleService.findHandle(context, dso);
+            return handleService.findHandle(context.getSession(), dso);
         } catch (SQLException sqe) {
             throw new IdentifierNotResolvableException(sqe.getMessage(), sqe);
         }
@@ -355,7 +356,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
                 Item item = (Item) dso;
 
                 // If it is the most current version occurs to move the canonical to the previous version
-                VersionHistory history = versionHistoryService.findByItem(context, item);
+                VersionHistory history = versionHistoryService.findByItem(context.getSession(), item);
                 if (history != null && versionHistoryService.getLatestVersion(context, history).getItem().equals(item)
                     && versionService.getVersionsByHistory(context, history).size() > 1) {
                     Item previous;

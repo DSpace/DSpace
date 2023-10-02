@@ -98,7 +98,7 @@ public class AbstractUnitTest extends AbstractDSpaceTest {
 
             //Find our global test EPerson account. If it doesn't exist, create it.
             EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-            eperson = ePersonService.findByEmail(context, "test@email.com");
+            eperson = ePersonService.findByEmail(context.getSession(), "test@email.com");
             if (eperson == null) {
                 // This EPerson creation should only happen once (i.e. for first test run)
                 log.info("Creating initial EPerson (email=test@email.com) for Unit Tests");

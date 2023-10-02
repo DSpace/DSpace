@@ -31,6 +31,7 @@ import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.event.Event;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -69,13 +70,12 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     }
 
     @Override
-    public Bitstream find(Context context, UUID id) throws SQLException {
-        Bitstream bitstream = bitstreamDAO.findByID(context, Bitstream.class, id);
+    public Bitstream find(Session session, UUID id) throws SQLException {
+        Bitstream bitstream = bitstreamDAO.findByID(session, Bitstream.class, id);
 
         if (bitstream == null) {
             if (log.isDebugEnabled()) {
-                log.debug(LogHelper.getHeader(context, "find_bitstream",
-                                               "not_found,bitstream_id=" + id));
+                log.debug("find_bitstream not_found,bitstream_id={}", id);
             }
 
             return null;
@@ -83,23 +83,22 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
         // not null, return Bitstream
         if (log.isDebugEnabled()) {
-            log.debug(LogHelper.getHeader(context, "find_bitstream",
-                                           "bitstream_id=" + id));
+            log.debug("find_bitstream bitstream_id={}", id);
         }
 
         return bitstream;
     }
 
     @Override
-    public List<Bitstream> findAll(Context context) throws SQLException {
-        return bitstreamDAO.findAll(context, Bitstream.class);
+    public List<Bitstream> findAll(Session session) throws SQLException {
+        return bitstreamDAO.findAll(session, Bitstream.class);
     }
 
     @Override
     public Bitstream clone(Context context, Bitstream bitstream)
             throws SQLException, AuthorizeException {
         // Create a new bitstream with a new ID.
-        Bitstream clonedBitstream = bitstreamDAO.create(context, new Bitstream());
+        Bitstream clonedBitstream = bitstreamDAO.create(context.getSession(), new Bitstream());
         // Set the internal identifier, file size, checksum, and
         // checksum algorithm as same as the given bitstream.
         clonedBitstream.setInternalId(bitstream.getInternalId());
@@ -112,20 +111,21 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     }
 
     @Override
-    public Iterator<Bitstream> findAll(Context context, int limit, int offset) throws SQLException {
-        return bitstreamDAO.findAll(context, limit, offset);
+    public Iterator<Bitstream> findAll(Session session, int limit, int offset) throws SQLException {
+        return bitstreamDAO.findAll(session, limit, offset);
     }
 
     @Override
     public Bitstream create(Context context, InputStream is) throws IOException, SQLException {
         // Store the bits
-        UUID bitstreamID = bitstreamStorageService.store(context, bitstreamDAO.create(context, new Bitstream()), is);
+        UUID bitstreamID = bitstreamStorageService.store(context,
+                bitstreamDAO.create(context.getSession(), new Bitstream()), is);
 
         log.info(LogHelper.getHeader(context, "create_bitstream",
                                       "bitstream_id=" + bitstreamID));
 
         // Set the format to "unknown"
-        Bitstream bitstream = find(context, bitstreamID);
+        Bitstream bitstream = find(context.getSession(), bitstreamID);
         setFormat(context, bitstream, null);
 
         context.addEvent(
@@ -177,7 +177,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
                               int assetstore, String bitstreamPath)
         throws IOException, SQLException, AuthorizeException {
         // Store the bits
-        Bitstream bitstream = bitstreamDAO.create(context, new Bitstream());
+        Bitstream bitstream = bitstreamDAO.create(context.getSession(), new Bitstream());
         bitstreamStorageService.register(
             context, bitstream, assetstore, bitstreamPath);
 
@@ -223,7 +223,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         // but we need to find the unknown format!
         if (bitstreamFormat == null) {
             // Use "Unknown" format
-            bitstreamFormat = bitstreamFormatService.findUnknown(context);
+            bitstreamFormat = bitstreamFormatService.findUnknown(context.getSession());
         }
 
         // Remove user type description
@@ -254,7 +254,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
             bitstream.clearDetails();
         }
 
-        bitstreamDAO.save(context, bitstream);
+        bitstreamDAO.save(context.getSession(), bitstream);
     }
 
     @Override
@@ -332,8 +332,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     }
 
     @Override
-    public List<Bitstream> findDeletedBitstreams(Context context, int limit, int offset) throws SQLException {
-        return bitstreamDAO.findDeletedBitstreams(context, limit, offset);
+    public List<Bitstream> findDeletedBitstreams(Session session, int limit, int offset) throws SQLException {
+        return bitstreamDAO.findDeletedBitstreams(session, limit, offset);
     }
 
     @Override
@@ -343,34 +343,34 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
             throw new IllegalStateException("Bitstream " + bitstream.getID().toString()
                     + " must be deleted before it can be removed from the database.");
         }
-        bitstreamDAO.delete(context, bitstream);
+        bitstreamDAO.delete(context.getSession(), bitstream);
     }
 
     @Override
-    public List<Bitstream> findDuplicateInternalIdentifier(Context context, Bitstream bitstream) throws SQLException {
-        return bitstreamDAO.findDuplicateInternalIdentifier(context, bitstream);
+    public List<Bitstream> findDuplicateInternalIdentifier(Session session, Bitstream bitstream) throws SQLException {
+        return bitstreamDAO.findDuplicateInternalIdentifier(session, bitstream);
     }
 
     @Override
     public Iterator<Bitstream> getItemBitstreams(Context context, Item item) throws SQLException {
-        return bitstreamDAO.findByItem(context, item);
+        return bitstreamDAO.findByItem(context.getSession(), item);
     }
 
 
     @Override
     public Iterator<Bitstream> getCollectionBitstreams(Context context, Collection collection) throws SQLException {
-        return bitstreamDAO.findByCollection(context, collection);
+        return bitstreamDAO.findByCollection(context.getSession(), collection);
 
     }
 
     @Override
     public Iterator<Bitstream> getCommunityBitstreams(Context context, Community community) throws SQLException {
-        return bitstreamDAO.findByCommunity(context, community);
+        return bitstreamDAO.findByCommunity(context.getSession(), community);
     }
 
     @Override
-    public List<Bitstream> findBitstreamsWithNoRecentChecksum(Context context) throws SQLException {
-        return bitstreamDAO.findBitstreamsWithNoRecentChecksum(context);
+    public List<Bitstream> findBitstreamsWithNoRecentChecksum(Session session) throws SQLException {
+        return bitstreamDAO.findBitstreamsWithNoRecentChecksum(session);
     }
 
     @Override
@@ -423,55 +423,55 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Override
     public BitstreamFormat getFormat(Context context, Bitstream bitstream) throws SQLException {
         if (bitstream.getBitstreamFormat() == null) {
-            return bitstreamFormatService.findUnknown(context);
+            return bitstreamFormatService.findUnknown(context.getSession());
         } else {
             return bitstream.getBitstreamFormat();
         }
     }
 
     @Override
-    public Iterator<Bitstream> findByStoreNumber(Context context, Integer storeNumber) throws SQLException {
-        return bitstreamDAO.findByStoreNumber(context, storeNumber);
+    public Iterator<Bitstream> findByStoreNumber(Session session, Integer storeNumber) throws SQLException {
+        return bitstreamDAO.findByStoreNumber(session, storeNumber);
     }
 
     @Override
     public Long countByStoreNumber(Context context, Integer storeNumber) throws SQLException {
-        return bitstreamDAO.countByStoreNumber(context, storeNumber);
+        return bitstreamDAO.countByStoreNumber(context.getSession(), storeNumber);
     }
 
     @Override
     public int countTotal(Context context) throws SQLException {
-        return bitstreamDAO.countRows(context);
+        return bitstreamDAO.countRows(context.getSession());
     }
 
     @Override
-    public Bitstream findByIdOrLegacyId(Context context, String id) throws SQLException {
+    public Bitstream findByIdOrLegacyId(Session session, String id) throws SQLException {
         if (StringUtils.isNumeric(id)) {
-            return findByLegacyId(context, Integer.parseInt(id));
+            return findByLegacyId(session, Integer.parseInt(id));
         } else {
-            return find(context, UUID.fromString(id));
+            return find(session, UUID.fromString(id));
         }
     }
 
     @Override
-    public Bitstream findByLegacyId(Context context, int id) throws SQLException {
-        return bitstreamDAO.findByLegacyId(context, id, Bitstream.class);
+    public Bitstream findByLegacyId(Session session, int id) throws SQLException {
+        return bitstreamDAO.findByLegacyId(session, id, Bitstream.class);
 
     }
 
     @Override
     public int countDeletedBitstreams(Context context) throws SQLException {
-        return bitstreamDAO.countDeleted(context);
+        return bitstreamDAO.countDeleted(context.getSession());
     }
 
     @Override
     public int countBitstreamsWithoutPolicy(Context context) throws SQLException {
-        return bitstreamDAO.countWithNoPolicy(context);
+        return bitstreamDAO.countWithNoPolicy(context.getSession());
     }
 
     @Override
     public List<Bitstream> getNotReferencedBitstreams(Context context) throws SQLException {
-        return bitstreamDAO.getNotReferencedBitstreams(context);
+        return bitstreamDAO.getNotReferencedBitstreams(context.getSession());
     }
 
     @Nullable

@@ -456,7 +456,7 @@ public class Utils {
                 })
                 .map(id -> {
                     try {
-                        return bitstreamFormatService.find(context, parseInt(id));
+                        return bitstreamFormatService.find(context.getSession(), parseInt(id));
                     } catch (SQLException | NumberFormatException e) {
                         log.error("Could not find bitstream format for id: " + id, e);
                         return null;
@@ -485,7 +485,8 @@ public class Utils {
             String uuid = string.substring(string.lastIndexOf('/') + 1);
             try {
                 for (DSpaceObjectService dSpaceObjectService : dSpaceObjectServices) {
-                    DSpaceObject dSpaceObject = dSpaceObjectService.find(context, UUIDUtils.fromString(uuid));
+                    DSpaceObject dSpaceObject = dSpaceObjectService.find(context.getSession(),
+                            UUIDUtils.fromString(uuid));
                     if (dSpaceObject != null) {
                         dSpaceObjects.add(dSpaceObject);
                         break;

@@ -64,7 +64,7 @@ public class OrcidQueueSearchRestPermissionEvaluatorPlugin extends RestObjectPer
         try {
             ePerson = context.getCurrentUser();
             UUID ownerUUID = UUID.fromString(targetId.toString());
-            Item owner = itemService.find(context, ownerUUID);
+            Item owner = itemService.find(context.getSession(), ownerUUID);
 
             // anonymous user
             if (ePerson == null) {

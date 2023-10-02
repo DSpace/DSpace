@@ -245,7 +245,7 @@ public class InstallItemServiceImpl implements InstallItemService {
     }
 
     private void deleteSupervisionOrders(Context c, Item item) throws SQLException, AuthorizeException {
-        List<SupervisionOrder> supervisionOrders = supervisionOrderService.findByItem(c, item);
+        List<SupervisionOrder> supervisionOrders = supervisionOrderService.findByItem(c.getSession(), item);
         for (SupervisionOrder supervisionOrder : supervisionOrders) {
             supervisionOrderService.delete(c, supervisionOrder);
         }

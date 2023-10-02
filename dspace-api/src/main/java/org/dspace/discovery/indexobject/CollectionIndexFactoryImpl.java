@@ -49,7 +49,7 @@ public class CollectionIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Ind
 
     @Override
     public Iterator<IndexableCollection> findAll(Context context) throws SQLException {
-        Iterator<Collection> collections = collectionService.findAll(context).iterator();
+        Iterator<Collection> collections = collectionService.findAll(context.getSession()).iterator();
 
         return new Iterator<IndexableCollection>() {
             @Override
@@ -150,7 +150,7 @@ public class CollectionIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Ind
 
     @Override
     public Optional<IndexableCollection> findIndexableObject(Context context, String id) throws SQLException {
-        final Collection collection = (collectionService.find(context, UUID.fromString(id)));
+        final Collection collection = (collectionService.find(context.getSession(), UUID.fromString(id)));
         return collection == null ? Optional.empty() : Optional.of(new IndexableCollection(collection));
     }
 

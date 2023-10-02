@@ -60,7 +60,7 @@ public class CollectionBitstreamReadGroupLinkRepository extends AbstractDSpaceRe
                                            Projection projection) {
         try {
             Context context = obtainContext();
-            Collection collection = collectionService.find(context, collectionId);
+            Collection collection = collectionService.find(context.getSession(), collectionId);
             if (collection == null) {
                 throw new ResourceNotFoundException("No such collection: " + collectionId);
             }

@@ -60,7 +60,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataFieldRestRepository.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     @Autowired
     MetadataFieldService metadataFieldService;
@@ -76,7 +76,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
     public MetadataFieldRest findOne(Context context, Integer id) {
         MetadataField metadataField = null;
         try {
-            metadataField = metadataFieldService.find(context, id);
+            metadataField = metadataFieldService.find(context.getSession(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -89,7 +89,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
     @Override
     public Page<MetadataFieldRest> findAll(Context context, Pageable pageable) {
         try {
-            List<MetadataField> metadataFields = metadataFieldService.findAll(context);
+            List<MetadataField> metadataFields = metadataFieldService.findAll(context.getSession());
             return converter.toRestPage(metadataFields, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -101,11 +101,11 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         Pageable pageable) {
         try {
             Context context = obtainContext();
-            MetadataSchema schema = metadataSchemaService.find(context, schemaName);
+            MetadataSchema schema = metadataSchemaService.find(context.getSession(), schemaName);
             if (schema == null) {
                 return null;
             }
-            List<MetadataField> metadataFields = metadataFieldService.findAllInSchema(context, schema);
+            List<MetadataField> metadataFields = metadataFieldService.findAllInSchema(context.getSession(), schema);
             return converter.toRestPage(metadataFields, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -163,7 +163,8 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
                                                        "and schema to search discovery for metadata fields");
             }
             // Find at most one match with exactName query param in DB
-            MetadataField exactMatchingMdField = metadataFieldService.findByString(context, exactName, '.');
+            MetadataField exactMatchingMdField
+                    = metadataFieldService.findByString(context.getSession(), exactName, '.');
             if (exactMatchingMdField != null) {
                 matchingMetadataFields.add(exactMatchingMdField);
                 totalElements = 1;
@@ -253,7 +254,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
             throw new UnprocessableEntityException("metadata schema ID cannot be blank");
         }
 
-        MetadataSchema schema = metadataSchemaService.find(context, parseInt(schemaId));
+        MetadataSchema schema = metadataSchemaService.find(context.getSession(), parseInt(schemaId));
         if (schema == null) {
             throw new UnprocessableEntityException("metadata schema with ID " + schemaId + " not found");
         }
@@ -300,7 +301,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
     protected void delete(Context context, Integer id) throws AuthorizeException {
 
         try {
-            MetadataField metadataField = metadataFieldService.find(context, id);
+            MetadataField metadataField = metadataFieldService.find(context.getSession(), id);
 
             if (metadataField == null) {
                 throw new ResourceNotFoundException("metadata field with id: " + id + " not found");
@@ -324,7 +325,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
             throw new DSpaceBadRequestException("Cannot parse JSON in request body", e);
         }
 
-        MetadataField metadataField = metadataFieldService.find(context, id);
+        MetadataField metadataField = metadataFieldService.find(context.getSession(), id);
         if (metadataField == null) {
             throw new UnprocessableEntityException("metadata field with id: " + id + " not found");
         }

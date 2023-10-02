@@ -26,6 +26,7 @@ import org.dspace.orcid.model.OrcidEntityType;
 import org.dspace.orcid.service.OrcidHistoryService;
 import org.dspace.orcid.service.OrcidQueueService;
 import org.dspace.profile.OrcidEntitySyncPreference;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -49,40 +50,40 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     private RelationshipService relationshipService;
 
     @Override
-    public List<OrcidQueue> findByProfileItemId(Context context, UUID profileItemId) throws SQLException {
-        return orcidQueueDAO.findByProfileItemId(context, profileItemId, -1, 0);
+    public List<OrcidQueue> findByProfileItemId(Session session, UUID profileItemId) throws SQLException {
+        return orcidQueueDAO.findByProfileItemId(session, profileItemId, -1, 0);
     }
 
     @Override
     public List<OrcidQueue> findByProfileItemId(Context context, UUID profileItemId, Integer limit, Integer offset)
         throws SQLException {
-        return orcidQueueDAO.findByProfileItemId(context, profileItemId, limit, offset);
+        return orcidQueueDAO.findByProfileItemId(context.getSession(), profileItemId, limit, offset);
     }
 
     @Override
-    public List<OrcidQueue> findByProfileItemAndEntity(Context context, Item profileItem, Item entity)
+    public List<OrcidQueue> findByProfileItemAndEntity(Session session, Item profileItem, Item entity)
         throws SQLException {
-        return orcidQueueDAO.findByProfileItemAndEntity(context, profileItem, entity);
+        return orcidQueueDAO.findByProfileItemAndEntity(session, profileItem, entity);
     }
 
     @Override
-    public List<OrcidQueue> findByProfileItemOrEntity(Context context, Item item) throws SQLException {
-        return orcidQueueDAO.findByProfileItemOrEntity(context, item);
+    public List<OrcidQueue> findByProfileItemOrEntity(Session session, Item item) throws SQLException {
+        return orcidQueueDAO.findByProfileItemOrEntity(session, item);
     }
 
     @Override
     public long countByProfileItemId(Context context, UUID profileItemId) throws SQLException {
-        return orcidQueueDAO.countByProfileItemId(context, profileItemId);
+        return orcidQueueDAO.countByProfileItemId(context.getSession(), profileItemId);
     }
 
     @Override
-    public List<OrcidQueue> findAll(Context context) throws SQLException {
-        return orcidQueueDAO.findAll(context, OrcidQueue.class);
+    public List<OrcidQueue> findAll(Session session) throws SQLException {
+        return orcidQueueDAO.findAll(session, OrcidQueue.class);
     }
 
     @Override
     public OrcidQueue create(Context context, Item profileItem, Item entity) throws SQLException {
-        Optional<String> putCode = orcidHistoryService.findLastPutCode(context, profileItem, entity);
+        Optional<String> putCode = orcidHistoryService.findLastPutCode(context.getSession(), profileItem, entity);
         if (putCode.isPresent()) {
             return createEntityUpdateRecord(context, profileItem, entity, putCode.get());
         } else {
@@ -98,7 +99,7 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
         orcidQueue.setProfileItem(profileItem);
         orcidQueue.setDescription(getMetadataValue(entity, "dc.title"));
         orcidQueue.setOperation(OrcidOperation.INSERT);
-        return orcidQueueDAO.create(context, orcidQueue);
+        return orcidQueueDAO.create(context.getSession(), orcidQueue);
     }
 
     @Override
@@ -111,7 +112,7 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
         orcidQueue.setRecordType(itemService.getEntityTypeLabel(entity));
         orcidQueue.setDescription(getMetadataValue(entity, "dc.title"));
         orcidQueue.setOperation(OrcidOperation.UPDATE);
-        return orcidQueueDAO.create(context, orcidQueue);
+        return orcidQueueDAO.create(context.getSession(), orcidQueue);
     }
 
     @Override
@@ -124,7 +125,7 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
         orcidQueue.setPutCode(putCode);
         orcidQueue.setDescription(description);
         orcidQueue.setOperation(OrcidOperation.DELETE);
-        return orcidQueueDAO.create(context, orcidQueue);
+        return orcidQueueDAO.create(context.getSession(), orcidQueue);
     }
 
     @Override
@@ -137,7 +138,7 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
         orcidQueue.setDescription(description);
         orcidQueue.setMetadata(metadata);
         orcidQueue.setOperation(OrcidOperation.INSERT);
-        return orcidQueueDAO.create(context, orcidQueue);
+        return orcidQueueDAO.create(context.getSession(), orcidQueue);
     }
 
     @Override
@@ -151,52 +152,54 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
         orcidQueue.setPutCode(putCode);
         orcidQueue.setMetadata(metadata);
         orcidQueue.setOperation(OrcidOperation.DELETE);
-        return orcidQueueDAO.create(context, orcidQueue);
+        return orcidQueueDAO.create(context.getSession(), orcidQueue);
     }
 
     @Override
     public void deleteById(Context context, Integer id) throws SQLException {
-        OrcidQueue orcidQueue = orcidQueueDAO.findByID(context, OrcidQueue.class, id);
+        OrcidQueue orcidQueue = orcidQueueDAO.findByID(context.getSession(), OrcidQueue.class, id);
         if (orcidQueue != null) {
             delete(context, orcidQueue);
         }
     }
 
     @Override
-    public List<OrcidQueue> findByAttemptsLessThan(Context context, int attempts) throws SQLException {
-        return orcidQueueDAO.findByAttemptsLessThan(context, attempts);
+    public List<OrcidQueue> findByAttemptsLessThan(Session session, int attempts) throws SQLException {
+        return orcidQueueDAO.findByAttemptsLessThan(session, attempts);
     }
 
     @Override
     public void delete(Context context, OrcidQueue orcidQueue) throws SQLException {
-        orcidQueueDAO.delete(context, orcidQueue);
+        orcidQueueDAO.delete(context.getSession(), orcidQueue);
     }
 
     @Override
     public void deleteByEntityAndRecordType(Context context, Item entity, String recordType) throws SQLException {
-        List<OrcidQueue> records = orcidQueueDAO.findByEntityAndRecordType(context, entity, recordType);
+        List<OrcidQueue> records
+                = orcidQueueDAO.findByEntityAndRecordType(context.getSession(), entity, recordType);
         for (OrcidQueue record : records) {
-            orcidQueueDAO.delete(context, record);
+            orcidQueueDAO.delete(context.getSession(), record);
         }
     }
 
     @Override
     public void deleteByProfileItemAndRecordType(Context context, Item profileItem, String recordType)
         throws SQLException {
-        List<OrcidQueue> records = orcidQueueDAO.findByProfileItemAndRecordType(context, profileItem, recordType);
+        List<OrcidQueue> records
+                = orcidQueueDAO.findByProfileItemAndRecordType(context.getSession(), profileItem, recordType);
         for (OrcidQueue record : records) {
-            orcidQueueDAO.delete(context, record);
+            orcidQueueDAO.delete(context.getSession(), record);
         }
     }
 
     @Override
-    public OrcidQueue find(Context context, int id) throws SQLException {
-        return orcidQueueDAO.findByID(context, OrcidQueue.class, id);
+    public OrcidQueue find(Session session, int id) throws SQLException {
+        return orcidQueueDAO.findByID(session, OrcidQueue.class, id);
     }
 
     @Override
     public void update(Context context, OrcidQueue orcidQueue) throws SQLException {
-        orcidQueueDAO.save(context, orcidQueue);
+        orcidQueueDAO.save(context.getSession(), orcidQueue);
     }
 
     @Override
@@ -226,7 +229,7 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
 
     private List<Relationship> findRelationshipsByItem(Context context, Item item) {
         try {
-            return relationshipService.findByItem(context, item);
+            return relationshipService.findByItem(context.getSession(), item);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

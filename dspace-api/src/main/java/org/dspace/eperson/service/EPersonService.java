@@ -23,6 +23,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.PasswordHash;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the EPerson object.
@@ -60,23 +61,23 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
     /**
      * Find the eperson by their email address.
      *
-     * @param context The relevant DSpace Context.
+     * @param session current request's database context.
      * @param email   EPerson's email to search by
      * @return EPerson, or {@code null} if none such exists.
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public EPerson findByEmail(Context context, String email)
+    public EPerson findByEmail(Session session, String email)
         throws SQLException;
 
     /**
      * Find the eperson by their netid.
      *
-     * @param context The relevant DSpace Context.
+     * @param session current request's database context.
      * @param netId   Network ID
      * @return corresponding EPerson, or <code>null</code>
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public EPerson findByNetid(Context context, String netId)
+    public EPerson findByNetid(Session session, String netId)
         throws SQLException;
 
     /**
@@ -127,14 +128,14 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      * <li><code>NETID</code></li>
      * </ul>
      *
-     * @param context   The relevant DSpace Context.
+     * @param session   current request's database context.
      * @param sortField which field to sort EPersons by
      * @return list of EPerson objects
      * @throws SQLException An exception that provides information on a database access error or other errors.
      * @deprecated use the paginated method {@link findAll(Context, int)}.
      */
     @Deprecated
-    public List<EPerson> findAll(Context context, int sortField)
+    public List<EPerson> findAll(Session session, int sortField)
         throws SQLException;
 
     /**
@@ -147,14 +148,14 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      * <li><code>NETID</code></li>
      * </ul>
      *
-     * @param context   The relevant DSpace Context.
+     * @param session   current request's database context.
      * @param sortField which field to sort EPersons by
      * @param pageSize  how many results return
      * @param offset    the position of the first result to return
      * @return list of EPerson objects
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<EPerson> findAll(Context context, int sortField, int pageSize, int offset)
+    public List<EPerson> findAll(Session session, int sortField, int pageSize, int offset)
         throws SQLException;
 
     /**
@@ -207,21 +208,21 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
     /**
      * Retrieve all accounts which have a password but do not have a digest algorithm
      *
-     * @param context The relevant DSpace Context.
+     * @param session current request's database context.
      * @return a list of epeople
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<EPerson> findUnsalted(Context context) throws SQLException;
+    public List<EPerson> findUnsalted(Session session) throws SQLException;
 
     /**
      * Retrieve all accounts which have not logged in since the specified date
      *
-     * @param context The relevant DSpace Context.
+     * @param session current request's database context.
      * @param date    from which date
      * @return a list of epeople
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<EPerson> findNotActiveSince(Context context, Date date) throws SQLException;
+    public List<EPerson> findNotActiveSince(Session session, Date date) throws SQLException;
 
     /**
      * Check for presence of EPerson in tables that have constraints on
@@ -240,21 +241,21 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
     /**
      * Retrieve all accounts which belong to at least one of the specified groups.
      *
-     * @param c      The relevant DSpace Context.
+     * @param session      current request's database context.
      * @param groups set of eperson groups
-     * @return a list of epeople
+     * @return the groups' membership
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<EPerson> findByGroups(Context c, Set<Group> groups) throws SQLException;
+    public List<EPerson> findByGroups(Session session, Set<Group> groups) throws SQLException;
 
     /**
      * Retrieve all accounts which are subscribed to receive information about new items.
      *
-     * @param context The relevant DSpace Context.
+     * @param session current request's database context.
      * @return a list of epeople
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    List<EPerson> findEPeopleWithSubscription(Context context) throws SQLException;
+    List<EPerson> findEPeopleWithSubscription(Session session) throws SQLException;
 
     /**
      * Count all accounts.
@@ -269,11 +270,11 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      * Find the EPerson related to the given profile item. If the given item is not
      * a profile item, null is returned.
      *
-     * @param  context      The relevant DSpace Context.
+     * @param  session      current request's database context.
      * @param  profile      the profile item to search for
      * @return              the EPerson, if any
      * @throws SQLException An exception that provides information on a database
      *                      access error or other errors.
      */
-    EPerson findByProfileItem(Context context, Item profile) throws SQLException;
+    EPerson findByProfileItem(Session session, Item profile) throws SQLException;
 }

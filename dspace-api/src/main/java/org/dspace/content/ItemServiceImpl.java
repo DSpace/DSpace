@@ -81,6 +81,7 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.service.VersioningService;
 import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -95,7 +96,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     /**
      * log4j category
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Item.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     @Autowired(required = true)
     protected ItemDAO itemDAO;
@@ -206,20 +207,18 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public Item find(Context context, UUID id) throws SQLException {
-        Item item = itemDAO.findByID(context, Item.class, id);
+    public Item find(Session session, UUID id) throws SQLException {
+        Item item = itemDAO.findByID(session, Item.class, id);
         if (item == null) {
             if (log.isDebugEnabled()) {
-                log.debug(LogHelper.getHeader(context, "find_item",
-                                               "not_found,item_id=" + id));
+                log.debug("find_item not_found, item_id={}", id);
             }
             return null;
         }
 
         // not null, return item
         if (log.isDebugEnabled()) {
-            log.debug(LogHelper.getHeader(context, "find_item", "item_id="
-                + id));
+            log.debug("find_item item_id={}", id);
         }
 
         return item;
@@ -277,93 +276,94 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public Iterator<Item> findAll(Context context) throws SQLException {
-        return itemDAO.findAll(context, true);
+    public Iterator<Item> findAll(Session session) throws SQLException {
+        return itemDAO.findAll(session, true);
     }
 
     @Override
-    public Iterator<Item> findAll(Context context, Integer limit, Integer offset) throws SQLException {
-        return itemDAO.findAll(context, true, limit, offset);
+    public Iterator<Item> findAll(Session session, Integer limit, Integer offset) throws SQLException {
+        return itemDAO.findAll(session, true, limit, offset);
     }
 
     @Override
-    public Iterator<Item> findAllUnfiltered(Context context) throws SQLException {
-        return itemDAO.findAll(context, true, true);
+    public Iterator<Item> findAllUnfiltered(Session session) throws SQLException {
+        return itemDAO.findAll(session, true, true);
     }
 
     @Override
-    public Iterator<Item> findAllRegularItems(Context context) throws SQLException {
-        return itemDAO.findAllRegularItems(context);
+    public Iterator<Item> findAllRegularItems(Session session) throws SQLException {
+        return itemDAO.findAllRegularItems(session);
     }
 
     @Override
-    public Iterator<Item> findBySubmitter(Context context, EPerson eperson) throws SQLException {
-        return itemDAO.findBySubmitter(context, eperson);
+    public Iterator<Item> findBySubmitter(Session session, EPerson eperson) throws SQLException {
+        return itemDAO.findBySubmitter(session, eperson);
     }
 
     @Override
-    public Iterator<Item> findBySubmitter(Context context, EPerson eperson, boolean retrieveAllItems)
+    public Iterator<Item> findBySubmitter(Session session, EPerson eperson, boolean retrieveAllItems)
         throws SQLException {
-        return itemDAO.findBySubmitter(context, eperson, retrieveAllItems);
+        return itemDAO.findBySubmitter(session, eperson, retrieveAllItems);
     }
 
     @Override
-    public Iterator<Item> findBySubmitterDateSorted(Context context, EPerson eperson, Integer limit)
+    public Iterator<Item> findBySubmitterDateSorted(Session session, EPerson eperson, Integer limit)
         throws SQLException {
 
         MetadataField metadataField = metadataFieldService
-            .findByElement(context, MetadataSchemaEnum.DC.getName(), "date", "accessioned");
+            .findByElement(session, MetadataSchemaEnum.DC.getName(), "date", "accessioned");
         if (metadataField == null) {
             throw new IllegalArgumentException(
                 "Required metadata field '" + MetadataSchemaEnum.DC.getName() + ".date.accessioned' doesn't exist!");
         }
 
-        return itemDAO.findBySubmitter(context, eperson, metadataField, limit);
+        return itemDAO.findBySubmitter(session, eperson, metadataField, limit);
     }
 
     @Override
-    public Iterator<Item> findByCollection(Context context, Collection collection) throws SQLException {
-        return findByCollection(context, collection, null, null);
+    public Iterator<Item> findByCollection(Session session, Collection collection) throws SQLException {
+        return findByCollection(session, collection, null, null);
     }
 
     @Override
-    public Iterator<Item> findByCollection(Context context, Collection collection, Integer limit, Integer offset)
+    public Iterator<Item> findByCollection(Session session, Collection collection, Integer limit, Integer offset)
         throws SQLException {
-        return itemDAO.findArchivedByCollection(context, collection, limit, offset);
+        return itemDAO.findArchivedByCollection(session, collection, limit, offset);
     }
 
     @Override
-    public Iterator<Item> findByCollectionMapping(Context context, Collection collection, Integer limit, Integer offset)
+    public Iterator<Item> findByCollectionMapping(Session session, Collection collection, Integer limit, Integer offset)
         throws SQLException {
-        return itemDAO.findArchivedByCollectionExcludingOwning(context, collection, limit, offset);
+        return itemDAO.findArchivedByCollectionExcludingOwning(session, collection, limit, offset);
     }
 
     @Override
     public int countByCollectionMapping(Context context, Collection collection) throws SQLException {
-        return itemDAO.countArchivedByCollectionExcludingOwning(context, collection);
+        return itemDAO.countArchivedByCollectionExcludingOwning(context.getSession(), collection);
     }
 
     @Override
-    public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException {
-        return itemDAO.findAllByCollection(context, collection);
+    public Iterator<Item> findAllByCollection(Session session, Collection collection)
+            throws SQLException {
+        return itemDAO.findAllByCollection(session, collection);
     }
 
     @Override
-    public Iterator<Item> findAllByCollection(Context context, Collection collection, Integer limit, Integer offset)
+    public Iterator<Item> findAllByCollection(Session session, Collection collection, Integer limit, Integer offset)
         throws SQLException {
-        return itemDAO.findAllByCollection(context, collection, limit, offset);
+        return itemDAO.findAllByCollection(session, collection, limit, offset);
     }
 
     @Override
-    public Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Date since)
+    public Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Session session, Date since)
         throws SQLException {
-        return itemDAO.findAll(context, true, true, true, since);
+        return itemDAO.findAll(session, true, true, true, since);
     }
 
     @Override
-    public Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Context context, Date since)
+    public Iterator<Item> findInArchiveOrWithdrawnNonDiscoverableModifiedSince(Session session, Date since)
         throws SQLException {
-        return itemDAO.findAll(context, true, true, false, since);
+        return itemDAO.findAll(session, true, true, false, since);
     }
 
     @Override
@@ -490,9 +490,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     protected Item createItem(Context context, UUID uuid) throws SQLException, AuthorizeException {
         Item item;
         if (uuid != null) {
-            item = itemDAO.create(context, new Item(uuid));
+            item = itemDAO.create(context.getSession(), new Item(uuid));
         } else {
-            item = itemDAO.create(context, new Item());
+            item = itemDAO.create(context.getSession(), new Item());
         }
         // set discoverable to true (default)
         item.setDiscoverable(true);
@@ -512,7 +512,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     protected Item createItem(Context context) throws SQLException, AuthorizeException {
-        Item item = itemDAO.create(context, new Item());
+        Item item = itemDAO.create(context.getSession(), new Item());
         // set discoverable to true (default)
         item.setDiscoverable(true);
 
@@ -547,7 +547,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Override
     public void removeLicenses(Context context, Item item) throws SQLException, AuthorizeException, IOException {
         // Find the License format
-        BitstreamFormat bf = bitstreamFormatService.findByShortDescription(context, "License");
+        BitstreamFormat bf = bitstreamFormatService.findByShortDescription(context.getSession(), "License");
         int licensetype = bf.getID();
 
         // search through bundles, looking for bitstream type license
@@ -623,7 +623,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             // Set the last modified date
             item.setLastModified(new Date());
 
-            itemDAO.save(context, item);
+            itemDAO.save(context.getSession(), item);
 
             if (item.isMetadataModified()) {
                 context.addEvent(new Event(Event.MODIFY_METADATA, item.getType(), item.getID(), item.getDetails(),
@@ -742,11 +742,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         }
 
         // check if the item was withdrawn before the fix DS-3097
-        if (authorizeService.getPoliciesActionFilter(context, item, Constants.WITHDRAWN_READ).size() != 0) {
+        if (!authorizeService.getPoliciesActionFilter(context, item, Constants.WITHDRAWN_READ).isEmpty()) {
             authorizeService.switchPoliciesAction(context, item, Constants.WITHDRAWN_READ, Constants.READ);
         } else {
             // authorization policies
-            if (colls.size() > 0) {
+            if (!colls.isEmpty()) {
                 // remove the item's policies and replace them with
                 // the defaults from the collection
                 adjustItemPolicies(context, item, item.getOwningCollection());
@@ -780,7 +780,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         //remove subscription related with it
         subscribeService.deleteByDspaceObject(context, item);
         // Remove relationships
-        for (Relationship relationship : relationshipService.findByItem(context, item, -1, -1, false, false)) {
+        for (Relationship relationship : relationshipService.findByItem(context.getSession(),
+                item, -1, -1, false, false)) {
             relationshipService.forceDelete(context, relationship, false, false);
         }
 
@@ -795,7 +796,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // hibernate will throw a foreign constraint exception.
         // Here we use the DOI service directly as it is able to manage DOIs even without any configured
         // consumer or provider.
-        DOI doi = doiService.findDOIByDSpaceObject(context, item);
+        DOI doi = doiService.findDOIByDSpaceObject(context.getSession(), item);
         if (doi != null) {
             doi.setDSpaceObject(null);
         }
@@ -808,13 +809,13 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         removeOrcidSynchronizationStuff(context, item);
 
         // Also delete the item if it appears in a harvested collection.
-        HarvestedItem hi = harvestedItemService.find(context, item);
+        HarvestedItem hi = harvestedItemService.find(context.getSession(), item);
 
         if (hi != null) {
             harvestedItemService.delete(context, hi);
         }
 
-        OrcidToken orcidToken = orcidTokenService.findByProfileItem(context, item);
+        OrcidToken orcidToken = orcidTokenService.findByProfileItem(context.getSession(), item);
         if (orcidToken != null) {
             orcidToken.setProfileItem(null);
         }
@@ -824,11 +825,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         item.setOwningCollection(null);
 
         // Finally remove item row
-        itemDAO.delete(context, item);
+        itemDAO.delete(context.getSession(), item);
     }
 
     protected void removeRequest(Context context, Item item) throws SQLException {
-        Iterator<RequestItem> requestItems = requestItemService.findByItem(context, item);
+        Iterator<RequestItem> requestItems = requestItemService.findByItem(context.getSession(), item);
         while (requestItems.hasNext()) {
             RequestItem requestItem = requestItems.next();
             requestItemService.delete(context, requestItem);
@@ -1097,7 +1098,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Override
     public List<Collection> getCollectionsNotLinked(Context context, Item item) throws SQLException {
-        List<Collection> allCollections = collectionService.findAll(context);
+        List<Collection> allCollections = collectionService.findAll(context.getSession());
         List<Collection> linkedCollections = item.getCollections();
         List<Collection> notLinkedCollections = new ArrayList<>(allCollections.size() - linkedCollections.size());
 
@@ -1198,8 +1199,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
      */
     @Override
     public boolean isInProgressSubmission(Context context, Item item) throws SQLException {
-        return workspaceItemService.findByItem(context, item) != null
-            || workflowItemService.findByItem(context, item) != null;
+        return workspaceItemService.findByItem(context.getSession(), item) != null
+            || workflowItemService.findByItem(context.getSession(), item) != null;
     }
 
     /*
@@ -1240,8 +1241,8 @@ prevent the generation of resource policy entry values with null dspace_object a
 
     private void addCustomPoliciesNotInPlace(Context context, DSpaceObject dso, List<ResourcePolicy> customPolicies)
             throws SQLException, AuthorizeException {
-        boolean customPoliciesAlreadyInPlace = authorizeService
-                .findPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM).size() > 0;
+        boolean customPoliciesAlreadyInPlace = !authorizeService
+                .findPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM).isEmpty();
         if (!customPoliciesAlreadyInPlace) {
             authorizeService.addPolicies(context, customPolicies, dso);
         }
@@ -1257,7 +1258,7 @@ prevent the generation of resource policy entry values with null dspace_object a
      * @throws SQLException If something goes wrong retrieving the RP on the DSO
      */
     private boolean isNotAlreadyACustomRPOfThisTypeOnDSO(Context context, DSpaceObject dso) throws SQLException {
-        List<ResourcePolicy> readRPs = resourcePolicyService.find(context, dso, Constants.READ);
+        List<ResourcePolicy> readRPs = resourcePolicyService.find(context.getSession(), dso, Constants.READ);
         for (ResourcePolicy readRP : readRPs) {
             if (readRP.getRpType() != null && readRP.getRpType().equals(ResourcePolicy.TYPE_CUSTOM)) {
                 return false;
@@ -1279,7 +1280,7 @@ prevent the generation of resource policy entry values with null dspace_object a
      */
     private boolean shouldBeAppended(Context context, DSpaceObject dso, ResourcePolicy defaultPolicy)
             throws SQLException {
-        boolean hasCustomPolicy = resourcePolicyService.find(context, dso, Constants.READ)
+        boolean hasCustomPolicy = resourcePolicyService.find(context.getSession(), dso, Constants.READ)
                                                        .stream()
                                                        .filter(rp -> (Objects.nonNull(rp.getRpType()) &&
                                                             Objects.equals(rp.getRpType(), ResourcePolicy.TYPE_CUSTOM)))
@@ -1295,97 +1296,63 @@ prevent the generation of resource policy entry values with null dspace_object a
         return !(hasCustomPolicy && isAnonimousGroup && datesAreNull);
     }
 
-    /**
-     * Returns an iterator of Items possessing the passed metadata field, or only
-     * those matching the passed value, if value is not Item.ANY
-     *
-     * @param context   DSpace context object
-     * @param schema    metadata field schema
-     * @param element   metadata field element
-     * @param qualifier metadata field qualifier
-     * @param value     field value or Item.ANY to match any value
-     * @return an iterator over the items matching that authority value
-     * @throws SQLException       if database error
-     *                            An exception that provides information on a database access error or other errors.
-     * @throws AuthorizeException if authorization error
-     *                            Exception indicating the current user of the context does not have permission
-     *                            to perform a particular action.
-     */
     @Override
-    public Iterator<Item> findArchivedByMetadataField(Context context,
+    public Iterator<Item> findArchivedByMetadataField(Session session,
                                                       String schema, String element, String qualifier, String value)
             throws SQLException, AuthorizeException {
-        MetadataSchema mds = metadataSchemaService.find(context, schema);
+        MetadataSchema mds = metadataSchemaService.find(session, schema);
         if (mds == null) {
             throw new IllegalArgumentException("No such metadata schema: " + schema);
         }
-        MetadataField mdf = metadataFieldService.findByElement(context, mds, element, qualifier);
+        MetadataField mdf = metadataFieldService.findByElement(session, mds, element, qualifier);
         if (mdf == null) {
             throw new IllegalArgumentException(
                     "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
         }
 
         if (Item.ANY.equals(value)) {
-            return itemDAO.findByMetadataField(context, mdf, null, true);
+            return itemDAO.findByMetadataField(session, mdf, null, true);
         } else {
-            return itemDAO.findByMetadataField(context, mdf, value, true);
+            return itemDAO.findByMetadataField(session, mdf, value, true);
         }
     }
 
     @Override
-    public Iterator<Item> findArchivedByMetadataField(Context context, String metadataField, String value)
+    public Iterator<Item> findArchivedByMetadataField(Session session, String metadataField, String value)
             throws SQLException, AuthorizeException {
         String[] mdValueByField = getMDValueByField(metadataField);
-        return findArchivedByMetadataField(context, mdValueByField[0], mdValueByField[1], mdValueByField[2], value);
+        return findArchivedByMetadataField(session, mdValueByField[0], mdValueByField[1], mdValueByField[2], value);
     }
 
-    /**
-     * Returns an iterator of Items possessing the passed metadata field, or only
-     * those matching the passed value, if value is not Item.ANY
-     *
-     * @param context   DSpace context object
-     * @param schema    metadata field schema
-     * @param element   metadata field element
-     * @param qualifier metadata field qualifier
-     * @param value     field value or Item.ANY to match any value
-     * @return an iterator over the items matching that authority value
-     * @throws SQLException       if database error
-     *                            An exception that provides information on a database access error or other errors.
-     * @throws AuthorizeException if authorization error
-     *                            Exception indicating the current user of the context does not have permission
-     *                            to perform a particular action.
-     * @throws IOException        if IO error
-     *                            A general class of exceptions produced by failed or interrupted I/O operations.
-     */
     @Override
-    public Iterator<Item> findByMetadataField(Context context,
+    public Iterator<Item> findByMetadataField(Session session,
                                               String schema, String element, String qualifier, String value)
         throws SQLException, AuthorizeException, IOException {
-        MetadataSchema mds = metadataSchemaService.find(context, schema);
+        MetadataSchema mds = metadataSchemaService.find(session, schema);
         if (mds == null) {
             throw new IllegalArgumentException("No such metadata schema: " + schema);
         }
-        MetadataField mdf = metadataFieldService.findByElement(context, mds, element, qualifier);
+        MetadataField mdf = metadataFieldService.findByElement(session, mds, element, qualifier);
         if (mdf == null) {
             throw new IllegalArgumentException(
                 "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
         }
 
         if (Item.ANY.equals(value)) {
-            return itemDAO.findByMetadataField(context, mdf, null, true);
+            return itemDAO.findByMetadataField(session, mdf, null, true);
         } else {
-            return itemDAO.findByMetadataField(context, mdf, value, true);
+            return itemDAO.findByMetadataField(session, mdf, value, true);
         }
     }
 
     @Override
-    public Iterator<Item> findByMetadataQuery(Context context, List<List<MetadataField>> listFieldList,
+    public Iterator<Item> findByMetadataQuery(Session session, List<List<MetadataField>> listFieldList,
                                               List<String> query_op, List<String> query_val, List<UUID> collectionUuids,
                                               String regexClause, int offset, int limit)
         throws SQLException, AuthorizeException, IOException {
         return itemDAO
-            .findByMetadataQuery(context, listFieldList, query_op, query_val, collectionUuids, regexClause, offset,
-                                 limit);
+            .findByMetadataQuery(session, listFieldList, query_op,
+                    query_val, collectionUuids, regexClause, offset, limit);
     }
 
     @Override
@@ -1452,11 +1419,12 @@ prevent the generation of resource policy entry values with null dspace_object a
         if (ownCollection != null) {
             return ownCollection;
         } else {
-            InProgressSubmission inprogress = ContentServiceFactory.getInstance().getWorkspaceItemService()
-                                                                   .findByItem(context,
-                                                                               item);
+            InProgressSubmission inprogress = ContentServiceFactory.getInstance()
+                    .getWorkspaceItemService()
+                    .findByItem(context.getSession(), item);
             if (inprogress == null) {
-                inprogress = WorkflowServiceFactory.getInstance().getWorkflowItemService().findByItem(context, item);
+                inprogress = WorkflowServiceFactory.getInstance().getWorkflowItemService()
+                        .findByItem(context.getSession(), item);
             }
 
             if (inprogress != null) {
@@ -1468,38 +1436,38 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     @Override
-    public Iterator<Item> findByAuthorityValue(Context context, String schema, String element, String qualifier,
+    public Iterator<Item> findByAuthorityValue(Session session, String schema, String element, String qualifier,
                                                String value) throws SQLException, AuthorizeException {
-        MetadataSchema mds = metadataSchemaService.find(context, schema);
+        MetadataSchema mds = metadataSchemaService.find(session, schema);
         if (mds == null) {
             throw new IllegalArgumentException("No such metadata schema: " + schema);
         }
-        MetadataField mdf = metadataFieldService.findByElement(context, mds, element, qualifier);
+        MetadataField mdf = metadataFieldService.findByElement(session, mds, element, qualifier);
         if (mdf == null) {
             throw new IllegalArgumentException(
                 "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
         }
 
-        return itemDAO.findByAuthorityValue(context, mdf, value, true);
+        return itemDAO.findByAuthorityValue(session, mdf, value, true);
     }
 
     @Override
-    public Iterator<Item> findByMetadataFieldAuthority(Context context, String mdString, String authority)
+    public Iterator<Item> findByMetadataFieldAuthority(Session session, String mdString, String authority)
         throws SQLException, AuthorizeException {
         String[] elements = getElementsFilled(mdString);
         String schema = elements[0];
         String element = elements[1];
         String qualifier = elements[2];
-        MetadataSchema mds = metadataSchemaService.find(context, schema);
+        MetadataSchema mds = metadataSchemaService.find(session, schema);
         if (mds == null) {
             throw new IllegalArgumentException("No such metadata schema: " + schema);
         }
-        MetadataField mdf = metadataFieldService.findByElement(context, mds, element, qualifier);
+        MetadataField mdf = metadataFieldService.findByElement(session, mds, element, qualifier);
         if (mdf == null) {
             throw new IllegalArgumentException(
                 "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
         }
-        return findByAuthorityValue(context, mds.getName(), mdf.getElement(), mdf.getQualifier(), authority);
+        return findByAuthorityValue(session, mds.getName(), mdf.getElement(), mdf.getQualifier(), authority);
     }
 
     @Override
@@ -1523,13 +1491,13 @@ prevent the generation of resource policy entry values with null dspace_object a
 
     @Override
     public int countItems(Context context, Collection collection) throws SQLException {
-        return itemDAO.countItems(context, collection, true, false);
+        return itemDAO.countItems(context.getSession(), collection, true, false);
     }
 
     @Override
     public int countAllItems(Context context, Collection collection) throws SQLException {
-        return itemDAO.countItems(context, collection, true, false) + itemDAO.countItems(context, collection,
-                                                                                         false, true);
+        return itemDAO.countItems(context.getSession(), collection, true, false)
+                + itemDAO.countItems(context.getSession(), collection, false, true);
     }
 
     @Override
@@ -1538,7 +1506,7 @@ prevent the generation of resource policy entry values with null dspace_object a
         List<Collection> collections = communityService.getAllCollections(context, community);
 
         // Now, lets count unique items across that list of collections
-        return itemDAO.countItems(context, collections, true, false);
+        return itemDAO.countItems(context.getSession(), collections, true, false);
     }
 
     @Override
@@ -1547,8 +1515,8 @@ prevent the generation of resource policy entry values with null dspace_object a
         List<Collection> collections = communityService.getAllCollections(context, community);
 
         // Now, lets count unique items across that list of collections
-        return itemDAO.countItems(context, collections, true, false) + itemDAO.countItems(context, collections,
-                                                                                          false, true);
+        return itemDAO.countItems(context.getSession(), collections, true, false)
+                + itemDAO.countItems(context.getSession(), collections, false, true);
     }
 
     @Override
@@ -1560,46 +1528,46 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     @Override
-    public Item findByIdOrLegacyId(Context context, String id) throws SQLException {
+    public Item findByIdOrLegacyId(Session session, String id) throws SQLException {
         if (StringUtils.isNumeric(id)) {
-            return findByLegacyId(context, Integer.parseInt(id));
+            return findByLegacyId(session, Integer.parseInt(id));
         } else {
-            return find(context, UUID.fromString(id));
+            return find(session, UUID.fromString(id));
         }
     }
 
     @Override
-    public Item findByLegacyId(Context context, int id) throws SQLException {
-        return itemDAO.findByLegacyId(context, id, Item.class);
+    public Item findByLegacyId(Session session, int id) throws SQLException {
+        return itemDAO.findByLegacyId(session, id, Item.class);
     }
 
     @Override
-    public Iterator<Item> findByLastModifiedSince(Context context, Date last)
+    public Iterator<Item> findByLastModifiedSince(Session session, Date last)
         throws SQLException {
-        return itemDAO.findByLastModifiedSince(context, last);
+        return itemDAO.findByLastModifiedSince(session, last);
     }
 
     @Override
     public int countTotal(Context context) throws SQLException {
-        return itemDAO.countRows(context);
+        return itemDAO.countRows(context.getSession());
     }
 
     @Override
     public int countNotArchivedItems(Context context) throws SQLException {
         // return count of items not in archive and also not withdrawn
-        return itemDAO.countItems(context, false, false);
+        return itemDAO.countItems(context.getSession(), false, false);
     }
 
     @Override
     public int countArchivedItems(Context context) throws SQLException {
         // return count of items in archive and also not withdrawn
-        return itemDAO.countItems(context, true, false);
+        return itemDAO.countItems(context.getSession(), true, false);
     }
 
     @Override
     public int countWithdrawnItems(Context context) throws SQLException {
         // return count of items that are not in archive and withdrawn
-        return itemDAO.countItems(context, false, true);
+        return itemDAO.countItems(context.getSession(), false, true);
     }
 
     @Override
@@ -1683,7 +1651,7 @@ prevent the generation of resource policy entry values with null dspace_object a
         if (rr instanceof RelationshipMetadataValue) {
             try {
                 //Retrieve the applicable relationship
-                Relationship rs = relationshipService.find(context,
+                Relationship rs = relationshipService.find(context.getSession(),
                         ((RelationshipMetadataValue) rr).getRelationshipId());
                 if (rs.getLeftItem() == dso) {
                     rs.setLeftPlace(place);
@@ -1707,7 +1675,8 @@ prevent the generation of resource policy entry values with null dspace_object a
 
         // We will not verify that they are valid entries in the registry
         // until update() is called.
-        MetadataField metadataField = metadataFieldService.findByElement(context, schema, element, qualifier);
+        MetadataField metadataField = metadataFieldService.findByElement(context.getSession(),
+                schema, element, qualifier);
         if (metadataField == null) {
             throw new SQLException(
                 "bad_dublin_core schema=" + schema + "." + element + "." + qualifier + ". Metadata field does not " +
@@ -1751,7 +1720,7 @@ prevent the generation of resource policy entry values with null dspace_object a
             return null;
         }
 
-        return entityTypeService.findByEntityType(context, entityTypeString);
+        return entityTypeService.findByEntityType(context.getSession(), entityTypeString);
     }
 
     private void removeOrcidSynchronizationStuff(Context context, Item item) throws SQLException, AuthorizeException {
@@ -1787,7 +1756,7 @@ prevent the generation of resource policy entry values with null dspace_object a
             return;
         }
 
-        Map<Item, String> profileAndPutCodeMap = orcidHistoryService.findLastPutCodes(context, entity);
+        Map<Item, String> profileAndPutCodeMap = orcidHistoryService.findLastPutCodes(context.getSession(), entity);
         for (Item profile : profileAndPutCodeMap.keySet()) {
             if (orcidSynchronizationService.isSynchronizationAllowed(profile, entity)) {
                 String putCode = profileAndPutCodeMap.get(profile);
@@ -1799,7 +1768,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     private void deleteOrcidHistoryRecords(Context context, Item item) throws SQLException {
-        List<OrcidHistory> historyRecords = orcidHistoryService.findByProfileItemOrEntity(context, item);
+        List<OrcidHistory> historyRecords = orcidHistoryService.findByProfileItemOrEntity(context.getSession(), item);
         for (OrcidHistory historyRecord : historyRecords) {
             if (historyRecord.getProfileItem().equals(item)) {
                 orcidHistoryService.delete(context, historyRecord);
@@ -1811,7 +1780,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     private void deleteOrcidQueueRecords(Context context, Item item) throws SQLException {
-        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findByProfileItemOrEntity(context, item);
+        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findByProfileItemOrEntity(context.getSession(), item);
         for (OrcidQueue orcidQueueRecord : orcidQueueRecords) {
             orcidQueueService.delete(context, orcidQueueRecord);
         }

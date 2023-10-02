@@ -79,7 +79,7 @@ public class AuthorizeServicePermissionEvaluatorPlugin extends RestObjectPermiss
                 ePerson = context.getCurrentUser();
 
                 if (dSpaceObjectService != null && dsoId != null) {
-                    DSpaceObject dSpaceObject = dSpaceObjectService.find(context, dsoId);
+                    DSpaceObject dSpaceObject = dSpaceObjectService.find(context.getSession(), dsoId);
 
                     //If the dso is null then we give permission so we can throw another status code instead
                     if (dSpaceObject == null) {

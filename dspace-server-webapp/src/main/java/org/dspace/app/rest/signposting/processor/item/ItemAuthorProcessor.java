@@ -65,7 +65,7 @@ public class ItemAuthorProcessor extends ItemSignpostingProcessor {
             String authorId = itemService.getMetadataFirstValue(item, MetadataSchemaEnum.RELATION.getName(),
                     "isAuthorOfPublication", null, ANY);
             if (isNotBlank(authorId)) {
-                Item author = itemService.findByIdOrLegacyId(context, authorId);
+                Item author = itemService.findByIdOrLegacyId(context.getSession(), authorId);
                 if (nonNull(author)) {
                     String authorOrcid = itemService.getMetadataFirstValue(
                             author, new MetadataFieldName(getOrcidMetadata()), ANY

@@ -79,8 +79,8 @@ public class BitstreamFormatTest extends AbstractUnitTest {
     public void init() {
         super.init();
         try {
-            bf = bitstreamFormatService.find(context, 5);
-            bunknown = bitstreamFormatService.findUnknown(context);
+            bf = bitstreamFormatService.find(context.getSession(), 5);
+            bunknown = bitstreamFormatService.findUnknown(context.getSession());
 
             // Initialize our spy of the autowired (global) authorizeService bean.
             // This allows us to customize the bean's method return values in tests below
@@ -114,11 +114,11 @@ public class BitstreamFormatTest extends AbstractUnitTest {
      */
     @Test
     public void testFind() throws SQLException {
-        BitstreamFormat found = bitstreamFormatService.find(context, 1);
+        BitstreamFormat found = bitstreamFormatService.find(context.getSession(), 1);
         assertThat("testFind 0", found, notNullValue());
         assertThat("testFind 1", found.getShortDescription(), equalTo("Unknown"));
 
-        found = bitstreamFormatService.find(context, 2);
+        found = bitstreamFormatService.find(context.getSession(), 2);
         assertThat("testFind 2", found, notNullValue());
         assertThat("testFind 3", found.getShortDescription(), equalTo("License"));
         assertTrue("testFind 4", found.isInternal());
@@ -129,12 +129,12 @@ public class BitstreamFormatTest extends AbstractUnitTest {
      */
     @Test
     public void testFindByMIMEType() throws SQLException {
-        BitstreamFormat found = bitstreamFormatService.findByMIMEType(context, "text/plain");
+        BitstreamFormat found = bitstreamFormatService.findByMIMEType(context.getSession(), "text/plain");
         assertThat("testFindByMIMEType 0", found, notNullValue());
         assertThat("testFindByMIMEType 1", found.getMIMEType(), equalTo("text/plain"));
         assertFalse("testFindByMIMEType 2", found.isInternal());
 
-        found = bitstreamFormatService.findByMIMEType(context, "text/xml");
+        found = bitstreamFormatService.findByMIMEType(context.getSession(), "text/xml");
         assertThat("testFindByMIMEType 3", found, notNullValue());
         assertThat("testFindByMIMEType 4", found.getMIMEType(), equalTo("text/xml"));
         assertFalse("testFindByMIMEType 5", found.isInternal());
@@ -145,12 +145,12 @@ public class BitstreamFormatTest extends AbstractUnitTest {
      */
     @Test
     public void testFindByShortDescription() throws SQLException {
-        BitstreamFormat found = bitstreamFormatService.findByShortDescription(context, "Adobe PDF");
+        BitstreamFormat found = bitstreamFormatService.findByShortDescription(context.getSession(), "Adobe PDF");
         assertThat("testFindByShortDescription 0", found, notNullValue());
         assertThat("testFindByShortDescription 1", found.getShortDescription(), equalTo("Adobe PDF"));
         assertFalse("testFindByShortDescription 2", found.isInternal());
 
-        found = bitstreamFormatService.findByShortDescription(context, "XML");
+        found = bitstreamFormatService.findByShortDescription(context.getSession(), "XML");
         assertThat("testFindByShortDescription 3", found, notNullValue());
         assertThat("testFindByShortDescription 4", found.getShortDescription(), equalTo("XML"));
         assertFalse("testFindByShortDescription 5", found.isInternal());
@@ -162,7 +162,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
     @Test
     public void testFindUnknown()
         throws SQLException {
-        BitstreamFormat found = bitstreamFormatService.findUnknown(context);
+        BitstreamFormat found = bitstreamFormatService.findUnknown(context.getSession());
         assertThat("testFindUnknown 0", found, notNullValue());
         assertThat("testFindUnknown 1", found.getShortDescription(), equalTo("Unknown"));
         assertFalse("testFindUnknown 2", found.isInternal());
@@ -175,7 +175,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
     @Test
     public void testFindAll() throws SQLException {
 
-        List<BitstreamFormat> found = bitstreamFormatService.findAll(context);
+        List<BitstreamFormat> found = bitstreamFormatService.findAll(context.getSession());
         assertThat("testFindAll 0", found, notNullValue());
 
         //check pos 0 is Unknown
@@ -198,7 +198,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
     @Test
     public void testFindNonInternal() throws SQLException {
 
-        List<BitstreamFormat> found = bitstreamFormatService.findNonInternal(context);
+        List<BitstreamFormat> found = bitstreamFormatService.findNonInternal(context.getSession());
         assertThat("testFindNonInternal 0", found, notNullValue());
         int i = 0;
         for (BitstreamFormat b : found) {
@@ -351,7 +351,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
         assertTrue("testGetSupportLevel 2", bunknown.getSupportLevel() >= 0);
         assertTrue("testGetSupportLevel 3", bunknown.getSupportLevel() <= 2);
 
-        List<BitstreamFormat> found = bitstreamFormatService.findAll(context);
+        List<BitstreamFormat> found = bitstreamFormatService.findAll(context.getSession());
         int i = 0;
         for (BitstreamFormat b : found) {
             i++;
@@ -423,10 +423,10 @@ public class BitstreamFormatTest extends AbstractUnitTest {
     public void testIsInternal() throws SQLException {
         assertThat("testIsInternal 0", bf.isInternal(), equalTo(false));
 
-        BitstreamFormat found = bitstreamFormatService.findByShortDescription(context, "License");
+        BitstreamFormat found = bitstreamFormatService.findByShortDescription(context.getSession(), "License");
         assertThat("testIsInternal 1", found.isInternal(), equalTo(true));
 
-        found = bitstreamFormatService.findByShortDescription(context, "CC License");
+        found = bitstreamFormatService.findByShortDescription(context.getSession(), "CC License");
         assertThat("testIsInternal 2", found.isInternal(), equalTo(true));
 
         assertThat("testIsInternal 3", bunknown.isInternal(), equalTo(false));
@@ -469,7 +469,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
         bf.setDescription(desc);
         bitstreamFormatService.update(context, bf);
 
-        BitstreamFormat b = bitstreamFormatService.find(context, 5);
+        BitstreamFormat b = bitstreamFormatService.find(context.getSession(), 5);
         assertThat("testUpdateAdmin 0", b.getDescription(), equalTo(desc));
         bf.setDescription(oldDescription);
     }
@@ -497,7 +497,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
         BitstreamFormat bitstreamFormat = bitstreamFormatService.create(context);
         int toDeleteIdentifier = bitstreamFormat.getID();
         bitstreamFormatService.delete(context, bitstreamFormat);
-        BitstreamFormat b = bitstreamFormatService.find(context, toDeleteIdentifier);
+        BitstreamFormat b = bitstreamFormatService.find(context.getSession(), toDeleteIdentifier);
         assertThat("testDeleteAdmin 0", b, nullValue());
     }
 

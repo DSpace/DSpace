@@ -40,7 +40,7 @@ public class CommunityIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Inde
 
     @Override
     public Iterator<IndexableCommunity> findAll(Context context) throws SQLException {
-        Iterator<Community> communities = communityService.findAll(context).iterator();
+        Iterator<Community> communities = communityService.findAll(context.getSession()).iterator();
 
         return new Iterator<IndexableCommunity>() {
             @Override
@@ -117,7 +117,7 @@ public class CommunityIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Inde
 
     @Override
     public Optional<IndexableCommunity> findIndexableObject(Context context, String id) throws SQLException {
-        final Community community = communityService.find(context, UUID.fromString(id));
+        final Community community = communityService.find(context.getSession(), UUID.fromString(id));
         return community == null ? Optional.empty() : Optional.of(new IndexableCommunity(community));
     }
 

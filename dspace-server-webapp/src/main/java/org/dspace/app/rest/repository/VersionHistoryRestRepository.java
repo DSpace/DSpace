@@ -41,7 +41,7 @@ public class VersionHistoryRestRepository extends DSpaceRestRepository<VersionHi
     @PreAuthorize("@versioningSecurity.isEnableVersioning() && hasPermission(#id, 'VERSIONHISTORY', 'READ')")
     public VersionHistoryRest findOne(Context context, Integer id) {
         try {
-            VersionHistory versionHistory = versionHistoryService.find(context, id);
+            VersionHistory versionHistory = versionHistoryService.find(context.getSession(), id);
             if (versionHistory == null) {
                 throw new ResourceNotFoundException("Couldn't find version for id: " + id);
             }

@@ -118,7 +118,7 @@ public class ProcessBuilder extends AbstractBuilder<Process, ProcessService> {
         }
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
-            Process process = processService.find(c, integer);
+            Process process = processService.find(c.getSession(), integer);
             if (process != null) {
                 try {
                     processService.delete(c, process);

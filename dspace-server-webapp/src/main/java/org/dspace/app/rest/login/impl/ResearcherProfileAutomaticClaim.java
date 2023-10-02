@@ -119,10 +119,12 @@ public class ResearcherProfileAutomaticClaim implements PostLoggedInAction {
             return null;
         }
 
-        List<Item> items = toList(itemService.findArchivedByMetadataField(context, profileField, value)).stream()
-            .filter(this::hasNotOwner)
-            .filter(researcherProfileService::hasProfileType)
-            .collect(Collectors.toList());
+        List<Item> items = toList(itemService.findArchivedByMetadataField(context.getSession(),
+                profileField, value))
+                .stream()
+                .filter(this::hasNotOwner)
+                .filter(researcherProfileService::hasProfileType)
+                .collect(Collectors.toList());
 
         return items.size() == 1 ? items.get(0) : null;
     }

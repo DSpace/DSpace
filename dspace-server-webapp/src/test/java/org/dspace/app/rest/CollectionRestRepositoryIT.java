@@ -1259,7 +1259,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         authorizeService.addPolicy(context, parentCommunity, Constants.ADD, eperson);
         context.restoreAuthSystemState();
 
-        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+        AtomicReference<UUID> idRef = new AtomicReference<>();
         try {
         String authToken = getAuthToken(eperson.getEmail(), password);
 
@@ -2841,7 +2841,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.turnOffAuthorisationSystem();
         GroupBuilder.createGroup(context)
             .withName("adminSubGroup")
-            .withParent(groupService.findByName(context, Group.ADMIN))
+            .withParent(groupService.findByName(context.getSession(), Group.ADMIN))
             .addMember(eperson)
             .build();
         communityB = CommunityBuilder.createCommunity(context)
@@ -2885,7 +2885,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.turnOffAuthorisationSystem();
         GroupBuilder.createGroup(context)
             .withName("communityAdminSubGroup")
-            .withParent(groupService.findByName(context, "COMMUNITY_" + topLevelCommunityA.getID() + "_ADMIN"))
+            .withParent(groupService.findByName(context.getSession(),
+                    "COMMUNITY_" + topLevelCommunityA.getID() + "_ADMIN"))
             .addMember(eperson)
             .build();
         communityB = CommunityBuilder.createCommunity(context)
@@ -2897,7 +2898,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         ResourcePolicyBuilder.createResourcePolicy(context)
             .withDspaceObject(communityB)
             .withAction(Constants.ADMIN)
-            .withGroup(groupService.findByName(context, "COMMUNITY_" + topLevelCommunityA.getID() + "_ADMIN"))
+            .withGroup(groupService.findByName(context.getSession(),
+                    "COMMUNITY_" + topLevelCommunityA.getID() + "_ADMIN"))
             .build();
         collectionB = CollectionBuilder.createCollection(context, subCommunityA)
             .withName("collectionB is a very original name")
@@ -2939,7 +2941,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.turnOffAuthorisationSystem();
         GroupBuilder.createGroup(context)
             .withName("communityAdminSubGroup")
-            .withParent(groupService.findByName(context, "COMMUNITY_" + subCommunityA.getID() + "_ADMIN"))
+            .withParent(groupService.findByName(context.getSession(),
+                    "COMMUNITY_" + subCommunityA.getID() + "_ADMIN"))
             .addMember(eperson)
             .build();
         communityB = CommunityBuilder.createCommunity(context)
@@ -2953,7 +2956,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         ResourcePolicyBuilder.createResourcePolicy(context)
             .withDspaceObject(communityB)
             .withAction(Constants.ADMIN)
-            .withGroup(groupService.findByName(context, "COMMUNITY_" + subCommunityA.getID() + "_ADMIN"))
+            .withGroup(groupService.findByName(context.getSession(),
+                    "COMMUNITY_" + subCommunityA.getID() + "_ADMIN"))
             .build();
         collectionB = CollectionBuilder.createCollection(context, subCommunityA)
             .withName("collectionB is a very original name")
@@ -2995,7 +2999,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.turnOffAuthorisationSystem();
         GroupBuilder.createGroup(context)
             .withName("collectionAdminSubGroup")
-            .withParent(groupService.findByName(context, "COLLECTION_" + collectionA.getID() + "_ADMIN"))
+            .withParent(groupService.findByName(context.getSession(),
+                    "COLLECTION_" + collectionA.getID() + "_ADMIN"))
             .addMember(eperson)
             .build();
         communityB = CommunityBuilder.createCommunity(context)
@@ -3015,7 +3020,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         ResourcePolicyBuilder.createResourcePolicy(context)
             .withDspaceObject(collectionB)
             .withAction(Constants.ADMIN)
-            .withGroup(groupService.findByName(context, "COLLECTION_" + collectionA.getID() + "_ADMIN"))
+            .withGroup(groupService.findByName(context.getSession(),
+                    "COLLECTION_" + collectionA.getID() + "_ADMIN"))
             .build();
         context.restoreAuthSystemState();
 
@@ -3051,7 +3057,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.turnOffAuthorisationSystem();
         GroupBuilder.createGroup(context)
             .withName("collectionAdminSubGroup")
-            .withParent(groupService.findByName(context, "COLLECTION_" + collectionA.getID() + "_SUBMIT"))
+            .withParent(groupService.findByName(context.getSession(),
+                    "COLLECTION_" + collectionA.getID() + "_SUBMIT"))
             .addMember(eperson)
             .build();
         communityB = CommunityBuilder.createCommunity(context)
@@ -3068,7 +3075,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         ResourcePolicyBuilder.createResourcePolicy(context)
             .withDspaceObject(collectionB)
             .withAction(Constants.ADD)
-            .withGroup(groupService.findByName(context, "COLLECTION_" + collectionA.getID() + "_SUBMIT"))
+            .withGroup(groupService.findByName(context.getSession(),
+                    "COLLECTION_" + collectionA.getID() + "_SUBMIT"))
             .build();
         collectionC = CollectionBuilder.createCollection(context, communityC)
             .withName("the last collection is collectionC")
@@ -3202,8 +3210,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                        )))
                              .andExpect(jsonPath("$.page.totalElements", is(1)));
 
-        List<Operation> updateTitle = new ArrayList<Operation>();
-        Map<String, String> value = new HashMap<String, String>();
+        List<Operation> updateTitle = new ArrayList<>();
+        Map<String, String> value = new HashMap<>();
         value.put("value", "New Name");
         updateTitle.add(new ReplaceOperation("/metadata/dc.title/0", value));
 

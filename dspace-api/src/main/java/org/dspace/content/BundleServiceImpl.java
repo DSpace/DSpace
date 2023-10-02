@@ -37,6 +37,7 @@ import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.Group;
 import org.dspace.event.Event;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -51,7 +52,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(Bundle.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     @Autowired(required = true)
     protected BundleDAO bundleDAO;
@@ -70,20 +71,18 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
     }
 
     @Override
-    public Bundle find(Context context, UUID id) throws SQLException {
+    public Bundle find(Session session, UUID id) throws SQLException {
         // First check the cache
-        Bundle bundle = bundleDAO.findByID(context, Bundle.class, id);
+        Bundle bundle = bundleDAO.findByID(session, Bundle.class, id);
         if (bundle == null) {
             if (log.isDebugEnabled()) {
-                log.debug(LogHelper.getHeader(context, "find_bundle",
-                        "not_found,bundle_id=" + id));
+                log.debug("find_bundle not_found,bundle_id={}", id);
             }
 
             return null;
         } else {
             if (log.isDebugEnabled()) {
-                log.debug(LogHelper.getHeader(context, "find_bundle",
-                        "bundle_id=" + id));
+                log.debug("find_bundle bundle_id={}", id);
             }
 
             return bundle;
@@ -99,7 +98,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
 
 
         // Create a table row
-        Bundle bundle = bundleDAO.create(context, new Bundle());
+        Bundle bundle = bundleDAO.create(context.getSession(), new Bundle());
         bundle.setName(context, name);
         itemService.addBundle(context, item, bundle);
         if (!bundle.getItems().contains(item)) {
@@ -268,7 +267,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
                     + " has no default bitstream READ policies");
         }
 
-        List<ResourcePolicy> newPolicies = new ArrayList<ResourcePolicy>();
+        List<ResourcePolicy> newPolicies = new ArrayList<>();
         while (i.hasNext()) {
             ResourcePolicy rp = resourcePolicyService.clone(context, i.next());
             rp.setAction(Constants.READ);
@@ -296,7 +295,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
 
     @Override
     public List<ResourcePolicy> getBitstreamPolicies(Context context, Bundle bundle) throws SQLException {
-        List<ResourcePolicy> list = new ArrayList<ResourcePolicy>();
+        List<ResourcePolicy> list = new ArrayList<>();
         List<Bitstream> bitstreams = bundle.getBitstreams();
         if (CollectionUtils.isNotEmpty(bitstreams)) {
             for (Bitstream bs : bitstreams) {
@@ -391,12 +390,12 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         authorizeService.authorizeAction(context, bundle, Constants.WRITE);
 
         List<Bitstream> currentBitstreams = bundle.getBitstreams();
-        List<Bitstream> updatedBitstreams = new ArrayList<Bitstream>();
+        List<Bitstream> updatedBitstreams = new ArrayList<>();
 
         // Loop through and ensure these Bitstream IDs are all valid. Add them to list of updatedBitstreams.
         for (int i = 0; i < bitstreamIds.length; i++) {
             UUID bitstreamId = bitstreamIds[i];
-            Bitstream bitstream = bitstreamService.find(context, bitstreamId);
+            Bitstream bitstream = bitstreamService.find(context.getSession(), bitstreamId);
 
             // If we have an invalid Bitstream ID, just ignore it, but log a warning
             if (bitstream == null) {
@@ -514,7 +513,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
                 + bundle.getID()));
 
         super.update(context, bundle);
-        bundleDAO.save(context, bundle);
+        bundleDAO.save(context.getSession(), bundle);
 
         if (bundle.isModified() || bundle.isMetadataModified()) {
             if (bundle.isMetadataModified()) {
@@ -552,7 +551,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         }
 
         // Remove ourself
-        bundleDAO.delete(context, bundle);
+        bundleDAO.delete(context.getSession(), bundle);
     }
 
     @Override
@@ -561,21 +560,21 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
     }
 
     @Override
-    public Bundle findByIdOrLegacyId(Context context, String id) throws SQLException {
+    public Bundle findByIdOrLegacyId(Session session, String id) throws SQLException {
         if (StringUtils.isNumeric(id)) {
-            return findByLegacyId(context, Integer.parseInt(id));
+            return findByLegacyId(session, Integer.parseInt(id));
         } else {
-            return find(context, UUID.fromString(id));
+            return find(session, UUID.fromString(id));
         }
     }
 
     @Override
-    public Bundle findByLegacyId(Context context, int id) throws SQLException {
-        return bundleDAO.findByLegacyId(context, id, Bundle.class);
+    public Bundle findByLegacyId(Session session, int id) throws SQLException {
+        return bundleDAO.findByLegacyId(session, id, Bundle.class);
     }
 
     @Override
     public int countTotal(Context context) throws SQLException {
-        return bundleDAO.countRows(context);
+        return bundleDAO.countRows(context.getSession());
     }
 }

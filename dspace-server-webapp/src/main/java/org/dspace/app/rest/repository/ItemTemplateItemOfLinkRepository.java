@@ -41,7 +41,7 @@ public class ItemTemplateItemOfLinkRepository extends AbstractDSpaceRestReposito
                                             Projection projection) {
         try {
             Context context = obtainContext();
-            Item item = itemService.find(context, itemId);
+            Item item = itemService.find(context.getSession(), itemId);
             if (item == null) {
                 throw new ResourceNotFoundException("No such item: " + itemId);
             }

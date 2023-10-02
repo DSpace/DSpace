@@ -48,13 +48,13 @@ public class ItemRelationshipLinkRepository extends AbstractDSpaceRestRepository
                                                    Projection projection) {
         try {
             Context context = obtainContext();
-            Item item = itemService.find(context, itemId);
+            Item item = itemService.find(context.getSession(), itemId);
             if (item == null) {
                 throw new ResourceNotFoundException("No such item: " + itemId);
             }
             int total = relationshipService.countByItem(context, item, true, true);
             Pageable pageable = utils.getPageable(optionalPageable);
-            List<Relationship> relationships = relationshipService.findByItem(context, item,
+            List<Relationship> relationships = relationshipService.findByItem(context.getSession(), item,
                     pageable.getPageSize(), Math.toIntExact(pageable.getOffset()), true, true);
             return converter.toRestPage(relationships, pageable, total, projection);
         } catch (SQLException e) {

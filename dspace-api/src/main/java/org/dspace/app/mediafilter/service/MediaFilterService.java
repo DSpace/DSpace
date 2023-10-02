@@ -35,17 +35,44 @@ public interface MediaFilterService {
     //for MediaFilters which extend SelfNamedPlugin (\034 is "file separator" char)
     public static final String FILTER_PLUGIN_SEPARATOR = "\034";
 
-
+    /**
+     * Apply filters to all items in the repository, respecting the skip list if
+     * any.
+     *
+     * @param context the current DSpace session.
+     * @throws Exception passed through.
+     */
     public void applyFiltersAllItems(Context context) throws Exception;
 
+    /**
+     * Apply filters to all items in a Community, unless the Community is in the
+     * optional skip list.
+     *
+     * @param context the current DSpace session.
+     * @param community the Community to be filtered.
+     * @throws Exception passed through.
+     */
     public void applyFiltersCommunity(Context context, Community community)
         throws Exception;
 
+    /**
+     * Apply filters to all Items in a Collection, unless the Collection is in
+     * the optional skip list.
+     *
+     * @param context the current DSpace session.
+     * @param collection the Collection to be filtered.
+     * @throws Exception passed through.
+     */
     public void applyFiltersCollection(Context context, Collection collection)
         throws Exception;
 
+    /**
+     * Apply filters to an Item, unless the Item is in the optional skip list.
+     * @param c
+     * @param item
+     * @throws Exception
+     */
     public void applyFiltersItem(Context c, Item item) throws Exception;
-
 
     /**
      * Iterate through the item's bitstreams in the ORIGINAL bundle, applying
@@ -140,8 +167,22 @@ public interface MediaFilterService {
 
     public void setFilterClasses(List<FormatFilter> filterClasses);
 
+    /**
+     * Set the optional skip list to skip processing of certain model objects.
+     *
+     * @param skipList Handles of the objects to skip.
+     */
     public void setSkipList(List<String> skipList);
 
+    /**
+     * Set the mapping of filters into file formats.
+     *
+     * @param filterFormats the mapping.
+     *                      For SelfNamedPlugins, map key is:
+     *                        {@code <class-name><separator><plugin-name>}
+     *                      For other MediaFilters, map key is just:
+     *                        {@code <class-name>}
+     */
     public void setFilterFormats(Map<String, List<String>> filterFormats);
 
     /**

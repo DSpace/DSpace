@@ -96,7 +96,7 @@ public class VersioningConsumer implements Consumer {
         }
 
         // get version history
-        VersionHistory history = versionHistoryService.findByItem(ctx, item);
+        VersionHistory history = versionHistoryService.findByItem(ctx.getSession(), item);
         if (history == null) {
             return;
         }
@@ -339,6 +339,7 @@ public class VersioningConsumer implements Consumer {
 
     /**
      * Get the entity type (stored in metadata field dspace.entity.type) of any item.
+     * @param ctx current DSpace session.
      * @param item the item.
      * @return the entity type.
      */
@@ -362,7 +363,7 @@ public class VersioningConsumer implements Consumer {
      */
     protected List<RelationshipType> getRelationshipTypes(Context ctx, EntityType entityType) {
         try {
-            return relationshipTypeService.findByEntityType(ctx, entityType);
+            return relationshipTypeService.findByEntityType(ctx.getSession(), entityType);
         } catch (SQLException e) {
             log.error(
                 "Exception occurred when trying to obtain relationship types via entity type with id {}, label {}",
@@ -381,7 +382,8 @@ public class VersioningConsumer implements Consumer {
      */
     protected List<Relationship> getAllRelationships(Context ctx, Item item, RelationshipType relationshipType) {
         try {
-            return relationshipService.findByItemAndRelationshipType(ctx, item, relationshipType, -1, -1, false);
+            return relationshipService.findByItemAndRelationshipType(ctx.getSession(),
+                    item, relationshipType, -1, -1, false);
         } catch (SQLException e) {
             log.error(
                 "Exception occurred when trying to obtain relationships of type with id {}, rightward name {} " +

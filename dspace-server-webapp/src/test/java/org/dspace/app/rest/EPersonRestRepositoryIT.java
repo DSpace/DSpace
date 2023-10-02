@@ -119,8 +119,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         dataFull.setCanLogIn(true);
         dataFull.setMetadata(metadataRest);
 
-        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
-        AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<UUID>();
+        AtomicReference<UUID> idRef = new AtomicReference<>();
+        AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<>();
 
         String authToken = getAuthToken(admin.getEmail(), password);
 
@@ -202,7 +202,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.turnOffAuthorisationSystem();
         accountService.sendRegistrationInfo(context, "test@fake-email.com");
-        String token = registrationDataService.findByEmail(context, "test@fake-email.com").getToken();
+        String token = registrationDataService.findByEmail(context.getSession(), "test@fake-email.com").getToken();
         context.restoreAuthSystemState();
 
         String ePersonData = "{" +
@@ -944,7 +944,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/netid", "newNetId");
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -977,7 +977,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/netid", "newNetId");
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1008,7 +1008,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/netid", "newNetId");
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1041,7 +1041,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
 
         // String should be converted to boolean.
         ReplaceOperation replaceOperation = new ReplaceOperation("/canLogin", "true");
@@ -1085,7 +1085,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/netid", "newNetId");
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1122,7 +1122,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String token = getAuthToken(admin.getEmail(), password);
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/netid", newId);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1135,7 +1135,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .andExpect(jsonPath("$.netid", Matchers.is(newId)));
 
 
-        List<Operation> ops2 = new ArrayList<Operation>();
+        List<Operation> ops2 = new ArrayList<>();
         ReplaceOperation replaceOperation2 = new ReplaceOperation("/netid", null);
         ops2.add(replaceOperation2);
         patchBody = getPatchContent(ops2);
@@ -2104,7 +2104,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String patchBody = buildPasswordAddOperationPatchBody(newPassword, null);
 
         accountService.sendRegistrationInfo(context, ePerson.getEmail());
-        String tokenForEPerson = registrationDataService.findByEmail(context, ePerson.getEmail()).getToken();
+        String tokenForEPerson = registrationDataService.findByEmail(context.getSession(), ePerson.getEmail())
+                .getToken();
         PasswordHash oldPassword = ePersonService.getPasswordHash(ePerson);
         // updates password
         getClient().perform(patch("/api/eperson/epersons/" + ePerson.getID())
@@ -2115,9 +2116,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         PasswordHash newPasswordHash = ePersonService.getPasswordHash(ePerson);
         assertNotEquals(oldPassword, newPasswordHash);
-        assertTrue(registrationDataService.findByEmail(context, ePerson.getEmail()) == null);
+        assertTrue(registrationDataService.findByEmail(context.getSession(), ePerson.getEmail()) == null);
 
-        assertNull(registrationDataService.findByToken(context, tokenForEPerson));
+        assertNull(registrationDataService.findByToken(context.getSession(), tokenForEPerson));
     }
 
 
@@ -2138,7 +2139,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String patchBody = buildPasswordAddOperationPatchBody(newPassword, null);
 
         accountService.sendRegistrationInfo(context, ePerson.getEmail());
-        String tokenForEPerson = registrationDataService.findByEmail(context, ePerson.getEmail()).getToken();
+        String tokenForEPerson = registrationDataService.findByEmail(context.getSession(), ePerson.getEmail())
+                .getToken();
         PasswordHash oldPassword = ePersonService.getPasswordHash(ePerson);
         // updates password
         getClient().perform(patch("/api/eperson/epersons/" + ePerson.getID())
@@ -2149,8 +2151,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         PasswordHash newPasswordHash = ePersonService.getPasswordHash(ePerson);
         assertEquals(oldPassword.getHashString(),newPasswordHash.getHashString());
-        assertNotNull(registrationDataService.findByEmail(context, ePerson.getEmail()));
-        assertEquals(registrationDataService.findByEmail(context, ePerson.getEmail()).getToken(), tokenForEPerson);
+        assertNotNull(registrationDataService.findByEmail(context.getSession(), ePerson.getEmail()));
+        assertEquals(registrationDataService.findByEmail(context.getSession(), ePerson.getEmail()).getToken(),
+                tokenForEPerson);
 
         context.turnOffAuthorisationSystem();
         registrationDataService.deleteByToken(context, tokenForEPerson);
@@ -2182,8 +2185,10 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         accountService.sendRegistrationInfo(context, ePerson.getEmail());
         accountService.sendRegistrationInfo(context, ePersonTwo.getEmail());
-        String tokenForEPerson = registrationDataService.findByEmail(context, ePerson.getEmail()).getToken();
-        String tokenForEPersonTwo = registrationDataService.findByEmail(context, ePersonTwo.getEmail()).getToken();
+        String tokenForEPerson = registrationDataService.findByEmail(context.getSession(), ePerson.getEmail())
+                .getToken();
+        String tokenForEPersonTwo = registrationDataService.findByEmail(context.getSession(), ePersonTwo.getEmail())
+                .getToken();
 
         PasswordHash oldPassword = ePersonService.getPasswordHash(ePerson);
         // updates password
@@ -2195,7 +2200,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         PasswordHash newPasswordHash = ePersonService.getPasswordHash(ePerson);
         assertEquals(oldPassword.getHashString(),newPasswordHash.getHashString());
-        assertNotNull(registrationDataService.findByEmail(context, ePerson.getEmail()));
+        assertNotNull(registrationDataService.findByEmail(context.getSession(), ePerson.getEmail()));
 
         context.turnOffAuthorisationSystem();
         registrationDataService.deleteByToken(context, tokenForEPerson);
@@ -2218,12 +2223,13 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/email", newEmail);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
         accountService.sendRegistrationInfo(context, ePerson.getEmail());
-        String tokenForEPerson = registrationDataService.findByEmail(context, ePerson.getEmail()).getToken();
+        String tokenForEPerson = registrationDataService.findByEmail(context.getSession(), ePerson.getEmail())
+                .getToken();
         PasswordHash oldPassword = ePersonService.getPasswordHash(ePerson);
         // updates password
         getClient().perform(patch("/api/eperson/epersons/" + ePerson.getID())
@@ -2234,11 +2240,12 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         PasswordHash newPasswordHash = ePersonService.getPasswordHash(ePerson);
         assertEquals(oldPassword.getHashString(),newPasswordHash.getHashString());
-        assertNotNull(registrationDataService.findByEmail(context, ePerson.getEmail()));
+        assertNotNull(registrationDataService.findByEmail(context.getSession(), ePerson.getEmail()));
         assertEquals(ePerson.getEmail(), originalEmail);
 
         context.turnOffAuthorisationSystem();
-        registrationDataService.delete(context, registrationDataService.findByEmail(context, ePerson.getEmail()));
+        registrationDataService.delete(context,
+                registrationDataService.findByEmail(context.getSession(), ePerson.getEmail()));
         registrationDataService.deleteByToken(context, tokenForEPerson);
         context.restoreAuthSystemState();
 
@@ -2271,7 +2278,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String patchBody = buildPasswordAddOperationPatchBody(newPassword, null);
 
         accountService.sendRegistrationInfo(context, ePerson.getEmail());
-        String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
+        String newRegisterToken = registrationDataService.findByEmail(context.getSession(), newRegisterEmail)
+                .getToken();
         PasswordHash oldPassword = ePersonService.getPasswordHash(ePerson);
         try {
             // updates password
@@ -2283,11 +2291,12 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
             PasswordHash newPasswordHash = ePersonService.getPasswordHash(ePerson);
             assertTrue(StringUtils.equalsIgnoreCase(oldPassword.getHashString(),newPasswordHash.getHashString()));
-            assertFalse(registrationDataService.findByEmail(context, ePerson.getEmail()) == null);
-            assertFalse(registrationDataService.findByEmail(context, newRegisterEmail) == null);
+            assertFalse(registrationDataService.findByEmail(context.getSession(), ePerson.getEmail()) == null);
+            assertFalse(registrationDataService.findByEmail(context.getSession(), newRegisterEmail) == null);
         } finally {
             context.turnOffAuthorisationSystem();
-            registrationDataService.delete(context, registrationDataService.findByEmail(context, ePerson.getEmail()));
+            registrationDataService.delete(context, registrationDataService.findByEmail(context.getSession(),
+                    ePerson.getEmail()));
             registrationDataService.deleteByToken(context, newRegisterToken);
             context.restoreAuthSystemState();
         }
@@ -2306,7 +2315,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
-        String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
+        String newRegisterToken = registrationDataService.findByEmail(context.getSession(), newRegisterEmail)
+                .getToken();
 
         EPersonRest ePersonRest = new EPersonRest();
         MetadataRest metadataRest = new MetadataRest();
@@ -2319,7 +2329,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         metadataRest.put("eperson.firstname", firstname);
         ePersonRest.setMetadata(metadataRest);
         ePersonRest.setPassword("somePassword");
-        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+        AtomicReference<UUID> idRef = new AtomicReference<>();
 
         mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
@@ -2345,10 +2355,10 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
 
             String epersonUuid = String.valueOf(idRef.get());
-            EPerson createdEPerson = ePersonService.find(context, UUID.fromString(epersonUuid));
+            EPerson createdEPerson = ePersonService.find(context.getSession(), UUID.fromString(epersonUuid));
             assertTrue(ePersonService.checkPassword(context, createdEPerson, "somePassword"));
 
-            assertNull(registrationDataService.findByToken(context, newRegisterToken));
+            assertNull(registrationDataService.findByToken(context.getSession(), newRegisterToken));
 
         } finally {
             context.turnOffAuthorisationSystem();
@@ -2371,7 +2381,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
-        String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
+        String newRegisterToken = registrationDataService.findByEmail(context.getSession(), newRegisterEmail)
+                .getToken();
 
         EPersonRest ePersonRest = new EPersonRest();
         MetadataRest metadataRest = new MetadataRest();
@@ -2385,7 +2396,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         metadataRest.put("eperson.firstname", firstname);
         ePersonRest.setMetadata(metadataRest);
         ePersonRest.setPassword("somePassword");
-        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+        AtomicReference<UUID> idRef = new AtomicReference<>();
 
         mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
         try {
@@ -2408,9 +2419,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                             .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
 
             String epersonUuid = String.valueOf(idRef.get());
-            EPerson createdEPerson = ePersonService.find(context, UUID.fromString(epersonUuid));
+            EPerson createdEPerson = ePersonService.find(context.getSession(), UUID.fromString(epersonUuid));
             assertTrue(ePersonService.checkPassword(context, createdEPerson, "somePassword"));
-            assertNull(registrationDataService.findByToken(context, newRegisterToken));
+            assertNull(registrationDataService.findByToken(context.getSession(), newRegisterToken));
 
         } finally {
             context.turnOffAuthorisationSystem();
@@ -2434,7 +2445,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
-        String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
+        String newRegisterToken = registrationDataService.findByEmail(context.getSession(), newRegisterEmail)
+                .getToken();
 
         EPersonRest ePersonRest = new EPersonRest();
         MetadataRest metadataRest = new MetadataRest();
@@ -2449,7 +2461,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         ePersonRest.setMetadata(metadataRest);
         ePersonRest.setPassword("somePassword");
         ePersonRest.setSelfRegistered(true);
-        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+        AtomicReference<UUID> idRef = new AtomicReference<>();
 
         mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
@@ -2475,9 +2487,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
 
             String epersonUuid = String.valueOf(idRef.get());
-            EPerson createdEPerson = ePersonService.find(context, UUID.fromString(epersonUuid));
+            EPerson createdEPerson = ePersonService.find(context.getSession(), UUID.fromString(epersonUuid));
             assertTrue(ePersonService.checkPassword(context, createdEPerson, "somePassword"));
-            assertNull(registrationDataService.findByToken(context, newRegisterToken));
+            assertNull(registrationDataService.findByToken(context.getSession(), newRegisterToken));
 
         } finally {
             context.turnOffAuthorisationSystem();
@@ -2501,7 +2513,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
-        String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
+        String newRegisterToken = registrationDataService.findByEmail(context.getSession(), newRegisterEmail)
+                .getToken();
 
         String newRegisterEmailTwo = "new-register-two@fake-email.com";
         RegistrationRest registrationRestTwo = new RegistrationRest();
@@ -2511,7 +2524,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsBytes(registrationRestTwo)))
                    .andExpect(status().isCreated());
-        String newRegisterTokenTwo = registrationDataService.findByEmail(context, newRegisterEmailTwo).getToken();
+        String newRegisterTokenTwo = registrationDataService.findByEmail(context.getSession(), newRegisterEmailTwo)
+                .getToken();
 
 
         EPersonRest ePersonRest = new EPersonRest();
@@ -2536,10 +2550,10 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                                .contentType(MediaType.APPLICATION_JSON))
                                                   .andExpect(status().isBadRequest());
 
-            EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmailTwo);
+            EPerson createdEPerson = ePersonService.findByEmail(context.getSession(), newRegisterEmailTwo);
             assertNull(createdEPerson);
-            assertNotNull(registrationDataService.findByToken(context, newRegisterToken));
-            assertNotNull(registrationDataService.findByToken(context, newRegisterTokenTwo));
+            assertNotNull(registrationDataService.findByToken(context.getSession(), newRegisterToken));
+            assertNotNull(registrationDataService.findByToken(context.getSession(), newRegisterTokenTwo));
         } finally {
             context.turnOffAuthorisationSystem();
             registrationDataService.deleteByToken(context, newRegisterToken);
@@ -2562,8 +2576,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
-        String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
-
+        String newRegisterToken = registrationDataService.findByEmail(context.getSession(), newRegisterEmail)
+                .getToken();
 
         EPersonRest ePersonRest = new EPersonRest();
         MetadataRest metadataRest = new MetadataRest();
@@ -2587,9 +2601,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .contentType(MediaType.APPLICATION_JSON))
                             .andExpect(status().isBadRequest());
 
-            EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
+            EPerson createdEPerson = ePersonService.findByEmail(context.getSession(), newRegisterEmail);
             assertNull(createdEPerson);
-            assertNotNull(registrationDataService.findByToken(context, newRegisterToken));
+            assertNotNull(registrationDataService.findByToken(context.getSession(), newRegisterToken));
         } finally {
             context.turnOffAuthorisationSystem();
             registrationDataService.deleteByToken(context, newRegisterToken);
@@ -2611,8 +2625,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
-        String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
-
+        String newRegisterToken = registrationDataService.findByEmail(context.getSession(), newRegisterEmail)
+                .getToken();
 
         EPersonRest ePersonRest = new EPersonRest();
         MetadataRest metadataRest = new MetadataRest();
@@ -2637,9 +2651,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                                .contentType(MediaType.APPLICATION_JSON))
                                                   .andExpect(status().isBadRequest());
 
-            EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
+            EPerson createdEPerson = ePersonService.findByEmail(context.getSession(), newRegisterEmail);
             assertNull(createdEPerson);
-            assertNotNull(registrationDataService.findByToken(context, newRegisterToken));
+            assertNotNull(registrationDataService.findByToken(context.getSession(), newRegisterToken));
         } finally {
             context.turnOffAuthorisationSystem();
             registrationDataService.deleteByToken(context, newRegisterToken);
@@ -2661,8 +2675,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
-        String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
-
+        String newRegisterToken = registrationDataService.findByEmail(context.getSession(), newRegisterEmail)
+                .getToken();
 
         EPersonRest ePersonRest = new EPersonRest();
         MetadataRest metadataRest = new MetadataRest();
@@ -2705,9 +2719,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                             )))
                             .andExpect(status().reason(not(startsWith("[PL]"))));
 
-            EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
+            EPerson createdEPerson = ePersonService.findByEmail(context.getSession(), newRegisterEmail);
             assertNull(createdEPerson);
-            assertNotNull(registrationDataService.findByToken(context, newRegisterToken));
+            assertNotNull(registrationDataService.findByToken(context.getSession(), newRegisterToken));
         } finally {
             context.turnOffAuthorisationSystem();
             registrationDataService.deleteByToken(context, newRegisterToken);
@@ -2729,8 +2743,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
-        String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
-
+        String newRegisterToken = registrationDataService.findByEmail(context.getSession(), newRegisterEmail)
+                .getToken();
 
         EPersonRest ePersonRest = new EPersonRest();
         MetadataRest metadataRest = new MetadataRest();
@@ -2774,9 +2788,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                             )))
                             .andExpect(status().reason(not(startsWith("[PL]"))));
 
-            EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
+            EPerson createdEPerson = ePersonService.findByEmail(context.getSession(), newRegisterEmail);
             assertNull(createdEPerson);
-            assertNotNull(registrationDataService.findByToken(context, newRegisterToken));
+            assertNotNull(registrationDataService.findByToken(context.getSession(), newRegisterToken));
         } finally {
             context.turnOffAuthorisationSystem();
             registrationDataService.deleteByToken(context, newRegisterToken);
@@ -2798,8 +2812,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
-        String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
-
+        String newRegisterToken = registrationDataService.findByEmail(context.getSession(), newRegisterEmail)
+                .getToken();
 
         EPersonRest ePersonRest = new EPersonRest();
         MetadataRest metadataRest = new MetadataRest();
@@ -2822,9 +2836,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .contentType(MediaType.APPLICATION_JSON))
                             .andExpect(status().isBadRequest());
 
-            EPerson createdEPerson = ePersonService.findByEmail(context, newRegisterEmail);
+            EPerson createdEPerson = ePersonService.findByEmail(context.getSession(), newRegisterEmail);
             assertNull(createdEPerson);
-            assertNotNull(registrationDataService.findByToken(context, newRegisterToken));
+            assertNotNull(registrationDataService.findByToken(context.getSession(), newRegisterToken));
         } finally {
             context.turnOffAuthorisationSystem();
             registrationDataService.deleteByToken(context, newRegisterToken);
@@ -2846,8 +2860,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
-        String forgotPasswordToken = registrationDataService.findByEmail(context, eperson.getEmail()).getToken();
-
+        String forgotPasswordToken = registrationDataService.findByEmail(context.getSession(), eperson.getEmail())
+                .getToken();
 
         EPersonRest ePersonRest = new EPersonRest();
         MetadataRest metadataRest = new MetadataRest();
@@ -2871,9 +2885,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                          .contentType(MediaType.APPLICATION_JSON))
                             .andExpect(status().isBadRequest());
 
-            EPerson createdEPerson = ePersonService.findByEmail(context, newEmail);
+            EPerson createdEPerson = ePersonService.findByEmail(context.getSession(), newEmail);
             assertNull(createdEPerson);
-            assertNotNull(registrationDataService.findByToken(context, forgotPasswordToken));
+            assertNotNull(registrationDataService.findByToken(context.getSession(), forgotPasswordToken));
         } finally {
             context.turnOffAuthorisationSystem();
             registrationDataService.deleteByToken(context, forgotPasswordToken);
@@ -2896,8 +2910,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
-        String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
-
+        String newRegisterToken = registrationDataService.findByEmail(context.getSession(), newRegisterEmail)
+                .getToken();
 
         EPersonRest ePersonRest = new EPersonRest();
         MetadataRest metadataRest = new MetadataRest();
@@ -2914,7 +2928,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
-        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+        AtomicReference<UUID> idRef = new AtomicReference<>();
 
         try {
             getClient().perform(post("/api/eperson/epersons")
@@ -2936,9 +2950,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                     .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
 
             String epersonUuid = String.valueOf(idRef.get());
-            EPerson createdEPerson = ePersonService.find(context, UUID.fromString(epersonUuid));
+            EPerson createdEPerson = ePersonService.find(context.getSession(), UUID.fromString(epersonUuid));
             assertTrue(ePersonService.checkPassword(context, createdEPerson, "somePassword"));
-            assertNull(registrationDataService.findByToken(context, newRegisterToken));
+            assertNull(registrationDataService.findByToken(context.getSession(), newRegisterToken));
         } finally {
             context.turnOffAuthorisationSystem();
             registrationDataService.deleteByToken(context, newRegisterToken);
@@ -3230,7 +3244,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
 
-        String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
+        String newRegisterToken = registrationDataService.findByEmail(context.getSession(), newRegisterEmail)
+                .getToken();
 
         EPersonRest ePersonRest = new EPersonRest();
         MetadataRest metadataRest = new MetadataRest();
@@ -3276,7 +3291,8 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                    .content(mapper.writeValueAsBytes(registrationRest)))
                    .andExpect(status().isCreated());
 
-        String newRegisterToken = registrationDataService.findByEmail(context, newRegisterEmail).getToken();
+        String newRegisterToken = registrationDataService.findByEmail(context.getSession(), newRegisterEmail)
+                .getToken();
 
         EPersonRest ePersonRest = new EPersonRest();
         MetadataRest metadataRest = new MetadataRest();
@@ -3289,7 +3305,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         metadataRest.put("eperson.firstname", firstname);
         ePersonRest.setMetadata(metadataRest);
         ePersonRest.setPassword("Lowercasepassword");
-        AtomicReference<UUID> idRef = new AtomicReference<UUID>();
+        AtomicReference<UUID> idRef = new AtomicReference<>();
 
         mapper.setAnnotationIntrospector(new IgnoreJacksonWriteOnlyAccess());
 
@@ -3308,9 +3324,10 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                                       matchMetadata("eperson.lastname", "Boychuk"))))))
                  .andDo(result -> idRef.set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
 
-            EPerson createdEPerson = ePersonService.find(context, UUID.fromString(String.valueOf(idRef.get())));
+            EPerson createdEPerson = ePersonService.find(context.getSession(),
+                    UUID.fromString(String.valueOf(idRef.get())));
             assertTrue(ePersonService.checkPassword(context, createdEPerson, "Lowercasepassword"));
-            assertNull(registrationDataService.findByToken(context, newRegisterToken));
+            assertNull(registrationDataService.findByToken(context.getSession(), newRegisterToken));
         } finally {
             context.turnOffAuthorisationSystem();
             registrationDataService.deleteByToken(context, newRegisterToken);

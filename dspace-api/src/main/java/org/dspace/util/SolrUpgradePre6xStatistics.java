@@ -158,7 +158,7 @@ public class SolrUpgradePre6xStatistics {
      * Process a batch of updates to SOLR
      */
     private void batchUpdateStats() throws SolrServerException, IOException {
-        if (docs.size() > 0) {
+        if (!docs.isEmpty()) {
             server.add(docs);
             server.commit(true, true);
             docs.clear();
@@ -570,7 +570,7 @@ public class SolrUpgradePre6xStatistics {
                     }
                 }
             }
-            if (newvals.size() > 0) {
+            if (!newvals.isEmpty()) {
                 input.removeField(col.name());
                 for (String nv : newvals) {
                     input.addField(col.name(), nv);
@@ -626,20 +626,20 @@ public class SolrUpgradePre6xStatistics {
     private UUID mapId(FIELD col, int val) throws SQLException {
 
         if (col == FIELD.owningComm) {
-            Community comm = communityService.findByLegacyId(context, val);
+            Community comm = communityService.findByLegacyId(context.getSession(), val);
             return comm == null ? null : comm.getID();
         }
         if (col == FIELD.owningColl) {
-            org.dspace.content.Collection coll = collectionService.findByLegacyId(context, val);
+            org.dspace.content.Collection coll = collectionService.findByLegacyId(context.getSession(), val);
             return coll == null ? null : coll.getID();
         }
         if (col == FIELD.owningItem) {
-            Item item = itemService.findByLegacyId(context, val);
+            Item item = itemService.findByLegacyId(context.getSession(), val);
             checkLastItem(item);
             return item == null ? null : item.getID();
         }
         if (col == FIELD.epersonid || col == FIELD.actor || col == FIELD.submitter) {
-            EPerson per = epersonService.findByLegacyId(context, val);
+            EPerson per = epersonService.findByLegacyId(context.getSession(), val);
             return per == null ? null : per.getID();
         }
         return null;
@@ -655,20 +655,20 @@ public class SolrUpgradePre6xStatistics {
      */
     private UUID mapType(int type, int val) throws SQLException {
         if (type == Constants.COMMUNITY) {
-            Community comm = communityService.findByLegacyId(context, val);
+            Community comm = communityService.findByLegacyId(context.getSession(), val);
             return comm == null ? null : comm.getID();
         }
         if (type == Constants.COLLECTION) {
-            org.dspace.content.Collection coll = collectionService.findByLegacyId(context, val);
+            org.dspace.content.Collection coll = collectionService.findByLegacyId(context.getSession(), val);
             return coll == null ? null : coll.getID();
         }
         if (type == Constants.ITEM) {
-            Item item = itemService.findByLegacyId(context, val);
+            Item item = itemService.findByLegacyId(context.getSession(), val);
             checkLastItem(item);
             return item == null ? null : item.getID();
         }
         if (type == Constants.BITSTREAM) {
-            Bitstream bit = bitstreamService.findByLegacyId(context, val);
+            Bitstream bit = bitstreamService.findByLegacyId(context.getSession(), val);
             UUID uuid = bit == null ? null : bit.getID();
             // A bitstream is unlikely to be processed more than once, to clear immediately
             checkLastBitstream(bit);
@@ -687,10 +687,10 @@ public class SolrUpgradePre6xStatistics {
      */
     private UUID mapOwner(String owntype, int val) throws SQLException {
         if (owntype.equals("e")) {
-            EPerson per = epersonService.findByLegacyId(context, val);
+            EPerson per = epersonService.findByLegacyId(context.getSession(), val);
             return per == null ? null : per.getID();
         } else if (owntype.equals("g")) {
-            Group perg = groupService.findByLegacyId(context, val);
+            Group perg = groupService.findByLegacyId(context.getSession(), val);
             return perg == null ? null : perg.getID();
         }
         return null;

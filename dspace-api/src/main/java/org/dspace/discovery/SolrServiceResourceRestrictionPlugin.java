@@ -142,7 +142,7 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
             if (!authorizeService.isAdmin(context)) {
                 StringBuilder resourceQuery = new StringBuilder();
                 //Always add the anonymous group id to the query
-                Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+                Group anonymousGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
                 String anonGroupId = "";
                 if (anonymousGroup != null) {
                     anonGroupId = anonymousGroup.getID().toString();

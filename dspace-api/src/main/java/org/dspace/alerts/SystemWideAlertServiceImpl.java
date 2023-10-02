@@ -20,6 +20,7 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -51,35 +52,35 @@ public class SystemWideAlertServiceImpl implements SystemWideAlertService {
         systemWideAlert.setCountdownTo(countdownTo);
         systemWideAlert.setActive(active);
 
-        SystemWideAlert createdAlert = systemWideAlertDAO.create(context, systemWideAlert);
+        SystemWideAlert createdAlert
+                = systemWideAlertDAO.create(context.getSession(), systemWideAlert);
         log.info(LogHelper.getHeader(context, "system_wide_alert_create",
                                      "System Wide Alert has been created with message: '" + message + "' and ID "
                                              + createdAlert.getID() + " and allowSessionsType " + allowSessionsType +
                                              " and active set to " + active));
 
-
         return createdAlert;
     }
 
     @Override
-    public SystemWideAlert find(final Context context, final int alertId) throws SQLException {
-        return systemWideAlertDAO.findByID(context, SystemWideAlert.class, alertId);
+    public SystemWideAlert find(final Session session, final int alertId) throws SQLException {
+        return systemWideAlertDAO.findByID(session, SystemWideAlert.class, alertId);
     }
 
     @Override
-    public List<SystemWideAlert> findAll(final Context context) throws SQLException {
-        return systemWideAlertDAO.findAll(context, SystemWideAlert.class);
+    public List<SystemWideAlert> findAll(final Session session) throws SQLException {
+        return systemWideAlertDAO.findAll(session, SystemWideAlert.class);
     }
 
     @Override
-    public List<SystemWideAlert> findAll(final Context context, final int limit, final int offset) throws SQLException {
-        return systemWideAlertDAO.findAll(context, limit, offset);
+    public List<SystemWideAlert> findAll(final Session session, final int limit, final int offset) throws SQLException {
+        return systemWideAlertDAO.findAll(session, limit, offset);
     }
 
     @Override
-    public List<SystemWideAlert> findAllActive(final Context context, final int limit, final int offset)
+    public List<SystemWideAlert> findAllActive(final Session session, final int limit, final int offset)
             throws SQLException {
-        return systemWideAlertDAO.findAllActive(context, limit, offset);
+        return systemWideAlertDAO.findAllActive(session, limit, offset);
     }
 
     @Override
@@ -89,7 +90,7 @@ public class SystemWideAlertServiceImpl implements SystemWideAlertService {
             throw new AuthorizeException(
                     "Only administrators can create a system-wide alert");
         }
-        systemWideAlertDAO.delete(context, systemWideAlert);
+        systemWideAlertDAO.delete(context.getSession(), systemWideAlert);
         log.info(LogHelper.getHeader(context, "system_wide_alert_create",
                                      "System Wide Alert with ID " + systemWideAlert.getID() + " has been deleted"));
 
@@ -102,13 +103,13 @@ public class SystemWideAlertServiceImpl implements SystemWideAlertService {
             throw new AuthorizeException(
                     "Only administrators can create a system-wide alert");
         }
-        systemWideAlertDAO.save(context, systemWideAlert);
+        systemWideAlertDAO.save(context.getSession(), systemWideAlert);
 
     }
 
     @Override
     public boolean canNonAdminUserLogin(Context context) throws SQLException {
-        List<SystemWideAlert> active = findAllActive(context, 1, 0);
+        List<SystemWideAlert> active = findAllActive(context.getSession(), 1, 0);
         if (active == null || active.isEmpty()) {
             return true;
         }
@@ -120,7 +121,7 @@ public class SystemWideAlertServiceImpl implements SystemWideAlertService {
         if (authorizeService.isAdmin(context, ePerson)) {
             return true;
         }
-        List<SystemWideAlert> active = findAllActive(context, 1, 0);
+        List<SystemWideAlert> active = findAllActive(context.getSession(), 1, 0);
         if (active == null || active.isEmpty()) {
             return true;
         }

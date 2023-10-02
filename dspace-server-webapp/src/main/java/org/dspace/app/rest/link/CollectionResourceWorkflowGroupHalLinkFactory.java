@@ -43,7 +43,8 @@ public class CollectionResourceWorkflowGroupHalLinkFactory
     protected void addLinks(CollectionResource halResource, Pageable pageable, LinkedList<Link> list) throws Exception {
 
         Context context = ContextUtil.obtainContext(requestService.getCurrentRequest().getHttpServletRequest());
-        Collection collection = collectionService.find(context, UUID.fromString(halResource.getContent().getId()));
+        Collection collection = collectionService.find(context.getSession(),
+                UUID.fromString(halResource.getContent().getId()));
         Map<String, Role> roles = WorkflowUtils.getCollectionRoles(collection);
         UUID resourceUuid = UUID.fromString(halResource.getContent().getUuid());
         for (Map.Entry<String, Role> entry : roles.entrySet()) {

@@ -17,6 +17,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.xmlworkflow.storedcomponents.dao.InProgressUserDAO;
 import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -36,39 +37,39 @@ public class InProgressUserServiceImpl implements InProgressUserService {
     }
 
     @Override
-    public InProgressUser findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
+    public InProgressUser findByWorkflowItemAndEPerson(Session session, XmlWorkflowItem workflowItem, EPerson ePerson)
         throws SQLException {
-        return inProgressUserDAO.findByWorkflowItemAndEPerson(context, workflowItem, ePerson);
+        return inProgressUserDAO.findByWorkflowItemAndEPerson(session, workflowItem, ePerson);
     }
 
     @Override
-    public List<InProgressUser> findByEperson(Context context, EPerson ePerson) throws SQLException {
-        return inProgressUserDAO.findByEperson(context, ePerson);
+    public List<InProgressUser> findByEperson(Session session, EPerson ePerson) throws SQLException {
+        return inProgressUserDAO.findByEperson(session, ePerson);
     }
 
     @Override
-    public List<InProgressUser> findByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException {
-        return inProgressUserDAO.findByWorkflowItem(context, workflowItem);
+    public List<InProgressUser> findByWorkflowItem(Session session, XmlWorkflowItem workflowItem) throws SQLException {
+        return inProgressUserDAO.findByWorkflowItem(session, workflowItem);
     }
 
     @Override
     public int getNumberOfInProgressUsers(Context context, XmlWorkflowItem workflowItem) throws SQLException {
-        return inProgressUserDAO.countInProgressUsers(context, workflowItem);
+        return inProgressUserDAO.countInProgressUsers(context.getSession(), workflowItem);
     }
 
     @Override
     public int getNumberOfFinishedUsers(Context context, XmlWorkflowItem workflowItem) throws SQLException {
-        return inProgressUserDAO.countFinishedUsers(context, workflowItem);
+        return inProgressUserDAO.countFinishedUsers(context.getSession(), workflowItem);
     }
 
     @Override
     public InProgressUser create(Context context) throws SQLException, AuthorizeException {
-        return inProgressUserDAO.create(context, new InProgressUser());
+        return inProgressUserDAO.create(context.getSession(), new InProgressUser());
     }
 
     @Override
-    public InProgressUser find(Context context, int id) throws SQLException {
-        return inProgressUserDAO.findByID(context, InProgressUser.class, id);
+    public InProgressUser find(Session session, int id) throws SQLException {
+        return inProgressUserDAO.findByID(session, InProgressUser.class, id);
     }
 
     @Override
@@ -80,13 +81,13 @@ public class InProgressUserServiceImpl implements InProgressUserService {
     public void update(Context context, List<InProgressUser> inProgressUsers) throws SQLException, AuthorizeException {
         if (CollectionUtils.isNotEmpty(inProgressUsers)) {
             for (InProgressUser inProgressUser : inProgressUsers) {
-                inProgressUserDAO.save(context, inProgressUser);
+                inProgressUserDAO.save(context.getSession(), inProgressUser);
             }
         }
     }
 
     @Override
     public void delete(Context context, InProgressUser inProgressUser) throws SQLException, AuthorizeException {
-        inProgressUserDAO.delete(context, inProgressUser);
+        inProgressUserDAO.delete(context.getSession(), inProgressUser);
     }
 }

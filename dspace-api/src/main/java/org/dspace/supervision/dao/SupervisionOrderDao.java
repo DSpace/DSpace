@@ -11,10 +11,10 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.content.Item;
-import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 import org.dspace.eperson.Group;
 import org.dspace.supervision.SupervisionOrder;
+import org.hibernate.Session;
 
 /**
  * Database Access Object interface class for the SupervisionOrder object.
@@ -29,22 +29,22 @@ public interface SupervisionOrderDao extends GenericDAO<SupervisionOrder> {
     /**
      * find all Supervision Orders related to the item
      *
-     * @param context The DSpace context
+     * @param session The current request's database context.
      * @param item the item
      * @return the Supervision Orders related to the item
      * @throws SQLException If something goes wrong in the database
      */
-    List<SupervisionOrder> findByItem(Context context, Item item) throws SQLException;
+    List<SupervisionOrder> findByItem(Session session, Item item) throws SQLException;
 
     /**
      * find the Supervision Order related to the item and group
      *
-     * @param context The DSpace context
+     * @param session The current request's database context.
      * @param item the item
      * @param group the group
      * @return the Supervision Order related to the item and group
      * @throws SQLException If something goes wrong in the database
      */
-    SupervisionOrder findByItemAndGroup(Context context, Item item, Group group) throws SQLException;
+    SupervisionOrder findByItemAndGroup(Session session, Item item, Group group) throws SQLException;
 
 }

@@ -159,7 +159,7 @@ public class LDAPAuthentication
             if (!context.getCurrentUser().getNetid().equals("")) {
                 String groupName = configurationService.getProperty("authentication-ldap.login.specialgroup");
                 if ((groupName != null) && (!groupName.trim().equals(""))) {
-                    Group ldapGroup = groupService.findByName(context, groupName);
+                    Group ldapGroup = groupService.findByName(context.getSession(), groupName);
                     if (ldapGroup == null) {
                         // Oops - the group isn't there.
                         log.warn(LogHelper.getHeader(context,
@@ -227,7 +227,7 @@ public class LDAPAuthentication
         // Locate the eperson
         EPerson eperson = null;
         try {
-            eperson = ePersonService.findByNetid(context, netid.toLowerCase());
+            eperson = ePersonService.findByNetid(context.getSession(), netid.toLowerCase());
         } catch (SQLException e) {
             // ignore
         }
@@ -308,7 +308,7 @@ public class LDAPAuthentication
 
                 if (StringUtils.isNotEmpty(email)) {
                     try {
-                        eperson = ePersonService.findByEmail(context, email);
+                        eperson = ePersonService.findByEmail(context.getSession(), email);
                         if (eperson != null) {
                             log.info(LogHelper.getHeader(context,
                                                           "type=ldap-login", "type=ldap_but_already_email"));
@@ -551,7 +551,7 @@ public class LDAPAuthentication
                             att = atts.get(attlist[4]);
                             if (att != null) {
                                 // loop through all groups returned by LDAP
-                                ldapGroup = new ArrayList<String>();
+                                ldapGroup = new ArrayList<>();
                                 for (NamingEnumeration val = att.getAll(); val.hasMoreElements(); )  {
                                     ldapGroup.add((String) val.next());
                                 }
@@ -700,13 +700,13 @@ public class LDAPAuthentication
     /*
      * Add authenticated users to the group defined in dspace.cfg by
      * the authentication-ldap.login.groupmap.* key.
-     * 
+     *
      * @param dn
      *  The string containing distinguished name of the user
-     * 
+     *
      * @param group
      *  List of strings with LDAP dn of groups
-     * 
+     *
      * @param context
      *  DSpace context
      */
@@ -743,7 +743,7 @@ public class LDAPAuthentication
                     if (cmp) {
                         // assign user to this group
                         try {
-                            Group ldapGroup = groupService.findByName(context, dspaceGroupName);
+                            Group ldapGroup = groupService.findByName(context.getSession(), dspaceGroupName);
                             if (ldapGroup != null) {
                                 groupService.addMember(context, ldapGroup, context.getCurrentUser());
                                 groupService.update(context, ldapGroup);

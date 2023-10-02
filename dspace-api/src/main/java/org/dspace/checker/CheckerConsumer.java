@@ -7,6 +7,7 @@
  */
 package org.dspace.checker;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.checker.factory.CheckerServiceFactory;
 import org.dspace.checker.service.ChecksumHistoryService;
@@ -26,7 +27,7 @@ public class CheckerConsumer implements Consumer {
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(CheckerConsumer.class);
+    private static final Logger log = LogManager.getLogger();
 
     protected ChecksumHistoryService checksumHistoryService = CheckerServiceFactory.getInstance()
                                                                                    .getChecksumHistoryService();
@@ -54,7 +55,7 @@ public class CheckerConsumer implements Consumer {
     public void consume(Context ctx, Event event) throws Exception {
 
         if (event.getEventType() == Event.DELETE) {
-            Bitstream bitstream = bitstreamService.find(ctx, event.getSubjectID());
+            Bitstream bitstream = bitstreamService.find(ctx.getSession(), event.getSubjectID());
             log.debug("Attempting to remove Checker Info");
             checksumHistoryService.deleteByBitstream(ctx, bitstream);
             log.debug("Completed removing Checker Info");

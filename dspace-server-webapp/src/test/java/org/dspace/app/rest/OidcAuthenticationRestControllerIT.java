@@ -66,7 +66,7 @@ public class OidcAuthenticationRestControllerIT extends AbstractControllerIntegr
 
     private OidcClient originalOidcClient;
 
-    private OidcClient oidcClientMock = mock(OidcClient.class);
+    private final OidcClient oidcClientMock = mock(OidcClient.class);
 
     private EPerson createdEperson;
 
@@ -121,7 +121,7 @@ public class OidcAuthenticationRestControllerIT extends AbstractControllerIntegr
 
         String ePersonId = getEPersonIdFromAuthorizationCookie(mvcResult);
 
-        createdEperson = ePersonService.find(context, UUIDUtils.fromString(ePersonId));
+        createdEperson = ePersonService.find(context.getSession(), UUIDUtils.fromString(ePersonId));
         assertThat(createdEperson, notNullValue());
         assertThat(createdEperson.getEmail(), equalTo("test@email.it"));
         assertThat(createdEperson.getFullName(), equalTo("Test User"));
@@ -149,7 +149,7 @@ public class OidcAuthenticationRestControllerIT extends AbstractControllerIntegr
 
         String ePersonId = getEPersonIdFromAuthorizationCookie(mvcResult);
 
-        createdEperson = ePersonService.find(context, UUIDUtils.fromString(ePersonId));
+        createdEperson = ePersonService.find(context.getSession(), UUIDUtils.fromString(ePersonId));
         assertThat(createdEperson, notNullValue());
     }
 

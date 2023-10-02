@@ -54,7 +54,7 @@ public class TemplateItemRestRepository extends DSpaceRestRepository<TemplateIte
     public TemplateItemRest findOne(Context context, UUID uuid) {
         Item item = null;
         try {
-            item = itemService.find(context, uuid);
+            item = itemService.find(context.getSession(), uuid);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

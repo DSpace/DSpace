@@ -67,7 +67,7 @@ public class XmlWorkflowServiceIT extends AbstractIntegrationTestWithDatabase {
      */
     @After
     public void cleanup() throws SQLException, AuthorizeException, IOException {
-        Group reviewManagers = groupService.findByName(context, "ReviewManagers");
+        Group reviewManagers = groupService.findByName(context.getSession(), "ReviewManagers");
         if (reviewManagers != null) {
             groupService.delete(context, reviewManagers);
         }

@@ -58,14 +58,14 @@ public class ItemIdentifierLinkRepository extends AbstractDSpaceRestRepository i
                                           @Nullable Pageable optionalPageable,
                                           Projection projection) throws SQLException {
         Context context = ContextUtil.obtainCurrentRequestContext();
-        Item item = itemService.find(context, itemId);
+        Item item = itemService.find(context.getSession(), itemId);
         if (item == null) {
             throw new ResourceNotFoundException("Could not find item with id " + itemId);
         }
         IdentifiersRest identifiersRest = new IdentifiersRest();
         List<IdentifierRest> identifierRestList = new ArrayList<>();
-        DOI doi = doiService.findDOIByDSpaceObject(context, item);
-        String handle = HandleServiceFactory.getInstance().getHandleService().findHandle(context, item);
+        DOI doi = doiService.findDOIByDSpaceObject(context.getSession(), item);
+        String handle = HandleServiceFactory.getInstance().getHandleService().findHandle(context.getSession(), item);
         try {
             if (doi != null) {
                 String doiUrl = doiService.DOIToExternalForm(doi.getDoi());

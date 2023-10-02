@@ -44,7 +44,7 @@ public final class CheckerCommand {
      */
     private static final Logger LOG = org.apache.logging.log4j.LogManager.getLogger(CheckerCommand.class);
 
-    private Context context;
+    private final Context context;
 
     /**
      * BitstreamInfoDAO dependency.
@@ -145,7 +145,7 @@ public final class CheckerCommand {
      */
     protected MostRecentChecksum checkBitstream(final Bitstream bitstream) throws SQLException {
         // get bitstream info from bitstream table
-        MostRecentChecksum info = checksumService.findByBitstream(context, bitstream);
+        MostRecentChecksum info = checksumService.findByBitstream(context.getSession(), bitstream);
 
         // requested id was not found in bitstream
         // or most_recent_checksum table
@@ -288,7 +288,7 @@ public final class CheckerCommand {
     }
 
     protected ChecksumResult getChecksumResultByCode(ChecksumResultCode checksumResultCode) throws SQLException {
-        return checksumResultService.findByCode(context, checksumResultCode);
+        return checksumResultService.findByCode(context.getSession(), checksumResultCode);
     }
 
     /**

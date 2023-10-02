@@ -210,10 +210,10 @@ public class PolicySet {
                                          String name, String description, Date startDate, Date endDate)
         throws SQLException, AuthorizeException {
         if (containerType == Constants.COLLECTION) {
-            Collection collection = collectionService.find(c, containerID);
-            Group group = groupService.find(c, groupID);
+            Collection collection = collectionService.find(c.getSession(), containerID);
+            Group group = groupService.find(c.getSession(), groupID);
 
-            Iterator<Item> i = itemService.findAllByCollection(c, collection);
+            Iterator<Item> i = itemService.findAllByCollection(c.getSession(), collection);
             if (contentType == Constants.ITEM) {
                 // build list of all items in a collection
                 while (i.hasNext()) {

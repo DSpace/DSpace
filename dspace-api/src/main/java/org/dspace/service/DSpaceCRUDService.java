@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Interface containing the simple CRUD methods so we don't have to add them
@@ -24,7 +25,7 @@ public interface DSpaceCRUDService<T> {
 
     public T create(Context context) throws SQLException, AuthorizeException;
 
-    public T find(Context context, int id) throws SQLException;
+    public T find(Session session, int id) throws SQLException;
 
     /**
      * Persist a model object.

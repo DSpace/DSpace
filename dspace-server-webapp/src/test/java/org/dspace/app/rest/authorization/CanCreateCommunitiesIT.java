@@ -99,7 +99,7 @@ public class CanCreateCommunitiesIT extends AbstractControllerIntegrationTest {
     @Test
     public void canCreateCommunitiesOnSiteAsAdminTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
 
@@ -143,7 +143,7 @@ public class CanCreateCommunitiesIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void canCreateCommunitiesOnSiteAsAnonymousTest() throws Exception {
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
 
@@ -190,7 +190,7 @@ public class CanCreateCommunitiesIT extends AbstractControllerIntegrationTest {
     public void canCreateCommunitiesOnSiteAsEPersonWithoutRightsTest() throws Exception {
         authorizeService.addPolicy(context, communityB, Constants.ADMIN, eperson);
         String token = getAuthToken(eperson.getEmail(), password);
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
 

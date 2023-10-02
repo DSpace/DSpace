@@ -54,6 +54,7 @@ import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
 import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -109,7 +110,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         }
 
         // Create a table row
-        Group g = groupDAO.create(context, new Group());
+        Group g = groupDAO.create(context.getSession(), new Group());
 
         log.info(LogHelper.getHeader(context, "create_group", "group_id="
             + g.getID()));
@@ -169,10 +170,10 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
      */
     @Override
     public void removeMember(Context context, Group group, EPerson ePerson) throws SQLException {
-        List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context, group);
+        List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context.getSession(), group);
         if (!collectionRoles.isEmpty()) {
-            List<PoolTask> poolTasks = poolTaskService.findByGroup(context, group);
-            List<ClaimedTask> claimedTasks = claimedTaskService.findByEperson(context, ePerson);
+            List<PoolTask> poolTasks = poolTaskService.findByGroup(context.getSession(), group);
+            List<ClaimedTask> claimedTasks = claimedTaskService.findByEperson(context.getSession(), ePerson);
             for (ClaimedTask claimedTask : claimedTasks) {
                 Step stepByName = workflowFactory.getStepByName(claimedTask.getStepID());
                 Role role = stepByName.getRole();
@@ -208,9 +209,9 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Override
     public void removeMember(Context context, Group groupParent, Group childGroup) throws SQLException {
-        List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context, groupParent);
+        List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context.getSession(), groupParent);
         if (!collectionRoles.isEmpty()) {
-            List<PoolTask> poolTasks = poolTaskService.findByGroup(context, groupParent);
+            List<PoolTask> poolTasks = poolTaskService.findByGroup(context.getSession(), groupParent);
             if (!poolTasks.isEmpty()) {
                 List<EPerson> parentPeople = allMembers(context, groupParent);
                 List<EPerson> childPeople = allMembers(context, childGroup);
@@ -243,7 +244,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Override
     public boolean isParentOf(Context context, Group parentGroup, Group childGroup) throws SQLException {
-        return group2GroupCacheDAO.findByParentAndChild(context, parentGroup, childGroup) != null;
+        return group2GroupCacheDAO.findByParentAndChild(context.getSession(), parentGroup, childGroup) != null;
     }
 
     @Override
@@ -259,7 +260,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
             // special, everyone is member of group 0 (anonymous)
         } else if (StringUtils.equals(group.getName(), Group.ANONYMOUS) ||
-                   isParentOf(context, group, findByName(context, Group.ANONYMOUS))) {
+                   isParentOf(context, group, findByName(context.getSession(), Group.ANONYMOUS))) {
             return true;
 
         } else {
@@ -309,12 +310,12 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Override
     public boolean isMember(final Context context, final String groupName) throws SQLException {
-        return isMember(context, findByName(context, groupName));
+        return isMember(context, findByName(context.getSession(), groupName));
     }
 
     @Override
     public boolean isMember(final Context context, EPerson eperson, final String groupName) throws SQLException {
-        return isMember(context, eperson, findByName(context, groupName));
+        return isMember(context, eperson, findByName(context.getSession(), groupName));
     }
 
     @Override
@@ -334,7 +335,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         if (ePerson != null) {
             // two queries - first to get groups eperson is a member of
             // second query gets parent groups for groups eperson is a member of
-            groups.addAll(groupDAO.findByEPerson(context, ePerson));
+            groups.addAll(groupDAO.findByEPerson(context.getSession(), ePerson));
         }
         // Also need to get all "Special Groups" user is a member of!
         // Otherwise, you're ignoring the user's membership to these groups!
@@ -349,9 +350,9 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         }
 
         // all the users are members of the anonymous group
-        groups.add(findByName(context, Group.ANONYMOUS));
+        groups.add(findByName(context.getSession(), Group.ANONYMOUS));
 
-        List<Group2GroupCache> groupCache = group2GroupCacheDAO.findByChildren(context, groups);
+        List<Group2GroupCache> groupCache = group2GroupCacheDAO.findByChildren(context.getSession(), groups);
         // now we have all owning groups, also grab all parents of owning groups
         for (Group2GroupCache group2GroupCache : groupCache) {
             groups.add(group2GroupCache.getParent());
@@ -367,14 +368,14 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         // second query gets all members of each group in the first query
 
         // Get all groups which are a member of this group
-        List<Group2GroupCache> group2GroupCaches = group2GroupCacheDAO.findByParent(c, g);
+        List<Group2GroupCache> group2GroupCaches = group2GroupCacheDAO.findByParent(c.getSession(), g);
         Set<Group> groups = new HashSet<>();
         for (Group2GroupCache group2GroupCache : group2GroupCaches) {
             groups.add(group2GroupCache.getChild());
         }
 
 
-        Set<EPerson> childGroupChildren = new HashSet<>(ePersonService.findByGroups(c, groups));
+        Set<EPerson> childGroupChildren = new HashSet<>(ePersonService.findByGroups(c.getSession(), groups));
         //Don't forget to add our direct children
         childGroupChildren.addAll(g.getMembers());
 
@@ -382,21 +383,21 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     }
 
     @Override
-    public Group find(Context context, UUID id) throws SQLException {
+    public Group find(Session session, UUID id) throws SQLException {
         if (id == null) {
             return null;
         } else {
-            return groupDAO.findByID(context, Group.class, id);
+            return groupDAO.findByID(session, Group.class, id);
         }
     }
 
     @Override
-    public Group findByName(Context context, String name) throws SQLException {
+    public Group findByName(Session session, String name) throws SQLException {
         if (name == null) {
             return null;
         }
 
-        return groupDAO.findByName(context, name);
+        return groupDAO.findByName(session, name);
     }
 
     /**
@@ -404,26 +405,26 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
      */
     @Override
     @Deprecated
-    public List<Group> findAll(Context context, int sortField) throws SQLException {
+    public List<Group> findAll(Session session, int sortField) throws SQLException {
         if (sortField == GroupService.NAME) {
-            return findAll(context, null);
+            return findAll(session, null);
         } else {
             throw new UnsupportedOperationException("You can only find all groups sorted by name with this method");
         }
     }
 
     @Override
-    public List<Group> findAll(Context context, List<MetadataField> metadataSortFields) throws SQLException {
-        return findAll(context, metadataSortFields, -1, -1);
+    public List<Group> findAll(Session session, List<MetadataField> metadataSortFields) throws SQLException {
+        return findAll(session, metadataSortFields, -1, -1);
     }
 
     @Override
-    public List<Group> findAll(Context context, List<MetadataField> metadataSortFields, int pageSize, int offset)
+    public List<Group> findAll(Session session, List<MetadataField> metadataSortFields, int pageSize, int offset)
         throws SQLException {
         if (CollectionUtils.isEmpty(metadataSortFields)) {
-            return groupDAO.findAll(context, pageSize, offset);
+            return groupDAO.findAll(session, pageSize, offset);
         } else {
-            return groupDAO.findAll(context, metadataSortFields, pageSize, offset);
+            return groupDAO.findAll(session, metadataSortFields, pageSize, offset);
         }
     }
 
@@ -438,10 +439,10 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         UUID uuid = UUIDUtils.fromString(groupIdentifier);
         if (uuid == null) {
             //Search by group name
-            groups = groupDAO.findByNameLike(context, groupIdentifier, offset, limit);
+            groups = groupDAO.findByNameLike(context.getSession(), groupIdentifier, offset, limit);
         } else {
             //Search by group id
-            Group group = find(context, uuid);
+            Group group = find(context.getSession(), uuid);
             if (group != null) {
                 groups.add(group);
             }
@@ -456,10 +457,10 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         UUID uuid = UUIDUtils.fromString(groupIdentifier);
         if (uuid == null) {
             //Search by group name
-            result = groupDAO.countByNameLike(context, groupIdentifier);
+            result = groupDAO.countByNameLike(context.getSession(), groupIdentifier);
         } else {
             //Search by group id
-            Group group = find(context, uuid);
+            Group group = find(context.getSession(), uuid);
             if (group != null) {
                 result = 1;
             }
@@ -493,9 +494,9 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         }
 
         // empty out group2groupcache table (if we do it after we delete our object we get an issue with references)
-        group2GroupCacheDAO.deleteAll(context);
+        group2GroupCacheDAO.deleteAll(context.getSession());
         // Remove ourself
-        groupDAO.delete(context, group);
+        groupDAO.delete(context.getSession(), group);
         rethinkGroupCache(context, false);
 
         log.info(LogHelper.getHeader(context, "delete_group", "group_id="
@@ -533,7 +534,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     public void initDefaultGroupNames(Context context) throws SQLException, AuthorizeException {
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
         // Check for Anonymous group. If not found, create it
-        Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+        Group anonymousGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         if (anonymousGroup == null) {
             anonymousGroup = groupService.create(context);
             anonymousGroup.setName(Group.ANONYMOUS);
@@ -543,7 +544,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
 
         // Check for Administrator group. If not found, create it
-        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        Group adminGroup = groupService.findByName(context.getSession(), Group.ADMIN);
         if (adminGroup == null) {
             adminGroup = groupService.create(context);
             adminGroup.setName(Group.ADMIN);
@@ -561,7 +562,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
      */
     @Override
     public List<Group> getEmptyGroups(Context context) throws SQLException {
-        return groupDAO.getEmptyGroups(context);
+        return groupDAO.getEmptyGroups(context.getSession());
     }
 
     /**
@@ -578,7 +579,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
         super.update(context, group);
         // FIXME: Check authorisation
-        groupDAO.save(context, group);
+        groupDAO.save(context.getSession(), group);
 
         if (group.isMetadataModified()) {
             context.addEvent(new Event(Event.MODIFY_METADATA, Constants.GROUP, group.getID(), group.getDetails(),
@@ -598,13 +599,13 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     protected boolean isEPersonInGroup(Context context, Group group, EPerson ePerson)
         throws SQLException {
-        return groupDAO.findByIdAndMembership(context, group.getID(), ePerson) != null;
+        return groupDAO.findByIdAndMembership(context.getSession(), group.getID(), ePerson) != null;
     }
 
 
     /**
-     * Regenerate the group cache AKA the group2groupcache table in the database -
-     * meant to be called when a group is added or removed from another group
+     * Regenerate the group cache AKA the group2groupcache table in the database.
+     * Meant to be called when a group is added or removed from another group.
      *
      * @param context      The relevant DSpace Context.
      * @param flushQueries flushQueries Flush all pending queries
@@ -614,7 +615,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
         Map<UUID, Set<UUID>> parents = new HashMap<>();
 
-        List<Pair<UUID, UUID>> group2groupResults = groupDAO.getGroup2GroupResults(context, flushQueries);
+        List<Pair<UUID, UUID>> group2groupResults = groupDAO.getGroup2GroupResults(context.getSession(), flushQueries);
         for (Pair<UUID, UUID> group2groupResult : group2groupResults) {
             UUID parent = group2groupResult.getLeft();
             UUID child = group2groupResult.getRight();
@@ -645,7 +646,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         }
 
         // empty out group2groupcache table
-        group2GroupCacheDAO.deleteAll(context);
+        group2GroupCacheDAO.deleteAll(context.getSession());
 
         // write out new one
         for (Map.Entry<UUID, Set<UUID>> parent : parents.entrySet()) {
@@ -653,16 +654,17 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
             for (UUID child : parent.getValue()) {
 
-                Group parentGroup = find(context, key);
-                Group childGroup = find(context, child);
+                Group parentGroup = find(context.getSession(), key);
+                Group childGroup = find(context.getSession(), child);
 
 
                 if (parentGroup != null && childGroup != null && group2GroupCacheDAO
-                    .find(context, parentGroup, childGroup) == null) {
-                    Group2GroupCache group2GroupCache = group2GroupCacheDAO.create(context, new Group2GroupCache());
+                    .find(context.getSession(), parentGroup, childGroup) == null) {
+                    Group2GroupCache group2GroupCache
+                            = group2GroupCacheDAO.create(context.getSession(), new Group2GroupCache());
                     group2GroupCache.setParent(parentGroup);
                     group2GroupCache.setChild(childGroup);
-                    group2GroupCacheDAO.save(context, group2GroupCache);
+                    group2GroupCacheDAO.save(context.getSession(), group2GroupCache);
                 }
             }
         }
@@ -687,7 +689,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             || AuthorizeConfiguration
             .canCommunityAdminManageCollectionWorkflows()) {
             // is this a collection related group?
-            org.dspace.content.Collection collection = collectionService.findByGroup(context, group);
+            org.dspace.content.Collection collection = collectionService.findByGroup(context.getSession(), group);
 
             if (collection != null) {
                 if (group.equals(collection.getSubmitters())) {
@@ -709,7 +711,8 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                         || AuthorizeConfiguration.canCommunityAdminManageCollectionWorkflows()) {
                     // if the group is used for one or more roles on a single collection,
                     // admins can eventually manage it
-                    List<CollectionRole> collectionRoles = collectionRoleService.findByGroup(context, group);
+                    List<CollectionRole> collectionRoles
+                            = collectionRoleService.findByGroup(context.getSession(), group);
                     if (collectionRoles != null && !collectionRoles.isEmpty()) {
                         Set<Collection> colls = new HashSet<>();
                         for (CollectionRole cr : collectionRoles) {
@@ -729,8 +732,9 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                             || AuthorizeConfiguration.canCommunityAdminManageCollectionWorkflows()) {
                             List<Group> groups = new ArrayList<>();
                             groups.add(group);
-                            List<ResourcePolicy> policies = resourcePolicyService.find(context, null, groups,
-                                                            Constants.DEFAULT_ITEM_READ, Constants.COLLECTION);
+                            List<ResourcePolicy> policies = resourcePolicyService.find(context.getSession(),
+                                    null, groups,
+                                    Constants.DEFAULT_ITEM_READ, Constants.COLLECTION);
 
                             Optional<ResourcePolicy> defaultPolicy = policies.stream().filter(p -> StringUtils.equals(
                                     collectionService.getDefaultReadGroupName((Collection) p.getdSpaceObject(), "ITEM"),
@@ -739,7 +743,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                             if (defaultPolicy.isPresent()) {
                                 return defaultPolicy.get().getdSpaceObject();
                             }
-                            policies = resourcePolicyService.find(context, null, groups,
+                            policies = resourcePolicyService.find(context.getSession(), null, groups,
                                                              Constants.DEFAULT_BITSTREAM_READ, Constants.COLLECTION);
 
                             defaultPolicy = policies.stream()
@@ -756,7 +760,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                 if (AuthorizeConfiguration.canCommunityAdminManageAdminGroup()) {
                     // is the group related to a community and community administrator allowed
                     // to manage it?
-                    return communityService.findByAdminGroup(context, group);
+                    return communityService.findByAdminGroup(context.getSession(), group);
                 }
             }
         }
@@ -801,28 +805,28 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     }
 
     @Override
-    public Group findByIdOrLegacyId(Context context, String id) throws SQLException {
+    public Group findByIdOrLegacyId(Session session, String id) throws SQLException {
         if (org.apache.commons.lang3.StringUtils.isNumeric(id)) {
-            return findByLegacyId(context, Integer.parseInt(id));
+            return findByLegacyId(session, Integer.parseInt(id));
         } else {
-            return find(context, UUIDUtils.fromString(id));
+            return find(session, UUIDUtils.fromString(id));
         }
     }
 
     @Override
-    public Group findByLegacyId(Context context, int id) throws SQLException {
-        return groupDAO.findByLegacyId(context, id, Group.class);
+    public Group findByLegacyId(Session session, int id) throws SQLException {
+        return groupDAO.findByLegacyId(session, id, Group.class);
     }
 
     @Override
     public int countTotal(Context context) throws SQLException {
-        return groupDAO.countRows(context);
+        return groupDAO.countRows(context.getSession());
     }
 
     @Override
-    public List<Group> findByMetadataField(final Context context, final String searchValue,
+    public List<Group> findByMetadataField(final Session session, final String searchValue,
                                            final MetadataField metadataField) throws SQLException {
-        return groupDAO.findByMetadataField(context, searchValue, metadataField);
+        return groupDAO.findByMetadataField(session, searchValue, metadataField);
     }
 
     @Override

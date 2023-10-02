@@ -45,7 +45,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * This is the Repository that takes care of the operations on the {@link VersionRest} objects
- * 
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 @Component(VersionRest.CATEGORY + "." + VersionRest.NAME)
@@ -120,16 +120,16 @@ public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Int
 
         WorkflowItem workflowItem = null;
         WorkspaceItem workspaceItem = null;
-        VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
+        VersionHistory versionHistory = versionHistoryService.findByItem(context.getSession(), item);
         if (Objects.nonNull(versionHistory)) {
             Version lastVersion = versionHistoryService.getLatestVersion(context, versionHistory);
             if (Objects.nonNull(lastVersion)) {
-                workflowItem = workflowItemService.findByItem(context, lastVersion.getItem());
-                workspaceItem = workspaceItemService.findByItem(context, lastVersion.getItem());
+                workflowItem = workflowItemService.findByItem(context.getSession(), lastVersion.getItem());
+                workspaceItem = workspaceItemService.findByItem(context.getSession(), lastVersion.getItem());
             }
         } else {
-            workflowItem = workflowItemService.findByItem(context, item);
-            workspaceItem = workspaceItemService.findByItem(context, item);
+            workflowItem = workflowItemService.findByItem(context.getSession(), item);
+            workspaceItem = workspaceItemService.findByItem(context.getSession(), item);
         }
 
         if (Objects.nonNull(workflowItem) || Objects.nonNull(workspaceItem)) {

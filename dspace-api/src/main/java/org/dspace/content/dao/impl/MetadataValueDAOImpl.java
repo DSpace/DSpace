@@ -21,7 +21,7 @@ import org.dspace.content.MetadataField_;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.dao.MetadataValueDAO;
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the MetadataValue object.
@@ -35,65 +35,63 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
         super();
     }
 
-
     @Override
-    public List<MetadataValue> findByField(Context context, MetadataField metadataField) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public List<MetadataValue> findByField(Session session, MetadataField metadataField) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, MetadataValue.class);
         Root<MetadataValue> metadataValueRoot = criteriaQuery.from(MetadataValue.class);
         Join<MetadataValue, MetadataField> join = metadataValueRoot.join("metadataField");
         criteriaQuery.select(metadataValueRoot);
         criteriaQuery.where(criteriaBuilder.equal(join.get(MetadataField_.id), metadataField.getID()));
 
-        return list(context, criteriaQuery, false, MetadataValue.class, -1, -1);
+        return list(session, criteriaQuery, false, MetadataValue.class, -1, -1);
     }
 
     @Override
-    public Iterator<MetadataValue> findItemValuesByFieldAndValue(Context context,
+    public Iterator<MetadataValue> findItemValuesByFieldAndValue(Session session,
                                                                  MetadataField metadataField, String value)
             throws SQLException {
         String queryString = "SELECT m from MetadataValue m " +
                 "join Item i on m.dSpaceObject = i.id where m.metadataField.id = :metadata_field_id " +
                 "and m.value = :text_value";
-        Query query = createQuery(context, queryString);
+        Query query = createQuery(session, queryString);
         query.setParameter("metadata_field_id", metadataField.getID());
         query.setParameter("text_value", value);
         return iterate(query);
     }
 
     @Override
-    public Iterator<MetadataValue> findByValueLike(Context context, String value) throws SQLException {
+    public Iterator<MetadataValue> findByValueLike(Session session, String value) throws SQLException {
         String queryString = "SELECT m FROM MetadataValue m JOIN m.metadataField f " +
             "WHERE m.value like concat('%', concat(:searchString,'%')) ORDER BY m.id ASC";
 
-        Query query = createQuery(context, queryString);
+        Query query = createQuery(session, queryString);
         query.setParameter("searchString", value);
 
         return iterate(query);
     }
 
     @Override
-    public void deleteByMetadataField(Context context, MetadataField metadataField) throws SQLException {
+    public void deleteByMetadataField(Session session, MetadataField metadataField) throws SQLException {
         String queryString = "delete from MetadataValue where metadataField= :metadataField";
-        Query query = createQuery(context, queryString);
+        Query query = createQuery(session, queryString);
         query.setParameter("metadataField", metadataField);
         query.executeUpdate();
     }
 
     @Override
-    public MetadataValue getMinimum(Context context, int metadataFieldId)
+    public MetadataValue getMinimum(Session session, int metadataFieldId)
         throws SQLException {
         String queryString = "SELECT m FROM MetadataValue m JOIN FETCH m.metadataField WHERE m.metadataField.id = " +
             ":metadata_field_id ORDER BY text_value";
-        Query query = createQuery(context, queryString);
+        Query query = createQuery(session, queryString);
         query.setParameter("metadata_field_id", metadataFieldId);
         query.setMaxResults(1);
         return (MetadataValue) query.getSingleResult();
     }
 
     @Override
-    public int countRows(Context context) throws SQLException {
-        return count(createQuery(context, "SELECT count(*) FROM MetadataValue"));
+    public int countRows(Session session) throws SQLException {
+        return count(createQuery(session, "SELECT count(*) FROM MetadataValue"));
     }
-
 }

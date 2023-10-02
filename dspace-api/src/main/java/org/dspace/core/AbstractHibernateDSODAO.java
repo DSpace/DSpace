@@ -19,6 +19,7 @@ import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataField;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation used by DSpaceObject Database Access Objects.
@@ -37,18 +38,18 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
      * All DSOs now have UUID primary keys, and those should be used when available.
      * Each type derived from DSpaceObject had its own stream of record IDs, so
      * it is also necessary to know the specific type.
-     * @param context current DSpace context.
+     * @param session current request's database context.
      * @param legacyId the old integer record identifier.
      * @param clazz DSO subtype of record identified by {@link legacyId}.
      * @return
      * @throws SQLException
      */
-    public T findByLegacyId(Context context, int legacyId, Class<T> clazz) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public T findByLegacyId(Session session, int legacyId, Class<T> clazz) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, clazz);
         Root<T> root = criteriaQuery.from(clazz);
         criteriaQuery.where(criteriaBuilder.equal(root.get("legacyId"), legacyId));
-        return uniqueResult(context, criteriaQuery, false, clazz);
+        return uniqueResult(session, criteriaQuery, false, clazz);
     }
 
     /**
@@ -87,8 +88,9 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
                 MetadataField metadataField = metadataFields.get(i);
                 if (StringUtils.isNotBlank(operator)) {
                     query.append(" (");
-                    query.append("lower(STR(" + metadataField.toString()).append(".value)) ").append(operator)
-                         .append(" lower(:queryParam)");
+                    query.append("lower(STR(").append(metadataField.toString())
+                            .append(".value)) ").append(operator)
+                            .append(" lower(:queryParam)");
                     query.append(")");
                     if (i < metadataFields.size() - 1) {
                         query.append(" OR ");

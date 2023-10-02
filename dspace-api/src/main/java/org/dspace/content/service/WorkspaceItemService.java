@@ -20,6 +20,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowItem;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the WorkspaceItem object.
@@ -34,12 +35,12 @@ public interface WorkspaceItemService extends InProgressSubmissionService<Worksp
      * Get a workspace item from the database. The item, collection and
      * submitter are loaded into memory.
      *
-     * @param context DSpace context object
+     * @param session current request's database context.
      * @param id      ID of the workspace item
      * @return the workspace item, or null if the ID is invalid.
      * @throws SQLException if database error
      */
-    public WorkspaceItem find(Context context, int id) throws SQLException;
+    public WorkspaceItem find(Session session, int id) throws SQLException;
 
     /**
      * Create a new workspace item, with a new ID. An Item is also created. The
@@ -80,12 +81,12 @@ public interface WorkspaceItemService extends InProgressSubmissionService<Worksp
      * workspace item ID, since this should likely keep them in the order in
      * which they were created.
      *
-     * @param context the context object
+     * @param session current request's database context.
      * @param ep      the eperson
      * @return the corresponding workspace items
      * @throws SQLException if database error
      */
-    public List<WorkspaceItem> findByEPerson(Context context, EPerson ep)
+    public List<WorkspaceItem> findByEPerson(Session session, EPerson ep)
         throws SQLException;
 
     /**
@@ -93,25 +94,25 @@ public interface WorkspaceItemService extends InProgressSubmissionService<Worksp
      * workspace item ID, since this should likely keep them in the order in
      * which they were created.
      *
-     * @param context the context object
+     * @param session current request's database context.
      * @param ep      the eperson
      * @param limit   the max number of workspaceitems to return
      * @param offset  the offset
      * @return the corresponding workspace items
      * @throws SQLException if database error
      */
-    public List<WorkspaceItem> findByEPerson(Context context, EPerson ep, Integer limit, Integer offset)
+    public List<WorkspaceItem> findByEPerson(Session session, EPerson ep, Integer limit, Integer offset)
         throws SQLException;
 
     /**
      * Get all workspace items for a particular collection.
      *
-     * @param context    the context object
+     * @param session    current request's database context.
      * @param collection the collection
      * @return the corresponding workspace items
      * @throws SQLException if database error
      */
-    public List<WorkspaceItem> findByCollection(Context context, Collection collection)
+    public List<WorkspaceItem> findByCollection(Session session, Collection collection)
         throws SQLException;
 
 
@@ -119,34 +120,34 @@ public interface WorkspaceItemService extends InProgressSubmissionService<Worksp
      * Check to see if a particular item is currently still in a user's Workspace.
      * If so, its WorkspaceItem is returned.  If not, null is returned
      *
-     * @param context the context object
+     * @param session current request's database session.
      * @param item    the item
      * @return workflow item corresponding to the item, or null
      * @throws SQLException if database error
      */
-    public WorkspaceItem findByItem(Context context, Item item)
+    public WorkspaceItem findByItem(Session session, Item item)
         throws SQLException;
 
     /**
      * Get all workspace items in the whole system
      *
-     * @param context the context object
+     * @param session the context object
      * @return all workspace items
      * @throws SQLException if database error
      */
-    public List<WorkspaceItem> findAll(Context context)
+    public List<WorkspaceItem> findAll(Session session)
         throws SQLException;
 
     /**
      * Get all workspace items in the whole system, paginated.
      *
-     * @param context the context object
+     * @param session current request's database context.
      * @param limit   limit
      * @param offset  offset
      * @return a page of workspace items
      * @throws SQLException if database error
      */
-    public List<WorkspaceItem> findAll(Context context, Integer limit, Integer offset) throws SQLException;
+    public List<WorkspaceItem> findAll(Session session, Integer limit, Integer offset) throws SQLException;
 
 
     /**

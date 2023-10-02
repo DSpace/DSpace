@@ -78,7 +78,7 @@ public class CommunityAdminGroupRestController {
         throws SQLException, AuthorizeException {
 
         Context context = ContextUtil.obtainContext(request);
-        Community community = communityService.find(context, uuid);
+        Community community = communityService.find(context.getSession(), uuid);
 
         if (community == null) {
             throw new ResourceNotFoundException("No such community: " + uuid);
@@ -113,7 +113,7 @@ public class CommunityAdminGroupRestController {
         throws SQLException, AuthorizeException, IOException {
 
         Context context = ContextUtil.obtainContext(request);
-        Community community = communityService.find(context, uuid);
+        Community community = communityService.find(context.getSession(), uuid);
         if (community == null) {
             throw new ResourceNotFoundException("No such community: " + uuid);
         }

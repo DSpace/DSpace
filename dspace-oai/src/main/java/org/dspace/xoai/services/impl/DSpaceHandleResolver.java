@@ -40,7 +40,7 @@ public class DSpaceHandleResolver implements HandleResolver {
     @Override
     public String getHandle(DSpaceObject object) throws HandleResolverException {
         try {
-            return handleService.findHandle(contextService.getContext(), object);
+            return handleService.findHandle(contextService.getContext().getSession(), object);
         } catch (SQLException | ContextServiceException e) {
             throw new HandleResolverException(e);
         }

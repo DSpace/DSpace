@@ -17,31 +17,33 @@ import org.dspace.alerts.SystemWideAlert;
 import org.dspace.alerts.SystemWideAlert_;
 import org.dspace.alerts.dao.SystemWideAlertDAO;
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Implementation class for the {@link SystemWideAlertDAO}
  */
 public class SystemWideAlertDAOImpl extends AbstractHibernateDAO<SystemWideAlert> implements SystemWideAlertDAO {
 
-    public List<SystemWideAlert> findAll(final Context context, final int limit, final int offset) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    @Override
+    public List<SystemWideAlert> findAll(final Session session, final int limit, final int offset) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, SystemWideAlert.class);
         Root<SystemWideAlert> alertRoot = criteriaQuery.from(SystemWideAlert.class);
         criteriaQuery.select(alertRoot);
 
-        return list(context, criteriaQuery, false, SystemWideAlert.class, limit, offset);
+        return list(session, criteriaQuery, false, SystemWideAlert.class, limit, offset);
     }
 
-    public List<SystemWideAlert> findAllActive(final Context context, final int limit, final int offset)
+    @Override
+    public List<SystemWideAlert> findAllActive(final Session session, final int limit, final int offset)
             throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, SystemWideAlert.class);
         Root<SystemWideAlert> alertRoot = criteriaQuery.from(SystemWideAlert.class);
         criteriaQuery.select(alertRoot);
         criteriaQuery.where(criteriaBuilder.equal(alertRoot.get(SystemWideAlert_.active), true));
 
-        return list(context, criteriaQuery, false, SystemWideAlert.class, limit, offset);
+        return list(session, criteriaQuery, false, SystemWideAlert.class, limit, offset);
     }
 
 

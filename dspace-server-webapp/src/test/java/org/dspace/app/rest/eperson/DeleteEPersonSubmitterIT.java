@@ -146,7 +146,7 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
         configurationService.setProperty("request.item.helpdesk.override", "true");
 
         // Test it.
-        Item item = itemService.find(context, installItem.getID());
+        Item item = itemService.find(context.getSession(), installItem.getID());
         List<RequestItemAuthor> requestItemAuthor = requestItemAuthorExtractor.getRequestItemAuthor(context, item);
 
         assertEquals(HELPDESK_NAME, requestItemAuthor.get(0).getFullName());
@@ -249,7 +249,7 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
         //TODO: Replace this with a REST call when possible
         Version version1 = versioningService.createNewVersion(context, item);
         Integer version1ID = version1.getID();
-        WorkspaceItem version1WorkspaceItem = workspaceItemService.findByItem(context, version1.getItem());
+        WorkspaceItem version1WorkspaceItem = workspaceItemService.findByItem(context.getSession(), version1.getItem());
         installItemService.installItem(context, version1WorkspaceItem);
 
         assertDeletionOfEperson(submitter);
@@ -263,7 +263,7 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
 
         Version version2 = versioningService.createNewVersion(context, item);
         Integer version2ID = version2.getID();
-        WorkspaceItem version2WorkspaceItem = workspaceItemService.findByItem(context, version2.getItem());
+        WorkspaceItem version2WorkspaceItem = workspaceItemService.findByItem(context.getSession(), version2.getItem());
         installItemService.installItem(context, version2WorkspaceItem);
         Item version2Item = retrieveVersionItem(version2ID);
         assertEquals(submitterForVersion1.getID(), retrieveItemSubmitter(version2Item.getID()).getID());
@@ -350,7 +350,7 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
             fail("Caught an Exception while deleting an EPerson. " + ex.getClass().getName() +
                          ": " + ex.getMessage());
         }
-        EPerson ePersonCheck = ePersonService.find(context, ePerson.getID());
+        EPerson ePersonCheck = ePersonService.find(context.getSession(), ePerson.getID());
         assertNull(ePersonCheck);
     }
 
@@ -360,7 +360,7 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
      */
     private EPerson retrieveItemSubmitter(UUID itemID) throws Exception {
 
-        Item item = itemService.find(context, itemID);
+        Item item = itemService.find(context.getSession(), itemID);
         return item.getSubmitter();
 
     }
@@ -374,7 +374,7 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
                         .andDo(result -> idRef
                                 .set(read(result.getResponse().getContentAsString(), "$.uuid")));
 
-        return itemService.find(context, UUID.fromString(idRef.get()));
+        return itemService.find(context.getSession(), UUID.fromString(idRef.get()));
     }
 
     private void cleanupVersion(int id) throws SQLException {

@@ -53,17 +53,17 @@ public class MetadataFieldTest extends AbstractUnitTest {
     /**
      * Element of the metadata element
      */
-    private String element = "contributor";
+    private final String element = "contributor";
 
     /**
      * Qualifier of the metadata element
      */
-    private String qualifier = "author";
+    private final String qualifier = "author";
 
     /**
      * Scope note of the metadata element
      */
-    private String scopeNote = "scope note";
+    private final String scopeNote = "scope note";
 
     protected MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance()
                                                                                  .getMetadataSchemaService();
@@ -87,13 +87,14 @@ public class MetadataFieldTest extends AbstractUnitTest {
     public void init() {
         super.init();
         try {
-            this.dcSchema = metadataSchemaService.find(context, MetadataSchemaEnum.DC.getName());
-            this.mf = metadataFieldService.findByElement(context,
+            this.dcSchema = metadataSchemaService.find(context.getSession(), MetadataSchemaEnum.DC.getName());
+            this.mf = metadataFieldService.findByElement(context.getSession(),
                                                          MetadataSchemaEnum.DC.getName(), element, qualifier);
             if (mf == null) {
                 context.turnOffAuthorisationSystem();
                 this.mf = metadataFieldService
-                    .create(context, metadataSchemaService.find(context, MetadataSchemaEnum.DC.getName()),
+                    .create(context, metadataSchemaService.find(context.getSession(),
+                            MetadataSchemaEnum.DC.getName()),
                             element, qualifier, scopeNote);
                 context.restoreAuthSystemState();
             }
@@ -228,7 +229,8 @@ public class MetadataFieldTest extends AbstractUnitTest {
         String qual = "qual1";
         MetadataField m = metadataFieldService.create(context, dcSchema, elem, qual, null);
 
-        MetadataField found = metadataFieldService.findByElement(context, dcSchema, elem, qual);
+        MetadataField found = metadataFieldService.findByElement(context.getSession(),
+                dcSchema, elem, qual);
         assertThat("testCreateAuth 0", found.getID(), equalTo(m.getID()));
     }
 
@@ -262,8 +264,8 @@ public class MetadataFieldTest extends AbstractUnitTest {
      */
     @Test
     public void testFindByElement() throws Exception {
-        MetadataField found = metadataFieldService.findByElement(context, MetadataSchemaEnum.DC.getName(),
-                                                                 element, qualifier);
+        MetadataField found = metadataFieldService.findByElement(context.getSession(),
+                MetadataSchemaEnum.DC.getName(), element, qualifier);
         assertThat("testFindByElement 0", found, notNullValue());
         assertThat("testFindByElement 1", found.getID(), equalTo(mf.getID()));
         assertThat("testFindByElement 2", found.getElement(), equalTo(mf.getElement()));
@@ -275,7 +277,7 @@ public class MetadataFieldTest extends AbstractUnitTest {
      */
     @Test
     public void testFindAll() throws Exception {
-        List<MetadataField> found = metadataFieldService.findAll(context);
+        List<MetadataField> found = metadataFieldService.findAll(context.getSession());
         assertThat("testFindAll 0", found, notNullValue());
         assertTrue("testFindAll 1", found.size() >= 1);
 
@@ -294,10 +296,11 @@ public class MetadataFieldTest extends AbstractUnitTest {
     @Test
     public void testFindAllInSchema() throws Exception {
         List<MetadataField> found = metadataFieldService
-            .findAllInSchema(context, metadataSchemaService.find(context, MetadataSchemaEnum.DC.getName()));
+            .findAllInSchema(context.getSession(), metadataSchemaService.find(context.getSession(),
+                    MetadataSchemaEnum.DC.getName()));
         assertThat("testFindAllInSchema 0", found, notNullValue());
         assertTrue("testFindAllInSchema 1", found.size() >= 1);
-        assertTrue("testFindAllInSchema 2", found.size() <= metadataFieldService.findAll(context).size());
+        assertTrue("testFindAllInSchema 2", found.size() <= metadataFieldService.findAll(context.getSession()).size());
 
         boolean added = false;
         for (MetadataField mdf : found) {
@@ -321,7 +324,8 @@ public class MetadataFieldTest extends AbstractUnitTest {
         MetadataField m = metadataFieldService.create(context, dcSchema, elem, qual, null);
         metadataFieldService.update(context, m);
 
-        MetadataField found = metadataFieldService.findByElement(context, MetadataSchemaEnum.DC.getName(), elem, qual);
+        MetadataField found = metadataFieldService.findByElement(context.getSession(),
+                MetadataSchemaEnum.DC.getName(), elem, qual);
         assertThat("testUpdateAuth 0", found.getID(), equalTo(m.getID()));
     }
 
@@ -369,7 +373,8 @@ public class MetadataFieldTest extends AbstractUnitTest {
 
         metadataFieldService.delete(context, m);
 
-        MetadataField found = metadataFieldService.findByElement(context, MetadataSchemaEnum.DC.getName(), elem, qual);
+        MetadataField found = metadataFieldService.findByElement(context.getSession(),
+                MetadataSchemaEnum.DC.getName(), elem, qual);
         assertThat("testDeleteAuth 0", found, nullValue());
     }
 
@@ -393,7 +398,7 @@ public class MetadataFieldTest extends AbstractUnitTest {
     public void testFind() throws Exception {
         int id = mf.getID();
 
-        MetadataField found = metadataFieldService.find(context, id);
+        MetadataField found = metadataFieldService.find(context.getSession(), id);
         assertThat("testFind 0", found, notNullValue());
         assertThat("testFind 1", found.getID(), equalTo(mf.getID()));
     }

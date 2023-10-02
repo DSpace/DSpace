@@ -79,7 +79,7 @@ public class RequestCopyFeature implements AuthorizationFeature {
         if (object instanceof ItemRest) {
             ItemRest itemRest = (ItemRest) object;
             String id = itemRest.getId();
-            Item item = itemService.find(context, UUID.fromString(id));
+            Item item = itemService.find(context.getSession(), UUID.fromString(id));
             if (!item.isArchived()) {
                 return false;
             }
@@ -96,7 +96,7 @@ public class RequestCopyFeature implements AuthorizationFeature {
             }
         } else if (object instanceof BitstreamRest) {
             BitstreamRest bitstreamRest = (BitstreamRest) object;
-            Bitstream bitstream = bitstreamService.find(context, UUID.fromString(bitstreamRest.getId()));
+            Bitstream bitstream = bitstreamService.find(context.getSession(), UUID.fromString(bitstreamRest.getId()));
 
             DSpaceObject parentObject = bitstreamService.getParentObject(context, bitstream);
             if (parentObject instanceof Item) {

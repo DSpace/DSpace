@@ -111,7 +111,7 @@ public class EPersonTest extends AbstractUnitTest {
     public void destroy() {
         context.turnOffAuthorisationSystem();
         try {
-            EPerson testPerson = ePersonService.findByEmail(context, EMAIL);
+            EPerson testPerson = ePersonService.findByEmail(context.getSession(), EMAIL);
             if (testPerson != null) {
                 ePersonService.delete(context, testPerson);
             }
@@ -121,7 +121,7 @@ public class EPersonTest extends AbstractUnitTest {
         }
         if (item != null) {
             try {
-                item = itemService.find(context, item.getID());
+                item = itemService.find(context.getSession(), item.getID());
                 itemService.delete(context, item);
             } catch (SQLException | AuthorizeException | IOException ex) {
                 log.error("Error in destroy", ex);
@@ -130,7 +130,7 @@ public class EPersonTest extends AbstractUnitTest {
         }
         if (this.collection != null) {
             try {
-                this.collection = collectionService.find(context, this.collection.getID());
+                this.collection = collectionService.find(context.getSession(), this.collection.getID());
                 collectionService.delete(context, this.collection);
             } catch (SQLException | AuthorizeException | IOException ex) {
                 log.error("Error in destroy", ex);
@@ -139,7 +139,7 @@ public class EPersonTest extends AbstractUnitTest {
         }
         if (this.community != null) {
             try {
-                this.community = communityService.find(context, this.community.getID());
+                this.community = communityService.find(context.getSession(), this.community.getID());
                 communityService.delete(context, this.community);
             } catch (SQLException | AuthorizeException | IOException ex) {
                 log.error("Error in destroy", ex);
@@ -793,7 +793,7 @@ public class EPersonTest extends AbstractUnitTest {
     @Test
     public void testCheckPassword()
             throws SQLException, DecoderException {
-        EPerson eperson = ePersonService.findByEmail(context, EMAIL);
+        EPerson eperson = ePersonService.findByEmail(context.getSession(), EMAIL);
         ePersonService.checkPassword(context, eperson, PASSWORD);
     }
 
@@ -819,7 +819,7 @@ public class EPersonTest extends AbstractUnitTest {
      */
     @Test
     public void testDeleteEPerson() throws SQLException, AuthorizeException {
-        EPerson deleteEperson = ePersonService.findByEmail(context, EMAIL);
+        EPerson deleteEperson = ePersonService.findByEmail(context.getSession(), EMAIL);
         context.turnOffAuthorisationSystem();
 
         try {
@@ -831,7 +831,7 @@ public class EPersonTest extends AbstractUnitTest {
         }
         context.restoreAuthSystemState();
         context.commit();
-        EPerson findDeletedEperson = ePersonService.findByEmail(context, EMAIL);
+        EPerson findDeletedEperson = ePersonService.findByEmail(context.getSession(), EMAIL);
         assertNull("EPerson has not been deleted correctly!", findDeletedEperson);
     }
 
@@ -843,7 +843,7 @@ public class EPersonTest extends AbstractUnitTest {
     @Test
     public void testDeletionConstraintOfSubmitter()
             throws SQLException {
-        EPerson ep = ePersonService.findByEmail(context, EMAIL);
+        EPerson ep = ePersonService.findByEmail(context.getSession(), EMAIL);
         try {
             item = prepareItem(ep);
         } catch (SQLException | AuthorizeException | IOException ex) {
@@ -877,7 +877,7 @@ public class EPersonTest extends AbstractUnitTest {
     @Test
     public void testDeletionOfSubmitterWithAnItem()
             throws SQLException, AuthorizeException {
-        EPerson ep = ePersonService.findByEmail(context, EMAIL);
+        EPerson ep = ePersonService.findByEmail(context.getSession(), EMAIL);
         try {
             item = prepareItem(ep);
         } catch (SQLException | AuthorizeException | IOException ex) {
@@ -899,7 +899,7 @@ public class EPersonTest extends AbstractUnitTest {
                      ": " + ex.getMessage());
             }
         }
-        item = itemService.find(context, item.getID());
+        item = itemService.find(context.getSession(), item.getID());
         assertNotNull("Could not load item after cascading deletion of the submitter.", item);
         assertNull("Cascading deletion of an EPerson did not set the submitter of an submitted item null.",
                 item.getSubmitter());
@@ -916,7 +916,7 @@ public class EPersonTest extends AbstractUnitTest {
     @Test
     public void testCascadingDeletionOfUnsubmittedWorkspaceItem()
             throws SQLException, AuthorizeException, IOException {
-        EPerson ep = ePersonService.findByEmail(context, EMAIL);
+        EPerson ep = ePersonService.findByEmail(context.getSession(), EMAIL);
 
         context.turnOffAuthorisationSystem();
         WorkspaceItem wsi = prepareWorkspaceItem(ep);
@@ -945,8 +945,8 @@ public class EPersonTest extends AbstractUnitTest {
         context.commit();
 
         try {
-            WorkspaceItem restoredWsi = workspaceItemService.find(context, wsi.getID());
-            Item restoredItem = itemService.find(context, item.getID());
+            WorkspaceItem restoredWsi = workspaceItemService.find(context.getSession(), wsi.getID());
+            Item restoredItem = itemService.find(context.getSession(), item.getID());
             assertNull("An unsubmited WorkspaceItem wasn't deleted while cascading deleting the submitter.",
                        restoredWsi);
             assertNull("An unsubmited Item wasn't deleted while cascading deleting the submitter.", restoredItem);
@@ -968,7 +968,7 @@ public class EPersonTest extends AbstractUnitTest {
     @Test
     public void testCascadingDeleteSubmitterPreservesWorkflowItems()
             throws SQLException, AuthorizeException, IOException, MessagingException, WorkflowException {
-        EPerson ep = ePersonService.findByEmail(context, EMAIL);
+        EPerson ep = ePersonService.findByEmail(context.getSession(), EMAIL);
         WorkspaceItem wsi = null;
 
         try {
@@ -1001,7 +1001,8 @@ public class EPersonTest extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
 
         // check that the workflow item exists.
-        assertNotNull("Cannot find currently created WorkflowItem!", workflowItemService.find(context, wfiID));
+        assertNotNull("Cannot find currently created WorkflowItem!",
+                workflowItemService.find(context.getSession(), wfiID));
 
         // delete the submitter
         try {
@@ -1023,7 +1024,7 @@ public class EPersonTest extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
 
         // check whether the workflow item still exists.
-        WorkflowItem wfi = workflowItemService.find(context, wfiID);
+        WorkflowItem wfi = workflowItemService.find(context.getSession(), wfiID);
         assertNotNull("Could not load WorkflowItem after cascading deletion of the submitter.", wfi);
         assertNull("Cascading deletion of an EPerson did not set the submitter of an submitted WorkflowItem null.",
                 wfi.getSubmitter());

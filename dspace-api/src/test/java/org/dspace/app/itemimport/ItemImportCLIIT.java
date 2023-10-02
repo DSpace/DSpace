@@ -549,7 +549,7 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
      * @throws Exception
      */
     private void checkMetadata() throws Exception {
-        Item item = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next();
+        Item item = itemService.findByMetadataField(context.getSession(), "dc", "title", null, publicationTitle).next();
         assertEquals(item.getName(), publicationTitle);
         assertEquals(itemService.getMetadata(item, "dc.date.issued"), "1990");
         assertEquals(itemService.getMetadata(item, "dc.title.alternative"), "J'aime les Printemps");
@@ -560,7 +560,7 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
      * @throws Exception
      */
     private void checkMetadataWithAnotherSchema() throws Exception {
-        Item item = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next();
+        Item item = itemService.findByMetadataField(context.getSession(), "dc", "title", null, publicationTitle).next();
         assertEquals(item.getName(), publicationTitle);
         assertEquals(itemService.getMetadata(item, "dcterms.title"), publicationTitle);
     }
@@ -570,7 +570,8 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
      * @throws Exception
      */
     private void checkBitstream() throws Exception {
-        Bitstream bitstream = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next()
+        Bitstream bitstream = itemService.findByMetadataField(context.getSession(),
+                "dc", "title", null, publicationTitle).next()
                 .getBundles("ORIGINAL").get(0).getBitstreams().get(0);
         assertEquals(bitstream.getName(), "file1.txt");
     }
@@ -580,7 +581,8 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
      * @throws Exception
      */
     private void checkItemDeletion() throws Exception {
-        Iterator<Item> itemIterator = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle);
+        Iterator<Item> itemIterator = itemService.findByMetadataField(context.getSession(),
+                "dc", "title", null, publicationTitle);
         assertEquals(itemIterator.hasNext(), false);
     }
 
@@ -589,9 +591,11 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
      * @throws Exception
      */
     private void checkRelationship() throws Exception {
-        Item item = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next();
-        Item author = itemService.findByMetadataField(context, "dc", "title", null, personTitle).next();
-        List<Relationship> relationships = relationshipService.findByItem(context, item);
+        Item item = itemService.findByMetadataField(context.getSession(),
+                "dc", "title", null, publicationTitle).next();
+        Item author = itemService.findByMetadataField(context.getSession(),
+                "dc", "title", null, personTitle).next();
+        List<Relationship> relationships = relationshipService.findByItem(context.getSession(), item);
         assertEquals(1, relationships.size());
         assertEquals(author.getID(), relationships.get(0).getRightItem().getID());
         assertEquals(item.getID(), relationships.get(0).getLeftItem().getID());

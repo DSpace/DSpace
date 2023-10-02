@@ -56,7 +56,7 @@ public class SWORDService {
     /**
      * a holder for the messages coming through from the implementation
      */
-    private StringBuilder verboseDescription = new StringBuilder();
+    private final StringBuilder verboseDescription = new StringBuilder();
 
     /**
      * is this a verbose operation
@@ -66,7 +66,7 @@ public class SWORDService {
     /**
      * date formatter
      */
-    private SimpleDateFormat dateFormat;
+    private final SimpleDateFormat dateFormat;
 
     /**
      * Construct a new service instance around the given authenticated
@@ -157,7 +157,7 @@ public class SWORDService {
         throws DSpaceSWORDException {
         try {
             BitstreamFormat bf = bitstreamFormatService.findByMIMEType(
-                context, deposit.getContentType());
+                context.getSession(), deposit.getContentType());
             List<String> exts = null;
             if (bf != null) {
                 exts = bf.getExtensions();

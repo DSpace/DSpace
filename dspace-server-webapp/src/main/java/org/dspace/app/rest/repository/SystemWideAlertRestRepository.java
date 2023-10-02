@@ -75,7 +75,7 @@ public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWi
     @PreAuthorize("permitAll()")
     public SystemWideAlertRest findOne(Context context, Integer id) {
         try {
-            SystemWideAlert systemWideAlert = systemWideAlertService.find(context, id);
+            SystemWideAlert systemWideAlert = systemWideAlertService.find(context.getSession(), id);
             if (systemWideAlert == null) {
                 throw new ResourceNotFoundException(
                         "systemWideAlert with id " + systemWideAlert.getID() + " was not found");
@@ -94,9 +94,8 @@ public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWi
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<SystemWideAlertRest> findAll(Context context, Pageable pageable) {
         try {
-            List<SystemWideAlert> systemWideAlerts = systemWideAlertService.findAll(context, pageable.getPageSize(),
-                                                                                    Math.toIntExact(
-                                                                                            pageable.getOffset()));
+            List<SystemWideAlert> systemWideAlerts = systemWideAlertService.findAll(context.getSession(),
+                    pageable.getPageSize(), Math.toIntExact(pageable.getOffset()));
             return converter.toRestPage(systemWideAlerts, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -119,7 +118,7 @@ public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWi
             throw new UnprocessableEntityException("system alert message cannot be blank");
         }
 
-        SystemWideAlert systemWideAlert = systemWideAlertService.find(context, id);
+        SystemWideAlert systemWideAlert = systemWideAlertService.find(context.getSession(), id);
         if (systemWideAlert == null) {
             throw new ResourceNotFoundException("system wide alert with id: " + id + " not found");
         }
@@ -145,7 +144,7 @@ public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWi
      */
     private SystemWideAlert createSystemWideAlert(Context context)
             throws SQLException, AuthorizeException {
-        List<SystemWideAlert> all = systemWideAlertService.findAll(context);
+        List<SystemWideAlert> all = systemWideAlertService.findAll(context.getSession());
         if (!all.isEmpty()) {
             throw new DSpaceBadRequestException("A system wide alert already exists, no new value can be created. " +
                                                         "Try updating the existing one.");
@@ -189,7 +188,7 @@ public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWi
         Context context = obtainContext();
         try {
             List<SystemWideAlert> systemWideAlerts =
-                    systemWideAlertService.findAllActive(context,
+                    systemWideAlertService.findAllActive(context.getSession(),
                                                          pageable.getPageSize(),
                                                          Math.toIntExact(
                                                                  pageable.getOffset()));

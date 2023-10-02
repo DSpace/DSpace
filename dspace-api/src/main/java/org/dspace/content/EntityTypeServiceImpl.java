@@ -32,6 +32,7 @@ import org.dspace.discovery.SolrSearchCore;
 import org.dspace.discovery.indexobject.IndexableCollection;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class EntityTypeServiceImpl implements EntityTypeService {
@@ -49,20 +50,19 @@ public class EntityTypeServiceImpl implements EntityTypeService {
     protected SolrSearchCore solrSearchCore;
 
     @Override
-    public EntityType findByEntityType(Context context, String entityType) throws SQLException {
-        return entityTypeDAO.findByEntityType(context, entityType);
+    public EntityType findByEntityType(Session session, String entityType) throws SQLException {
+        return entityTypeDAO.findByEntityType(session, entityType);
     }
 
     @Override
-    public List<EntityType> findAll(Context context) throws SQLException {
+    public List<EntityType> findAll(Session session) throws SQLException {
 
-        return findAll(context, -1, -1);
+        return findAll(session, -1, -1);
     }
 
     @Override
-    public List<EntityType> findAll(Context context, Integer limit, Integer offset) throws SQLException {
-
-        return entityTypeDAO.findAll(context, EntityType.class, limit, offset);
+    public List<EntityType> findAll(Session session, Integer limit, Integer offset) throws SQLException {
+        return entityTypeDAO.findAll(session, EntityType.class, limit, offset);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class EntityTypeServiceImpl implements EntityTypeService {
             throw new AuthorizeException(
                 "Only administrators can modify entityType");
         }
-        return entityTypeDAO.create(context, new EntityType());
+        return entityTypeDAO.create(context.getSession(), new EntityType());
     }
 
     @Override
@@ -82,12 +82,12 @@ public class EntityTypeServiceImpl implements EntityTypeService {
         }
         EntityType entityType = new EntityType();
         entityType.setLabel(entityTypeString);
-        return entityTypeDAO.create(context, entityType);
+        return entityTypeDAO.create(context.getSession(), entityType);
     }
 
     @Override
-    public EntityType find(Context context,int id) throws SQLException {
-        EntityType entityType = entityTypeDAO.findByID(context, EntityType.class, id);
+    public EntityType find(Session session,int id) throws SQLException {
+        EntityType entityType = entityTypeDAO.findByID(session, EntityType.class, id);
         return entityType;
     }
 
@@ -106,7 +106,7 @@ public class EntityTypeServiceImpl implements EntityTypeService {
             }
 
             for (EntityType entityType : entityTypes) {
-                entityTypeDAO.save(context, entityType);
+                entityTypeDAO.save(context.getSession(), entityType);
             }
         }
     }
@@ -117,7 +117,7 @@ public class EntityTypeServiceImpl implements EntityTypeService {
             throw new AuthorizeException(
                 "Only administrators can delete entityType");
         }
-        entityTypeDAO.delete(context, entityType);
+        entityTypeDAO.delete(context.getSession(), entityType);
     }
 
     @Override
@@ -161,17 +161,17 @@ public class EntityTypeServiceImpl implements EntityTypeService {
     @Override
     public List<EntityType> getEntityTypesByNames(Context context, List<String> names, Integer limit, Integer offset)
             throws SQLException {
-        return entityTypeDAO.getEntityTypesByNames(context, names, limit, offset);
+        return entityTypeDAO.getEntityTypesByNames(context.getSession(), names, limit, offset);
     }
 
     @Override
     public int countEntityTypesByNames(Context context, List<String> names) throws SQLException {
-        return entityTypeDAO.countEntityTypesByNames(context, names);
+        return entityTypeDAO.countEntityTypesByNames(context.getSession(), names);
     }
 
     @Override
     public void initDefaultEntityTypeNames(Context context) throws SQLException, AuthorizeException {
-        EntityType noneEntityType = this.findByEntityType(context, Constants.ENTITY_TYPE_NONE);
+        EntityType noneEntityType = this.findByEntityType(context.getSession(), Constants.ENTITY_TYPE_NONE);
         if (Objects.isNull(noneEntityType)) {
             noneEntityType = this.create(context, Constants.ENTITY_TYPE_NONE);
             this.update(context, noneEntityType);

@@ -84,7 +84,7 @@ public class Role implements BeanNameAware {
 
     public RoleMembers getMembers(Context context, XmlWorkflowItem wfi) throws SQLException {
         if (scope == Scope.REPOSITORY) {
-            Group group = groupService.findByName(context, name);
+            Group group = groupService.findByName(context.getSession(), name);
             if (group == null) {
                 return new RoleMembers();
             } else {
@@ -93,7 +93,7 @@ public class Role implements BeanNameAware {
                 return assignees;
             }
         } else if (scope == Scope.COLLECTION) {
-            CollectionRole collectionRole = collectionRoleService.find(context, wfi.getCollection(), id);
+            CollectionRole collectionRole = collectionRoleService.find(context.getSession(), wfi.getCollection(), id);
             if (collectionRole != null) {
                 RoleMembers assignees = new RoleMembers();
                 assignees.addGroup(collectionRole.getGroup());
@@ -101,7 +101,7 @@ public class Role implements BeanNameAware {
             }
             return new RoleMembers();
         } else {
-            List<WorkflowItemRole> roles = workflowItemRoleService.find(context, wfi, id);
+            List<WorkflowItemRole> roles = workflowItemRoleService.find(context.getSession(), wfi, id);
             RoleMembers assignees = new RoleMembers();
             for (WorkflowItemRole itemRole : roles) {
                 EPerson user = itemRole.getEPerson();

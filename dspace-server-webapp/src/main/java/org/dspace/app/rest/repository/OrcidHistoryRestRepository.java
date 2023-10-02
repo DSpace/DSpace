@@ -52,7 +52,7 @@ public class OrcidHistoryRestRepository extends DSpaceRestRepository<OrcidHistor
     public OrcidHistoryRest findOne(Context context, Integer id) {
         OrcidHistory orcidHistory = null;
         try {
-            orcidHistory = orcidHistoryService.find(context, id);
+            orcidHistory = orcidHistoryService.find(context.getSession(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

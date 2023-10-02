@@ -25,13 +25,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Util class for shared methods between the Metadata Operations
+ * Utility class for shared methods between the Metadata Operations.
  * @author Maria Verdonck (Atmire) on 18/11/2019
  */
 @Component
 public final class DSpaceObjectMetadataPatchUtils {
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private MetadataFieldService metadataFieldService;
@@ -138,7 +138,7 @@ public final class DSpaceObjectMetadataPatchUtils {
      */
     protected MetadataField getMetadataField(Context context, Operation operation) throws SQLException {
         String mdElement = this.extractMdFieldStringFromOperation(operation);
-        return metadataFieldService.findByString(context, mdElement, '.');
+        return metadataFieldService.findByString(context.getSession(), mdElement, '.');
     }
 
     /**

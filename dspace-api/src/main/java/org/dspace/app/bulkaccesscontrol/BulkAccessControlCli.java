@@ -37,9 +37,9 @@ public class BulkAccessControlCli extends BulkAccessControl {
         }
 
         if (StringUtils.contains(eperson, '@')) {
-            myEPerson = epersonService.findByEmail(context, eperson);
+            myEPerson = epersonService.findByEmail(context.getSession(), eperson);
         } else {
-            myEPerson = epersonService.find(context, UUID.fromString(eperson));
+            myEPerson = epersonService.find(context.getSession(), UUID.fromString(eperson));
         }
 
         if (myEPerson == null) {

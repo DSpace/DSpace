@@ -16,6 +16,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.orcid.OrcidToken;
 import org.dspace.orcid.dao.OrcidTokenDAO;
 import org.dspace.orcid.service.OrcidTokenService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -41,26 +42,28 @@ public class OrcidTokenServiceImpl implements OrcidTokenService {
         orcidToken.setEPerson(ePerson);
         orcidToken.setProfileItem(profileItem);
         try {
-            return orcidTokenDAO.create(context, orcidToken);
+            return orcidTokenDAO.create(context.getSession(), orcidToken);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public OrcidToken findByEPerson(Context context, EPerson ePerson) {
-        return orcidTokenDAO.findByEPerson(context, ePerson);
+    public OrcidToken findByEPerson(Session session, EPerson ePerson)
+            throws SQLException {
+        return orcidTokenDAO.findByEPerson(session, ePerson);
     }
 
     @Override
-    public OrcidToken findByProfileItem(Context context, Item profileItem) {
-        return orcidTokenDAO.findByProfileItem(context, profileItem);
+    public OrcidToken findByProfileItem(Session session, Item profileItem)
+            throws SQLException {
+        return orcidTokenDAO.findByProfileItem(session, profileItem);
     }
 
     @Override
     public void delete(Context context, OrcidToken orcidToken) {
         try {
-            orcidTokenDAO.delete(context, orcidToken);
+            orcidTokenDAO.delete(context.getSession(), orcidToken);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -70,7 +73,7 @@ public class OrcidTokenServiceImpl implements OrcidTokenService {
     public void deleteAll(Context context) {
         try {
 
-            List<OrcidToken> tokens = orcidTokenDAO.findAll(context, OrcidToken.class);
+            List<OrcidToken> tokens = orcidTokenDAO.findAll(context.getSession(), OrcidToken.class);
             for (OrcidToken token : tokens) {
                 delete(context, token);
             }
@@ -81,19 +84,20 @@ public class OrcidTokenServiceImpl implements OrcidTokenService {
     }
 
     @Override
-    public void deleteByEPerson(Context context, EPerson ePerson) {
-        OrcidToken orcidToken = findByEPerson(context, ePerson);
+    public void deleteByEPerson(Context context, EPerson ePerson)
+            throws SQLException {
+        OrcidToken orcidToken = findByEPerson(context.getSession(), ePerson);
         if (orcidToken != null) {
             delete(context, orcidToken);
         }
     }
 
     @Override
-    public void deleteByProfileItem(Context context, Item profileItem) {
-        OrcidToken orcidToken = findByProfileItem(context, profileItem);
+    public void deleteByProfileItem(Context context, Item profileItem)
+            throws SQLException {
+        OrcidToken orcidToken = findByProfileItem(context.getSession(), profileItem);
         if (orcidToken != null) {
             delete(context, orcidToken);
         }
     }
-
 }

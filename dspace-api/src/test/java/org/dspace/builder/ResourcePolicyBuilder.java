@@ -74,7 +74,6 @@ public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, Resou
             log.error(e);
         } catch (AuthorizeException e) {
             log.error(e);
-            ;
         }
         return resourcePolicy;
     }
@@ -97,7 +96,7 @@ public class ResourcePolicyBuilder extends AbstractBuilder<ResourcePolicy, Resou
             throws SQLException, IOException, SearchServiceException {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
-            ResourcePolicy rp = resourcePolicyService.find(c, id);
+            ResourcePolicy rp = resourcePolicyService.find(c.getSession(), id);
             if (rp != null) {
                 try {
                     resourcePolicyService.delete(c, rp);

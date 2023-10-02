@@ -24,6 +24,7 @@ import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.Process;
 import org.dspace.scripts.ProcessLogLevel;
 import org.dspace.scripts.ProcessQueryParameterContainer;
+import org.hibernate.Session;
 
 /**
  * An interface for the ProcessService with methods regarding the Process workload
@@ -47,48 +48,48 @@ public interface ProcessService {
 
     /**
      * This method will retrieve a Process object from the Database with the given ID
-     * @param context   The relevant DSpace context
+     * @param session   current request's database context.
      * @param processId The process id on which we'll search for in the database
      * @return The process that holds the given process id
      * @throws SQLException If something goes wrong
      */
-    public Process find(Context context, int processId) throws SQLException;
+    public Process find(Session session, int processId) throws SQLException;
 
     /**
      * Returns a list of all Process objects in the database
-     * @param context   The relevant DSpace context
+     * @param session   current request's database context.
      * @return The list of all Process objects in the Database
      * @throws SQLException If something goes wrong
      */
-    public List<Process> findAll(Context context) throws SQLException;
+    public List<Process> findAll(Session session) throws SQLException;
 
     /**
      * Returns a list of all Process objects in the database
-     * @param context   The relevant DSpace context
+     * @param session   current request's database context.
      * @param limit     The limit for the amount of Processes returned
      * @param offset    The offset for the Processes to be returned
      * @return The list of all Process objects in the Database
      * @throws SQLException If something goes wrong
      */
-    public List<Process> findAll(Context context, int limit, int offset) throws SQLException;
+    public List<Process> findAll(Session session, int limit, int offset) throws SQLException;
 
 
     /**
      * Returns a list of all Process objects in the database sorted by script name
-     * @param context   The relevant DSpace context
+     * @param session   current request's database context.
      * @return The list of all Process objects in the database sorted by script name
      * @throws SQLException If something goes wrong
      */
-    public List<Process> findAllSortByScript(Context context) throws SQLException;
+    public List<Process> findAllSortByScript(Session session) throws SQLException;
 
     /**
-     * Returns a list of all Process objects in the database sorted by start time
-     * The most recent one will be shown first
-     * @param context   The relevant DSpace context
+     * Returns a list of all Process objects in the database sorted by start time.
+     * The most recent one will be shown first.
+     * @param session   current request's database context.
      * @return The list of all Process objects sorted by start time
      * @throws SQLException If something goes wrong
      */
-    public List<Process> findAllSortByStartTime(Context context) throws SQLException;
+    public List<Process> findAllSortByStartTime(Session session) throws SQLException;
 
     /**
      * This method will perform the logic needed to update the Process object in the database to represent a
@@ -247,26 +248,26 @@ public interface ProcessService {
      * Find all the processes with one of the given status and with a creation time
      * older than the specified date.
      *
-     * @param  context            The relevant DSpace context
+     * @param  session            current request's database context.
      * @param  statuses           the statuses of the processes to search for
      * @param  date               the creation date to search for
      * @return                    The list of all Processes which match requirements
-     * @throws AuthorizeException If something goes wrong
+     * @throws SQLException If something goes wrong
      */
-    List<Process> findByStatusAndCreationTimeOlderThan(Context context, List<ProcessStatus> statuses, Date date)
+    List<Process> findByStatusAndCreationTimeOlderThan(Session session, List<ProcessStatus> statuses, Date date)
         throws SQLException;
 
     /**
      * Returns a list of all Process objects in the database by the given user.
      *
-     * @param context The relevant DSpace context
+     * @param session current request's database context.
      * @param user    The user to search for
      * @param limit   The limit for the amount of Processes returned
      * @param offset  The offset for the Processes to be returned
      * @return The list of all Process objects in the Database
      * @throws SQLException If something goes wrong
      */
-    List<Process> findByUser(Context context, EPerson user, int limit, int offset) throws SQLException;
+    List<Process> findByUser(Session session, EPerson user, int limit, int offset) throws SQLException;
 
     /**
      * Count all the processes which is related to the given user.

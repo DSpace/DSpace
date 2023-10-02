@@ -108,7 +108,7 @@ public class Collection extends DSpaceObject {
         //TODO: Item paging. limit, offset/page
         if (expandFields.contains("items") || expandFields.contains("all")) {
             Iterator<org.dspace.content.Item> childItems =
-                itemService.findByCollection(context, collection, limit, offset);
+                itemService.findByCollection(context.getSession(), collection, limit, offset);
 
             items = new ArrayList<>();
             while (childItems.hasNext()) {

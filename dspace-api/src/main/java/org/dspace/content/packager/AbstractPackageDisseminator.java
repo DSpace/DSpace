@@ -47,7 +47,7 @@ public abstract class AbstractPackageDisseminator
     /**
      * List of all successfully disseminated package files
      */
-    private List<File> packageFileList = new ArrayList<File>();
+    private final List<File> packageFileList = new ArrayList<>();
 
     protected final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
@@ -121,7 +121,7 @@ public abstract class AbstractPackageDisseminator
                     case Constants.COLLECTION:
                         //Also find all Items in this Collection and disseminate
                         Collection collection = (Collection) dso;
-                        Iterator<Item> iterator = itemService.findByCollection(context, collection);
+                        Iterator<Item> iterator = itemService.findByCollection(context.getSession(), collection);
                         while (iterator.hasNext()) {
                             Item item = iterator.next();
 
@@ -154,7 +154,7 @@ public abstract class AbstractPackageDisseminator
                         break;
                     case Constants.SITE:
                         //Also find all top-level Communities and disseminate
-                        List<Community> topCommunities = communityService.findAllTop(context);
+                        List<Community> topCommunities = communityService.findAllTop(context.getSession());
                         for (Community topCommunity : topCommunities) {
                             //disseminate all top-level communities (recursively!)
                             String childFileName = pkgDirectory + PackageUtils

@@ -50,7 +50,7 @@ public class VersioningTest extends AbstractUnitTest {
 
     private Item originalItem;
     private Item versionedItem;
-    private String summary = "Unit test version";
+    private final String summary = "Unit test version";
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
@@ -86,7 +86,7 @@ public class VersioningTest extends AbstractUnitTest {
             originalItem = installItemService.installItem(context, is);
 
             Version version = versionService.createNewVersion(context, originalItem, summary);
-            WorkspaceItem wsi = workspaceItemService.findByItem(context, version.getItem());
+            WorkspaceItem wsi = workspaceItemService.findByItem(context.getSession(), version.getItem());
 
             versionedItem = installItemService.installItem(context, wsi);
             context.restoreAuthSystemState();
@@ -117,7 +117,7 @@ public class VersioningTest extends AbstractUnitTest {
 
     @Test
     public void testVersionFind() throws SQLException {
-        VersionHistory versionHistory = versionHistoryService.findByItem(context, originalItem);
+        VersionHistory versionHistory = versionHistoryService.findByItem(context.getSession(), originalItem);
         assertThat("testFindVersionHistory", versionHistory, notNullValue());
         Version version = versionHistoryService.getVersion(context, versionHistory, versionedItem);
         assertThat("testFindVersion", version, notNullValue());
@@ -129,7 +129,7 @@ public class VersioningTest extends AbstractUnitTest {
     @Test
     public void testVersionSummary() throws Exception {
         //Start by creating a new item !
-        VersionHistory versionHistory = versionHistoryService.findByItem(context, originalItem);
+        VersionHistory versionHistory = versionHistoryService.findByItem(context.getSession(), originalItem);
         Version version = versionHistoryService.getVersion(context, versionHistory, versionedItem);
         assertThat("Test_version_summary", summary, equalTo(version.getSummary()));
     }
@@ -166,7 +166,7 @@ public class VersioningTest extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
         String handle = versionedItem.getHandle();
         versionService.removeVersion(context, versionedItem);
-        assertThat("Test_version_delete", itemService.find(context, versionedItem.getID()), nullValue());
+        assertThat("Test_version_delete", itemService.find(context.getSession(), versionedItem.getID()), nullValue());
         assertThat("Test_version_handle_delete", handleService.resolveToObject(context, handle), nullValue());
         context.restoreAuthSystemState();
     }

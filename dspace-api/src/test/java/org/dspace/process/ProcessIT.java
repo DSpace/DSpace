@@ -53,7 +53,7 @@ public class ProcessIT extends AbstractIntegrationTestWithDatabase {
                                                         groupSet).build();
 
         context.restoreAuthSystemState();
-        Process process = processService.find(context, processA.getID());
+        Process process = processService.find(context.getSession(), processA.getID());
         List<Group> groups = process.getGroups();
         boolean isPresent = groups.stream().anyMatch(g -> g.getID().equals(groupA.getID()));
         assertTrue(isPresent);
@@ -81,7 +81,7 @@ public class ProcessIT extends AbstractIntegrationTestWithDatabase {
         context.reloadEntity(groupA);
         processA = context.reloadEntity(processA);
 
-        Process process = processService.find(context, processA.getID());
+        Process process = processService.find(context.getSession(), processA.getID());
         List<Group> groups = process.getGroups();
         boolean isPresent = groups.stream().anyMatch(g -> g.getID().equals(groupUuid));
         assertFalse(isPresent);

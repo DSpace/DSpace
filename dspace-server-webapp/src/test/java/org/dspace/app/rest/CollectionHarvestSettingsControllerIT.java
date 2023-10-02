@@ -241,7 +241,7 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
                 .content(json.toString()))
             .andExpect(status().isOk());
 
-        HarvestedCollection harvestedCollection = harvestedCollectionService.find(context, collection);
+        HarvestedCollection harvestedCollection = harvestedCollectionService.find(context.getSession(), collection);
 
         assertTrue(harvestedCollection.getHarvestType()
             == HarvestTypeEnum.valueOf(json.getString("harvest_type")).getValue());
@@ -276,7 +276,7 @@ public class CollectionHarvestSettingsControllerIT extends AbstractControllerInt
                 .content(json.toString()))
             .andExpect(status().isOk());
 
-        HarvestedCollection harvestedCollection = harvestedCollectionService.find(context, collection);
+        HarvestedCollection harvestedCollection = harvestedCollectionService.find(context.getSession(), collection);
 
         assertNull(harvestedCollection);
     }

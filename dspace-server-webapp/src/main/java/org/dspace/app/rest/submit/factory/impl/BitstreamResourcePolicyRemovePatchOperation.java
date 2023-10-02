@@ -61,7 +61,7 @@ public class BitstreamResourcePolicyRemovePatchOperation
                                                              ResourcePolicy.TYPE_CUSTOM);
                     } else {
                         String rpIdx = split[3];
-                        List<ResourcePolicy> policies = resourcePolicyService.find(context, b,
+                        List<ResourcePolicy> policies = resourcePolicyService.find(context.getSession(), b,
                                                                                    ResourcePolicy.TYPE_CUSTOM);
                         int index = 0;
                         for (ResourcePolicy policy : policies) {

@@ -25,6 +25,7 @@ import org.dspace.core.Context;
 import org.dspace.handle.dao.HandleDAO;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -75,7 +76,7 @@ public class HandleServiceImpl implements HandleService {
     @Override
     public String resolveToURL(Context context, String handle)
         throws SQLException {
-        Handle dbhandle = findHandleInternal(context, handle);
+        Handle dbhandle = findHandleInternal(context.getSession(), handle);
 
         if (dbhandle == null) {
             return null;
@@ -114,7 +115,7 @@ public class HandleServiceImpl implements HandleService {
         while (handle.startsWith("/")) {
             handle = handle.substring(1);
         }
-        Handle dbhandle = findHandleInternal(context, handle);
+        Handle dbhandle = findHandleInternal(context.getSession(), handle);
 
         return (null == dbhandle) ? null : handle;
     }
@@ -138,14 +139,14 @@ public class HandleServiceImpl implements HandleService {
     @Override
     public String createHandle(Context context, DSpaceObject dso)
         throws SQLException {
-        Handle handle = handleDAO.create(context, new Handle());
+        Handle handle = handleDAO.create(context.getSession(), new Handle());
         String handleId = createId(context);
 
         handle.setHandle(handleId);
         handle.setDSpaceObject(dso);
         dso.addHandle(handle);
         handle.setResourceTypeId(dso.getType());
-        handleDAO.save(context, handle);
+        handleDAO.save(context.getSession(), handle);
 
         log.debug("Created new handle for {} (ID={}) {}",
             () -> Constants.typeText[dso.getType()],
@@ -165,7 +166,7 @@ public class HandleServiceImpl implements HandleService {
     public String createHandle(Context context, DSpaceObject dso,
                                String suppliedHandle, boolean force) throws SQLException, IllegalStateException {
         //Check if the supplied handle is already in use -- cannot use the same handle twice
-        Handle handle = findHandleInternal(context, suppliedHandle);
+        Handle handle = findHandleInternal(context.getSession(), suppliedHandle);
         if (handle != null && handle.getDSpaceObject() != null) {
             //Check if this handle is already linked up to this specified DSpace Object
             if (handle.getDSpaceObject().getID().equals(dso.getID())) {
@@ -192,14 +193,14 @@ public class HandleServiceImpl implements HandleService {
         } else if (handle == null) {
             //if handle not found, create it
             //handle not found in DB table -- create a new table entry
-            handle = handleDAO.create(context, new Handle());
+            handle = handleDAO.create(context.getSession(), new Handle());
             handle.setHandle(suppliedHandle);
         }
 
         handle.setResourceTypeId(dso.getType());
         handle.setDSpaceObject(dso);
         dso.addHandle(handle);
-        handleDAO.save(context, handle);
+        handleDAO.save(context.getSession(), handle);
 
         log.debug("Created new handle for {} (ID={}) {}",
             () -> Constants.typeText[dso.getType()],
@@ -224,7 +225,7 @@ public class HandleServiceImpl implements HandleService {
                 handle.setDSpaceObject(null);
 
 
-                handleDAO.save(context, handle);
+                handleDAO.save(context.getSession(), handle);
 
                 log.debug("Unbound Handle {} from object {} id={}",
                     () -> handle.getHandle(),
@@ -241,7 +242,7 @@ public class HandleServiceImpl implements HandleService {
     @Override
     public DSpaceObject resolveToObject(Context context, String handle)
         throws IllegalStateException, SQLException {
-        Handle dbhandle = findHandleInternal(context, handle);
+        Handle dbhandle = findHandleInternal(context.getSession(), handle);
         // check if handle was allocated previously, but is currently not
         // associated with a DSpaceObject
         // (this may occur when 'unbindHandle()' is called for an obj that was removed)
@@ -255,7 +256,7 @@ public class HandleServiceImpl implements HandleService {
     }
 
     @Override
-    public String findHandle(Context context, DSpaceObject dso)
+    public String findHandle(Session session, DSpaceObject dso)
         throws SQLException {
         List<Handle> handles = dso.getHandles();
         if (CollectionUtils.isEmpty(handles)) {
@@ -279,7 +280,7 @@ public class HandleServiceImpl implements HandleService {
     @Override
     public List<String> getHandlesForPrefix(Context context, String prefix)
         throws SQLException {
-        List<Handle> handles = handleDAO.findByPrefix(context, prefix);
+        List<Handle> handles = handleDAO.findByPrefix(context.getSession(), prefix);
         List<String> handleStrings = new ArrayList<>(handles.size());
         for (Handle handle : handles) {
             handleStrings.add(handle.getHandle());
@@ -299,17 +300,17 @@ public class HandleServiceImpl implements HandleService {
 
     @Override
     public long countHandlesByPrefix(Context context, String prefix) throws SQLException {
-        return handleDAO.countHandlesByPrefix(context, prefix);
+        return handleDAO.countHandlesByPrefix(context.getSession(), prefix);
     }
 
     @Override
     public int updateHandlesWithNewPrefix(Context context, String newPrefix, String oldPrefix) throws SQLException {
-        return handleDAO.updateHandlesWithNewPrefix(context, newPrefix, oldPrefix);
+        return handleDAO.updateHandlesWithNewPrefix(context.getSession(), newPrefix, oldPrefix);
     }
 
     @Override
     public void modifyHandleDSpaceObject(Context context, String handle, DSpaceObject newOwner) throws SQLException {
-        Handle dbHandle = findHandleInternal(context, handle);
+        Handle dbHandle = findHandleInternal(context.getSession(), handle);
         if (dbHandle != null) {
             // Check if we have to remove the handle from the current handle list
             // or if object is alreday deleted.
@@ -321,7 +322,7 @@ public class HandleServiceImpl implements HandleService {
             dbHandle.setDSpaceObject(newOwner);
             dbHandle.setResourceTypeId(newOwner.getType());
             newOwner.getHandles().add(0, dbHandle);
-            handleDAO.save(context, dbHandle);
+            handleDAO.save(context.getSession(), dbHandle);
         }
 
     }
@@ -332,18 +333,18 @@ public class HandleServiceImpl implements HandleService {
     /**
      * Find the database row corresponding to handle.
      *
-     * @param context DSpace context
+     * @param session current request's database context.
      * @param handle  The handle to resolve
      * @return The database row corresponding to the handle
      * @throws SQLException If a database error occurs
      */
-    protected Handle findHandleInternal(Context context, String handle)
+    protected Handle findHandleInternal(Session session, String handle)
         throws SQLException {
         if (handle == null) {
             throw new IllegalArgumentException("Handle is null");
         }
 
-        return handleDAO.findByHandle(context, handle);
+        return handleDAO.findByHandle(session, handle);
     }
 
     /**
@@ -358,14 +359,14 @@ public class HandleServiceImpl implements HandleService {
         String handlePrefix = getPrefix();
 
         // Get next available suffix (as a Long, since DSpace uses an incrementing sequence)
-        Long handleSuffix = handleDAO.getNextHandleSuffix(context);
+        Long handleSuffix = handleDAO.getNextHandleSuffix(context.getSession());
 
         return handlePrefix + (handlePrefix.endsWith("/") ? "" : "/") + handleSuffix.toString();
     }
 
     @Override
     public int countTotal(Context context) throws SQLException {
-        return handleDAO.countRows(context);
+        return handleDAO.countRows(context.getSession());
     }
 
     @Override

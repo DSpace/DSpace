@@ -12,10 +12,10 @@ import java.util.List;
 
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 import org.dspace.eperson.EPerson;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.hibernate.Session;
 
 /**
  * Database Access Object interface class for the XmlWorkflowItem object.
@@ -29,9 +29,9 @@ public interface XmlWorkflowItemDAO extends GenericDAO<XmlWorkflowItem> {
 
     /**
      * Find all the workflow items in a specific collection using the pagination parameters (offset, limit)
-     * 
-     * @param context
-     *            dspace context
+     *
+     * @param session
+     *            the current request's database context.
      * @param offset
      *            the first record to return
      * @param limit
@@ -41,24 +41,24 @@ public interface XmlWorkflowItemDAO extends GenericDAO<XmlWorkflowItem> {
      * @return all the workflow items respecting the parameters conditions
      * @throws SQLException
      */
-    public List<XmlWorkflowItem> findAllInCollection(Context context, Integer offset, Integer limit,
+    public List<XmlWorkflowItem> findAllInCollection(Session session, Integer offset, Integer limit,
                                                      Collection collection) throws SQLException;
 
-    public int countAll(Context context) throws SQLException;
+    public int countAll(Session session) throws SQLException;
 
-    public int countAllInCollection(Context context, Collection collection) throws SQLException;
+    public int countAllInCollection(Session session, Collection collection) throws SQLException;
 
-    public List<XmlWorkflowItem> findBySubmitter(Context context, EPerson ep) throws SQLException;
+    public List<XmlWorkflowItem> findBySubmitter(Session session, EPerson ep) throws SQLException;
 
-    public List<XmlWorkflowItem> findByCollection(Context context, Collection collection) throws SQLException;
+    public List<XmlWorkflowItem> findByCollection(Session session, Collection collection) throws SQLException;
 
-    public XmlWorkflowItem findByItem(Context context, Item item) throws SQLException;
+    public XmlWorkflowItem findByItem(Session session, Item item) throws SQLException;
 
     /**
      * Return all the workflow items from a specific submitter respecting the pagination parameters
-     * 
-     * @param context
-     *            The relevant DSpace Context.
+     *
+     * @param session
+     *            The current request's database context.
      * @param ep
      *            the eperson that has submitted the item
      * @param offset
@@ -66,19 +66,20 @@ public interface XmlWorkflowItemDAO extends GenericDAO<XmlWorkflowItem> {
      * @param limit
      *            the max number of records to return
      * @return
+     * @throws SQLException
      */
-    public List<XmlWorkflowItem> findBySubmitter(Context context, EPerson ep, Integer offset, Integer limit)
+    public List<XmlWorkflowItem> findBySubmitter(Session session, EPerson ep, Integer offset, Integer limit)
             throws SQLException;
 
     /**
      * Count the number of workflow items from a specific submitter
-     * 
-     * @param context
-     *            The relevant DSpace Context.
+     *
+     * @param session
+     *            The current request's database context.
      * @param ep
      *            the eperson that has submitted the item
      * @return
      * @throws SQLException
      */
-    public int countBySubmitter(Context context, EPerson ep) throws SQLException;
+    public int countBySubmitter(Session session, EPerson ep) throws SQLException;
 }

@@ -95,7 +95,7 @@ public class SWORDConfiguration {
     /**
      * Accepted formats
      */
-    private List<String> swordaccepts;
+    private final List<String> swordaccepts;
 
     /**
      * Initialise the sword configuration.  It is at this stage that the
@@ -135,7 +135,7 @@ public class SWORDConfiguration {
         // Get the accepted formats
         String[] acceptsFormats = configurationService
             .getArrayProperty("sword-server.accepts");
-        swordaccepts = new ArrayList<String>();
+        swordaccepts = new ArrayList<>();
         if (acceptsFormats == null) {
             acceptsFormats = new String[] {"application/zip"};
         }
@@ -307,14 +307,14 @@ public class SWORDConfiguration {
     public List<String> getAccepts(Context context, DSpaceObject dso)
         throws DSpaceSWORDException {
         try {
-            List<String> accepts = new ArrayList<String>();
+            List<String> accepts = new ArrayList<>();
             if (dso instanceof Collection) {
                 for (String format : swordaccepts) {
                     accepts.add(format);
                 }
             } else if (dso instanceof Item) {
                 List<BitstreamFormat> bfs = bitstreamFormatService
-                    .findNonInternal(context);
+                    .findNonInternal(context.getSession());
                 for (BitstreamFormat bf : bfs) {
                     accepts.add(bf.getMIMEType());
                 }
@@ -333,7 +333,7 @@ public class SWORDConfiguration {
      * @throws DSpaceSWORDException can be thrown by the internals of the DSpace SWORD implementation
      */
     public List<String> getCollectionAccepts() throws DSpaceSWORDException {
-        List<String> accepts = new ArrayList<String>();
+        List<String> accepts = new ArrayList<>();
         for (String format : swordaccepts) {
             accepts.add(format);
         }
@@ -357,8 +357,8 @@ public class SWORDConfiguration {
      * the given collection will accept.
      */
     public Map<String, Float> getAcceptPackaging(Collection col) {
-        Map<String, String> identifiers = new HashMap<String, String>();
-        Map<String, String> qs = new HashMap<String, String>();
+        Map<String, String> identifiers = new HashMap<>();
+        Map<String, String> qs = new HashMap<>();
         String handle = col.getHandle();
 
         // build the holding maps of identifiers and q values

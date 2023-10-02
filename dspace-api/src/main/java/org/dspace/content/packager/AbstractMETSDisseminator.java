@@ -967,7 +967,7 @@ public abstract class AbstractMETSDisseminator
             }
         } else if (dso.getType() == Constants.COLLECTION) {
             Collection collection = (Collection) dso;
-            Iterator<Item> ii = itemService.findByCollection(context, collection);
+            Iterator<Item> ii = itemService.findByCollection(context.getSession(), collection);
             while (ii.hasNext()) {
                 //add a child <div> for each item in collection
                 Item item = ii.next();
@@ -1048,7 +1048,7 @@ public abstract class AbstractMETSDisseminator
         } else if (dso.getType() == Constants.SITE) {
             // This is a site-wide <structMap>, which just lists the top-level
             // communities.  Each top level community is referenced by a div.
-            List<Community> comms = communityService.findAllTop(context);
+            List<Community> comms = communityService.findAllTop(context.getSession());
             for (Community comm : comms) {
                 //add a child <div> for each top level community in this site
                 Div childDiv = makeChildDiv(getObjectTypeString(comm),

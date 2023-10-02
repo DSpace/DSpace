@@ -54,13 +54,13 @@ public class OptimizeSelectCollection {
 
         if (argv != null && argv.length > 0) {
             for (String email : argv) {
-                EPerson person = ePersonService.findByEmail(context, email);
+                EPerson person = ePersonService.findByEmail(context.getSession(), email);
                 checkSelectCollectionForUser(person);
                 peopleChecked++;
             }
         } else {
             //default case, run as specific user, or run all...
-            List<EPerson> people = ePersonService.findAll(context, EPerson.EMAIL);
+            List<EPerson> people = ePersonService.findAll(context.getSession(), EPerson.EMAIL);
             for (EPerson person : people) {
                 checkSelectCollectionForUser(person);
                 peopleChecked++;

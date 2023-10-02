@@ -19,8 +19,9 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 
 /**
- * CLI variant for the {@link MetadataImport} class
- * This has been made so that we can specify the behaviour of the determineChanges method to be specific for the CLI
+ * CLI variant for the {@link MetadataImport} class.
+ * This has been made so that we can specify the behaviour of the
+ * determineChanges method to be specific for the CLI.
  */
 public class MetadataImportCLI extends MetadataImport {
 
@@ -43,9 +44,13 @@ public class MetadataImportCLI extends MetadataImport {
                 EPerson eperson;
                 String e = commandLine.getOptionValue('e');
                 if (e.indexOf('@') != -1) {
-                    eperson = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context, e);
+                    eperson = EPersonServiceFactory.getInstance()
+                            .getEPersonService()
+                            .findByEmail(context.getSession(), e);
                 } else {
-                    eperson = EPersonServiceFactory.getInstance().getEPersonService().find(context, UUID.fromString(e));
+                    eperson = EPersonServiceFactory.getInstance()
+                            .getEPersonService()
+                            .find(context.getSession(), UUID.fromString(e));
                 }
 
                 if (eperson == null) {

@@ -71,7 +71,7 @@ public class TemplateItemRestPermissionEvaluatorPlugin extends RestObjectPermiss
         UUID dsoId = UUID.fromString(targetId.toString());
         requestService.getCurrentRequest().getHttpServletRequest().getRequestURL();
         try {
-            Collection coll = its.find(context, dsoId).getTemplateItemOf();
+            Collection coll = its.find(context.getSession(), dsoId).getTemplateItemOf();
             if (authorizeService.isAdmin(context, coll)) {
                 return true;
             }

@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 /**
  * Permission evaluator plugin that check if the current user can perform an
  * ORCID synchronization.
- * 
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 @Component
@@ -71,7 +71,7 @@ public class OrcidHistorySendToOrcidRestPermissionEvaluatorPlugin extends RestOb
         int queueId = Integer.parseInt(id);
         OrcidQueue orcidQueue = null;
         try {
-            orcidQueue = orcidQueueService.find(context, queueId);
+            orcidQueue = orcidQueueService.find(context.getSession(), queueId);
             // anonymous user
             if (currentUser == null) {
                 return false;

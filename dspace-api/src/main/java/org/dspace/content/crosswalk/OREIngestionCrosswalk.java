@@ -160,7 +160,7 @@ public class OREIngestionCrosswalk
             Bundle targetBundle;
 
             // if null, create the new bundle and add it in
-            if (targetBundles.size() == 0) {
+            if (targetBundles.isEmpty()) {
                 targetBundle = bundleService.create(context, item, bundleName);
                 itemService.addBundle(context, item, targetBundle);
             } else {
@@ -194,7 +194,7 @@ public class OREIngestionCrosswalk
 
                 // Identify the format
                 String mimeString = resource.getAttributeValue("type");
-                BitstreamFormat bsFormat = bitstreamFormatService.findByMIMEType(context, mimeString);
+                BitstreamFormat bsFormat = bitstreamFormatService.findByMIMEType(context.getSession(), mimeString);
                 if (bsFormat == null) {
                     bsFormat = bitstreamFormatService.guessFormat(context, newBitstream);
                 }
@@ -231,7 +231,7 @@ public class OREIngestionCrosswalk
         // reserved
         Character reserved[] = {';', '/', '?', ':', '@', '&', '=', '+', '$', ',', '%', '#'};
 
-        Set<Character> URLcharsSet = new HashSet<Character>();
+        Set<Character> URLcharsSet = new HashSet<>();
         URLcharsSet.addAll(Arrays.asList(lowalpha));
         URLcharsSet.addAll(Arrays.asList(upalpha));
         URLcharsSet.addAll(Arrays.asList(digit));

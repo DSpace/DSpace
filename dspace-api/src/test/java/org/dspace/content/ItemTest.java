@@ -72,11 +72,12 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     private Item it;
 
-    private MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance()
-                                                                               .getMetadataSchemaService();
-    private BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance()
-                                                                                 .getBitstreamFormatService();
-    private MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
+    private final MetadataSchemaService metadataSchemaService
+            = ContentServiceFactory.getInstance().getMetadataSchemaService();
+    private final BitstreamFormatService bitstreamFormatService
+            = ContentServiceFactory.getInstance().getBitstreamFormatService();
+    private final MetadataFieldService metadataFieldService
+            = ContentServiceFactory.getInstance().getMetadataFieldService();
 
     private Collection collection;
     private Community owningCommunity;
@@ -180,7 +181,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         // Get ID of item created in init()
         UUID id = it.getID();
         // Make sure we can find it via its ID
-        Item found = itemService.find(context, id);
+        Item found = itemService.find(context.getSession(), id);
         assertThat("testItemFind 0", found, notNullValue());
         assertThat("testItemFind 1", found.getID(), equalTo(id));
         assertThat("testItemFind 2", found.getName(), nullValue());
@@ -204,7 +205,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testFindAll() throws Exception {
-        Iterator<Item> all = itemService.findAll(context);
+        Iterator<Item> all = itemService.findAll(context.getSession());
         assertThat("testFindAll 0", all, notNullValue());
 
         boolean added = false;
@@ -222,7 +223,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testFindBySubmitter() throws Exception {
-        Iterator<Item> all = itemService.findBySubmitter(context, context.getCurrentUser());
+        Iterator<Item> all = itemService.findBySubmitter(context.getSession(), context.getCurrentUser());
         assertThat("testFindBySubmitter 0", all, notNullValue());
 
         boolean added = false;
@@ -235,7 +236,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         assertTrue("testFindBySubmitter 1", added);
 
         context.turnOffAuthorisationSystem();
-        all = itemService.findBySubmitter(context, ePersonService.create(context));
+        all = itemService.findBySubmitter(context.getSession(), ePersonService.create(context));
         context.restoreAuthSystemState();
 
         assertThat("testFindBySubmitter 2", all, notNullValue());
@@ -252,7 +253,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         it.setArchived(false);
         it.setDiscoverable(true);
          // Test 0: Using a future 'modified since' date, we should get non-null list, with no items
-        Iterator<Item> all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
+        Iterator<Item> all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context.getSession(),
                 DateUtils.addDays(it.getLastModified(),1));
         assertThat("Returned list should not be null", all, notNullValue());
         boolean added = false;
@@ -265,7 +266,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
          // Test 1: we should NOT find our item in this list
         assertFalse("List should not contain item when passing a date newer than item last-modified date", added);
          // Test 2: Using a past 'modified since' date, we should get a non-null list containing our item
-        all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
+        all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context.getSession(),
                 DateUtils.addDays(it.getLastModified(),-1));
         assertThat("Returned list should not be null", all, notNullValue());
         added = false;
@@ -281,7 +282,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         it.setWithdrawn(false);
         it.setArchived(true);
          // Test 4: Using a past 'modified since' date, we should get a non-null list containing our item
-        all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
+        all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context.getSession(),
                 DateUtils.addDays(it.getLastModified(),-1));
         assertThat("Returned list should not be null", all, notNullValue());
         added = false;
@@ -295,7 +296,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         assertTrue("List should contain item when passing a date older than item last-modified date", added);
          // Test 6: Make sure non-discoverable items are not returned, regardless of archived/withdrawn state
         it.setDiscoverable(false);
-        all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context,
+        all = itemService.findInArchiveOrWithdrawnDiscoverableModifiedSince(context.getSession(),
                 DateUtils.addDays(it.getLastModified(),-1));
         assertThat("Returned list should not be null", all, notNullValue());
         added = false;
@@ -319,7 +320,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         it.setArchived(false);
         it.setDiscoverable(false);
          // Test 0: Using a future 'modified since' date, we should get non-null list, with no items
-        Iterator<Item> all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,
+        Iterator<Item> all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context.getSession(),
                 DateUtils.addDays(it.getLastModified(),1));
         assertThat("Returned list should not be null", all, notNullValue());
         boolean added = false;
@@ -332,7 +333,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
          // Test 1: We should NOT find our item in this list
         assertFalse("List should not contain item when passing a date newer than item last-modified date", added);
          // Test 2: Using a past 'modified since' date, we should get a non-null list containing our item
-        all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,
+        all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context.getSession(),
                 DateUtils.addDays(it.getLastModified(),-1));
         assertThat("Returned list should not be null", all, notNullValue());
         added = false;
@@ -347,7 +348,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
          // Repeat Tests 2, 3 with discoverable = true
         it.setDiscoverable(true);
          // Test 4: Now we should still get a non-null list with NO items since item is discoverable
-        all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context,
+        all = itemService.findInArchiveOrWithdrawnNonDiscoverableModifiedSince(context.getSession(),
                 DateUtils.addDays(it.getLastModified(),-1));
         assertThat("Returned list should not be null", all, notNullValue());
         added = false;
@@ -1037,7 +1038,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String bsname = "License";
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), it, bsname);
-        bitstreamService.setFormat(context, result, bitstreamFormatService.findByShortDescription(context, bsname));
+        bitstreamService.setFormat(context, result,
+                bitstreamFormatService.findByShortDescription(context.getSession(), bsname));
         bundleService.addBitstream(context, created, result);
         context.restoreAuthSystemState();
 
@@ -1071,7 +1073,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String bsname = "License";
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), it, bsname);
-        bitstreamService.setFormat(context, result, bitstreamFormatService.findByShortDescription(context, bsname));
+        bitstreamService.setFormat(context, result,
+                bitstreamFormatService.findByShortDescription(context.getSession(), bsname));
         bundleService.addBitstream(context, created, result);
         context.restoreAuthSystemState();
 
@@ -1192,7 +1195,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
         UUID id = item.getID();
         itemService.delete(context, item);
-        Item found = itemService.find(context, id);
+        Item found = itemService.find(context.getSession(), id);
         assertThat("testDeleteAuth 0", found, nullValue());
     }
 
@@ -1280,10 +1283,11 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String bsname = "License";
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), it, bsname);
-        bitstreamService.setFormat(context, result, bitstreamFormatService.findByShortDescription(context, bsname));
+        bitstreamService.setFormat(context, result,
+                bitstreamFormatService.findByShortDescription(context.getSession(), bsname));
         bundleService.addBitstream(context, created, result);
 
-        List<ResourcePolicy> newpolicies = new ArrayList<ResourcePolicy>();
+        List<ResourcePolicy> newpolicies = new ArrayList<>();
         newpolicies.add(resourcePolicyService.create(context));
         newpolicies.add(resourcePolicyService.create(context));
         newpolicies.add(resourcePolicyService.create(context));
@@ -1291,7 +1295,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
         itemService.replaceAllBitstreamPolicies(context, it, newpolicies);
 
-        List<ResourcePolicy> retrieved = new ArrayList<ResourcePolicy>();
+        List<ResourcePolicy> retrieved = new ArrayList<>();
         List<Bundle> bundles = it.getBundles();
         for (Bundle b : bundles) {
             retrieved.addAll(authorizeService.getPolicies(context, b));
@@ -1340,7 +1344,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
         List<ResourcePolicy> defaultCollectionPolicies =
             authorizeService.getPoliciesActionFilter(context, c, Constants.DEFAULT_BITSTREAM_READ);
-        List<ResourcePolicy> newPolicies = new ArrayList<ResourcePolicy>();
+        List<ResourcePolicy> newPolicies = new ArrayList<>();
         for (ResourcePolicy collRp : defaultCollectionPolicies) {
             ResourcePolicy rp = resourcePolicyService.clone(context, collRp);
             rp.setAction(Constants.READ);
@@ -1356,7 +1360,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String bsname = "License";
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream result = itemService.createSingleBitstream(context, new FileInputStream(f), it, bsname);
-        bitstreamService.setFormat(context, result, bitstreamFormatService.findByShortDescription(context, bsname));
+        bitstreamService.setFormat(context, result,
+                bitstreamFormatService.findByShortDescription(context.getSession(), bsname));
         bundleService.addBitstream(context, created, result);
 
         context.restoreAuthSystemState();
@@ -1520,7 +1525,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         List<Collection> result = itemService.getCollectionsNotLinked(context, it);
         boolean isin = false;
         for (Collection c : result) {
-            Iterator<Item> iit = itemService.findByCollection(context, c);
+            Iterator<Item> iit = itemService.findByCollection(context.getSession(), c);
             while (iit.hasNext()) {
                 if (iit.next().getID().equals(it.getID())) {
                     isin = true;
@@ -1666,7 +1671,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String qualifier = "author";
         String value = "value";
 
-        Iterator<Item> result = itemService.findByMetadataField(context, schema, element, qualifier, value);
+        Iterator<Item> result = itemService.findByMetadataField(context.getSession(),
+                schema, element, qualifier, value);
         assertThat("testFindByMetadataField 0", result, notNullValue());
         assertFalse("testFindByMetadataField 1", result.hasNext());
 
@@ -1676,7 +1682,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         itemService.update(context, it);
         context.restoreAuthSystemState();
 
-        result = itemService.findByMetadataField(context, schema, element, qualifier, value);
+        result = itemService.findByMetadataField(context.getSession(),
+                schema, element, qualifier, value);
         assertThat("testFindByMetadataField 3", result, notNullValue());
         assertTrue("testFindByMetadataField 4", result.hasNext());
         assertTrue("testFindByMetadataField 5", result.next().equals(it));
@@ -1731,7 +1738,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String authority = "accepted";
         int confidence = 0;
 
-        Iterator<Item> result = itemService.findByAuthorityValue(context, schema, element, qualifier, value);
+        Iterator<Item> result = itemService.findByAuthorityValue(context.getSession(),
+                schema, element, qualifier, value);
         assertThat("testFindByAuthorityValue 0", result, notNullValue());
         assertFalse("testFindByAuthorityValue 1", result.hasNext());
 
@@ -1741,7 +1749,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         itemService.update(context, it);
         context.restoreAuthSystemState();
 
-        result = itemService.findByAuthorityValue(context, schema, element, qualifier, authority);
+        result = itemService.findByAuthorityValue(context.getSession(),
+                schema, element, qualifier, authority);
         assertThat("testFindByAuthorityValue 3", result, notNullValue());
         assertTrue("testFindByAuthorityValue 4", result.hasNext());
         assertThat("testFindByAuthorityValue 5", result.next(), equalTo(it));
@@ -1758,7 +1767,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         Collection colToMapTo = this.createCollection();
         Item item1 = this.createItem();
 
-        Iterator<Item> result = itemService.findByCollectionMapping(context, colToMapTo, limit, offset);
+        Iterator<Item> result = itemService.findByCollectionMapping(context.getSession(),
+                colToMapTo, limit, offset);
         assertThat("testFindByCollectionMapping 0", result, notNullValue());
         assertFalse("testFindByCollectionMapping 1", result.hasNext());
 
@@ -1767,7 +1777,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         collectionService.update(context, colToMapTo);
         context.restoreAuthSystemState();
 
-        result = itemService.findByCollectionMapping(context, colToMapTo, limit, offset);
+        result = itemService.findByCollectionMapping(context.getSession(),
+                colToMapTo, limit, offset);
         assertThat("testFindByCollectionMapping 3", result, notNullValue());
         assertTrue("testFindByCollectionMapping 4", result.hasNext());
         assertThat("testFindByCollectionMapping 5", result.next(), equalTo(item1));
@@ -1781,19 +1792,22 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
         limit = 5;
         offset = 1;
-        result = itemService.findByCollectionMapping(context, colToMapTo, limit, offset);
+        result = itemService.findByCollectionMapping(context.getSession(),
+                colToMapTo, limit, offset);
         Item secondItemMapped = result.next();
         assertTrue("testFindByCollectionMapping 7", secondItemMapped.equals(item1) || secondItemMapped.equals(item2));
         assertFalse("testFindByCollectionMapping 8", result.hasNext());
         limit = 1;
         offset = 0;
-        result = itemService.findByCollectionMapping(context, colToMapTo, limit, offset);
+        result = itemService.findByCollectionMapping(context.getSession(),
+                colToMapTo, limit, offset);
         Item onlyItemFound = result.next();
         assertTrue("testFindByCollectionMapping 9", onlyItemFound .equals(item1) || onlyItemFound .equals(item2));
         assertFalse("testFindByCollectionMapping 10", result.hasNext());
         limit = 5;
         offset = 3;
-        result = itemService.findByCollectionMapping(context, colToMapTo, limit, offset);
+        result = itemService.findByCollectionMapping(context.getSession(),
+                colToMapTo, limit, offset);
         assertFalse("testFindByCollectionMapping 11", result.hasNext());
 
     }

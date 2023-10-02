@@ -47,6 +47,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.scripts.service.ProcessService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -91,7 +92,7 @@ public class ProcessServiceImpl implements ProcessService {
                 process.setGroups(new ArrayList<>(specialGroupsSet));
             });
 
-        Process createdProcess = processDAO.create(context, process);
+        Process createdProcess = processDAO.create(context.getSession(), process);
         log.info(LogHelper.getHeader(context, "process_create",
                                       "Process has been created for eperson with email " + ePerson.getEmail()
                                           + " with ID " + createdProcess.getID() + " and scriptName " +
@@ -100,28 +101,28 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public Process find(Context context, int processId) throws SQLException {
-        return processDAO.findByID(context, Process.class, processId);
+    public Process find(Session session, int processId) throws SQLException {
+        return processDAO.findByID(session, Process.class, processId);
     }
 
     @Override
-    public List<Process> findAll(Context context) throws SQLException {
-        return processDAO.findAll(context, Process.class);
+    public List<Process> findAll(Session session) throws SQLException {
+        return processDAO.findAll(session, Process.class);
     }
 
     @Override
-    public List<Process> findAll(Context context, int limit, int offset) throws SQLException {
-        return processDAO.findAll(context, limit, offset);
+    public List<Process> findAll(Session session, int limit, int offset) throws SQLException {
+        return processDAO.findAll(session, limit, offset);
     }
 
     @Override
-    public List<Process> findAllSortByScript(Context context) throws SQLException {
-        return processDAO.findAllSortByScript(context);
+    public List<Process> findAllSortByScript(Session session) throws SQLException {
+        return processDAO.findAllSortByScript(session);
     }
 
     @Override
-    public List<Process> findAllSortByStartTime(Context context) throws SQLException {
-        List<Process> processes = findAll(context);
+    public List<Process> findAllSortByStartTime(Session session) throws SQLException {
+        List<Process> processes = findAll(session);
         Comparator<Process> comparing = Comparator
             .comparing(Process::getStartTime, Comparator.nullsLast(Comparator.naturalOrder()));
         comparing = comparing.thenComparing(Process::getID);
@@ -130,8 +131,8 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public List<Process> findByUser(Context context, EPerson eperson, int limit, int offset) throws SQLException {
-        return processDAO.findByUser(context, eperson, limit, offset);
+    public List<Process> findByUser(Session session, EPerson eperson, int limit, int offset) throws SQLException {
+        return processDAO.findByUser(session, eperson, limit, offset);
     }
 
     @Override
@@ -175,7 +176,7 @@ public class ProcessServiceImpl implements ProcessService {
         bitstream.setName(context, fileName);
         bitstreamService.setFormat(context, bitstream, bitstreamFormatService.guessFormat(context, bitstream));
         MetadataField dspaceProcessFileTypeField = metadataFieldService
-            .findByString(context, Process.BITSTREAM_TYPE_METADATAFIELD, '.');
+            .findByString(context.getSession(), Process.BITSTREAM_TYPE_METADATAFIELD, '.');
         bitstreamService.addMetadata(context, bitstream, dspaceProcessFileTypeField, null, type);
         authorizeService.addPolicy(context, bitstream, Constants.READ, context.getCurrentUser());
         authorizeService.addPolicy(context, bitstream, Constants.WRITE, context.getCurrentUser());
@@ -191,14 +192,14 @@ public class ProcessServiceImpl implements ProcessService {
         for (Bitstream bitstream : ListUtils.emptyIfNull(process.getBitstreams())) {
             bitstreamService.delete(context, bitstream);
         }
-        processDAO.delete(context, process);
+        processDAO.delete(context.getSession(), process);
         log.info(LogHelper.getHeader(context, "process_delete", "Process with ID " + process.getID()
             + " and name " + process.getName() + " has been deleted"));
     }
 
     @Override
     public void update(Context context, Process process) throws SQLException {
-        processDAO.save(context, process);
+        processDAO.save(context.getSession(), process);
     }
 
     @Override
@@ -252,8 +253,9 @@ public class ProcessServiceImpl implements ProcessService {
         return process.getBitstreams();
     }
 
+    @Override
     public int countTotal(Context context) throws SQLException {
-        return processDAO.countRows(context);
+        return processDAO.countRows(context.getSession());
     }
 
     @Override
@@ -273,13 +275,13 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public List<Process> search(Context context, ProcessQueryParameterContainer processQueryParameterContainer,
                                 int limit, int offset) throws SQLException {
-        return processDAO.search(context, processQueryParameterContainer, limit, offset);
+        return processDAO.search(context.getSession(), processQueryParameterContainer, limit, offset);
     }
 
     @Override
     public int countSearch(Context context, ProcessQueryParameterContainer processQueryParameterContainer)
         throws SQLException {
-        return processDAO.countTotalWithParameters(context, processQueryParameterContainer);
+        return processDAO.countTotalWithParameters(context.getSession(), processQueryParameterContainer);
     }
 
 
@@ -311,14 +313,14 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public List<Process> findByStatusAndCreationTimeOlderThan(Context context, List<ProcessStatus> statuses,
+    public List<Process> findByStatusAndCreationTimeOlderThan(Session session, List<ProcessStatus> statuses,
         Date date) throws SQLException {
-        return this.processDAO.findByStatusAndCreationTimeOlderThan(context, statuses, date);
+        return this.processDAO.findByStatusAndCreationTimeOlderThan(session, statuses, date);
     }
 
     @Override
     public int countByUser(Context context, EPerson user) throws SQLException {
-        return processDAO.countByUser(context, user);
+        return processDAO.countByUser(context.getSession(), user);
     }
 
     private String formatLogLine(int processId, String scriptName, String output, ProcessLogLevel processLogLevel) {

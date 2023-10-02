@@ -16,6 +16,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the RequestItem object.
@@ -47,29 +48,30 @@ public interface RequestItemService {
     /**
      * Fetch all item requests.
      *
-     * @param context current DSpace session.
+     * @param session current request's database context.
      * @return all item requests.
      * @throws java.sql.SQLException passed through.
      */
-    public List<RequestItem> findAll(Context context)
+    public List<RequestItem> findAll(Session session)
             throws SQLException;
 
     /**
      * Retrieve a request by its token.
      *
-     * @param context current DSpace session.
+     * @param session current request's database context.
      * @param token the token identifying the request.
      * @return the matching request, or null if not found.
      */
-    public RequestItem findByToken(Context context, String token);
+    public RequestItem findByToken(Session session, String token);
 
     /**
      * Retrieve a request based on the item.
-     * @param context current DSpace session.
+     * @param session current request's database context.
      * @param item the item to find requests for.
      * @return the matching requests, or null if not found.
+     * @throws java.sql.SQLException passed through.
      */
-    public Iterator<RequestItem> findByItem(Context context, Item item) throws SQLException;
+    public Iterator<RequestItem> findByItem(Session session, Item item) throws SQLException;
 
     /**
      * Save updates to the record. Only accept_request, and decision_date are set-able.

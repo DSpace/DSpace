@@ -92,7 +92,7 @@ public abstract class AbstractSwordContentIngester
             return null;
         }
 
-        List<BitstreamFormat> formats = bitstreamFormatService.findAll(context);
+        List<BitstreamFormat> formats = bitstreamFormatService.findAll(context.getSession());
         for (BitstreamFormat format : formats) {
             List<String> extensions = format.getExtensions();
             for (String ext : extensions) {

@@ -48,7 +48,8 @@ public class BitstreamRemoveOperation extends PatchOperation<Bitstream> {
     @Override
     public Bitstream perform(Context context, Bitstream resource, Operation operation) throws SQLException {
         String bitstreamIDtoDelete = operation.getPath().replace(OPERATION_PATH_BITSTREAM_REMOVE, "");
-        Bitstream bitstreamToDelete = bitstreamService.find(context, UUID.fromString(bitstreamIDtoDelete));
+        Bitstream bitstreamToDelete = bitstreamService.find(context.getSession(),
+                UUID.fromString(bitstreamIDtoDelete));
         if (bitstreamToDelete == null) {
             throw new RESTBitstreamNotFoundException(bitstreamIDtoDelete);
         }

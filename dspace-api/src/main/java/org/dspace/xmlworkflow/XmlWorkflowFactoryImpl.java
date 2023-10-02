@@ -126,7 +126,7 @@ public class XmlWorkflowFactoryImpl implements XmlWorkflowFactory {
     public List<Collection> getAllNonMappedCollectionsHandles(Context context) {
         List<Collection> nonMappedCollections = new ArrayList<>();
         try {
-            for (Collection collection : this.collectionService.findAll(context)) {
+            for (Collection collection : this.collectionService.findAll(context.getSession())) {
                 if (workflowMapping.get(collection.getHandle()) == null) {
                     nonMappedCollections.add(collection);
                 }

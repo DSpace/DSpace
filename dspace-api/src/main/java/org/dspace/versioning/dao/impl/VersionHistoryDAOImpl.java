@@ -17,11 +17,11 @@ import javax.persistence.criteria.Root;
 
 import org.dspace.content.Item;
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.Version_;
 import org.dspace.versioning.dao.VersionHistoryDAO;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the VersionHistory object.
@@ -39,8 +39,8 @@ public class VersionHistoryDAOImpl extends AbstractHibernateDAO<VersionHistory> 
     }
 
     @Override
-    public VersionHistory findByItem(Context context, Item item) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public VersionHistory findByItem(Session session, Item item) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, VersionHistory.class);
         Root<VersionHistory> versionHistoryRoot = criteriaQuery.from(VersionHistory.class);
         Join<VersionHistory, Version> join = versionHistoryRoot.join("versions");
@@ -51,6 +51,6 @@ public class VersionHistoryDAOImpl extends AbstractHibernateDAO<VersionHistory> 
         orderList.add(criteriaBuilder.desc(join.get(Version_.versionNumber)));
         criteriaQuery.orderBy(orderList);
 
-        return singleResult(context, criteriaQuery);
+        return singleResult(session, criteriaQuery);
     }
 }

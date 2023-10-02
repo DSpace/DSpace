@@ -99,7 +99,8 @@ public class ShowIdentifiersStep extends AbstractProcessingStep {
         DOI doi = null;
         String doiString = null;
         try {
-            doi = IdentifierServiceFactory.getInstance().getDOIService().findDOIByDSpaceObject(context, obj.getItem());
+            doi = IdentifierServiceFactory.getInstance().getDOIService()
+                    .findDOIByDSpaceObject(context.getSession(), obj.getItem());
             if (doi != null && !DOIIdentifierProvider.MINTED.equals(doi.getStatus())
                     && !DOIIdentifierProvider.DELETED.equals(doi.getStatus())) {
                 doiString = doi.getDoi();

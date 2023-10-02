@@ -26,6 +26,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.core.Utils;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -57,7 +58,8 @@ public class RequestItemServiceImpl implements RequestItemService {
     public String createRequest(Context context, Bitstream bitstream, Item item,
             boolean allFiles, String reqEmail, String reqName, String reqMessage)
             throws SQLException {
-        RequestItem requestItem = requestItemDAO.create(context, new RequestItem());
+        RequestItem requestItem
+                = requestItemDAO.create(context.getSession(), new RequestItem());
 
         requestItem.setToken(Utils.generateHexKey());
         requestItem.setBitstream(bitstream);
@@ -68,7 +70,7 @@ public class RequestItemServiceImpl implements RequestItemService {
         requestItem.setReqMessage(reqMessage);
         requestItem.setRequest_date(new Date());
 
-        requestItemDAO.save(context, requestItem);
+        requestItemDAO.save(context.getSession(), requestItem);
 
         log.debug("Created RequestItem with ID {} and token {}",
                 requestItem::getID, requestItem::getToken);
@@ -76,15 +78,15 @@ public class RequestItemServiceImpl implements RequestItemService {
     }
 
     @Override
-    public List<RequestItem> findAll(Context context)
+    public List<RequestItem> findAll(Session session)
             throws SQLException {
-        return requestItemDAO.findAll(context, RequestItem.class);
+        return requestItemDAO.findAll(session, RequestItem.class);
     }
 
     @Override
-    public RequestItem findByToken(Context context, String token) {
+    public RequestItem findByToken(Session session, String token) {
         try {
-            return requestItemDAO.findByToken(context, token);
+            return requestItemDAO.findByToken(session, token);
         } catch (SQLException e) {
             log.error(e.getMessage());
             return null;
@@ -92,14 +94,14 @@ public class RequestItemServiceImpl implements RequestItemService {
     }
 
     @Override
-    public Iterator<RequestItem> findByItem(Context context, Item item) throws SQLException {
-        return requestItemDAO.findByItem(context, item);
+    public Iterator<RequestItem> findByItem(Session session, Item item) throws SQLException {
+        return requestItemDAO.findByItem(session, item);
     }
 
     @Override
     public void update(Context context, RequestItem requestItem) {
         try {
-            requestItemDAO.save(context, requestItem);
+            requestItemDAO.save(context.getSession(), requestItem);
         } catch (SQLException e) {
             log.error(e.getMessage());
         }
@@ -110,7 +112,7 @@ public class RequestItemServiceImpl implements RequestItemService {
         log.debug(LogHelper.getHeader(context, "delete_itemrequest", "request_id={}"),
                 requestItem.getID());
         try {
-            requestItemDAO.delete(context, requestItem);
+            requestItemDAO.delete(context.getSession(), requestItem);
         } catch (SQLException e) {
             log.error(e.getMessage());
         }

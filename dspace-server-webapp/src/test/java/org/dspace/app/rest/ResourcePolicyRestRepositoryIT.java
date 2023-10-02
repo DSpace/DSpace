@@ -62,7 +62,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Integration test class for the resourcepolicies endpoint
+ * Integration test class for the {@code resourcepolicies} endpoint.
  *
  * @author Mykhaylo Boychuk - 4Science
  */
@@ -134,8 +134,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     public void findOneResourcePolicyOfAnonymousGroupTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        Group groupAnonymous = EPersonServiceFactory.getInstance().getGroupService().findByName(context,
-            Group.ANONYMOUS);
+        Group groupAnonymous = EPersonServiceFactory.getInstance().getGroupService()
+                .findByName(context.getSession(), Group.ANONYMOUS);
 
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
             .withEmail("eperson1@mail.com")
@@ -488,7 +488,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicyAnonymous = authorizeService
             .findByTypeGroupAction(context, community, EPersonServiceFactory.getInstance()
                 .getGroupService()
-                .findByName(context, Group.ANONYMOUS), Constants.READ);
+                .findByName(context.getSession(), Group.ANONYMOUS), Constants.READ);
 
         context.restoreAuthSystemState();
 
@@ -618,7 +618,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicyAnonymous = authorizeService
             .findByTypeGroupAction(context, community, EPersonServiceFactory.getInstance()
                 .getGroupService()
-                .findByName(context, Group.ANONYMOUS), Constants.READ);
+                .findByName(context.getSession(), Group.ANONYMOUS), Constants.READ);
 
 
         context.restoreAuthSystemState();
@@ -971,8 +971,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     public void findResourcesPoliciesByGroupAnonymousTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        Group groupAnonymous = EPersonServiceFactory.getInstance().getGroupService().findByName(context,
-            Group.ANONYMOUS);
+        Group groupAnonymous = EPersonServiceFactory.getInstance().getGroupService()
+                .findByName(context.getSession(), Group.ANONYMOUS);
 
         EPerson eperson1 = EPersonBuilder.createEPerson(context)
             .withEmail("eperson1@mail.com")
@@ -1002,7 +1002,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     public void createWithEPersonTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        AtomicReference<Integer> idRef = new AtomicReference<>();
         try {
             Community community = CommunityBuilder.createCommunity(context)
                 .withName("My commynity")
@@ -1256,7 +1256,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
             .withAction(Constants.READ)
             .withDspaceObject(publicItem1)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+            .withGroup(EPersonServiceFactory.getInstance().getGroupService()
+                    .findByName(context.getSession(), Group.ANONYMOUS))
             .withStartDate(data)
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
@@ -1272,7 +1273,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Date newDate = newCalendar.getTime();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/startDate", formatDate.format(newDate));
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1326,7 +1327,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
             .withAction(Constants.READ)
             .withDspaceObject(publicItem1)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+            .withGroup(EPersonServiceFactory.getInstance().getGroupService()
+                    .findByName(context.getSession(), Group.ANONYMOUS))
             .withEndDate(date)
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
@@ -1342,7 +1344,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Date newDate = newCalendar.getTime();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/endDate", formatDate.format(newDate));
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1388,7 +1390,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
             .withAction(Constants.READ)
             .withDspaceObject(publicItem1)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+            .withGroup(EPersonServiceFactory.getInstance().getGroupService()
+                    .findByName(context.getSession(), Group.ANONYMOUS))
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
@@ -1403,7 +1406,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Date newDate = newCalendar.getTime();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         AddOperation addOperation = new AddOperation("/startDate", formatDate.format(newDate));
         ops.add(addOperation);
         String patchBody = getPatchContent(ops);
@@ -1451,7 +1454,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                                                              .withDspaceObject(publicItem1)
                                                              .withGroup(
                                                                  EPersonServiceFactory.getInstance().getGroupService()
-                                                                                      .findByName(context,
+                                                                                      .findByName(context.getSession(),
                                                                                           Group.ANONYMOUS))
                                                              .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                                                              .build();
@@ -1462,7 +1465,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
         Date newDate = new Date();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         AddOperation addOperation = new AddOperation("/endDate", formatDate.format(newDate));
         ops.add(addOperation);
         String patchBody = getPatchContent(ops);
@@ -1516,14 +1519,15 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
             .withAction(Constants.READ)
             .withDspaceObject(publicItem1)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+            .withGroup(EPersonServiceFactory.getInstance().getGroupService()
+                    .findByName(context.getSession(), Group.ANONYMOUS))
             .withStartDate(data)
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
         context.restoreAuthSystemState();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         RemoveOperation removeOperation = new RemoveOperation("/startDate");
         ops.add(removeOperation);
         String patchBody = getPatchContent(ops);
@@ -1577,7 +1581,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
             .withAction(Constants.READ)
             .withDspaceObject(publicItem1)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+            .withGroup(EPersonServiceFactory.getInstance().getGroupService()
+                    .findByName(context.getSession(), Group.ANONYMOUS))
             .withStartDate(date)
             .withDescription("my description")
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
@@ -1588,7 +1593,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         String wrongStartDate = "";
         SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/startDate", wrongStartDate);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1643,7 +1648,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Date newDate = calendar2.getTime();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/startDate", formatDate.format(newDate));
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1690,7 +1695,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
             .withAction(Constants.READ)
             .withDspaceObject(item)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+            .withGroup(EPersonServiceFactory.getInstance().getGroupService()
+                    .findByName(context.getSession(), Group.ANONYMOUS))
             .withStartDate(date)
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
@@ -1706,7 +1712,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Date newData = calendar2.getTime();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/startDate", formatDate.format(newData));
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1746,7 +1752,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Date newData = calendar2.getTime();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/startDate", formatDate.format(newData));
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1813,7 +1819,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Date newEndDate = newEndDateCalendar.getTime();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/endDate", formatDate.format(newEndDate));
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1854,7 +1860,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
             .withAction(Constants.READ)
             .withDspaceObject(publicItem1)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+            .withGroup(EPersonServiceFactory.getInstance().getGroupService()
+                    .findByName(context.getSession(), Group.ANONYMOUS))
             .withDescription("my description")
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
@@ -1862,7 +1869,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         context.restoreAuthSystemState();
 
         String newDescription = "New Description";
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/description", newDescription);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1906,14 +1913,15 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
             .withAction(Constants.READ)
             .withDspaceObject(item)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+            .withGroup(EPersonServiceFactory.getInstance().getGroupService()
+                    .findByName(context.getSession(), Group.ANONYMOUS))
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
         context.restoreAuthSystemState();
 
         String description = "My Description";
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         AddOperation replaceOperation = new AddOperation("/description", description);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -1958,13 +1966,14 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withAction(Constants.READ)
             .withDspaceObject(item)
             .withDescription("my description")
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+            .withGroup(EPersonServiceFactory.getInstance().getGroupService()
+                    .findByName(context.getSession(), Group.ANONYMOUS))
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
         context.restoreAuthSystemState();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         RemoveOperation replaceOperation = new RemoveOperation("/description");
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -2007,7 +2016,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         String newDescription = "New Description";
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/description", newDescription);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -2045,7 +2054,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
             .withAction(Constants.READ)
             .withDspaceObject(item)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+            .withGroup(EPersonServiceFactory.getInstance().getGroupService()
+                    .findByName(context.getSession(), Group.ANONYMOUS))
             .withDescription("My Description")
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
@@ -2053,7 +2063,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         context.restoreAuthSystemState();
 
         String newDescription = "New Description";
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/description", newDescription);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -2067,7 +2077,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
     @Test
     public void patchRemoveDescriptionNotFoundTest() throws Exception {
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         RemoveOperation removeOperation = new RemoveOperation("/description");
         ops.add(removeOperation);
         String patchBody = getPatchContent(ops);
@@ -2101,7 +2111,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
             .withAction(Constants.READ)
             .withDspaceObject(publicItem1)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+            .withGroup(EPersonServiceFactory.getInstance().getGroupService()
+                    .findByName(context.getSession(), Group.ANONYMOUS))
             .withDescription("my description")
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
@@ -2109,7 +2120,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         context.restoreAuthSystemState();
 
         String newDescription = "";
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/description", newDescription);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -2149,7 +2160,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
             .withAction(Constants.READ)
             .withDspaceObject(myItem)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+            .withGroup(EPersonServiceFactory.getInstance().getGroupService()
+                    .findByName(context.getSession(), Group.ANONYMOUS))
             .withName("My name")
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
@@ -2157,7 +2169,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         context.restoreAuthSystemState();
 
         String newName = "New Name";
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/name", newName);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -2200,7 +2212,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
             .withAction(Constants.READ)
             .withDspaceObject(myItem)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+            .withGroup(EPersonServiceFactory.getInstance().getGroupService()
+                    .findByName(context.getSession(), Group.ANONYMOUS))
             .withName("My name")
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
@@ -2208,7 +2221,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         context.restoreAuthSystemState();
 
         String errorName = "";
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/name", errorName);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -2248,14 +2261,15 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
             .withAction(Constants.READ)
             .withDspaceObject(myItem)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+            .withGroup(EPersonServiceFactory.getInstance().getGroupService()
+                    .findByName(context.getSession(), Group.ANONYMOUS))
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
         context.restoreAuthSystemState();
 
         String name = "My Name";
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         AddOperation replaceOperation = new AddOperation("/name", name);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -2301,7 +2315,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         //Patch with a write action
         String action = Constants.actionText[1];
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         AddOperation addOperation = new AddOperation("/action", action);
         ops.add(addOperation);
         String patchBody = getPatchContent(ops);
@@ -2732,7 +2746,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         context.restoreAuthSystemState();
 
         String newPolicyType = "";
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/policyType", newPolicyType);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -2767,14 +2781,15 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withAction(Constants.READ)
             .withDspaceObject(myItem)
             .withName("My name")
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+            .withGroup(EPersonServiceFactory.getInstance().getGroupService()
+                    .findByName(context.getSession(), Group.ANONYMOUS))
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
         context.restoreAuthSystemState();
 
         String name = "Add Name";
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         AddOperation replaceOperation = new AddOperation("/name", name);
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -2814,14 +2829,15 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
             .withAction(Constants.READ)
             .withDspaceObject(myItem)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+            .withGroup(EPersonServiceFactory.getInstance().getGroupService()
+                    .findByName(context.getSession(), Group.ANONYMOUS))
             .withName("My Name")
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
         context.restoreAuthSystemState();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         RemoveOperation replaceOperation = new RemoveOperation("/name");
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -2863,14 +2879,15 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
             .withAction(Constants.READ)
             .withDspaceObject(myItem)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+            .withGroup(EPersonServiceFactory.getInstance().getGroupService()
+                    .findByName(context.getSession(), Group.ANONYMOUS))
             .withName("My Name")
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
         context.restoreAuthSystemState();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
         RemoveOperation replaceOperation = new RemoveOperation("/name");
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
@@ -2928,13 +2945,14 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withDspaceObject(publicItem1)
             .withStartDate(startDate)
             .withEndDate(endDate)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+            .withGroup(EPersonServiceFactory.getInstance().getGroupService()
+                    .findByName(context.getSession(), Group.ANONYMOUS))
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
         context.restoreAuthSystemState();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
 
         String addName = "My Name";
         AddOperation addNameOperation = new AddOperation("/name", addName);
@@ -3018,13 +3036,14 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withDspaceObject(publicItem1)
             .withName("My Name")
             .withEndDate(endDate)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
+            .withGroup(EPersonServiceFactory.getInstance().getGroupService()
+                    .findByName(context.getSession(), Group.ANONYMOUS))
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
         context.restoreAuthSystemState();
 
-        List<Operation> ops = new ArrayList<Operation>();
+        List<Operation> ops = new ArrayList<>();
 
         String newName = "New Name";
         ReplaceOperation replaceNameOperation = new ReplaceOperation("/name", newName);

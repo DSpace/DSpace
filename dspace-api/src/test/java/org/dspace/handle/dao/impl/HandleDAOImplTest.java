@@ -66,7 +66,7 @@ public class HandleDAOImplTest extends AbstractUnitTest {
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
     protected VersioningService versioningService = VersionServiceFactory.getInstance().getVersionService();
 
-    private HandleDAO handleDAO = new DSpace().getServiceManager().getServicesByType(HandleDAO.class).get(0);
+    private final HandleDAO handleDAO = new DSpace().getServiceManager().getServicesByType(HandleDAO.class).get(0);
 
     private Community owningCommunity;
 
@@ -143,15 +143,16 @@ public class HandleDAOImplTest extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
 
         String newPrefix = "987654321";
-        handleDAO.updateHandlesWithNewPrefix(context, newPrefix, HANDLE_PREFIX);
+        handleDAO.updateHandlesWithNewPrefix(context.getSession(), newPrefix, HANDLE_PREFIX);
         context.commit();
 
-        assertEquals(newPrefix + "/" + SUFFIX_1, itemService.find(context, item1.getID()).getHandle());
-        assertEquals(newPrefix + "/" + SUFFIX_2, itemService.find(context, item2.getID()).getHandle());
-        assertEquals(newPrefix + "/" + SUFFIX_3, itemService.find(context, item3.getID()).getHandle());
+        assertEquals(newPrefix + "/" + SUFFIX_1, itemService.find(context.getSession(), item1.getID()).getHandle());
+        assertEquals(newPrefix + "/" + SUFFIX_2, itemService.find(context.getSession(), item2.getID()).getHandle());
+        assertEquals(newPrefix + "/" + SUFFIX_3, itemService.find(context.getSession(), item3.getID()).getHandle());
 
         //Ensure that records not matching the old prefix are not touched
-        assertEquals("hdl:custom-prefix/" + SUFFIX_4, itemService.find(context, item4.getID()).getHandle());
+        assertEquals("hdl:custom-prefix/" + SUFFIX_4,
+                itemService.find(context.getSession(), item4.getID()).getHandle());
 
         context.restoreAuthSystemState();
     }

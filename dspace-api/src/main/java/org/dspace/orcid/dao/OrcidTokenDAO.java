@@ -8,10 +8,10 @@
 package org.dspace.orcid.dao;
 
 import org.dspace.content.Item;
-import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 import org.dspace.eperson.EPerson;
 import org.dspace.orcid.OrcidToken;
+import org.hibernate.Session;
 
 /**
  * Database Access Object interface class for the OrcidToken object. The
@@ -27,19 +27,19 @@ public interface OrcidTokenDAO extends GenericDAO<OrcidToken> {
     /**
      * Find an OrcidToken by ePerson.
      *
-     * @param  context the DSpace context
+     * @param  session The current request's database context.
      * @param  ePerson the ePerson to search for
      * @return         the Orcid token, if any
      */
-    public OrcidToken findByEPerson(Context context, EPerson ePerson);
+    public OrcidToken findByEPerson(Session session, EPerson ePerson);
 
     /**
      * Find an OrcidToken by profileItem.
      *
-     * @param  context     the DSpace context
+     * @param  session     The current request's database context.
      * @param  profileItem the profile item to search for
      * @return             the Orcid token, if any
      */
-    public OrcidToken findByProfileItem(Context context, Item profileItem);
+    public OrcidToken findByProfileItem(Session session, Item profileItem);
 
 }

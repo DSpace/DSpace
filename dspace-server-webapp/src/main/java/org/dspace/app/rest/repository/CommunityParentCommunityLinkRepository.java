@@ -49,7 +49,7 @@ public class CommunityParentCommunityLinkRepository extends AbstractDSpaceRestRe
                                             Projection projection) {
         try {
             Context context = obtainContext();
-            Community community = communityService.find(context, communityId);
+            Community community = communityService.find(context.getSession(), communityId);
             if (community == null) {
                 throw new ResourceNotFoundException("No such community: " + community);
             }

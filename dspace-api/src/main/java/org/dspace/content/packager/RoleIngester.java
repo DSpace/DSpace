@@ -96,7 +96,7 @@ public class RoleIngester implements PackageIngester {
                     continue; // Cannot operate on my own EPerson!
                 }
                 identity = email;
-                collider = ePersonService.findByEmail(context, identity);
+                collider = ePersonService.findByEmail(context.getSession(), identity);
                 // collider = EPerson.find(context, userID);
             } else if (netids.getLength() > 0) {
                 netid = netids.item(0).getTextContent();
@@ -104,7 +104,7 @@ public class RoleIngester implements PackageIngester {
                     continue; // Cannot operate on my own EPerson!
                 }
                 identity = netid;
-                collider = ePersonService.findByNetid(context, identity);
+                collider = ePersonService.findByNetid(context.getSession(), identity);
             } else {
                 throw new PackageException("EPerson has neither email nor netid.");
             }
@@ -226,7 +226,7 @@ public class RoleIngester implements PackageIngester {
             log.debug("Translated group name:  {}", name);
 
             Group groupObj = null; // The group to restore
-            Group collider = groupService.findByName(context, name); // Existing group?
+            Group collider = groupService.findByName(context.getSession(), name); // Existing group?
             if (null != collider) { // Group already exists, so empty it
 
                 if (params.replaceModeEnabled()) { // -r -f
@@ -248,7 +248,7 @@ public class RoleIngester implements PackageIngester {
                         // Remove all group members *EXCEPT* we don't ever want
                         // to remove the current user from the list of Administrators
                         // (otherwise remainder of ingest will fail)
-                        if (!(collider.equals(groupService.findByName(context, Group.ADMIN)) &&
+                        if (!(collider.equals(groupService.findByName(context.getSession(), Group.ADMIN)) &&
                             member.equals(context.getCurrentUser()))) {
                             groupService.removeMember(context, collider, member);
                         }
@@ -315,7 +315,7 @@ public class RoleIngester implements PackageIngester {
             for (int memberx = 0; memberx < members.getLength(); memberx++) {
                 Element member = (Element) members.item(memberx);
                 String memberName = member.getAttribute(RoleDisseminator.NAME);
-                EPerson memberEPerson = ePersonService.findByEmail(context, memberName);
+                EPerson memberEPerson = ePersonService.findByEmail(context.getSession(), memberName);
                 if (null != memberEPerson) {
                     groupService.addMember(context, groupObj, memberEPerson);
                 } else {
@@ -350,7 +350,7 @@ public class RoleIngester implements PackageIngester {
             }
 
             // Find previously created group
-            Group groupObj = groupService.findByName(context, name);
+            Group groupObj = groupService.findByName(context.getSession(), name);
             log.debug("Looked up the group and found {}", groupObj);
             NodeList members = group
                 .getElementsByTagName(RoleDisseminator.MEMBER_GROUP);
@@ -360,7 +360,7 @@ public class RoleIngester implements PackageIngester {
                 //Translate Group name back to internal ID format (e.g. COLLECTION_<ID>_ADMIN)
                 memberName = PackageUtils.translateGroupNameForImport(context, memberName);
                 // Find previously created group
-                Group memberGroup = groupService.findByName(context, memberName);
+                Group memberGroup = groupService.findByName(context.getSession(), memberName);
                 groupService.addMember(context, groupObj, memberGroup);
             }
             // Actually update Group info in DB

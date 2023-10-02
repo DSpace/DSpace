@@ -18,11 +18,11 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.Item_;
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem_;
 import org.dspace.xmlworkflow.storedcomponents.dao.XmlWorkflowItemDAO;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the XmlWorkflowItem object.
@@ -38,10 +38,10 @@ public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem
     }
 
     @Override
-    public List<XmlWorkflowItem> findAllInCollection(Context context, Integer offset,
+    public List<XmlWorkflowItem> findAllInCollection(Session session, Integer offset,
                                                      Integer limit,
                                                      Collection collection) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, XmlWorkflowItem.class);
         Root<XmlWorkflowItem> xmlWorkflowItemRoot = criteriaQuery.from(XmlWorkflowItem.class);
         criteriaQuery.select(xmlWorkflowItemRoot);
@@ -56,19 +56,19 @@ public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem
             limit = -1;
         }
         criteriaQuery.orderBy(criteriaBuilder.asc(xmlWorkflowItemRoot.get(XmlWorkflowItem_.id)));
-        return list(context, criteriaQuery, false, XmlWorkflowItem.class, limit, offset);
+        return list(session, criteriaQuery, false, XmlWorkflowItem.class, limit, offset);
     }
 
     @Override
-    public int countAll(Context context) throws SQLException {
-        return countAllInCollection(context, null);
+    public int countAll(Session session) throws SQLException {
+        return countAllInCollection(session, null);
     }
 
     @Override
-    public int countAllInCollection(Context context, Collection collection) throws SQLException {
+    public int countAllInCollection(Session session, Collection collection) throws SQLException {
 
 
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
 
         Root<XmlWorkflowItem> xmlWorkflowItemRoot = criteriaQuery.from(XmlWorkflowItem.class);
@@ -76,16 +76,16 @@ public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem
             criteriaQuery.where(criteriaBuilder.equal(xmlWorkflowItemRoot.get(XmlWorkflowItem_.collection),
                                                       collection));
         }
-        return count(context, criteriaQuery, criteriaBuilder, xmlWorkflowItemRoot);
+        return count(session, criteriaQuery, criteriaBuilder, xmlWorkflowItemRoot);
     }
 
     @Override
-    public List<XmlWorkflowItem> findBySubmitter(Context context, EPerson ep) throws SQLException {
-        return findBySubmitter(context, ep, null, null);
+    public List<XmlWorkflowItem> findBySubmitter(Session session, EPerson ep) throws SQLException {
+        return findBySubmitter(session, ep, null, null);
     }
 
     @Override
-    public List<XmlWorkflowItem> findBySubmitter(Context context, EPerson ep, Integer offset, Integer limit)
+    public List<XmlWorkflowItem> findBySubmitter(Session session, EPerson ep, Integer offset, Integer limit)
             throws SQLException {
         if (offset == null) {
             offset = -1;
@@ -94,44 +94,44 @@ public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem
             limit = -1;
         }
 
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, XmlWorkflowItem.class);
         Root<XmlWorkflowItem> xmlWorkflowItemRoot = criteriaQuery.from(XmlWorkflowItem.class);
         Join<XmlWorkflowItem, Item> join = xmlWorkflowItemRoot.join("item");
         criteriaQuery.select(xmlWorkflowItemRoot);
         criteriaQuery.where(criteriaBuilder.equal(join.get(Item_.submitter), ep));
         criteriaQuery.orderBy(criteriaBuilder.asc(xmlWorkflowItemRoot.get(XmlWorkflowItem_.id)));
-        return list(context, criteriaQuery, false, XmlWorkflowItem.class, limit, offset);
+        return list(session, criteriaQuery, false, XmlWorkflowItem.class, limit, offset);
     }
 
     @Override
-    public int countBySubmitter(Context context, EPerson ep) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public int countBySubmitter(Session session, EPerson ep) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         Root<XmlWorkflowItem> xmlWorkflowItemRoot = criteriaQuery.from(XmlWorkflowItem.class);
         Join<XmlWorkflowItem, Item> join = xmlWorkflowItemRoot.join("item");
         criteriaQuery.where(criteriaBuilder.equal(join.get(Item_.submitter), ep));
-        return count(context, criteriaQuery, criteriaBuilder, xmlWorkflowItemRoot);
+        return count(session, criteriaQuery, criteriaBuilder, xmlWorkflowItemRoot);
     }
 
     @Override
-    public List<XmlWorkflowItem> findByCollection(Context context, Collection collection) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public List<XmlWorkflowItem> findByCollection(Session session, Collection collection) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, XmlWorkflowItem.class);
         Root<XmlWorkflowItem> xmlWorkflowItemRoot = criteriaQuery.from(XmlWorkflowItem.class);
         criteriaQuery.select(xmlWorkflowItemRoot);
         criteriaQuery.where(criteriaBuilder.equal(xmlWorkflowItemRoot.get(XmlWorkflowItem_.collection), collection));
         criteriaQuery.orderBy(criteriaBuilder.asc(xmlWorkflowItemRoot.get(XmlWorkflowItem_.id)));
-        return list(context, criteriaQuery, false, XmlWorkflowItem.class, -1, -1);
+        return list(session, criteriaQuery, false, XmlWorkflowItem.class, -1, -1);
     }
 
     @Override
-    public XmlWorkflowItem findByItem(Context context, Item item) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public XmlWorkflowItem findByItem(Session session, Item item) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, XmlWorkflowItem.class);
         Root<XmlWorkflowItem> xmlWorkflowItemRoot = criteriaQuery.from(XmlWorkflowItem.class);
         criteriaQuery.select(xmlWorkflowItemRoot);
         criteriaQuery.where(criteriaBuilder.equal(xmlWorkflowItemRoot.get(XmlWorkflowItem_.item), item));
-        return uniqueResult(context, criteriaQuery, false, XmlWorkflowItem.class);
+        return uniqueResult(session, criteriaQuery, false, XmlWorkflowItem.class);
     }
 }

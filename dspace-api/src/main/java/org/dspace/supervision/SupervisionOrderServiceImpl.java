@@ -22,6 +22,7 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.event.Event;
 import org.dspace.supervision.dao.SupervisionOrderDao;
 import org.dspace.supervision.service.SupervisionOrderService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -46,18 +47,18 @@ public class SupervisionOrderServiceImpl implements SupervisionOrderService {
 
     @Override
     public SupervisionOrder create(Context context) throws SQLException, AuthorizeException {
-        return supervisionDao.create(context, new SupervisionOrder());
+        return supervisionDao.create(context.getSession(), new SupervisionOrder());
     }
 
     @Override
-    public SupervisionOrder find(Context context, int id) throws SQLException {
-        return supervisionDao.findByID(context, SupervisionOrder.class, id);
+    public SupervisionOrder find(Session session, int id) throws SQLException {
+        return supervisionDao.findByID(session, SupervisionOrder.class, id);
     }
 
     @Override
     public void update(Context context, SupervisionOrder supervisionOrder)
         throws SQLException, AuthorizeException {
-        supervisionDao.save(context, supervisionOrder);
+        supervisionDao.save(context.getSession(), supervisionOrder);
     }
 
     @Override
@@ -65,14 +66,14 @@ public class SupervisionOrderServiceImpl implements SupervisionOrderService {
         throws SQLException, AuthorizeException {
         if (CollectionUtils.isNotEmpty(supervisionOrders)) {
             for (SupervisionOrder supervisionOrder : supervisionOrders) {
-                supervisionDao.save(context, supervisionOrder);
+                supervisionDao.save(context.getSession(), supervisionOrder);
             }
         }
     }
 
     @Override
     public void delete(Context context, SupervisionOrder supervisionOrder) throws SQLException, AuthorizeException {
-        supervisionDao.delete(context, supervisionOrder);
+        supervisionDao.delete(context.getSession(), supervisionOrder);
     }
 
     @Override
@@ -80,30 +81,30 @@ public class SupervisionOrderServiceImpl implements SupervisionOrderService {
         SupervisionOrder supervisionOrder = new SupervisionOrder();
         supervisionOrder.setItem(item);
         supervisionOrder.setGroup(group);
-        SupervisionOrder supOrder = supervisionDao.create(context, supervisionOrder);
+        SupervisionOrder supOrder = supervisionDao.create(context.getSession(), supervisionOrder);
         context.addEvent(new Event(Event.MODIFY, Constants.ITEM, item.getID(), null,
             itemService.getIdentifiers(context, item)));
         return supOrder;
     }
 
     @Override
-    public List<SupervisionOrder> findAll(Context context) throws SQLException {
-        return supervisionDao.findAll(context, SupervisionOrder.class);
+    public List<SupervisionOrder> findAll(Session session) throws SQLException {
+        return supervisionDao.findAll(session, SupervisionOrder.class);
     }
 
     @Override
-    public List<SupervisionOrder> findByItem(Context context, Item item) throws SQLException {
-        return supervisionDao.findByItem(context, item);
+    public List<SupervisionOrder> findByItem(Session session, Item item) throws SQLException {
+        return supervisionDao.findByItem(session, item);
     }
 
     @Override
-    public SupervisionOrder findByItemAndGroup(Context context, Item item, Group group) throws SQLException {
-        return supervisionDao.findByItemAndGroup(context, item, group);
+    public SupervisionOrder findByItemAndGroup(Session session, Item item, Group group) throws SQLException {
+        return supervisionDao.findByItemAndGroup(session, item, group);
     }
 
     @Override
     public boolean isSupervisor(Context context, EPerson ePerson, Item item) throws SQLException {
-        List<SupervisionOrder> supervisionOrders = findByItem(context, item);
+        List<SupervisionOrder> supervisionOrders = findByItem(context.getSession(), item);
 
         if (CollectionUtils.isEmpty(supervisionOrders)) {
             return false;

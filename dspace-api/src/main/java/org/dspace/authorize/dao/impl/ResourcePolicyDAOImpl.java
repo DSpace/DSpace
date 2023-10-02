@@ -24,9 +24,9 @@ import org.dspace.authorize.dao.ResourcePolicyDAO;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.DSpaceObject_;
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the ResourcePolicy object.
@@ -42,18 +42,18 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
     }
 
     @Override
-    public List<ResourcePolicy> findByDso(Context context, DSpaceObject dso) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public List<ResourcePolicy> findByDso(Session session, DSpaceObject dso) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
         Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
         criteriaQuery.select(resourcePolicyRoot);
         criteriaQuery.where(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.dSpaceObject), dso));
-        return list(context, criteriaQuery, false, ResourcePolicy.class, -1, -1);
+        return list(session, criteriaQuery, false, ResourcePolicy.class, -1, -1);
     }
 
     @Override
-    public List<ResourcePolicy> findByDsoAndType(Context context, DSpaceObject dso, String type) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public List<ResourcePolicy> findByDsoAndType(Session session, DSpaceObject dso, String type) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
         Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
         criteriaQuery.select(resourcePolicyRoot);
@@ -65,33 +65,33 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
         List<Order> orderList = new LinkedList<>();
         orderList.add(criteriaBuilder.asc(resourcePolicyRoot.get(ResourcePolicy_.id)));
         criteriaQuery.orderBy(orderList);
-        return list(context, criteriaQuery, false, ResourcePolicy.class, -1, -1);
+        return list(session, criteriaQuery, false, ResourcePolicy.class, -1, -1);
     }
 
     @Override
-    public List<ResourcePolicy> findByEPerson(Context context, EPerson ePerson) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public List<ResourcePolicy> findByEPerson(Session session, EPerson ePerson) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
         Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
         criteriaQuery.select(resourcePolicyRoot);
         criteriaQuery.where(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.eperson), ePerson));
-        return list(context, criteriaQuery, false, ResourcePolicy.class, -1, -1);
+        return list(session, criteriaQuery, false, ResourcePolicy.class, -1, -1);
     }
 
     @Override
-    public List<ResourcePolicy> findByGroup(Context context, Group group) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public List<ResourcePolicy> findByGroup(Session session, Group group) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
         Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
         criteriaQuery.select(resourcePolicyRoot);
         criteriaQuery.where(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.epersonGroup), group));
-        return list(context, criteriaQuery, false, ResourcePolicy.class, -1, -1);
+        return list(session, criteriaQuery, false, ResourcePolicy.class, -1, -1);
     }
 
     @Override
-    public List<ResourcePolicy> findByDSoAndAction(Context context, DSpaceObject dso, int actionId)
+    public List<ResourcePolicy> findByDSoAndAction(Session session, DSpaceObject dso, int actionId)
         throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
         Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
         criteriaQuery.select(resourcePolicyRoot);
@@ -100,15 +100,15 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
                                        criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.actionId), actionId)
                    )
         );
-        return list(context, criteriaQuery, false, ResourcePolicy.class, -1, -1);
+        return list(session, criteriaQuery, false, ResourcePolicy.class, -1, -1);
     }
 
     @Override
-    public void deleteByDsoAndTypeAndAction(Context context, DSpaceObject dso, String type, int actionId)
+    public void deleteByDsoAndTypeAndAction(Session session, DSpaceObject dso, String type, int actionId)
         throws SQLException {
         String queryString = "delete from ResourcePolicy where dSpaceObject.id = :dsoId "
             + "AND rptype = :rptype AND actionId= :actionId";
-        Query query = createQuery(context, queryString);
+        Query query = createQuery(session, queryString);
         query.setParameter("dsoId", dso.getID());
         query.setParameter("rptype", type);
         query.setParameter("actionId", actionId);
@@ -117,9 +117,9 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
     }
 
     @Override
-    public List<ResourcePolicy> findByTypeGroupAction(Context context, DSpaceObject dso, Group group, int action)
+    public List<ResourcePolicy> findByTypeGroupAction(Session session, DSpaceObject dso, Group group, int action)
         throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
         Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
         criteriaQuery.select(resourcePolicyRoot);
@@ -130,13 +130,13 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
                                        criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.actionId), action)
                    )
         );
-        return list(context, criteriaQuery, false, ResourcePolicy.class, 1, -1);
+        return list(session, criteriaQuery, false, ResourcePolicy.class, 1, -1);
     }
 
     @Override
-    public List<ResourcePolicy> findByTypeGroupActionExceptId(Context context, DSpaceObject dso, Group group,
+    public List<ResourcePolicy> findByTypeGroupActionExceptId(Session session, DSpaceObject dso, Group group,
                                                               int action, int notPolicyID) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
         Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
         criteriaQuery.select(resourcePolicyRoot);
@@ -148,12 +148,13 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
                                        criteriaBuilder.notEqual(resourcePolicyRoot.get(ResourcePolicy_.id), notPolicyID)
                    )
         );
-        return list(context, criteriaQuery, false, ResourcePolicy.class, 1, -1);
+        return list(session, criteriaQuery, false, ResourcePolicy.class, 1, -1);
     }
 
-    public List<ResourcePolicy> findByEPersonGroupTypeIdAction(Context context, EPerson e, List<Group> groups,
+    @Override
+    public List<ResourcePolicy> findByEPersonGroupTypeIdAction(Session session, EPerson e, List<Group> groups,
                                                                int action, int type_id) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
         Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
         criteriaQuery.select(resourcePolicyRoot);
@@ -165,47 +166,47 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
                                         (resourcePolicyRoot.get(ResourcePolicy_.epersonGroup).in(groups)))
             )
         );
-        return list(context, criteriaQuery, false, ResourcePolicy.class, 1, -1);
+        return list(session, criteriaQuery, false, ResourcePolicy.class, 1, -1);
     }
 
     @Override
-    public void deleteByDso(Context context, DSpaceObject dso) throws SQLException {
+    public void deleteByDso(Session session, DSpaceObject dso) throws SQLException {
         String queryString = "delete from ResourcePolicy where dSpaceObject= :dSpaceObject";
-        Query query = createQuery(context, queryString);
+        Query query = createQuery(session, queryString);
         query.setParameter("dSpaceObject", dso);
         query.executeUpdate();
     }
 
     @Override
-    public void deleteByDsoAndAction(Context context, DSpaceObject dso, int actionId) throws SQLException {
+    public void deleteByDsoAndAction(Session session, DSpaceObject dso, int actionId) throws SQLException {
         String queryString = "delete from ResourcePolicy where dSpaceObject= :dSpaceObject AND actionId= :actionId";
-        Query query = createQuery(context, queryString);
+        Query query = createQuery(session, queryString);
         query.setParameter("dSpaceObject", dso);
         query.setParameter("actionId", actionId);
         query.executeUpdate();
     }
 
     @Override
-    public void deleteByDsoAndType(Context context, DSpaceObject dso, String type) throws SQLException {
+    public void deleteByDsoAndType(Session session, DSpaceObject dso, String type) throws SQLException {
         String queryString = "delete from ResourcePolicy where dSpaceObject.id = :dsoId AND rptype = :rptype";
-        Query query = createQuery(context, queryString);
+        Query query = createQuery(session, queryString);
         query.setParameter("dsoId", dso.getID());
         query.setParameter("rptype", type);
         query.executeUpdate();
     }
 
     @Override
-    public void deleteByGroup(Context context, Group group) throws SQLException {
+    public void deleteByGroup(Session session, Group group) throws SQLException {
         String queryString = "delete from ResourcePolicy where epersonGroup= :epersonGroup";
-        Query query = createQuery(context, queryString);
+        Query query = createQuery(session, queryString);
         query.setParameter("epersonGroup", group);
         query.executeUpdate();
     }
 
     @Override
-    public void deleteByDsoGroupPolicies(Context context, DSpaceObject dso, Group group) throws SQLException {
+    public void deleteByDsoGroupPolicies(Session session, DSpaceObject dso, Group group) throws SQLException {
         String queryString = "delete from ResourcePolicy where dSpaceObject = :dso AND epersonGroup= :epersonGroup";
-        Query query = createQuery(context, queryString);
+        Query query = createQuery(session, queryString);
         query.setParameter("dso", dso);
         query.setParameter("epersonGroup", group);
         query.executeUpdate();
@@ -213,9 +214,9 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
     }
 
     @Override
-    public void deleteByDsoEPersonPolicies(Context context, DSpaceObject dso, EPerson ePerson) throws SQLException {
+    public void deleteByDsoEPersonPolicies(Session session, DSpaceObject dso, EPerson ePerson) throws SQLException {
         String queryString = "delete from ResourcePolicy where dSpaceObject= :dso AND eperson= :eperson";
-        Query query = createQuery(context, queryString);
+        Query query = createQuery(session, queryString);
         query.setParameter("dso", dso);
         query.setParameter("eperson", ePerson);
         query.executeUpdate();
@@ -223,28 +224,28 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
     }
 
     @Override
-    public void deleteByEPerson(Context context, EPerson ePerson) throws SQLException {
+    public void deleteByEPerson(Session session, EPerson ePerson) throws SQLException {
         String queryString = "delete from ResourcePolicy where eperson= :eperson";
-        Query query = createQuery(context, queryString);
+        Query query = createQuery(session, queryString);
         query.setParameter("eperson", ePerson);
         query.executeUpdate();
 
     }
 
     @Override
-    public void deleteByDsoAndTypeNotEqualsTo(Context context, DSpaceObject dso, String type) throws SQLException {
+    public void deleteByDsoAndTypeNotEqualsTo(Session session, DSpaceObject dso, String type) throws SQLException {
 
         String queryString = "delete from ResourcePolicy where dSpaceObject=:dso AND rptype <> :rptype";
-        Query query = createQuery(context, queryString);
+        Query query = createQuery(session, queryString);
         query.setParameter("dso", dso);
         query.setParameter("rptype", type);
         query.executeUpdate();
     }
 
     @Override
-    public List<ResourcePolicy> findByDSoAndActionExceptRpType(Context context, DSpaceObject dso, int action,
+    public List<ResourcePolicy> findByDSoAndActionExceptRpType(Session session, DSpaceObject dso, int action,
                                                                String rpType) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
 
         Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
@@ -269,44 +270,44 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
                     )
             );
         }
-        return list(context, criteriaQuery, false, ResourcePolicy.class, 1, 1);
+        return list(session, criteriaQuery, false, ResourcePolicy.class, 1, 1);
     }
 
     @Override
-    public List<ResourcePolicy> findByEPerson(Context context, EPerson ePerson, int offset, int limit)
+    public List<ResourcePolicy> findByEPerson(Session session, EPerson ePerson, int offset, int limit)
             throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
         Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
         criteriaQuery.select(resourcePolicyRoot);
         criteriaQuery.where(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.eperson), ePerson));
-        return list(context, criteriaQuery, false, ResourcePolicy.class, limit, offset);
+        return list(session, criteriaQuery, false, ResourcePolicy.class, limit, offset);
     }
 
     @Override
-    public int countByEPerson(Context context, EPerson ePerson) throws SQLException {
-        Query query = createQuery(context,
+    public int countByEPerson(Session session, EPerson ePerson) throws SQLException {
+        Query query = createQuery(session,
                 "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName() + " WHERE eperson_id = (:epersonUuid) ");
         query.setParameter("epersonUuid", ePerson.getID());
         return count(query);
     }
 
     @Override
-    public List<ResourcePolicy> findByEPersonAndResourceUuid(Context context, EPerson ePerson, UUID resourceUuid,
+    public List<ResourcePolicy> findByEPersonAndResourceUuid(Session session, EPerson ePerson, UUID resourceUuid,
             int offset, int limit) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
         Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
         Join<ResourcePolicy, DSpaceObject> join = resourcePolicyRoot.join(ResourcePolicy_.dSpaceObject);
         criteriaQuery.where(
                 criteriaBuilder.and(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.eperson), ePerson),
                         criteriaBuilder.equal(join.get(DSpaceObject_.id), resourceUuid)));
-        return list(context, criteriaQuery, false, ResourcePolicy.class, limit, offset);
+        return list(session, criteriaQuery, false, ResourcePolicy.class, limit, offset);
     }
 
     @Override
-    public int countByEPersonAndResourceUuid(Context context, EPerson eperson, UUID resourceUuid) throws SQLException {
-        Query query = createQuery(context, "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName()
+    public int countByEPersonAndResourceUuid(Session session, EPerson eperson, UUID resourceUuid) throws SQLException {
+        Query query = createQuery(session, "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName()
                 + " WHERE eperson_id = (:epersonUuid) AND dspace_object = (:resourceUuid) ");
         query.setParameter("resourceUuid", resourceUuid);
         query.setParameter("epersonUuid", eperson.getID());
@@ -314,21 +315,21 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
     }
 
     @Override
-    public List<ResourcePolicy> findByResouceUuidAndActionId(Context context, UUID resourceUuid, int actionId,
+    public List<ResourcePolicy> findByResouceUuidAndActionId(Session session, UUID resourceUuid, int actionId,
             int offset, int limit) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
         Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
         Join<ResourcePolicy, DSpaceObject> join = resourcePolicyRoot.join(ResourcePolicy_.dSpaceObject);
         criteriaQuery.where(
                 criteriaBuilder.and(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.actionId), actionId),
                         criteriaBuilder.equal(join.get(DSpaceObject_.id), resourceUuid)));
-        return list(context, criteriaQuery, false, ResourcePolicy.class, limit, offset);
+        return list(session, criteriaQuery, false, ResourcePolicy.class, limit, offset);
     }
 
     @Override
-    public int countByResouceUuidAndActionId(Context context, UUID resourceUuid, int actionId) throws SQLException {
-        Query query = createQuery(context, "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName()
+    public int countByResouceUuidAndActionId(Session session, UUID resourceUuid, int actionId) throws SQLException {
+        Query query = createQuery(session, "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName()
                 + " WHERE dspace_object = (:resourceUuid) AND action_id = (:actionId) ");
         query.setParameter("resourceUuid", resourceUuid);
         query.setParameter("actionId", actionId);
@@ -336,58 +337,58 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
     }
 
     @Override
-    public List<ResourcePolicy> findByResouceUuid(Context context, UUID resourceUuid, int offset, int limit)
+    public List<ResourcePolicy> findByResouceUuid(Session session, UUID resourceUuid, int offset, int limit)
             throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
         Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
         Join<ResourcePolicy, DSpaceObject> join = resourcePolicyRoot.join(ResourcePolicy_.dSpaceObject);
         criteriaQuery.where(criteriaBuilder.equal(join.get(DSpaceObject_.id), resourceUuid));
-        return list(context, criteriaQuery, false, ResourcePolicy.class, limit, offset);
+        return list(session, criteriaQuery, false, ResourcePolicy.class, limit, offset);
     }
 
     @Override
-    public int countByResourceUuid(Context context, UUID resourceUuid) throws SQLException {
-        Query query = createQuery(context, "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName()
+    public int countByResourceUuid(Session session, UUID resourceUuid) throws SQLException {
+        Query query = createQuery(session, "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName()
                 + " WHERE dspace_object = (:resourceUuid) ");
         query.setParameter("resourceUuid", resourceUuid);
         return count(query);
     }
 
     @Override
-    public List<ResourcePolicy> findByGroup(Context context, Group group, int offset, int limit) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public List<ResourcePolicy> findByGroup(Session session, Group group, int offset, int limit) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
         Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
         criteriaQuery.select(resourcePolicyRoot);
         criteriaQuery.where(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.epersonGroup), group));
-        return list(context, criteriaQuery, false, ResourcePolicy.class, limit, offset);
+        return list(session, criteriaQuery, false, ResourcePolicy.class, limit, offset);
     }
 
     @Override
-    public int countResourcePolicyByGroup(Context context, Group group) throws SQLException {
-        Query query = createQuery(context, "SELECT count(*) " + "FROM " + ResourcePolicy.class.getSimpleName()
+    public int countResourcePolicyByGroup(Session session, Group group) throws SQLException {
+        Query query = createQuery(session, "SELECT count(*) " + "FROM " + ResourcePolicy.class.getSimpleName()
                 + " WHERE epersongroup_id = (:groupUuid) ");
         query.setParameter("groupUuid", group.getID());
         return count(query);
     }
 
     @Override
-    public List<ResourcePolicy> findByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid,
+    public List<ResourcePolicy> findByGroupAndResourceUuid(Session session, Group group, UUID resourceUuid,
             int offset, int limit) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
         Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
         Join<ResourcePolicy, DSpaceObject> join = resourcePolicyRoot.join(ResourcePolicy_.dSpaceObject);
         criteriaQuery.where(
                 criteriaBuilder.and(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.epersonGroup), group),
                         criteriaBuilder.equal(join.get(DSpaceObject_.id), resourceUuid)));
-        return list(context, criteriaQuery, false, ResourcePolicy.class, limit, offset);
+        return list(session, criteriaQuery, false, ResourcePolicy.class, limit, offset);
     }
 
     @Override
-    public int countByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid) throws SQLException {
-        Query query = createQuery(context, "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName()
+    public int countByGroupAndResourceUuid(Session session, Group group, UUID resourceUuid) throws SQLException {
+        Query query = createQuery(session, "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName()
                 + " WHERE dspace_object = (:resourceUuid) AND epersongroup_id = (:groupUuid) ");
         query.setParameter("resourceUuid", resourceUuid);
         query.setParameter("groupUuid", group.getID());
@@ -395,12 +396,12 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
     }
 
     @Override
-    public ResourcePolicy findOneById(Context context, Integer id) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public ResourcePolicy findOneById(Session session, Integer id) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
         Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
         criteriaQuery.select(resourcePolicyRoot);
         criteriaQuery.where(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.id), id));
-        return singleResult(context, criteriaQuery);
+        return singleResult(session, criteriaQuery);
     }
 }

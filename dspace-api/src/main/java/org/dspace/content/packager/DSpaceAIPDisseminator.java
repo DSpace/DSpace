@@ -116,7 +116,7 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
     protected PackageParameters disseminateParams = null;
 
     // List of Bundles to filter on, when building AIP
-    protected List<String> filterBundles = new ArrayList<String>();
+    protected List<String> filterBundles = new ArrayList<>();
     // Whether 'filterBundles' specifies an exclusion list (default) or inclusion list.
     protected boolean excludeBundles = true;
 
@@ -217,7 +217,7 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
         agent.setOTHERTYPE("DSpace Archive");
         Name name = new Name();
         name.getContent()
-            .add(new PCData(siteService.findSite(context).getHandle()));
+            .add(new PCData(siteService.findSite(context.getSession()).getHandle()));
         agent.getContent().add(name);
         metsHdr.getContent().add(agent);
 
@@ -362,7 +362,7 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
     public String[] getRightsMdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException {
 
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         String[] rTypes = configurationService.getArrayProperty("aip.disseminate.rightsMD");
 
         //If unspecified in configuration file, add default settings
@@ -437,7 +437,7 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
             case Constants.COMMUNITY:
                 List<Community> parents = ((Community) dso).getParentCommunities();
                 if (CollectionUtils.isEmpty(parents)) {
-                    parentHandle = siteService.findSite(context).getHandle();
+                    parentHandle = siteService.findSite(context.getSession()).getHandle();
                 } else {
                     parentHandle = parents.get(0).getHandle();
                 }

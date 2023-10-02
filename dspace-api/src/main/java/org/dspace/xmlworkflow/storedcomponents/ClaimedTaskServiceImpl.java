@@ -18,11 +18,13 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.xmlworkflow.storedcomponents.dao.ClaimedTaskDAO;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Service implementation for the ClaimedTask object.
- * This class is responsible for all business logic calls for the ClaimedTask object and is autowired by spring.
+ * This class is responsible for all business logic calls for the ClaimedTask
+ * object and is autowired by Spring.
  * This class should never be accessed directly.
  *
  * @author kevinvandevelde at atmire.com
@@ -38,17 +40,17 @@ public class ClaimedTaskServiceImpl implements ClaimedTaskService {
 
     @Override
     public ClaimedTask create(Context context) throws SQLException, AuthorizeException {
-        return claimedTaskDAO.create(context, new ClaimedTask());
+        return claimedTaskDAO.create(context.getSession(), new ClaimedTask());
     }
 
     @Override
-    public ClaimedTask find(Context context, int id) throws SQLException {
-        return claimedTaskDAO.findByID(context, ClaimedTask.class, id);
+    public ClaimedTask find(Session session, int id) throws SQLException {
+        return claimedTaskDAO.findByID(session, ClaimedTask.class, id);
     }
 
     @Override
-    public List<ClaimedTask> findAll(Context context) throws SQLException {
-        return claimedTaskDAO.findAll(context, ClaimedTask.class);
+    public List<ClaimedTask> findAll(Session session) throws SQLException {
+        return claimedTaskDAO.findAll(session, ClaimedTask.class);
     }
 
     @Override
@@ -60,64 +62,66 @@ public class ClaimedTaskServiceImpl implements ClaimedTaskService {
     public void update(Context context, List<ClaimedTask> claimedTasks) throws SQLException, AuthorizeException {
         if (CollectionUtils.isNotEmpty(claimedTasks)) {
             for (ClaimedTask claimedTask : claimedTasks) {
-                claimedTaskDAO.save(context, claimedTask);
+                claimedTaskDAO.save(context.getSession(), claimedTask);
             }
         }
     }
 
     @Override
     public void delete(Context context, ClaimedTask claimedTask) throws SQLException, AuthorizeException {
-        claimedTaskDAO.delete(context, claimedTask);
+        claimedTaskDAO.delete(context.getSession(), claimedTask);
     }
 
     @Override
-    public List<ClaimedTask> findByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException {
-        return claimedTaskDAO.findByWorkflowItem(context, workflowItem);
+    public List<ClaimedTask> findByWorkflowItem(Session session, XmlWorkflowItem workflowItem) throws SQLException {
+        return claimedTaskDAO.findByWorkflowItem(session, workflowItem);
     }
 
     @Override
-    public ClaimedTask findByWorkflowIdAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
+    public ClaimedTask findByWorkflowIdAndEPerson(Session session, XmlWorkflowItem workflowItem, EPerson ePerson)
         throws SQLException {
-        return claimedTaskDAO.findByWorkflowItemAndEPerson(context, workflowItem, ePerson);
+        return claimedTaskDAO.findByWorkflowItemAndEPerson(session, workflowItem, ePerson);
     }
 
     @Override
-    public List<ClaimedTask> findByEperson(Context context, EPerson ePerson) throws SQLException {
-        return claimedTaskDAO.findByEperson(context, ePerson);
+    public List<ClaimedTask> findByEperson(Session session, EPerson ePerson) throws SQLException {
+        return claimedTaskDAO.findByEperson(session, ePerson);
     }
 
     @Override
-    public List<ClaimedTask> find(Context context, XmlWorkflowItem workflowItem, String stepID) throws SQLException {
-        return claimedTaskDAO.findByWorkflowItemAndStepId(context, workflowItem, stepID);
+    public List<ClaimedTask> find(Session session, XmlWorkflowItem workflowItem, String stepID) throws SQLException {
+        return claimedTaskDAO.findByWorkflowItemAndStepId(session, workflowItem, stepID);
     }
 
     @Override
-    public ClaimedTask find(Context context, EPerson ePerson, XmlWorkflowItem workflowItem, String stepID,
+    public ClaimedTask find(Session session, EPerson ePerson, XmlWorkflowItem workflowItem, String stepID,
                             String actionID) throws SQLException {
         return claimedTaskDAO
-            .findByEPersonAndWorkflowItemAndStepIdAndActionId(context, ePerson, workflowItem, stepID, actionID);
+            .findByEPersonAndWorkflowItemAndStepIdAndActionId(session,
+                    ePerson, workflowItem, stepID, actionID);
     }
 
     @Override
-    public List<ClaimedTask> find(Context context, XmlWorkflowItem workflowItem, String stepID, String actionID)
+    public List<ClaimedTask> find(Session session, XmlWorkflowItem workflowItem, String stepID, String actionID)
         throws SQLException {
-        return claimedTaskDAO.findByWorkflowItemAndStepIdAndActionId(context, workflowItem, stepID, actionID);
+        return claimedTaskDAO.findByWorkflowItemAndStepIdAndActionId(session,
+                workflowItem, stepID, actionID);
     }
 
     @Override
-    public List<ClaimedTask> find(Context context, XmlWorkflowItem workflowItem) throws SQLException {
-        return claimedTaskDAO.findByWorkflowItem(context, workflowItem);
+    public List<ClaimedTask> find(Session session, XmlWorkflowItem workflowItem) throws SQLException {
+        return claimedTaskDAO.findByWorkflowItem(session, workflowItem);
     }
 
     @Override
-    public List<ClaimedTask> findAllInStep(Context context, String stepID) throws SQLException {
-        return claimedTaskDAO.findByStep(context, stepID);
+    public List<ClaimedTask> findAllInStep(Session session, String stepID) throws SQLException {
+        return claimedTaskDAO.findByStep(session, stepID);
     }
 
     @Override
     public void deleteByWorkflowItem(Context context, XmlWorkflowItem workflowItem)
         throws SQLException, AuthorizeException {
-        List<ClaimedTask> claimedTasks = findByWorkflowItem(context, workflowItem);
+        List<ClaimedTask> claimedTasks = findByWorkflowItem(context.getSession(), workflowItem);
         //Use an iterator to remove the tasks !
         Iterator<ClaimedTask> iterator = claimedTasks.iterator();
         while (iterator.hasNext()) {

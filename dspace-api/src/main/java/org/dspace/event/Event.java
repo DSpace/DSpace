@@ -107,9 +107,9 @@ public class Event implements Serializable {
     protected static final int ALL_OBJECTS_MASK = BITSTREAM | BUNDLE | ITEM
         | COLLECTION | COMMUNITY | SITE | GROUP | EPERSON;
 
-    protected static Map<Integer, Integer> objTypeToMask = new HashMap<Integer, Integer>();
+    protected static Map<Integer, Integer> objTypeToMask = new HashMap<>();
 
-    protected static Map<Integer, Integer> objMaskToType = new HashMap<Integer, Integer>();
+    protected static Map<Integer, Integer> objMaskToType = new HashMap<>();
 
     static {
         objTypeToMask.put(Constants.BITSTREAM, BITSTREAM);
@@ -375,7 +375,8 @@ public class Event implements Serializable {
         if (type < 0 || id == null) {
             return null;
         } else {
-            return ContentServiceFactory.getInstance().getDSpaceObjectService(type).find(context, id);
+            return ContentServiceFactory.getInstance().getDSpaceObjectService(type)
+                    .find(context.getSession(), id);
         }
     }
 
@@ -389,7 +390,7 @@ public class Event implements Serializable {
      */
     public DSpaceObject getSubject(Context context) throws SQLException {
         return ContentServiceFactory.getInstance().getDSpaceObjectService(getSubjectType())
-                                    .find(context, getSubjectID());
+                                    .find(context.getSession(), getSubjectID());
     }
 
     /**

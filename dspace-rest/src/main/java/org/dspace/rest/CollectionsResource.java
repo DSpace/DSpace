@@ -197,7 +197,8 @@ public class CollectionsResource extends Resource {
                 offset = 0;
             }
 
-            List<org.dspace.content.Collection> dspaceCollections = collectionService.findAll(context, limit, offset);
+            List<org.dspace.content.Collection> dspaceCollections
+                    = collectionService.findAll(context.getSession(), limit, offset);
             for (org.dspace.content.Collection dspaceCollection : dspaceCollections) {
                 if (authorizeService
                     .authorizeActionBoolean(context, dspaceCollection, org.dspace.core.Constants.READ)) {
@@ -281,8 +282,9 @@ public class CollectionsResource extends Resource {
                        headers, request, context);
 
             items = new ArrayList<>();
-            Iterator<org.dspace.content.Item> dspaceItems = itemService.findByCollection(context, dspaceCollection,
-                                                                                         limit, offset);
+            Iterator<org.dspace.content.Item> dspaceItems
+                    = itemService.findByCollection(context.getSession(),
+                            dspaceCollection, limit, offset);
 
             while (dspaceItems.hasNext()) {
                 org.dspace.content.Item dspaceItem = dspaceItems.next();
@@ -597,8 +599,8 @@ public class CollectionsResource extends Resource {
             context = createContext();
 
             org.dspace.content.Collection dspaceCollection = collectionService
-                .findByIdOrLegacyId(context, collectionId);
-            org.dspace.content.Item item = itemService.findByIdOrLegacyId(context, itemId);
+                .findByIdOrLegacyId(context.getSession(), collectionId);
+            org.dspace.content.Item item = itemService.findByIdOrLegacyId(context.getSession(), itemId);
 
 
             if (dspaceCollection == null) {
@@ -678,7 +680,7 @@ public class CollectionsResource extends Resource {
         try {
             context = createContext();
 
-            List<org.dspace.content.Collection> dspaceCollections = collectionService.findAll(context);
+            List<org.dspace.content.Collection> dspaceCollections = collectionService.findAll(context.getSession());
             //TODO, this would be more efficient with a findByName query
 
             for (org.dspace.content.Collection dspaceCollection : dspaceCollections) {
@@ -729,7 +731,7 @@ public class CollectionsResource extends Resource {
         throws WebApplicationException {
         org.dspace.content.Collection collection = null;
         try {
-            collection = collectionService.findByIdOrLegacyId(context, id);
+            collection = collectionService.findByIdOrLegacyId(context.getSession(), id);
 
             if (collection == null) {
                 context.abort();

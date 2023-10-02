@@ -28,8 +28,8 @@ import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 /**
- * A utility class that will send all the worklfow items
- * back to their submitters
+ * A utility class that will send all the workflow items
+ * back to their submitters.
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -94,9 +94,9 @@ public class RestartWorkflow {
 
             if (eperson.indexOf('@') != -1) {
                 // @ sign, must be an email
-                myEPerson = ePersonService.findByEmail(context, eperson);
+                myEPerson = ePersonService.findByEmail(context.getSession(), eperson);
             } else {
-                myEPerson = ePersonService.find(context, UUID.fromString(eperson));
+                myEPerson = ePersonService.find(context.getSession(), UUID.fromString(eperson));
             }
 
             if (myEPerson == null) {
@@ -115,7 +115,8 @@ public class RestartWorkflow {
 
 
             WorkflowServiceFactory workflowServiceFactory = WorkflowServiceFactory.getInstance();
-            List<WorkflowItem> workflowItems = workflowServiceFactory.getWorkflowItemService().findAll(context);
+            List<WorkflowItem> workflowItems = workflowServiceFactory.getWorkflowItemService()
+                    .findAll(context.getSession());
             WorkflowService workflowService = workflowServiceFactory.getWorkflowService();
             int i = 0;
             for (WorkflowItem workflowItem : workflowItems) {

@@ -42,6 +42,7 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.services.ConfigurationService;
 import org.dspace.util.ThrowableUtils;
+import org.hibernate.Session;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -115,16 +116,22 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         if (skipList != null) {
             //if a skip-list exists, we need to filter community-by-community
             //so we can respect what is in the skip-list
-            List<Community> topLevelCommunities = communityService.findAllTop(context);
+            List<Community> topLevelCommunities = communityService.findAllTop(context.getSession());
 
             for (Community topLevelCommunity : topLevelCommunities) {
                 applyFiltersCommunity(context, topLevelCommunity);
             }
         } else {
             //otherwise, just find every item and process
-            Iterator<Item> itemIterator = itemService.findAll(context);
-            while (itemIterator.hasNext() && processed < max2Process) {
-                applyFiltersItem(context, itemIterator.next());
+            try (Session roSession = context.getReadOnlySession()) {
+                Iterator<Item> itemIterator = itemService.findAll(roSession);
+                while (itemIterator.hasNext() && processed < max2Process) {
+                    Session rwSession = context.getSession();
+                    Item roItem = itemIterator.next();
+                    Item rwItem = itemService.find(rwSession, roItem.getID());
+                    applyFiltersItem(context, rwItem);
+                    context.commit();
+                }
             }
         }
     }
@@ -150,9 +157,16 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         throws Exception {
         //only apply filters if collection not in skip-list
         if (!inSkipList(collection.getHandle())) {
-            Iterator<Item> itemIterator = itemService.findAllByCollection(context, collection);
-            while (itemIterator.hasNext() && processed < max2Process) {
-                applyFiltersItem(context, itemIterator.next());
+            try (Session driverSession = context.getReadOnlySession();) {
+                Iterator<Item> itemIterator
+                        = itemService.findAllByCollection(driverSession, collection);
+                while (itemIterator.hasNext() && processed < max2Process) {
+                    Session rwSession = context.getSession();
+                    Item roItem = itemIterator.next();
+                    Item rwItem = itemService.find(rwSession, roItem.getID());
+                    applyFiltersItem(context, rwItem);
+                    context.commit();
+                }
             }
         }
     }
@@ -169,9 +183,6 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                 // increment processed count
                 ++processed;
             }
-            // clear item objects from context cache and internal cache
-            c.uncacheEntity(currentItem);
-            currentItem = null;
         }
     }
 
@@ -196,10 +207,9 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                                    Bitstream myBitstream) throws Exception {
         boolean filtered = false;
 
-        // iterate through filter classes. A single format may be actioned
-        // by more than one filter
+        // Iterate through filter classes. A single format may be filtered
+        // by more than one filter.
         for (FormatFilter filterClass : filterClasses) {
-            //List fmts = (List)filterFormats.get(filterClasses[i].getClass().getName());
             String pluginName = null;
 
             //if this filter class is a SelfNamedPlugin,
@@ -211,10 +221,6 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             }
 
             //Get list of supported formats for the filter (and possibly named plugin)
-            //For SelfNamedPlugins, map key is:
-            //  <class-name><separator><plugin-name>
-            //For other MediaFilters, map key is just:
-            //  <class-name>
             List<String> fmts = filterFormats.get(filterClass.getClass().getName() +
                                                       (pluginName != null ? FILTER_PLUGIN_SEPARATOR + pluginName : ""));
 
@@ -374,7 +380,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                     " on " + DCDate.getCurrent() + " (GMT).");
             b.setDescription(context, formatFilter.getDescription());
             // Set the format of the bitstream
-            BitstreamFormat bf = bitstreamFormatService.findByShortDescription(context,
+            BitstreamFormat bf = bitstreamFormatService.findByShortDescription(context.getSession(),
                     formatFilter.getFormatString());
             bitstreamService.setFormat(context, b, bf);
             bitstreamService.update(context, b);
@@ -461,7 +467,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         authorizeService.removeAllPolicies(context, bitstream);
 
         if (publicFiltersClasses.contains(formatFilter.getClass().getSimpleName())) {
-            Group anonymous = groupService.findByName(context, Group.ANONYMOUS);
+            Group anonymous = groupService.findByName(context.getSession(), Group.ANONYMOUS);
             authorizeService.addPolicy(context, bitstream, Constants.READ, anonymous);
         } else {
             authorizeService.replaceAllPolicies(context, source, bitstream);

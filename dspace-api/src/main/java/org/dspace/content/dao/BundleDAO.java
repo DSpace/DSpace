@@ -10,7 +10,7 @@ package org.dspace.content.dao;
 import java.sql.SQLException;
 
 import org.dspace.content.Bundle;
-import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Database Access Object interface class for the Bundle object.
@@ -21,5 +21,5 @@ import org.dspace.core.Context;
  * @author kevinvandevelde at atmire.com
  */
 public interface BundleDAO extends DSpaceObjectLegacySupportDAO<Bundle> {
-    int countRows(Context context) throws SQLException;
+    int countRows(Session session) throws SQLException;
 }

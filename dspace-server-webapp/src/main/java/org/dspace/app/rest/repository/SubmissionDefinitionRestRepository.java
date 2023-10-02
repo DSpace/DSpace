@@ -33,9 +33,10 @@ import org.springframework.stereotype.Component;
  */
 @Component(SubmissionDefinitionRest.CATEGORY + "." + SubmissionDefinitionRest.NAME)
 public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<SubmissionDefinitionRest, String> {
-    private SubmissionConfigReader submissionConfigReader;
+    private final SubmissionConfigReader submissionConfigReader;
 
-    private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    private final CollectionService collectionService
+            = ContentServiceFactory.getInstance().getCollectionService();
 
     public SubmissionDefinitionRestRepository() throws SubmissionConfigReaderException {
         submissionConfigReader = new SubmissionConfigReader();
@@ -64,7 +65,7 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
     @SearchRestMethod(name = "findByCollection")
     public SubmissionDefinitionRest findByCollection(@Parameter(value = "uuid", required = true) UUID collectionUuid)
             throws SQLException {
-        Collection col = collectionService.find(obtainContext(), collectionUuid);
+        Collection col = collectionService.find(obtainContext().getSession(), collectionUuid);
         if (col == null) {
             return null;
         }

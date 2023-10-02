@@ -14,6 +14,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.core.Context;
 import org.dspace.service.DSpaceCRUDService;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the BitstreamFormat object.
@@ -30,54 +31,54 @@ public interface BitstreamFormatService extends DSpaceCRUDService<BitstreamForma
      * If more than one bitstream format has the same MIME type, the
      * one returned is unpredictable.
      *
-     * @param context  DSpace context object
+     * @param session  current request's database context.
      * @param mimeType MIME type value
      * @return the corresponding bitstream format, or <code>null</code> if
      * there's no bitstream format with the given MIMEtype.
      * @throws SQLException if database error
      */
-    public BitstreamFormat findByMIMEType(Context context, String mimeType) throws SQLException;
+    public BitstreamFormat findByMIMEType(Session session, String mimeType) throws SQLException;
 
     /**
      * Find a bitstream format by its (unique) short description
      *
-     * @param context DSpace context object
+     * @param session current request's database context.
      * @param desc    the short description
      * @return the corresponding bitstream format, or <code>null</code> if
      * there's no bitstream format with the given short description
      * @throws SQLException if database error
      */
-    public BitstreamFormat findByShortDescription(Context context, String desc) throws SQLException;
+    public BitstreamFormat findByShortDescription(Session session, String desc) throws SQLException;
 
     /**
      * Get the generic "unknown" bitstream format.
      *
-     * @param context DSpace context object
+     * @param session current request's database context.
      * @return the "unknown" bitstream format.
      * @throws SQLException          if database error
      * @throws IllegalStateException if the "unknown" bitstream format couldn't be found
      */
-    public BitstreamFormat findUnknown(Context context) throws SQLException;
+    public BitstreamFormat findUnknown(Session session) throws SQLException;
 
     /**
      * Retrieve all bitstream formats from the registry, ordered by ID
      *
-     * @param context DSpace context object
+     * @param session current request's database context.
      * @return the bitstream formats.
      * @throws SQLException if database error
      */
-    public List<BitstreamFormat> findAll(Context context) throws SQLException;
+    public List<BitstreamFormat> findAll(Session session) throws SQLException;
 
     /**
      * Retrieve all non-internal bitstream formats from the registry. The
      * "unknown" format is not included, and the formats are ordered by support
      * level (highest first) first then short description.
      *
-     * @param context DSpace context object
+     * @param session current request's database context.
      * @return the bitstream formats.
      * @throws SQLException if database error
      */
-    public List<BitstreamFormat> findNonInternal(Context context) throws SQLException;
+    public List<BitstreamFormat> findNonInternal(Session session) throws SQLException;
 
     /**
      * Set the short description of the bitstream format

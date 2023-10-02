@@ -12,10 +12,10 @@ import javax.persistence.Query;
 
 import org.dspace.content.Item;
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.orcid.OrcidToken;
 import org.dspace.orcid.dao.OrcidTokenDAO;
+import org.hibernate.Session;
 
 /**
  * Implementation of {@link OrcidTokenDAO}.
@@ -26,9 +26,9 @@ import org.dspace.orcid.dao.OrcidTokenDAO;
 public class OrcidTokenDAOImpl extends AbstractHibernateDAO<OrcidToken> implements OrcidTokenDAO {
 
     @Override
-    public OrcidToken findByEPerson(Context context, EPerson ePerson) {
+    public OrcidToken findByEPerson(Session session, EPerson ePerson) {
         try {
-            Query query = createQuery(context, "FROM OrcidToken WHERE ePerson = :ePerson");
+            Query query = createQuery(session, "FROM OrcidToken WHERE ePerson = :ePerson");
             query.setParameter("ePerson", ePerson);
             return singleResult(query);
         } catch (SQLException e) {
@@ -37,14 +37,13 @@ public class OrcidTokenDAOImpl extends AbstractHibernateDAO<OrcidToken> implemen
     }
 
     @Override
-    public OrcidToken findByProfileItem(Context context, Item profileItem) {
+    public OrcidToken findByProfileItem(Session session, Item profileItem) {
         try {
-            Query query = createQuery(context, "FROM OrcidToken WHERE profileItem = :profileItem");
+            Query query = createQuery(session, "FROM OrcidToken WHERE profileItem = :profileItem");
             query.setParameter("profileItem", profileItem);
             return singleResult(query);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
-
 }

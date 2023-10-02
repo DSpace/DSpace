@@ -146,7 +146,7 @@ public class SWORDMETSIngester implements SWORDIngester {
             // so we have to look it up
             HandleService handleService = HandleServiceFactory.getInstance()
                                                               .getHandleService();
-            String handle = handleService.findHandle(context, installedItem);
+            String handle = handleService.findHandle(context.getSession(), installedItem);
 
             swordService.message("Ingest successful");
             swordService.message("Item created with internal identifier: " +

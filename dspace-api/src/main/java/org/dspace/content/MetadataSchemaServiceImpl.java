@@ -18,6 +18,7 @@ import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -32,7 +33,7 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataSchemaServiceImpl.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     @Autowired
     protected MetadataFieldService metadataFieldService;
@@ -70,10 +71,10 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
 
 
         // Create a table row and update it with the values
-        MetadataSchema metadataSchema = metadataSchemaDAO.create(context, new MetadataSchema());
+        MetadataSchema metadataSchema = metadataSchemaDAO.create(context.getSession(), new MetadataSchema());
         metadataSchema.setNamespace(namespace);
         metadataSchema.setName(name);
-        metadataSchemaDAO.save(context, metadataSchema);
+        metadataSchemaDAO.save(context.getSession(), metadataSchema);
         log.info(LogHelper.getHeader(context, "create_metadata_schema",
                                       "metadata_schema_id="
                                           + metadataSchema.getID()));
@@ -81,8 +82,8 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
     }
 
     @Override
-    public MetadataSchema findByNamespace(Context context, String namespace) throws SQLException {
-        return metadataSchemaDAO.findByNamespace(context, namespace);
+    public MetadataSchema findByNamespace(Session session, String namespace) throws SQLException {
+        return metadataSchemaDAO.findByNamespace(session, namespace);
     }
 
     @Override
@@ -105,7 +106,7 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
             throw new NonUniqueMetadataException("Please make the namespace " + metadataSchema.getNamespace()
                                                      + " unique");
         }
-        metadataSchemaDAO.save(context, metadataSchema);
+        metadataSchemaDAO.save(context.getSession(), metadataSchema);
         log.info(LogHelper.getHeader(context, "update_metadata_schema",
                                       "metadata_schema_id=" + metadataSchema.getID() + "namespace="
                                           + metadataSchema.getNamespace() + "name=" + metadataSchema.getName()));
@@ -119,33 +120,33 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
                 "Only administrators may modify the metadata registry");
         }
 
-        for (MetadataField metadataField : metadataFieldService.findAllInSchema(context, metadataSchema)) {
+        for (MetadataField metadataField : metadataFieldService.findAllInSchema(context.getSession(), metadataSchema)) {
             metadataFieldService.delete(context, metadataField);
         }
 
-        metadataSchemaDAO.delete(context, metadataSchema);
+        metadataSchemaDAO.delete(context.getSession(), metadataSchema);
 
         log.info(LogHelper.getHeader(context, "delete_metadata_schema",
                 "metadata_schema_id=" + metadataSchema.getID()));
     }
 
     @Override
-    public List<MetadataSchema> findAll(Context context) throws SQLException {
-        return metadataSchemaDAO.findAll(context, MetadataSchema.class);
+    public List<MetadataSchema> findAll(Session session) throws SQLException {
+        return metadataSchemaDAO.findAll(session, MetadataSchema.class);
     }
 
     @Override
-    public MetadataSchema find(Context context, int id) throws SQLException {
-        return metadataSchemaDAO.findByID(context, MetadataSchema.class, id);
+    public MetadataSchema find(Session session, int id) throws SQLException {
+        return metadataSchemaDAO.findByID(session, MetadataSchema.class, id);
     }
 
     @Override
-    public MetadataSchema find(Context context, String shortName) throws SQLException {
+    public MetadataSchema find(Session session, String shortName) throws SQLException {
         // If we are not passed a valid schema name then return
         if (shortName == null) {
             return null;
         }
-        return metadataSchemaDAO.find(context, shortName);
+        return metadataSchemaDAO.find(session, shortName);
     }
 
 
@@ -161,7 +162,7 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
      */
     protected boolean uniqueNamespace(Context context, int metadataSchemaId, String namespace)
         throws SQLException {
-        return metadataSchemaDAO.uniqueNamespace(context, metadataSchemaId, namespace);
+        return metadataSchemaDAO.uniqueNamespace(context.getSession(), metadataSchemaId, namespace);
     }
 
     /**
@@ -175,6 +176,6 @@ public class MetadataSchemaServiceImpl implements MetadataSchemaService {
      */
     protected boolean uniqueShortName(Context context, int metadataSchemaId, String name)
         throws SQLException {
-        return metadataSchemaDAO.uniqueShortName(context, metadataSchemaId, name);
+        return metadataSchemaDAO.uniqueShortName(context.getSession(), metadataSchemaId, name);
     }
 }

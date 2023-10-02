@@ -67,7 +67,7 @@ public class EntityServiceImplTest  {
 
         // The returned Entity's item should match the mocked item's name
         assertEquals("TestFindByItem 0", "ItemName",
-                entityService.findByItemId(context, item.getID()).getItem().getName());
+                entityService.findByItemId(context.getSession(), item.getID()).getItem().getName());
     }
 
     @Test
@@ -75,7 +75,7 @@ public class EntityServiceImplTest  {
         // Declare objects utilized in unit test
         Entity entity = mock(Entity.class);
         EntityTypeService entityTypeService = mock(EntityTypeService.class);
-        EntityType entityType = entityTypeService.findByEntityType(context, "testType");
+        EntityType entityType = entityTypeService.findByEntityType(context.getSession(), "testType");
 
         // The returned EntityType should equal our defined entityType case
         assertEquals("TestGetType 0", entityType, entityService.getType(context, entity));
@@ -133,7 +133,8 @@ public class EntityServiceImplTest  {
         relationshipList.add(relationship);
 
         // Mock the state of objects utilized in getRelationsByType() to meet the success criteria of an invocation
-        when(relationshipService.findByTypeName(context, "leftwardType", -1, -1)).thenReturn(relationshipList);
+        when(relationshipService.findByTypeName(context.getSession(), "leftwardType", -1, -1))
+                .thenReturn(relationshipList);
 
         // The relation(s) reported from our defined type should match our relationshipList
         assertEquals("TestGetRelationsByLabel 0", relationshipList,
@@ -156,7 +157,8 @@ public class EntityServiceImplTest  {
         // Mock the state of objects utilized in getAllRelationshipTypes()
         // to meet the success criteria of the invocation
         when(entity.getItem()).thenReturn(item);
-        when(relationshipTypeService.findByEntityType(context, entityService.getType(context, entity), -1, -1))
+        when(relationshipTypeService.findByEntityType(context.getSession(),
+                entityService.getType(context, entity), -1, -1))
                 .thenReturn(relationshipTypeList);
 
         // The relation(s) reported from our mocked Entity should match our relationshipList
@@ -184,7 +186,8 @@ public class EntityServiceImplTest  {
         when(itemService.getMetadata(item, "dspace", "entity", "type", Item.ANY, false)).thenReturn(metsList);
         when(entity.getItem()).thenReturn(item);
         when(entityService.getType(context, entity)).thenReturn(entityType);
-        when(relationshipTypeService.findByEntityType(context, entityService.getType(context, entity), true, -1, -1))
+        when(relationshipTypeService.findByEntityType(context.getSession(),
+                entityService.getType(context, entity), true, -1, -1))
                 .thenReturn(relationshipTypeList);
 
         // The left relationshipType(s) reported from our mocked Entity should match our relationshipList
@@ -212,7 +215,8 @@ public class EntityServiceImplTest  {
         when(itemService.getMetadata(item, "dspace", "entity", "type", Item.ANY, false)).thenReturn(metsList);
         when(entity.getItem()).thenReturn(item);
         when(entityService.getType(context, entity)).thenReturn(entityType);
-        when(relationshipTypeService.findByEntityType(context, entityService.getType(context, entity), false, -1, -1))
+        when(relationshipTypeService.findByEntityType(context.getSession(),
+                entityService.getType(context, entity), false, -1, -1))
                 .thenReturn(relationshipTypeList);
 
         // The right relationshipType(s) reported from our mocked Entity should match our relationshipList
@@ -230,7 +234,7 @@ public class EntityServiceImplTest  {
 
         // Mock the state of objects utilized in getRelationshipTypesByTypeName()
         // to meet the success criteria of the invocation
-        when(relationshipTypeService.findByLeftwardOrRightwardTypeName(context, "leftwardType", -1, -1))
+        when(relationshipTypeService.findByLeftwardOrRightwardTypeName(context.getSession(), "leftwardType", -1, -1))
                 .thenReturn(list);
 
         // The RelationshipType(s) reported from our mocked Entity should match our list

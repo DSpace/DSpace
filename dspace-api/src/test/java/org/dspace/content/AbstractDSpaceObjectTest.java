@@ -136,28 +136,28 @@ public abstract class AbstractDSpaceObjectTest extends AbstractUnitTest {
         DSpaceObjectService dSpaceObjectService = ContentServiceFactory.getInstance()
                                                                        .getDSpaceObjectService(dspaceObject.getType());
         if (this.dspaceObject instanceof Bitstream) {
-            assertThat("BITSTREAM type", dSpaceObjectService.find(context,
+            assertThat("BITSTREAM type", dSpaceObjectService.find(context.getSession(),
                                                                   dspaceObject.getID()), notNullValue());
         } else if (this.dspaceObject instanceof Bundle) {
-            assertThat("BUNDLE type", dSpaceObjectService.find(context,
+            assertThat("BUNDLE type", dSpaceObjectService.find(context.getSession(),
                                                                dspaceObject.getID()), notNullValue());
         } else if (this.dspaceObject instanceof Item) {
-            assertThat("ITEM type", dSpaceObjectService.find(context,
+            assertThat("ITEM type", dSpaceObjectService.find(context.getSession(),
                                                              dspaceObject.getID()), notNullValue());
         } else if (this.dspaceObject instanceof Collection) {
-            assertThat("COLLECTION type", dSpaceObjectService.find(context,
+            assertThat("COLLECTION type", dSpaceObjectService.find(context.getSession(),
                                                                    dspaceObject.getID()), notNullValue());
         } else if (this.dspaceObject instanceof Community) {
-            assertThat("COMMUNITY type", dSpaceObjectService.find(context,
+            assertThat("COMMUNITY type", dSpaceObjectService.find(context.getSession(),
                                                                   dspaceObject.getID()), notNullValue());
         } else if (this.dspaceObject instanceof Group) {
-            assertThat("GROUP type", dSpaceObjectService.find(context,
+            assertThat("GROUP type", dSpaceObjectService.find(context.getSession(),
                                                               dspaceObject.getID()), notNullValue());
         } else if (this.dspaceObject instanceof EPerson) {
-            assertThat("EPERSON type", dSpaceObjectService.find(context,
+            assertThat("EPERSON type", dSpaceObjectService.find(context.getSession(),
                                                                 dspaceObject.getID()), notNullValue());
         } else if (this.dspaceObject instanceof Site) {
-            assertThat("SITE type", dSpaceObjectService.find(context,
+            assertThat("SITE type", dSpaceObjectService.find(context.getSession(),
                                                              dspaceObject.getID()), notNullValue());
         } else {
             assertThat("Unknown type", dSpaceObjectService,

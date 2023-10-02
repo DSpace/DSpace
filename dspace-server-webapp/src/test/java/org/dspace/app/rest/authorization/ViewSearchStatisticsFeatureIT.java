@@ -64,7 +64,7 @@ public class ViewSearchStatisticsFeatureIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
 
-        site = siteService.findSite(context);
+        site = siteService.findSite(context.getSession());
         siteRest = siteConverter.convert(site, Projection.DEFAULT);
         communityA = CommunityBuilder.createCommunity(context)
                                      .withName("communityA")

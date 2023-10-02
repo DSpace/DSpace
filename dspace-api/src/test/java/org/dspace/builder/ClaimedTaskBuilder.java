@@ -93,7 +93,7 @@ public class ClaimedTaskBuilder extends AbstractBuilder<ClaimedTask, ClaimedTask
             workflowService
                 .doState(context, user, null, task.getWorkflowItem().getID(), workflow,
                     currentActionConfig);
-            claimedTask = getService().findByWorkflowIdAndEPerson(context, workflowItem, user);
+            claimedTask = getService().findByWorkflowIdAndEPerson(context.getSession(), workflowItem, user);
             // restore the submitter as current user
             context.setCurrentUser(submitter);
             context.dispatchEvents();

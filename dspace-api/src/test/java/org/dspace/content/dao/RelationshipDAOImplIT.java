@@ -55,7 +55,7 @@ public class RelationshipDAOImplIT extends AbstractIntegrationTest {
 
     private RelationshipType relationshipType;
 
-    private List<Relationship> relationshipsList = new ArrayList<>();
+    private final List<Relationship> relationshipsList = new ArrayList<>();
 
     private EntityType entityTypeOne;
 
@@ -134,8 +134,8 @@ public class RelationshipDAOImplIT extends AbstractIntegrationTest {
      */
     @Test
     public void testFindByItem() throws Exception {
-        assertEquals("TestFindByItem 0", relationshipsList, relationshipService.findByItem(context, itemOne,
-                -1, -1, false));
+        assertEquals("TestFindByItem 0", relationshipsList,
+                relationshipService.findByItem(context.getSession(), itemOne, -1, -1, false));
     }
 
     /**
@@ -146,8 +146,8 @@ public class RelationshipDAOImplIT extends AbstractIntegrationTest {
      */
     @Test
     public void testFindByRelationshipType() throws Exception {
-        assertEquals("TestByRelationshipType 0", relationshipsList, relationshipService.findByRelationshipType(context,
-                relationshipType));
+        assertEquals("TestByRelationshipType 0", relationshipsList,
+                relationshipService.findByRelationshipType(context.getSession(), relationshipType));
     }
 
     /**

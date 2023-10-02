@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.dspace.app.util.WebApp;
 import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the WebApp object.
@@ -25,7 +26,7 @@ public interface WebAppService {
 
     public WebApp create(Context context, String appName, String url, Date started, int isUI) throws SQLException;
 
-    public List<WebApp> findAll(Context context) throws SQLException;
+    public List<WebApp> findAll(Session session) throws SQLException;
 
     public void delete(Context context, WebApp webApp) throws SQLException;
 

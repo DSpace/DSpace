@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Test for the canSendFeedback authorization feature.
- * 
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  */
 public class CanSendFeedbackFeatureIT extends AbstractControllerIntegrationTest {
@@ -55,7 +55,7 @@ public class CanSendFeedbackFeatureIT extends AbstractControllerIntegrationTest 
     public void canSendFeedbackFeatureTest() throws Exception {
         configurationService.setProperty("feedback.recipient", "myemail@test.com");
 
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
@@ -86,7 +86,7 @@ public class CanSendFeedbackFeatureIT extends AbstractControllerIntegrationTest 
     public void canSendFeedbackFeatureWithRecipientEmailNotConfiguredTest() throws Exception {
         configurationService.setProperty("feedback.recipient", null);
 
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);

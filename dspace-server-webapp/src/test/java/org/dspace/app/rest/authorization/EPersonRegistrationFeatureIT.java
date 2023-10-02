@@ -61,7 +61,7 @@ public class EPersonRegistrationFeatureIT extends AbstractControllerIntegrationT
     @Test
     public void userRegistrationEnabledSuccessTest() throws Exception {
 
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest SiteRest = siteConverter.convert(site, Projection.DEFAULT);
         String siteUri = utils.linkToSingleResource(SiteRest, "self").getHref();
 
@@ -76,7 +76,7 @@ public class EPersonRegistrationFeatureIT extends AbstractControllerIntegrationT
     @Test
     public void userRegistrationDisabledUnAuthorizedTest() throws Exception {
 
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest SiteRest = siteConverter.convert(site, Projection.DEFAULT);
         String siteUri = utils.linkToSingleResource(SiteRest, "self").getHref();
 
@@ -94,7 +94,7 @@ public class EPersonRegistrationFeatureIT extends AbstractControllerIntegrationT
     @Test
     public void userRegistrationEnabledShibTest() throws Exception {
 
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest SiteRest = siteConverter.convert(site, Projection.DEFAULT);
         String siteUri = utils.linkToSingleResource(SiteRest, "self").getHref();
 

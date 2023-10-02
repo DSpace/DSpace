@@ -164,7 +164,7 @@ public class UpdateAuthorities {
     protected void updateItems(AuthorityValue authority) {
         try {
             Iterator<Item> itemIterator = itemService
-                .findByMetadataFieldAuthority(context, authority.getField(), authority.getId());
+                .findByMetadataFieldAuthority(context.getSession(), authority.getField(), authority.getId());
             while (itemIterator.hasNext()) {
                 Item next = itemIterator.next();
                 List<MetadataValue> metadata = itemService.getMetadata(next, authority.getField(), authority.getId());

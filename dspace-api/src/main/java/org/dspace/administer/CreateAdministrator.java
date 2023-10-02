@@ -254,14 +254,14 @@ public final class CreateAdministrator {
         context.turnOffAuthorisationSystem();
 
         // Find administrator group
-        Group admins = groupService.findByName(context, Group.ADMIN);
+        Group admins = groupService.findByName(context.getSession(), Group.ADMIN);
 
         if (admins == null) {
             throw new IllegalStateException("Error, no admin group (group 1) found");
         }
 
         // Create the administrator e-person
-        EPerson eperson = ePersonService.findByEmail(context, email);
+        EPerson eperson = ePersonService.findByEmail(context.getSession(), email);
 
         // check if the email belongs to a registered user,
         // if not create a new user with this email

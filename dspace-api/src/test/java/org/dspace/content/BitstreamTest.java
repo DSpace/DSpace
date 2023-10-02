@@ -120,7 +120,7 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     @Test
     public void testBSFind() throws SQLException {
         UUID id = this.bs.getID();
-        Bitstream found = bitstreamService.find(context, id);
+        Bitstream found = bitstreamService.find(context.getSession(), id);
         assertThat("testBSFind 0", found, notNullValue());
         //the item created by default has no name nor type set
         assertThat("testBSFind 1", found.getFormat(context).getMIMEType(), equalTo("application/octet-stream"));
@@ -133,7 +133,7 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
      */
     @Test
     public void testFindAll() throws SQLException {
-        List<Bitstream> found = bitstreamService.findAll(context);
+        List<Bitstream> found = bitstreamService.findAll(context.getSession());
         assertThat("testFindAll 0", found, notNullValue());
         //we have many bs, one created per test run, so at least we have 1 if
         //this test is run first
@@ -365,7 +365,8 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     @Test
     public void testGetFormat() throws SQLException {
         assertThat("testGetFormat 0", bs.getFormat(context), notNullValue());
-        assertThat("testGetFormat 1", bs.getFormat(context), equalTo(bitstreamFormatService.findUnknown(context)));
+        assertThat("testGetFormat 1", bs.getFormat(context),
+                equalTo(bitstreamFormatService.findUnknown(context.getSession())));
     }
 
     /**
@@ -374,10 +375,11 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     @Test
     public void testSetFormat() throws SQLException {
         int id = 3;
-        BitstreamFormat format = bitstreamFormatService.find(context, id);
+        BitstreamFormat format = bitstreamFormatService.find(context.getSession(), id);
         bs.setFormat(format);
         assertThat("testSetFormat 0", bs.getFormat(context), notNullValue());
-        assertThat("testSetFormat 1", bs.getFormat(context), equalTo(bitstreamFormatService.find(context, id)));
+        assertThat("testSetFormat 1", bs.getFormat(context),
+                equalTo(bitstreamFormatService.find(context.getSession(), id)));
     }
 
     /**
@@ -429,7 +431,7 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
 
         // Now test expunge actually removes the bitstream
         bitstreamService.expunge(context, delBS);
-        assertThat("testExpunge 0", bitstreamService.find(context, bitstreamId), nullValue());
+        assertThat("testExpunge 0", bitstreamService.find(context.getSession(), bitstreamId), nullValue());
     }
 
     /**

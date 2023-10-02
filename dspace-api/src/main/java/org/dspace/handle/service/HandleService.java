@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Interface to the <a href="https://www.handle.net" target=_new>CNRI Handle
@@ -147,12 +148,12 @@ public interface HandleService {
     /**
      * Return the handle for an Object, or null if the Object has no handle.
      *
-     * @param context DSpace context
+     * @param session current request's database context.
      * @param dso     The object to obtain a handle for
      * @return The handle for object, or null if the object has no handle.
      * @throws SQLException If a database error occurs
      */
-    public String findHandle(Context context, DSpaceObject dso)
+    public String findHandle(Session session, DSpaceObject dso)
         throws SQLException;
 
     /**
@@ -196,7 +197,7 @@ public interface HandleService {
     /**
      * Gets the additional prefixes used for handles,
      * mapped in configuration file.
-     * 
+     *
      * @return `String[]` array of prefixes
      */
     String[] getAdditionalPrefixes();

@@ -11,6 +11,7 @@ import java.sql.SQLException;
 
 import org.dspace.content.Site;
 import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the Site object.
@@ -23,5 +24,5 @@ public interface SiteService extends DSpaceObjectService<Site> {
 
     public Site createSite(Context context) throws SQLException;
 
-    public Site findSite(Context context) throws SQLException;
+    public Site findSite(Session session) throws SQLException;
 }

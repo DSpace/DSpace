@@ -35,7 +35,7 @@ public class DSpaceCollectionsService implements CollectionsService {
         Queue<Community> comqueue = new LinkedList<>();
         List<UUID> list = new ArrayList<>();
         try {
-            comqueue.add(communityService.find(contextService.getContext(), communityId));
+            comqueue.add(communityService.find(contextService.getContext().getSession(), communityId));
         } catch (ContextServiceException e) {
             throw new SQLException(e);
         }

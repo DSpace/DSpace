@@ -88,12 +88,12 @@ public class AuthorityConsumer implements Consumer {
         try {
             ctx.turnOffAuthorisationSystem();
             for (UUID id : itemsToUpdateAuthority) {
-                Item item = itemService.find(ctx, id);
+                Item item = itemService.find(ctx.getSession(), id);
                 authorityService.indexItem(ctx, item);
             }
             //Loop over our items which need to be re indexed
             for (UUID id : itemsToReindex) {
-                Item item = itemService.find(ctx, id);
+                Item item = itemService.find(ctx.getSession(), id);
                 authorityService.indexItem(ctx, item);
 
             }

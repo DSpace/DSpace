@@ -94,7 +94,7 @@ public class PDFPackager
     // utility to grovel bitstream formats..
     protected void setFormatToMIMEType(Context context, Bitstream bs, String mimeType)
         throws SQLException {
-        List<BitstreamFormat> bf = bitstreamFormatService.findNonInternal(context);
+        List<BitstreamFormat> bf = bitstreamFormatService.findNonInternal(context.getSession());
         for (BitstreamFormat aBf : bf) {
             if (aBf.getMIMEType().equalsIgnoreCase(mimeType)) {
                 bs.setFormat(context, aBf);
@@ -267,7 +267,7 @@ public class PDFPackager
         }
 
         Item item = (Item) dso;
-        BitstreamFormat pdff = bitstreamFormatService.findByShortDescription(context,
+        BitstreamFormat pdff = bitstreamFormatService.findByShortDescription(context.getSession(),
                                                                              BITSTREAM_FORMAT_NAME);
         if (pdff == null) {
             throw new PackageValidationException("Cannot find BitstreamFormat \"" + BITSTREAM_FORMAT_NAME + "\"");

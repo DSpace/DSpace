@@ -56,7 +56,7 @@ public class EntityTypeLabelRestController {
                                   @PathVariable("entity-type-label") String label) {
         Context context = ContextUtil.obtainContext(request);
         try {
-            EntityType entityType = this.entityTypeService.findByEntityType(context, label);
+            EntityType entityType = this.entityTypeService.findByEntityType(context.getSession(), label);
             if (entityType == null) {
                 throw new ResourceNotFoundException("There was no entityType found with label: " + label);
             }

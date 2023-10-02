@@ -54,7 +54,7 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Before
     public void setup() throws SQLException {
-        CollectionUtils.emptyIfNull(processService.findAll(context)).stream().forEach(process -> {
+        CollectionUtils.emptyIfNull(processService.findAll(context.getSession())).stream().forEach(process -> {
             try {
                 processService.delete(context, process);
             } catch (Exception e) {

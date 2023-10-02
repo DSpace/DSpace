@@ -56,7 +56,8 @@ public class ChecksumHistoryServiceImpl implements ChecksumHistoryService {
 //               + "not exists( select 'x' from checksum_history where "
 //               + "most_recent_checksum.bitstream_id = checksum_history.bitstream_id ) "
 //               + "and most_recent_checksum.bitstream_id = bitstream.bitstream_id";
-        List<MostRecentChecksum> mostRecentChecksums = mostRecentChecksumService.findNotInHistory(context);
+        List<MostRecentChecksum> mostRecentChecksums
+                = mostRecentChecksumService.findNotInHistory(context.getSession());
         for (MostRecentChecksum mostRecentChecksum : mostRecentChecksums) {
             addHistory(context, mostRecentChecksum);
         }
@@ -72,16 +73,17 @@ public class ChecksumHistoryServiceImpl implements ChecksumHistoryService {
         checksumHistory.setChecksumCalculated(mostRecentChecksum.getCurrentChecksum());
         ChecksumResult checksumResult;
         if (mostRecentChecksum.getBitstream().isDeleted()) {
-            checksumResult = checksumResultService.findByCode(context, ChecksumResultCode.BITSTREAM_MARKED_DELETED);
+            checksumResult = checksumResultService.findByCode(context.getSession(),
+                    ChecksumResultCode.BITSTREAM_MARKED_DELETED);
         } else {
-            checksumResult = checksumResultService.findByCode(context,
+            checksumResult = checksumResultService.findByCode(context.getSession(),
                     mostRecentChecksum.getChecksumResult().getResultCode());
         }
 
         checksumHistory.setResult(checksumResult);
 
-        checksumHistoryDAO.create(context, checksumHistory);
-        checksumHistoryDAO.save(context, checksumHistory);
+        checksumHistoryDAO.create(context.getSession(), checksumHistory);
+        checksumHistoryDAO.save(context.getSession(), checksumHistory);
     }
 
     /**
@@ -96,7 +98,7 @@ public class ChecksumHistoryServiceImpl implements ChecksumHistoryService {
     @Override
     public int deleteByDateAndCode(Context context, Date retentionDate, ChecksumResultCode checksumResultCode)
         throws SQLException {
-        return checksumHistoryDAO.deleteByDateAndCode(context, retentionDate, checksumResultCode);
+        return checksumHistoryDAO.deleteByDateAndCode(context.getSession(), retentionDate, checksumResultCode);
     }
 
     @Override
@@ -104,7 +106,7 @@ public class ChecksumHistoryServiceImpl implements ChecksumHistoryService {
         //Delete the most recent
         mostRecentChecksumService.deleteByBitstream(context, bitstream);
         //Delete the history as well
-        checksumHistoryDAO.deleteByBitstream(context, bitstream);
+        checksumHistoryDAO.deleteByBitstream(context.getSession(), bitstream);
     }
 
     @Override
@@ -112,11 +114,9 @@ public class ChecksumHistoryServiceImpl implements ChecksumHistoryService {
         long now = System.currentTimeMillis();
         int count = 0;
         for (Map.Entry<ChecksumResultCode, Long> interest : interests.entrySet()) {
-            count += deleteByDateAndCode(context, new Date(now - interest.getValue().longValue()),
+            count += deleteByDateAndCode(context, new Date(now - interest.getValue()),
                                          interest.getKey());
         }
         return count;
-
     }
-
 }

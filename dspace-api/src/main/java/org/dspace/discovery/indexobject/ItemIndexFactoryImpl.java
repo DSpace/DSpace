@@ -112,7 +112,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
 
     @Override
     public Iterator<IndexableItem> findAll(Context context) throws SQLException {
-        Iterator<Item> items = itemService.findAllRegularItems(context);
+        Iterator<Item> items = itemService.findAllRegularItems(context.getSession());
         return new Iterator<IndexableItem>() {
             @Override
             public boolean hasNext() {
@@ -184,7 +184,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
      * @return true if the item is the latest version, false otherwise.
      */
     protected boolean isLatestVersion(Context context, Item item) throws SQLException {
-        VersionHistory history = versionHistoryService.findByItem(context, item);
+        VersionHistory history = versionHistoryService.findByItem(context.getSession(), item);
         if (history == null) {
             // not all items have a version history
             // if an item does not have a version history, it is by definition the latest version
@@ -572,7 +572,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                 }
                 if (toProjectionFields.contains(field) || toProjectionFields
                         .contains(unqualifiedField + "." + Item.ANY)) {
-                    StringBuffer variantsToStore = new StringBuffer();
+                    StringBuilder variantsToStore = new StringBuilder();
                     if (variants != null) {
                         for (String var : variants) {
                             variantsToStore.append(VARIANTS_STORE_SEPARATOR);
@@ -609,7 +609,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
 
             List<MetadataValue> values = itemService.getMetadataByMetadataString(item, "dc.relation.ispartof");
 
-            if (values != null && values.size() > 0 && values.get(0) != null && values.get(0).getValue() != null) {
+            if (values != null && !values.isEmpty() && values.get(0) != null && values.get(0).getValue() != null) {
                 // group on parent
                 String handlePrefix = handleService.getCanonicalPrefix();
 
@@ -692,13 +692,13 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
             return List.of(new IndexableItem(item));
         }
 
-        final WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, item);
+        final WorkspaceItem workspaceItem = workspaceItemService.findByItem(context.getSession(), item);
         if (workspaceItem != null) {
             // a workspace item is linked to the given item
             return List.copyOf(workspaceItemIndexFactory.getIndexableObjects(context, workspaceItem));
         }
 
-        final XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.findByItem(context, item);
+        final XmlWorkflowItem xmlWorkflowItem = xmlWorkflowItemService.findByItem(context.getSession(), item);
         if (xmlWorkflowItem != null) {
             // a workflow item is linked to the given item
             return List.copyOf(workflowItemIndexFactory.getIndexableObjects(context, xmlWorkflowItem));
@@ -715,7 +715,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
 
     @Override
     public Optional<IndexableItem> findIndexableObject(Context context, String id) throws SQLException {
-        final Item item = itemService.find(context, UUID.fromString(id));
+        final Item item = itemService.find(context.getSession(), UUID.fromString(id));
         return item == null ? Optional.empty() : Optional.of(new IndexableItem(item));
     }
 

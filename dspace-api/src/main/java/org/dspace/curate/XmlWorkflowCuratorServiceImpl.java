@@ -103,7 +103,7 @@ public class XmlWorkflowCuratorServiceImpl
     @Override
     public boolean curate(Curator curator, Context c, String wfId)
             throws AuthorizeException, IOException, SQLException {
-        XmlWorkflowItem wfi = workflowItemService.find(c, Integer.parseInt(wfId));
+        XmlWorkflowItem wfi = workflowItemService.find(c.getSession(), Integer.parseInt(wfId));
         if (wfi != null) {
             return curate(curator, c, wfi);
         } else {
@@ -182,7 +182,7 @@ public class XmlWorkflowCuratorServiceImpl
      */
     protected FlowStep getFlowStep(Context c, XmlWorkflowItem wfi)
             throws SQLException, IOException {
-        if (claimedTaskService.find(c, wfi).isEmpty()) { // No claimed tasks:  assume first step
+        if (claimedTaskService.find(c.getSession(), wfi).isEmpty()) { // No claimed tasks:  assume first step
             Collection coll = wfi.getCollection();
             String taskSetName = curationTaskConfig.containsKey(coll.getHandle()) ?
                     coll.getHandle() : CurationTaskConfig.DEFAULT_TASKSET_NAME;
@@ -190,7 +190,7 @@ public class XmlWorkflowCuratorServiceImpl
             return ts.steps.isEmpty() ? null : ts.steps.get(0);
         }
         ClaimedTask claimedTask
-                = claimedTaskService.findByWorkflowIdAndEPerson(c, wfi, c.getCurrentUser());
+                = claimedTaskService.findByWorkflowIdAndEPerson(c.getSession(), wfi, c.getCurrentUser());
         if (claimedTask != null) {
             Collection coll = wfi.getCollection();
             String taskSetName = curationTaskConfig.containsKey(coll.getHandle()) ?
@@ -223,7 +223,7 @@ public class XmlWorkflowCuratorServiceImpl
             String status, String action, String message)
             throws AuthorizeException, IOException, SQLException {
         List<EPerson> epa = resolveContacts(c, task.getContacts(status), wfi);
-        if (epa.size() > 0) {
+        if (!epa.isEmpty()) {
             workflowService.notifyOfCuration(c, wfi, epa, task.name, action, message);
         }
     }
@@ -247,7 +247,8 @@ public class XmlWorkflowCuratorServiceImpl
             // decode contacts
             if ("$flowgroup".equals(contact)) {
                 // special literal for current flowgoup
-                ClaimedTask claimedTask = claimedTaskService.findByWorkflowIdAndEPerson(c, wfi, c.getCurrentUser());
+                ClaimedTask claimedTask
+                        = claimedTaskService.findByWorkflowIdAndEPerson(c.getSession(), wfi, c.getCurrentUser());
                 String stepID = claimedTask.getStepID();
                 Step step;
                 try {
@@ -271,20 +272,20 @@ public class XmlWorkflowCuratorServiceImpl
                     epList.addAll(groupService.allMembers(c, adGroup));
                 }
             } else if ("$siteadmin".equals(contact)) {
-                EPerson siteEp = ePersonService.findByEmail(c,
+                EPerson siteEp = ePersonService.findByEmail(c.getSession(),
                         configurationService.getProperty("mail.admin"));
                 if (siteEp != null) {
                     epList.add(siteEp);
                 }
             } else if (contact.indexOf("@") > 0) {
                 // little shaky heuristic here - assume an eperson email name
-                EPerson ep = ePersonService.findByEmail(c, contact);
+                EPerson ep = ePersonService.findByEmail(c.getSession(), contact);
                 if (ep != null) {
                     epList.add(ep);
                 }
             } else {
                 // assume it is an arbitrary group name
-                Group group = groupService.findByName(c, contact);
+                Group group = groupService.findByName(c.getSession(), contact);
                 if (group != null) {
                     epList.addAll(groupService.allMembers(c, group));
                 }

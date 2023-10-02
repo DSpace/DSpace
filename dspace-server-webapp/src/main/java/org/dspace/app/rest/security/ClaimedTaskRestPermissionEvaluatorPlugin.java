@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 /**
  * An authenticated user is allowed to interact with a claimed task only if they own it
  * claim.
- * 
+ *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
@@ -58,12 +58,12 @@ public class ClaimedTaskRestPermissionEvaluatorPlugin extends RestObjectPermissi
         Context context = ContextUtil.obtainContext(request.getHttpServletRequest());
         EPerson ePerson = null;
         try {
-            ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
+            ePerson = ePersonService.findByEmail(context.getSession(), (String) authentication.getPrincipal());
             if (ePerson == null) {
                 return false;
             }
             int dsoId = Integer.parseInt(targetId.toString());
-            ClaimedTask claimedTask = claimedTaskService.find(context, dsoId);
+            ClaimedTask claimedTask = claimedTaskService.find(context.getSession(), dsoId);
             // If the claimed task is null then we give permission so we can throw another status code instead
             if (claimedTask == null) {
                 return true;

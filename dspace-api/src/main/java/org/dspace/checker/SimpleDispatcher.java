@@ -74,14 +74,14 @@ public class SimpleDispatcher implements BitstreamDispatcher {
         // should process loop infinitely through the
         // bitstreams in most_recent_checksum table?
         if (!loopContinuously && (processStartTime != null)) {
-            MostRecentChecksum oldestRecord = checksumService.findOldestRecord(context, processStartTime);
+            MostRecentChecksum oldestRecord = checksumService.findOldestRecord(context.getSession(), processStartTime);
             if (oldestRecord != null) {
                 return oldestRecord.getBitstream();
             } else {
                 return null;
             }
         } else {
-            MostRecentChecksum oldestRecord = checksumService.findOldestRecord(context);
+            MostRecentChecksum oldestRecord = checksumService.findOldestRecord(context.getSession());
             if (oldestRecord != null) {
                 return oldestRecord.getBitstream();
             } else {

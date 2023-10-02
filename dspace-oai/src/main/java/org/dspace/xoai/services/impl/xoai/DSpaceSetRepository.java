@@ -48,7 +48,7 @@ public class DSpaceSetRepository implements SetRepository {
 
     private int getCommunityCount() {
         try {
-            List<Community> communityList = communityService.findAll(_context);
+            List<Community> communityList = communityService.findAll(_context.getSession());
 
             return communityList.size();
         } catch (SQLException e) {
@@ -59,7 +59,7 @@ public class DSpaceSetRepository implements SetRepository {
 
     private int getCollectionCount() {
         try {
-            List<Collection> collectionList = collectionService.findAll(_context);
+            List<Collection> collectionList = collectionService.findAll(_context.getSession());
 
             return collectionList.size();
         } catch (SQLException e) {
@@ -77,10 +77,10 @@ public class DSpaceSetRepository implements SetRepository {
      * @return some Sets representing the Community list segment.
      */
     private List<Set> community(int offset, int length) {
-        List<Set> array = new ArrayList<Set>();
+        List<Set> array = new ArrayList<>();
 
         try {
-            List<Community> communityList = communityService.findAll(_context, length, offset);
+            List<Community> communityList = communityService.findAll(_context.getSession(), length, offset);
 
             for (Community community : communityList) {
                 array.add(DSpaceSet.newDSpaceCommunitySet(
@@ -102,10 +102,10 @@ public class DSpaceSetRepository implements SetRepository {
      * @return some Sets representing the Collection list segment.
      */
     private List<Set> collection(int offset, int length) {
-        List<Set> array = new ArrayList<Set>();
+        List<Set> array = new ArrayList<>();
 
         try {
-            List<Collection> collectionList = collectionService.findAll(_context, length, offset);
+            List<Collection> collectionList = collectionService.findAll(_context.getSession(), length, offset);
 
             for (Collection collection : collectionList) {
                 array.add(DSpaceSet.newDSpaceCollectionSet(
@@ -122,7 +122,7 @@ public class DSpaceSetRepository implements SetRepository {
     public ListSetsResult retrieveSets(int offset, int length) {
         // Only database sets (virtual sets are added by lyncode common library)
         log.debug("Querying sets. Offset: " + offset + " - Length: " + length);
-        List<Set> array = new ArrayList<Set>();
+        List<Set> array = new ArrayList<>();
         int communityCount = this.getCommunityCount();
         log.debug("Communities: " + communityCount);
         int collectionCount = this.getCollectionCount();

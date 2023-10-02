@@ -51,7 +51,7 @@ public class ClaimedTaskStepLinkRepository extends AbstractDSpaceRestRepository 
 
         Context context = obtainContext();
         try {
-            ClaimedTask claimedTask = claimedTaskService.find(context, claimedTaskId);
+            ClaimedTask claimedTask = claimedTaskService.find(context.getSession(), claimedTaskId);
             if (claimedTask == null) {
                 throw new ResourceNotFoundException("ClaimedTask with id: " + claimedTaskId + " wasn't found");
             }

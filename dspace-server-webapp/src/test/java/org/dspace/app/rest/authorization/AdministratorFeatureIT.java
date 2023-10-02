@@ -47,7 +47,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Test suite for the administrator feature
- * 
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  *
  */
@@ -88,7 +88,7 @@ public class AdministratorFeatureIT extends AbstractControllerIntegrationTest {
     private Item itemInCollectionB;
 
 
-    /** 
+    /**
      * this hold a reference to the test feature {@link AdministratorOfFeature}
      */
     private AuthorizationFeature administratorFeature;
@@ -312,7 +312,7 @@ public class AdministratorFeatureIT extends AbstractControllerIntegrationTest {
     @Test
     public void siteWithAdministratorFeatureTest() throws Exception {
 
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
 
         // tokens

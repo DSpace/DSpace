@@ -61,7 +61,7 @@ public class LoginOnBehalfOfFeatureRestIT extends AbstractControllerIntegrationT
 
     @Test
     public void loginOnBehalfOfTest() throws Exception {
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, Projection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
 
@@ -107,7 +107,7 @@ public class LoginOnBehalfOfFeatureRestIT extends AbstractControllerIntegrationT
 
     @Test
     public void loginOnBehalfOfNonAdminUserNotFoundTest() throws Exception {
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, Projection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
 
@@ -127,7 +127,7 @@ public class LoginOnBehalfOfFeatureRestIT extends AbstractControllerIntegrationT
 
     @Test
     public void loginOnBehalfOfNonAdminUserAssumeLoginPropertyFalseNotFoundTest() throws Exception {
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, Projection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
 
@@ -147,7 +147,7 @@ public class LoginOnBehalfOfFeatureRestIT extends AbstractControllerIntegrationT
 
     @Test
     public void loginOnBehalfOfAssumeLoginPropertyFalseNotFoundTest() throws Exception {
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, Projection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
 

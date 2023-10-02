@@ -18,6 +18,7 @@ import org.dspace.identifier.dao.DOIDAO;
 import org.dspace.identifier.doi.DOIIdentifierException;
 import org.dspace.identifier.service.DOIService;
 import org.dspace.services.ConfigurationService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -49,28 +50,28 @@ public class DOIServiceImpl implements DOIService {
 
     @Override
     public void update(Context context, DOI doi) throws SQLException {
-        doiDAO.save(context, doi);
+        doiDAO.save(context.getSession(), doi);
     }
 
     @Override
     public DOI create(Context context) throws SQLException {
-        return doiDAO.create(context, new DOI());
+        return doiDAO.create(context.getSession(), new DOI());
     }
 
     @Override
-    public DOI findByDoi(Context context, String doi) throws SQLException {
-        return doiDAO.findByDoi(context, doi);
+    public DOI findByDoi(Session session, String doi) throws SQLException {
+        return doiDAO.findByDoi(session, doi);
     }
 
     @Override
-    public DOI findDOIByDSpaceObject(Context context, DSpaceObject dso) throws SQLException {
-        return doiDAO.findDOIByDSpaceObject(context, dso);
+    public DOI findDOIByDSpaceObject(Session session, DSpaceObject dso) throws SQLException {
+        return doiDAO.findDOIByDSpaceObject(session, dso);
     }
 
     @Override
-    public DOI findDOIByDSpaceObject(Context context, DSpaceObject dso, List<Integer> statusToExclude)
+    public DOI findDOIByDSpaceObject(Session session, DSpaceObject dso, List<Integer> statusToExclude)
         throws SQLException {
-        return doiDAO.findDOIByDSpaceObject(context, dso, statusToExclude);
+        return doiDAO.findDOIByDSpaceObject(session, dso, statusToExclude);
     }
 
     @Override
@@ -161,14 +162,14 @@ public class DOIServiceImpl implements DOIService {
 
     @Override
     public List<DOI> getDOIsByStatus(Context context, List<Integer> statuses) throws SQLException {
-        return doiDAO.findByStatus(context, statuses);
+        return doiDAO.findByStatus(context.getSession(), statuses);
     }
 
     @Override
     public List<DOI> getSimilarDOIsNotInState(Context context, String doiPattern, List<Integer> statuses,
                                               boolean dsoIsNotNull)
         throws SQLException {
-        return doiDAO.findSimilarNotInState(context, doiPattern, statuses, dsoIsNotNull);
+        return doiDAO.findSimilarNotInState(context.getSession(), doiPattern, statuses, dsoIsNotNull);
     }
 
     @Override

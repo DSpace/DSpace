@@ -15,6 +15,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.xmlworkflow.storedcomponents.dao.CollectionRoleDAO;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -35,29 +36,29 @@ public class CollectionRoleServiceImpl implements CollectionRoleService {
 
 
     @Override
-    public CollectionRole find(Context context, int id) throws SQLException {
-        return collectionRoleDAO.findByID(context, CollectionRole.class, id);
+    public CollectionRole find(Session session, int id) throws SQLException {
+        return collectionRoleDAO.findByID(session, CollectionRole.class, id);
     }
 
     @Override
-    public CollectionRole find(Context context, Collection collection, String role) throws SQLException {
-        return collectionRoleDAO.findByCollectionAndRole(context, collection, role);
+    public CollectionRole find(Session session, Collection collection, String role) throws SQLException {
+        return collectionRoleDAO.findByCollectionAndRole(session, collection, role);
     }
 
     @Override
-    public List<CollectionRole> findByCollection(Context context, Collection collection) throws SQLException {
-        return collectionRoleDAO.findByCollection(context, collection);
+    public List<CollectionRole> findByCollection(Session session, Collection collection) throws SQLException {
+        return collectionRoleDAO.findByCollection(session, collection);
     }
 
     @Override
-    public List<CollectionRole> findByGroup(Context context, Group group) throws SQLException {
-        return collectionRoleDAO.findByGroup(context, group);
+    public List<CollectionRole> findByGroup(Session session, Group group) throws SQLException {
+        return collectionRoleDAO.findByGroup(session, group);
     }
 
     @Override
     public CollectionRole create(Context context, Collection collection, String roleId, Group group)
         throws SQLException {
-        CollectionRole collectionRole = collectionRoleDAO.create(context, new CollectionRole());
+        CollectionRole collectionRole = collectionRoleDAO.create(context.getSession(), new CollectionRole());
         collectionRole.setCollection(collection);
         collectionRole.setRoleId(roleId);
         collectionRole.setGroup(group);
@@ -67,17 +68,17 @@ public class CollectionRoleServiceImpl implements CollectionRoleService {
 
     @Override
     public void update(Context context, CollectionRole collectionRole) throws SQLException {
-        collectionRoleDAO.save(context, collectionRole);
+        collectionRoleDAO.save(context.getSession(), collectionRole);
 
     }
 
     @Override
     public void delete(Context context, CollectionRole collectionRole) throws SQLException {
-        collectionRoleDAO.delete(context, collectionRole);
+        collectionRoleDAO.delete(context.getSession(), collectionRole);
     }
 
     @Override
     public void deleteByCollection(Context context, Collection collection) throws SQLException {
-        collectionRoleDAO.deleteByCollection(context, collection);
+        collectionRoleDAO.deleteByCollection(context.getSession(), collection);
     }
 }

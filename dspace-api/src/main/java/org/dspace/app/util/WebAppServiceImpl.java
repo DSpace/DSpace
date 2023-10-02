@@ -22,6 +22,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.dao.WebAppDAO;
 import org.dspace.app.util.service.WebAppService;
 import org.dspace.core.Context;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -45,23 +46,23 @@ public class WebAppServiceImpl implements WebAppService {
 
     @Override
     public WebApp create(Context context, String appName, String url, Date started, int isUI) throws SQLException {
-        WebApp webApp = webAppDAO.create(context, new WebApp());
+        WebApp webApp = webAppDAO.create(context.getSession(), new WebApp());
         webApp.setAppName(appName);
         webApp.setUrl(url);
         webApp.setStarted(started);
         webApp.setIsui(isUI);
-        webAppDAO.save(context, webApp);
+        webAppDAO.save(context.getSession(), webApp);
         return webApp;
     }
 
     @Override
     public void delete(Context context, WebApp webApp) throws SQLException {
-        webAppDAO.delete(context, webApp);
+        webAppDAO.delete(context.getSession(), webApp);
     }
 
     @Override
-    public List<WebApp> findAll(Context context) throws SQLException {
-        return webAppDAO.findAll(context, WebApp.class);
+    public List<WebApp> findAll(Session session) throws SQLException {
+        return webAppDAO.findAll(session, WebApp.class);
     }
 
     @Override
@@ -72,7 +73,7 @@ public class WebAppServiceImpl implements WebAppService {
         HttpHead method = null;
         try {
             context = new Context();
-            List<WebApp> webApps = findAll(context);
+            List<WebApp> webApps = findAll(context.getSession());
 
             for (WebApp app : webApps) {
                 method = new HttpHead(app.getUrl());

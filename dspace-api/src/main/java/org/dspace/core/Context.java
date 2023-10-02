@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
+import javax.persistence.FlushModeType;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.ResourcePolicy;
@@ -33,6 +34,7 @@ import org.dspace.event.service.EventService;
 import org.dspace.storage.rdbms.DatabaseConfigVO;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.utils.DSpace;
+import org.hibernate.Session;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -193,6 +195,37 @@ public class Context implements AutoCloseable {
             setMode(this.mode);
         }
 
+    }
+
+    /**
+     * Get the database context for this DSpace context.
+     *
+     * @return the database context.
+     * @throws SQLException
+     */
+    public Session getSession()
+            throws SQLException {
+        return (Session) dbConnection.getSession();
+    }
+
+    /**
+     * Get an additional JPA {@link Session} from a DSpace {@link Context},
+     * set default-read-only.
+     * Be sure to {@code close()} the Session when finished -- Context does not
+     * track it.
+     *
+     * @return a new read-only JPA {@link Session}.
+     * @throws SQLException passed through.
+     */
+    public Session getReadOnlySession()
+            throws SQLException {
+        DBConnection<Session> connection = dbConnection;
+        Session newSession = connection.getSession()
+                .getSessionFactory()
+                .openSession();
+        newSession.setDefaultReadOnly(true);
+        newSession.setFlushMode(FlushModeType.COMMIT);
+        return newSession;
     }
 
     /**
@@ -681,7 +714,9 @@ public class Context implements AutoCloseable {
     public List<Group> getSpecialGroups() throws SQLException {
         List<Group> myGroups = new ArrayList<>();
         for (UUID groupId : specialGroups) {
-            myGroups.add(EPersonServiceFactory.getInstance().getGroupService().find(this, groupId));
+            myGroups.add(EPersonServiceFactory.getInstance()
+                    .getGroupService()
+                    .find(this.getSession(), groupId));
         }
 
         return myGroups;
@@ -947,6 +982,7 @@ public class Context implements AutoCloseable {
 
     /**
      * Check if the user of the context is switched.
+     * @return true if the user of the context is switched.
      */
     public boolean isContextUserSwitched() {
         return currentUserPreviousState != null;

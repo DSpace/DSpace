@@ -93,7 +93,7 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
     public GroupRest findOne(Context context, UUID id) {
         Group group = null;
         try {
-            group = gs.find(context, id);
+            group = gs.find(context.getSession(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -108,7 +108,7 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
     public Page<GroupRest> findAll(Context context, Pageable pageable) {
         try {
             long total = gs.countTotal(context);
-            List<Group> groups = gs.findAll(context, null, pageable.getPageSize(),
+            List<Group> groups = gs.findAll(context.getSession(), null, pageable.getPageSize(),
                                             Math.toIntExact(pageable.getOffset()));
             return converter.toRestPage(groups, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
@@ -158,7 +158,7 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
     protected void delete(Context context, UUID uuid) throws AuthorizeException {
         Group group = null;
         try {
-            group = gs.find(context, uuid);
+            group = gs.find(context.getSession(), uuid);
             if (group == null) {
                 throw new ResourceNotFoundException(
                         GroupRest.CATEGORY + "." + GroupRest.NAME

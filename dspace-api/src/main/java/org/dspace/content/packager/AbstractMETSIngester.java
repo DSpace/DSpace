@@ -463,7 +463,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
 
             //Check if this item is still in a user's workspace.
             //It should be, as we haven't completed its install yet.
-            WorkspaceItem wsi = workspaceItemService.findByItem(context, item);
+            WorkspaceItem wsi = workspaceItemService.findByItem(context.getSession(), item);
 
             // Get collection this item is being submitted to
             Collection collection = item.getOwningCollection();
@@ -628,10 +628,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                                                                             .getParentObject(context, dso);
             if (owningCollection == null) {
                 //We are probably dealing with an item that isn't archived yet
-                InProgressSubmission inProgressSubmission = workspaceItemService.findByItem(context, item);
+                InProgressSubmission inProgressSubmission
+                        = workspaceItemService.findByItem(context.getSession(), item);
                 if (inProgressSubmission == null) {
                     inProgressSubmission = WorkflowServiceFactory.getInstance().getWorkflowItemService()
-                                                                 .findByItem(context, item);
+                                                                 .findByItem(context.getSession(), item);
                 }
                 owningCollection = inProgressSubmission.getCollection();
             }
@@ -714,7 +715,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
             .getBundleFiles();
 
         boolean setPrimaryBitstream = false;
-        BitstreamFormat unknownFormat = bitstreamFormatService.findUnknown(context);
+        BitstreamFormat unknownFormat = bitstreamFormatService.findUnknown(context.getSession());
 
         for (Iterator<Element> mi = manifestContentFiles.iterator(); mi
             .hasNext(); ) {
@@ -782,7 +783,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                 }
                 String mimeType = mfile.getAttributeValue("MIMETYPE");
                 BitstreamFormat bf = (mimeType == null) ? null
-                    : bitstreamFormatService.findByMIMEType(context, mimeType);
+                    : bitstreamFormatService.findByMIMEType(context.getSession(), mimeType);
                 if (bf == null) {
                     bf = bitstreamFormatService.guessFormat(context, bitstream);
                 }

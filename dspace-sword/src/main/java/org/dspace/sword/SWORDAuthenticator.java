@@ -310,9 +310,9 @@ public class SWORDAuthenticator {
                 // authentication process fails
                 EPerson epObo = null;
                 if (obo != null) {
-                    epObo = ePersonService.findByEmail(context, obo);
+                    epObo = ePersonService.findByEmail(context.getSession(), obo);
                     if (epObo == null) {
-                        epObo = ePersonService.findByNetid(context, obo);
+                        epObo = ePersonService.findByNetid(context.getSession(), obo);
                     }
 
                     if (epObo != null) {
@@ -538,7 +538,7 @@ public class SWORDAuthenticator {
             // locate all the top level communities
             Context context = swordContext.getContext();
             List<Community> allowed = new ArrayList<>();
-            List<Community> comms = communityService.findAllTop(context);
+            List<Community> comms = communityService.findAllTop(context.getSession());
             for (Community comm : comms) {
                 boolean authAllowed = false;
                 boolean oboAllowed = false;
@@ -786,7 +786,7 @@ public class SWORDAuthenticator {
         try {
             List<Item> allowed = new ArrayList<>();
             Iterator<Item> ii = itemService.findByCollection(
-                swordContext.getContext(), collection);
+                swordContext.getContext().getSession(), collection);
 
             while (ii.hasNext()) {
                 Item item = ii.next();

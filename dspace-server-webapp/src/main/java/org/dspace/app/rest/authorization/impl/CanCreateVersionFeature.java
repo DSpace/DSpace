@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * The create version feature. It can be used to verify if the user can create the version of an Item.
- * 
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
 @Component
@@ -55,7 +55,8 @@ public class CanCreateVersionFeature implements AuthorizationFeature {
             if (Objects.isNull(currentUser)) {
                 return false;
             }
-            Item item = itemService.find(context, UUID.fromString(((ItemRest) object).getUuid()));
+            Item item = itemService.find(context.getSession(),
+                    UUID.fromString(((ItemRest) object).getUuid()));
             if (Objects.nonNull(item)) {
                 if (authorizeService.isAdmin(context, item)) {
                     return true;

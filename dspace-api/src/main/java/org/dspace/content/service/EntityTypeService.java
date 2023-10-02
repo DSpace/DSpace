@@ -16,6 +16,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.EntityType;
 import org.dspace.core.Context;
 import org.dspace.service.DSpaceCRUDService;
+import org.hibernate.Session;
 
 /**
  * This Service is used to access the data for EntityTypes through the DAO objects
@@ -24,30 +25,30 @@ public interface EntityTypeService extends DSpaceCRUDService<EntityType> {
 
     /**
      * Retrieves the EntityType that has the entityType String parameter as label
-     * @param context       The relevant DSpace context
+     * @param session       The current request's database context.
      * @param entityType    The String label that has to match
      * @return              The EntityType that has a String
      * @throws SQLException If something goes wrong
      */
-    public EntityType findByEntityType(Context context,String entityType) throws SQLException;
+    public EntityType findByEntityType(Session session, String entityType) throws SQLException;
 
     /**
      * Retrieves all the EntityType objects currently in the system
-     * @param context   The relevant DSpace context
+     * @param session   The current request's database context.
      * @return          A list of all EntityType objects
      * @throws SQLException If something goes wrong
      */
-    public List<EntityType> findAll(Context context) throws SQLException;
+    public List<EntityType> findAll(Session session) throws SQLException;
 
     /**
      * Retrieves all the EntityType objects currently in the system
-     * @param context   The relevant DSpace context
+     * @param session   The current request's database context.
      * @param limit     paging limit
      * @param offset    paging offset
      * @return          A list of all EntityType objects
      * @throws SQLException If something goes wrong
      */
-    List<EntityType> findAll(Context context, Integer limit, Integer offset) throws SQLException;
+    List<EntityType> findAll(Session session, Integer limit, Integer offset) throws SQLException;
 
     /**
      * This method creates an EntityType object in the database with the given entityTypeString as it's label

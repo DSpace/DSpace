@@ -94,7 +94,7 @@ public class MetadataFieldBuilder extends AbstractBuilder<MetadataField, Metadat
     public static void deleteMetadataField(Integer id) throws SQLException, IOException {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
-            MetadataField metadataField = metadataFieldService.find(c, id);
+            MetadataField metadataField = metadataFieldService.find(c.getSession(), id);
             if (metadataField != null) {
                 try {
                     metadataFieldService.delete(c, metadataField);
@@ -121,7 +121,7 @@ public class MetadataFieldBuilder extends AbstractBuilder<MetadataField, Metadat
     private MetadataFieldBuilder create(Context context, String element, String qualifier, String scopeNote)
         throws SQLException, AuthorizeException {
 
-        create(context, metadataSchemaService.find(context, "dc"), element, qualifier, scopeNote);
+        create(context, metadataSchemaService.find(context.getSession(), "dc"), element, qualifier, scopeNote);
         return this;
     }
 

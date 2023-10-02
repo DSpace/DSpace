@@ -171,9 +171,9 @@ public class ItemImportCLI extends ItemImport {
         EPerson myEPerson = null;
         if (StringUtils.contains(eperson, '@')) {
             // @ sign, must be an email
-            myEPerson = epersonService.findByEmail(context, eperson);
+            myEPerson = epersonService.findByEmail(context.getSession(), eperson);
         } else {
-            myEPerson = epersonService.find(context, UUID.fromString(eperson));
+            myEPerson = epersonService.find(context.getSession(), UUID.fromString(eperson));
         }
 
         // check eperson

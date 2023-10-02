@@ -2320,7 +2320,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.turnOffAuthorisationSystem();
         GroupBuilder.createGroup(context)
             .withName("adminSubGroup")
-            .withParent(groupService.findByName(context, Group.ADMIN))
+            .withParent(groupService.findByName(context.getSession(), Group.ADMIN))
             .addMember(eperson)
             .build();
         communityB = CommunityBuilder.createCommunity(context)
@@ -2361,7 +2361,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.turnOffAuthorisationSystem();
         GroupBuilder.createGroup(context)
             .withName("communityAdminSubGroup")
-            .withParent(groupService.findByName(context, "COMMUNITY_" + topLevelCommunityA.getID() + "_ADMIN"))
+            .withParent(groupService.findByName(context.getSession(),
+                    "COMMUNITY_" + topLevelCommunityA.getID() + "_ADMIN"))
             .addMember(eperson)
             .build();
         communityB = CommunityBuilder.createCommunity(context)
@@ -2373,7 +2374,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         ResourcePolicyBuilder.createResourcePolicy(context)
             .withDspaceObject(communityB)
             .withAction(Constants.ADMIN)
-            .withGroup(groupService.findByName(context, "COMMUNITY_" + topLevelCommunityA.getID() + "_ADMIN"))
+            .withGroup(groupService.findByName(context.getSession(),
+                    "COMMUNITY_" + topLevelCommunityA.getID() + "_ADMIN"))
             .build();
         context.restoreAuthSystemState();
 
@@ -2412,7 +2414,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.turnOffAuthorisationSystem();
         GroupBuilder.createGroup(context)
             .withName("communityAdminSubGroup")
-            .withParent(groupService.findByName(context, "COMMUNITY_" + subCommunityA.getID() + "_ADMIN"))
+            .withParent(groupService.findByName(context.getSession(),
+                    "COMMUNITY_" + subCommunityA.getID() + "_ADMIN"))
             .addMember(eperson)
             .build();
         communityB = CommunityBuilder.createCommunity(context)
@@ -2426,7 +2429,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         ResourcePolicyBuilder.createResourcePolicy(context)
             .withDspaceObject(communityB)
             .withAction(Constants.ADMIN)
-            .withGroup(groupService.findByName(context, "COMMUNITY_" + subCommunityA.getID() + "_ADMIN"))
+            .withGroup(groupService.findByName(context.getSession(),
+                    "COMMUNITY_" + subCommunityA.getID() + "_ADMIN"))
             .build();
         context.restoreAuthSystemState();
 
@@ -2463,7 +2467,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.turnOffAuthorisationSystem();
         GroupBuilder.createGroup(context)
             .withName("collectionAdminSubGroup")
-            .withParent(groupService.findByName(context, "COLLECTION_" + collectionA.getID() + "_ADMIN"))
+            .withParent(groupService.findByName(context.getSession(),
+                    "COLLECTION_" + collectionA.getID() + "_ADMIN"))
             .addMember(eperson)
             .build();
         communityB = CommunityBuilder.createCommunity(context)
@@ -2476,7 +2481,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         ResourcePolicyBuilder.createResourcePolicy(context)
             .withDspaceObject(collectionB)
             .withAction(Constants.ADMIN)
-            .withGroup(groupService.findByName(context, "COLLECTION_" + collectionA.getID() + "_ADMIN"))
+            .withGroup(groupService.findByName(context.getSession(),
+                    "COLLECTION_" + collectionA.getID() + "_ADMIN"))
             .build();
         communityC = CommunityBuilder.createCommunity(context)
             .withName("the last community is topLevelCommunityC")
@@ -2511,7 +2517,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         context.turnOffAuthorisationSystem();
         GroupBuilder.createGroup(context)
             .withName("collectionAdminSubGroup")
-            .withParent(groupService.findByName(context, "COLLECTION_" + collectionA.getID() + "_SUBMIT"))
+            .withParent(groupService.findByName(context.getSession(),
+                    "COLLECTION_" + collectionA.getID() + "_SUBMIT"))
             .addMember(eperson)
             .build();
         communityB = CommunityBuilder.createCommunity(context)
@@ -2524,7 +2531,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         ResourcePolicyBuilder.createResourcePolicy(context)
             .withDspaceObject(collectionB)
             .withAction(Constants.ADD)
-            .withGroup(groupService.findByName(context, "COLLECTION_" + collectionA.getID() + "_SUBMIT"))
+            .withGroup(groupService.findByName(context.getSession(),
+                    "COLLECTION_" + collectionA.getID() + "_SUBMIT"))
             .build();
         communityC = CommunityBuilder.createCommunity(context)
             .withName("the last community is topLevelCommunityC")

@@ -163,7 +163,7 @@ public class CommunitiesResource extends Resource {
         try {
             context = createContext();
 
-            List<org.dspace.content.Community> dspaceCommunities = communityService.findAll(context);
+            List<org.dspace.content.Community> dspaceCommunities = communityService.findAll(context.getSession());
             communities = new ArrayList<>();
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0))) {
@@ -239,7 +239,7 @@ public class CommunitiesResource extends Resource {
         try {
             context = createContext();
 
-            List<org.dspace.content.Community> dspaceCommunities = communityService.findAllTop(context);
+            List<org.dspace.content.Community> dspaceCommunities = communityService.findAllTop(context.getSession());
             communities = new ArrayList<>();
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0))) {
@@ -864,7 +864,8 @@ public class CommunitiesResource extends Resource {
 
             org.dspace.content.Community community = findCommunity(context, communityId,
                                                                    org.dspace.core.Constants.WRITE);
-            org.dspace.content.Collection collection = collectionService.findByIdOrLegacyId(context, collectionId);
+            org.dspace.content.Collection collection
+                    = collectionService.findByIdOrLegacyId(context.getSession(), collectionId);
 
             if (collection == null) {
                 context.abort();
@@ -955,7 +956,8 @@ public class CommunitiesResource extends Resource {
 
             org.dspace.content.Community parentCommunity = findCommunity(context, parentCommunityId,
                                                                          org.dspace.core.Constants.WRITE);
-            org.dspace.content.Community subcommunity = communityService.findByIdOrLegacyId(context, subcommunityId);
+            org.dspace.content.Community subcommunity
+                    = communityService.findByIdOrLegacyId(context.getSession(), subcommunityId);
 
             if (subcommunity == null) {
                 context.abort();
@@ -1026,7 +1028,7 @@ public class CommunitiesResource extends Resource {
         throws WebApplicationException {
         org.dspace.content.Community community = null;
         try {
-            community = communityService.findByIdOrLegacyId(context, id);
+            community = communityService.findByIdOrLegacyId(context.getSession(), id);
 
             if (community == null) {
                 context.abort();

@@ -143,7 +143,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withParent(embargoedGroups)
                 .build();
 
-        anonymousGroup = EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS);
+        anonymousGroup = EPersonServiceFactory.getInstance().getGroupService()
+                .findByName(context.getSession(), Group.ANONYMOUS);
 
         context.restoreAuthSystemState();
     }
@@ -5995,7 +5996,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create a list of values to use in add operation
         List<Operation> addAccessCondition = new ArrayList<>();
-        List<Map<String, String>> values = new ArrayList<Map<String,String>>();
+        List<Map<String, String>> values = new ArrayList<>();
         Map<String, String> value = new HashMap<>();
         value.put("name", "openaccess");
 
@@ -6094,7 +6095,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isOk());
 
         Bitstream bitstream = wItem.getItem().getBundles().get(0).getBitstreams().get(0);
-        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        Group adminGroup = groupService.findByName(context.getSession(), Group.ADMIN);
 
         // verify that bitstream of workspace item has this admin RP
         getClient(adminToken).perform(get("/api/authz/resourcepolicies/search/resource")
@@ -6112,7 +6113,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(textUriContentType))
             .andExpect(status().isCreated());
 
-        Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
+        Group anonGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
 
         // verify that bitstream of workspace item still has this admin RP and no Anon READ inherited policy
         getClient(adminToken).perform(get("/api/authz/resourcepolicies/search/resource")
@@ -6240,7 +6241,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isOk());
 
         Bitstream bitstream = wItem.getItem().getBundles().get(0).getBitstreams().get(0);
-        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        Group adminGroup = groupService.findByName(context.getSession(), Group.ADMIN);
 
         // verify that bitstream of workspace item has this admin RP
         getClient(adminToken).perform(get("/api/authz/resourcepolicies/search/resource")
@@ -6328,7 +6329,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                .andExpect(status().isOk());
 
         Bitstream bitstream = wItem.getItem().getBundles().get(0).getBitstreams().get(0);
-        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        Group adminGroup = groupService.findByName(context.getSession(), Group.ADMIN);
 
         // verify that bitstream of workspace item has this admin RP
         getClient(adminToken).perform(get("/api/authz/resourcepolicies/search/resource")
@@ -6344,7 +6345,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                .contentType(textUriContentType))
                                .andExpect(status().isCreated());
 
-        Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
+        Group anonGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
 
         // verify that bitstream of workspace item still has this admin RP and no Anon READ inherited policy
         getClient(adminToken).perform(get("/api/authz/resourcepolicies/search/resource")
@@ -6467,7 +6468,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                .andExpect(status().isOk());
 
         Bitstream bitstream = wItem.getItem().getBundles().get(0).getBitstreams().get(0);
-        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        Group adminGroup = groupService.findByName(context.getSession(), Group.ADMIN);
 
         // verify that bitstream of workspace item has this admin RP
         getClient(adminToken).perform(get("/api/authz/resourcepolicies/search/resource")
@@ -6551,7 +6552,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                .andExpect(status().isOk());
 
         Bitstream bitstream = wItem.getItem().getBundles().get(0).getBitstreams().get(0);
-        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        Group adminGroup = groupService.findByName(context.getSession(), Group.ADMIN);
 
         // verify that bitstream of workspace item has this admin RP
         getClient(adminToken).perform(get("/api/authz/resourcepolicies/search/resource")
@@ -6616,7 +6617,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                .andExpect(status().isOk());
 
         Bitstream bitstream = wItem.getItem().getBundles().get(0).getBitstreams().get(0);
-        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        Group adminGroup = groupService.findByName(context.getSession(), Group.ADMIN);
 
         // verify that bitstream of workspace item has this admin RP
         getClient(adminToken).perform(get("/api/authz/resourcepolicies/search/resource")
@@ -7748,9 +7749,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         Group anonymousGroup = EPersonServiceFactory.getInstance().getGroupService()
-                                                    .findByName(context, Group.ANONYMOUS);
+                                                    .findByName(context.getSession(), Group.ANONYMOUS);
         Group adminGroup = EPersonServiceFactory.getInstance().getGroupService()
-                                                .findByName(context, Group.ADMIN);
+                                                .findByName(context.getSession(), Group.ADMIN);
 
         Community community = CommunityBuilder.createCommunity(context)
                                               .withName("Com")
@@ -7979,7 +7980,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
-        Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+        Group anonymousGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
 
         // Create access condition
         Map<String, String> accessCondition = new HashMap<>();
@@ -8038,7 +8039,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
-        Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+        Group anonymousGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
 
         // Create unexisting access condition
         Map<String, String> accessCondition = new HashMap<>();
@@ -8082,7 +8083,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
-        Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+        Group anonymousGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
 
         // Access condition exists but it is not configured in access-conditions.xml
         Map<String, String> accessCondition = new HashMap<>();

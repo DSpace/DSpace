@@ -17,8 +17,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
-import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.hibernate.Session;
 
 /**
  * Database Access Object interface class for the Item object.
@@ -28,12 +28,12 @@ import org.dspace.eperson.EPerson;
  * @author kevinvandevelde at atmire.com
  */
 public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
-    public Iterator<Item> findAll(Context context, boolean archived) throws SQLException;
+    public Iterator<Item> findAll(Session session, boolean archived) throws SQLException;
 
-    public Iterator<Item> findAll(Context context, boolean archived, int limit, int offset) throws SQLException;
+    public Iterator<Item> findAll(Session session, boolean archived, int limit, int offset) throws SQLException;
 
     @Deprecated
-    public Iterator<Item> findAll(Context context, boolean archived, boolean withdrawn) throws SQLException;
+    public Iterator<Item> findAll(Session session, boolean archived, boolean withdrawn) throws SQLException;
 
     /**
      * Find all items that are:
@@ -42,93 +42,93 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * - NOT a template item for e.g. a collection
      *
      * This implies that the result also contains older versions of items and withdrawn items.
-     * @param context the DSpace context.
+     * @param session the current request's database context.
      * @return iterator over all regular items.
      * @throws SQLException if database error.
      */
-    public Iterator<Item> findAllRegularItems(Context context) throws SQLException;
+    public Iterator<Item> findAllRegularItems(Session session) throws SQLException;
 
     /**
      * Find all Items modified since a Date.
      *
-     * @param context Context
+     * @param session the current request's database context.
      * @param since   Earliest interesting last-modified date.
      * @return iterator over items
      * @throws SQLException if database error
      */
-    public Iterator<Item> findByLastModifiedSince(Context context, Date since)
+    public Iterator<Item> findByLastModifiedSince(Session session, Date since)
         throws SQLException;
 
-    public Iterator<Item> findBySubmitter(Context context, EPerson eperson) throws SQLException;
+    public Iterator<Item> findBySubmitter(Session session, EPerson eperson) throws SQLException;
 
     /**
      * Find all the items by a given submitter. The order is
      * indeterminate. All items are included.
      *
-     * @param context DSpace context object
+     * @param session the current request's database context.
      * @param eperson the submitter
      * @param retrieveAllItems flag to determine if only archive should be returned
      * @return an iterator over the items submitted by eperson
      * @throws SQLException if database error
      */
-    public Iterator<Item> findBySubmitter(Context context, EPerson eperson, boolean retrieveAllItems)
+    public Iterator<Item> findBySubmitter(Session session, EPerson eperson, boolean retrieveAllItems)
         throws SQLException;
 
-    public Iterator<Item> findBySubmitter(Context context, EPerson eperson, MetadataField metadataField, int limit)
+    public Iterator<Item> findBySubmitter(Session session, EPerson eperson, MetadataField metadataField, int limit)
         throws SQLException;
 
-    public Iterator<Item> findByMetadataField(Context context, MetadataField metadataField, String value,
+    public Iterator<Item> findByMetadataField(Session session, MetadataField metadataField, String value,
                                               boolean inArchive) throws SQLException;
 
-    public Iterator<Item> findByMetadataQuery(Context context, List<List<MetadataField>> listFieldList,
+    public Iterator<Item> findByMetadataQuery(Session session, List<List<MetadataField>> listFieldList,
                                               List<String> query_op, List<String> query_val, List<UUID> collectionUuids,
                                               String regexClause, int offset, int limit) throws SQLException;
 
-    public Iterator<Item> findByAuthorityValue(Context context, MetadataField metadataField, String authority,
+    public Iterator<Item> findByAuthorityValue(Session session, MetadataField metadataField, String authority,
                                                boolean inArchive) throws SQLException;
 
-    public Iterator<Item> findArchivedByCollection(Context context, Collection collection, Integer limit,
+    public Iterator<Item> findArchivedByCollection(Session session, Collection collection, Integer limit,
                                                    Integer offset) throws SQLException;
 
     /**
      * Returns all the Items in an iterator that are archived and for which the given Collection is part of the Item's
      * Collections but it is not the owning collection
-     * @param context       The relevant DSpace context
+     * @param session       The current request's database context.
      * @param collection    The collection to check on
      * @param limit         The limit for the query
      * @param offset        The offset for the query
      * @return              An iterator containing the items for which the constraints hold true
      * @throws SQLException If something goes wrong
      */
-    public Iterator<Item> findArchivedByCollectionExcludingOwning(Context context, Collection collection, Integer limit,
+    public Iterator<Item> findArchivedByCollectionExcludingOwning(Session session, Collection collection, Integer limit,
                                                                   Integer offset) throws SQLException;
 
     /**
      * Counts all the items that are archived and for which the given Collection is part of the Item's Collections
      * but it is not the owning Collection
-     * @param context       The relevant DSpace context
+     * @param session       The current request's database context.
      * @param collection    The collection to check on
      * @return              The total amount of items that fit the constraints
      * @throws SQLException If something goes wrong
      */
-    public int countArchivedByCollectionExcludingOwning(Context context, Collection collection) throws SQLException;
+    public int countArchivedByCollectionExcludingOwning(Session session, Collection collection) throws SQLException;
 
-    public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException;
+    public Iterator<Item> findAllByCollection(Session session, Collection collection) throws SQLException;
 
-    public Iterator<Item> findAllByCollection(Context context, Collection collection, Integer limit, Integer offset)
+    public Iterator<Item> findAllByCollection(Session session, Collection collection, Integer limit, Integer offset)
         throws SQLException;
 
     /**
      * Count number of items in a given collection
      *
-     * @param context          context
+     * @param session          the current request's database context.
      * @param collection       the collection
      * @param includeArchived  whether to include archived items in count
      * @param includeWithdrawn whether to include withdrawn items in count
      * @return item count
      * @throws SQLException if database error
      */
-    public int countItems(Context context, Collection collection, boolean includeArchived, boolean includeWithdrawn)
+    public int countItems(Session session, Collection collection, boolean includeArchived, boolean includeWithdrawn)
         throws SQLException;
 
     /**
@@ -137,20 +137,20 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * {@link org.dspace.content.service.CommunityService#getAllCollections(Context, Community)}
      * to determine the unique number of items in a Community.
      *
-     * @param context          context
+     * @param session          the current request's database context.
      * @param collections      the list of collections
      * @param includeArchived  whether to include archived items in count
      * @param includeWithdrawn whether to include withdrawn items in count
      * @return item count
      * @throws SQLException if database error
      */
-    public int countItems(Context context, List<Collection> collections, boolean includeArchived,
+    public int countItems(Session session, List<Collection> collections, boolean includeArchived,
                           boolean includeWithdrawn) throws SQLException;
 
     /**
      * Get all Items installed or withdrawn, discoverable, and modified since a Date.
      *
-     * @param context      context
+     * @param session      the current request's database context.
      * @param archived     whether to find archived
      * @param withdrawn    whether to find withdrawn
      * @param discoverable whether to find discoverable
@@ -158,41 +158,40 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @return iterator over items
      * @throws SQLException if database error
      */
-    public Iterator<Item> findAll(Context context, boolean archived,
+    public Iterator<Item> findAll(Session session, boolean archived,
                                   boolean withdrawn, boolean discoverable, Date lastModified)
         throws SQLException;
 
     /**
-     * Count total number of items (rows in item table)
+     * Count total number of items (rows in item table).
      *
-     * @param context context
+     * @param session the current request's database context.
      * @return total count
      * @throws SQLException if database error
      */
-    int countRows(Context context) throws SQLException;
+    int countRows(Session session) throws SQLException;
 
     /**
      * Count number of items based on specific status flags
      *
-     * @param context          context
+     * @param session          the current request's database context.
      * @param includeArchived  whether to include archived items in count
      * @param includeWithdrawn whether to include withdrawn items in count
      * @return count of items
      * @throws SQLException if database error
      */
-    int countItems(Context context, boolean includeArchived, boolean includeWithdrawn) throws SQLException;
+    int countItems(Session session, boolean includeArchived, boolean includeWithdrawn) throws SQLException;
 
     /**
      * Count number of items from the specified submitter based on specific status flags
      *
-     * @param context          context
+     * @param session          the current request's database context.
      * @param submitter        the submitter
      * @param includeArchived  whether to include archived items in count
      * @param includeWithdrawn whether to include withdrawn items in count
      * @return count of items
      * @throws SQLException if database error
      */
-    public int countItems(Context context, EPerson submitter, boolean includeArchived, boolean includeWithdrawn)
+    public int countItems(Session session, EPerson submitter, boolean includeArchived, boolean includeWithdrawn)
         throws SQLException;
-
 }

@@ -11,8 +11,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.content.BitstreamFormat;
-import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
+import org.hibernate.Session;
 
 /**
  * Database Access Object interface class for the BitstreamFormat object.
@@ -24,15 +24,15 @@ import org.dspace.core.GenericDAO;
  */
 public interface BitstreamFormatDAO extends GenericDAO<BitstreamFormat> {
 
-    public BitstreamFormat findByMIMEType(Context context, String mimeType, boolean includeInternal)
+    public BitstreamFormat findByMIMEType(Session session, String mimeType, boolean includeInternal)
         throws SQLException;
 
-    public BitstreamFormat findByShortDescription(Context context, String desc) throws SQLException;
+    public BitstreamFormat findByShortDescription(Session session, String desc) throws SQLException;
 
-    public int updateRemovedBitstreamFormat(Context context, BitstreamFormat deletedBitstreamFormat,
+    public int updateRemovedBitstreamFormat(Session session, BitstreamFormat deletedBitstreamFormat,
                                             BitstreamFormat newBitstreamFormat) throws SQLException;
 
-    public List<BitstreamFormat> findNonInternal(Context context) throws SQLException;
+    public List<BitstreamFormat> findNonInternal(Session session) throws SQLException;
 
-    public List<BitstreamFormat> findByFileExtension(Context context, String extension) throws SQLException;
+    public List<BitstreamFormat> findByFileExtension(Session session, String extension) throws SQLException;
 }

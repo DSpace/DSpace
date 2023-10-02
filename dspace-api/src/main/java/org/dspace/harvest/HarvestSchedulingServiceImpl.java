@@ -79,7 +79,7 @@ public class HarvestSchedulingServiceImpl implements HarvestSchedulingService {
     @Override
     public void resetScheduler() throws SQLException, AuthorizeException, IOException {
         Context context = new Context();
-        List<HarvestedCollection> harvestedCollections = harvestedCollectionService.findAll(context);
+        List<HarvestedCollection> harvestedCollections = harvestedCollectionService.findAll(context.getSession());
         for (HarvestedCollection hc : harvestedCollections) {
             hc.setHarvestStartTime(null);
             hc.setHarvestStatus(HarvestedCollection.STATUS_READY);

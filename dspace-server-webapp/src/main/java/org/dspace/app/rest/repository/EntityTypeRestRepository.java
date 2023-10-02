@@ -43,7 +43,7 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
     @PreAuthorize("permitAll()")
     public EntityTypeRest findOne(Context context, Integer integer) {
         try {
-            EntityType entityType = entityTypeService.find(context, integer);
+            EntityType entityType = entityTypeService.find(context.getSession(), integer);
             if (entityType == null) {
                 throw new ResourceNotFoundException("The entityType for ID: " + integer + " could not be found");
             }
@@ -56,7 +56,7 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
     @Override
     public Page<EntityTypeRest> findAll(Context context, Pageable pageable) {
         try {
-            List<EntityType> entityTypes = entityTypeService.findAll(context);
+            List<EntityType> entityTypes = entityTypeService.findAll(context.getSession());
             return converter.toRestPage(entityTypes, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -79,7 +79,7 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
                     return null;
                 }
                 try {
-                    return entityTypeService.findByEntityType(context, type);
+                    return entityTypeService.findByEntityType(context.getSession(), type);
                 } catch (SQLException e) {
                     throw new RuntimeException(e.getMessage(), e);
                 }
@@ -103,13 +103,13 @@ public class EntityTypeRestRepository extends DSpaceRestRepository<EntityTypeRes
             Context context = obtainContext();
             List<String> types = entityTypeService.getSubmitAuthorizedTypes(context);
             List<EntityType> entityTypes = types.stream()
-                    .filter(x -> externalDataService.getExternalDataProvidersForEntityType(x).size() > 0)
+                    .filter(x -> !externalDataService.getExternalDataProvidersForEntityType(x).isEmpty())
                     .map(type -> {
                         if (StringUtils.isBlank(type)) {
                             return null;
                         }
                         try {
-                            return entityTypeService.findByEntityType(context, type);
+                            return entityTypeService.findByEntityType(context.getSession(), type);
                         } catch (SQLException e) {
                             throw new RuntimeException(e.getMessage(), e);
                         }

@@ -194,7 +194,7 @@ public abstract class ExportEventProcessor {
      * @throws SQLException
      */
     protected boolean shouldProcessEntityType(Item item) throws SQLException {
-        Entity entity = entityService.findByItemId(context, item.getID());
+        Entity entity = entityService.findByItemId(context.getSession(), item.getID());
         EntityType type = entityService.getType(context, entity);
 
         if (type == null) {

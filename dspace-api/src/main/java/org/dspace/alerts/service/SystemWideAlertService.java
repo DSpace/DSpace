@@ -17,6 +17,7 @@ import org.dspace.alerts.SystemWideAlert;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.hibernate.Session;
 
 /**
  * An interface for the SystemWideAlertService with methods regarding the SystemWideAlert workload
@@ -32,7 +33,9 @@ public interface SystemWideAlertService {
      * @param countdownTo       The date to which to count down to when the system-wide alert is active
      * @param active            Whether the system-wide alert os active
      * @return The created SystemWideAlert object
-     * @throws SQLException If something goes wrong
+     * @throws SQLException     If something goes wrong
+     * @throws AuthorizeException if current user is not an
+     *                          administrator.
      */
     SystemWideAlert create(Context context, String message, AllowSessionsEnum allowSessionsType,
                            Date countdownTo, boolean active
@@ -41,42 +44,44 @@ public interface SystemWideAlertService {
     /**
      * This method will retrieve a SystemWideAlert object from the Database with the given ID
      *
-     * @param context The relevant DSpace context
+     * @param session current request's database context.
      * @param alertId The alert id on which we'll search for in the database
      * @return The system-wide alert that holds the given alert id
      * @throws SQLException If something goes wrong
      */
-    SystemWideAlert find(Context context, int alertId) throws SQLException;
+    SystemWideAlert find(Session session, int alertId) throws SQLException;
 
     /**
      * Returns a list of all SystemWideAlert objects in the database
      *
-     * @param context The relevant DSpace context
+     * @param session current request's database context.
      * @return The list of all SystemWideAlert objects in the Database
      * @throws SQLException If something goes wrong
      */
-    List<SystemWideAlert> findAll(Context context) throws SQLException;
+    List<SystemWideAlert> findAll(Session session) throws SQLException;
 
     /**
      * Returns a list of all SystemWideAlert objects in the database
      *
-     * @param context The relevant DSpace context
+     * @param session current request's database context.
      * @param limit   The limit for the amount of system-wide alerts returned
      * @param offset  The offset for the system-wide alerts to be returned
      * @return The list of all SystemWideAlert objects in the Database
      * @throws SQLException If something goes wrong
      */
-    List<SystemWideAlert> findAll(Context context, int limit, int offset) throws SQLException;
+    List<SystemWideAlert> findAll(Session session, int limit, int offset) throws SQLException;
 
 
     /**
      * Returns a list of all active SystemWideAlert objects in the database
      *
-     * @param context The relevant DSpace context
+     * @param session current request's database context.
+     * @param limit   return at most this many alerts.
+     * @param offset  start at this alert in the list.
      * @return The list of all active SystemWideAlert objects in the database
      * @throws SQLException If something goes wrong
      */
-    List<SystemWideAlert> findAllActive(Context context, int limit, int offset) throws SQLException;
+    List<SystemWideAlert> findAllActive(Session session, int limit, int offset) throws SQLException;
 
     /**
      * This method will delete the given SystemWideAlert object from the database

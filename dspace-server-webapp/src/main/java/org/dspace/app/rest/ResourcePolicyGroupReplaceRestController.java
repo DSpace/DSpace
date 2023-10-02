@@ -64,7 +64,7 @@ public class ResourcePolicyGroupReplaceRestController {
             throw new UnprocessableEntityException("The Group doesn't exist or the data cannot be resolved to a Group");
         }
 
-        ResourcePolicy resourcePolicy = resourcePolicyService.find(context, id);
+        ResourcePolicy resourcePolicy = resourcePolicyService.find(context.getSession(), id);
         if (Objects.isNull(resourcePolicy)) {
             throw new ResourceNotFoundException("ResourcePolicy with id: " + id + " not found!");
         }

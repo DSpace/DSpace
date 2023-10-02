@@ -48,10 +48,11 @@ public class EntityTypeServiceImplTest   {
     @Test
     public void testFindByEntityType() throws Exception {
         // Mock DAO to return our mocked EntityType
-        when(entityTypeDAO.findByEntityType(context, "TestType")).thenReturn(entityType);
+        when(entityTypeDAO.findByEntityType(context.getSession(), "TestType")).thenReturn(entityType);
 
         // The EntityType reported from our TestType parameter should match our mocked EntityType
-        assertEquals("TestFindByEntityType 0", entityType, entityTypeService.findByEntityType(context, "TestType"));
+        assertEquals("TestFindByEntityType 0", entityType,
+                entityTypeService.findByEntityType(context.getSession(), "TestType"));
     }
 
 
@@ -61,7 +62,7 @@ public class EntityTypeServiceImplTest   {
         List<EntityType> entityTypeList = new ArrayList<>();
 
         // The EntityType(s) reported from our mocked state should match our entityTypeList
-        assertEquals("TestFindAll 0", entityTypeList, entityTypeService.findAll(context));
+        assertEquals("TestFindAll 0", entityTypeList, entityTypeService.findAll(context.getSession()));
     }
 
 
@@ -86,10 +87,10 @@ public class EntityTypeServiceImplTest   {
     @Test
     public void testFind() throws Exception {
         // Mock DAO to return our mocked EntityType
-        when(entityTypeDAO.findByID(context, EntityType.class, 0)).thenReturn(entityType);
+        when(entityTypeDAO.findByID(context.getSession(), EntityType.class, 0)).thenReturn(entityType);
 
         // The reported EntityType should match our mocked entityType
-        assertEquals("TestFind 0", entityType, entityTypeService.find(context, 0));
+        assertEquals("TestFind 0", entityType, entityTypeService.find(context.getSession(), 0));
     }
 
     @Test
@@ -106,7 +107,7 @@ public class EntityTypeServiceImplTest   {
         entityTypeService.update(context, entityTypeList);
 
         // Verify entityTypeDAO.save was invoked twice to confirm proper invocation of both impls of update()
-        Mockito.verify(entityTypeDAO,times(2)).save(context, entityType);
+        Mockito.verify(entityTypeDAO,times(2)).save(context.getSession(), entityType);
     }
 
     @Test
@@ -118,7 +119,7 @@ public class EntityTypeServiceImplTest   {
         entityTypeService.delete(context, entityType);
 
         // Verify entityTypeDAO.delete() ran once to confirm proper invocation of delete()
-        Mockito.verify(entityTypeDAO,times(1)).delete(context, entityType);
+        Mockito.verify(entityTypeDAO,times(1)).delete(context.getSession(), entityType);
     }
 
     /**

@@ -13,6 +13,7 @@ import java.util.List;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.harvest.HarvestedCollection;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the HarvestedCollection object.
@@ -26,12 +27,12 @@ public interface HarvestedCollectionService {
     /**
      * Find the harvest settings corresponding to this collection
      *
-     * @param context    The relevant DSpace Context.
+     * @param session    current request's database context.
      * @param collection target collection
      * @return a HarvestInstance object corresponding to this collection's settings, null if not found.
      * @throws SQLException if database error
      */
-    public HarvestedCollection find(Context context, Collection collection) throws SQLException;
+    public HarvestedCollection find(Session session, Collection collection) throws SQLException;
 
     /**
      * Create a new harvest instance row for a specified collection.
@@ -88,49 +89,49 @@ public interface HarvestedCollectionService {
     /**
      * Find all collections that are set up for harvesting
      *
-     * @param context The relevant DSpace Context.
+     * @param session current request's database context.
      * @return list of collection id's
      * @throws SQLException if database error
      */
-    public List<HarvestedCollection> findAll(Context context) throws SQLException;
+    public List<HarvestedCollection> findAll(Session session) throws SQLException;
 
     /**
      * Find all collections that are ready for harvesting
      *
-     * @param context The relevant DSpace Context.
+     * @param session The relevant DSpace Context.
      * @return list of collection id's
      * @throws SQLException if database error
      */
-    public List<HarvestedCollection> findReady(Context context) throws SQLException;
+    public List<HarvestedCollection> findReady(Session session) throws SQLException;
 
     /**
      * Find all collections with the specified status flag.
      *
-     * @param context The relevant DSpace Context.
+     * @param session current request's database context.
      * @param status  see HarvestInstance.STATUS_...
      * @return all collections with the specified status flag
      * @throws SQLException if database error
      */
-    public List<HarvestedCollection> findByStatus(Context context, int status) throws SQLException;
+    public List<HarvestedCollection> findByStatus(Session session, int status) throws SQLException;
 
     /**
      * Find the collection that was harvested the longest time ago.
      *
-     * @param context The relevant DSpace Context.
+     * @param session current request's database context.
      * @return collection that was harvested the longest time ago
      * @throws SQLException if database error
      */
-    public HarvestedCollection findOldestHarvest(Context context) throws SQLException;
+    public HarvestedCollection findOldestHarvest(Session session) throws SQLException;
 
 
     /**
      * Find the collection that was harvested most recently.
      *
-     * @param context The relevant DSpace Context.
+     * @param session current request's database context.
      * @return collection that was harvested most recently
      * @throws SQLException if database error
      */
-    public HarvestedCollection findNewestHarvest(Context context) throws SQLException;
+    public HarvestedCollection findNewestHarvest(Session session) throws SQLException;
 
     public void delete(Context context, HarvestedCollection harvestedCollection) throws SQLException;
 

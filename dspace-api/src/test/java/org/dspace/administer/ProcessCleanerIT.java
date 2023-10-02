@@ -69,10 +69,9 @@ public class ProcessCleanerIT extends AbstractIntegrationTestWithDatabase {
         assertThat(messages, hasItem("Found 0 processes to be deleted"));
         assertThat(messages, hasItem("Process cleanup completed"));
 
-        assertThat(processService.find(context, process_1.getID()), notNullValue());
-        assertThat(processService.find(context, process_2.getID()), notNullValue());
-        assertThat(processService.find(context, process_3.getID()), notNullValue());
-
+        assertThat(processService.find(context.getSession(), process_1.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_2.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_3.getID()), notNullValue());
     }
 
     @Test
@@ -102,14 +101,13 @@ public class ProcessCleanerIT extends AbstractIntegrationTestWithDatabase {
         assertThat(messages, hasItem("Found 2 processes to be deleted"));
         assertThat(messages, hasItem("Process cleanup completed"));
 
-        assertThat(processService.find(context, process_1.getID()), notNullValue());
-        assertThat(processService.find(context, process_2.getID()), notNullValue());
-        assertThat(processService.find(context, process_3.getID()), notNullValue());
-        assertThat(processService.find(context, process_4.getID()), nullValue());
-        assertThat(processService.find(context, process_5.getID()), nullValue());
-        assertThat(processService.find(context, process_6.getID()), notNullValue());
-        assertThat(processService.find(context, process_7.getID()), notNullValue());
-
+        assertThat(processService.find(context.getSession(), process_1.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_2.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_3.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_4.getID()), nullValue());
+        assertThat(processService.find(context.getSession(), process_5.getID()), nullValue());
+        assertThat(processService.find(context.getSession(), process_6.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_7.getID()), notNullValue());
     }
 
     @Test
@@ -139,14 +137,13 @@ public class ProcessCleanerIT extends AbstractIntegrationTestWithDatabase {
         assertThat(messages, hasItem("Found 2 processes to be deleted"));
         assertThat(messages, hasItem("Process cleanup completed"));
 
-        assertThat(processService.find(context, process_1.getID()), notNullValue());
-        assertThat(processService.find(context, process_2.getID()), notNullValue());
-        assertThat(processService.find(context, process_3.getID()), notNullValue());
-        assertThat(processService.find(context, process_4.getID()), nullValue());
-        assertThat(processService.find(context, process_5.getID()), nullValue());
-        assertThat(processService.find(context, process_6.getID()), notNullValue());
-        assertThat(processService.find(context, process_7.getID()), notNullValue());
-
+        assertThat(processService.find(context.getSession(), process_1.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_2.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_3.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_4.getID()), nullValue());
+        assertThat(processService.find(context.getSession(), process_5.getID()), nullValue());
+        assertThat(processService.find(context.getSession(), process_6.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_7.getID()), notNullValue());
     }
 
     @Test
@@ -177,15 +174,14 @@ public class ProcessCleanerIT extends AbstractIntegrationTestWithDatabase {
         assertThat(messages, hasItem("Found 2 processes to be deleted"));
         assertThat(messages, hasItem("Process cleanup completed"));
 
-        assertThat(processService.find(context, process_1.getID()), notNullValue());
-        assertThat(processService.find(context, process_2.getID()), notNullValue());
-        assertThat(processService.find(context, process_3.getID()), notNullValue());
-        assertThat(processService.find(context, process_4.getID()), notNullValue());
-        assertThat(processService.find(context, process_5.getID()), notNullValue());
-        assertThat(processService.find(context, process_6.getID()), nullValue());
-        assertThat(processService.find(context, process_7.getID()), notNullValue());
-        assertThat(processService.find(context, process_8.getID()), nullValue());
-
+        assertThat(processService.find(context.getSession(), process_1.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_2.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_3.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_4.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_5.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_6.getID()), nullValue());
+        assertThat(processService.find(context.getSession(), process_7.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_8.getID()), nullValue());
     }
 
     @Test
@@ -216,15 +212,14 @@ public class ProcessCleanerIT extends AbstractIntegrationTestWithDatabase {
         assertThat(messages, hasItem("Found 2 processes to be deleted"));
         assertThat(messages, hasItem("Process cleanup completed"));
 
-        assertThat(processService.find(context, process_1.getID()), notNullValue());
-        assertThat(processService.find(context, process_2.getID()), notNullValue());
-        assertThat(processService.find(context, process_3.getID()), notNullValue());
-        assertThat(processService.find(context, process_4.getID()), notNullValue());
-        assertThat(processService.find(context, process_5.getID()), notNullValue());
-        assertThat(processService.find(context, process_6.getID()), notNullValue());
-        assertThat(processService.find(context, process_7.getID()), nullValue());
-        assertThat(processService.find(context, process_8.getID()), nullValue());
-
+        assertThat(processService.find(context.getSession(), process_1.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_2.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_3.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_4.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_5.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_6.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_7.getID()), nullValue());
+        assertThat(processService.find(context.getSession(), process_8.getID()), nullValue());
     }
 
     @Test
@@ -252,15 +247,14 @@ public class ProcessCleanerIT extends AbstractIntegrationTestWithDatabase {
         assertThat(messages, hasItem("Found 4 processes to be deleted"));
         assertThat(messages, hasItem("Process cleanup completed"));
 
-        assertThat(processService.find(context, process_1.getID()), notNullValue());
-        assertThat(processService.find(context, process_2.getID()), notNullValue());
-        assertThat(processService.find(context, process_3.getID()), notNullValue());
-        assertThat(processService.find(context, process_4.getID()), nullValue());
-        assertThat(processService.find(context, process_5.getID()), nullValue());
-        assertThat(processService.find(context, process_6.getID()), notNullValue());
-        assertThat(processService.find(context, process_7.getID()), nullValue());
-        assertThat(processService.find(context, process_8.getID()), nullValue());
-
+        assertThat(processService.find(context.getSession(), process_1.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_2.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_3.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_4.getID()), nullValue());
+        assertThat(processService.find(context.getSession(), process_5.getID()), nullValue());
+        assertThat(processService.find(context.getSession(), process_6.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_7.getID()), nullValue());
+        assertThat(processService.find(context.getSession(), process_8.getID()), nullValue());
     }
 
     @Test
@@ -288,15 +282,14 @@ public class ProcessCleanerIT extends AbstractIntegrationTestWithDatabase {
         assertThat(messages, hasItem("Found 4 processes to be deleted"));
         assertThat(messages, hasItem("Process cleanup completed"));
 
-        assertThat(processService.find(context, process_1.getID()), notNullValue());
-        assertThat(processService.find(context, process_2.getID()), notNullValue());
-        assertThat(processService.find(context, process_3.getID()), notNullValue());
-        assertThat(processService.find(context, process_4.getID()), nullValue());
-        assertThat(processService.find(context, process_5.getID()), nullValue());
-        assertThat(processService.find(context, process_6.getID()), nullValue());
-        assertThat(processService.find(context, process_7.getID()), notNullValue());
-        assertThat(processService.find(context, process_8.getID()), nullValue());
-
+        assertThat(processService.find(context.getSession(), process_1.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_2.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_3.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_4.getID()), nullValue());
+        assertThat(processService.find(context.getSession(), process_5.getID()), nullValue());
+        assertThat(processService.find(context.getSession(), process_6.getID()), nullValue());
+        assertThat(processService.find(context.getSession(), process_7.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_8.getID()), nullValue());
     }
 
     @Test
@@ -324,15 +317,14 @@ public class ProcessCleanerIT extends AbstractIntegrationTestWithDatabase {
         assertThat(messages, hasItem("Found 3 processes to be deleted"));
         assertThat(messages, hasItem("Process cleanup completed"));
 
-        assertThat(processService.find(context, process_1.getID()), notNullValue());
-        assertThat(processService.find(context, process_2.getID()), notNullValue());
-        assertThat(processService.find(context, process_3.getID()), notNullValue());
-        assertThat(processService.find(context, process_4.getID()), notNullValue());
-        assertThat(processService.find(context, process_5.getID()), notNullValue());
-        assertThat(processService.find(context, process_6.getID()), nullValue());
-        assertThat(processService.find(context, process_7.getID()), nullValue());
-        assertThat(processService.find(context, process_8.getID()), nullValue());
-
+        assertThat(processService.find(context.getSession(), process_1.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_2.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_3.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_4.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_5.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_6.getID()), nullValue());
+        assertThat(processService.find(context.getSession(), process_7.getID()), nullValue());
+        assertThat(processService.find(context.getSession(), process_8.getID()), nullValue());
     }
 
     @Test
@@ -360,15 +352,14 @@ public class ProcessCleanerIT extends AbstractIntegrationTestWithDatabase {
         assertThat(messages, hasItem("Found 5 processes to be deleted"));
         assertThat(messages, hasItem("Process cleanup completed"));
 
-        assertThat(processService.find(context, process_1.getID()), notNullValue());
-        assertThat(processService.find(context, process_2.getID()), notNullValue());
-        assertThat(processService.find(context, process_3.getID()), notNullValue());
-        assertThat(processService.find(context, process_4.getID()), nullValue());
-        assertThat(processService.find(context, process_5.getID()), nullValue());
-        assertThat(processService.find(context, process_6.getID()), nullValue());
-        assertThat(processService.find(context, process_7.getID()), nullValue());
-        assertThat(processService.find(context, process_8.getID()), nullValue());
-
+        assertThat(processService.find(context.getSession(), process_1.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_2.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_3.getID()), notNullValue());
+        assertThat(processService.find(context.getSession(), process_4.getID()), nullValue());
+        assertThat(processService.find(context.getSession(), process_5.getID()), nullValue());
+        assertThat(processService.find(context.getSession(), process_6.getID()), nullValue());
+        assertThat(processService.find(context.getSession(), process_7.getID()), nullValue());
+        assertThat(processService.find(context.getSession(), process_8.getID()), nullValue());
     }
 
     private Process buildProcess(ProcessStatus processStatus, Date creationTime) throws SQLException {

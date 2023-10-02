@@ -101,7 +101,7 @@ public class CanCreateCollectionsIT extends AbstractControllerIntegrationTest {
     @Test
     public void canCreateCollectionsOnSiteAsAdminTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
 
@@ -145,7 +145,7 @@ public class CanCreateCollectionsIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void canCreateCollectionsOnSiteAsAnonymousTest() throws Exception {
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
 
@@ -192,7 +192,7 @@ public class CanCreateCollectionsIT extends AbstractControllerIntegrationTest {
     public void canCreateCollectionsOnSiteAsEPersonWithoutRightsTest() throws Exception {
         authorizeService.addPolicy(context, communityB, Constants.ADMIN, eperson);
         String token = getAuthToken(eperson.getEmail(), password);
-        Site site = siteService.findSite(context);
+        Site site = siteService.findSite(context.getSession());
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
         String siteUri = utils.linkToSingleResource(siteRest, "self").getHref();
 

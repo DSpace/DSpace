@@ -64,7 +64,7 @@ public class ResearcherProfileEPersonLinkRepository extends AbstractDSpaceRestRe
                 throw new ResourceNotFoundException("No such profile with UUID: " + id);
             }
 
-            EPerson ePerson = ePersonService.find(context, id);
+            EPerson ePerson = ePersonService.find(context.getSession(), id);
             if (ePerson == null) {
                 throw new ResourceNotFoundException("No such eperson related to a profile with EPerson UUID: " + id);
             }

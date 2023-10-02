@@ -42,7 +42,8 @@ public class RelationshipTypeRestRepository extends DSpaceRestRepository<Relatio
     @PreAuthorize("permitAll()")
     public RelationshipTypeRest findOne(Context context, Integer integer) {
         try {
-            return converter.toRest(relationshipTypeService.find(context, integer), utils.obtainProjection());
+            return converter.toRest(relationshipTypeService.find(context.getSession(), integer),
+                    utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -51,7 +52,7 @@ public class RelationshipTypeRestRepository extends DSpaceRestRepository<Relatio
     @Override
     public Page<RelationshipTypeRest> findAll(Context context, Pageable pageable) {
         try {
-            List<RelationshipType> relationshipTypes = relationshipTypeService.findAll(context);
+            List<RelationshipType> relationshipTypes = relationshipTypeService.findAll(context.getSession());
             return converter.toRestPage(relationshipTypes, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -60,7 +61,7 @@ public class RelationshipTypeRestRepository extends DSpaceRestRepository<Relatio
 
     /**
      * Returns a list of relationship types that matches provided entity type on any side of relationship
-     * 
+     *
      * @param type             The entity type label
      * @param pageable         The page information
      * @return
@@ -70,12 +71,12 @@ public class RelationshipTypeRestRepository extends DSpaceRestRepository<Relatio
     public Page<RelationshipTypeRest> findByEntityType(@Parameter(value = "type", required = true) String type,
                                                         Pageable pageable) throws SQLException {
         Context context = obtainContext();
-        EntityType entityType = entityTypeService.findByEntityType(context, type);
+        EntityType entityType = entityTypeService.findByEntityType(context.getSession(), type);
         if (Objects.isNull(entityType)) {
             throw new DSpaceBadRequestException("EntityType with name: " + type + " not found");
         }
-        List<RelationshipType> relationshipTypes = relationshipTypeService.findByEntityType(context, entityType,
-                                Math.toIntExact(pageable.getPageSize()), Math.toIntExact(pageable.getOffset()));
+        List<RelationshipType> relationshipTypes = relationshipTypeService.findByEntityType(context.getSession(),
+                entityType, Math.toIntExact(pageable.getPageSize()), Math.toIntExact(pageable.getOffset()));
         int total = relationshipTypeService.countByEntityType(context, entityType);
         return converter.toRestPage(relationshipTypes, pageable, total, utils.obtainProjection());
     }

@@ -57,7 +57,7 @@ public class ProcessOutputLinkRepository extends AbstractDSpaceRestRepository im
                                               Projection projection) throws SQLException, AuthorizeException {
 
         Context context = obtainContext();
-        Process process = processService.find(context, processId);
+        Process process = processService.find(context.getSession(), processId);
         if ((context.getCurrentUser() == null) || (!context.getCurrentUser().equals(process.getEPerson())
                 && !authorizeService.isAdmin(context))) {
             throw new AuthorizeException("The current user is not eligible to view the process with id: " + processId);

@@ -256,7 +256,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void versionForItemTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
-        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, version.getItem());
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context.getSession(), version.getItem());
         installItemService.installItem(context, workspaceItem);
         context.restoreAuthSystemState();
         getClient().perform(get("/api/core/items/" + version.getItem().getID() + "/version"))
@@ -1697,7 +1697,7 @@ public class VersionRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.commit();
 
         // archive the new version, this implies that VersioningConsumer will unarchive the previous version
-        installItemService.installItem(context, workspaceItemService.findByItem(context, newItem));
+        installItemService.installItem(context, workspaceItemService.findByItem(context.getSession(), newItem));
         context.commit();
 
         context.restoreAuthSystemState();

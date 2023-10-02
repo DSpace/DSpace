@@ -24,6 +24,8 @@ import java.util.Optional;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataFieldName;
 import org.dspace.content.MetadataValue;
@@ -47,9 +49,8 @@ import org.dspace.orcid.service.OrcidEntityFactoryService;
 import org.dspace.orcid.service.OrcidHistoryService;
 import org.dspace.orcid.service.OrcidProfileSectionFactoryService;
 import org.dspace.orcid.service.OrcidTokenService;
+import org.hibernate.Session;
 import org.orcid.jaxb.model.v3.release.record.Activity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -61,7 +62,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class OrcidHistoryServiceImpl implements OrcidHistoryService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrcidHistoryServiceImpl.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired
     private OrcidHistoryDAO orcidHistoryDAO;
@@ -91,18 +92,18 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     private OrcidTokenService orcidTokenService;
 
     @Override
-    public OrcidHistory find(Context context, int id) throws SQLException {
-        return orcidHistoryDAO.findByID(context, OrcidHistory.class, id);
+    public OrcidHistory find(Session session, int id) throws SQLException {
+        return orcidHistoryDAO.findByID(session, OrcidHistory.class, id);
     }
 
     @Override
-    public List<OrcidHistory> findAll(Context context) throws SQLException {
-        return orcidHistoryDAO.findAll(context, OrcidHistory.class);
+    public List<OrcidHistory> findAll(Session session) throws SQLException {
+        return orcidHistoryDAO.findAll(session, OrcidHistory.class);
     }
 
     @Override
-    public List<OrcidHistory> findByProfileItemOrEntity(Context context, Item profileItem) throws SQLException {
-        return orcidHistoryDAO.findByProfileItemOrEntity(context, profileItem);
+    public List<OrcidHistory> findByProfileItemOrEntity(Session session, Item profileItem) throws SQLException {
+        return orcidHistoryDAO.findByProfileItemOrEntity(session, profileItem);
     }
 
     @Override
@@ -110,33 +111,35 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         OrcidHistory orcidHistory = new OrcidHistory();
         orcidHistory.setEntity(entity);
         orcidHistory.setProfileItem(profileItem);
-        return orcidHistoryDAO.create(context, orcidHistory);
+        return orcidHistoryDAO.create(context.getSession(), orcidHistory);
     }
 
     @Override
     public void delete(Context context, OrcidHistory orcidHistory) throws SQLException {
-        orcidHistoryDAO.delete(context, orcidHistory);
+        orcidHistoryDAO.delete(context.getSession(), orcidHistory);
     }
 
     @Override
     public void update(Context context, OrcidHistory orcidHistory) throws SQLException {
         if (orcidHistory != null) {
-            orcidHistoryDAO.save(context, orcidHistory);
+            orcidHistoryDAO.save(context.getSession(), orcidHistory);
         }
     }
 
     @Override
-    public Optional<String> findLastPutCode(Context context, Item profileItem, Item entity) throws SQLException {
-        List<OrcidHistory> records = orcidHistoryDAO.findByProfileItemAndEntity(context, profileItem.getID(),
-            entity.getID());
+    public Optional<String> findLastPutCode(Session session, Item profileItem, Item entity) throws SQLException {
+        List<OrcidHistory> records
+                = orcidHistoryDAO.findByProfileItemAndEntity(session,
+                        profileItem.getID(),
+                        entity.getID());
         return findLastPutCode(records, profileItem);
     }
 
     @Override
-    public Map<Item, String> findLastPutCodes(Context context, Item entity) throws SQLException {
-        Map<Item, String> profileItemAndPutCodeMap = new HashMap<Item, String>();
+    public Map<Item, String> findLastPutCodes(Session session, Item entity) throws SQLException {
+        Map<Item, String> profileItemAndPutCodeMap = new HashMap<>();
 
-        List<OrcidHistory> orcidHistoryRecords = findByEntity(context, entity);
+        List<OrcidHistory> orcidHistoryRecords = findByEntity(session, entity);
         for (OrcidHistory orcidHistoryRecord : orcidHistoryRecords) {
             Item profileItem = orcidHistoryRecord.getProfileItem();
             if (profileItemAndPutCodeMap.containsKey(profileItem)) {
@@ -151,14 +154,14 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     }
 
     @Override
-    public List<OrcidHistory> findByEntity(Context context, Item entity) throws SQLException {
-        return orcidHistoryDAO.findByEntity(context, entity);
+    public List<OrcidHistory> findByEntity(Session session, Item entity) throws SQLException {
+        return orcidHistoryDAO.findByEntity(session, entity);
     }
 
     @Override
     public List<OrcidHistory> findSuccessfullyRecordsByEntityAndType(Context context,
         Item entity, String recordType) throws SQLException {
-        return orcidHistoryDAO.findSuccessfullyRecordsByEntityAndType(context, entity, recordType);
+        return orcidHistoryDAO.findSuccessfullyRecordsByEntityAndType(context.getSession(), entity, recordType);
     }
 
     @Override
@@ -181,7 +184,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
 
             OrcidResponse response = synchronizeWithOrcid(context, orcidQueue, orcid, token, operation);
             OrcidHistory orcidHistory = createHistoryRecordFromOrcidResponse(context, orcidQueue, operation, response);
-            orcidQueueDAO.delete(context, orcidQueue);
+            orcidQueueDAO.delete(context.getSession(), orcidQueue);
             return orcidHistory;
 
         } catch (OrcidValidationException ex) {
@@ -315,7 +318,7 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
         history.setMetadata(orcidQueue.getMetadata());
         history.setOperation(operation);
         history.setDescription(orcidQueue.getDescription());
-        return orcidHistoryDAO.create(context, history);
+        return orcidHistoryDAO.create(context.getSession(), history);
     }
 
     private Optional<String> getMetadataValue(Item item, String metadataField) {
@@ -324,8 +327,13 @@ public class OrcidHistoryServiceImpl implements OrcidHistoryService {
     }
 
     private Optional<String> getAccessToken(Context context, Item item) {
-        return ofNullable(orcidTokenService.findByProfileItem(context, item))
-            .map(orcidToken -> orcidToken.getAccessToken());
+        try {
+            return ofNullable(orcidTokenService.findByProfileItem(context.getSession(), item))
+                    .map(orcidToken -> orcidToken.getAccessToken());
+        } catch (SQLException ex) {
+            LOGGER.error("Unable to get ORCiD access token for Item {}", item::getID, () -> ex);
+            return Optional.ofNullable(null);
+        }
     }
 
     private boolean isProfileSectionType(OrcidQueue orcidQueue) {

@@ -96,11 +96,13 @@ public class MetadataDeletionIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void metadataDeletionTest() throws Exception {
 
-        MetadataField titleField = metadataFieldService.findByElement(context, "dc", "title", null);
-        MetadataField authorField = metadataFieldService.findByElement(context, "dc", "contributor", "author");
+        MetadataField titleField = metadataFieldService.findByElement(context.getSession(),
+                "dc", "title", null);
+        MetadataField authorField = metadataFieldService.findByElement(context.getSession(),
+                "dc", "contributor", "author");
 
-        assertThat(metadataValueService.findByField(context, titleField), hasSize(2));
-        assertThat(metadataValueService.findByField(context, authorField), hasSize(2));
+        assertThat(metadataValueService.findByField(context.getSession(), titleField), hasSize(2));
+        assertThat(metadataValueService.findByField(context.getSession(), authorField), hasSize(2));
 
         configurationService.setProperty("bulkedit.allow-bulk-deletion", "dc.title");
 
@@ -109,8 +111,8 @@ public class MetadataDeletionIT extends AbstractIntegrationTestWithDatabase {
         String[] args = new String[] { "metadata-deletion", "-m", "dc.title" };
         ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), testDSpaceRunnableHandler, kernelImpl);
 
-        assertThat(metadataValueService.findByField(context, titleField), empty());
-        assertThat(metadataValueService.findByField(context, authorField), hasSize(2));
+        assertThat(metadataValueService.findByField(context.getSession(), titleField), empty());
+        assertThat(metadataValueService.findByField(context.getSession(), authorField), hasSize(2));
 
         List<String> infoMessages = testDSpaceRunnableHandler.getInfoMessages();
         assertThat(infoMessages, hasSize(1));
@@ -120,11 +122,13 @@ public class MetadataDeletionIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void metadataDeletionNotAllowedTest() throws Exception {
 
-        MetadataField titleField = metadataFieldService.findByElement(context, "dc", "title", null);
-        MetadataField authorField = metadataFieldService.findByElement(context, "dc", "contributor", "author");
+        MetadataField titleField = metadataFieldService.findByElement(context.getSession(),
+                "dc", "title", null);
+        MetadataField authorField = metadataFieldService.findByElement(context.getSession(),
+                "dc", "contributor", "author");
 
-        assertEquals(2, metadataValueService.findByField(context, titleField).size());
-        assertEquals(2, metadataValueService.findByField(context, authorField).size());
+        assertEquals(2, metadataValueService.findByField(context.getSession(), titleField).size());
+        assertEquals(2, metadataValueService.findByField(context.getSession(), authorField).size());
 
         configurationService.setProperty("bulkedit.allow-bulk-deletion", "dc.type");
 
@@ -138,18 +142,20 @@ public class MetadataDeletionIT extends AbstractIntegrationTestWithDatabase {
         assertThat(exception, instanceOf(IllegalArgumentException.class));
         assertThat(exception.getMessage(), is("The given metadata field cannot be bulk deleted"));
 
-        assertEquals(2, metadataValueService.findByField(context, titleField).size());
-        assertEquals(2, metadataValueService.findByField(context, authorField).size());
+        assertEquals(2, metadataValueService.findByField(context.getSession(), titleField).size());
+        assertEquals(2, metadataValueService.findByField(context.getSession(), authorField).size());
     }
 
     @Test
     public void metadataDeletionWithUnknownMetadataTest() throws Exception {
 
-        MetadataField titleField = metadataFieldService.findByElement(context, "dc", "title", null);
-        MetadataField authorField = metadataFieldService.findByElement(context, "dc", "contributor", "author");
+        MetadataField titleField = metadataFieldService.findByElement(context.getSession(),
+                "dc", "title", null);
+        MetadataField authorField = metadataFieldService.findByElement(context.getSession(),
+                "dc", "contributor", "author");
 
-        assertEquals(2, metadataValueService.findByField(context, titleField).size());
-        assertEquals(2, metadataValueService.findByField(context, authorField).size());
+        assertEquals(2, metadataValueService.findByField(context.getSession(), titleField).size());
+        assertEquals(2, metadataValueService.findByField(context.getSession(), authorField).size());
 
         TestDSpaceRunnableHandler testDSpaceRunnableHandler = new TestDSpaceRunnableHandler();
 
@@ -161,8 +167,8 @@ public class MetadataDeletionIT extends AbstractIntegrationTestWithDatabase {
         assertThat(exception, instanceOf(IllegalArgumentException.class));
         assertThat(exception.getMessage(), is("No metadata field found with name dc.unknown"));
 
-        assertEquals(2, metadataValueService.findByField(context, titleField).size());
-        assertEquals(2, metadataValueService.findByField(context, authorField).size());
+        assertEquals(2, metadataValueService.findByField(context.getSession(), titleField).size());
+        assertEquals(2, metadataValueService.findByField(context.getSession(), authorField).size());
     }
 
     private void createItem(Collection collection, String title, String author) {

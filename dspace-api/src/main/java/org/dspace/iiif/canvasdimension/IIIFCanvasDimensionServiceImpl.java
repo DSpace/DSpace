@@ -103,7 +103,7 @@ public class IIIFCanvasDimensionServiceImpl implements IIIFCanvasDimensionServic
     @Override
     public int processCollection(Context context, Collection collection) throws Exception {
         if (!inSkipList(collection.getHandle())) {
-            Iterator<Item> itemIterator = itemService.findAllByCollection(context, collection);
+            Iterator<Item> itemIterator = itemService.findAllByCollection(context.getSession(), collection);
             while (itemIterator.hasNext() && processed < max2Process) {
                 processItem(context, itemIterator.next());
             }

@@ -46,7 +46,7 @@ public class EPersonGroupLinkRepository extends AbstractDSpaceRestRepository
                                      Projection projection) {
         try {
             Context context = obtainContext();
-            EPerson eperson = epersonService.find(context, epersonId);
+            EPerson eperson = epersonService.find(context.getSession(), epersonId);
             if (eperson == null) {
                 throw new ResourceNotFoundException("No such eperson: " + epersonId);
             }

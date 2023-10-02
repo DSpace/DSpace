@@ -41,7 +41,7 @@ public class BitstreamBundleLinkRepository extends AbstractDSpaceRestRepository
                                 Projection projection) {
         try {
             Context context = obtainContext();
-            Bitstream bitstream = bitstreamService.find(context, bitstreamId);
+            Bitstream bitstream = bitstreamService.find(context.getSession(), bitstreamId);
             if (bitstream == null) {
                 throw new ResourceNotFoundException("No such bitstream: " + bitstreamId);
             }

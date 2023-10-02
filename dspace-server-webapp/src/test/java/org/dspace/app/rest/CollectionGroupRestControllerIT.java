@@ -166,7 +166,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         );
         // no needs to explicitly cleanup the group created as the collection comes
         // from a CollectionBuilder that will cleanup also related groups
-        Group adminGroup = groupService.find(context, idRef.get());
+        Group adminGroup = groupService.find(context.getSession(), idRef.get());
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/adminGroup"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.metadata", allOf(
@@ -198,7 +198,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         );
         // no needs to explicitly cleanup the group created as the collection comes
         // from a CollectionBuilder that will cleanup also related groups
-        Group adminGroup = groupService.find(context, idRef.get());
+        Group adminGroup = groupService.find(context.getSession(), idRef.get());
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/adminGroup"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -257,7 +257,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         );
         // no needs to explicitly cleanup the group created as the collection comes
         // from a CollectionBuilder that will cleanup also related groups
-        Group adminGroup = groupService.find(context, idRef.get());
+        Group adminGroup = groupService.find(context.getSession(), idRef.get());
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/adminGroup"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -290,7 +290,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         );
         // no needs to explicitly cleanup the group created as the collection comes
         // from a CollectionBuilder that will cleanup also related groups
-        Group adminGroup = groupService.find(context, idRef.get());
+        Group adminGroup = groupService.find(context.getSession(), idRef.get());
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/adminGroup"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -609,7 +609,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         );
         // no needs to explicitly cleanup the group created as the collection comes
         // from a CollectionBuilder that will cleanup also related groups
-        Group submittersGroup = groupService.find(context, idRef.get());
+        Group submittersGroup = groupService.find(context.getSession(), idRef.get());
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/submittersGroup"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.metadata", allOf(
@@ -644,7 +644,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         );
         // no needs to explicitly cleanup the group created as the collection comes
         // from a CollectionBuilder that will cleanup also related groups
-        Group submittersGroup = groupService.find(context, idRef.get());
+        Group submittersGroup = groupService.find(context.getSession(), idRef.get());
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/submittersGroup"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -702,7 +702,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         );
         // no needs to explicitly cleanup the group created as the collection comes
         // from a CollectionBuilder that will cleanup also related groups
-        Group submittersGroup = groupService.find(context, idRef.get());
+        Group submittersGroup = groupService.find(context.getSession(), idRef.get());
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/submittersGroup"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -736,7 +736,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         );
         // no needs to explicitly cleanup the group created as the collection comes
         // from a CollectionBuilder that will cleanup also related groups
-        Group submittersGroup = groupService.find(context, idRef.get());
+        Group submittersGroup = groupService.find(context.getSession(), idRef.get());
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/submittersGroup"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -1037,7 +1037,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     public void getCollectionDefaultItemReadGroupAnonymousGroupTest() throws Exception {
 
         String token = getAuthToken(admin.getEmail(), password);
-        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+        Group anon = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -1075,7 +1075,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         );
         // no needs to explicitly cleanup the group created as the collection comes
         // from a CollectionBuilder that will cleanup also related groups
-        Group itemReadGroup = groupService.find(context, idRef.get());
+        Group itemReadGroup = groupService.find(context.getSession(), idRef.get());
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -1104,7 +1104,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         .andExpect(status().isUnprocessableEntity());
 
         // Note that the Default Read Group has the expected behaviour of defaulting to the Anonymous group
-        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+        Group anon = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -1138,7 +1138,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         );
         // no needs to explicitly cleanup the group created as the collection comes
         // from a CollectionBuilder that will cleanup also related groups
-        Group itemReadGroup = groupService.find(context, idRef.get());
+        Group itemReadGroup = groupService.find(context.getSession(), idRef.get());
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -1172,7 +1172,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         );
         // no needs to explicitly cleanup the group created as the collection comes
         // from a CollectionBuilder that will cleanup also related groups
-        Group itemReadGroup = groupService.find(context, idRef.get());
+        Group itemReadGroup = groupService.find(context.getSession(), idRef.get());
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -1199,7 +1199,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
         String token = getAuthToken(admin.getEmail(), password);
         // Note that the Default Read Group has the expected behaviour of defaulting to the Anonymous group
-        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+        Group anon = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -1228,7 +1228,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
         token = getAuthToken(admin.getEmail(), password);
         // Note that the Default Read Group has the expected behaviour of defaulting to the Anonymous group
-        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+        Group anon = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -1277,7 +1277,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         .andExpect(status().isUnprocessableEntity());
 
         // Note that the Default Read Group has the expected behaviour of defaulting to the Anonymous group
-        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+        Group anon = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -1307,7 +1307,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
 
         // Note that the Default Read Group has the expected behaviour of defaulting to the Anonymous group
-        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+        Group anon = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -1330,7 +1330,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
         // Note that deleting a Default Read Group has the expected behaviour of defaulting the DefaultReadGroup back
         // to the Anonymous group
-        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+        Group anon = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -1354,7 +1354,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         .andExpect(status().isNoContent());
 
         // Note that the Default Read Group has the expected behaviour of defaulting to the Anonymous group
-        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+        Group anon = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -1376,7 +1376,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         .andExpect(status().isNoContent());
 
         // Note that the Default Read Group has the expected behaviour of defaulting to the Anonymous group
-        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+        Group anon = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/itemReadGroup"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -1524,7 +1524,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void getCollectionDefaultBitstreamReadGroupNoContentTest() throws Exception {
 
-        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+        Group anon = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
                         .andExpect(status().isOk())
@@ -1563,7 +1563,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         );
         // no needs to explicitly cleanup the group created as the collection comes
         // from a CollectionBuilder that will cleanup also related groups
-        Group bitstreamReadGroup = groupService.find(context, idRef.get());
+        Group bitstreamReadGroup = groupService.find(context.getSession(), idRef.get());
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -1591,7 +1591,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                                      .content(mapper.writeValueAsBytes(groupRest))
                                      .contentType(contentType))
                         .andExpect(status().isUnprocessableEntity());
-        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+        Group anon = groupService.findByName(context.getSession(), Group.ANONYMOUS);
 
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
                         .andExpect(status().isOk())
@@ -1626,7 +1626,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         );
         // no needs to explicitly cleanup the group created as the collection comes
         // from a CollectionBuilder that will cleanup also related groups
-        Group bitstreamReadGroup = groupService.find(context, idRef.get());
+        Group bitstreamReadGroup = groupService.find(context.getSession(), idRef.get());
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -1661,7 +1661,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         );
         // no needs to explicitly cleanup the group created as the collection comes
         // from a CollectionBuilder that will cleanup also related groups
-        Group bitstreamReadGroup = groupService.find(context, idRef.get());
+        Group bitstreamReadGroup = groupService.find(context.getSession(), idRef.get());
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -1687,7 +1687,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                    .andExpect(status().isUnauthorized());
 
         String token = getAuthToken(admin.getEmail(), password);
-        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+        Group anon = groupService.findByName(context.getSession(), Group.ANONYMOUS);
 
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
                         .andExpect(status().isOk())
@@ -1717,7 +1717,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
 
         token = getAuthToken(admin.getEmail(), password);
-        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+        Group anon = groupService.findByName(context.getSession(), Group.ANONYMOUS);
 
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
                         .andExpect(status().isOk())
@@ -1767,7 +1767,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         .andExpect(status().isUnprocessableEntity());
 
 
-        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+        Group anon = groupService.findByName(context.getSession(), Group.ANONYMOUS);
 
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
                         .andExpect(status().isOk())
@@ -1797,7 +1797,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         .andExpect(status().isUnprocessableEntity());
 
 
-        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+        Group anon = groupService.findByName(context.getSession(), Group.ANONYMOUS);
 
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
                         .andExpect(status().isOk())
@@ -1821,7 +1821,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
         // Note that deleting a Default Read Group has the expected behaviour of defaulting the DefaultReadGroup back
         // to the Anonymous group
-        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+        Group anon = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -1845,7 +1845,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         .andExpect(status().isNoContent());
 
         // Note that the Default Read Group has the expected behaviour of defaulting to the Anonymous group
-        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+        Group anon = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -1869,7 +1869,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         .andExpect(status().isNoContent());
 
         // Note that the Default Read Group has the expected behaviour of defaulting to the Anonymous group
-        Group anon = groupService.findByName(context, Group.ANONYMOUS);
+        Group anon = groupService.findByName(context.getSession(), Group.ANONYMOUS);
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/bitstreamReadGroup"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -2049,7 +2049,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         );
         // no needs to explicitly cleanup the group created as the collection comes
         // from a CollectionBuilder that will cleanup also related groups
-        Group workflowGroup = groupService.find(context, idRef.get());
+        Group workflowGroup = groupService.find(context.getSession(), idRef.get());
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -2081,7 +2081,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         );
         // no needs to explicitly cleanup the group created as the collection comes
         // from a CollectionBuilder that will cleanup also related groups
-        Group workflowGroup = groupService.find(context, idRef.get());
+        Group workflowGroup = groupService.find(context.getSession(), idRef.get());
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.metadata", allOf(
@@ -2183,7 +2183,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         );
         // no needs to explicitly cleanup the group created as the collection comes
         // from a CollectionBuilder that will cleanup also related groups
-        Group workflowGroup = groupService.find(context, idRef.get());
+        Group workflowGroup = groupService.find(context.getSession(), idRef.get());
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
                         .andExpect(status().isOk())
                         .andExpect(
@@ -2217,7 +2217,7 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
                         );
         // no needs to explicitly cleanup the group created as the collection comes
         // from a CollectionBuilder that will cleanup also related groups
-        Group workflowGroup = groupService.find(context, idRef.get());
+        Group workflowGroup = groupService.find(context.getSession(), idRef.get());
         getClient(token).perform(get("/api/core/collections/" + collection.getID() + "/workflowGroups/reviewer"))
                         .andExpect(status().isOk())
                         .andExpect(

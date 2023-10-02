@@ -347,7 +347,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         // a public item with an embargoed bitstream
         String bitstreamContent = "Embargoed!";
 
-        BitstreamFormat bitstreamFormat = bitstreamFormatService.findByMIMEType(context, "text/plain");
+        BitstreamFormat bitstreamFormat = bitstreamFormatService.findByMIMEType(context.getSession(), "text/plain");
 
         Item publicItem1;
         Bitstream bitstream;
@@ -460,7 +460,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         String bitstreamContent = "ThisIsSomeDummyText";
 
-        BitstreamFormat bitstreamFormat = bitstreamFormatService.findByMIMEType(context, "text/plain");
+        BitstreamFormat bitstreamFormat = bitstreamFormatService.findByMIMEType(context.getSession(), "text/plain");
 
         //Add a bitstream to an item
         Bitstream bitstream = null;
@@ -561,7 +561,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         // a public item with an embargoed bitstream
         String bitstreamContent = "Embargoed!";
 
-        BitstreamFormat bitstreamFormat = bitstreamFormatService.findByMIMEType(context, "text/plain");
+        BitstreamFormat bitstreamFormat = bitstreamFormatService.findByMIMEType(context.getSession(), "text/plain");
 
         Item publicItem1;
         Bitstream bitstream;
@@ -685,7 +685,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         // a public item with an embargoed bitstream
         String bitstreamContent = "Embargoed!";
 
-        BitstreamFormat bitstreamFormat = bitstreamFormatService.findByMIMEType(context, "text/plain");
+        BitstreamFormat bitstreamFormat = bitstreamFormatService.findByMIMEType(context.getSession(), "text/plain");
 
         Item publicItem1;
         Bitstream bitstream;
@@ -1913,7 +1913,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                         .build();
         }
 
-        Group group = groupService.findByName(context, Group.ANONYMOUS);
+        Group group = groupService.findByName(context.getSession(), Group.ANONYMOUS);
 
         bitstreamContent = "This is an archived bitstream";
         Bitstream bitstream2 = null;

@@ -141,13 +141,13 @@ public class BundleTest extends AbstractDSpaceObjectTest {
     public void testDeleteParents() throws Exception {
         try {
             context.turnOffAuthorisationSystem();
-            b = bundleService.find(context, b.getID());
+            b = bundleService.find(context.getSession(), b.getID());
             if (b != null) {
                 itemService.removeBundle(context, item, b);
             }
-            item = itemService.find(context, item.getID());
-            collection = collectionService.find(context, collection.getID());
-            owningCommunity = communityService.find(context, owningCommunity.getID());
+            item = itemService.find(context.getSession(), item.getID());
+            collection = collectionService.find(context.getSession(), collection.getID());
+            owningCommunity = communityService.find(context.getSession(), owningCommunity.getID());
 
             collectionService.removeItem(context, collection, item);
             communityService.removeCollection(context, owningCommunity, collection);
@@ -165,7 +165,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
     @Test
     public void testBundleFind() throws SQLException {
         UUID id = b.getID();
-        Bundle found = bundleService.find(context, id);
+        Bundle found = bundleService.find(context.getSession(), id);
         assertThat("testBundleFind 0", found, notNullValue());
         assertThat("testBundleFind 1", found.getID(), equalTo(id));
     }
@@ -182,7 +182,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
         //the item created by default has no name nor type set
         assertThat("testCreate 0", created, notNullValue());
         assertTrue("testCreate 1", created.getID() != null);
-        assertTrue("testCreate 2", created.getBitstreams().size() == 0);
+        assertTrue("testCreate 2", created.getBitstreams().isEmpty());
         assertThat("testCreate 3", created.getName(), equalTo("testCreateBundle"));
     }
 
@@ -535,7 +535,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
 
         UUID id = b.getID();
         itemService.removeBundle(context, item, b);
-        assertThat("testDelete 0", bundleService.find(context, id), nullValue());
+        assertThat("testDelete 0", bundleService.find(context.getSession(), id), nullValue());
     }
 
     /**

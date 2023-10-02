@@ -167,8 +167,8 @@ public class ManageGroupFeatureIT extends AbstractControllerIntegrationTest {
             .build();
 
 
-        anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
-        administratorGroup = groupService.findByName(context, Group.ADMIN);
+        anonymousGroup = groupService.findByName(context.getSession(), Group.ANONYMOUS);
+        administratorGroup = groupService.findByName(context.getSession(), Group.ADMIN);
 
 
         context.restoreAuthSystemState();

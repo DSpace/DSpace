@@ -107,7 +107,7 @@ public class RelationshipServiceImplVersioningIT extends AbstractIntegrationTest
         );
         context.restoreAuthSystemState();
         assertEquals(Relationship.LatestVersionStatus.BOTH, relationship1.getLatestVersionStatus());
-        Relationship relationship2 = relationshipService.find(context, relationship1.getID());
+        Relationship relationship2 = relationshipService.find(context.getSession(), relationship1.getID());
         assertEquals(Relationship.LatestVersionStatus.BOTH, relationship2.getLatestVersionStatus());
 
         // create method #2
@@ -117,7 +117,7 @@ public class RelationshipServiceImplVersioningIT extends AbstractIntegrationTest
         );
         context.restoreAuthSystemState();
         assertEquals(Relationship.LatestVersionStatus.BOTH, relationship3.getLatestVersionStatus());
-        Relationship relationship4 = relationshipService.find(context, relationship3.getID());
+        Relationship relationship4 = relationshipService.find(context.getSession(), relationship3.getID());
         assertEquals(Relationship.LatestVersionStatus.BOTH, relationship4.getLatestVersionStatus());
 
         // create method #3
@@ -129,7 +129,7 @@ public class RelationshipServiceImplVersioningIT extends AbstractIntegrationTest
         Relationship relationship5 = relationshipService.create(context, inputRelationship);
         context.restoreAuthSystemState();
         assertEquals(Relationship.LatestVersionStatus.BOTH, relationship5.getLatestVersionStatus());
-        Relationship relationship6 = relationshipService.find(context, relationship5.getID());
+        Relationship relationship6 = relationshipService.find(context.getSession(), relationship5.getID());
         assertEquals(Relationship.LatestVersionStatus.BOTH, relationship6.getLatestVersionStatus());
 
         // clean up
@@ -150,7 +150,7 @@ public class RelationshipServiceImplVersioningIT extends AbstractIntegrationTest
         );
         context.restoreAuthSystemState();
         assertEquals(Relationship.LatestVersionStatus.BOTH, relationship1.getLatestVersionStatus());
-        Relationship relationship2 = relationshipService.find(context, relationship1.getID());
+        Relationship relationship2 = relationshipService.find(context.getSession(), relationship1.getID());
         assertEquals(Relationship.LatestVersionStatus.BOTH, relationship2.getLatestVersionStatus());
 
         // create method #2
@@ -163,7 +163,7 @@ public class RelationshipServiceImplVersioningIT extends AbstractIntegrationTest
         Relationship relationship3 = relationshipService.create(context, inputRelationship);
         context.restoreAuthSystemState();
         assertEquals(Relationship.LatestVersionStatus.BOTH, relationship3.getLatestVersionStatus());
-        Relationship relationship4 = relationshipService.find(context, relationship3.getID());
+        Relationship relationship4 = relationshipService.find(context.getSession(), relationship3.getID());
         assertEquals(Relationship.LatestVersionStatus.BOTH, relationship4.getLatestVersionStatus());
 
         // clean up
@@ -183,7 +183,7 @@ public class RelationshipServiceImplVersioningIT extends AbstractIntegrationTest
         );
         context.restoreAuthSystemState();
         assertEquals(Relationship.LatestVersionStatus.LEFT_ONLY, relationship1.getLatestVersionStatus());
-        Relationship relationship2 = relationshipService.find(context, relationship1.getID());
+        Relationship relationship2 = relationshipService.find(context.getSession(), relationship1.getID());
         assertEquals(Relationship.LatestVersionStatus.LEFT_ONLY, relationship2.getLatestVersionStatus());
 
         // create method #2
@@ -196,7 +196,7 @@ public class RelationshipServiceImplVersioningIT extends AbstractIntegrationTest
         Relationship relationship3 = relationshipService.create(context, inputRelationship);
         context.restoreAuthSystemState();
         assertEquals(Relationship.LatestVersionStatus.LEFT_ONLY, relationship3.getLatestVersionStatus());
-        Relationship relationship4 = relationshipService.find(context, relationship3.getID());
+        Relationship relationship4 = relationshipService.find(context.getSession(), relationship3.getID());
         assertEquals(Relationship.LatestVersionStatus.LEFT_ONLY, relationship4.getLatestVersionStatus());
 
         // clean up
@@ -216,7 +216,7 @@ public class RelationshipServiceImplVersioningIT extends AbstractIntegrationTest
         );
         context.restoreAuthSystemState();
         assertEquals(Relationship.LatestVersionStatus.RIGHT_ONLY, relationship1.getLatestVersionStatus());
-        Relationship relationship2 = relationshipService.find(context, relationship1.getID());
+        Relationship relationship2 = relationshipService.find(context.getSession(), relationship1.getID());
         assertEquals(Relationship.LatestVersionStatus.RIGHT_ONLY, relationship2.getLatestVersionStatus());
 
         // create method #2
@@ -229,7 +229,7 @@ public class RelationshipServiceImplVersioningIT extends AbstractIntegrationTest
         Relationship relationship3 = relationshipService.create(context, inputRelationship);
         context.restoreAuthSystemState();
         assertEquals(Relationship.LatestVersionStatus.RIGHT_ONLY, relationship3.getLatestVersionStatus());
-        Relationship relationship4 = relationshipService.find(context, relationship3.getID());
+        Relationship relationship4 = relationshipService.find(context.getSession(), relationship3.getID());
         assertEquals(Relationship.LatestVersionStatus.RIGHT_ONLY, relationship4.getLatestVersionStatus());
 
         // clean up
@@ -261,234 +261,272 @@ public class RelationshipServiceImplVersioningIT extends AbstractIntegrationTest
 
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItem(context, publication1, false, false)
+            relationshipDAO.findByItem(context.getSession(), publication1, false, false)
         );
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItem(context, publication1, false, true)
+            relationshipDAO.findByItem(context.getSession(), publication1, false, true)
         );
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItem(context, person1, false, false)
+            relationshipDAO.findByItem(context.getSession(), person1, false, false)
         );
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItem(context, person1, false, true)
+            relationshipDAO.findByItem(context.getSession(), person1, false, true)
         );
 
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItem(context, publication1, -1, -1, false, false)
+            relationshipDAO.findByItem(context.getSession(), publication1, -1, -1, false, false)
         );
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItem(context, publication1, -1, -1, false, true)
+            relationshipDAO.findByItem(context.getSession(), publication1, -1, -1, false, true)
         );
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItem(context, person1, -1, -1, false, false)
+            relationshipDAO.findByItem(context.getSession(), person1, -1, -1, false, false)
         );
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItem(context, person1, -1, -1, false, true)
+            relationshipDAO.findByItem(context.getSession(), person1, -1, -1, false, true)
         );
 
-        assertEquals(1, relationshipDAO.countByItem(context, publication1, false, false));
-        assertEquals(1, relationshipDAO.countByItem(context, publication1, false, true));
-        assertEquals(1, relationshipDAO.countByItem(context, person1, false, false));
-        assertEquals(1, relationshipDAO.countByItem(context, person1, false, true));
-        assertEquals(1, relationshipDAO.countByItem(context, publication1, true, false));
-        assertEquals(1, relationshipDAO.countByItem(context, publication1, true, true));
-        assertEquals(1, relationshipDAO.countByItem(context, person1, true, false));
-        assertEquals(1, relationshipDAO.countByItem(context, person1, true, true));
-
-        assertRelationship(
-            relationship1,
-            relationshipDAO.findByItemAndRelationshipType(context, publication1, relationshipType, -1, -1, false)
-        );
-        assertRelationship(
-            relationship1,
-            relationshipDAO.findByItemAndRelationshipType(context, publication1, relationshipType, -1, -1, true)
-        );
-        assertRelationship(
-            relationship1,
-            relationshipDAO.findByItemAndRelationshipType(context, person1, relationshipType, -1, -1, false)
-        );
-        assertRelationship(
-            relationship1,
-            relationshipDAO.findByItemAndRelationshipType(context, person1, relationshipType, -1, -1, true)
-        );
-
-        assertNoRelationship(
-            relationshipDAO.findByItemAndRelationshipType(context, publication1, relationshipType, false, -1, -1, false)
-        );
-        assertNoRelationship(
-            relationshipDAO.findByItemAndRelationshipType(context, publication1, relationshipType, false, -1, -1, true)
-        );
-        assertRelationship(
-            relationship1,
-            relationshipDAO.findByItemAndRelationshipType(context, publication1, relationshipType, true, -1, -1, false)
-        );
-        assertRelationship(
-            relationship1,
-            relationshipDAO.findByItemAndRelationshipType(context, publication1, relationshipType, true, -1, -1, true)
-        );
-        assertRelationship(
-            relationship1,
-            relationshipDAO.findByItemAndRelationshipType(context, person1, relationshipType, false, -1, -1, false)
-        );
-        assertRelationship(
-            relationship1,
-            relationshipDAO.findByItemAndRelationshipType(context, person1, relationshipType, false, -1, -1, true)
-        );
-        assertNoRelationship(
-            relationshipDAO.findByItemAndRelationshipType(context, person1, relationshipType, true, -1, -1, false)
-        );
-        assertNoRelationship(
-            relationshipDAO.findByItemAndRelationshipType(context, person1, relationshipType, true, -1, -1, true)
-        );
-
-        assertEquals(
-            0, relationshipDAO.countByItemAndRelationshipType(context, publication1, relationshipType, false, false)
-        );
-        assertEquals(
-            0, relationshipDAO.countByItemAndRelationshipType(context, publication1, relationshipType, false, true)
-        );
-        assertEquals(
-            1, relationshipDAO.countByItemAndRelationshipType(context, publication1, relationshipType, true, false)
-        );
-        assertEquals(
-            1, relationshipDAO.countByItemAndRelationshipType(context, publication1, relationshipType, true, true)
-        );
-        assertEquals(
-            1, relationshipDAO.countByItemAndRelationshipType(context, person1, relationshipType, false, false)
-        );
-        assertEquals(
-            1, relationshipDAO.countByItemAndRelationshipType(context, person1, relationshipType, false, true)
-        );
-        assertEquals(
-            0, relationshipDAO.countByItemAndRelationshipType(context, person1, relationshipType, true, false)
-        );
-        assertEquals(
-            0, relationshipDAO.countByItemAndRelationshipType(context, person1, relationshipType, true, true)
-        );
+        assertEquals(1, relationshipDAO.countByItem(context.getSession(), publication1, false, false));
+        assertEquals(1, relationshipDAO.countByItem(context.getSession(), publication1, false, true));
+        assertEquals(1, relationshipDAO.countByItem(context.getSession(), person1, false, false));
+        assertEquals(1, relationshipDAO.countByItem(context.getSession(), person1, false, true));
+        assertEquals(1, relationshipDAO.countByItem(context.getSession(), publication1, true, false));
+        assertEquals(1, relationshipDAO.countByItem(context.getSession(), publication1, true, true));
+        assertEquals(1, relationshipDAO.countByItem(context.getSession(), person1, true, false));
+        assertEquals(1, relationshipDAO.countByItem(context.getSession(), person1, true, true));
 
         assertRelationship(
             relationship1,
-            relationshipService.findByItem(context, publication1)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, -1, -1, false)
         );
         assertRelationship(
             relationship1,
-            relationshipService.findByItem(context, person1)
-        );
-
-        assertRelationship(
-            relationship1,
-            relationshipService.findByItem(context, publication1, -1, -1, false)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, -1, -1, true)
         );
         assertRelationship(
             relationship1,
-            relationshipService.findByItem(context, person1, -1, -1, false)
-        );
-
-        assertRelationship(
-            relationship1,
-            relationshipService.findByItem(context, publication1, -1, -1, false, false)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, -1, -1, false)
         );
         assertRelationship(
             relationship1,
-            relationshipService.findByItem(context, publication1, -1, -1, false, true)
-        );
-        assertRelationship(
-            relationship1,
-            relationshipService.findByItem(context, person1, -1, -1, false, false)
-        );
-        assertRelationship(
-            relationship1,
-            relationshipService.findByItem(context, person1, -1, -1, false, true)
-        );
-
-        assertRelationship(
-            relationship1,
-            relationshipService.findByItemAndRelationshipType(context, publication1, relationshipType)
-        );
-        assertRelationship(
-            relationship1,
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType)
-        );
-
-        assertRelationship(
-            relationship1,
-            relationshipService.findByItemAndRelationshipType(context, publication1, relationshipType, -1, -1)
-        );
-        assertRelationship(
-            relationship1,
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, -1, -1)
-        );
-
-        assertRelationship(
-            relationship1,
-            relationshipService.findByItemAndRelationshipType(context, publication1, relationshipType, -1, -1, false)
-        );
-        assertRelationship(
-            relationship1,
-            relationshipService.findByItemAndRelationshipType(context, publication1, relationshipType, -1, -1, true)
-        );
-        assertRelationship(
-            relationship1,
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, -1, -1, false)
-        );
-        assertRelationship(
-            relationship1,
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, -1, -1, true)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, -1, -1, true)
         );
 
         assertNoRelationship(
-            relationshipService.findByItemAndRelationshipType(context, publication1, relationshipType, false, -1, -1)
-        );
-        assertRelationship(
-            relationship1,
-            relationshipService.findByItemAndRelationshipType(context, publication1, relationshipType, true, -1, -1)
-        );
-        assertRelationship(
-            relationship1,
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, false, -1, -1)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, false, -1, -1, false)
         );
         assertNoRelationship(
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, true, -1, -1)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, false, -1, -1, true)
+        );
+        assertRelationship(
+            relationship1,
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, true, -1, -1, false)
+        );
+        assertRelationship(
+            relationship1,
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, true, -1, -1, true)
+        );
+        assertRelationship(
+            relationship1,
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, false, -1, -1, false)
+        );
+        assertRelationship(
+            relationship1,
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, false, -1, -1, true)
+        );
+        assertNoRelationship(
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, true, -1, -1, false)
+        );
+        assertNoRelationship(
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, true, -1, -1, true)
+        );
+
+        assertEquals(
+            0, relationshipDAO.countByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, false, false)
+        );
+        assertEquals(
+            0, relationshipDAO.countByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, false, true)
+        );
+        assertEquals(
+            1, relationshipDAO.countByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, true, false)
+        );
+        assertEquals(
+            1, relationshipDAO.countByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, true, true)
+        );
+        assertEquals(
+            1, relationshipDAO.countByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, false, false)
+        );
+        assertEquals(
+            1, relationshipDAO.countByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, false, true)
+        );
+        assertEquals(
+            0, relationshipDAO.countByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, true, false)
+        );
+        assertEquals(
+            0, relationshipDAO.countByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, true, true)
+        );
+
+        assertRelationship(
+            relationship1,
+            relationshipService.findByItem(context.getSession(), publication1)
+        );
+        assertRelationship(
+            relationship1,
+            relationshipService.findByItem(context.getSession(), person1)
+        );
+
+        assertRelationship(
+            relationship1,
+            relationshipService.findByItem(context.getSession(), publication1, -1, -1, false)
+        );
+        assertRelationship(
+            relationship1,
+            relationshipService.findByItem(context.getSession(), person1, -1, -1, false)
+        );
+
+        assertRelationship(
+            relationship1,
+            relationshipService.findByItem(context.getSession(), publication1, -1, -1, false, false)
+        );
+        assertRelationship(
+            relationship1,
+            relationshipService.findByItem(context.getSession(), publication1, -1, -1, false, true)
+        );
+        assertRelationship(
+            relationship1,
+            relationshipService.findByItem(context.getSession(), person1, -1, -1, false, false)
+        );
+        assertRelationship(
+            relationship1,
+            relationshipService.findByItem(context.getSession(), person1, -1, -1, false, true)
+        );
+
+        assertRelationship(
+            relationship1,
+            relationshipService.findByItemAndRelationshipType(context.getSession(), publication1, relationshipType)
+        );
+        assertRelationship(
+            relationship1,
+            relationshipService.findByItemAndRelationshipType(context.getSession(), person1, relationshipType)
+        );
+
+        assertRelationship(
+            relationship1,
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, -1, -1)
+        );
+        assertRelationship(
+            relationship1,
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, -1, -1)
+        );
+
+        assertRelationship(
+            relationship1,
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, -1, -1, false)
+        );
+        assertRelationship(
+            relationship1,
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, -1, -1, true)
+        );
+        assertRelationship(
+            relationship1,
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, -1, -1, false)
+        );
+        assertRelationship(
+            relationship1,
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, -1, -1, true)
+        );
+
+        assertNoRelationship(
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, false, -1, -1)
+        );
+        assertRelationship(
+            relationship1,
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, true, -1, -1)
+        );
+        assertRelationship(
+            relationship1,
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, false, -1, -1)
+        );
+        assertNoRelationship(
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, true, -1, -1)
         );
 
         assertNoRelationship(
             relationshipService
-                .findByItemAndRelationshipType(context, publication1, relationshipType, false, -1, -1, false)
+                .findByItemAndRelationshipType(context.getSession(),
+                        publication1, relationshipType, false, -1, -1, false)
         );
         assertNoRelationship(
             relationshipService
-                .findByItemAndRelationshipType(context, publication1, relationshipType, false, -1, -1, true)
-        );
-        assertRelationship(
-            relationship1,
-            relationshipService
-                .findByItemAndRelationshipType(context, publication1, relationshipType, true, -1, -1, false)
+                .findByItemAndRelationshipType(context.getSession(),
+                        publication1, relationshipType, false, -1, -1, true)
         );
         assertRelationship(
             relationship1,
             relationshipService
-                .findByItemAndRelationshipType(context, publication1, relationshipType, true, -1, -1, true)
+                .findByItemAndRelationshipType(context.getSession(),
+                        publication1, relationshipType, true, -1, -1, false)
         );
         assertRelationship(
             relationship1,
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, false, -1, -1, false)
+            relationshipService
+                .findByItemAndRelationshipType(context.getSession(),
+                        publication1, relationshipType, true, -1, -1, true)
         );
         assertRelationship(
             relationship1,
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, false, -1, -1, true)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, false, -1, -1, false)
+        );
+        assertRelationship(
+            relationship1,
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, false, -1, -1, true)
         );
         assertNoRelationship(
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, true, -1, -1, false)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, true, -1, -1, false)
         );
         assertNoRelationship(
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, true, -1, -1, true)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, true, -1, -1, true)
         );
 
         assertEquals(1, relationshipService.countByItem(context, publication1));
@@ -504,41 +542,53 @@ public class RelationshipServiceImplVersioningIT extends AbstractIntegrationTest
         assertEquals(1, relationshipService.countByItem(context, person1, true, true));
 
         assertEquals(
-            0, relationshipService.countByItemAndRelationshipType(context, publication1, relationshipType, false)
+            0, relationshipService.countByItemAndRelationshipType(context,
+                    publication1, relationshipType, false)
         );
         assertEquals(
-            1, relationshipService.countByItemAndRelationshipType(context, publication1, relationshipType, true)
+            1, relationshipService.countByItemAndRelationshipType(context,
+                    publication1, relationshipType, true)
         );
         assertEquals(
-            1, relationshipService.countByItemAndRelationshipType(context, person1, relationshipType, false)
+            1, relationshipService.countByItemAndRelationshipType(context,
+                    person1, relationshipType, false)
         );
         assertEquals(
-            0, relationshipService.countByItemAndRelationshipType(context, person1, relationshipType, true)
+            0, relationshipService.countByItemAndRelationshipType(context,
+                    person1, relationshipType, true)
         );
 
         assertEquals(
-            0, relationshipService.countByItemAndRelationshipType(context, publication1, relationshipType, false, false)
+            0, relationshipService.countByItemAndRelationshipType(context,
+                    publication1, relationshipType, false, false)
         );
         assertEquals(
-            0, relationshipService.countByItemAndRelationshipType(context, publication1, relationshipType, false, true)
+            0, relationshipService.countByItemAndRelationshipType(context,
+                    publication1, relationshipType, false, true)
         );
         assertEquals(
-            1, relationshipService.countByItemAndRelationshipType(context, publication1, relationshipType, true, false)
+            1, relationshipService.countByItemAndRelationshipType(context,
+                    publication1, relationshipType, true, false)
         );
         assertEquals(
-            1, relationshipService.countByItemAndRelationshipType(context, publication1, relationshipType, true, true)
+            1, relationshipService.countByItemAndRelationshipType(context,
+                    publication1, relationshipType, true, true)
         );
         assertEquals(
-            1, relationshipService.countByItemAndRelationshipType(context, person1, relationshipType, false, false)
+            1, relationshipService.countByItemAndRelationshipType(context,
+                    person1, relationshipType, false, false)
         );
         assertEquals(
-            1, relationshipService.countByItemAndRelationshipType(context, person1, relationshipType, false, true)
+            1, relationshipService.countByItemAndRelationshipType(context,
+                    person1, relationshipType, false, true)
         );
         assertEquals(
-            0, relationshipService.countByItemAndRelationshipType(context, person1, relationshipType, true, false)
+            0, relationshipService.countByItemAndRelationshipType(context,
+                    person1, relationshipType, true, false)
         );
         assertEquals(
-            0, relationshipService.countByItemAndRelationshipType(context, person1, relationshipType, true, true)
+            0, relationshipService.countByItemAndRelationshipType(context,
+                    person1, relationshipType, true, true)
         );
     }
 
@@ -553,222 +603,262 @@ public class RelationshipServiceImplVersioningIT extends AbstractIntegrationTest
 
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItem(context, publication1, false, false)
+            relationshipDAO.findByItem(context.getSession(), publication1, false, false)
         );
         assertNoRelationship(
-            relationshipDAO.findByItem(context, publication1, false, true)
+            relationshipDAO.findByItem(context.getSession(), publication1, false, true)
         );
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItem(context, person1, false, false)
+            relationshipDAO.findByItem(context.getSession(), person1, false, false)
         );
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItem(context, person1, false, true)
+            relationshipDAO.findByItem(context.getSession(), person1, false, true)
         );
 
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItem(context, publication1, -1, -1, false, false)
+            relationshipDAO.findByItem(context.getSession(), publication1, -1, -1, false, false)
         );
         assertNoRelationship(
-            relationshipDAO.findByItem(context, publication1, -1, -1, false, true)
+            relationshipDAO.findByItem(context.getSession(), publication1, -1, -1, false, true)
         );
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItem(context, person1, -1, -1, false, false)
+            relationshipDAO.findByItem(context.getSession(), person1, -1, -1, false, false)
         );
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItem(context, person1, -1, -1, false, true)
+            relationshipDAO.findByItem(context.getSession(), person1, -1, -1, false, true)
         );
 
-        assertEquals(1, relationshipDAO.countByItem(context, publication1, false, false));
-        assertEquals(0, relationshipDAO.countByItem(context, publication1, false, true));
-        assertEquals(1, relationshipDAO.countByItem(context, person1, false, false));
-        assertEquals(1, relationshipDAO.countByItem(context, person1, false, true));
-        assertEquals(1, relationshipDAO.countByItem(context, publication1, true, false));
-        assertEquals(0, relationshipDAO.countByItem(context, publication1, true, true));
-        assertEquals(1, relationshipDAO.countByItem(context, person1, true, false));
-        assertEquals(1, relationshipDAO.countByItem(context, person1, true, true));
+        assertEquals(1, relationshipDAO.countByItem(context.getSession(), publication1, false, false));
+        assertEquals(0, relationshipDAO.countByItem(context.getSession(), publication1, false, true));
+        assertEquals(1, relationshipDAO.countByItem(context.getSession(), person1, false, false));
+        assertEquals(1, relationshipDAO.countByItem(context.getSession(), person1, false, true));
+        assertEquals(1, relationshipDAO.countByItem(context.getSession(), publication1, true, false));
+        assertEquals(0, relationshipDAO.countByItem(context.getSession(), publication1, true, true));
+        assertEquals(1, relationshipDAO.countByItem(context.getSession(), person1, true, false));
+        assertEquals(1, relationshipDAO.countByItem(context.getSession(), person1, true, true));
 
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItemAndRelationshipType(context, publication1, relationshipType, -1, -1, false)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, -1, -1, false)
         );
         assertNoRelationship(
-            relationshipDAO.findByItemAndRelationshipType(context, publication1, relationshipType, -1, -1, true)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, -1, -1, true)
         );
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItemAndRelationshipType(context, person1, relationshipType, -1, -1, false)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, -1, -1, false)
         );
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItemAndRelationshipType(context, person1, relationshipType, -1, -1, true)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, -1, -1, true)
         );
 
         assertNoRelationship(
-            relationshipDAO.findByItemAndRelationshipType(context, publication1, relationshipType, false, -1, -1, false)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, false, -1, -1, false)
         );
         assertNoRelationship(
-            relationshipDAO.findByItemAndRelationshipType(context, publication1, relationshipType, false, -1, -1, true)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, false, -1, -1, true)
         );
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItemAndRelationshipType(context, publication1, relationshipType, true, -1, -1, false)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, true, -1, -1, false)
         );
         assertNoRelationship(
-            relationshipDAO.findByItemAndRelationshipType(context, publication1, relationshipType, true, -1, -1, true)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, true, -1, -1, true)
         );
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItemAndRelationshipType(context, person1, relationshipType, false, -1, -1, false)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, false, -1, -1, false)
         );
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItemAndRelationshipType(context, person1, relationshipType, false, -1, -1, true)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, false, -1, -1, true)
         );
         assertNoRelationship(
-            relationshipDAO.findByItemAndRelationshipType(context, person1, relationshipType, true, -1, -1, false)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, true, -1, -1, false)
         );
         assertNoRelationship(
-            relationshipDAO.findByItemAndRelationshipType(context, person1, relationshipType, true, -1, -1, true)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, true, -1, -1, true)
         );
 
         assertEquals(
-            0, relationshipDAO.countByItemAndRelationshipType(context, publication1, relationshipType, false, false)
+            0, relationshipDAO.countByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, false, false)
         );
         assertEquals(
-            0, relationshipDAO.countByItemAndRelationshipType(context, publication1, relationshipType, false, true)
+            0, relationshipDAO.countByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, false, true)
         );
         assertEquals(
-            1, relationshipDAO.countByItemAndRelationshipType(context, publication1, relationshipType, true, false)
+            1, relationshipDAO.countByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, true, false)
         );
         assertEquals(
-            0, relationshipDAO.countByItemAndRelationshipType(context, publication1, relationshipType, true, true)
+            0, relationshipDAO.countByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, true, true)
         );
         assertEquals(
-            1, relationshipDAO.countByItemAndRelationshipType(context, person1, relationshipType, false, false)
+            1, relationshipDAO.countByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, false, false)
         );
         assertEquals(
-            1, relationshipDAO.countByItemAndRelationshipType(context, person1, relationshipType, false, true)
+            1, relationshipDAO.countByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, false, true)
         );
         assertEquals(
-            0, relationshipDAO.countByItemAndRelationshipType(context, person1, relationshipType, true, false)
+            0, relationshipDAO.countByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, true, false)
         );
         assertEquals(
-            0, relationshipDAO.countByItemAndRelationshipType(context, person1, relationshipType, true, true)
+            0, relationshipDAO.countByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, true, true)
         );
 
         assertNoRelationship(
-            relationshipService.findByItem(context, publication1)
+            relationshipService.findByItem(context.getSession(), publication1)
         );
         assertRelationship(
             relationship1,
-            relationshipService.findByItem(context, person1)
+            relationshipService.findByItem(context.getSession(), person1)
         );
 
         assertNoRelationship(
-            relationshipService.findByItem(context, publication1, -1, -1, false)
+            relationshipService.findByItem(context.getSession(), publication1, -1, -1, false)
         );
         assertRelationship(
             relationship1,
-            relationshipService.findByItem(context, person1, -1, -1, false)
-        );
-
-        assertRelationship(
-            relationship1,
-            relationshipService.findByItem(context, publication1, -1, -1, false, false)
-        );
-        assertNoRelationship(
-            relationshipService.findByItem(context, publication1, -1, -1, false, true)
-        );
-        assertRelationship(
-            relationship1,
-            relationshipService.findByItem(context, person1, -1, -1, false, false)
-        );
-        assertRelationship(
-            relationship1,
-            relationshipService.findByItem(context, person1, -1, -1, false, true)
-        );
-
-        assertNoRelationship(
-            relationshipService.findByItemAndRelationshipType(context, publication1, relationshipType)
-        );
-        assertRelationship(
-            relationship1,
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType)
-        );
-
-        assertNoRelationship(
-            relationshipService.findByItemAndRelationshipType(context, publication1, relationshipType, -1, -1)
-        );
-        assertRelationship(
-            relationship1,
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, -1, -1)
+            relationshipService.findByItem(context.getSession(), person1, -1, -1, false)
         );
 
         assertRelationship(
             relationship1,
-            relationshipService.findByItemAndRelationshipType(context, publication1, relationshipType, -1, -1, false)
+            relationshipService.findByItem(context.getSession(), publication1, -1, -1, false, false)
         );
         assertNoRelationship(
-            relationshipService.findByItemAndRelationshipType(context, publication1, relationshipType, -1, -1, true)
+            relationshipService.findByItem(context.getSession(), publication1, -1, -1, false, true)
         );
         assertRelationship(
             relationship1,
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, -1, -1, false)
+            relationshipService.findByItem(context.getSession(), person1, -1, -1, false, false)
         );
         assertRelationship(
             relationship1,
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, -1, -1, true)
+            relationshipService.findByItem(context.getSession(), person1, -1, -1, false, true)
         );
 
         assertNoRelationship(
-            relationshipService.findByItemAndRelationshipType(context, publication1, relationshipType, false, -1, -1)
-        );
-        assertNoRelationship(
-            relationshipService.findByItemAndRelationshipType(context, publication1, relationshipType, true, -1, -1)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType)
         );
         assertRelationship(
             relationship1,
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, false, -1, -1)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType)
+        );
+
+        assertNoRelationship(
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, -1, -1)
+        );
+        assertRelationship(
+            relationship1,
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, -1, -1)
+        );
+
+        assertRelationship(
+            relationship1,
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, -1, -1, false)
         );
         assertNoRelationship(
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, true, -1, -1)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, -1, -1, true)
+        );
+        assertRelationship(
+            relationship1,
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, -1, -1, false)
+        );
+        assertRelationship(
+            relationship1,
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, -1, -1, true)
+        );
+
+        assertNoRelationship(
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, false, -1, -1)
+        );
+        assertNoRelationship(
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, true, -1, -1)
+        );
+        assertRelationship(
+            relationship1,
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, false, -1, -1)
+        );
+        assertNoRelationship(
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, true, -1, -1)
         );
 
         assertNoRelationship(
             relationshipService
-                .findByItemAndRelationshipType(context, publication1, relationshipType, false, -1, -1, false)
+                .findByItemAndRelationshipType(context.getSession(), publication1,
+                        relationshipType, false, -1, -1, false)
         );
         assertNoRelationship(
             relationshipService
-                .findByItemAndRelationshipType(context, publication1, relationshipType, false, -1, -1, true)
+                .findByItemAndRelationshipType(context.getSession(), publication1,
+                        relationshipType, false, -1, -1, true)
         );
         assertRelationship(
             relationship1,
             relationshipService
-                .findByItemAndRelationshipType(context, publication1, relationshipType, true, -1, -1, false)
+                .findByItemAndRelationshipType(context.getSession(), publication1,
+                        relationshipType, true, -1, -1, false)
         );
         assertNoRelationship(
             relationshipService
-                .findByItemAndRelationshipType(context, publication1, relationshipType, true, -1, -1, true)
+                .findByItemAndRelationshipType(context.getSession(), publication1,
+                        relationshipType, true, -1, -1, true)
         );
         assertRelationship(
             relationship1,
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, false, -1, -1, false)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, false, -1, -1, false)
         );
         assertRelationship(
             relationship1,
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, false, -1, -1, true)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, false, -1, -1, true)
         );
         assertNoRelationship(
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, true, -1, -1, false)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, true, -1, -1, false)
         );
         assertNoRelationship(
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, true, -1, -1, true)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, true, -1, -1, true)
         );
 
         assertEquals(0, relationshipService.countByItem(context, publication1));
@@ -833,222 +923,262 @@ public class RelationshipServiceImplVersioningIT extends AbstractIntegrationTest
 
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItem(context, publication1, false, false)
+            relationshipDAO.findByItem(context.getSession(), publication1, false, false)
         );
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItem(context, publication1, false, true)
+            relationshipDAO.findByItem(context.getSession(), publication1, false, true)
         );
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItem(context, person1, false, false)
+            relationshipDAO.findByItem(context.getSession(), person1, false, false)
         );
         assertNoRelationship(
-            relationshipDAO.findByItem(context, person1, false, true)
+            relationshipDAO.findByItem(context.getSession(), person1, false, true)
         );
 
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItem(context, publication1, -1, -1, false, false)
+            relationshipDAO.findByItem(context.getSession(), publication1, -1, -1, false, false)
         );
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItem(context, publication1, -1, -1, false, true)
+            relationshipDAO.findByItem(context.getSession(), publication1, -1, -1, false, true)
         );
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItem(context, person1, -1, -1, false, false)
+            relationshipDAO.findByItem(context.getSession(), person1, -1, -1, false, false)
         );
         assertNoRelationship(
-            relationshipDAO.findByItem(context, person1, -1, -1, false, true)
+            relationshipDAO.findByItem(context.getSession(), person1, -1, -1, false, true)
         );
 
-        assertEquals(1, relationshipDAO.countByItem(context, publication1, false, false));
-        assertEquals(1, relationshipDAO.countByItem(context, publication1, false, true));
-        assertEquals(1, relationshipDAO.countByItem(context, person1, false, false));
-        assertEquals(0, relationshipDAO.countByItem(context, person1, false, true));
-        assertEquals(1, relationshipDAO.countByItem(context, publication1, true, false));
-        assertEquals(1, relationshipDAO.countByItem(context, publication1, true, true));
-        assertEquals(1, relationshipDAO.countByItem(context, person1, true, false));
-        assertEquals(0, relationshipDAO.countByItem(context, person1, true, true));
+        assertEquals(1, relationshipDAO.countByItem(context.getSession(), publication1, false, false));
+        assertEquals(1, relationshipDAO.countByItem(context.getSession(), publication1, false, true));
+        assertEquals(1, relationshipDAO.countByItem(context.getSession(), person1, false, false));
+        assertEquals(0, relationshipDAO.countByItem(context.getSession(), person1, false, true));
+        assertEquals(1, relationshipDAO.countByItem(context.getSession(), publication1, true, false));
+        assertEquals(1, relationshipDAO.countByItem(context.getSession(), publication1, true, true));
+        assertEquals(1, relationshipDAO.countByItem(context.getSession(), person1, true, false));
+        assertEquals(0, relationshipDAO.countByItem(context.getSession(), person1, true, true));
 
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItemAndRelationshipType(context, publication1, relationshipType, -1, -1, false)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, -1, -1, false)
         );
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItemAndRelationshipType(context, publication1, relationshipType, -1, -1, true)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, -1, -1, true)
         );
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItemAndRelationshipType(context, person1, relationshipType, -1, -1, false)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, -1, -1, false)
         );
         assertNoRelationship(
-            relationshipDAO.findByItemAndRelationshipType(context, person1, relationshipType, -1, -1, true)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, -1, -1, true)
         );
 
         assertNoRelationship(
-            relationshipDAO.findByItemAndRelationshipType(context, publication1, relationshipType, false, -1, -1, false)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, false, -1, -1, false)
         );
         assertNoRelationship(
-            relationshipDAO.findByItemAndRelationshipType(context, publication1, relationshipType, false, -1, -1, true)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, false, -1, -1, true)
         );
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItemAndRelationshipType(context, publication1, relationshipType, true, -1, -1, false)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, true, -1, -1, false)
         );
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItemAndRelationshipType(context, publication1, relationshipType, true, -1, -1, true)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, true, -1, -1, true)
         );
         assertRelationship(
             relationship1,
-            relationshipDAO.findByItemAndRelationshipType(context, person1, relationshipType, false, -1, -1, false)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, false, -1, -1, false)
         );
         assertNoRelationship(
-            relationshipDAO.findByItemAndRelationshipType(context, person1, relationshipType, false, -1, -1, true)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, false, -1, -1, true)
         );
         assertNoRelationship(
-            relationshipDAO.findByItemAndRelationshipType(context, person1, relationshipType, true, -1, -1, false)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, true, -1, -1, false)
         );
         assertNoRelationship(
-            relationshipDAO.findByItemAndRelationshipType(context, person1, relationshipType, true, -1, -1, true)
+            relationshipDAO.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, true, -1, -1, true)
         );
 
         assertEquals(
-            0, relationshipDAO.countByItemAndRelationshipType(context, publication1, relationshipType, false, false)
+            0, relationshipDAO.countByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, false, false)
         );
         assertEquals(
-            0, relationshipDAO.countByItemAndRelationshipType(context, publication1, relationshipType, false, true)
+            0, relationshipDAO.countByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, false, true)
         );
         assertEquals(
-            1, relationshipDAO.countByItemAndRelationshipType(context, publication1, relationshipType, true, false)
+            1, relationshipDAO.countByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, true, false)
         );
         assertEquals(
-            1, relationshipDAO.countByItemAndRelationshipType(context, publication1, relationshipType, true, true)
+            1, relationshipDAO.countByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, true, true)
         );
         assertEquals(
-            1, relationshipDAO.countByItemAndRelationshipType(context, person1, relationshipType, false, false)
+            1, relationshipDAO.countByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, false, false)
         );
         assertEquals(
-            0, relationshipDAO.countByItemAndRelationshipType(context, person1, relationshipType, false, true)
+            0, relationshipDAO.countByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, false, true)
         );
         assertEquals(
-            0, relationshipDAO.countByItemAndRelationshipType(context, person1, relationshipType, true, false)
+            0, relationshipDAO.countByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, true, false)
         );
         assertEquals(
-            0, relationshipDAO.countByItemAndRelationshipType(context, person1, relationshipType, true, true)
+            0, relationshipDAO.countByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, true, true)
         );
 
         assertRelationship(
             relationship1,
-            relationshipService.findByItem(context, publication1)
+            relationshipService.findByItem(context.getSession(), publication1)
         );
         assertNoRelationship(
-            relationshipService.findByItem(context, person1)
+            relationshipService.findByItem(context.getSession(), person1)
         );
 
         assertRelationship(
             relationship1,
-            relationshipService.findByItem(context, publication1, -1, -1, false)
+            relationshipService.findByItem(context.getSession(), publication1, -1, -1, false)
         );
         assertNoRelationship(
-            relationshipService.findByItem(context, person1, -1, -1, false)
+            relationshipService.findByItem(context.getSession(), person1, -1, -1, false)
         );
 
         assertRelationship(
             relationship1,
-            relationshipService.findByItem(context, publication1, -1, -1, false, false)
+            relationshipService.findByItem(context.getSession(), publication1, -1, -1, false, false)
         );
         assertRelationship(
             relationship1,
-            relationshipService.findByItem(context, publication1, -1, -1, false, true)
+            relationshipService.findByItem(context.getSession(), publication1, -1, -1, false, true)
         );
         assertRelationship(
             relationship1,
-            relationshipService.findByItem(context, person1, -1, -1, false, false)
+            relationshipService.findByItem(context.getSession(), person1, -1, -1, false, false)
         );
         assertNoRelationship(
-            relationshipService.findByItem(context, person1, -1, -1, false, true)
+            relationshipService.findByItem(context.getSession(), person1, -1, -1, false, true)
         );
 
         assertRelationship(
             relationship1,
-            relationshipService.findByItemAndRelationshipType(context, publication1, relationshipType)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType)
         );
         assertNoRelationship(
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType)
         );
 
         assertRelationship(
             relationship1,
-            relationshipService.findByItemAndRelationshipType(context, publication1, relationshipType, -1, -1)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, -1, -1)
         );
         assertNoRelationship(
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, -1, -1)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, -1, -1)
         );
 
         assertRelationship(
             relationship1,
-            relationshipService.findByItemAndRelationshipType(context, publication1, relationshipType, -1, -1, false)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, -1, -1, false)
         );
         assertRelationship(
             relationship1,
-            relationshipService.findByItemAndRelationshipType(context, publication1, relationshipType, -1, -1, true)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, -1, -1, true)
         );
         assertRelationship(
             relationship1,
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, -1, -1, false)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, -1, -1, false)
         );
         assertNoRelationship(
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, -1, -1, true)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, -1, -1, true)
         );
 
         assertNoRelationship(
-            relationshipService.findByItemAndRelationshipType(context, publication1, relationshipType, false, -1, -1)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, false, -1, -1)
         );
         assertRelationship(
             relationship1,
-            relationshipService.findByItemAndRelationshipType(context, publication1, relationshipType, true, -1, -1)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    publication1, relationshipType, true, -1, -1)
         );
         assertNoRelationship(
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, false, -1, -1)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, false, -1, -1)
         );
         assertNoRelationship(
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, true, -1, -1)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, true, -1, -1)
         );
 
         assertNoRelationship(
             relationshipService
-                .findByItemAndRelationshipType(context, publication1, relationshipType, false, -1, -1, false)
+                .findByItemAndRelationshipType(context.getSession(),
+                        publication1, relationshipType, false, -1, -1, false)
         );
         assertNoRelationship(
             relationshipService
-                .findByItemAndRelationshipType(context, publication1, relationshipType, false, -1, -1, true)
+                .findByItemAndRelationshipType(context.getSession(),
+                        publication1, relationshipType, false, -1, -1, true)
         );
         assertRelationship(
             relationship1,
             relationshipService
-                .findByItemAndRelationshipType(context, publication1, relationshipType, true, -1, -1, false)
+                .findByItemAndRelationshipType(context.getSession(),
+                        publication1, relationshipType, true, -1, -1, false)
         );
         assertRelationship(
             relationship1,
             relationshipService
-                .findByItemAndRelationshipType(context, publication1, relationshipType, true, -1, -1, true)
+                .findByItemAndRelationshipType(context.getSession(),
+                        publication1, relationshipType, true, -1, -1, true)
         );
         assertRelationship(
             relationship1,
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, false, -1, -1, false)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, false, -1, -1, false)
         );
         assertNoRelationship(
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, false, -1, -1, true)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, false, -1, -1, true)
         );
         assertNoRelationship(
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, true, -1, -1, false)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, true, -1, -1, false)
         );
         assertNoRelationship(
-            relationshipService.findByItemAndRelationshipType(context, person1, relationshipType, true, -1, -1, true)
+            relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    person1, relationshipType, true, -1, -1, true)
         );
 
         assertEquals(1, relationshipService.countByItem(context, publication1));

@@ -81,7 +81,7 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
 
     private CollectionBuilder create(final Community parent, final String handle) {
         try {
-            for (Collection collection : this.collectionService.findAll(context)) {
+            for (Collection collection : this.collectionService.findAll(context.getSession())) {
                 if (collection.getHandle().equalsIgnoreCase(handle)) {
                     this.collection = collection;
                 }
@@ -336,9 +336,9 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
      * @throws Exception passed through.
      */
     public void deleteDefaultReadGroups(Context c, Collection collection) throws Exception {
-        Group defaultItemReadGroup = groupService.findByName(c, "COLLECTION_" +
+        Group defaultItemReadGroup = groupService.findByName(c.getSession(), "COLLECTION_" +
               collection.getID().toString() + "_ITEM_DEFAULT_READ");
-        Group defaultBitstreamReadGroup = groupService.findByName(c, "COLLECTION_" +
+        Group defaultBitstreamReadGroup = groupService.findByName(c.getSession(), "COLLECTION_" +
               collection.getID().toString() + "_BITSTREAM_DEFAULT_READ");
         if (defaultItemReadGroup != null) {
             groupService.delete(c, defaultItemReadGroup);
@@ -359,7 +359,7 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
     public static void deleteCollection(UUID uuid) throws SQLException, IOException, SearchServiceException {
        try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
-            Collection collection = collectionService.find(c, uuid);
+            Collection collection = collectionService.find(c.getSession(), uuid);
             if (collection != null) {
                 try {
                     collectionService.delete(c, collection);

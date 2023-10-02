@@ -66,7 +66,7 @@ public class SiteTest extends AbstractUnitTest {
         try {
             //we have to create a new community in the database
             context.turnOffAuthorisationSystem();
-            this.s = siteService.findSite(context);
+            this.s = siteService.findSite(context.getSession());
             //we need to commit the changes so we don't block the table for testing
             context.restoreAuthSystemState();
         } catch (SQLException ex) {
@@ -129,7 +129,7 @@ public class SiteTest extends AbstractUnitTest {
      */
     @Test
     public void testSiteFind() throws Exception {
-        Site found = siteService.findSite(context);
+        Site found = siteService.findSite(context.getSession());
         assertThat("testSiteFind 0", found, notNullValue());
         assertThat("testSiteFind 1", found, equalTo(s));
     }

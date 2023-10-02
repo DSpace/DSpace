@@ -73,7 +73,7 @@ public class IIIFServiceFacade {
             throws ResourceNotFoundException {
         Item item;
         try {
-            item = itemService.find(context, id);
+            item = itemService.find(context.getSession(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -97,7 +97,7 @@ public class IIIFServiceFacade {
             throws ResourceNotFoundException {
         Item item;
         try {
-            item = itemService.find(context, id);
+            item = itemService.find(context.getSession(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

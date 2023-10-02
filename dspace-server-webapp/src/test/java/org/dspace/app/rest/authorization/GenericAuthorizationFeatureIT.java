@@ -206,7 +206,8 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         String communityAAdminToken = getAuthToken(communityAAdmin.getEmail(), password);
         String collectionXAdminToken = getAuthToken(collectionXAdmin.getEmail(), password);
         String item1AdminToken = getAuthToken(item1Admin.getEmail(), password);
-        String siteId = ContentServiceFactory.getInstance().getSiteService().findSite(context).getID().toString();
+        String siteId = ContentServiceFactory.getInstance().getSiteService()
+                .findSite(context.getSession()).getID().toString();
 
         // Verify the general admin has this feature on the site
         getClient(adminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
@@ -863,7 +864,8 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         String communityAAdminToken = getAuthToken(communityAAdmin.getEmail(), password);
         String collectionXAdminToken = getAuthToken(collectionXAdmin.getEmail(), password);
         String item1AdminToken = getAuthToken(item1Admin.getEmail(), password);
-        String siteId = ContentServiceFactory.getInstance().getSiteService().findSite(context).getID().toString();
+        String siteId = ContentServiceFactory.getInstance().getSiteService()
+                .findSite(context.getSession()).getID().toString();
         final String feature = "canDelete";
 
         // Verify the general admin doesn’t have this feature on the site

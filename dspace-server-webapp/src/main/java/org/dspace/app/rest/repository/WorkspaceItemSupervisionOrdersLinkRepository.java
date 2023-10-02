@@ -47,12 +47,12 @@ public class WorkspaceItemSupervisionOrdersLinkRepository
                                                            Projection projection) {
         try {
             Context context = obtainContext();
-            WorkspaceItem workspaceItem = workspaceItemService.find(context, id);
+            WorkspaceItem workspaceItem = workspaceItemService.find(context.getSession(), id);
             if (workspaceItem == null) {
                 throw new ResourceNotFoundException("No such workspace item: " + id);
             }
             return converter.toRestPage(
-                supervisionOrderService.findByItem(context, workspaceItem.getItem()),
+                supervisionOrderService.findByItem(context.getSession(), workspaceItem.getItem()),
                 optionalPageable, projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);

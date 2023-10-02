@@ -102,7 +102,8 @@ public class RdfIT extends AbstractWebClientIntegrationTest {
 
         // Get the RDF identifiers for this new Community & our Site object
         String communityIdentifier = RDFUtil.generateIdentifier(context, community);
-        String siteIdentifier = RDFUtil.generateIdentifier(context, siteService.findSite(context));
+        String siteIdentifier = RDFUtil.generateIdentifier(context,
+                siteService.findSite(context.getSession()));
 
         // Mock an RDF triplestore's response by returning the RDF conversion of our Community
         // when rdfStorage.load() is called with the RDF identifier for this Community

@@ -17,6 +17,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the MetadataValue object.
@@ -41,38 +42,38 @@ public interface MetadataValueService {
     /**
      * Retrieves the metadata value from the database.
      *
-     * @param context dspace context
+     * @param session current request's database context.
      * @param valueId database key id of value
      * @return recalled metadata value
      * @throws IOException  if IO error
      * @throws SQLException if database error
      */
-    public MetadataValue find(Context context, int valueId)
+    public MetadataValue find(Session session, int valueId)
         throws IOException, SQLException;
 
 
     /**
      * Retrieves the metadata values for a given field from the database.
      *
-     * @param context       dspace context
+     * @param session       current request's database context.
      * @param metadataField metadata field whose values to look for
      * @return a collection of metadata values
      * @throws IOException  if IO error
      * @throws SQLException if database error
      */
-    public List<MetadataValue> findByField(Context context, MetadataField metadataField)
+    public List<MetadataValue> findByField(Session session, MetadataField metadataField)
         throws IOException, SQLException;
 
     /**
      * Retrieves matching MetadataValues for a given field and value.
      *
-     * @param context dspace context
+     * @param session current request's database context.
      * @param metadataField The field that must match
      * @param value The value that must match
      * @return the matching MetadataValues
      * @throws SQLException if database error
      */
-    public Iterator<MetadataValue> findByFieldAndValue(Context context, MetadataField metadataField, String value)
+    public Iterator<MetadataValue> findByFieldAndValue(Session session, MetadataField metadataField, String value)
             throws SQLException;
 
     /**
@@ -96,7 +97,7 @@ public interface MetadataValueService {
      */
     public void delete(Context context, MetadataValue metadataValue) throws SQLException;
 
-    public Iterator<MetadataValue> findByValueLike(Context context, String value) throws SQLException;
+    public Iterator<MetadataValue> findByValueLike(Session session, String value) throws SQLException;
 
     public void deleteByMetadataField(Context context, MetadataField metadataField) throws SQLException;
 

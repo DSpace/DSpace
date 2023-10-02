@@ -125,7 +125,7 @@ public class Groomer {
         boolean delete = command.hasOption('d');
 
         Context myContext = new Context();
-        List<EPerson> epeople = ePersonService.findNotActiveSince(myContext, before);
+        List<EPerson> epeople = ePersonService.findNotActiveSince(myContext.getSession(), before);
 
         myContext.turnOffAuthorisationSystem();
         for (EPerson account : epeople) {
@@ -161,7 +161,7 @@ public class Groomer {
     private static void findUnsalted()
         throws SQLException {
         Context myContext = new Context();
-        List<EPerson> ePersons = ePersonService.findUnsalted(myContext);
+        List<EPerson> ePersons = ePersonService.findUnsalted(myContext.getSession());
         for (EPerson ePerson : ePersons) {
             System.out.println(ePerson.getEmail());
         }

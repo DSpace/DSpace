@@ -71,7 +71,7 @@ public class MetadataDeletion extends DSpaceRunnable<MetadataDeletionScriptConfi
 
     private void performMetadataValuesDeletion(Context context) throws SQLException {
 
-        MetadataField field = metadataFieldService.findByString(context, metadataField, '.');
+        MetadataField field = metadataFieldService.findByString(context.getSession(), metadataField, '.');
         if (field == null) {
             throw new IllegalArgumentException("No metadata field found with name " + metadataField);
         }

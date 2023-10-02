@@ -156,7 +156,7 @@ public class OrcidFundingFactory implements OrcidEntityFactory {
 
         try {
 
-            return relationshipTypeService.findByLeftwardOrRightwardTypeName(context,
+            return relationshipTypeService.findByLeftwardOrRightwardTypeName(context.getSession(),
                 fieldMapping.getOrganizationRelationshipType()).stream()
                 .flatMap(relationshipType -> getRelationships(context, item, relationshipType))
                 .map(relationship -> getRelatedItem(item, relationship))
@@ -172,7 +172,8 @@ public class OrcidFundingFactory implements OrcidEntityFactory {
 
     private Stream<Relationship> getRelationships(Context context, Item item, RelationshipType relationshipType) {
         try {
-            return relationshipService.findByItemAndRelationshipType(context, item, relationshipType).stream();
+            return relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    item, relationshipType).stream();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

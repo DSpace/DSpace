@@ -14,6 +14,7 @@ import org.dspace.core.Context;
 import org.dspace.service.DSpaceCRUDService;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
+import org.hibernate.Session;
 
 /**
  * @author Fabio Bolognesi (fabio at atmire dot com)
@@ -26,7 +27,7 @@ public interface VersionHistoryService extends DSpaceCRUDService<VersionHistory>
     public void add(Context context, VersionHistory versionHistory, Version version)
         throws SQLException;
 
-    public VersionHistory findByItem(Context context, Item item)
+    public VersionHistory findByItem(Session session, Item item)
         throws SQLException;
 
     public Version getFirstVersion(Context context, VersionHistory versionHistory)
@@ -70,7 +71,7 @@ public interface VersionHistoryService extends DSpaceCRUDService<VersionHistory>
     /**
      * This method has a scope to verify if the logged user has permission
      * to see the attribute 'draftVersion' of the latest version.
-     * 
+     *
      * @param context             DSpace context object
      * @param versionHistory      Version history object
      * @return                    return true if the logged user has permission to see

@@ -157,7 +157,7 @@ public class AccessConditionOption {
                                      Date startDate, Date endDate)
             throws SQLException, AuthorizeException, ParseException {
         validateResourcePolicy(context, name, startDate, endDate);
-        Group group = groupService.findByName(context, getGroupName());
+        Group group = groupService.findByName(context.getSession(), getGroupName());
         authorizeService.createResourcePolicy(context, obj, group, null, Constants.READ,
                 ResourcePolicy.TYPE_CUSTOM, name, description, startDate,
                 endDate);

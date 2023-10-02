@@ -542,7 +542,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                             .set(read(result.getResponse().getContentAsString(), "$.processId")));
 
 
-            Process process = processService.find(context, idRef.get());
+            Process process = processService.find(context.getSession(), idRef.get());
             Bitstream bitstream = processService.getBitstream(context, process, Process.OUTPUT_TYPE);
 
 
@@ -744,7 +744,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                                         parameters, acceptableProcessStatuses))))
                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.processId")));
 
-            Process process = processService.find(context, idRef.get());
+            Process process = processService.find(context.getSession(), idRef.get());
             List<Group> groups = process.getGroups();
             boolean isPresent = groups.stream().anyMatch(g -> g.getID().equals(specialGroup.getID()));
             assertTrue(isPresent);
@@ -754,10 +754,11 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         }
     }
 
+    @Override
     @After
     public void destroy() throws Exception {
         context.turnOffAuthorisationSystem();
-        CollectionUtils.emptyIfNull(processService.findAll(context)).stream().forEach(process -> {
+        CollectionUtils.emptyIfNull(processService.findAll(context.getSession())).stream().forEach(process -> {
             try {
                 processService.delete(context, process);
             } catch (SQLException | AuthorizeException | IOException e) {

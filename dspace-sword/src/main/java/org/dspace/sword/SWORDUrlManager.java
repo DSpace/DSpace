@@ -52,10 +52,10 @@ public class SWORDUrlManager {
     private final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    private String swordPath = configurationService.getProperty(
+    private final String swordPath = configurationService.getProperty(
             "sword-server.path", "sword");
 
-    private String dspaceUrl = configurationService.getProperty(
+    private final String dspaceUrl = configurationService.getProperty(
             "dspace.server.url");
 
     public SWORDUrlManager(SWORDConfiguration config, Context context) {
@@ -289,7 +289,7 @@ public class SWORDUrlManager {
                 if (bsid.endsWith("/")) {
                     bsid = bsid.substring(0, url.length() - 1);
                 }
-                return bitstreamService.findByIdOrLegacyId(context, bsid);
+                return bitstreamService.findByIdOrLegacyId(context.getSession(), bsid);
             } else {
                 throw new SWORDErrorException(DSpaceSWORDErrorCodes.BAD_URL,
                                               "Unable to recognise URL as a valid service document: " +

@@ -74,7 +74,7 @@ public class GroupRestController {
 
         Context context = obtainContext(request);
 
-        Group parentGroup = groupService.find(context, uuid);
+        Group parentGroup = groupService.find(context.getSession(), uuid);
         if (parentGroup == null) {
             throw new ResourceNotFoundException("parent group is not found for uuid: " + uuid);
         }
@@ -109,7 +109,7 @@ public class GroupRestController {
         Pattern linkPattern = compile("^.*/(" + REGEX_UUID + ")/?$");
         Matcher matcher = linkPattern.matcher(groupLink);
         if (matcher.matches()) {
-            group = groupService.find(context, UUID.fromString(matcher.group(1)));
+            group = groupService.find(context.getReadOnlySession(), UUID.fromString(matcher.group(1)));
         }
 
         return Optional.ofNullable(group);
@@ -135,7 +135,7 @@ public class GroupRestController {
 
         Context context = obtainContext(request);
 
-        Group parentGroup = groupService.find(context, uuid);
+        Group parentGroup = groupService.find(context.getSession(), uuid);
         if (parentGroup == null) {
             throw new ResourceNotFoundException("parent group is not found for uuid: " + uuid);
         }
@@ -169,7 +169,7 @@ public class GroupRestController {
         Pattern linkPattern = compile("^.*/(" + REGEX_UUID + ")/?$");
         Matcher matcher = linkPattern.matcher(groupLink);
         if (matcher.matches()) {
-            ePerson = ePersonService.find(context, UUID.fromString(matcher.group(1)));
+            ePerson = ePersonService.find(context.getSession(), UUID.fromString(matcher.group(1)));
         }
 
         return Optional.ofNullable(ePerson);
@@ -191,14 +191,14 @@ public class GroupRestController {
 
         Context context = obtainContext(request);
 
-        Group parentGroup = groupService.find(context, parentUUID);
+        Group parentGroup = groupService.find(context.getSession(), parentUUID);
         if (parentGroup == null) {
             throw new ResourceNotFoundException("parent group is not found for uuid: " + parentUUID);
         }
 
         AuthorizeUtil.authorizeManageGroup(context, parentGroup);
 
-        Group childGroup = groupService.find(context, childUUID);
+        Group childGroup = groupService.find(context.getSession(), childUUID);
         if (childGroup == null) {
             response.sendError(SC_UNPROCESSABLE_ENTITY);
         }
@@ -227,14 +227,14 @@ public class GroupRestController {
 
         Context context = obtainContext(request);
 
-        Group parentGroup = groupService.find(context, parentUUID);
+        Group parentGroup = groupService.find(context.getSession(), parentUUID);
         if (parentGroup == null) {
             throw new ResourceNotFoundException("parent group is not found for uuid: " + parentUUID);
         }
 
         AuthorizeUtil.authorizeManageGroup(context, parentGroup);
 
-        EPerson childGroup = ePersonService.find(context, memberUUID);
+        EPerson childGroup = ePersonService.find(context.getSession(), memberUUID);
         if (childGroup == null) {
             response.sendError(SC_UNPROCESSABLE_ENTITY);
         }

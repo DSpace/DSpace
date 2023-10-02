@@ -55,7 +55,7 @@ public class SubscribeBuilder extends AbstractBuilder<Subscription, SubscribeSer
     public static void deleteSubscription(int id) throws Exception {
         try (Context c = new Context()) {
             c.turnOffAuthorisationSystem();
-            Subscription subscription = subscribeService.findById(c, id);
+            Subscription subscription = subscribeService.findById(c.getSession(), id);
             if (Objects.nonNull(subscription)) {
                 try {
                     subscribeService.deleteSubscription(c, subscription);

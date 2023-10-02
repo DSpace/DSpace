@@ -41,7 +41,7 @@ public class GroupGroupLinkRepository extends AbstractDSpaceRestRepository
                                      Projection projection) {
         try {
             Context context = obtainContext();
-            Group group = groupService.find(context, groupId);
+            Group group = groupService.find(context.getSession(), groupId);
             if (group == null) {
                 throw new ResourceNotFoundException("No such group: " + groupId);
             }

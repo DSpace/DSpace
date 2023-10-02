@@ -291,7 +291,7 @@ public class DSpaceSwordAPI {
                                                   "Original SWORD entry document");
 
                     BitstreamFormat bf = bitstreamFormatService
-                        .findByMIMEType(context, "application/xml");
+                        .findByMIMEType(context.getSession(), "application/xml");
                     if (bf != null) {
                         entryBitstream.setFormat(context, bf);
                     }
@@ -326,7 +326,7 @@ public class DSpaceSwordAPI {
                                              "Original SWORD deposit file");
 
                     BitstreamFormat bf = bitstreamFormatService
-                        .findByMIMEType(context, deposit.getMimeType());
+                        .findByMIMEType(context.getSession(), deposit.getMimeType());
                     if (bf != null) {
                         bitstream.setFormat(context, bf);
                     }
@@ -368,7 +368,7 @@ public class DSpaceSwordAPI {
         throws DSpaceSwordException {
         try {
             BitstreamFormat bf = bitstreamFormatService
-                .findByMIMEType(context, deposit.getMimeType());
+                .findByMIMEType(context.getSession(), deposit.getMimeType());
             List<String> exts = null;
             if (bf != null) {
                 exts = bf.getExtensions();

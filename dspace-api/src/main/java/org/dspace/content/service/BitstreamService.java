@@ -23,6 +23,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the Bitstream object.
@@ -34,11 +35,11 @@ import org.dspace.core.Context;
 public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpaceObjectLegacySupportService<Bitstream> {
 
     @Override
-    public Bitstream find(Context context, UUID id) throws SQLException;
+    public Bitstream find(Session session, UUID id) throws SQLException;
 
-    public List<Bitstream> findAll(Context context) throws SQLException;
+    public List<Bitstream> findAll(Session session) throws SQLException;
 
-    public Iterator<Bitstream> findAll(Context context, int limit, int offset) throws SQLException;
+    public Iterator<Bitstream> findAll(Session session, int limit, int offset) throws SQLException;
 
     /**
      * Clone the given bitstream by firstly creating a new bitstream, with a new ID.
@@ -179,12 +180,11 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
     /**
      * Retrieve all bitstreams with the deleted flag set to true
      *
-     * @param context the dspace context
+     * @param session current request's database context.
      * @return a list of all bitstreams that have been "deleted"
      * @throws SQLException if database error
      */
-    public List<Bitstream> findDeletedBitstreams(Context context, int limit, int offset) throws SQLException;
-
+    public List<Bitstream> findDeletedBitstreams(Session session, int limit, int offset) throws SQLException;
 
     /**
      * Remove a bitstream that has been set to "deleted" from the database
@@ -196,7 +196,7 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
      */
     public void expunge(Context context, Bitstream bitstream) throws SQLException, AuthorizeException;
 
-    public List<Bitstream> findDuplicateInternalIdentifier(Context context, Bitstream bitstream) throws SQLException;
+    public List<Bitstream> findDuplicateInternalIdentifier(Session session, Bitstream bitstream) throws SQLException;
 
     public Iterator<Bitstream> getItemBitstreams(Context context, Item item) throws SQLException;
 
@@ -204,7 +204,7 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
 
     public Iterator<Bitstream> getCommunityBitstreams(Context context, Community community) throws SQLException;
 
-    public List<Bitstream> findBitstreamsWithNoRecentChecksum(Context context) throws SQLException;
+    public List<Bitstream> findBitstreamsWithNoRecentChecksum(Session session) throws SQLException;
 
     public Bitstream getBitstreamByName(Item item, String bundleName, String bitstreamName) throws SQLException;
 
@@ -214,7 +214,7 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
 
     public BitstreamFormat getFormat(Context context, Bitstream bitstream) throws SQLException;
 
-    public Iterator<Bitstream> findByStoreNumber(Context context, Integer storeNumber) throws SQLException;
+    public Iterator<Bitstream> findByStoreNumber(Session session, Integer storeNumber) throws SQLException;
 
     public Long countByStoreNumber(Context context, Integer storeNumber) throws SQLException;
 

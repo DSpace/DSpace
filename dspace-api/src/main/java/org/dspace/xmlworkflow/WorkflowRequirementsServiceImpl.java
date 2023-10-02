@@ -31,10 +31,10 @@ import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * A class that contains utililty methods related to the workflow
+ * A class that contains utility methods related to the workflow.
  * The adding/removing from claimed users and ensuring that
  * if multiple users have to perform these steps that a count is kept
- * so that no more then the allowed user count are allowed to perform their actions
+ * so that no more then the allowed user count are allowed to perform their actions.
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -98,7 +98,8 @@ public class WorkflowRequirementsServiceImpl implements WorkflowRequirementsServ
             .getNumberOfFinishedUsers(context, wfi);
 
         //Then remove the current user from the inProgressUsers
-        inProgressUserService.delete(context, inProgressUserService.findByWorkflowItemAndEPerson(context, wfi, user));
+        inProgressUserService.delete(context, inProgressUserService.findByWorkflowItemAndEPerson(context.getSession(),
+                wfi, user));
 
         //Make sure the removed user has their custom rights removed
         xmlWorkflowService.removeUserItemPolicies(context, wfi.getItem(), user);
@@ -111,7 +112,7 @@ public class WorkflowRequirementsServiceImpl implements WorkflowRequirementsServ
         if (totalUsers == step.getRequiredUsers()) {
 
             //Create a list of the users we are to ignore
-            List<InProgressUser> toIgnore = inProgressUserService.findByWorkflowItem(context, wfi);
+            List<InProgressUser> toIgnore = inProgressUserService.findByWorkflowItem(context.getSession(), wfi);
 
             //Remove the users to ignore
             RoleMembers roleMembers = step.getRole().getMembers(context, wfi);
@@ -143,7 +144,7 @@ public class WorkflowRequirementsServiceImpl implements WorkflowRequirementsServ
 
     @Override
     public void addFinishedUser(Context c, XmlWorkflowItem wfi, EPerson user) throws AuthorizeException, SQLException {
-        InProgressUser ipu = inProgressUserService.findByWorkflowItemAndEPerson(c, wfi, user);
+        InProgressUser ipu = inProgressUserService.findByWorkflowItemAndEPerson(c.getSession(), wfi, user);
         ipu.setFinished(true);
         inProgressUserService.update(c, ipu);
     }
@@ -151,7 +152,7 @@ public class WorkflowRequirementsServiceImpl implements WorkflowRequirementsServ
 
     @Override
     public void clearInProgressUsers(Context c, XmlWorkflowItem wfi) throws AuthorizeException, SQLException {
-        Iterator<InProgressUser> ipus = inProgressUserService.findByWorkflowItem(c, wfi).iterator();
+        Iterator<InProgressUser> ipus = inProgressUserService.findByWorkflowItem(c.getSession(), wfi).iterator();
         while (ipus.hasNext()) {
             InProgressUser ipu = ipus.next();
             ipus.remove();

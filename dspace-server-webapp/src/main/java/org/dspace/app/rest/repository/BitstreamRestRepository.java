@@ -90,7 +90,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
     public BitstreamRest findOne(Context context, UUID id) {
         Bitstream bit = null;
         try {
-            bit = bs.find(context, id);
+            bit = bs.find(context.getSession(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -129,7 +129,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
     protected void delete(Context context, UUID id) throws AuthorizeException {
         Bitstream bit = null;
         try {
-            bit = bs.find(context, id);
+            bit = bs.find(context.getSession(), id);
             if (bit == null) {
                 throw new ResourceNotFoundException("The bitstream with uuid " + id + " could not be found");
             }
@@ -219,7 +219,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
         Context context = obtainContext();
         Bitstream bit = null;
         try {
-            bit = bs.find(context, uuid);
+            bit = bs.find(context.getSession(), uuid);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

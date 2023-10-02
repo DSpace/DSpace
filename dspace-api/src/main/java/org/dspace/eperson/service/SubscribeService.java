@@ -17,6 +17,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.SubscriptionParameter;
+import org.hibernate.Session;
 
 /**
  * Service interface class for the Subscription object.
@@ -32,19 +33,19 @@ public interface SubscribeService {
      * Subscribe an e-person to a collection. An e-mail will be sent every day a
      * new item appears in the collection.
      *
-     * @param context DSpace context
+     * @param session current request's database context.
      * @param limit   Number of subscriptions to return
      * @param offset  Offset number
      * @return list of Subscription objects
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<Subscription> findAll(Context context, String resourceType, Integer limit, Integer offset)
+    public List<Subscription> findAll(Session session, String resourceType, Integer limit, Integer offset)
             throws Exception;
 
     /**
      * Subscribe an EPerson to a dSpaceObject (Collection or Community). An e-mail will be sent every day a
      * new item appears in the Collection or Community.
-     * 
+     *
      * @param context                 DSpace context object
      * @param eperson                 EPerson to subscribe
      * @param dSpaceObject            DSpaceObject to subscribe
@@ -77,20 +78,20 @@ public interface SubscribeService {
     /**
      * Find out which collections an e-person is subscribed to
      *
-     * @param context DSpace context
+     * @param session current request's database context.
      * @param eperson EPerson
      * @param limit   Number of subscriptions to return
      * @param offset  Offset number
      * @return array of collections e-person is subscribed to
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<Subscription> findSubscriptionsByEPerson(Context context, EPerson eperson, Integer limit,Integer offset)
+    public List<Subscription> findSubscriptionsByEPerson(Session session, EPerson eperson, Integer limit,Integer offset)
             throws SQLException;
 
     /**
      * Find out which collections an e-person is subscribed to and related with dso
      *
-     * @param context      DSpace context
+     * @param session      current request's database context.
      * @param eperson      EPerson
      * @param dSpaceObject DSpaceObject
      * @param limit        Number of subscriptions to return
@@ -98,7 +99,7 @@ public interface SubscribeService {
      * @return array of collections e-person is subscribed to and related with dso
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<Subscription> findSubscriptionsByEPersonAndDso(Context context, EPerson eperson,
+    public List<Subscription> findSubscriptionsByEPersonAndDso(Session session, EPerson eperson,
                                                               DSpaceObject dSpaceObject,
                                                               Integer limit, Integer offset) throws SQLException;
 
@@ -153,11 +154,11 @@ public interface SubscribeService {
     /**
      * Finds a subscription by id
      *
-     * @param context DSpace context
+     * @param session current request's database context.
      * @param id      the id of subscription to be searched
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public Subscription findById(Context context, int id) throws SQLException;
+    public Subscription findById(Session session, int id) throws SQLException;
 
     /**
      * Updates a subscription by id
@@ -205,12 +206,12 @@ public interface SubscribeService {
     /**
      * Finds all subscriptions by subscriptionType and frequency
      *
-     * @param context             DSpace context
+     * @param session             current request's database context.
      * @param subscriptionType    Could be "content" or "statistics". NOTE: in DSpace we have only "content"
      * @param frequencyValue      Could be "D" stand for Day, "W" stand for Week, and "M" stand for Month
      * @throws SQLException       An exception that provides information on a database access error or other errors.
      */
-    public List<Subscription> findAllSubscriptionsBySubscriptionTypeAndFrequency(Context context,
+    public List<Subscription> findAllSubscriptionsBySubscriptionTypeAndFrequency(Session session,
             String subscriptionType, String frequencyValue) throws SQLException;
 
     /**

@@ -51,7 +51,7 @@ public class FailedOpenURLTrackerServiceImplTest {
     public void testRemove() throws SQLException {
         openURLTrackerLoggerService.remove(context, openURLTracker);
 
-        Mockito.verify(openURLTrackerDAO, times(1)).delete(context, openURLTracker);
+        Mockito.verify(openURLTrackerDAO, times(1)).delete(context.getSession(), openURLTracker);
 
     }
 
@@ -63,7 +63,8 @@ public class FailedOpenURLTrackerServiceImplTest {
     public void testFindAll() throws SQLException {
         List<OpenURLTracker> trackers = new ArrayList<>();
 
-        when(openURLTrackerDAO.findAll(context, OpenURLTracker.class)).thenReturn(trackers);
+        when(openURLTrackerDAO.findAll(context.getSession(), OpenURLTracker.class))
+                .thenReturn(trackers);
 
         assertEquals("TestFindAll 0", trackers, openURLTrackerLoggerService.findAll(context));
     }

@@ -60,13 +60,13 @@ public class PoolTaskRestPermissionEvaluatorPlugin extends RestObjectPermissionE
         Context context = ContextUtil.obtainContext(request.getHttpServletRequest());
         EPerson ePerson = null;
         try {
-            ePerson = ePersonService.findByEmail(context, (String) authentication.getPrincipal());
+            ePerson = ePersonService.findByEmail(context.getSession(), (String) authentication.getPrincipal());
             if (ePerson == null) {
                 return false;
             }
             int dsoId = Integer.parseInt(targetId.toString());
 
-            PoolTask poolTask = poolTaskService.find(context, dsoId);
+            PoolTask poolTask = poolTaskService.find(context.getSession(), dsoId);
             // If the pool task is null then we give permission so we can throw another status code instead
             if (poolTask == null) {
                 return true;

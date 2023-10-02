@@ -43,7 +43,7 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
 
         if (exportAllItems) {
             handler.logInfo("Exporting whole repository WARNING: May take some time!");
-            toExport = itemService.findAll(context);
+            toExport = itemService.findAll(context.getSession());
         } else {
             DSpaceObject dso = HandleServiceFactory.getInstance().getHandleService()
                 .resolveToObject(context, identifier);
@@ -63,7 +63,7 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
             } else if (dso.getType() == Constants.COLLECTION) {
                 handler.logInfo("Exporting collection '" + dso.getName() + "' (" + identifier + ")");
                 Collection collection = (Collection) dso;
-                toExport = itemService.findByCollection(context, collection);
+                toExport = itemService.findByCollection(context.getSession(), collection);
             } else if (dso.getType() == Constants.COMMUNITY) {
                 handler.logInfo("Exporting community '" + dso.getName() + "' (" + identifier + ")");
                 toExport = buildFromCommunity(context, (Community) dso);
@@ -117,7 +117,7 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
         // Add all the collections
         List<Collection> collections = community.getCollections();
         for (Collection collection : collections) {
-            Iterator<Item> items = itemService.findByCollection(context, collection);
+            Iterator<Item> items = itemService.findByCollection(context.getSession(), collection);
             while (items.hasNext()) {
                 result.add(items.next());
             }

@@ -114,7 +114,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     @Autowired
     private OrcidClient orcidClient;
 
-    private OrcidClient orcidClientMock = mock(OrcidClient.class);
+    private final OrcidClient orcidClientMock = mock(OrcidClient.class);
 
     private EPerson user;
 
@@ -319,7 +319,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .andExpect(jsonPath("$.name", is(name)));
 
         String itemId = getItemIdByProfileId(authToken, id);
-        Item profileItem = itemService.find(context, UUIDUtils.fromString(itemId));
+        Item profileItem = itemService.find(context.getSession(), UUIDUtils.fromString(itemId));
 
         getClient(getAuthToken(admin.getEmail(), password))
             .perform(get("/api/authz/resourcepolicies/search/resource")
@@ -417,7 +417,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .andExpect(jsonPath("$", matchLinks("http://localhost/api/eperson/profiles/" + id, "item", "eperson")));
 
         String itemId = getItemIdByProfileId(authToken, id);
-        Item profileItem = itemService.find(context, UUIDUtils.fromString(itemId));
+        Item profileItem = itemService.find(context.getSession(), UUIDUtils.fromString(itemId));
         assertThat(profileItem, notNullValue());
         assertThat(profileItem.getOwningCollection(), is(personCollection));
 
@@ -452,7 +452,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .andExpect(jsonPath("$", matchLinks("http://localhost/api/eperson/profiles/" + id, "item", "eperson")));
 
         String itemId = getItemIdByProfileId(authToken, id);
-        Item profileItem = itemService.find(context, UUIDUtils.fromString(itemId));
+        Item profileItem = itemService.find(context.getSession(), UUIDUtils.fromString(itemId));
         assertThat(profileItem, notNullValue());
         assertThat(profileItem.getOwningCollection(), is(personCollection));
 
@@ -1336,7 +1336,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         getClient(authToken).perform(post("/api/eperson/profiles/")
                                          .contentType(MediaType.APPLICATION_JSON_VALUE))
                             .andExpect(status().isCreated())
-                            .andExpect(jsonPath("$.id", is(ePersonId.toString())))
+                            .andExpect(jsonPath("$.id", is(ePersonId)))
                             .andExpect(jsonPath("$.visible", is(false)))
                             .andExpect(jsonPath("$.type", is("profile")));
 
@@ -1350,7 +1350,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         String itemId = getItemIdByProfileId(authToken, ePersonId);
 
-        Item profileItem = itemService.find(context, UUIDUtils.fromString(itemId));
+        Item profileItem = itemService.find(context.getSession(), UUIDUtils.fromString(itemId));
         assertThat(profileItem, notNullValue());
 
         List<MetadataValue> metadata = profileItem.getMetadata();
@@ -2300,7 +2300,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         context.restoreAuthSystemState();
 
         // no preferences configured, so no orcid queue records created
-        assertThat(orcidQueueService.findByProfileItemId(context, profileItemId), empty());
+        assertThat(orcidQueueService.findByProfileItemId(context.getSession(), profileItemId), empty());
 
         String authToken = getAuthToken(ePerson.getEmail(), password);
 
@@ -2309,7 +2309,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().isOk());
 
-        List<OrcidQueue> queueRecords = orcidQueueService.findByProfileItemId(context, profileItemId);
+        List<OrcidQueue> queueRecords = orcidQueueService.findByProfileItemId(context.getSession(), profileItemId);
         assertThat(queueRecords, hasSize(1));
         assertThat(queueRecords, has(orcidQueueRecordWithEntity(publication)));
 
@@ -2318,7 +2318,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().isOk());
 
-        queueRecords = orcidQueueService.findByProfileItemId(context, profileItemId);
+        queueRecords = orcidQueueService.findByProfileItemId(context.getSession(), profileItemId);
         assertThat(queueRecords, hasSize(3));
         assertThat(queueRecords, has(orcidQueueRecordWithEntity(publication)));
         assertThat(queueRecords, has(orcidQueueRecordWithEntity(firstProject)));
@@ -2329,7 +2329,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().isOk());
 
-        queueRecords = orcidQueueService.findByProfileItemId(context, profileItemId);
+        queueRecords = orcidQueueService.findByProfileItemId(context.getSession(), profileItemId);
         assertThat(queueRecords, hasSize(2));
         assertThat(queueRecords, has(orcidQueueRecordWithEntity(firstProject)));
         assertThat(queueRecords, has(orcidQueueRecordWithEntity(secondProject)));
@@ -2339,7 +2339,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().isOk());
 
-        assertThat(orcidQueueService.findByProfileItemId(context, profileItemId), empty());
+        assertThat(orcidQueueService.findByProfileItemId(context.getSession(), profileItemId), empty());
 
     }
 
@@ -2527,8 +2527,8 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         String authToken = getAuthToken(ePerson.getEmail(), password);
 
-        AtomicReference<UUID> ePersonIdRef = new AtomicReference<UUID>();
-        AtomicReference<UUID> itemIdRef = new AtomicReference<UUID>();
+        AtomicReference<UUID> ePersonIdRef = new AtomicReference<>();
+        AtomicReference<UUID> itemIdRef = new AtomicReference<>();
 
         getClient(authToken).perform(post("/api/eperson/profiles/")
                                          .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -2542,7 +2542,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
                             .andDo(result -> itemIdRef.set(fromString(read(result.getResponse().getContentAsString(),
                                                                            "$.id"))));
 
-        return itemService.find(context, itemIdRef.get());
+        return itemService.find(context.getSession(), itemIdRef.get());
     }
 
     private String getItemIdByProfileId(String token, String id) throws SQLException, Exception {
@@ -2553,8 +2553,9 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         return readAttributeFromResponse(result, "$.id");
     }
 
-    private String getOrcidAccessToken(Item item) {
-        OrcidToken orcidToken = orcidTokenService.findByProfileItem(context, item);
+    private String getOrcidAccessToken(Item item)
+            throws SQLException {
+        OrcidToken orcidToken = orcidTokenService.findByProfileItem(context.getSession(), item);
         return orcidToken != null ? orcidToken.getAccessToken() : null;
     }
 

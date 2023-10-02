@@ -10,9 +10,9 @@ package org.dspace.versioning.dao;
 import java.sql.SQLException;
 
 import org.dspace.content.Item;
-import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 import org.dspace.versioning.VersionHistory;
+import org.hibernate.Session;
 
 /**
  * Database Access Object interface class for the VersionHistory object.
@@ -24,5 +24,5 @@ import org.dspace.versioning.VersionHistory;
  */
 public interface VersionHistoryDAO extends GenericDAO<VersionHistory> {
 
-    public VersionHistory findByItem(Context context, Item item) throws SQLException;
+    public VersionHistory findByItem(Session session, Item item) throws SQLException;
 }

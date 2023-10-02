@@ -82,7 +82,7 @@ public class LicenseCleanup {
 
         Context ctx = new Context();
         ctx.turnOffAuthorisationSystem();
-        Iterator<Item> iter = itemService.findAll(ctx);
+        Iterator<Item> iter = itemService.findAll(ctx.getSession());
 
         Properties props = new Properties();
 

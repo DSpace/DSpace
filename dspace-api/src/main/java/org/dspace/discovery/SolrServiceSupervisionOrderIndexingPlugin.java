@@ -58,7 +58,7 @@ public class SolrServiceSupervisionOrderIndexingPlugin implements SolrServiceInd
     }
 
     private void addSupervisedField(Context context, Item item, SolrInputDocument document) throws SQLException {
-        List<SupervisionOrder> supervisionOrders = supervisionOrderService.findByItem(context, item);
+        List<SupervisionOrder> supervisionOrders = supervisionOrderService.findByItem(context.getSession(), item);
         if (CollectionUtils.isNotEmpty(supervisionOrders)) {
             document.addField("supervised", true);
         } else {

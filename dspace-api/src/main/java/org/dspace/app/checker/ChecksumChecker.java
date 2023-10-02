@@ -166,7 +166,7 @@ public final class ChecksumChecker {
 
                 for (int i = 0; i < ids.length; i++) {
                     try {
-                        bitstreams.add(bitstreamService.find(context, UUID.fromString(ids[i])));
+                        bitstreams.add(bitstreamService.find(context.getSession(), UUID.fromString(ids[i])));
                     } catch (NumberFormatException nfe) {
                         System.err.println("The following argument: " + ids[i]
                                                + " is not an integer");

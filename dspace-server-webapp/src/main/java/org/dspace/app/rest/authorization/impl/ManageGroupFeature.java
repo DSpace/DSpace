@@ -49,7 +49,7 @@ public class ManageGroupFeature implements AuthorizationFeature {
         GroupRest groupRest = (GroupRest) object;
 
         // get the group
-        Group group = groupService.findByName(context, groupRest.getName());
+        Group group = groupService.findByName(context.getSession(), groupRest.getName());
         if (group == null) {
             return false;
         }

@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * A bean implementing the {@link VirtualMetadataConfiguration} interface to achieve the generation of
- * Virtual metadata by traversing the path of relation specified in the config for this bean
+ * Virtual metadata by traversing the path of relation specified in the config for this bean.
  * The Related bean will find the relationshiptype defined in the relationshipTypeString property on
  * the current item and it'll use the related item from that relationship to pass it along to the
  * virtualMetadataConfiguration property which in turn refers to another VirtualBean instance and it continues
@@ -146,7 +146,7 @@ public class Related implements VirtualMetadataConfiguration {
      */
     @Override
     public List<String> getValues(Context context, Item item) throws SQLException {
-        Entity entity = entityService.findByItemId(context, item.getID());
+        Entity entity = entityService.findByItemId(context.getSession(), item.getID());
         EntityType entityType = entityService.getType(context, entity);
 
         List<RelationshipType> relationshipTypes = entityService.getAllRelationshipTypes(context, entity);
@@ -160,7 +160,8 @@ public class Related implements VirtualMetadataConfiguration {
 
         List<Relationship> relationships = new LinkedList<>();
         for (RelationshipType relationshipType : possibleRelationshipTypes) {
-            relationships.addAll(relationshipService.findByItemAndRelationshipType(context, item, relationshipType));
+            relationships.addAll(relationshipService.findByItemAndRelationshipType(context.getSession(),
+                    item, relationshipType));
         }
 
         for (Relationship relationship : relationships) {

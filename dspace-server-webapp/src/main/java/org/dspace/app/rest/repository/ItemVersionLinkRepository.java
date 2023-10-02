@@ -59,7 +59,7 @@ public class ItemVersionLinkRepository extends AbstractDSpaceRestRepository
 
 
         Context context = obtainContext();
-        Item item = itemService.find(context, itemUuid);
+        Item item = itemService.find(context.getSession(), itemUuid);
         if (item == null) {
             throw new ResourceNotFoundException("The Item for uuid: " + itemUuid + " couldn't be found");
         }

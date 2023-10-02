@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Utility class to manipulate the AuthorizationRest object
- * 
+ *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
@@ -37,7 +37,7 @@ public class AuthorizationRestUtil {
 
     /**
      * Extract the feature name from the Authorization business ID. See {@link Authorization#getID()}
-     * 
+     *
      * @param id
      *            the Authorization business ID
      * @return the feature name
@@ -49,7 +49,7 @@ public class AuthorizationRestUtil {
     /**
      * Get the object addressed in the authorization extracting its type and primary key from the authorization business
      * ID ({@link Authorization#getID()}) and using the appropriate service
-     * 
+     *
      * @param context
      *            the DSpace context
      * @param id
@@ -85,7 +85,7 @@ public class AuthorizationRestUtil {
      * Get the eperson in the authorization extracting its uuid from the authorization business ID
      * ({@link Authorization#getID()}) and retrieving the corresponding eperson object with the {@link EPersonService}.
      * Please note that reference to deleted eperson will result in an IllegalArgumentException
-     * 
+     *
      * @param context
      *            the DSpace context
      * @param id
@@ -109,7 +109,7 @@ public class AuthorizationRestUtil {
                     " contains a reference to an invalid eperson uuid " + epersonIdStr);
         }
         EPersonService service = EPersonServiceFactory.getInstance().getEPersonService();
-        EPerson ep = service.find(context, uuid);
+        EPerson ep = service.find(context.getSession(), uuid);
         if (ep == null) {
             throw new IllegalArgumentException("No eperson found with the uuid " + epersonIdStr);
         }
@@ -119,7 +119,7 @@ public class AuthorizationRestUtil {
     /**
      * Split the business ID in an array with a fixed length (4) as follow eperson uuid, feature name, object type id,
      * object id
-     * 
+     *
      * @param id
      *            the Authorization business ID. See {@link Authorization#getID()}
      * @return an array with a fixed length (4) as follow eperson uuid, feature name, object type id, object id

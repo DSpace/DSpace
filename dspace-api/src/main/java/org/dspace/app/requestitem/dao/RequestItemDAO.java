@@ -12,8 +12,8 @@ import java.util.Iterator;
 
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.content.Item;
-import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
+import org.hibernate.Session;
 
 /**
  * Database Access Object interface class for the RequestItem object.
@@ -28,12 +28,12 @@ public interface RequestItemDAO extends GenericDAO<RequestItem> {
     /**
      * Fetch a request named by its unique token (passed in emails).
      *
-     * @param context the current DSpace context.
+     * @param session the current request's database context.
      * @param token uniquely identifies the request.
      * @return the found request (or {@code null}?)
      * @throws SQLException passed through.
      */
-    public RequestItem findByToken(Context context, String token) throws SQLException;
+    public RequestItem findByToken(Session session, String token) throws SQLException;
 
-    public Iterator<RequestItem> findByItem(Context context, Item item) throws SQLException;
+    public Iterator<RequestItem> findByItem(Session session, Item item) throws SQLException;
 }

@@ -45,7 +45,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 @Path("/hierarchy")
 @Produces( {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public class HierarchyResource extends Resource {
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(HierarchyResource.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
     protected SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
@@ -82,11 +82,11 @@ public class HierarchyResource extends Resource {
         try {
             context = createContext();
 
-            Site site = siteService.findSite(context);
+            Site site = siteService.findSite(context.getSession());
             repo.setId(site.getID().toString());
             repo.setName(site.getName());
             repo.setHandle(site.getHandle());
-            List<Community> dspaceCommunities = communityService.findAllTop(context);
+            List<Community> dspaceCommunities = communityService.findAllTop(context.getSession());
             processCommunity(context, repo, dspaceCommunities);
         } catch (Exception e) {
             processException(e.getMessage(), context);
@@ -108,10 +108,10 @@ public class HierarchyResource extends Resource {
         if (communities == null) {
             return;
         }
-        if (communities.size() == 0) {
+        if (communities.isEmpty()) {
             return;
         }
-        List<HierarchyCommunity> parentComms = new ArrayList<HierarchyCommunity>();
+        List<HierarchyCommunity> parentComms = new ArrayList<>();
         parent.setCommunities(parentComms);
         for (Community comm : communities) {
             if (!authorizeService.authorizeActionBoolean(context, comm, org.dspace.core.Constants.READ)) {
@@ -121,8 +121,8 @@ public class HierarchyResource extends Resource {
                                                                comm.getHandle());
             parentComms.add(mycomm);
             List<Collection> colls = comm.getCollections();
-            if (colls.size() > 0) {
-                List<HierarchyCollection> myColls = new ArrayList<HierarchyCollection>();
+            if (!colls.isEmpty()) {
+                List<HierarchyCollection> myColls = new ArrayList<>();
                 mycomm.setCollections(myColls);
                 for (Collection coll : colls) {
                     if (!authorizeService.authorizeActionBoolean(context, coll, org.dspace.core.Constants.READ)) {

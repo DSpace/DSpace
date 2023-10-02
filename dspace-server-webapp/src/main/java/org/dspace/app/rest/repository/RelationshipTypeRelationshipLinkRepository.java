@@ -41,7 +41,7 @@ public class RelationshipTypeRelationshipLinkRepository extends AbstractDSpaceRe
                                                             Projection projection) {
         try {
             Context context = obtainContext();
-            Relationship relationship = relationshipService.find(context, relationshipId);
+            Relationship relationship = relationshipService.find(context.getSession(), relationshipId);
             if (relationship == null) {
                 throw new ResourceNotFoundException("No such relationship: " + relationshipId);
             }

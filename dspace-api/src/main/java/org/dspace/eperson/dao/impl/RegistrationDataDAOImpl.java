@@ -14,10 +14,10 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 import org.dspace.core.AbstractHibernateDAO;
-import org.dspace.core.Context;
 import org.dspace.eperson.RegistrationData;
 import org.dspace.eperson.RegistrationData_;
 import org.dspace.eperson.dao.RegistrationDataDAO;
+import org.hibernate.Session;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the RegistrationData object.
@@ -33,29 +33,29 @@ public class RegistrationDataDAOImpl extends AbstractHibernateDAO<RegistrationDa
     }
 
     @Override
-    public RegistrationData findByEmail(Context context, String email) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public RegistrationData findByEmail(Session session, String email) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RegistrationData.class);
         Root<RegistrationData> registrationDataRoot = criteriaQuery.from(RegistrationData.class);
         criteriaQuery.select(registrationDataRoot);
         criteriaQuery.where(criteriaBuilder.equal(registrationDataRoot.get(RegistrationData_.email), email));
-        return uniqueResult(context, criteriaQuery, false, RegistrationData.class);
+        return uniqueResult(session, criteriaQuery, false, RegistrationData.class);
     }
 
     @Override
-    public RegistrationData findByToken(Context context, String token) throws SQLException {
-        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+    public RegistrationData findByToken(Session session, String token) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RegistrationData.class);
         Root<RegistrationData> registrationDataRoot = criteriaQuery.from(RegistrationData.class);
         criteriaQuery.select(registrationDataRoot);
         criteriaQuery.where(criteriaBuilder.equal(registrationDataRoot.get(RegistrationData_.token), token));
-        return uniqueResult(context, criteriaQuery, false, RegistrationData.class);
+        return uniqueResult(session, criteriaQuery, false, RegistrationData.class);
     }
 
     @Override
-    public void deleteByToken(Context context, String token) throws SQLException {
+    public void deleteByToken(Session session, String token) throws SQLException {
         String hql = "delete from RegistrationData where token=:token";
-        Query query = createQuery(context, hql);
+        Query query = createQuery(session, hql);
         query.setParameter("token", token);
         query.executeUpdate();
     }

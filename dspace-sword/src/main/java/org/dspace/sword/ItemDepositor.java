@@ -151,7 +151,7 @@ public class ItemDepositor extends Depositor {
                                          "Original file deposited via SWORD");
 
                 BitstreamFormat bf = bitstreamFormatService
-                    .findByMIMEType(context, deposit.getContentType());
+                    .findByMIMEType(context.getSession(), deposit.getContentType());
                 if (bf != null) {
                     bitstreamService.setFormat(context, bitstream, bf);
                 }

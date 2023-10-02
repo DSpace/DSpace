@@ -79,7 +79,7 @@ public class RequestItemHelpdeskStrategy
     public RequestItemAuthor getHelpDeskPerson(Context context, String helpDeskEmail)
             throws SQLException {
         context.turnOffAuthorisationSystem();
-        EPerson helpdeskEPerson = ePersonService.findByEmail(context, helpDeskEmail);
+        EPerson helpdeskEPerson = ePersonService.findByEmail(context.getSession(), helpDeskEmail);
         context.restoreAuthSystemState();
 
         if (helpdeskEPerson != null) {

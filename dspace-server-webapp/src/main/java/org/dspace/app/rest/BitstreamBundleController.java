@@ -93,7 +93,7 @@ public class BitstreamBundleController {
                     "or the data cannot be resolved to a bundle.");
         }
 
-        Bitstream bitstream = bitstreamService.find(context, uuid);
+        Bitstream bitstream = bitstreamService.find(context.getSession(), uuid);
         if (bitstream == null) {
             throw new ResourceNotFoundException("Bitstream with id: " + uuid + " not found");
         }

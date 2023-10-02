@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * This class extends the {@link ExternalSourceEntryItemUriListHandler} abstract class and implements it specifically
- * for the List<PoolTask> objects.
+ * for the {@code List<PoolTask>} objects.
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
@@ -66,7 +66,7 @@ public class ExternalSourceEntryPoolTaskUriListHandler extends ExternalSourceEnt
         String id = matcher.group(1);
         int poolTaskId = Integer.parseInt(id);
         try {
-            poolTask = poolTaskService.find(context, poolTaskId);
+            poolTask = poolTaskService.find(context.getSession(), poolTaskId);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

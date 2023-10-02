@@ -260,9 +260,9 @@ public class EPersonCLITool {
         EPerson eperson = null;
         try {
             if (command.hasOption(OPT_NETID.getOpt())) {
-                eperson = ePersonService.findByNetid(context, command.getOptionValue(OPT_NETID.getOpt()));
+                eperson = ePersonService.findByNetid(context.getSession(), command.getOptionValue(OPT_NETID.getOpt()));
             } else if (command.hasOption(OPT_EMAIL.getOpt())) {
-                eperson = ePersonService.findByEmail(context, command.getOptionValue(OPT_EMAIL.getOpt()));
+                eperson = ePersonService.findByEmail(context.getSession(), command.getOptionValue(OPT_EMAIL.getOpt()));
             } else {
                 System.err.println("You must specify the user's email address or netid.");
                 return 1;
@@ -352,10 +352,10 @@ public class EPersonCLITool {
         try {
             if (command.hasOption(OPT_NETID.getOpt())) {
                 userName = command.getOptionValue(OPT_NETID.getOpt());
-                eperson = ePersonService.findByNetid(context, userName);
+                eperson = ePersonService.findByNetid(context.getSession(), userName);
             } else if (command.hasOption(OPT_EMAIL.getOpt())) {
                 userName = command.getOptionValue(OPT_EMAIL.getOpt());
-                eperson = ePersonService.findByEmail(context, userName);
+                eperson = ePersonService.findByEmail(context.getSession(), userName);
             } else {
                 System.err.println("No EPerson selected");
                 return 1;
@@ -451,7 +451,7 @@ public class EPersonCLITool {
         // wild or regex match user/netid
         // select details (pseudo-format string)
         try {
-            for (EPerson person : ePersonService.findAll(context, EPerson.EMAIL)) {
+            for (EPerson person : ePersonService.findAll(context.getSession(), EPerson.EMAIL)) {
                 System.out.printf("%s\t%s/%s\t%s, %s\n",
                                   person.getID().toString(),
                                   person.getEmail(),
