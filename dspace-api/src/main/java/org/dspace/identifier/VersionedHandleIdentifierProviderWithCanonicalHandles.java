@@ -95,11 +95,11 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
         String id = mint(context, dso);
 
         // move canonical to point the latest version
-        if (dso != null && dso.getType() == Constants.ITEM) {
+        if (dso.getType() == Constants.ITEM && dso instanceof Item) {
             Item item = (Item) dso;
-            VersionHistory history = null;
+            VersionHistory history;
             try {
-                history = versionHistoryService.findByItem(context, (Item) dso);
+                history = versionHistoryService.findByItem(context, item);
             } catch (SQLException ex) {
                 throw new RuntimeException("A problem with the database connection occured.", ex);
             }
