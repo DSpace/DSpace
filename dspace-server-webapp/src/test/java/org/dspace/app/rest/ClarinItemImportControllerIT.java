@@ -17,6 +17,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -33,6 +34,7 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
@@ -469,5 +471,55 @@ public class ClarinItemImportControllerIT extends AbstractControllerIntegrationT
         MetadataValue dcRelationValue = dcRelationValues.get(0);
         assertEquals(dcRelationValue.getAuthority(), String.valueOf(AUTHORITY));
         assertEquals(dcRelationValue.getConfidence(), CONFIDENCE);
+    }
+
+    @Test
+    public void importItemsMappedCollections() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+        Collection col3 = CollectionBuilder.createCollection(context, child1).withName("Collection 3").build();
+
+        //2. Public item that is readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+        context.restoreAuthSystemState();
+
+        String startOfCollectionLink = "https://localhost:8080/spring-rest/api/core/collections/";
+        // It is owning collection
+        String col1SelfLink = startOfCollectionLink + col1.getID();
+        String col2SelfLink = startOfCollectionLink + col2.getID();
+        String col3SelfLink = startOfCollectionLink + col3.getID();
+        List<String> collectionSelfLinksList = new ArrayList<>();
+        collectionSelfLinksList.add(col1SelfLink);
+        collectionSelfLinksList.add(col2SelfLink);
+        collectionSelfLinksList.add(col3SelfLink);
+
+        ObjectMapper mapper = new ObjectMapper();
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(post("/api/clarin/import/item/" +
+                                publicItem1.getID() + "/mappedCollections")
+                                .content(mapper.writeValueAsBytes(collectionSelfLinksList))
+                                .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                        .andExpect(status().isOk());
+
+        Item updatedItem = itemService.find(context, publicItem1.getID());
+        assertEquals(updatedItem.getCollections().size(), 3);
+        assertTrue(updatedItem.getCollections().contains(col1));
+        assertTrue(updatedItem.getCollections().contains(col2));
+        assertTrue(updatedItem.getCollections().contains(col3));
     }
 }

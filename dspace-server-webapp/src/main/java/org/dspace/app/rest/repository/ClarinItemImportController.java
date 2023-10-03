@@ -8,8 +8,11 @@
 package org.dspace.app.rest.repository;
 
 import static org.dspace.app.rest.utils.ContextUtil.obtainContext;
+import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
+import static org.dspace.core.Constants.COLLECTION;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +23,7 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.MetadataConverter;
@@ -27,10 +31,12 @@ import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
+import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
@@ -51,6 +57,8 @@ import org.dspace.util.UUIDUtils;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -367,6 +375,79 @@ public class ClarinItemImportController {
     }
 
     /**
+     * Endpoint for importing item's mapped collection.
+     * The mapping for requested endpoint, for example
+     * <pre>
+     * {@code
+     * https://<dspace.server.url>/api/clarin/import/item/{ITEM_UUID}/mappedCollections
+     * }
+     * </pre>
+     * @param request request
+     * @throws SQLException       if database error
+     * @throws AuthorizeException if authorization error
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @RequestMapping(method = RequestMethod.POST, value = "/item" + REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID +
+            "/mappedCollections")
+    public void importItemCollections(@PathVariable UUID uuid, HttpServletRequest request) throws SQLException,
+            AuthorizeException {
+        Context context = ContextUtil.obtainContext(request);
+        if (Objects.isNull(context)) {
+            throw new RuntimeException("Context is null - cannot import item's mapped collections.");
+        }
+
+        // Load List of collection self links
+        List<String> requestAsStringList = new ArrayList<>();
+        JSONParser parser = new JSONParser();
+        try {
+            Object obj = parser.parse(new InputStreamReader(request.getInputStream()));
+
+            if (!(obj instanceof JSONArray)) {
+                throw new UnprocessableEntityException("The request is not a JSON Array");
+            }
+
+            for (Object entity : (JSONArray) obj) {
+                String collectionSelfLink = entity.toString();
+                requestAsStringList.add(collectionSelfLink);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot import item's mapped collections because parsing of the request JSON" +
+                    "throws this error: " + e.getMessage());
+        }
+
+        // Find Collections following its self link
+        List<DSpaceObject> listDsoFoundInRequest
+                = utils.constructDSpaceObjectList(context, requestAsStringList);
+
+        if (CollectionUtils.isEmpty(listDsoFoundInRequest)) {
+            throw new UnprocessableEntityException("Not a valid collection uuid.");
+        }
+
+        for (DSpaceObject dso : listDsoFoundInRequest) {
+
+            Item item = itemService.find(context, uuid);
+            if (dso != null && dso.getType() == COLLECTION && item != null) {
+                if (this.checkIfItemIsTemplate(item)) {
+                    continue;
+                }
+
+                Collection collectionToMapTo = (Collection) dso;
+                if (this.checkIfOwningCollection(item, collectionToMapTo.getID())) {
+                    continue;
+                }
+
+                collectionService.addItem(context, collectionToMapTo, item);
+                collectionService.update(context, collectionToMapTo);
+                itemService.update(context, item);
+            } else {
+                throw new UnprocessableEntityException("Not a valid collection or item uuid.");
+            }
+        }
+
+        context.commit();
+    }
+
+    /**
      * Convert String input value to boolean.
      * @param value input value
      * @return converted input value to boolean
@@ -390,5 +471,19 @@ public class ClarinItemImportController {
             output = Integer.parseInt(value);
         }
         return output;
+    }
+
+    private boolean checkIfItemIsTemplate(Item item) {
+        return item.getTemplateItemOf() != null;
+    }
+
+    private boolean checkIfOwningCollection(Item item, UUID collectionID) {
+        if (Objects.isNull(item)) {
+            return false;
+        }
+        if (Objects.isNull(item.getOwningCollection())) {
+            return false;
+        }
+        return item.getOwningCollection().getID().equals(collectionID);
     }
 }
