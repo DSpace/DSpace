@@ -8,15 +8,18 @@
 package org.dspace.eperson.dao.impl;
 
 import java.sql.SQLException;
+import java.util.Date;
 
 import jakarta.persistence.Query;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaDelete;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 import org.dspace.eperson.RegistrationData;
 import org.dspace.eperson.RegistrationData_;
+import org.dspace.eperson.RegistrationTypeEnum;
 import org.dspace.eperson.dao.RegistrationDataDAO;
 
 /**
@@ -43,6 +46,21 @@ public class RegistrationDataDAOImpl extends AbstractHibernateDAO<RegistrationDa
     }
 
     @Override
+    public RegistrationData findBy(Context context, String email, RegistrationTypeEnum type) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RegistrationData.class);
+        Root<RegistrationData> registrationDataRoot = criteriaQuery.from(RegistrationData.class);
+        criteriaQuery.select(registrationDataRoot);
+        criteriaQuery.where(
+            criteriaBuilder.and(
+                criteriaBuilder.equal(registrationDataRoot.get(RegistrationData_.email), email),
+                criteriaBuilder.equal(registrationDataRoot.get(RegistrationData_.registrationType), type)
+            )
+        );
+        return uniqueResult(context, criteriaQuery, false, RegistrationData.class);
+    }
+
+    @Override
     public RegistrationData findByToken(Context context, String token) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RegistrationData.class);
@@ -58,5 +76,16 @@ public class RegistrationDataDAOImpl extends AbstractHibernateDAO<RegistrationDa
         Query query = createQuery(context, hql);
         query.setParameter("token", token);
         query.executeUpdate();
+    }
+
+    @Override
+    public void deleteExpiredBy(Context context, Date date) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaDelete<RegistrationData> deleteQuery = criteriaBuilder.createCriteriaDelete(RegistrationData.class);
+        Root<RegistrationData> deleteRoot = deleteQuery.from(RegistrationData.class);
+        deleteQuery.where(
+            criteriaBuilder.lessThanOrEqualTo(deleteRoot.get(RegistrationData_.expires), date)
+        );
+        getHibernateSession(context).createQuery(deleteQuery).executeUpdate();
     }
 }
