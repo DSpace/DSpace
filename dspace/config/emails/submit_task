@@ -4,9 +4,9 @@
 ## {1}  Name of collection
 ## {2}  submitter's name
 ## {3}  Description of task
-## {4}  link to 'my DRUM' page
+## {4}  link to 'my DSpace' page
 ##
-#set($subject = 'DRUM: You have a new task')
+#set($subject = "${config.get('dspace.name')}: You have a new task")
 
 A new item has been submitted:
 
@@ -16,9 +16,9 @@ Submitted by: ${params[2]}
 
 ${params[3]}
 
-To claim this task, please visit your "My DRUM"
+To claim this task, please visit your "My${config.get('dspace.shortname')}"
 page:  ${params[4]}
 
 Many thanks!
 
-DRUM
+The ${config.get('dspace.name')} Team

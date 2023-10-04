@@ -22,7 +22,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
+import org.dspace.discovery.SearchServiceException;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.w3c.dom.Document;
@@ -106,6 +109,13 @@ public class SubmissionConfigReader {
     private SubmissionConfig lastSubmissionConfig = null;
 
     /**
+     * Collection Service instance, needed to interact with collection's
+     * stored data
+     */
+    protected static final CollectionService collectionService
+                = ContentServiceFactory.getInstance().getCollectionService();
+
+    /**
      * Load Submission Configuration from the
      * item-submission.xml configuration file
      *
@@ -152,6 +162,9 @@ public class SubmissionConfigReader {
         } catch (FactoryConfigurationError fe) {
             throw new SubmissionConfigReaderException(
                 "Cannot create Item Submission Configuration parser", fe);
+        } catch (SearchServiceException se) {
+            throw new SubmissionConfigReaderException(
+                "Cannot perform a discovery search for Item Submission Configuration", se);
         } catch (Exception e) {
             throw new SubmissionConfigReaderException(
                 "Error creating Item Submission Configuration: " + e);
@@ -287,7 +300,7 @@ public class SubmissionConfigReader {
      * should correspond to the collection-form maps, the form definitions, and
      * the display/storage word pairs.
      */
-    private void doNodes(Node n) throws SAXException, SubmissionConfigReaderException {
+    private void doNodes(Node n) throws SAXException, SearchServiceException, SubmissionConfigReaderException {
         if (n == null) {
             return;
         }
@@ -334,18 +347,23 @@ public class SubmissionConfigReader {
      * the collection handle and item submission name, put name in hashmap keyed
      * by the collection handle.
      */
-    private void processMap(Node e) throws SAXException {
+    private void processMap(Node e) throws SAXException, SearchServiceException {
+        // create a context
+        Context context = new Context();
+
         NodeList nl = e.getChildNodes();
         int len = nl.getLength();
         for (int i = 0; i < len; i++) {
             Node nd = nl.item(i);
             if (nd.getNodeName().equals("name-map")) {
                 String id = getAttribute(nd, "collection-handle");
+                String entityType = getAttribute(nd, "collection-entity-type");
                 String value = getAttribute(nd, "submission-name");
                 String content = getValue(nd);
-                if (id == null) {
+                if (id == null && entityType == null) {
                     throw new SAXException(
-                        "name-map element is missing collection-handle attribute in 'item-submission.xml'");
+                        "name-map element is missing collection-handle or collection-entity-type attribute " +
+                            "in 'item-submission.xml'");
                 }
                 if (value == null) {
                     throw new SAXException(
@@ -355,7 +373,17 @@ public class SubmissionConfigReader {
                     throw new SAXException(
                         "name-map element has content in 'item-submission.xml', it should be empty.");
                 }
-                collectionToSubmissionConfig.put(id, value);
+                if (id != null) {
+                    collectionToSubmissionConfig.put(id, value);
+
+                } else {
+                    // get all collections for this entity-type
+                    List<Collection> collections = collectionService.findAllCollectionsByEntityType( context,
+                                    entityType);
+                    for (Collection collection : collections) {
+                        collectionToSubmissionConfig.putIfAbsent(collection.getHandle(), value);
+                    }
+                }
             } // ignore any child node that isn't a "name-map"
         }
     }

@@ -1,4 +1,4 @@
-## E-mail sent to DRUM users when they register for an account
+## E-mail sent to DSpace users when they register for an account
 ##
 ## Parameters: {0} is expanded to a special registration URL
 ##
@@ -6,17 +6,13 @@
 ##
 #set($subject = "${config.get('dspace.name')} Account Registration")
 #set($phone = ${config.get('mail.message.helpdesk.telephone')})
-To complete registration for a DRUM account, please click the link
-below:
+To complete registration for a ${config.get('dspace.name')} account, please click the link below:
 
   ${params[0]}
 
-If you need assistance with your account, please email
-
-  ${config.get("mail.helpdesk")}
+If you need assistance with your account, please email ${config.get("mail.helpdesk")}
 #if( $phone )
-
 or call us at ${phone}.
 #end
 
-The DRUM Team
+The ${config.get('dspace.name')} Team

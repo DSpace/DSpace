@@ -86,7 +86,7 @@ public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest {
             CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(Class.forName(PLUGIN_INTERFACE), "farm");
         assertNotNull(instance);
         Choices result = instance.getMatches(text, start, limit, locale);
-        assertEquals("the farm::north 40", result.values[0].value);
+        assertEquals("north 40", result.values[0].value);
     }
 
     /**

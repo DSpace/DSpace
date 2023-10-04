@@ -54,6 +54,7 @@
         <mapping class="org.dspace.content.EntityType"/>
 
         <mapping class="org.dspace.scripts.Process"/>
+        <mapping class="org.dspace.alerts.SystemWideAlert"/>
 
         <mapping class="org.dspace.content.MetadataField"/>
         <mapping class="org.dspace.content.MetadataSchema"/>
@@ -66,7 +67,7 @@
         <mapping class="org.dspace.eperson.Group2GroupCache"/>
         <mapping class="org.dspace.eperson.RegistrationData"/>
         <mapping class="org.dspace.eperson.Subscription"/>
-
+        <mapping class="org.dspace.eperson.SubscriptionParameter"/>
         <mapping class="org.dspace.handle.Handle"/>
 
         <mapping class="org.dspace.harvest.HarvestedCollection"/>
@@ -93,10 +94,13 @@
         <mapping class="org.dspace.orcid.OrcidHistory" />
         <mapping class="org.dspace.orcid.OrcidToken"/>
 
-        <!-- Begin UMD Customization -->
+        <mapping class="org.dspace.supervision.SupervisionOrder"/>        
+
+        <!-- UMD Customization -->
         <!-- Mappings for UMD entities -->
-        <mapping class="org.dspace.content.EtdUnit"/> 
+        <mapping class="org.dspace.content.EtdUnit"/>
         <mapping class="org.dspace.eperson.Unit"/>
         <!-- End UMD Customization -->
+
     </session-factory>
 </hibernate-configuration>

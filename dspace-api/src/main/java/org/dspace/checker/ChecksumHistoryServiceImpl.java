@@ -74,7 +74,8 @@ public class ChecksumHistoryServiceImpl implements ChecksumHistoryService {
         if (mostRecentChecksum.getBitstream().isDeleted()) {
             checksumResult = checksumResultService.findByCode(context, ChecksumResultCode.BITSTREAM_MARKED_DELETED);
         } else {
-            checksumResult = checksumResultService.findByCode(context, ChecksumResultCode.CHECKSUM_MATCH);
+            checksumResult = checksumResultService.findByCode(context,
+                    mostRecentChecksum.getChecksumResult().getResultCode());
         }
 
         checksumHistory.setResult(checksumResult);

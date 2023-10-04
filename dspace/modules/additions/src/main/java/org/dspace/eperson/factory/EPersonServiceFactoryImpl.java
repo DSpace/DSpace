@@ -12,8 +12,9 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.eperson.service.SubscribeService;
-import org.dspace.eperson.service.SupervisorService;
+// UMD Customization
 import org.dspace.eperson.service.UnitService;
+// End UMD Customization
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -34,8 +35,6 @@ public class EPersonServiceFactoryImpl extends EPersonServiceFactory {
     private AccountService accountService;
     @Autowired(required = true)
     private SubscribeService subscribeService;
-    @Autowired(required = true)
-    private SupervisorService supervisorService;
 
     @Override
     public EPersonService getEPersonService() {
@@ -62,12 +61,7 @@ public class EPersonServiceFactoryImpl extends EPersonServiceFactory {
         return subscribeService;
     }
 
-    @Override
-    public SupervisorService getSupervisorService() {
-        return supervisorService;
-    }
-
-    // Begin UMD Customization
+    // UMD Customization
     // Add UnitService to the factory
     @Autowired(required = true)
     private UnitService unitService;

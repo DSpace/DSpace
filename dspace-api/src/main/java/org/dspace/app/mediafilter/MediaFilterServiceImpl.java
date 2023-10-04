@@ -8,13 +8,17 @@
 package org.dspace.app.mediafilter;
 
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.mediafilter.service.MediaFilterService;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -315,25 +319,25 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
 
         // check if destination bitstream exists
         Bundle existingBundle = null;
-        Bitstream existingBitstream = null;
+        List<Bitstream> existingBitstreams = new ArrayList<Bitstream>();
         List<Bundle> bundles = itemService.getBundles(item, formatFilter.getBundleName());
 
         if (bundles.size() > 0) {
-            // only finds the last match (FIXME?)
+            // only finds the last matching bundle and all matching bitstreams in the proper bundle(s)
             for (Bundle bundle : bundles) {
                 List<Bitstream> bitstreams = bundle.getBitstreams();
 
                 for (Bitstream bitstream : bitstreams) {
                     if (bitstream.getName().trim().equals(newName.trim())) {
                         existingBundle = bundle;
-                        existingBitstream = bitstream;
+                        existingBitstreams.add(bitstream);
                     }
                 }
             }
         }
 
         // if exists and overwrite = false, exit
-        if (!overWrite && (existingBitstream != null)) {
+        if (!overWrite && (existingBitstreams.size() > 0)) {
             if (!isQuiet) {
                 logInfo("SKIPPED: bitstream " + source.getID()
                                        + " (item: " + item.getHandle() + ") because '" + newName + "' already exists");
@@ -388,18 +392,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             bitstreamService.update(context, b);
 
             //Set permissions on the derivative bitstream
-            //- First remove any existing policies
-            authorizeService.removeAllPolicies(context, b);
-
-            //- Determine if this is a public-derivative format
-            if (publicFiltersClasses.contains(formatFilter.getClass().getSimpleName())) {
-                //- Set derivative bitstream to be publicly accessible
-                Group anonymous = groupService.findByName(context, Group.ANONYMOUS);
-                authorizeService.addPolicy(context, b, Constants.READ, anonymous);
-            } else {
-                //- Inherit policies from the source bitstream
-                authorizeService.inheritPolicies(context, source, b);
-            }
+            updatePoliciesOfDerivativeBitstream(context, b, formatFilter, source);
 
             //do post-processing of the generated bitstream
             formatFilter.postProcessBitstream(context, item, b);
@@ -408,9 +401,8 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             logError("!!! OutOfMemoryError !!!");
         }
 
-        // fixme - set date?
         // we are overwriting, so remove old bitstream
-        if (existingBitstream != null) {
+        for (Bitstream existingBitstream : existingBitstreams) {
             bundleService.removeBitstream(context, existingBundle, existingBitstream);
         }
 
@@ -420,6 +412,71 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         }
 
         return true;
+    }
+
+    @Override
+    public void updatePoliciesOfDerivativeBitstreams(Context context, Item item, Bitstream source)
+        throws SQLException, AuthorizeException {
+
+        if (filterClasses == null) {
+            return;
+        }
+
+        for (FormatFilter formatFilter : filterClasses) {
+            for (Bitstream bitstream : findDerivativeBitstreams(item, source, formatFilter)) {
+                updatePoliciesOfDerivativeBitstream(context, bitstream, formatFilter, source);
+            }
+        }
+    }
+
+    /**
+     * find derivative bitstreams related to source bitstream
+     *
+     * @param item item containing bitstreams
+     * @param source source bitstream
+     * @param formatFilter formatFilter
+     * @return list of derivative bitstreams from source bitstream
+     * @throws SQLException If something goes wrong in the database
+     */
+    private List<Bitstream> findDerivativeBitstreams(Item item, Bitstream source, FormatFilter formatFilter)
+        throws SQLException {
+
+        String bitstreamName = formatFilter.getFilteredName(source.getName());
+        List<Bundle> bundles = itemService.getBundles(item, formatFilter.getBundleName());
+
+        return bundles.stream()
+                      .flatMap(bundle ->
+                          bundle.getBitstreams().stream())
+                      .filter(bitstream ->
+                          StringUtils.equals(bitstream.getName().trim(), bitstreamName.trim()))
+                      .collect(Collectors.toList());
+    }
+
+    /**
+     * update resource polices of derivative bitstreams.
+     * by remove all resource policies and
+     * set derivative bitstreams to be publicly accessible or
+     * replace derivative bitstreams policies using
+     * the same in the source bitstream.
+     *
+     * @param context the context
+     * @param bitstream derivative bitstream
+     * @param formatFilter formatFilter
+     * @param source the source bitstream
+     * @throws SQLException If something goes wrong in the database
+     * @throws AuthorizeException if authorization error
+     */
+    private void updatePoliciesOfDerivativeBitstream(Context context, Bitstream bitstream, FormatFilter formatFilter,
+                                                     Bitstream source) throws SQLException, AuthorizeException {
+
+        authorizeService.removeAllPolicies(context, bitstream);
+
+        if (publicFiltersClasses.contains(formatFilter.getClass().getSimpleName())) {
+            Group anonymous = groupService.findByName(context, Group.ANONYMOUS);
+            authorizeService.addPolicy(context, bitstream, Constants.READ, anonymous);
+        } else {
+            authorizeService.replaceAllPolicies(context, source, bitstream);
+        }
     }
 
     @Override

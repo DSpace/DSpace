@@ -80,6 +80,15 @@ public class DiscoverConfigurationConverter
                 sortOption.setSortOrder(discoverySearchSortConfiguration.getDefaultSortOrder().name());
                 searchConfigurationRest.addSortOption(sortOption);
             }
+
+            DiscoverySortFieldConfiguration defaultSortField = searchSortConfiguration.getDefaultSortField();
+            if (defaultSortField != null) {
+                SearchConfigurationRest.SortOption sortOption = new SearchConfigurationRest.SortOption();
+                sortOption.setName(defaultSortField.getMetadataField());
+                sortOption.setActualName(defaultSortField.getType());
+                sortOption.setSortOrder(defaultSortField.getDefaultSortOrder().name());
+                searchConfigurationRest.setDefaultSortOption(sortOption);
+            }
         }
 
     }

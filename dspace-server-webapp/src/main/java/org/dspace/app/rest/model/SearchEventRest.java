@@ -25,6 +25,7 @@ public class SearchEventRest extends BaseObjectRest<UUID> {
     private UUID scope;
     private String configuration;
     private String dsoType;
+    private UUID clickedObject;
     private List<SearchResultsRest.AppliedFilter> appliedFilters;
     private SearchResultsRest.Sorting sort;
     private PageRest page;
@@ -96,5 +97,13 @@ public class SearchEventRest extends BaseObjectRest<UUID> {
 
     public void setDsoType(String dsoType) {
         this.dsoType = dsoType;
+    }
+
+    public UUID getClickedObject() {
+        return clickedObject;
+    }
+
+    public void setClickedObject(UUID clickedObject) {
+        this.clickedObject = clickedObject;
     }
 }

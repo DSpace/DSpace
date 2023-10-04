@@ -76,9 +76,9 @@
         <property name="map">
             <map>
                 <entry key="upload" value-ref="uploadConfigurationDefault" />
-                <!-- Customization for LIBDRUM-684 -->
+                <!-- UMD Customization -->
                 <entry key="optionalUpload" value-ref="uploadConfigurationOptional" />
-                <!-- Customization for LIBDRUM-684 -->
+                <!-- End UMD Customization -->
             </map>
         </property>
     </bean>
@@ -95,6 +95,36 @@
                 <ref bean="lease"/>
                 <ref bean="embargoed" />
                 <ref bean="administrator"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="defaultBulkAccessConditionConfiguration"
+          class="org.dspace.app.bulkaccesscontrol.model.BulkAccessConditionConfiguration">
+        <property name="name" value="default"/>
+        <property name="itemAccessConditionOptions">
+            <list>
+                <ref bean="openAccess"/>
+                <ref bean="administrator"/>
+                <ref bean="embargoed" />
+                <ref bean="lease"/>
+            </list>
+        </property>
+        <property name="bitstreamAccessConditionOptions">
+            <list>
+                <ref bean="openAccess"/>
+                <ref bean="administrator"/>
+                <ref bean="embargoed" />
+                <ref bean="lease"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="bulkAccessConditionConfigurationService"
+          class="org.dspace.app.bulkaccesscontrol.service.BulkAccessConditionConfigurationService">
+        <property name="bulkAccessConditionConfigurations">
+            <list>
+                <ref bean="defaultBulkAccessConditionConfiguration"/>
             </list>
         </property>
     </bean>

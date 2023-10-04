@@ -20,7 +20,6 @@ public interface CommunityGroupService {
     /**
      * Find the CommunityGroup for the ID
      *
-     * @param id id of the community group
      * @return communityGroup communityGroup
      */
     List<CommunityGroup> findAll();

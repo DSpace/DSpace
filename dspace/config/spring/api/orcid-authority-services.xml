@@ -28,7 +28,9 @@
     <bean name="AuthorityTypes" class="org.dspace.authority.AuthorityTypes">
         <property name="types">
             <list>
+                <!-- UMD Customization -->
                 <bean class="org.dspace.authority.orcid.Orcidv3AuthorityValue"/>
+                <!-- End UMD Customization -->
                 <bean class="org.dspace.authority.PersonAuthorityValue"/>
             </list>
         </property>

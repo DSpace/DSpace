@@ -8,8 +8,10 @@
 package org.dspace.app.requestitem.dao;
 
 import java.sql.SQLException;
+import java.util.Iterator;
 
 import org.dspace.app.requestitem.RequestItem;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 
@@ -32,4 +34,6 @@ public interface RequestItemDAO extends GenericDAO<RequestItem> {
      * @throws SQLException passed through.
      */
     public RequestItem findByToken(Context context, String token) throws SQLException;
+
+    public Iterator<RequestItem> findByItem(Context context, Item item) throws SQLException;
 }

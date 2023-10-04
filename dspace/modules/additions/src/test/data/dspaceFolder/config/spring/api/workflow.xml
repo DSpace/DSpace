@@ -31,9 +31,9 @@
                 <ref bean="reviewstep"/>
                 <ref bean="editstep"/>
                 <ref bean="finaleditstep"/>
-                <!-- UMD customization -->
+                <!-- UMD Customization -->
                 <ref bean="umdcollectionmapping"/>
-                <!-- End UMD customization -->
+                <!-- End UMD Customization -->
             </util:list>
         </property>
     </bean>
@@ -92,14 +92,14 @@
                 <ref bean="finaleditaction"/>
             </list>
         </property>
-        <!-- UMD customization for LIBDRUM-711 -->
+        <!-- UMD Customization -->
         <property name="outcomes">
             <util:map>
                 <entry key="#{ T(org.dspace.xmlworkflow.state.actions.ActionResult).OUTCOME_COMPLETE}"
                        value-ref="umdcollectionmapping"/>
             </util:map>
         </property>
-        <!-- End UMD customization for LIBDRUM-711 -->
+        <!-- End UMD Customization -->
     </bean>
 
     <bean id="finaleditor" class="org.dspace.xmlworkflow.Role">
@@ -162,6 +162,7 @@
     <bean id="scoreassignedreviewer" class="org.dspace.xmlworkflow.Role">
         <property name="scope" value="#{ T(org.dspace.xmlworkflow.Role.Scope).ITEM}"/>
         <property name="name" value="Reviewer"/>
+        <property name="deleteTemporaryGroup" value="true"/>
     </bean>
 
 
@@ -207,7 +208,7 @@
         <property name="name" value="ScoreReviewers"/>
     </bean>
 
-    <!-- UMD customization -->
+    <!-- UMD Customization -->
     <bean name="umdcollectionmapping" class="org.dspace.xmlworkflow.state.Step">
         <property name="userSelectionMethod" ref="noUserSelectionAction"/>
         <property name="actions">
@@ -217,5 +218,5 @@
             </list>
         </property>
     </bean>
-    <!-- End UMD customization -->
+    <!-- End UMD Customization -->
 </beans>

@@ -8,20 +8,28 @@
 package org.dspace.app.rest.converter;
 
 import java.sql.SQLException;
+// UMD Customization
 import java.util.Date;
+// End UMD Customization
 import java.util.List;
 
+// UMD Customization
 import org.apache.commons.lang3.time.DateFormatUtils;
+// End UMD Customization
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CheckSumRest;
 import org.dspace.app.rest.projection.Projection;
+// UMD Customization
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.ResourcePolicyService;
+// End UMD Customization
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
+// UMD Customization
 import org.dspace.content.DSpaceObject;
 import org.dspace.eperson.Group;
 import org.springframework.beans.factory.annotation.Autowired;
+// End UMD Customization
 import org.springframework.stereotype.Component;
 
 
@@ -32,8 +40,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class BitstreamConverter extends DSpaceObjectConverter<Bitstream, BitstreamRest> {
+    // UMD Customization
     @Autowired(required = true)
     protected ResourcePolicyService resourcePolicyService;
+    // End UMD Customization
 
     @Override
     public BitstreamRest convert(org.dspace.content.Bitstream obj, Projection projection) {

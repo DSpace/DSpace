@@ -1,6 +1,8 @@
+## UMD Customization
 ## Ignore temporary directories related to helper scripts
 scripts/work
 scripts/patches
+## End UMD Customization
 
 ## Ignore the MVN compiled output directories from version tracking
 target/

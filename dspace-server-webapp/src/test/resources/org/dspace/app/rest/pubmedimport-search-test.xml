@@ -1,0 +1,194 @@
+<?xml version="1.0" ?>
+<!DOCTYPE PubmedArticleSet PUBLIC "-//NLM//DTD PubMedArticle, 1st January 2023//EN" "https://dtd.nlm.nih.gov/ncbi/pubmed/out/pubmed_230101.dtd">
+<PubmedArticleSet>
+    <PubmedArticle>
+        <MedlineCitation Status="MEDLINE" Owner="NLM" IndexingMethod="Automated">
+            <PMID Version="1">36708638</PMID>
+            <DateCompleted>
+                <Year>2023</Year>
+                <Month>02</Month>
+                <Day>23</Day>
+            </DateCompleted>
+            <DateRevised>
+                <Year>2023</Year>
+                <Month>02</Month>
+                <Day>23</Day>
+            </DateRevised>
+            <Article PubModel="Print-Electronic">
+                <Journal>
+                    <ISSN IssnType="Electronic">1873-5223</ISSN>
+                    <JournalIssue CitedMedium="Internet">
+                        <Volume>67</Volume>
+                        <PubDate>
+                            <Year>2023</Year>
+                            <Month>Feb</Month>
+                        </PubDate>
+                    </JournalIssue>
+                    <Title>Nurse education in practice</Title>
+                    <ISOAbbreviation>Nurse Educ Pract</ISOAbbreviation>
+                </Journal>
+                <ArticleTitle>Teaching strategies of clinical reasoning in advanced nursing clinical practice: A scoping review.</ArticleTitle>
+                <Pagination>
+                    <StartPage>103548</StartPage>
+                    <MedlinePgn>103548</MedlinePgn>
+                </Pagination>
+                <ELocationID EIdType="doi" ValidYN="Y">10.1016/j.nepr.2023.103548</ELocationID>
+                <ELocationID EIdType="pii" ValidYN="Y">S1471-5953(23)00010-0</ELocationID>
+                <Abstract>
+                    <AbstractText Label="AIM/OBJECTIVE" NlmCategory="OBJECTIVE">To report and synthesize the main strategies for teaching clinical reasoning described in the literature in the context of advanced clinical practice and promote new areas of research to improve the pedagogical approach to clinical reasoning in Advanced Practice Nursing.</AbstractText>
+                    <AbstractText Label="BACKGROUND" NlmCategory="BACKGROUND">Clinical reasoning and clinical thinking are essential elements in the advanced nursing clinical practice decision-making process. The quality improvement of care is related to the development of those skills. Therefore, it is crucial to optimize teaching strategies that can enhance the role of clinical reasoning in advanced clinical practice.</AbstractText>
+                    <AbstractText Label="DESIGN" NlmCategory="METHODS">A scoping review was conducted using the framework developed by Arksey and O'Malley as a research strategy. Consistent with the nature of scoping reviews, a study protocol has been established.</AbstractText>
+                    <AbstractText Label="METHODS" NlmCategory="METHODS">The studies included and analyzed in this scoping review cover from January 2016 to June 2022. Primary studies and secondary revision studies, published in biomedical databases, were selected, including qualitative ones. Electronic databases used were: CINAHL, PubMed, Cochrane Library, Scopus, and OVID. Three authors independently evaluated the articles for titles, abstracts, and full text.</AbstractText>
+                    <AbstractText Label="RESULTS" NlmCategory="RESULTS">1433 articles were examined, applying the eligibility and exclusion criteria 73 studies were assessed for eligibility, and 27 were included in the scoping review. The results that emerged from the review were interpreted and grouped into three macro strategies (simulations-based education, art and visual thinking, and other learning approaches) and nineteen educational interventions.</AbstractText>
+                    <AbstractText Label="CONCLUSIONS" NlmCategory="CONCLUSIONS">Among the different strategies, the simulations are the most used. Despite this, our scoping review reveals that is necessary to use different teaching strategies to stimulate critical thinking, improve diagnostic reasoning, refine clinical judgment, and strengthen decision-making. However, it is not possible to demonstrate which methodology is more effective in obtaining the learning outcomes necessary to acquire an adequate level of judgment and critical thinking. Therefore, it will be necessary to relate teaching methodologies with the skills developed.</AbstractText>
+                    <CopyrightInformation>Copyright &#xa9; 2023 Elsevier Ltd. All rights reserved.</CopyrightInformation>
+                </Abstract>
+                <AuthorList CompleteYN="Y">
+                    <Author ValidYN="Y">
+                        <LastName>Giuffrida</LastName>
+                        <ForeName>Silvia</ForeName>
+                        <Initials>S</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Department of Cardiology and Cardiac Surgery, Cardio Centro Ticino Institute, Ente Ospedaliero Cantonale, Lugano, Switzerland. Electronic address: silvia.giuffrida@eoc.ch.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Silano</LastName>
+                        <ForeName>Verdiana</ForeName>
+                        <Initials>V</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Nursing Direction of Settore Anziani Citt&#xe0; di Bellinzona, Bellinzona, Switzerland. Electronic address: verdiana.silano@hotmail.it.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Ramacciati</LastName>
+                        <ForeName>Nicola</ForeName>
+                        <Initials>N</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Department of Pharmacy, Health and Nutritional Sciences (DFSSN), University of Calabria, Rende, Italy. Electronic address: nicola.ramacciati@unical.it.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Prandi</LastName>
+                        <ForeName>Cesarina</ForeName>
+                        <Initials>C</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Department of Business Economics, Health and Social Care (DEASS), University of Applied Sciences and Arts of Southern Switzerland, Manno, Switzerland. Electronic address: cesarina.prandi@supsi.ch.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Baldon</LastName>
+                        <ForeName>Alessia</ForeName>
+                        <Initials>A</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Department of Business Economics, Health and Social Care (DEASS), University of Applied Sciences and Arts of Southern Switzerland, Manno, Switzerland. Electronic address: alessia.baldon@supsi.ch.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Bianchi</LastName>
+                        <ForeName>Monica</ForeName>
+                        <Initials>M</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Department of Business Economics, Health and Social Care (DEASS), University of Applied Sciences and Arts of Southern Switzerland, Manno, Switzerland. Electronic address: monica.bianchi@supsi.ch.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                </AuthorList>
+                <Language>eng</Language>
+                <PublicationTypeList>
+                    <PublicationType UI="D016428">Journal Article</PublicationType>
+                    <PublicationType UI="D016454">Review</PublicationType>
+                </PublicationTypeList>
+                <ArticleDate DateType="Electronic">
+                    <Year>2023</Year>
+                    <Month>01</Month>
+                    <Day>17</Day>
+                </ArticleDate>
+            </Article>
+            <MedlineJournalInfo>
+                <Country>Scotland</Country>
+                <MedlineTA>Nurse Educ Pract</MedlineTA>
+                <NlmUniqueID>101090848</NlmUniqueID>
+                <ISSNLinking>1471-5953</ISSNLinking>
+            </MedlineJournalInfo>
+            <CitationSubset>IM</CitationSubset>
+            <MeshHeadingList>
+                <MeshHeading>
+                    <DescriptorName UI="D006801" MajorTopicYN="N">Humans</DescriptorName>
+                </MeshHeading>
+                <MeshHeading>
+                    <DescriptorName UI="D057179" MajorTopicYN="Y">Advanced Practice Nursing</DescriptorName>
+                </MeshHeading>
+                <MeshHeading>
+                    <DescriptorName UI="D007858" MajorTopicYN="N">Learning</DescriptorName>
+                </MeshHeading>
+                <MeshHeading>
+                    <DescriptorName UI="D003479" MajorTopicYN="N">Curriculum</DescriptorName>
+                </MeshHeading>
+                <MeshHeading>
+                    <DescriptorName UI="D013850" MajorTopicYN="N">Thinking</DescriptorName>
+                </MeshHeading>
+                <MeshHeading>
+                    <DescriptorName UI="D000086723" MajorTopicYN="N">Clinical Reasoning</DescriptorName>
+                </MeshHeading>
+                <MeshHeading>
+                    <DescriptorName UI="D013338" MajorTopicYN="Y">Students, Nursing</DescriptorName>
+                </MeshHeading>
+            </MeshHeadingList>
+            <KeywordList Owner="NOTNLM">
+                <Keyword MajorTopicYN="N">Advanced practice nursing</Keyword>
+                <Keyword MajorTopicYN="N">Clinical reasoning</Keyword>
+                <Keyword MajorTopicYN="N">Critical thinking</Keyword>
+                <Keyword MajorTopicYN="N">Educational strategies</Keyword>
+                <Keyword MajorTopicYN="N">Nursing education</Keyword>
+                <Keyword MajorTopicYN="N">Teaching methodology</Keyword>
+            </KeywordList>
+            <CoiStatement>Declaration of Competing Interest The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.</CoiStatement>
+        </MedlineCitation>
+        <PubmedData>
+            <History>
+                <PubMedPubDate PubStatus="received">
+                    <Year>2022</Year>
+                    <Month>11</Month>
+                    <Day>9</Day>
+                </PubMedPubDate>
+                <PubMedPubDate PubStatus="revised">
+                    <Year>2022</Year>
+                    <Month>12</Month>
+                    <Day>17</Day>
+                </PubMedPubDate>
+                <PubMedPubDate PubStatus="accepted">
+                    <Year>2023</Year>
+                    <Month>1</Month>
+                    <Day>10</Day>
+                </PubMedPubDate>
+                <PubMedPubDate PubStatus="pubmed">
+                    <Year>2023</Year>
+                    <Month>1</Month>
+                    <Day>29</Day>
+                    <Hour>6</Hour>
+                    <Minute>0</Minute>
+                </PubMedPubDate>
+                <PubMedPubDate PubStatus="medline">
+                    <Year>2023</Year>
+                    <Month>2</Month>
+                    <Day>25</Day>
+                    <Hour>6</Hour>
+                    <Minute>0</Minute>
+                </PubMedPubDate>
+                <PubMedPubDate PubStatus="entrez">
+                    <Year>2023</Year>
+                    <Month>1</Month>
+                    <Day>28</Day>
+                    <Hour>18</Hour>
+                    <Minute>7</Minute>
+                </PubMedPubDate>
+            </History>
+            <PublicationStatus>ppublish</PublicationStatus>
+            <ArticleIdList>
+                <ArticleId IdType="pubmed">36708638</ArticleId>
+                <ArticleId IdType="doi">10.1016/j.nepr.2023.103548</ArticleId>
+                <ArticleId IdType="pii">S1471-5953(23)00010-0</ArticleId>
+            </ArticleIdList>
+        </PubmedData>
+    </PubmedArticle>
+</PubmedArticleSet>

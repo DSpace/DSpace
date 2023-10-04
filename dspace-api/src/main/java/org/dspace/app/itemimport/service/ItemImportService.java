@@ -212,6 +212,13 @@ public interface ItemImportService {
     public void setTest(boolean isTest);
 
     /**
+     * Set exclude-content flag.
+     *
+     * @param isExcludeContent true or false
+     */
+    public void setExcludeContent(boolean isExcludeContent);
+
+    /**
      * Set resume flag
      *
      * @param isResume true or false

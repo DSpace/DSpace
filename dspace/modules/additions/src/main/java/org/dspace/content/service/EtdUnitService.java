@@ -28,7 +28,6 @@ public interface EtdUnitService extends DSpaceObjectService<EtdUnit>, DSpaceObje
     /**
      * Create a new etdunit, with a new ID.
      *
-     * @param parent  parent etdunit
      * @param context
      *                DSpace context object
      *
@@ -83,7 +82,7 @@ public interface EtdUnitService extends DSpaceObjectService<EtdUnit>, DSpaceObje
      *
      * @param context
      *                  DSpace context
-     * @param collction
+     * @param collection
      *                  collection
      *
      * @return list of all etdunits mapped to the given collection

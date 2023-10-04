@@ -15,12 +15,14 @@ package org.dspace.core;
  * @version $Revision$
  */
 public class Constants {
+    // UMD Customization
     /**
      * Type of locally defined objects
      */
     public static final int UNIT = 666;
 
     public static final int ETDUNIT = 667;
+    // End UMD Customization
 
     /**
      * Type of bitstream objects
@@ -65,8 +67,10 @@ public class Constants {
     /**
      * lets you look up type names from the type IDs
      */
+    // UMD Customization
     public static final String[] typeText = { "BITSTREAM", "BUNDLE", "ITEM", "COLLECTION", "COMMUNITY", "SITE", "GROUP",
         "EPERSON", "ETDUNIT", "UNIT" };
+    // End UMD Customization
 
     /**
      * Special Bundle and Bitstream Names:

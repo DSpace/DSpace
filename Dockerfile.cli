@@ -8,7 +8,9 @@
 ARG JDK_VERSION=11
 
 # Step 1 - Run Maven Build
+# UMD Customization
 FROM docker.lib.umd.edu/drum-dependencies-7_x:latest as build
+# End UMD Customization
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 # The dspace-installer directory will be written to /install
@@ -18,7 +20,9 @@ RUN mkdir /install \
 USER dspace
 # Copy the DSpace source code (from local machine) into the workdir (excluding .dockerignore contents)
 ADD --chown=dspace . /app/
+# UMD Customization
 COPY --chown=dspace dspace/src/main/docker/mvn-settings.xml /home/dspace/.m2/settings.xml
+# End UMD Customization
 
 # Build DSpace.  Copy the dspace-installer directory to /install.  Clean up the build to keep the docker image small
 RUN mvn --no-transfer-progress package && \
@@ -32,12 +36,12 @@ ARG TARGET_DIR=dspace-installer
 COPY --from=build /install /dspace-src
 WORKDIR /dspace-src
 # Create the initial install deployment using ANT
-ENV ANT_VERSION 1.10.12
+ENV ANT_VERSION 1.10.13
 ENV ANT_HOME /tmp/ant-$ANT_VERSION
 ENV PATH $ANT_HOME/bin:$PATH
-# Need wget to install ant
+# Need wget to install ant, and unzip for managing AIPs
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends wget \
+    && apt-get install -y --no-install-recommends wget unzip \
     && apt-get purge -y --auto-remove \
     && rm -rf /var/lib/apt/lists/*
 # Download and install 'ant'

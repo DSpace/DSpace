@@ -12,8 +12,9 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.eperson.service.SubscribeService;
-import org.dspace.eperson.service.SupervisorService;
+// UMD Customization
 import org.dspace.eperson.service.UnitService;
+// End UMD Customization
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -34,14 +35,12 @@ public abstract class EPersonServiceFactory {
 
     public abstract SubscribeService getSubscribeService();
 
-    public abstract SupervisorService getSupervisorService();
-
     public static EPersonServiceFactory getInstance() {
         return DSpaceServicesFactory.getInstance().getServiceManager()
                                     .getServiceByName("ePersonServiceFactory", EPersonServiceFactory.class);
     }
 
-    // Begin UMD Customization
+    // UMD Customization
     public abstract UnitService getUnitService();
     // End UMD Customization
 }

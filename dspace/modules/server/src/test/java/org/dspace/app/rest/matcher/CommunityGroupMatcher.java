@@ -16,7 +16,6 @@ public class CommunityGroupMatcher {
     /**
      * Returns a Matcher for a CommunityGroup based on the given name
      *
-     * @param shortName the shortName of CommunityGroup being matched
      * @return a Matcher for a CommunityGroup based on the given name
      */
     public static Matcher<? super Object> matchCommunityGroupWithId(int id) {

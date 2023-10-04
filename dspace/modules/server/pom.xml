@@ -13,7 +13,7 @@ just adding new jar in the classloader</description>
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
-        <version>7.4-drum-0-SNAPSHOT</version>
+        <version>7.6-drum-0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -118,11 +118,13 @@ just adding new jar in the classloader</description>
             </activation>
             <build>
                 <plugins>
+                    <!-- UMD Customization -->
                     <!-- Unit Testing setup: This plugin unzips the
                          'testEnvironment-additions.zip' file (created by dspace-parent POM), into
                          the 'target/testing/' folder, as this modules incorporates
                          the "additions" module, to essentially create a test
                          install of DSpace, against which Tests can be run. -->
+                    <!-- End UMD Customization -->
                     <plugin>
                         <artifactId>maven-dependency-plugin</artifactId>
                         <configuration>
@@ -133,7 +135,9 @@ just adding new jar in the classloader</description>
                                     <artifactId>dspace-parent</artifactId>
                                     <version>${project.version}</version>
                                     <type>zip</type>
+                                    <!-- UMD Customization -->
                                     <classifier>testEnvironment-additions</classifier>
+                                    <!-- End UMD Customization -->
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -189,11 +193,13 @@ just adding new jar in the classloader</description>
             </activation>
             <build>
                 <plugins>
+                    <!-- UMD Customization -->
                     <!-- Integration Testing setup: This plugin unzips the
                         'testEnvironment-additions.zip' file (created by dspace-parent POM), into
                         the 'target/testing/' folder, as this modules incorporates
                         the "additions" module, to essentially create a test
                         install of DSpace, against which Tests can be run. -->
+                   <!-- End UMD Customization -->
                     <plugin>
                         <artifactId>maven-dependency-plugin</artifactId>
                         <configuration>
@@ -204,7 +210,9 @@ just adding new jar in the classloader</description>
                                     <artifactId>dspace-parent</artifactId>
                                     <version>${project.version}</version>
                                     <type>zip</type>
+                                    <!-- UMD Customization -->
                                     <classifier>testEnvironment-additions</classifier>
+                                    <!-- End UMD Customization -->
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -243,22 +251,6 @@ just adding new jar in the classloader</description>
                     <artifactId>dspace-server-webapp</artifactId>
                     <type>test-jar</type>
                     <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
-            <id>oracle-support</id>
-            <activation>
-                <property>
-                    <name>db.name</name>
-                    <value>oracle</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.oracle</groupId>
-                    <artifactId>ojdbc6</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -338,13 +330,6 @@ just adding new jar in the classloader</description>
             <artifactId>solr-core</artifactId>
             <version>${solr.client.version}</version>
             <scope>test</scope>
-            <exclusions>
-                <!-- Newer version brought in by opencsv -->
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-text</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>

@@ -87,7 +87,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         // Configure authentication requirements for ${dspace.server.url}/api/ URL only
         // NOTE: REST API is hardcoded to respond on /api/. Other modules (OAI, SWORD, IIIF, etc) use other root paths.
         http.requestMatchers()
-            .antMatchers("/api/**", "/iiif/**", actuatorBasePath + "/**")
+            .antMatchers("/api/**", "/iiif/**", actuatorBasePath + "/**", "/signposting/**")
             .and()
             // Enable Spring Security authorization on these paths
             .authorizeRequests()
@@ -145,12 +145,13 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                                                        restAuthenticationService),
                              LogoutFilter.class)
 
-            // UMD - Add a filter before our CAS endpoints to do authentication
+            // UMD Customization
+            // Add a filter before our CAS endpoints to do authentication
             // based on the data in the HTTP request.
             .addFilterBefore(new CASLoginFilter("/api/authn/cas", authenticationManager(),
                                                 restAuthenticationService),
                              LogoutFilter.class)
-            // UMD End
+            // End UMD Customization
 
             //Add a filter before our ORCID endpoints to do the authentication based on the data in the
             // HTTP request

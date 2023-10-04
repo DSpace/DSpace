@@ -65,6 +65,8 @@ public class UsageEvent extends Event {
 
     private Action action;
 
+    private String referrer;
+
     private static String checkParams(Action action, HttpServletRequest request, Context context, DSpaceObject object) {
         StringBuilder eventName = new StringBuilder();
         if (action == null) {
@@ -187,6 +189,12 @@ public class UsageEvent extends Event {
         this.object = object;
     }
 
+    public UsageEvent(Action action, HttpServletRequest request, Context context, DSpaceObject object,
+                      String referrer) {
+        this(action, request, context, object);
+        setReferrer(referrer);
+    }
+
 
     public HttpServletRequest getRequest() {
         return request;
@@ -240,4 +248,11 @@ public class UsageEvent extends Event {
         return this.action;
     }
 
+    public String getReferrer() {
+        return referrer;
+    }
+
+    public void setReferrer(String referrer) {
+        this.referrer = referrer;
+    }
 }

@@ -69,6 +69,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
@@ -499,13 +500,13 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient(tokenParentAdmin).perform(get("/api/core/collections/" + col1.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",
-                        Matchers.is((CollectionMatcher.matchCollection(col1)))));
+                        Matchers.is(CollectionMatcher.matchCollection(col1))));
 
         String tokenCol1Admin = getAuthToken(col1Admin.getEmail(), "qwerty02");
         getClient(tokenCol1Admin).perform(get("/api/core/collections/" + col1.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",
-                        Matchers.is((CollectionMatcher.matchCollection(col1)))));
+                        Matchers.is(CollectionMatcher.matchCollection(col1))));
 
         String tokenCol2Admin = getAuthToken(col2Admin.getEmail(), "qwerty03");
         getClient(tokenCol2Admin).perform(get("/api/core/collections/" + col1.getID()))
@@ -1206,7 +1207,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                 )
                             )))
                             .andDo(result -> idRef
-                                    .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));;
+                                    .set(UUID.fromString(read(result.getResponse().getContentAsString(), "$.id"))));
 
 
         getClient(authToken).perform(post("/api/core/collections")
@@ -3099,6 +3100,81 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         // Verify a non-authenticated user can't use this function
         getClient().perform(get("/api/core/collections/search/findAdminAuthorized"))
             .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void patchReplaceMultipleDescriptionCollection() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        List<String> collectionDescriptions = List.of(
+            "FIRST",
+            "SECOND",
+            "THIRD"
+        );
+
+        parentCommunity =
+            CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Collection col =
+            CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("MyTest")
+                .build();
+
+        this.collectionService
+            .addMetadata(
+                context, col, MetadataSchemaEnum.DC.getName(), "description", null, Item.ANY, collectionDescriptions
+            );
+
+        context.restoreAuthSystemState();
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token)
+            .perform(get("/api/core/collections/" + col.getID()))
+            .andExpect(status().isOk())
+            .andExpect(
+                jsonPath("$.metadata",
+                    Matchers.allOf(
+                        MetadataMatcher.matchMetadata("dc.description", collectionDescriptions.get(0), 0),
+                        MetadataMatcher.matchMetadata("dc.description", collectionDescriptions.get(1), 1),
+                        MetadataMatcher.matchMetadata("dc.description", collectionDescriptions.get(2), 2)
+                    )
+                )
+            );
+
+        List<Operation> ops = List.of(
+            new ReplaceOperation("/metadata/dc.description/0", collectionDescriptions.get(2)),
+            new ReplaceOperation("/metadata/dc.description/1", collectionDescriptions.get(0)),
+            new ReplaceOperation("/metadata/dc.description/2", collectionDescriptions.get(1))
+        );
+        String requestBody = getPatchContent(ops);
+        getClient(token)
+            .perform(patch("/api/core/collections/" + col.getID())
+            .content(requestBody)
+            .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(
+                 jsonPath("$.metadata",
+                     Matchers.allOf(
+                         MetadataMatcher.matchMetadata("dc.description", collectionDescriptions.get(2), 0),
+                         MetadataMatcher.matchMetadata("dc.description", collectionDescriptions.get(0), 1),
+                         MetadataMatcher.matchMetadata("dc.description", collectionDescriptions.get(1), 2)
+                     )
+                 )
+             );
+        getClient(token)
+            .perform(get("/api/core/collections/" + col.getID()))
+            .andExpect(status().isOk())
+            .andExpect(
+                jsonPath("$.metadata",
+                    Matchers.allOf(
+                        MetadataMatcher.matchMetadata("dc.description", collectionDescriptions.get(2), 0),
+                        MetadataMatcher.matchMetadata("dc.description", collectionDescriptions.get(0), 1),
+                        MetadataMatcher.matchMetadata("dc.description", collectionDescriptions.get(1), 2)
+                    )
+                )
+            );
     }
 
     @Test

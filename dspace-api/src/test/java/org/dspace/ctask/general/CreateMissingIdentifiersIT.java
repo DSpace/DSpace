@@ -17,10 +17,12 @@ import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.curate.Curator;
 import org.dspace.identifier.VersionedHandleIdentifierProviderWithCanonicalHandles;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.junit.After;
 import org.junit.Test;
 
 /**
@@ -37,10 +39,11 @@ public class CreateMissingIdentifiersIT
     @Test
     public void testPerform()
             throws IOException {
-        ConfigurationService configurationService
-                = DSpaceServicesFactory.getInstance().getConfigurationService();
-        configurationService.setProperty(P_TASK_DEF, null);
-        configurationService.addPropertyValue(P_TASK_DEF,
+        // Must remove any cached named plugins before creating a new one
+        CoreServiceFactory.getInstance().getPluginService().clearNamedPluginClasses();
+        ConfigurationService configurationService = kernelImpl.getConfigurationService();
+        // Define a new task dynamically
+        configurationService.setProperty(P_TASK_DEF,
                 CreateMissingIdentifiers.class.getCanonicalName() + " = " + TASK_NAME);
 
         Curator curator = new Curator();
@@ -48,11 +51,11 @@ public class CreateMissingIdentifiersIT
 
         context.setCurrentUser(admin);
         parentCommunity = CommunityBuilder.createCommunity(context)
-                .build();
+                                          .build();
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
-                .build();
+                                                 .build();
         Item item = ItemBuilder.createItem(context, collection)
-                .build();
+                               .build();
 
         /*
          * Curate with regular test configuration -- should succeed.
@@ -75,5 +78,12 @@ public class CreateMissingIdentifiersIT
                 curator.getResult(TASK_NAME));
         assertEquals("Curation should fail", Curator.CURATE_ERROR,
                 curator.getStatus(TASK_NAME));
+    }
+
+    @Override
+    @After
+    public void destroy() throws Exception {
+        super.destroy();
+        DSpaceServicesFactory.getInstance().getServiceManager().getApplicationContext().refresh();
     }
 }

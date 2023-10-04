@@ -17,13 +17,17 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
+// UMD Customization
 import org.dspace.content.service.CommunityGroupService;
+// End UMD Customization
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.EntityService;
 import org.dspace.content.service.EntityTypeService;
+// UMD Customization
 import org.dspace.content.service.EtdUnitService;
+// End UMD Customization
 import org.dspace.content.service.InProgressSubmissionService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
@@ -33,8 +37,8 @@ import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.SiteService;
-import org.dspace.content.service.SupervisedItemService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.eperson.service.SubscribeService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 
@@ -73,9 +77,9 @@ public abstract class ContentServiceFactory {
 
     public abstract InstallItemService getInstallItemService();
 
-    public abstract SupervisedItemService getSupervisedItemService();
-
     public abstract SiteService getSiteService();
+
+    public abstract SubscribeService getSubscribeService();
 
     /**
      * Return the implementation of the RelationshipTypeService interface
@@ -116,11 +120,7 @@ public abstract class ContentServiceFactory {
     }
 
     public <T extends DSpaceObject> DSpaceObjectService<T> getDSpaceObjectService(T dso) {
-        // No need to worry when supressing, as long as our "getDSpaceObjectManager" method is properly implemented
-        // no casting issues should occur
-        @SuppressWarnings("unchecked")
-        DSpaceObjectService<T> manager = getDSpaceObjectService(dso.getType());
-        return manager;
+        return getDSpaceObjectService(dso.getType());
     }
 
     @SuppressWarnings("unchecked")
@@ -152,7 +152,7 @@ public abstract class ContentServiceFactory {
                                     .getServiceByName("contentServiceFactory", ContentServiceFactory.class);
     }
 
-    // Begin UMD Customization
+    // UMD Customization
     public abstract EtdUnitService getEtdUnitService();
     public abstract CommunityGroupService getCommunityGroupService();
     // End UMD Customization

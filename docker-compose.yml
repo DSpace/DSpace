@@ -22,17 +22,25 @@ services:
       # dspace__P__ui__P__url: http://localhost:4000
       dspace__P__name: 'DSpace Started with Docker Compose'
       # db.url: Ensure we are using the 'dspacedb' image for our database
+      # UMD Customization
       db__P__url: 'jdbc:postgresql://dspacedb:5432/drum'
+      # End UMD Customization
       # solr.server: Ensure we are using the 'dspacesolr' image for Solr
       solr__P__server: http://dspacesolr:8983/solr
       # proxies.trusted.ipranges: This setting is required for a REST API running in Docker to trust requests
       # from the host machine. This IP range MUST correspond to the 'dspacenet' subnet defined above.
       proxies__P__trusted__P__ipranges: '172.23.0'
+      # UMD Customization
       JPDA_OPTS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
+      # End UMD Customization
+    # UMD Customization
     image: "docker.lib.umd.edu/drum:${DSPACE_VER:-7_x-dev}"
+    # End UMD Customization
     build:
       context: .
+      # UMD Customization
       dockerfile: Dockerfile.dev
+      # End UMD Customization
     depends_on:
     - dspacedb
     networks:
@@ -40,8 +48,10 @@ services:
     ports:
     - published: 8080
       target: 8080
+    # UMD Customization
     - published: 8000
       target: 8000
+    # End UMD Customization
     stdin_open: true
     tty: true
     volumes:
@@ -57,20 +67,27 @@ services:
     entrypoint:
     - /bin/bash
     - '-c'
+    # UMD Customization
     - |
       while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
       /dspace/bin/dspace database migrate ignored
       catalina.sh jpda run
-  # DSpace database container
+    # End UMD Customization
+  # DSpace PostgreSQL database container
   dspacedb:
     container_name: dspacedb
+    # UMD Customization
+    # Uses a custom Postgres image with pgcrypto installed
+    image: docker.lib.umd.edu/dspace-postgres:latest
+    build:
+      # Must build out of subdirectory to have access to install script for pgcrypto
+      context: ./dspace/src/main/docker/dspace-postgres-pgcrypto/
     environment:
       PGDATA: /pgdata
       POSTGRES_DB: drum
       POSTGRES_USER: drum
       POSTGRES_PASSWORD: drum
-    # Uses a custom Postgres image with pgcrypto installed
-    image: docker.lib.umd.edu/dspace-postgres:latest
+    # End UMD Customization
     networks:
       dspacenet:
     ports:
@@ -79,13 +96,19 @@ services:
     stdin_open: true
     tty: true
     volumes:
+    # UMD Customization
     - pgdata:/pgdatasql
     - ./postgres-init:/docker-entrypoint-initdb.d
+    # End UMD Customization
   # DSpace Solr container
   dspacesolr:
     container_name: dspacesolr
-    # Uses official Solr image at https://hub.docker.com/_/solr/
-    image: solr:8.11-slim
+    image: "${DOCKER_OWNER:-dspace}/dspace-solr:${DSPACE_VER:-dspace-7_x}"
+    build:
+      context: .
+      dockerfile: ./dspace/src/main/docker/dspace-solr/Dockerfile
+      args:
+        SOLR_VERSION: "${SOLR_VER:-8.11}"
     networks:
       dspacenet:
     ports:
@@ -95,30 +118,25 @@ services:
     tty: true
     working_dir: /var/solr/data
     volumes:
-    # Mount our local Solr core configs so that they are available as Solr configsets on container
-    - ./dspace/solr/authority:/opt/solr/server/solr/configsets/authority
-    - ./dspace/solr/oai:/opt/solr/server/solr/configsets/oai
-    - ./dspace/solr/search:/opt/solr/server/solr/configsets/search
-    - ./dspace/solr/statistics:/opt/solr/server/solr/configsets/statistics
     # Keep Solr data directory between reboots
     - solr_data:/var/solr/data
-    # Initialize all DSpace Solr cores using the mounted local configsets (see above), then start Solr
+    # Initialize all DSpace Solr cores then start Solr:
     # * First, run precreate-core to create the core (if it doesn't yet exist). If exists already, this is a no-op
-    # * Second, copy updated configs from mounted configsets to this core. If it already existed, this updates core
-    #   to the latest configs. If it's a newly created core, this is a no-op.
+    # * Second, copy configsets to this core:
+    #   Updates to Solr configs require the container to be rebuilt/restarted: `docker compose -p d7 up -d --build dspacesolr`
     entrypoint:
     - /bin/bash
     - '-c'
     - |
       init-var-solr
       precreate-core authority /opt/solr/server/solr/configsets/authority
-      cp -r -u /opt/solr/server/solr/configsets/authority/* authority
+      cp -r /opt/solr/server/solr/configsets/authority/* authority
       precreate-core oai /opt/solr/server/solr/configsets/oai
-      cp -r -u /opt/solr/server/solr/configsets/oai/* oai
+      cp -r /opt/solr/server/solr/configsets/oai/* oai
       precreate-core search /opt/solr/server/solr/configsets/search
-      cp -r -u /opt/solr/server/solr/configsets/search/* search
+      cp -r /opt/solr/server/solr/configsets/search/* search
       precreate-core statistics /opt/solr/server/solr/configsets/statistics
-      cp -r -u /opt/solr/server/solr/configsets/statistics/* statistics
+      cp -r /opt/solr/server/solr/configsets/statistics/* statistics
       exec solr -f
 volumes:
   assetstore:

@@ -14,10 +14,13 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.browse.ItemCountException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+// UMD Customization
 import org.dspace.content.CommunityGroup;
+// End UMD Customization
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 
@@ -294,7 +297,17 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
 
     int countTotal(Context context) throws SQLException;
 
-    // Begin UMD Customization
+    /**
+     * Returns total community archived items
+     *
+     * @param community       Community
+     * @return                total community archived items
+     * @throws ItemCountException
+     */
+    int countArchivedItems(Community community) throws ItemCountException;
+
+
+    // UMD Customization
     // Customization to support getting/setting int metadata value, finding top level community by CommunityGroup
     // Used in CommunityGroupServiceImpl.java
     /**

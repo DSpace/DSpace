@@ -15,13 +15,17 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
+// UMD Customization
 import org.dspace.content.service.CommunityGroupService;
+// End UMD Customization
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.EntityService;
 import org.dspace.content.service.EntityTypeService;
+// UMD Customization
 import org.dspace.content.service.EtdUnitService;
+// End UMD Customization
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
@@ -30,8 +34,8 @@ import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.SiteService;
-import org.dspace.content.service.SupervisedItemService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.eperson.service.SubscribeService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -70,10 +74,9 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     @Autowired(required = true)
     private InstallItemService installItemService;
     @Autowired(required = true)
-    private SupervisedItemService supervisedItemService;
-    @Autowired(required = true)
     private SiteService siteService;
-
+    @Autowired(required = true)
+    private SubscribeService subscribeService;
     @Autowired(required = true)
     private RelationshipService relationshipService;
     @Autowired(required = true)
@@ -151,13 +154,13 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     }
 
     @Override
-    public SupervisedItemService getSupervisedItemService() {
-        return supervisedItemService;
+    public SiteService getSiteService() {
+        return siteService;
     }
 
     @Override
-    public SiteService getSiteService() {
-        return siteService;
+    public SubscribeService getSubscribeService() {
+        return subscribeService ;
     }
 
     @Override
@@ -185,7 +188,7 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
         return relationshipMetadataService;
     }
 
-    // Begin UMD Customization
+    // UMD Customization
     // Add EtdUnitService to the factory
     @Autowired(required = true)
     private EtdUnitService etdunitService;

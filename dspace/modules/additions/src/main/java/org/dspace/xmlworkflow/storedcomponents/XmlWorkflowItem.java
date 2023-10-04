@@ -7,8 +7,10 @@
  */
 package org.dspace.xmlworkflow.storedcomponents;
 
+// UMD Customization
 import java.util.Collections;
 import java.util.List;
+// End UMD Customization
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -56,11 +58,6 @@ public class XmlWorkflowItem implements WorkflowItem {
 
     @Column(name = "multiple_titles")
     private boolean multipleTitles = false;
-
-//    // Customization for LIBDRUM-628
-//    @Column(name = "is_dataset")
-//    private boolean isDataset = false;
-//    // End customization for LIBDRUM-628
 
     @Column(name = "published_before")
     private boolean publishedBefore = false;
@@ -130,20 +127,6 @@ public class XmlWorkflowItem implements WorkflowItem {
         this.multipleTitles = b;
     }
 
-//    // Customization for LIBDRUM-628
-//    @Override
-//    public boolean isDataset()
-//    {
-//        return this.isDataset;
-//    }
-//
-//    @Override
-//    public void setDataset(boolean b)
-//    {
-//        this.isDataset = b;
-//    }
-//    // End customization for LIBDRUM-628
-
     @Override
     public boolean isPublishedBefore() {
         return this.publishedBefore;
@@ -154,7 +137,7 @@ public class XmlWorkflowItem implements WorkflowItem {
         this.publishedBefore = b;
     }
 
-    // Begin UMD Customization
+    // UMD Customization
     // Stub implementation for InProgressSubmission interface compliance.
     /**
      * Unimplemented stub
@@ -178,5 +161,4 @@ public class XmlWorkflowItem implements WorkflowItem {
     public void removeMappedCollections() {
     }
     // End UMD Customization
-
 }

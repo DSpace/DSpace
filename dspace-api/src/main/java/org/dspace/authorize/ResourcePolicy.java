@@ -41,9 +41,16 @@ import org.hibernate.proxy.HibernateProxyHelper;
 @Entity
 @Table(name = "resourcepolicy")
 public class ResourcePolicy implements ReloadableEntity<Integer> {
+    /** This policy was set on submission, to give the submitter access. */
     public static String TYPE_SUBMISSION = "TYPE_SUBMISSION";
+
+    /** This policy was set to allow access by a workflow group. */
     public static String TYPE_WORKFLOW = "TYPE_WORKFLOW";
+
+    /** This policy was explicitly set on this object. */
     public static String TYPE_CUSTOM = "TYPE_CUSTOM";
+
+    /** This policy was copied from the containing object's default policies. */
     public static String TYPE_INHERITED = "TYPE_INHERITED";
 
     @Id
@@ -93,7 +100,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
     private String rptype;
 
     @Lob
-    @Type(type = "org.dspace.storage.rdbms.hibernate.DatabaseAwareLobType")
+    @Type(type = "org.hibernate.type.TextType")
     @Column(name = "rpdescription")
     private String rpdescription;
 
