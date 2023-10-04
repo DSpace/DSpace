@@ -112,6 +112,7 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
                 notifyServiceRest.getNotifyServiceOutboundPatterns());
         }
 
+        notifyServiceEntity.setEnabled(notifyServiceRest.isEnabled());
         notifyService.update(context, notifyServiceEntity);
 
         return converter.toRest(notifyServiceEntity, utils.obtainProjection());
