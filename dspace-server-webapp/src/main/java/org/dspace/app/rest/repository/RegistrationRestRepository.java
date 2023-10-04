@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import javax.mail.MessagingException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.BadRequestException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -25,16 +26,22 @@ import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RegistrationRest;
+import org.dspace.app.rest.model.patch.Patch;
+import org.dspace.app.rest.repository.patch.ResourcePatch;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.InvalidReCaptchaException;
 import org.dspace.eperson.RegistrationData;
+import org.dspace.eperson.RegistrationTypeEnum;
 import org.dspace.eperson.service.AccountService;
 import org.dspace.eperson.service.CaptchaService;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
@@ -53,9 +60,10 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
 
     private static Logger log = LogManager.getLogger(RegistrationRestRepository.class);
 
+    public static final String TOKEN_QUERY_PARAM = "token";
     public static final String TYPE_QUERY_PARAM = "accountRequestType";
-    public static final String TYPE_REGISTER = "register";
-    public static final String TYPE_FORGOT = "forgot";
+    public static final String TYPE_REGISTER = RegistrationTypeEnum.REGISTER.toString().toLowerCase();
+    public static final String TYPE_FORGOT = RegistrationTypeEnum.FORGOT.toString().toLowerCase();
 
     @Autowired
     private EPersonService ePersonService;
@@ -77,6 +85,18 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
 
     @Autowired
     private RegistrationDataService registrationDataService;
+
+    @Autowired
+    private AuthorizeService authorizeService;
+
+    @Autowired
+    private GroupService groupService;
+
+    @Autowired
+    private Utils utils;
+
+    @Autowired
+    private ResourcePatch<RegistrationData> resourcePatch;
 
     @Override
     public RegistrationRest findOne(Context context, Integer integer) {
@@ -137,46 +157,34 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
                               + registrationRest.getEmail(), e);
             }
         } else if (accountType.equalsIgnoreCase(TYPE_REGISTER)) {
-            if (eperson == null) {
-                try {
-                    String email = registrationRest.getEmail();
-                    if (!AuthorizeUtil.authorizeNewAccountRegistration(context, request)) {
-                        throw new AccessDeniedException(
-                            "Registration is disabled, you are not authorized to create a new Authorization");
-                    }
-                    if (!authenticationService.canSelfRegister(context, request, email)) {
-                        throw new UnprocessableEntityException(
-                            String.format("Registration is not allowed with email address" +
+            try {
+                String email = registrationRest.getEmail();
+                if (!AuthorizeUtil.authorizeNewAccountRegistration(context, request)) {
+                    throw new AccessDeniedException(
+                        "Registration is disabled, you are not authorized to create a new Authorization");
+                }
+
+                if (!authenticationService.canSelfRegister(context, request, registrationRest.getEmail())) {
+                    throw new UnprocessableEntityException(
+                        String.format("Registration is not allowed with email address" +
                                           " %s", email));
-                    }
-                    accountService.sendRegistrationInfo(context, email);
-                } catch (SQLException | IOException | MessagingException | AuthorizeException e) {
-                    log.error("Something went wrong with sending registration info email: "
-                              + registrationRest.getEmail(), e);
                 }
-            } else {
-                // if an eperson with this email already exists then send "forgot password" email instead
-                try {
-                    accountService.sendForgotPasswordInfo(context, registrationRest.getEmail());
-                }  catch (SQLException | IOException | MessagingException | AuthorizeException e) {
-                    log.error("Something went wrong with sending forgot password info email: "
+
+                accountService.sendRegistrationInfo(context, registrationRest.getEmail());
+            } catch (SQLException | IOException | MessagingException | AuthorizeException e) {
+                log.error("Something went wrong with sending registration info email: "
                               + registrationRest.getEmail(), e);
-                }
             }
         }
         return null;
     }
 
-    @Override
-    public Class<RegistrationRest> getDomainClass() {
-        return RegistrationRest.class;
-    }
-
     /**
      * This method will find the RegistrationRest object that is associated with the token given
+     *
      * @param token The token to be found and for which a RegistrationRest object will be found
-     * @return      A RegistrationRest object for the given token
-     * @throws SQLException If something goes wrong
+     * @return A RegistrationRest object for the given token
+     * @throws SQLException       If something goes wrong
      * @throws AuthorizeException If something goes wrong
      */
     @SearchRestMethod(name = "findByToken")
@@ -187,17 +195,55 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
         if (registrationData == null) {
             throw new ResourceNotFoundException("The token: " + token + " couldn't be found");
         }
-        RegistrationRest registrationRest = new RegistrationRest();
-        registrationRest.setEmail(registrationData.getEmail());
-        EPerson ePerson = accountService.getEPerson(context, token);
-        if (ePerson != null) {
-            registrationRest.setUser(ePerson.getID());
+        return converter.toRest(registrationData, utils.obtainProjection());
+    }
+
+    @Override
+    public RegistrationRest patch(
+        HttpServletRequest request, String apiCategory, String model, Integer id, Patch patch
+    ) throws UnprocessableEntityException, DSpaceBadRequestException {
+        if (id == null || id <= 0) {
+            throw new BadRequestException("The id of the registration cannot be null or negative");
         }
-        return registrationRest;
+        if (patch == null || patch.getOperations() == null || patch.getOperations().isEmpty()) {
+            throw new BadRequestException("Patch request is incomplete: cannot find operations");
+        }
+        String token = request.getParameter("token");
+        if (token == null || token.trim().isBlank()) {
+            throw new AccessDeniedException("The token is required");
+        }
+        Context context = obtainContext();
+
+        validateToken(context, token);
+
+        try {
+            resourcePatch.patch(context, registrationDataService.find(context, id), patch.getOperations());
+            context.commit();
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        return null;
+    }
+
+    private void validateToken(Context context, String token) {
+        try {
+            RegistrationData registrationData =
+                registrationDataService.findByToken(context, token);
+            if (registrationData == null || !registrationDataService.isValid(registrationData)) {
+                throw new AccessDeniedException("The token is invalid");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void setCaptchaService(CaptchaService captchaService) {
         this.captchaService = captchaService;
+    }
+
+    @Override
+    public Class<RegistrationRest> getDomainClass() {
+        return RegistrationRest.class;
     }
 
 }

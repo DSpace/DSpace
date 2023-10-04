@@ -188,7 +188,7 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             throw new DSpaceBadRequestException("The self registered property cannot be set to false using this method"
                                                     + " with a token");
         }
-        checkRequiredProperties(epersonRest);
+        checkRequiredProperties(registrationData, epersonRest);
         // We'll turn off authorisation system because this call isn't admin based as it's token based
         context.turnOffAuthorisationSystem();
         EPerson ePerson = createEPersonFromRestObject(context, epersonRest);
@@ -201,8 +201,8 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         return converter.toRest(ePerson, utils.obtainProjection());
     }
 
-    private void checkRequiredProperties(EPersonRest epersonRest) {
-        MetadataRest metadataRest = epersonRest.getMetadata();
+    private void checkRequiredProperties(RegistrationData registration, EPersonRest epersonRest) {
+        MetadataRest<MetadataValueRest> metadataRest = epersonRest.getMetadata();
         if (metadataRest != null) {
             List<MetadataValueRest> epersonFirstName = metadataRest.getMap().get("eperson.firstname");
             List<MetadataValueRest> epersonLastName = metadataRest.getMap().get("eperson.lastname");
@@ -211,10 +211,25 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
                 throw new EPersonNameNotProvidedException();
             }
         }
+
         String password = epersonRest.getPassword();
-        if (StringUtils.isBlank(password)) {
-            throw new DSpaceBadRequestException("A password is required");
+        String netId = epersonRest.getNetid();
+        if (StringUtils.isBlank(password) && StringUtils.isBlank(netId)) {
+            throw new DSpaceBadRequestException(
+                "You must provide a password or register using an external account"
+            );
         }
+
+        if (StringUtils.isBlank(password) && !canRegisterExternalAccount(registration, epersonRest)) {
+            throw new DSpaceBadRequestException(
+                "Cannot register external account with netId: " + netId
+            );
+        }
+    }
+
+    private boolean canRegisterExternalAccount(RegistrationData registration, EPersonRest epersonRest) {
+        return accountService.isTokenValidForCreation(registration) &&
+            StringUtils.equals(registration.getNetId(), epersonRest.getNetid());
     }
 
     @Override
@@ -365,6 +380,29 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     @Override
     public Class<EPersonRest> getDomainClass() {
         return EPersonRest.class;
+    }
+
+    public EPersonRest mergeFromRegistrationData(
+        Context context, UUID uuid, String token, List<String> override
+    ) throws AuthorizeException {
+        try {
+
+            if (uuid == null) {
+                throw new DSpaceBadRequestException("The uuid of the person cannot be null");
+            }
+
+            if (token == null) {
+                throw new DSpaceBadRequestException("You must provide a token for the eperson");
+            }
+
+            return converter.toRest(
+                accountService.mergeRegistration(context, uuid, token, override),
+                utils.obtainProjection()
+            );
+        } catch (SQLException e) {
+            log.error(e);
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
