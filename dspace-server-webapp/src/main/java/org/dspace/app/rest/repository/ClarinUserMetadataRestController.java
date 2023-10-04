@@ -136,6 +136,7 @@ public class ClarinUserMetadataRestController {
                 this.sendEmailWithDownloadLink(context, bitstreamUUID, clarinLicenseResourceMapping,
                         clarinUserMetadataRestList, downloadToken);
             } catch (MessagingException e) {
+                log.error("Cannot send the download email because: " + e.getMessage());
                 throw new RuntimeException("Cannot send the download email because: " + e.getMessage());
             }
 
