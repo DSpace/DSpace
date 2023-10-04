@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
  * Content-Type: application/json" -d '
  * [{
  *  "op": "add",
- *  "path": "notifyservices_outbound_patterns/-",
+ *  "path": "notifyServiceOutboundPatterns/-",
  *  "value": {"pattern":"patternA","constraint":"itemFilterA"}
  *  }]'
  * </code>
