@@ -151,3 +151,5 @@ See [dspace/docs/DrumCronTasks.md](DrumCronTasks.md) for additional information.
   to Faculty collections. (see also LIBDRUM-676)
 * LIBDRUM-666 - "Preservation" bundle type option provided for bitstreams
   bundles
+* LIBDRUM-811 - Maximum file upload size is set to 2GB for a single file
+  and 15GB for a record with multiple files.

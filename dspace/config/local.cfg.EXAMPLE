@@ -321,11 +321,13 @@ drum.ldap.cacheTimeout = 300000
 # These defaults are specified in [dspace-src]/dspace-server-webapp/src/main/resources/application.properties
 # but may be overridden in this local.cfg
 #
+#  UMD Customization
 # Maximum size of a single uploaded file
-#spring.servlet.multipart.max-file-size = 512MB
+spring.servlet.multipart.max-file-size = 2048MB
 
 # Maximum size of a multipart request (i.e. max total size of all files in one request)
-#spring.servlet.multipart.max-request-size = 512MB
+spring.servlet.multipart.max-request-size = 15360MB
+# End UMD Customization
 
 # UMD Customization
 #####################
