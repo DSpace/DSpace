@@ -165,6 +165,41 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     }
 
     @Override
+    public List<Group> findByNameLikeAndNotMember(Context context, String groupName, Group excludeParent,
+                                                  int offset, int limit) throws SQLException {
+        Query query = createQuery(context,
+                                  "FROM Group " +
+                                      "WHERE lower(name) LIKE lower(:group_name) " +
+                                      "AND id != :parent_id " +
+                                      "AND (from Group g where g.id = :parent_id) not in elements (parentGroups)");
+        query.setParameter("parent_id", excludeParent.getID());
+        query.setParameter("group_name", "%" + StringUtils.trimToEmpty(groupName) + "%");
+
+        if (0 <= offset) {
+            query.setFirstResult(offset);
+        }
+        if (0 <= limit) {
+            query.setMaxResults(limit);
+        }
+        query.setHint("org.hibernate.cacheable", Boolean.TRUE);
+
+        return list(query);
+    }
+
+    @Override
+    public int countByNameLikeAndNotMember(Context context, String groupName, Group excludeParent) throws SQLException {
+        Query query = createQuery(context,
+                                  "SELECT count(*) FROM Group " +
+                                      "WHERE lower(name) LIKE lower(:group_name) " +
+                                      "AND id != :parent_id " +
+                                      "AND (from Group g where g.id = :parent_id) not in elements (parentGroups)");
+        query.setParameter("parent_id", excludeParent.getID());
+        query.setParameter("group_name", "%" + StringUtils.trimToEmpty(groupName) + "%");
+
+        return count(query);
+    }
+
+    @Override
     public void delete(Context context, Group group) throws SQLException {
         Query query = getHibernateSession(context)
             .createNativeQuery("DELETE FROM group2group WHERE parent_id=:groupId or child_id=:groupId");
@@ -213,6 +248,7 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
         return list(query);
     }
 
+    @Override
     public int countByParent(Context context, Group parent) throws SQLException {
         Query query = createQuery(context, "SELECT count(g) FROM Group g JOIN g.parentGroups pg " +
                                             "WHERE pg.id = :parent_id");
