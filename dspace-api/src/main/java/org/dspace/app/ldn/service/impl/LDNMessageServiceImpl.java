@@ -90,7 +90,8 @@ public class LDNMessageServiceImpl implements LDNMessageService {
             message = mapper.writeValueAsString(notification);
             ldnMessage.setMessage(message);
         } catch (JsonProcessingException e) {
-            log.error("Notification json can't be correctly processed and stored inside the LDN Message Entity" + ldnMessage);
+            log.error("Notification json can't be correctly processed " +
+                "and stored inside the LDN Message Entity" + ldnMessage);
             log.error(e);
         }
         ldnMessage.setType(StringUtils.joinWith(",", notification.getType()));
@@ -105,10 +106,10 @@ public class LDNMessageServiceImpl implements LDNMessageService {
         ldnMessage.setActivityStreamType(notificationTypeArrayList.get(0));
         ldnMessage.setCoarNotifyType(notificationTypeArrayList.get(1));
         ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_QUEUED);
-        //CST-12126 if source is untrusted, set the queue_status of the 
+        //CST-12126 if source is untrusted, set the queue_status of the
         //ldnMsgEntity to UNTRUSTED
-        if(ldnMessage.getOrigin() == null) {
-            ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_UNTRUSTED);    
+        if (ldnMessage.getOrigin() == null) {
+            ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_UNTRUSTED);
         }
         ldnMessage.setQueueTimeout(new Date());
 
@@ -118,9 +119,9 @@ public class LDNMessageServiceImpl implements LDNMessageService {
 
     @Override
     public void update(Context context, LDNMessageEntity ldnMessage) throws SQLException {
-        //CST-12126 then LDNMessageService.update() when the origin is set != null, 
+        //CST-12126 then LDNMessageService.update() when the origin is set != null,
         //move the queue_status from UNTRUSTED to QUEUED
-        if(ldnMessage.getOrigin() != null && 
+        if (ldnMessage.getOrigin() != null &&
             LDNMessageEntity.QUEUE_STATUS_UNTRUSTED.compareTo(ldnMessage.getQueueStatus()) == 0) {
             ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_QUEUED);
         }

@@ -60,10 +60,10 @@ public class LDNInboxController {
         context.commit();
 
         LDNMessageEntity ldnMsgEntity = ldnMessageService.create(context, notification);
-        log.info("stored ldn message {}", ldnMsgEntity); 
+        log.info("stored ldn message {}", ldnMsgEntity);
         context.commit();
 
-        if(ldnMsgEntity.getQueueStatus() != LDNMessageEntity.QUEUE_STATUS_UNTRUSTED) {
+        if (ldnMsgEntity.getQueueStatus() != LDNMessageEntity.QUEUE_STATUS_UNTRUSTED) {
             LDNProcessor processor = router.route(ldnMsgEntity);
             if (processor == null) {
                 log.error(String.format("No processor found for type %s", notification.getType()));

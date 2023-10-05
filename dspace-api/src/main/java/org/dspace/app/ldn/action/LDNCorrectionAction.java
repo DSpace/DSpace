@@ -48,7 +48,7 @@ public class LDNCorrectionAction implements LDNAction {
 
         return result;
     }
-    
+
     public String getQaEventTopic() {
         return qaEventTopic;
     }
