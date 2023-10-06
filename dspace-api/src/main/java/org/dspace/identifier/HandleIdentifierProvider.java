@@ -68,10 +68,9 @@ public class HandleIdentifierProvider extends IdentifierProvider {
         try {
             String id = mint(context, dso);
 
-            // move canonical to point the latest version
+            // Populate metadata
             if (dso instanceof Item || dso instanceof Collection || dso instanceof Community) {
-                Item item = (Item) dso;
-                populateHandleMetadata(context, item, id);
+                populateHandleMetadata(context, dso, id);
             }
 
             return id;
