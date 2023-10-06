@@ -199,7 +199,8 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     @Override
     public List<Group> findByParent(Context context, Group parent, int pageSize, int offset) throws SQLException {
         Query query = createQuery(context,
-                                  "from Group where (from Group g where g.id = :parent_id) in elements (parentGroups)");
+                                  "SELECT g FROM Group g JOIN g.parentGroups pg " +
+                                      "WHERE pg.id = :parent_id");
         query.setParameter("parent_id", parent.getID());
         if (pageSize > 0) {
             query.setMaxResults(pageSize);
@@ -213,8 +214,8 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     }
 
     public int countByParent(Context context, Group parent) throws SQLException {
-        Query query = createQuery(context, "SELECT count(*) from Group " +
-                                      "where (from Group g where g.id = :parent_id) in elements (parentGroups)");
+        Query query = createQuery(context, "SELECT count(g) FROM Group g JOIN g.parentGroups pg " +
+                                            "WHERE pg.id = :parent_id");
         query.setParameter("parent_id", parent.getID());
 
         return count(query);
