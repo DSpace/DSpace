@@ -45,7 +45,7 @@ public class LDNCorrectionAction implements LDNAction {
             value = notification.getObject().getIetfCiteAs();
             qaEvent = new QAEvent(QAEvent.COAR_NOTIFY,
                 notification.getObject().getId(), item.getID().toString(), itemName,
-                this.getQaEventTopic(), 0d,
+                this.getQaEventTopic(), 1d,
                 "{\"abstracts[0]\": \"" + value + "\"}"
                 , new Date());
         } else if (notification.getObject().getAsRelationship() != null) {
@@ -53,7 +53,7 @@ public class LDNCorrectionAction implements LDNAction {
             value = notification.getObject().getAsObject();
             qaEvent = new QAEvent(QAEvent.COAR_NOTIFY,
                 notification.getObject().getId(), item.getID().toString(), itemName,
-                this.getQaEventTopic(), 0d,
+                this.getQaEventTopic(), 1d,
                 "{\"pids[0].value\":\"" + value + "\"," +
                 "\"pids[0].type\":\"" +  type + "\"}"
                 , new Date());
