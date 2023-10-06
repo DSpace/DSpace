@@ -32,6 +32,8 @@ import javax.ws.rs.core.MediaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomUtils;
 import org.dspace.app.ldn.NotifyServiceEntity;
+import org.dspace.app.rest.model.NotifyServiceInboundPatternRest;
+import org.dspace.app.rest.model.NotifyServiceOutboundPatternRest;
 import org.dspace.app.rest.model.NotifyServiceRest;
 import org.dspace.app.rest.model.patch.AddOperation;
 import org.dspace.app.rest.model.patch.Operation;
@@ -148,11 +150,27 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
     public void createTest() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
 
+        NotifyServiceInboundPatternRest inboundPatternRestOne = new NotifyServiceInboundPatternRest();
+        inboundPatternRestOne.setPattern("patternA");
+        inboundPatternRestOne.setConstraint("itemFilterA");
+        inboundPatternRestOne.setAutomatic(true);
+
+        NotifyServiceInboundPatternRest inboundPatternRestTwo = new NotifyServiceInboundPatternRest();
+        inboundPatternRestTwo.setPattern("patternB");
+        inboundPatternRestTwo.setAutomatic(false);
+
+        NotifyServiceOutboundPatternRest outboundPatternRest = new NotifyServiceOutboundPatternRest();
+        outboundPatternRest.setPattern("patternC");
+        outboundPatternRest.setConstraint("itemFilterC");
+
         NotifyServiceRest notifyServiceRest = new NotifyServiceRest();
         notifyServiceRest.setName("service name");
         notifyServiceRest.setDescription("service description");
         notifyServiceRest.setUrl("service url");
         notifyServiceRest.setLdnUrl("service ldn url");
+        notifyServiceRest.setNotifyServiceInboundPatterns(List.of(inboundPatternRestOne, inboundPatternRestTwo));
+        notifyServiceRest.setNotifyServiceOutboundPatterns(List.of(outboundPatternRest));
+        notifyServiceRest.setEnabled(false);
 
         AtomicReference<Integer> idRef = new AtomicReference<Integer>();
         String authToken = getAuthToken(admin.getEmail(), password);
@@ -161,16 +179,26 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                                 .contentType(contentType))
                             .andExpect(status().isCreated())
                             .andExpect(jsonPath("$", matchNotifyService("service name", "service description",
-                                "service url", "service ldn url")))
+                                "service url", "service ldn url", false)))
                             .andDo(result ->
                                 idRef.set((read(result.getResponse().getContentAsString(), "$.id"))));
 
         getClient(authToken)
             .perform(get("/api/ldn/ldnservices/" + idRef.get()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$",
+            .andExpect(jsonPath("$.notifyServiceInboundPatterns", hasSize(2)))
+            .andExpect(jsonPath("$.notifyServiceOutboundPatterns", hasSize(1)))
+            .andExpect(jsonPath("$", allOf(
                 matchNotifyService(idRef.get(), "service name", "service description",
-                    "service url", "service ldn url")));
+                        "service url", "service ldn url", false),
+                hasJsonPath("$.notifyServiceInboundPatterns", containsInAnyOrder(
+                    matchNotifyServicePattern("patternA", "itemFilterA", true),
+                    matchNotifyServicePattern("patternB", null, false)
+                )),
+                hasJsonPath("$.notifyServiceOutboundPatterns", contains(
+                    matchNotifyServicePattern("patternC", "itemFilterC")
+                )))
+            ));
     }
 
     @Test
@@ -239,6 +267,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                                 .withName("service name")
                                 .withUrl("service url")
                                 .withLdnUrl("service ldn url")
+                                .isEnabled(false)
                                 .build();
         context.restoreAuthSystemState();
 
@@ -255,7 +284,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
-                "add service description", "service url", "service ldn url"))
+                "add service description", "service url", "service ldn url", false))
             );
     }
 
@@ -313,7 +342,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
-                "service description replaced", "service url", "service ldn url"))
+                "service description replaced", "service url", "service ldn url", false))
             );
     }
 
@@ -328,6 +357,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                                 .withDescription("service description")
                                 .withUrl("service url")
                                 .withLdnUrl("service ldn url")
+                                .isEnabled(false)
                                 .build();
         context.restoreAuthSystemState();
 
@@ -344,7 +374,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
-                null, "service url", "service ldn url"))
+                null, "service url", "service ldn url", false))
             );
     }
 
@@ -402,7 +432,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
-                "service description", "add service url", "service ldn url"))
+                "service description", "add service url", "service ldn url", false))
             );
     }
 
@@ -444,6 +474,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                                 .withDescription("service description")
                                 .withUrl("service url")
                                 .withLdnUrl("service ldn url")
+                                .isEnabled(true)
                                 .build();
         context.restoreAuthSystemState();
 
@@ -460,7 +491,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
-                "service description", "service url replaced", "service ldn url"))
+                "service description", "service url replaced", "service ldn url", true))
             );
     }
 
@@ -776,10 +807,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation inboundAddOperationOne = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationOne = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\",\"automatic\":\"false\"}");
 
-        AddOperation inboundAddOperationTwo = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationTwo = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\",\"automatic\":\"true\"}");
 
         ops.add(inboundAddOperationOne);
@@ -821,10 +852,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation inboundAddOperationOne = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationOne = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\",\"automatic\":\"false\"}");
 
-        AddOperation inboundAddOperationTwo = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationTwo = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\",\"automatic\":\"true\"}");
 
         ops.add(inboundAddOperationOne);
@@ -873,10 +904,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation outboundAddOperationOne = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationOne = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\"}");
 
-        AddOperation outboundAddOperationTwo = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationTwo = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\"}");
 
         ops.add(outboundAddOperationOne);
@@ -918,10 +949,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation outboundAddOperationOne = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationOne = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\"}");
 
-        AddOperation outboundAddOperationTwo = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationTwo = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\"}");
 
         ops.add(outboundAddOperationOne);
@@ -970,10 +1001,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation inboundAddOperationOne = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationOne = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\",\"automatic\":\"false\"}");
 
-        AddOperation inboundAddOperationTwo = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationTwo = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\",\"automatic\":\"true\"}");
 
         ops.add(inboundAddOperationOne);
@@ -998,7 +1029,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        RemoveOperation inboundRemoveOperation = new RemoveOperation("notifyservices_inbound_patterns[0]");
+        RemoveOperation inboundRemoveOperation = new RemoveOperation("notifyServiceInboundPatterns[0]");
         ops.clear();
         ops.add(inboundRemoveOperation);
         patchBody = getPatchContent(ops);
@@ -1036,7 +1067,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation inboundAddOperation = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperation = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\",\"automatic\":\"false\"}");
 
         ops.add(inboundAddOperation);
@@ -1060,7 +1091,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 )));
 
         // index out of the range
-        RemoveOperation inboundRemoveOperation = new RemoveOperation("notifyservices_inbound_patterns[1]");
+        RemoveOperation inboundRemoveOperation = new RemoveOperation("notifyServiceInboundPatterns[1]");
         ops.clear();
         ops.add(inboundRemoveOperation);
         patchBody = getPatchContent(ops);
@@ -1088,10 +1119,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation outboundAddOperationOne = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationOne = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\"}");
 
-        AddOperation outboundAddOperationTwo = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationTwo = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\"}");
 
         ops.add(outboundAddOperationOne);
@@ -1116,7 +1147,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        RemoveOperation outboundRemoveOperation = new RemoveOperation("notifyservices_outbound_patterns[0]");
+        RemoveOperation outboundRemoveOperation = new RemoveOperation("notifyServiceOutboundPatterns[0]");
         ops.clear();
         ops.add(outboundRemoveOperation);
         patchBody = getPatchContent(ops);
@@ -1154,7 +1185,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation outboundAddOperation = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperation = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\"}");
 
         ops.add(outboundAddOperation);
@@ -1178,7 +1209,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 )));
 
         // index out of the range
-        RemoveOperation outboundRemoveOperation = new RemoveOperation("notifyservices_outbound_patterns[1]");
+        RemoveOperation outboundRemoveOperation = new RemoveOperation("notifyServiceOutboundPatterns[1]");
         ops.clear();
         ops.add(outboundRemoveOperation);
         patchBody = getPatchContent(ops);
@@ -1206,10 +1237,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation inboundAddOperationOne = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationOne = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":null,\"automatic\":\"false\"}");
 
-        AddOperation inboundAddOperationTwo = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationTwo = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\",\"automatic\":\"true\"}");
 
         ops.add(inboundAddOperationOne);
@@ -1234,7 +1265,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        AddOperation inboundAddOperation = new AddOperation("notifyservices_inbound_patterns[0]/constraint",
+        AddOperation inboundAddOperation = new AddOperation("notifyServiceInboundPatterns[0]/constraint",
             "itemFilterA");
         ops.clear();
         ops.add(inboundAddOperation);
@@ -1274,10 +1305,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation inboundAddOperationOne = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationOne = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\",\"automatic\":\"false\"}");
 
-        AddOperation inboundAddOperationTwo = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationTwo = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\",\"automatic\":\"true\"}");
 
         ops.add(inboundAddOperationOne);
@@ -1302,7 +1333,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        AddOperation inboundAddOperation = new AddOperation("notifyservices_inbound_patterns[0]/constraint",
+        AddOperation inboundAddOperation = new AddOperation("notifyServiceInboundPatterns[0]/constraint",
             "itemFilterA");
         ops.clear();
         ops.add(inboundAddOperation);
@@ -1332,10 +1363,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation inboundAddOperationOne = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationOne = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\",\"automatic\":\"false\"}");
 
-        AddOperation inboundAddOperationTwo = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationTwo = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\",\"automatic\":\"true\"}");
 
         ops.add(inboundAddOperationOne);
@@ -1360,7 +1391,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("notifyservices_inbound_patterns[0]/constraint",
+        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("notifyServiceInboundPatterns[0]/constraint",
             "itemFilterC");
         ops.clear();
         ops.add(inboundReplaceOperation);
@@ -1400,10 +1431,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation inboundAddOperationOne = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationOne = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":null,\"automatic\":\"false\"}");
 
-        AddOperation inboundAddOperationTwo = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationTwo = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\",\"automatic\":\"true\"}");
 
         ops.add(inboundAddOperationOne);
@@ -1428,7 +1459,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("notifyservices_inbound_patterns[0]/constraint",
+        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("notifyServiceInboundPatterns[0]/constraint",
             "itemFilterA");
         ops.clear();
         ops.add(inboundReplaceOperation);
@@ -1458,10 +1489,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation inboundAddOperationOne = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationOne = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\",\"automatic\":\"false\"}");
 
-        AddOperation inboundAddOperationTwo = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationTwo = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\",\"automatic\":\"true\"}");
 
         ops.add(inboundAddOperationOne);
@@ -1486,7 +1517,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        RemoveOperation inboundRemoveOperation = new RemoveOperation("notifyservices_inbound_patterns[1]/constraint");
+        RemoveOperation inboundRemoveOperation = new RemoveOperation("notifyServiceInboundPatterns[1]/constraint");
         ops.clear();
         ops.add(inboundRemoveOperation);
         patchBody = getPatchContent(ops);
@@ -1525,7 +1556,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation inboundAddOperation = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperation = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\",\"automatic\":\"false\"}");
 
         ops.add(inboundAddOperation);
@@ -1549,7 +1580,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 )));
 
         // index out of the range
-        RemoveOperation inboundRemoveOperation = new RemoveOperation("notifyservices_inbound_patterns[1]/constraint");
+        RemoveOperation inboundRemoveOperation = new RemoveOperation("notifyServiceInboundPatterns[1]/constraint");
         ops.clear();
         ops.add(inboundRemoveOperation);
         patchBody = getPatchContent(ops);
@@ -1577,10 +1608,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation outboundAddOperationOne = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationOne = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":null}");
 
-        AddOperation outboundAddOperationTwo = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationTwo = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":null}");
 
         ops.add(outboundAddOperationOne);
@@ -1605,7 +1636,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        AddOperation outboundAddOperation = new AddOperation("notifyservices_outbound_patterns[1]/constraint",
+        AddOperation outboundAddOperation = new AddOperation("notifyServiceOutboundPatterns[1]/constraint",
             "itemFilterB");
         ops.clear();
         ops.add(outboundAddOperation);
@@ -1645,10 +1676,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation outboundAddOperationOne = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationOne = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\"}");
 
-        AddOperation outboundAddOperationTwo = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationTwo = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\"}");
 
         ops.add(outboundAddOperationOne);
@@ -1673,7 +1704,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        AddOperation outboundAddOperation = new AddOperation("notifyservices_outbound_patterns[1]/constraint",
+        AddOperation outboundAddOperation = new AddOperation("notifyServiceOutboundPatterns[1]/constraint",
             "itemFilterB");
         ops.clear();
         ops.add(outboundAddOperation);
@@ -1703,10 +1734,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation outboundAddOperationOne = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationOne = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\"}");
 
-        AddOperation outboundAddOperationTwo = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationTwo = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\"}");
 
         ops.add(outboundAddOperationOne);
@@ -1732,7 +1763,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 )));
 
         ReplaceOperation outboundReplaceOperation = new ReplaceOperation(
-            "notifyservices_outbound_patterns[1]/constraint", "itemFilterD");
+            "notifyServiceOutboundPatterns[1]/constraint", "itemFilterD");
         ops.clear();
         ops.add(outboundReplaceOperation);
         patchBody = getPatchContent(ops);
@@ -1771,10 +1802,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation outboundAddOperationOne = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationOne = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\"}");
 
-        AddOperation outboundAddOperationTwo = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationTwo = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":null}");
 
         ops.add(outboundAddOperationOne);
@@ -1800,7 +1831,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 )));
 
         ReplaceOperation outboundReplaceOperation = new ReplaceOperation(
-            "notifyservices_outbound_patterns[1]/constraint", "itemFilterB");
+            "notifyServiceOutboundPatterns[1]/constraint", "itemFilterB");
         ops.clear();
         ops.add(outboundReplaceOperation);
         patchBody = getPatchContent(ops);
@@ -1829,10 +1860,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation outboundAddOperationOne = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationOne = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\"}");
 
-        AddOperation outboundAddOperationTwo = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationTwo = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\"}");
 
         ops.add(outboundAddOperationOne);
@@ -1857,7 +1888,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        RemoveOperation outboundRemoveOperation = new RemoveOperation("notifyservices_outbound_patterns[0]/constraint");
+        RemoveOperation outboundRemoveOperation = new RemoveOperation("notifyServiceOutboundPatterns[0]/constraint");
         ops.clear();
         ops.add(outboundRemoveOperation);
         patchBody = getPatchContent(ops);
@@ -1896,7 +1927,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation outboundAddOperation = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperation = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\"}");
 
         ops.add(outboundAddOperation);
@@ -1920,7 +1951,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 )));
 
         // index out of the range
-        RemoveOperation outboundRemoveOperation = new RemoveOperation("notifyservices_outbound_patterns[1]/constraint");
+        RemoveOperation outboundRemoveOperation = new RemoveOperation("notifyServiceOutboundPatterns[1]/constraint");
         ops.clear();
         ops.add(outboundRemoveOperation);
         patchBody = getPatchContent(ops);
@@ -1948,10 +1979,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation inboundAddOperationOne = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationOne = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":null,\"constraint\":\"itemFilterA\",\"automatic\":\"false\"}");
 
-        AddOperation inboundAddOperationTwo = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationTwo = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\",\"automatic\":\"true\"}");
 
         ops.add(inboundAddOperationOne);
@@ -1976,7 +2007,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        AddOperation inboundAddOperation = new AddOperation("notifyservices_inbound_patterns[0]/pattern",
+        AddOperation inboundAddOperation = new AddOperation("notifyServiceInboundPatterns[0]/pattern",
             "patternA");
         ops.clear();
         ops.add(inboundAddOperation);
@@ -2016,10 +2047,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation inboundAddOperationOne = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationOne = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\",\"automatic\":\"false\"}");
 
-        AddOperation inboundAddOperationTwo = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationTwo = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\",\"automatic\":\"true\"}");
 
         ops.add(inboundAddOperationOne);
@@ -2044,7 +2075,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        AddOperation inboundAddOperation = new AddOperation("notifyservices_inbound_patterns[0]/pattern",
+        AddOperation inboundAddOperation = new AddOperation("notifyServiceInboundPatterns[0]/pattern",
             "patternA");
         ops.clear();
         ops.add(inboundAddOperation);
@@ -2074,10 +2105,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation inboundAddOperationOne = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationOne = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\",\"automatic\":\"false\"}");
 
-        AddOperation inboundAddOperationTwo = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationTwo = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\",\"automatic\":\"true\"}");
 
         ops.add(inboundAddOperationOne);
@@ -2102,7 +2133,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("notifyservices_inbound_patterns[0]/pattern",
+        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("notifyServiceInboundPatterns[0]/pattern",
             "patternC");
         ops.clear();
         ops.add(inboundReplaceOperation);
@@ -2142,10 +2173,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation inboundAddOperationOne = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationOne = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":null,\"constraint\":\"itemFilterA\",\"automatic\":\"false\"}");
 
-        AddOperation inboundAddOperationTwo = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationTwo = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\",\"automatic\":\"true\"}");
 
         ops.add(inboundAddOperationOne);
@@ -2170,7 +2201,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("notifyservices_inbound_patterns[0]/pattern",
+        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("notifyServiceInboundPatterns[0]/pattern",
             "patternA");
         ops.clear();
         ops.add(inboundReplaceOperation);
@@ -2200,10 +2231,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation inboundAddOperationOne = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationOne = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\",\"automatic\":\"false\"}");
 
-        AddOperation inboundAddOperationTwo = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationTwo = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\",\"automatic\":\"true\"}");
 
         ops.add(inboundAddOperationOne);
@@ -2228,7 +2259,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("notifyservices_inbound_patterns[0]/automatic",
+        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("notifyServiceInboundPatterns[0]/automatic",
             "true");
         ops.clear();
         ops.add(inboundReplaceOperation);
@@ -2268,10 +2299,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation inboundAddOperationOne = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationOne = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\",\"automatic\":\"false\"}");
 
-        AddOperation inboundAddOperationTwo = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationTwo = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\",\"automatic\":\"true\"}");
 
         ops.add(inboundAddOperationOne);
@@ -2296,7 +2327,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("notifyservices_inbound_patterns[0]/automatic",
+        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("notifyServiceInboundPatterns[0]/automatic",
             "test");
         ops.clear();
         ops.add(inboundReplaceOperation);
@@ -2326,10 +2357,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation outboundAddOperationOne = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationOne = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\"}");
 
-        AddOperation outboundAddOperationTwo = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationTwo = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":null,\"constraint\":\"itemFilterB\"}");
 
         ops.add(outboundAddOperationOne);
@@ -2354,7 +2385,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        AddOperation outboundAddOperation = new AddOperation("notifyservices_outbound_patterns[1]/pattern",
+        AddOperation outboundAddOperation = new AddOperation("notifyServiceOutboundPatterns[1]/pattern",
             "patternB");
         ops.clear();
         ops.add(outboundAddOperation);
@@ -2394,10 +2425,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation outboundAddOperationOne = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationOne = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\"}");
 
-        AddOperation outboundAddOperationTwo = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationTwo = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\"}");
 
         ops.add(outboundAddOperationOne);
@@ -2422,7 +2453,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        AddOperation outboundAddOperation = new AddOperation("notifyservices_outbound_patterns[1]/pattern",
+        AddOperation outboundAddOperation = new AddOperation("notifyServiceOutboundPatterns[1]/pattern",
             "patternB");
         ops.clear();
         ops.add(outboundAddOperation);
@@ -2452,10 +2483,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation outboundAddOperationOne = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationOne = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\"}");
 
-        AddOperation outboundAddOperationTwo = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationTwo = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\"}");
 
         ops.add(outboundAddOperationOne);
@@ -2480,7 +2511,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        ReplaceOperation outboundReplaceOperation = new ReplaceOperation("notifyservices_outbound_patterns[1]/pattern",
+        ReplaceOperation outboundReplaceOperation = new ReplaceOperation("notifyServiceOutboundPatterns[1]/pattern",
             "patternD");
         ops.clear();
         ops.add(outboundReplaceOperation);
@@ -2520,10 +2551,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation outboundAddOperationOne = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationOne = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\"}");
 
-        AddOperation outboundAddOperationTwo = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationTwo = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":null,\"constraint\":\"itemFilterB\"}");
 
         ops.add(outboundAddOperationOne);
@@ -2548,7 +2579,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        ReplaceOperation outboundReplaceOperation = new ReplaceOperation("notifyservices_outbound_patterns[1]/pattern",
+        ReplaceOperation outboundReplaceOperation = new ReplaceOperation("notifyServiceOutboundPatterns[1]/pattern",
             "patternB");
         ops.clear();
         ops.add(outboundReplaceOperation);
@@ -2578,10 +2609,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation inboundAddOperationOne = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationOne = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\",\"automatic\":\"false\"}");
 
-        AddOperation inboundAddOperationTwo = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationTwo = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\",\"automatic\":\"true\"}");
 
         ops.add(inboundAddOperationOne);
@@ -2606,7 +2637,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("notifyservices_inbound_patterns",
+        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("notifyServiceInboundPatterns",
             "[{\"pattern\":\"patternC\",\"constraint\":\"itemFilterC\",\"automatic\":\"true\"}," +
                 "{\"pattern\":\"patternD\",\"constraint\":\"itemFilterD\",\"automatic\":\"true\"}]");
         ops.clear();
@@ -2647,10 +2678,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation inboundAddOperationOne = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationOne = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\",\"automatic\":\"false\"}");
 
-        AddOperation inboundAddOperationTwo = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationTwo = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\",\"automatic\":\"true\"}");
 
         ops.add(inboundAddOperationOne);
@@ -2676,7 +2707,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 )));
 
         // empty array will only remove all old patterns
-        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("notifyservices_inbound_patterns", "[]");
+        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("notifyServiceInboundPatterns", "[]");
         ops.clear();
         ops.add(inboundReplaceOperation);
         patchBody = getPatchContent(ops);
@@ -2706,10 +2737,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation inboundAddOperationOne = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationOne = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\",\"automatic\":\"false\"}");
 
-        AddOperation inboundAddOperationTwo = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationTwo = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\",\"automatic\":\"true\"}");
 
         ops.add(inboundAddOperationOne);
@@ -2735,7 +2766,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 )));
 
         // value must be an array not object
-        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("notifyservices_inbound_patterns",
+        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("notifyServiceInboundPatterns",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\",\"automatic\":\"true\"}");
         ops.clear();
         ops.add(inboundReplaceOperation);
@@ -2764,10 +2795,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation outboundAddOperationOne = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationOne = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\"}");
 
-        AddOperation outboundAddOperationTwo = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationTwo = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\"}");
 
         ops.add(outboundAddOperationOne);
@@ -2792,7 +2823,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        ReplaceOperation outboundReplaceOperation = new ReplaceOperation("notifyservices_outbound_patterns",
+        ReplaceOperation outboundReplaceOperation = new ReplaceOperation("notifyServiceOutboundPatterns",
             "[{\"pattern\":\"patternC\",\"constraint\":\"itemFilterC\"}," +
                 "{\"pattern\":\"patternD\",\"constraint\":\"itemFilterD\"}]");
         ops.clear();
@@ -2833,10 +2864,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation outboundAddOperationOne = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationOne = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\"}");
 
-        AddOperation outboundAddOperationTwo = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationTwo = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\"}");
 
         ops.add(outboundAddOperationOne);
@@ -2862,7 +2893,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 )));
 
         // empty array will only remove all old patterns
-        ReplaceOperation outboundReplaceOperation = new ReplaceOperation("notifyservices_outbound_patterns", "[]");
+        ReplaceOperation outboundReplaceOperation = new ReplaceOperation("notifyServiceOutboundPatterns", "[]");
         ops.clear();
         ops.add(outboundReplaceOperation);
         patchBody = getPatchContent(ops);
@@ -2892,10 +2923,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation outboundAddOperationOne = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationOne = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\"}");
 
-        AddOperation outboundAddOperationTwo = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationTwo = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\"}");
 
         ops.add(outboundAddOperationOne);
@@ -2921,7 +2952,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 )));
 
         // value must be an array not object
-        ReplaceOperation outboundReplaceOperation = new ReplaceOperation("notifyservices_outbound_patterns",
+        ReplaceOperation outboundReplaceOperation = new ReplaceOperation("notifyServiceOutboundPatterns",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\"}");
         ops.clear();
         ops.add(outboundReplaceOperation);
@@ -2950,10 +2981,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation inboundAddOperationOne = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationOne = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\",\"automatic\":\"false\"}");
 
-        AddOperation inboundAddOperationTwo = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationTwo = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\",\"automatic\":\"true\"}");
 
         ops.add(inboundAddOperationOne);
@@ -2978,7 +3009,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        RemoveOperation inboundRemoveOperation = new RemoveOperation("notifyservices_inbound_patterns");
+        RemoveOperation inboundRemoveOperation = new RemoveOperation("notifyServiceInboundPatterns");
         ops.clear();
         ops.add(inboundRemoveOperation);
         patchBody = getPatchContent(ops);
@@ -3008,10 +3039,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation outboundAddOperationOne = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationOne = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\"}");
 
-        AddOperation outboundAddOperationTwo = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationTwo = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\"}");
 
         ops.add(outboundAddOperationOne);
@@ -3036,7 +3067,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        RemoveOperation outboundRemoveOperation = new RemoveOperation("notifyservices_outbound_patterns");
+        RemoveOperation outboundRemoveOperation = new RemoveOperation("notifyServiceOutboundPatterns");
         ops.clear();
         ops.add(outboundRemoveOperation);
         patchBody = getPatchContent(ops);
@@ -3066,10 +3097,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation inboundAddOperationOne = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationOne = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\",\"automatic\":\"false\"}");
 
-        AddOperation inboundAddOperationTwo = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationTwo = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\",\"automatic\":\"true\"}");
 
         ops.add(inboundAddOperationOne);
@@ -3094,7 +3125,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("notifyservices_inbound_patterns[1]",
+        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("notifyServiceInboundPatterns[1]",
             "{\"pattern\":\"patternC\",\"constraint\":\"itemFilterC\",\"automatic\":\"false\"}");
         ops.clear();
         ops.add(inboundReplaceOperation);
@@ -3134,10 +3165,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation outboundAddOperationOne = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationOne = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternA\",\"constraint\":\"itemFilterA\"}");
 
-        AddOperation outboundAddOperationTwo = new AddOperation("notifyservices_outbound_patterns/-",
+        AddOperation outboundAddOperationTwo = new AddOperation("notifyServiceOutboundPatterns/-",
             "{\"pattern\":\"patternB\",\"constraint\":\"itemFilterB\"}");
 
         ops.add(outboundAddOperationOne);
@@ -3162,7 +3193,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     ))
                 )));
 
-        ReplaceOperation outboundReplaceOperation = new ReplaceOperation("notifyservices_outbound_patterns[0]",
+        ReplaceOperation outboundReplaceOperation = new ReplaceOperation("notifyServiceOutboundPatterns[0]",
             "{\"pattern\":\"patternC\",\"constraint\":\"itemFilterC\"}");
         ops.clear();
         ops.add(outboundReplaceOperation);
@@ -3184,6 +3215,64 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                         matchNotifyServicePattern("patternB", "itemFilterB")
                     ))
                 )));
+    }
+
+    @Test
+    public void NotifyServiceStatusReplaceOperationTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("service ldn url")
+                                .isEnabled(true)
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("/enabled", "false");
+        ops.add(inboundReplaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.notifyServiceInboundPatterns", empty()))
+            .andExpect(jsonPath("$.notifyServiceOutboundPatterns", empty()))
+            .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
+                "service description", "service url", "service ldn url", false)));
+    }
+
+    @Test
+    public void NotifyServiceStatusReplaceOperationTestBadRequestTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("service ldn url")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("/enabled", "test");
+        ops.add(inboundReplaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        // patch not boolean value
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isBadRequest());
     }
 
 }

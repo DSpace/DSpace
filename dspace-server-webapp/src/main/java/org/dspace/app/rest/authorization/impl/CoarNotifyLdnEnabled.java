@@ -19,7 +19,6 @@ import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-
 @Component
 @AuthorizationFeatureDocumentation(name = CoarNotifyLdnEnabled.NAME,
         description = "It can be used to verify if the user can see the coar notify protocol is enabled")

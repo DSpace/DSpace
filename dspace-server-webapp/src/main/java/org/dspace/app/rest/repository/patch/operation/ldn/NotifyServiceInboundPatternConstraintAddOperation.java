@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  * Content-Type: application/json" -d '
  * [{
  *  "op": "add",
- *  "path": "notifyservices_inbound_patterns[index]/constraint"
+ *  "path": "notifyServiceInboundPatterns[index]/constraint"
  *  }]'
  * </code>
  */
@@ -86,7 +86,7 @@ public class NotifyServiceInboundPatternConstraintAddOperation extends PatchOper
 
     @Override
     public boolean supports(Object objectToMatch, Operation operation) {
-        String path = operation.getPath().trim().toLowerCase();
+        String path = operation.getPath().trim();
         return (objectToMatch instanceof NotifyServiceEntity &&
             operation.getOp().trim().equalsIgnoreCase(OPERATION_ADD) &&
             path.startsWith(NOTIFY_SERVICE_INBOUND_PATTERNS + "[") &&
