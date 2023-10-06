@@ -37,7 +37,8 @@ public class StringEscapeUtils extends org.apache.commons.text.StringEscapeUtils
      * <p>Example:</p>
      * <pre>
      * input string: <div attr="*x" onblur="alert(1)*"> lá lé lí ló LÚ pingüino & yo # </div>!!"
-     * output string: &lt;div attr=&quot;*x&quot; onblur=&quot;alert(1)*&quot;&gt; lá lé lí ló LÚ pingüino &amp; yo &#35 &lt;/div&gt;!!
+     * output string: &lt;div attr=&quot;*x&quot; onblur=&quot;alert(1)*&quot;&gt; lá lé lí ló LÚ
+     *  pingüino &amp; yo &#35 &lt;/div&gt;!!
      * </pre>
      *
      * @param input  String to escape values in, may be null
