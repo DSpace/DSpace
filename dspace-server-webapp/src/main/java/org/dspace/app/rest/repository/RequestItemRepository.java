@@ -42,6 +42,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
+import org.dspace.util.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -172,10 +173,11 @@ public class RequestItemRepository
             username = user.getFullName();
         } else { // An anonymous session may provide a name.
             // Escape username to evade nasty XSS attempts
-            username = rir.getRequestName();
+            username = StringEscapeUtils.escapeMail(rir.getRequestName());
         }
 
-        String message = rir.getRequestMessage();
+        // Requester's message text, escaped to evade nasty XSS attempts
+        String message = StringEscapeUtils.escapeMail(rir.getRequestMessage());
 
         // Create the request.
         String token;
