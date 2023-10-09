@@ -2,6 +2,10 @@
 ## Ignore temporary directories related to helper scripts
 scripts/work
 scripts/patches
+
+# Ignore HTTPS certificates
+dspace/src/main/docker/nginx/certs/*
+!dspace/src/main/docker/nginx/certs/.keep
 ## End UMD Customization
 
 ## Ignore the MVN compiled output directories from version tracking

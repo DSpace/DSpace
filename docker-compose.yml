@@ -7,6 +7,21 @@ networks:
         # If you customize this value, be sure to customize the 'proxies.trusted.ipranges' env variable below.
         - subnet: 172.23.0.0/16
 services:
+  # UMD Customization
+  # Nginx server configuration for supporting HTTPS connections from the
+  # local development environment
+  nginx:
+    container_name: nginx
+    image: nginx:1.25.2
+    ports:
+    - "80:80"
+    - "443:8443"
+    volumes:
+    - ./dspace/src/main/docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    - ./dspace/src/main/docker/nginx/certs:/etc/nginx/certs:ro
+    networks:
+      dspacenet:
+  # End UMD Customization
   # DSpace (backend) webapp container
   dspace:
     container_name: dspace
@@ -18,8 +33,10 @@ services:
       # dspace.dir: Must match with Dockerfile's DSPACE_INSTALL directory.
       dspace__P__dir: /dspace
       # Uncomment to set a non-default value for dspace.server.url or dspace.ui.url
-      # dspace__P__server__P__url: http://localhost:8080/server
-      # dspace__P__ui__P__url: http://localhost:4000
+      # UMD Customization
+      dspace__P__server__P__url: https://api.drum-local.lib.umd.edu/server
+      dspace__P__ui__P__url: https://drum-local.lib.umd.edu:4000
+      # End UMD Customization
       dspace__P__name: 'DSpace Started with Docker Compose'
       # db.url: Ensure we are using the 'dspacedb' image for our database
       # UMD Customization
