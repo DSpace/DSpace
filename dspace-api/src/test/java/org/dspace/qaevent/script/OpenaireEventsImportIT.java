@@ -9,6 +9,7 @@ package org.dspace.qaevent.script;
 
 import static java.util.List.of;
 import static org.dspace.content.QAEvent.OPENAIRE_SOURCE;
+import static org.dspace.content.QAEvent.COAR_NOTIFY;
 import static org.dspace.matcher.QAEventMatcher.pendingOpenaireEventWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -33,7 +34,6 @@ import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.net.URL;
 
-import eu.dnetlib.broker.BrokerClient;
 import org.apache.commons.io.IOUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.launcher.ScriptLauncher;
@@ -52,6 +52,8 @@ import org.dspace.utils.DSpace;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import eu.dnetlib.broker.BrokerClient;
 
 /**
  * Integration tests for {@link OpenaireEventsImport}.
@@ -155,7 +157,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
             "Trying to read the QA events from the provided file",
             "Found 5 events in the given file"));
 
-        assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 5L)));
+        assertThat(qaEventService.findAllSources(0, 20), containsInAnyOrder(QASourceMatcher.with(OPENAIRE_SOURCE, 5L), QASourceMatcher.with(COAR_NOTIFY, 0L)));
 
         assertThat(qaEventService.findAllTopics(0, 20), containsInAnyOrder(
             QATopicMatcher.with("ENRICH/MORE/PROJECT", 1L),
@@ -211,7 +213,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
             "Trying to read the QA events from the provided file",
             "Found 5 events in the given file"));
 
-        assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 3L)));
+        assertThat(qaEventService.findAllSources(0, 20), containsInAnyOrder(QASourceMatcher.with(OPENAIRE_SOURCE, 3L), QASourceMatcher.with(COAR_NOTIFY, 0L)));
 
         assertThat(qaEventService.findAllTopics(0, 20), containsInAnyOrder(
             QATopicMatcher.with("ENRICH/MISSING/ABSTRACT", 1L),
@@ -251,7 +253,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
             "Trying to read the QA events from the provided file",
             "Found 2 events in the given file"));
 
-        assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 1L)));
+        assertThat(qaEventService.findAllSources(0, 20), containsInAnyOrder(QASourceMatcher.with(OPENAIRE_SOURCE, 1L), QASourceMatcher.with(COAR_NOTIFY, 0L)));
 
         assertThat(qaEventService.findAllTopics(0, 20), contains(QATopicMatcher.with("ENRICH/MISSING/ABSTRACT", 1L)));
 
@@ -278,7 +280,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
         assertThat(handler.getWarningMessages(),empty());
         assertThat(handler.getInfoMessages(), contains("Trying to read the QA events from the provided file"));
 
-        assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 0L)));
+        assertThat(qaEventService.findAllSources(0, 20), containsInAnyOrder(QASourceMatcher.with(OPENAIRE_SOURCE, 0L), QASourceMatcher.with(COAR_NOTIFY, 0L)));
 
         assertThat(qaEventService.findAllTopics(0, 20), empty());
 
@@ -325,7 +327,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
             "Found 0 events from the subscription sub2",
             "Found 2 events from the subscription sub3"));
 
-        assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 6L)));
+        assertThat(qaEventService.findAllSources(0, 20), containsInAnyOrder(QASourceMatcher.with(OPENAIRE_SOURCE, 6L), QASourceMatcher.with(COAR_NOTIFY, 0L)));
 
         assertThat(qaEventService.findAllTopics(0, 20), containsInAnyOrder(
             QATopicMatcher.with("ENRICH/MORE/PROJECT", 1L),
@@ -379,7 +381,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
         assertThat(handler.getWarningMessages(), empty());
         assertThat(handler.getInfoMessages(), contains("Trying to read the QA events from the OPENAIRE broker"));
 
-        assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 0L)));
+        assertThat(qaEventService.findAllSources(0, 20), containsInAnyOrder(QASourceMatcher.with(OPENAIRE_SOURCE, 0L), QASourceMatcher.with(COAR_NOTIFY, 0L)));
 
         assertThat(qaEventService.findAllTopics(0, 20), empty());
 
@@ -430,7 +432,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
             "Found 0 events from the subscription sub2",
             "Found 2 events from the subscription sub3"));
 
-        assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 6L)));
+        assertThat(qaEventService.findAllSources(0, 20), containsInAnyOrder(QASourceMatcher.with(OPENAIRE_SOURCE, 6L), QASourceMatcher.with(COAR_NOTIFY, 0L)));
 
         assertThat(qaEventService.findAllTopics(0, 20), containsInAnyOrder(
             QATopicMatcher.with("ENRICH/MORE/PROJECT", 1L),
@@ -455,10 +457,9 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
     public void testImportFromFileEventMoreReview() throws Exception {
 
         context.turnOffAuthorisationSystem();
-
         Item firstItem = createItem("Test item", "123456789/99998");
         Item secondItem = createItem("Test item 2", "123456789/99999");
-
+        
         context.restoreAuthSystemState();
 
         TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
@@ -466,10 +467,10 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
         String[] args = new String[] { "import-openaire-events", "-f", getFileLocation("event-more-review.json") };
         ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl);
 
-        assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 1L)));
-
         assertThat(qaEventService.findAllTopics(0, 20), contains(
             QATopicMatcher.with("ENRICH/MORE/REVIEW", 1L)));
+
+        assertThat(qaEventService.findAllSources(0, 20), containsInAnyOrder(QASourceMatcher.with(OPENAIRE_SOURCE, 1L), QASourceMatcher.with(COAR_NOTIFY, 0L)));
 
         verifyNoInteractions(mockBrokerClient);
     }
@@ -506,3 +507,4 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
         return new File(resource.getFile()).getAbsolutePath();
     }
 }
+
