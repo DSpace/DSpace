@@ -3,6 +3,52 @@
 This document contains instructions for building a local development instance
 of a DSpace 7-based DRUM using Docker.
 
+## Development Prerequisites
+
+The following steps need to be run *once* on the local workstation to prepare
+it to use the hostnames and certificates needed for running DRUM in the local
+development environment.
+
+See the "CAS and the Local Development Environment" section in
+[docs/dspace/CASAuthentication.md](CASAuthentication.md) for more information
+about these steps.
+
+Preq. 1) Install the "mkcert" and "nss" utilities:
+
+```zsh
+$ brew install mkcert nss
+```
+
+Note: The "nss" utility is necessary to enable the certificate authority
+to be added to Mozilla Firefox.
+
+Preq. 2) Generate and install the "mkcert" certificate authority:
+
+```zsh
+$ mkcert -install
+```
+
+You will be prompted for the "sudo" password. After entering the "sudo"
+password, a MacOS security dialog  will be shown indicating that changes are
+being made to the "System Certificate Trust Settings" and requesting your
+account password. Enter your password and left-click the "Update Settings"
+button.
+
+Preq. 3) Restart your web browser to pick up the changes to the system settings.
+
+Preq. 4) Edit the "/etc/host" file:
+
+```zsh
+$ sudo vi /etc/hosts
+```
+
+and add the following lines:
+
+```text
+127.0.0.1       api.drum-local.lib.umd.edu
+127.0.0.1       drum-local.lib.umd.edu
+```
+
 ## Development Setup
 
 This repository uses the "GitHub Flow" branching model, with "drum-main" as the
@@ -10,14 +56,14 @@ main branch for DRUM development.
 
 1) Clone the Git repository and switch to the directory:
 
-    ```bash
+    ```zsh
     $ git clone -b drum-main git@github.com:umd-lib/DSpace.git drum
     $ cd drum
     ```
 
 2) Optional: Build the dependent images.
 
-    ```bash
+    ```zsh
     $ docker build -f Dockerfile.dependencies -t docker.lib.umd.edu/drum-dependencies-7_x:latest .
     $ docker build -f Dockerfile.ant -t docker.lib.umd.edu/drum-ant:latest .
     $ cd dspace/src/main/docker/dspace-postgres-pgcrypto
@@ -27,13 +73,13 @@ main branch for DRUM development.
 
 3) Create the local configuration file
 
-    ```bash
+    ```zsh
     $ cp dspace/config/local.cfg.EXAMPLE dspace/config/local.cfg
     ```
 
 4) Edit the local configuration file:
 
-    ```bash
+    ```zsh
     $ vi dspace/config/local.cfg
     ```
 
@@ -56,25 +102,34 @@ main branch for DRUM development.
    **Note:** If populating the Postgres database from a DSpace 6 database
    snapshot, use [dspace/docs/DrumDBRestoreFromDSpace6.md](DrumDBRestoreFromDSpace6.md)
 
-6) Build the application and client Docker images:
+6) Generate the HTTPS certificate for the back-end:
+
+   ```zsh
+   $ mkcert -cert-file dspace/src/main/docker/nginx/certs/api.drum-local.pem \
+            -key-file dspace/src/main/docker/nginx/certs/api.drum-local-key.pem \
+            api.drum-local.lib.umd.edu
+   ```
+
+7) Build the application and client Docker images:
 
    **Note:** If building for development, use the instructions in the
    "Quick Builds for development" section below, in place of the following
    steps.
 
-    ```bash
+    ```zsh
     # Build the dspace image
     $ docker compose -f docker-compose.yml build
 
     ```
 
-7) Start all the containers
+8) Start all the containers
 
-    ```bash
+    ```zsh
     $ docker compose -p d7 up
     ```
 
-    Once the REST API starts, it should be accessible at [http://localhost:8080/server]
+    Once the REST API starts, it should be accessible at
+    <https://api.drum-local.lib.umd.edu/server>
 
 ## Quick Builds for development
 
@@ -83,7 +138,7 @@ can do a two stage build where the base build does a full Maven build, and for
 subsequent changes, only build the "overlays" modules that contain our
 customized Java classes.
 
-```bash
+```zsh
 # Base build
 $ docker build -f Dockerfile.dev-base -t docker.lib.umd.edu/drum:7_x-dev-base .
 
@@ -95,9 +150,9 @@ Also, we can start the "dspace" container and the dependencies ("dspacedb"
 and "dspacesolr") in separate commands. This allows the "dspace"
 container to be started/stopped individually.
 
-```bash
-# Start the db and solr container in detached mode
-$ docker compose -p d7 up -d dspacedb dspacesolr
+```zsh
+# Start the Postgres, Solr, and Nginx containers in detached mode
+$ docker compose -p d7 up -d dspacedb dspacesolr nginx
 
 # Start the dspace container
 $ docker compose -p d7 up dspace
@@ -130,12 +185,12 @@ To start debugging,
 
 2) Open to the "Run and Debug" panel (CMD + SHIFT + D) on VS Code.
 
-3) Click the green triange (Play)  "Debug (Attach to Tomcat)" button on top of
+3) Click the green triangle (Play)  "Debug (Attach to Tomcat)" button on top of
    the debug panel.
 
 ## Useful commands
 
-```bash
+```zsh
 # To stop all the containers
 $ docker compose -p d7 stop
 
@@ -151,7 +206,7 @@ $ docker exec -it dspace bash
 
 ## Create an adminstrator user
 
-```bash
+```zsh
 $ docker compose -p d7 -f docker-compose-cli.yml run dspace-cli create-administrator
 $ docker exec -it dspace /dspace/bin/dspace create-administrator
 Creating d7_dspace-cli_run ... done
@@ -168,7 +223,7 @@ Administrator account created
 
 ## Populate the Solr search index
 
-```bash
+```zsh
 $ docker exec -it dspace /dspace/bin/dspace index-discovery
 The script has started
 Updating Index
@@ -182,7 +237,7 @@ By default the unit and integration tests are not run when building the project.
 
 To run both the unit and integration tests:
 
-```bash
+```zsh
 $ mvn install -DskipUnitTests=false -DskipIntegrationTests=false
 ```
 
@@ -214,7 +269,7 @@ standard DSpace or Spring configuration files, or any changes in a module's
 "src/test/data/dspaceFolder" folder, run the following command in the project
 root directory:
 
-```bash
+```zsh
 $ mvn install
 ```
 
@@ -248,7 +303,7 @@ credentials.
 <https://db-ip.com/db/download/ip-to-city-lite> and put in the “/tmp” directory,
 and extract the file, where “YYYY-MM” is the year/month of the download:
 
-```bash
+```zsh
 $ cd /tmp
 $ gunzip dbip-city-lite-YYYY-MM.mmdb.gz
 ```
@@ -256,19 +311,19 @@ $ gunzip dbip-city-lite-YYYY-MM.mmdb.gz
 This will result in a file named “dbip-city-lite-YYYY-MM.mmdb”. For simplicity,
 rename the file to “dbip-city-lite.mmdb”:
 
-```bash
+```zsh
 $ mv /tmp/dbip-city-lite-<yyyy-MM>.mmdb /tmp/dbip-city-lite.mmdb
 ```
 
 2) Copy the "/tmp/dbip-city-lite.mmdb" file into the "dspace/config/" directory:
 
-```bash
+```zsh
 $ cp /tmp/dbip-city-lite.mmdb dspace/config/
 ```
 
 3) Add the following line to the “dspace/config/local.cfg” file:
 
-```text
+```zsh
 usage-statistics.dbfile = /dspace/config/dbip-city-lite.mmdb
 ```
 
