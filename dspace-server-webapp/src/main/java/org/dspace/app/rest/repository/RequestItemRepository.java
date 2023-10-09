@@ -42,13 +42,13 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
-import org.dspace.util.StringEscapeUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-
+import org.springframework.web.util.HtmlUtils;
 /**
  * Component to expose item requests.
  *
@@ -173,11 +173,11 @@ public class RequestItemRepository
             username = user.getFullName();
         } else { // An anonymous session may provide a name.
             // Escape username to evade nasty XSS attempts
-            username = StringEscapeUtils.escapeMail(rir.getRequestName());
+            username = HtmlUtils.htmlEscape(rir.getRequestName(),"UTF-8");
         }
 
         // Requester's message text, escaped to evade nasty XSS attempts
-        String message = StringEscapeUtils.escapeMail(rir.getRequestMessage());
+        String message = HtmlUtils.htmlEscape(rir.getRequestMessage(),"UTF-8");
 
         // Create the request.
         String token;
