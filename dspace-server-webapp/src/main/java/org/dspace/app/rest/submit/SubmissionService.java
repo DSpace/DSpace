@@ -11,12 +11,17 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.atteo.evo.inflector.English;
+import org.dspace.app.ldn.NotifyPatternToTrigger;
+import org.dspace.app.ldn.NotifyServiceEntity;
+import org.dspace.app.ldn.service.NotifyPatternToTriggerService;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
@@ -27,9 +32,11 @@ import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CheckSumRest;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.model.NotifyServiceRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.step.DataCCLicense;
+import org.dspace.app.rest.model.step.DataCOARNotify;
 import org.dspace.app.rest.model.step.DataUpload;
 import org.dspace.app.rest.model.step.UploadBitstreamRest;
 import org.dspace.app.rest.projection.Projection;
@@ -95,6 +102,8 @@ public class SubmissionService {
     protected CreativeCommonsService creativeCommonsService;
     @Autowired
     private RequestService requestService;
+    @Autowired
+    private NotifyPatternToTriggerService notifyPatternToTriggerService;
     @Lazy
     @Autowired
     private ConverterService converter;
@@ -461,6 +470,47 @@ public class SubmissionService {
                 step.doPostProcessing(context, source);
             }
         }
+    }
+
+    /**
+     * Builds the COAR Notify data of an inprogress submission
+     *
+     * @param obj   - the in progress submission
+     * @return an object representing the CC License data
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
+     */
+    public ArrayList<DataCOARNotify> getDataCOARNotify(InProgressSubmission obj) throws SQLException {
+        Context context = new Context();
+        ArrayList<DataCOARNotify> dataCOARNotifyList = new ArrayList<>();
+
+        List<NotifyPatternToTrigger> patternsToTrigger =
+            notifyPatternToTriggerService.findByItem(context, obj.getItem());
+
+        Map<String, List<NotifyServiceEntity>> data =
+            patternsToTrigger.stream()
+                             .collect(Collectors.groupingBy(
+                                 NotifyPatternToTrigger::getPattern,
+                                 Collectors.mapping(NotifyPatternToTrigger::getNotifyService, Collectors.toList())
+                             ));
+
+        data.forEach((pattern, notifyServiceEntities) -> {
+            DataCOARNotify dataCOARNotify = new DataCOARNotify();
+            dataCOARNotify.setPattern(pattern);
+            dataCOARNotify.setServices(convertToNotifyServiceRests(notifyServiceEntities));
+            dataCOARNotifyList.add(dataCOARNotify);
+        });
+
+        return dataCOARNotifyList;
+    }
+
+    private List<NotifyServiceRest> convertToNotifyServiceRests(List<NotifyServiceEntity> notifyServiceList) {
+        return notifyServiceList.stream()
+                                .map(notifyServiceEntity ->
+                                    (NotifyServiceRest) converter.toRest(
+                                        notifyServiceEntity, Projection.DEFAULT))
+                                .collect(Collectors.toList());
     }
 
 }

@@ -11,6 +11,7 @@ import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
+import static org.dspace.app.rest.matcher.NotifyServiceMatcher.matchNotifyServiceWithoutLinks;
 import static org.dspace.app.rest.matcher.SupervisionOrderMatcher.matchSuperVisionOrder;
 import static org.dspace.authorize.ResourcePolicy.TYPE_CUSTOM;
 import static org.hamcrest.Matchers.allOf;
@@ -52,6 +53,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.matchers.JsonPathMatchers;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.dspace.app.ldn.NotifyPatternToTrigger;
+import org.dspace.app.ldn.NotifyServiceEntity;
+import org.dspace.app.ldn.service.NotifyPatternToTriggerService;
+import org.dspace.app.ldn.service.NotifyService;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
@@ -70,6 +75,7 @@ import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.NotifyServiceBuilder;
 import org.dspace.builder.RelationshipBuilder;
 import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
@@ -8602,5 +8608,64 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(textUriContentType))
                 .andExpect(status().isCreated());
 
+    }
+
+    @Test
+    public void testSubmissionWithCOARNotifyServicesSection() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Collection 1")
+                                                 .build();
+
+        // create three notify services
+        NotifyServiceEntity notifyServiceOne =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name one")
+                                .withLdnUrl("service ldn url one")
+                                .build();
+
+        NotifyServiceEntity notifyServiceTwo =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name two")
+                                .withLdnUrl("service ldn url two")
+                                .build();
+
+        NotifyServiceEntity notifyServiceThree =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name three")
+                                .withLdnUrl("service ldn url three")
+                                .build();
+
+        // append the three services to the workspace item with different patterns
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+                                                          .withTitle("Workspace Item")
+                                                          .withIssueDate("2024-10-10")
+                                                          .withCOARNotifyService(notifyServiceOne, "review")
+                                                          .withCOARNotifyService(notifyServiceTwo, "endorsement")
+                                                          .withCOARNotifyService(notifyServiceThree, "endorsement")
+                                                          .build();
+
+        context.restoreAuthSystemState();
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // check coarnotify section data
+        getClient(adminToken)
+            .perform(get("/api/submission/workspaceitems/" + workspaceItem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.sections.coarnotify[0]", allOf(
+                hasJsonPath("pattern", is("endorsement")),
+                hasJsonPath("services", containsInAnyOrder(
+                    matchNotifyServiceWithoutLinks(notifyServiceTwo.getID(), "service name two",
+                        null, null, "service ldn url two"),
+                    matchNotifyServiceWithoutLinks(notifyServiceThree.getID(), "service name three",
+                        null, null, "service ldn url three"))))))
+            .andExpect(jsonPath("$.sections.coarnotify[1]", allOf(
+                hasJsonPath("pattern", is("review")),
+                hasJsonPath("services", contains(matchNotifyServiceWithoutLinks(notifyServiceOne.getID(),
+                    "service name one", null, null, "service ldn url one"))))));
     }
 }

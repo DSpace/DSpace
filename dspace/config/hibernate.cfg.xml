@@ -103,6 +103,7 @@
         <mapping class="org.dspace.app.ldn.NotifyServiceOutboundPattern"/>
 
         <mapping class="org.dspace.app.ldn.LDNMessageEntity"/>
+        <mapping class="org.dspace.app.ldn.NotifyPatternToTrigger"/>
 
     </session-factory>
 </hibernate-configuration>
