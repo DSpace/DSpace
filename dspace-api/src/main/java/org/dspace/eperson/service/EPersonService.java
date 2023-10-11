@@ -98,9 +98,9 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      *
      * @param context The relevant DSpace Context.
      * @param query   The search string
-     * @param offset  Inclusive offset
+     * @param offset  Inclusive offset (the position of the first result to return)
      * @param limit   Maximum number of matches returned
-     * @return array of EPerson objects
+     * @return List of matching EPerson objects
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     public List<EPerson> search(Context context, String query, int offset, int limit)
@@ -117,6 +117,34 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      */
     public int searchResultCount(Context context, String query)
         throws SQLException;
+
+    /**
+     * Find the EPersons that match the search query which are NOT currently members of the given Group.  The search
+     * query is run against firstname, lastname or email.
+     *
+     * @param context      DSpace context
+     * @param query        The search string
+     * @param excludeGroup Group to exclude results from. Members of this group will never be returned.
+     * @param offset       Inclusive offset (the position of the first result to return)
+     * @param limit        Maximum number of matches returned
+     * @return List of matching EPerson objects
+     * @throws SQLException if error
+     */
+    List<EPerson> searchNonMembers(Context context, String query, Group excludeGroup,
+                                 int offset, int limit) throws SQLException;
+
+    /**
+     * Returns the total number of EPersons that match the search query which are NOT currently members of the given
+     * Group. The search query is run against firstname, lastname or email. Can be used with searchNonMembers() to
+     * support pagination
+     *
+     * @param context      DSpace context
+     * @param query        The search string
+     * @param excludeGroup Group to exclude results from. Members of this group will never be returned.
+     * @return List of matching EPerson objects
+     * @throws SQLException if error
+     */
+    int searchNonMembersCount(Context context, String query, Group excludeGroup) throws SQLException;
 
     /**
      * Find all the {@code EPerson}s in a specific order by field.
