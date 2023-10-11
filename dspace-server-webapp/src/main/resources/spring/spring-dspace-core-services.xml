@@ -63,6 +63,9 @@
                         <entry key="accessConditions">
                             <bean class="org.dspace.app.rest.submit.factory.impl.AccessConditionAddPatchOperation"/>
                         </entry>
+                        <entry key="coarnotify/service">
+                            <bean class="org.dspace.app.rest.submit.factory.impl.COARNotifyServiceAddPatchOperation"/>
+                        </entry>
                     </map>
                 </entry>
                 <entry key="remove">
@@ -97,6 +100,9 @@
                         <entry key="accessConditions">
                             <bean class="org.dspace.app.rest.submit.factory.impl.AccessConditionRemovePatchOperation"/>
                         </entry>
+                        <entry key="coarnotify/service">
+                            <bean class="org.dspace.app.rest.submit.factory.impl.COARNotifyServiceRemovePatchOperation"/>
+                        </entry>
                     </map>
                 </entry>
                 <entry key="replace">
@@ -129,6 +135,9 @@
                         </entry>
                         <entry key="accessConditions">
                             <bean class="org.dspace.app.rest.submit.factory.impl.AccessConditionReplacePatchOperation"/>
+                        </entry>
+                        <entry key="coarnotify/service">
+                            <bean class="org.dspace.app.rest.submit.factory.impl.COARNotifyServiceReplacePatchOperation"/>
                         </entry>
                     </map>
                 </entry>

@@ -14,6 +14,8 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.step.DataCOARNotify;
 import org.dspace.app.rest.submit.AbstractProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
+import org.dspace.app.rest.submit.factory.PatchOperationFactory;
+import org.dspace.app.rest.submit.factory.impl.PatchOperation;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.core.Context;
@@ -54,5 +56,8 @@ public class COARNotifyStep extends AbstractProcessingStep {
     public void doPatchProcessing(Context context, HttpServletRequest currentRequest, InProgressSubmission source,
             Operation op, SubmissionStepConfig stepConf) throws Exception {
 
+        PatchOperation<?> patchOperation = new PatchOperationFactory().instanceOf(
+            COARNOTIFY_STEP_OPERATION_ENTRY, op.getOp());
+        patchOperation.perform(context, currentRequest, source, op);
     }
 }

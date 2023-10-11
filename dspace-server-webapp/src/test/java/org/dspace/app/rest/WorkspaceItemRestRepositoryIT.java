@@ -8668,4 +8668,214 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 hasJsonPath("services", contains(matchNotifyServiceWithoutLinks(notifyServiceOne.getID(),
                     "service name one", null, null, "service ldn url one"))))));
     }
+
+    @Test
+    public void patchCOARNotifyServiceAddTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+
+        NotifyServiceEntity notifyServiceOne =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name one")
+                                .withLdnUrl("service ldn url one")
+                                .build();
+
+        NotifyServiceEntity notifyServiceTwo =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name two")
+                                .withLdnUrl("service ldn url two")
+                                .build();
+
+        NotifyServiceEntity notifyServiceThree =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name three")
+                                .withLdnUrl("service ldn url three")
+                                .build();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("Test WorkspaceItem")
+                                                  .withIssueDate("2017-10-17")
+                                                  .withCOARNotifyService(notifyServiceOne, "review")
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        // check the coar notify services of witem
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.sections.coarnotify[0].services", hasSize(1)))
+                            .andExpect(jsonPath("$.sections.coarnotify[0].services", contains(
+                                matchNotifyServiceWithoutLinks(notifyServiceOne.getID(), "service name one",
+                                    null, null, "service ldn url one"))));
+
+        // try to add new service of review pattern to witem
+        List<Operation> addOpts = new ArrayList<Operation>();
+        addOpts.add(new AddOperation("/sections/coarnotify/review/-",
+            List.of(notifyServiceTwo.getID(), notifyServiceThree.getID())));
+
+        String patchBody = getPatchContent(addOpts);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                                .content(patchBody)
+                                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.sections.coarnotify[0].services", hasSize(3)))
+                            .andExpect(jsonPath("$.sections.coarnotify[0].services", contains(
+                                matchNotifyServiceWithoutLinks(notifyServiceOne.getID(), "service name one",
+                                    null, null, "service ldn url one"),
+                                matchNotifyServiceWithoutLinks(notifyServiceTwo.getID(), "service name two",
+                                    null, null, "service ldn url two"),
+                                matchNotifyServiceWithoutLinks(notifyServiceThree.getID(), "service name three",
+                                    null, null, "service ldn url three")
+                                )));
+
+    }
+
+    @Test
+    public void patchCOARNotifyServiceReplaceTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+
+        NotifyServiceEntity notifyServiceOne =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name one")
+                                .withLdnUrl("service ldn url one")
+                                .build();
+
+        NotifyServiceEntity notifyServiceTwo =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name two")
+                                .withLdnUrl("service ldn url two")
+                                .build();
+
+        NotifyServiceEntity notifyServiceThree =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name three")
+                                .withLdnUrl("service ldn url three")
+                                .build();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("Test WorkspaceItem")
+                                                  .withIssueDate("2017-10-17")
+                                                  .withCOARNotifyService(notifyServiceOne, "review")
+                                                  .withCOARNotifyService(notifyServiceTwo, "review")
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        // check the coar notify services of witem
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.sections.coarnotify[0].services", hasSize(2)))
+                            .andExpect(jsonPath("$.sections.coarnotify[0].services", contains(
+                                matchNotifyServiceWithoutLinks(notifyServiceOne.getID(), "service name one",
+                                    null, null, "service ldn url one"),
+                                matchNotifyServiceWithoutLinks(notifyServiceTwo.getID(), "service name two",
+                                    null, null, "service ldn url two"))));
+
+        // try to replace the notifyServiceOne of witem with notifyServiceThree of review pattern
+        List<Operation> removeOpts = new ArrayList<Operation>();
+        removeOpts.add(new ReplaceOperation("/sections/coarnotify/review/0", notifyServiceThree.getID()));
+
+        String patchBody = getPatchContent(removeOpts);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                                .content(patchBody)
+                                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.sections.coarnotify[0].services", hasSize(2)))
+                            .andExpect(jsonPath("$.sections.coarnotify[0].services", contains(
+                                matchNotifyServiceWithoutLinks(notifyServiceThree.getID(), "service name three",
+                                    null, null, "service ldn url three"),
+                                matchNotifyServiceWithoutLinks(notifyServiceTwo.getID(), "service name two",
+                                    null, null, "service ldn url two")
+                                )));
+
+    }
+
+    @Test
+    public void patchCOARNotifyServiceRemoveTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+
+        NotifyServiceEntity notifyServiceOne =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name one")
+                                .withLdnUrl("service ldn url one")
+                                .build();
+
+        NotifyServiceEntity notifyServiceTwo =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name two")
+                                .withLdnUrl("service ldn url two")
+                                .build();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("Test WorkspaceItem")
+                                                  .withIssueDate("2017-10-17")
+                                                  .withCOARNotifyService(notifyServiceOne, "review")
+                                                  .withCOARNotifyService(notifyServiceTwo, "review")
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        // check the coar notify services of witem
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.sections.coarnotify[0].services", hasSize(2)))
+                            .andExpect(jsonPath("$.sections.coarnotify[0].services", contains(
+                                matchNotifyServiceWithoutLinks(notifyServiceOne.getID(), "service name one",
+                                    null, null, "service ldn url one"),
+                                matchNotifyServiceWithoutLinks(notifyServiceTwo.getID(), "service name two",
+                                    null, null, "service ldn url two"))));
+
+        // try to remove the notifyServiceOne of witem
+        List<Operation> removeOpts = new ArrayList<Operation>();
+        removeOpts.add(new RemoveOperation("/sections/coarnotify/review/0"));
+
+        String patchBody = getPatchContent(removeOpts);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                                .content(patchBody)
+                                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.sections.coarnotify[0].services", hasSize(1)))
+                            .andExpect(jsonPath("$.sections.coarnotify[0].services", contains(
+                                matchNotifyServiceWithoutLinks(notifyServiceTwo.getID(), "service name two",
+                                    null, null, "service ldn url two"))
+                            ));
+
+    }
+
 }
