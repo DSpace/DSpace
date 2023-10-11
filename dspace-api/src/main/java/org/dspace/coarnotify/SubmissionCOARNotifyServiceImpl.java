@@ -29,8 +29,8 @@ public class SubmissionCOARNotifyServiceImpl implements SubmissionCOARNotifyServ
 
     @Override
     public COARNotify findOne(String id) {
-        List<COARNotifyPattern> patterns =
-            coarNotifyConfigurationService.getMap().get(id);
+        List<String> patterns =
+            coarNotifyConfigurationService.getPatterns().get(id);
 
         if (patterns == null) {
             return null;
@@ -43,8 +43,8 @@ public class SubmissionCOARNotifyServiceImpl implements SubmissionCOARNotifyServ
     public List<COARNotify> findAll() {
         List<COARNotify> coarNotifies = new ArrayList<>();
 
-        coarNotifyConfigurationService.getMap().forEach((id, coarNotifyPatterns) ->
-            coarNotifies.add(new COARNotify(id, id, coarNotifyPatterns)
+        coarNotifyConfigurationService.getPatterns().forEach((id, patterns) ->
+            coarNotifies.add(new COARNotify(id, id, patterns)
             ));
 
         return coarNotifies;

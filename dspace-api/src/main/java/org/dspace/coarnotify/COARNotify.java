@@ -16,17 +16,17 @@ public class COARNotify {
 
     private String name;
     private String id;
-    private List<COARNotifyPattern> coarNotifyPatterns;
+    private List<String> patterns;
 
     public COARNotify() {
-        super();
+
     }
 
-    public COARNotify(String id, String name, List<COARNotifyPattern> coarNotifyPatterns) {
+    public COARNotify(String id, String name, List<String> patterns) {
         super();
         this.id = id;
         this.name = name;
-        this.coarNotifyPatterns = coarNotifyPatterns;
+        this.patterns = patterns;
     }
 
     public String getName() {
@@ -50,15 +50,15 @@ public class COARNotify {
      *
      * @return the list of COAR Notify Patterns
      */
-    public List<COARNotifyPattern> getCoarNotifyPatterns() {
-        return coarNotifyPatterns;
+    public List<String> getPatterns() {
+        return patterns;
     }
 
     /**
      * Sets the list of COAR Notify Patterns
-     * @param coarNotifyPatterns
+     * @param patterns
      */
-    public void setCoarNotifyPatterns(final List<COARNotifyPattern> coarNotifyPatterns) {
-        this.coarNotifyPatterns = coarNotifyPatterns;
+    public void setPatterns(final List<String> patterns) {
+        this.patterns = patterns;
     }
 }

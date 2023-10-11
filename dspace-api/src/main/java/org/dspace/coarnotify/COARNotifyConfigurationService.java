@@ -21,15 +21,14 @@ public class COARNotifyConfigurationService {
      * Mapping the submission step process identifier with the configuration
      * (see configuration at coar-notify.xml)
      */
-    private Map<String, List<COARNotifyPattern>> map;
+    private Map<String, List<String>> patterns;
 
-    public Map<String, List<COARNotifyPattern>> getMap() {
-        return map;
+    public Map<String, List<String>> getPatterns() {
+        return patterns;
     }
 
-    public void setMap(Map<String, List<COARNotifyPattern>> map) {
-        this.map = map;
+    public void setPatterns(Map<String, List<String>> patterns) {
+        this.patterns = patterns;
     }
-
 
 }

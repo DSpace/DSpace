@@ -26,7 +26,7 @@ public class SubmissionCOARNotifyRest extends BaseObjectRest<String> {
 
     private String name;
 
-    private List<SubmissionCOARNotifyPatternRest> patterns;
+    private List<String> patterns;
 
     public String getId() {
         return id;
@@ -44,11 +44,11 @@ public class SubmissionCOARNotifyRest extends BaseObjectRest<String> {
         this.name = name;
     }
 
-    public List<SubmissionCOARNotifyPatternRest> getPatterns() {
+    public List<String> getPatterns() {
         return patterns;
     }
 
-    public void setPatterns(final List<SubmissionCOARNotifyPatternRest> patterns) {
+    public void setPatterns(final List<String> patterns) {
         this.patterns = patterns;
     }
 

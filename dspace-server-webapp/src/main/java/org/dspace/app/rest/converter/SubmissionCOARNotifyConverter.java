@@ -7,10 +7,6 @@
  */
 package org.dspace.app.rest.converter;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.dspace.app.rest.model.SubmissionCOARNotifyPatternRest;
 import org.dspace.app.rest.model.SubmissionCOARNotifyRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.coarnotify.COARNotify;
@@ -33,20 +29,12 @@ public class SubmissionCOARNotifyConverter implements DSpaceConverter<COARNotify
      */
     @Override
     public SubmissionCOARNotifyRest convert(final COARNotify modelObject, final Projection projection) {
-        List<SubmissionCOARNotifyPatternRest> patternRests = new ArrayList<>();
         SubmissionCOARNotifyRest submissionCOARNotifyRest = new SubmissionCOARNotifyRest();
 
         submissionCOARNotifyRest.setProjection(projection);
         submissionCOARNotifyRest.setId(modelObject.getId());
         submissionCOARNotifyRest.setName(modelObject.getName());
-
-        modelObject.getCoarNotifyPatterns().forEach(coarNotifyPattern -> {
-            SubmissionCOARNotifyPatternRest patternRest = new SubmissionCOARNotifyPatternRest();
-            patternRest.setPattern(coarNotifyPattern.getPattern());
-            patternRests.add(patternRest);
-        });
-
-        submissionCOARNotifyRest.setPatterns(patternRests);
+        submissionCOARNotifyRest.setPatterns(modelObject.getPatterns());
         return submissionCOARNotifyRest;
     }
 

@@ -6,29 +6,17 @@
     <bean class="org.dspace.coarnotify.SubmissionCOARNotifyServiceImpl"/>
 
     <bean class="org.dspace.coarnotify.COARNotifyConfigurationService">
-        <property name="map">
+        <property name="patterns">
             <map>
                 <entry key="default">
                     <list>
-                        <ref bean="coarnotifyreview"/>
-                        <ref bean="coarnotifyendorsement"/>
-                        <ref bean="coarnotifyingest" />
+                        <value>review</value>
+                        <value>endorsement</value>
+                        <value>ingest</value>
                     </list>
                 </entry>
             </map>
         </property>
-    </bean>
-
-    <bean id="coarnotifyreview" class="org.dspace.coarnotify.COARNotifyPattern">
-        <property name="pattern" value="review"/>
-    </bean>
-
-    <bean id="coarnotifyendorsement" class="org.dspace.coarnotify.COARNotifyPattern">
-        <property name="pattern" value="endorsement"/>
-    </bean>
-
-    <bean id="coarnotifyingest" class="org.dspace.coarnotify.COARNotifyPattern">
-        <property name="pattern" value="ingest"/>
     </bean>
 
 </beans>
