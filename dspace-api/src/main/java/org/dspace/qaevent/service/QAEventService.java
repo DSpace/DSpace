@@ -156,4 +156,9 @@ public interface QAEventService {
      */
     public boolean isRelatedItemSupported(QAEvent qaevent);
 
+    List<QAEvent> findEventsByTopicAndPageAndTarget(String topic, long offset, int pageSize, String orderField,
+        boolean ascending, UUID target);
+
+    public long countEventsByTopicAndTarget(String topic, UUID target);
+
 }

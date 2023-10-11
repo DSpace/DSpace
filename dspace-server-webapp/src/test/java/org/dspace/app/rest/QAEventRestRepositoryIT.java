@@ -26,6 +26,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
 import javax.ws.rs.core.MediaType;
 
 import org.dspace.app.rest.matcher.ItemMatcher;
@@ -151,6 +153,31 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken).perform(get("/api/integration/qualityassuranceevents/" + event1.getEventId()))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void findByTopicAndTargetTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        String uuid = UUID.randomUUID().toString();
+        Item item = ItemBuilder.createItem(context, col1).withTitle("Tracking Papyrus and Parchment Paths")
+                .build();
+        QAEvent event1 = QAEventBuilder.createTarget(context, col1, "Tracking Papyrus and Parchment Paths")
+                .withTopic("ENRICH/MISSING/PID")
+                .withRelatedItem(item.getID().toString())
+                .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken)
+            .perform(
+                get("/api/integration/qualityassuranceevents/search/findByTopic")
+                    .param("topic", "ENRICH!MISSING!PID")
+                    .param("target", uuid))
+            .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(1)))
+            .andExpect(jsonPath("$._embedded.qualityassuranceevents",
+                        Matchers.contains(QAEventMatcher.matchQAEventEntry(event1))))
+                .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(1)));
     }
 
     @Test

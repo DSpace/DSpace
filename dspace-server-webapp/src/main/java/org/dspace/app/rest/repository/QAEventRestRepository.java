@@ -9,6 +9,8 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.Parameter;
@@ -75,6 +77,7 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
     @SearchRestMethod(name = "findByTopic")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<QAEventRest> findByTopic(Context context, @Parameter(value = "topic", required = true) String topic,
+        @Parameter(value = "target", required = false) UUID target,
         Pageable pageable) {
         List<QAEvent> qaEvents = null;
         long count = 0L;
@@ -82,9 +85,15 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
         if (pageable.getSort() != null && pageable.getSort().getOrderFor(ORDER_FIELD) != null) {
             ascending = pageable.getSort().getOrderFor(ORDER_FIELD).getDirection() == Direction.ASC;
         }
-        qaEvents = qaEventService.findEventsByTopicAndPage(topic,
-            pageable.getOffset(), pageable.getPageSize(), ORDER_FIELD, ascending);
-        count = qaEventService.countEventsByTopic(topic);
+        if(target == null) {
+            qaEvents = qaEventService.findEventsByTopicAndPage(topic,
+                pageable.getOffset(), pageable.getPageSize(), ORDER_FIELD, ascending);
+            count = qaEventService.countEventsByTopic(topic);
+        } else {
+            qaEvents = qaEventService.findEventsByTopicAndPageAndTarget(topic,
+                pageable.getOffset(), pageable.getPageSize(), ORDER_FIELD, ascending, target);
+            count = qaEventService.countEventsByTopicAndTarget(topic, target);           
+        }
         if (qaEvents == null) {
             return null;
         }

@@ -314,6 +314,39 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
+    public List<QAEvent> findEventsByTopicAndPageAndTarget(String topic, long offset,
+        int pageSize, String orderField, boolean ascending, UUID target) {
+
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setStart(((Long) offset).intValue());
+        if (pageSize != -1) {
+            solrQuery.setRows(pageSize);
+        }
+        solrQuery.setSort(orderField, ascending ? ORDER.asc : ORDER.desc);
+        solrQuery.setQuery("*:*");
+        solrQuery.addFilterQuery(TOPIC + ":" + topic.replaceAll("!", "/"));
+        solrQuery.addFilterQuery(RESOURCE_UUID + ":" + target.toString());
+
+        QueryResponse response;
+        try {
+            response = getSolr().query(solrQuery);
+            if (response != null) {
+                SolrDocumentList list = response.getResults();
+                List<QAEvent> responseItem = new ArrayList<>();
+                for (SolrDocument doc : list) {
+                    QAEvent item = getQAEventFromSOLR(doc);
+                    responseItem.add(item);
+                }
+                return responseItem;
+            }
+        } catch (SolrServerException | IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return List.of();
+    }
+
+    @Override
     public List<QAEvent> findEventsByTopic(String topic) {
         return findEventsByTopicAndPage(topic, 0, -1, TRUST, false);
     }
@@ -323,6 +356,22 @@ public class QAEventServiceImpl implements QAEventService {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
         solrQuery.setQuery(TOPIC + ":" + topic.replace("!", "/"));
+        QueryResponse response = null;
+        try {
+            response = getSolr().query(solrQuery);
+            return response.getResults().getNumFound();
+        } catch (SolrServerException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public long countEventsByTopicAndTarget(String topic, UUID target) {
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setRows(0);
+        solrQuery.setQuery("*:*");
+        solrQuery.addFilterQuery(TOPIC + ":" + topic.replace("!", "/"));
+        solrQuery.addFilterQuery(RESOURCE_UUID + ":" + target.toString());
         QueryResponse response = null;
         try {
             response = getSolr().query(solrQuery);
