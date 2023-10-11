@@ -10,6 +10,8 @@ package org.dspace.app.rest;
 import static org.dspace.content.QAEvent.OPENAIRE_SOURCE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -18,7 +20,9 @@ import java.nio.charset.Charset;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
+import org.dspace.app.ldn.LDNMessageEntity;
 import org.dspace.app.ldn.model.Notification;
+import org.dspace.app.ldn.service.LDNMessageService;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -40,6 +44,9 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
     @Autowired
     private ConfigurationService configurationService;
 
+    @Autowired
+    private LDNMessageService ldnMessageService;
+
     private QAEventService qaEventService = new DSpace().getSingletonService(QAEventService.class);
 
     @Test
@@ -52,6 +59,7 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
 
         context.restoreAuthSystemState();
+
         InputStream offerEndorsementStream = getClass().getResourceAsStream("ldn_offer_endorsement_object.json");
         String offerEndorsementJson = IOUtils.toString(offerEndorsementStream, Charset.defaultCharset());
         offerEndorsementStream.close();
@@ -64,14 +72,27 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
                 .contentType("application/ld+json")
                 .content(message))
             .andExpect(status().isAccepted());
+
+        LDNMessageEntity ldnMessage = ldnMessageService.find(context, notification.getId());
+        checkStoredLDNMessage(notification, ldnMessage, object);
     }
 
     @Test
     public void ldnInboxAnnounceEndorsementTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Community community = CommunityBuilder.createCommunity(context).withName("community").build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+        String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
+
+        context.restoreAuthSystemState();
 
         InputStream announceEndorsementStream = getClass().getResourceAsStream("ldn_announce_endorsement.json");
-        String message = IOUtils.toString(announceEndorsementStream, Charset.defaultCharset());
+        String announceEndorsement = IOUtils.toString(announceEndorsementStream, Charset.defaultCharset());
         announceEndorsementStream.close();
+        String message = announceEndorsement.replace("<<object>>", object);
+
         ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
         getClient(getAuthToken(admin.getEmail(), password))
@@ -79,6 +100,9 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
                 .contentType("application/ld+json")
                 .content(message))
             .andExpect(status().isAccepted());
+
+        LDNMessageEntity ldnMessage = ldnMessageService.find(context, notification.getId());
+        checkStoredLDNMessage(notification, ldnMessage, object);
     }
 
 
@@ -115,4 +139,28 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
                 .content(message))
             .andExpect(status().isBadRequest());
     }
+
+    private void checkStoredLDNMessage(Notification notification, LDNMessageEntity ldnMessage, String object)
+        throws Exception {
+
+        ObjectMapper mapper = new ObjectMapper();
+        Notification storedMessage = mapper.readValue(ldnMessage.getMessage(), Notification.class);
+
+        assertNotNull(ldnMessage);
+        assertNotNull(ldnMessage.getObject());
+        assertEquals(ldnMessage.getObject()
+                               .getMetadata()
+                               .stream()
+                               .filter(metadataValue ->
+                                   metadataValue.getMetadataField().toString('.').equals("dc.identifier.uri"))
+                               .map(metadataValue -> metadataValue.getValue())
+                               .findFirst().get(), object);
+
+        assertEquals(notification.getId(), storedMessage.getId());
+        assertEquals(notification.getOrigin().getInbox(), storedMessage.getOrigin().getInbox());
+        assertEquals(notification.getTarget().getInbox(), storedMessage.getTarget().getInbox());
+        assertEquals(notification.getObject().getId(), storedMessage.getObject().getId());
+        assertEquals(notification.getType(), storedMessage.getType());
+    }
+
 }

@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
  * Content-Type: application/json" -d '
  * [{
  *  "op": "remove",
- *  "path": "notifyservices_outbound_patterns[index]/constraint"
+ *  "path": "notifyServiceOutboundPatterns[index]/constraint"
  *  }]'
  * </code>
  */
@@ -72,7 +72,7 @@ public class NotifyServiceOutboundPatternConstraintRemoveOperation extends Patch
 
     @Override
     public boolean supports(Object objectToMatch, Operation operation) {
-        String path = operation.getPath().trim().toLowerCase();
+        String path = operation.getPath().trim();
         return (objectToMatch instanceof NotifyServiceEntity &&
             operation.getOp().trim().equalsIgnoreCase(OPERATION_REMOVE) &&
             path.startsWith(NOTIFY_SERVICE_OUTBOUND_PATTERNS + "[") &&

@@ -125,4 +125,9 @@ public class NotifyServiceBuilder extends AbstractBuilder<NotifyServiceEntity, N
         return this;
     }
 
+    public NotifyServiceBuilder isEnabled(boolean enabled) {
+        notifyServiceEntity.setEnabled(enabled);
+        return this;
+    }
+
 }
