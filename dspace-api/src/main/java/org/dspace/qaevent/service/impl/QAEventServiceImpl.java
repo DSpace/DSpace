@@ -141,6 +141,27 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
+    public long countTopicsBySourceAndTarget(String source, UUID target) {
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setRows(0);
+        solrQuery.setQuery("*:*");
+        solrQuery.setFacet(true);
+        solrQuery.setFacetMinCount(1);
+        solrQuery.addFacetField(TOPIC);
+        solrQuery.addFilterQuery("source:" + source);
+        if (target != null) {
+            solrQuery.addFilterQuery(RESOURCE_UUID + ":" + target.toString());
+        }
+        QueryResponse response;
+        try {
+            response = getSolr().query(solrQuery);
+        } catch (SolrServerException | IOException e) {
+            throw new RuntimeException(e);
+        }
+        return response.getFacetField(TOPIC).getValueCount();
+    }
+
+    @Override
     public void deleteEventByEventId(String id) {
         try {
             getSolr().deleteById(id);
@@ -208,6 +229,49 @@ public class QAEventServiceImpl implements QAEventService {
         solrQuery.addFacetField(TOPIC);
         if (source != null) {
             solrQuery.addFilterQuery(SOURCE + ":" + source);
+        }
+        QueryResponse response;
+        List<QATopic> topics = new ArrayList<>();
+        try {
+            response = getSolr().query(solrQuery);
+            FacetField facetField = response.getFacetField(TOPIC);
+            topics = new ArrayList<>();
+            int idx = 0;
+            for (Count c : facetField.getValues()) {
+                if (idx < offset) {
+                    idx++;
+                    continue;
+                }
+                QATopic topic = new QATopic();
+                topic.setKey(c.getName());
+                topic.setTotalEvents(c.getCount());
+                topic.setLastEvent(new Date());
+                topics.add(topic);
+                idx++;
+            }
+        } catch (SolrServerException | IOException e) {
+            throw new RuntimeException(e);
+        }
+        return topics;
+    }
+
+    @Override
+    public List<QATopic> findAllTopicsBySourceAndTarget(String source, UUID target, long offset, int count) {
+        if (source != null && isNotSupportedSource(source)) {
+            return null;
+        }
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setRows(0);
+        solrQuery.setQuery("*:*");
+        solrQuery.setFacet(true);
+        solrQuery.setFacetMinCount(1);
+        solrQuery.setFacetLimit((int) (offset + count));
+        solrQuery.addFacetField(TOPIC);
+        if (source != null) {
+            solrQuery.addFilterQuery(SOURCE + ":" + source);
+        }
+        if (target != null) {
+            solrQuery.addFilterQuery(RESOURCE_UUID + ":" + target.toString());
         }
         QueryResponse response;
         List<QATopic> topics = new ArrayList<>();

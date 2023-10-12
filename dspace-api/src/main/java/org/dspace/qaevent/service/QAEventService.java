@@ -156,9 +156,47 @@ public interface QAEventService {
      */
     public boolean isRelatedItemSupported(QAEvent qaevent);
 
+    /**
+     * Find all the events by topic and target.
+     *
+     * @param  topic      the topic to search for
+     * @param  target     the item uuid qaEvents are referring to
+     * @param  offset     the offset to apply
+     * @param  pageSize   the page size
+     * @param  orderField the field to order for
+     * @param  ascending  true if the order should be ascending, false otherwise
+     * @return            the events
+     */
     List<QAEvent> findEventsByTopicAndPageAndTarget(String topic, long offset, int pageSize, String orderField,
         boolean ascending, UUID target);
 
+    /**
+     * Find all the events by topic and target.
+     *
+     * @param  target  the item uuid
+     * @param  topic   the topic to search for
+     * @return         the events count
+     */
     public long countEventsByTopicAndTarget(String topic, UUID target);
+
+    /**
+     * Find all the event's topics related to the given source for a specific item
+     *
+     * @param  source the source to search for
+     * @param  target the item referring to
+     * @param  offset the offset to apply
+     * @param  pageSize  the page size
+     * @return        the topics list
+     */
+    public List<QATopic> findAllTopicsBySourceAndTarget(String source, UUID target, long offset, int pageSize);
+
+    /**
+     * Count all the event's topics related to the given source referring to a specific item
+     *
+     * @param  target  the item uuid
+     * @param  source  the source to search for
+     * @return         the count result
+     */
+    public long countTopicsBySourceAndTarget(String source, UUID target);
 
 }
