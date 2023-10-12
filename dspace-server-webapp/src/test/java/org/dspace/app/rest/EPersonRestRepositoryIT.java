@@ -79,6 +79,7 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.PasswordHash;
 import org.dspace.eperson.service.AccountService;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
@@ -95,6 +96,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private EPersonService ePersonService;
+
+    @Autowired
+    private GroupService groupService;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -773,6 +777,242 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata"))
                 .andExpect(status().isBadRequest());
+    }
+
+    // Test of /epersons/search/isNotMemberOf pagination
+    // NOTE: Additional tests of 'isNotMemberOf' search functionality can be found in EPersonTest in 'dspace-api'
+    @Test
+    public void searchIsNotMemberOfPaginationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group group = GroupBuilder.createGroup(context)
+                                  .withName("Test Parent group")
+                                  .build();
+        // Create two EPerson in main group. These SHOULD NOT be included in pagination
+        EPersonBuilder.createEPerson(context)
+                      .withNameInMetadata("Test", "Person")
+                      .withEmail("test@example.com")
+                      .withGroupMembership(group)
+                      .build();
+        EPersonBuilder.createEPerson(context)
+                      .withNameInMetadata("Test2", "Person")
+                      .withEmail("test2@example.com")
+                      .withGroupMembership(group)
+                      .build();
+
+        // Create five EPersons who are NOT members of that group. These SHOULD be included in pagination
+        EPersonBuilder.createEPerson(context)
+                      .withNameInMetadata("Test3", "Person")
+                      .withEmail("test3@example.com")
+                      .build();
+        EPersonBuilder.createEPerson(context)
+                      .withNameInMetadata("Test4", "Person")
+                      .withEmail("test4@example.com")
+                      .build();
+        EPersonBuilder.createEPerson(context)
+                      .withNameInMetadata("Test5", "Person")
+                      .withEmail("test5@example.com")
+                      .build();
+        EPersonBuilder.createEPerson(context)
+                      .withNameInMetadata("Test6", "Person")
+                      .withEmail("test6@example.com")
+                      .build();
+        EPersonBuilder.createEPerson(context)
+                      .withNameInMetadata("Test7", "Person")
+                      .withEmail("test7@example.com")
+                      .build();
+
+        context.restoreAuthSystemState();
+
+        String authTokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(authTokenAdmin).perform(get("/api/eperson/epersons/search/isNotMemberOf")
+                                              .param("group", group.getID().toString())
+                                              .param("query", "person")
+                                              .param("page", "0")
+                                              .param("size", "2"))
+                                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$._embedded.epersons", Matchers.everyItem(
+                                     hasJsonPath("$.type", is("eperson")))
+                                 ))
+                                 .andExpect(jsonPath("$._embedded.epersons").value(Matchers.hasSize(2)))
+                                 .andExpect(jsonPath("$.page.size", is(2)))
+                                 .andExpect(jsonPath("$.page.number", is(0)))
+                                 .andExpect(jsonPath("$.page.totalPages", is(3)))
+                                 .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(authTokenAdmin).perform(get("/api/eperson/epersons/search/isNotMemberOf")
+                                              .param("group", group.getID().toString())
+                                              .param("query", "person")
+                                              .param("page", "1")
+                                              .param("size", "2"))
+                                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$._embedded.epersons", Matchers.everyItem(
+                                     hasJsonPath("$.type", is("eperson")))
+                                 ))
+                                 .andExpect(jsonPath("$._embedded.epersons").value(Matchers.hasSize(2)))
+                                 .andExpect(jsonPath("$.page.size", is(2)))
+                                 .andExpect(jsonPath("$.page.number", is(1)))
+                                 .andExpect(jsonPath("$.page.totalPages", is(3)))
+                                 .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(authTokenAdmin).perform(get("/api/eperson/epersons/search/isNotMemberOf")
+                                              .param("group", group.getID().toString())
+                                              .param("query", "person")
+                                              .param("page", "2")
+                                              .param("size", "2"))
+                                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$._embedded.epersons", Matchers.everyItem(
+                                     hasJsonPath("$.type", is("eperson")))
+                                 ))
+                                 .andExpect(jsonPath("$._embedded.epersons").value(Matchers.hasSize(1)))
+                                 .andExpect(jsonPath("$.page.size", is(2)))
+                                 .andExpect(jsonPath("$.page.number", is(2)))
+                                 .andExpect(jsonPath("$.page.totalPages", is(3)))
+                                 .andExpect(jsonPath("$.page.totalElements", is(5)));
+    }
+
+    @Test
+    public void searchIsNotMemberOfByEmail() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Group group = GroupBuilder.createGroup(context)
+                                  .withName("Test group")
+                                  .build();
+        Group group2 = GroupBuilder.createGroup(context)
+                                  .withName("Test another group")
+                                  .build();
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@example.com")
+                                        .withGroupMembership(group)
+                                        .build();
+
+        EPerson ePerson2 = EPersonBuilder.createEPerson(context)
+                                         .withNameInMetadata("Jane", "Smith")
+                                         .withEmail("janesmith@example.com")
+                                         .build();
+
+        EPerson ePerson3 = EPersonBuilder.createEPerson(context)
+                                         .withNameInMetadata("Tom", "Doe")
+                                         .withEmail("tomdoe@example.com")
+                                         .build();
+
+        EPerson ePerson4 = EPersonBuilder.createEPerson(context)
+                                         .withNameInMetadata("Harry", "Prefix-Doe")
+                                         .withEmail("harrydoeprefix@example.com")
+                                         .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        // Search for exact email in a group the person already belongs to.  Should return zero results.
+        getClient(authToken).perform(get("/api/eperson/epersons/search/isNotMemberOf")
+                                         .param("query", ePerson.getEmail())
+                                         .param("group", group.getID().toString()))
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        // Search for exact email in a group the person does NOT belong to.  Should return the person
+        getClient(authToken).perform(get("/api/eperson/epersons/search/isNotMemberOf")
+                                         .param("query", ePerson.getEmail())
+                                         .param("group", group2.getID().toString()))
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$._embedded.epersons", Matchers.contains(
+                                EPersonMatcher.matchEPersonEntry(ePerson)
+                            )))
+                            .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        // Search partial email should return all the people created above.
+        getClient(authToken).perform(get("/api/eperson/epersons/search/isNotMemberOf")
+                                         .param("query", "example.com")
+                                         .param("group", group2.getID().toString()))
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
+                                EPersonMatcher.matchEPersonEntry(ePerson),
+                                EPersonMatcher.matchEPersonEntry(ePerson2),
+                                EPersonMatcher.matchEPersonEntry(ePerson3),
+                                EPersonMatcher.matchEPersonEntry(ePerson4)
+                            )));
+    }
+
+    @Test
+    public void searchIsNotMemberOfByUUID() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Group group = GroupBuilder.createGroup(context)
+                                  .withName("Test group")
+                                  .build();
+        Group group2 = GroupBuilder.createGroup(context)
+                                   .withName("Test another group")
+                                   .build();
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("John", "Doe")
+                                        .withEmail("Johndoe@example.com")
+                                        .withGroupMembership(group)
+                                        .build();
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        // Search for UUID in a group the person already belongs to.  Should return zero results.
+        getClient(authToken).perform(get("/api/eperson/epersons/search/isNotMemberOf")
+                                         .param("query", ePerson.getID().toString())
+                                         .param("group", group.getID().toString()))
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        // Search for exact email in a group the person does NOT belong to.  Should return the person
+        getClient(authToken).perform(get("/api/eperson/epersons/search/isNotMemberOf")
+                                         .param("query", ePerson.getID().toString())
+                                         .param("group", group2.getID().toString()))
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$._embedded.epersons", Matchers.contains(
+                                EPersonMatcher.matchEPersonEntry(ePerson)
+                            )))
+                            .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void searchIsNotMemberOfUnauthorized() throws Exception {
+        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        getClient().perform(get("/api/eperson/epersons/search/isNotMemberOf")
+                                .param("query", eperson.getID().toString())
+                                .param("group", adminGroup.getID().toString()))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void searchIsNotMemberOfForbidden() throws Exception {
+        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/epersons/search/isNotMemberOf")
+                                         .param("query", eperson.getID().toString())
+                                         .param("group", adminGroup.getID().toString()))
+                            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void searchIsNotMemberOfMissingOrInvalidParameter() throws Exception {
+        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/epersons/search/isNotMemberOf"))
+                            .andExpect(status().isBadRequest());
+
+        getClient(authToken).perform(get("/api/eperson/epersons/search/isNotMemberOf")
+                                         .param("query", eperson.getID().toString()))
+                            .andExpect(status().isBadRequest());
+
+        getClient(authToken).perform(get("/api/eperson/epersons/search/isNotMemberOf")
+                                         .param("group", adminGroup.getID().toString()))
+                            .andExpect(status().isBadRequest());
+
+        // Test invalid group UUID
+        getClient(authToken).perform(get("/api/eperson/epersons/search/isNotMemberOf")
+                                         .param("query", eperson.getID().toString())
+                                         .param("group", "not-a-uuid"))
+                            .andExpect(status().isBadRequest());
     }
 
     @Test
