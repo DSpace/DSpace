@@ -151,7 +151,7 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
     /**
      * Find the Groups matching the query parameter which are NOT a member of the given parent Group.
      * The search is delegated to the
-     * {@link GroupService#search(Context, String, int, int)} method
+     * {@link GroupService#searchNonMembers(Context, String, Group, int, int)} method
      *
      * @param groupUUID the parent group UUID
      * @param query    is the *required* query string
