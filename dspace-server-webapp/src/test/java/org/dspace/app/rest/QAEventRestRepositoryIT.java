@@ -163,10 +163,10 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         String uuid = UUID.randomUUID().toString();
         Item item = ItemBuilder.createItem(context, col1).withTitle("Tracking Papyrus and Parchment Paths")
                 .build();
-        QAEvent event1 = QAEventBuilder.createTarget(context, col1, "Tracking Papyrus and Parchment Paths")
+        QAEventBuilder qBuilder = QAEventBuilder.createTarget(context, item)
                 .withTopic("ENRICH/MISSING/PID")
-                .withRelatedItem(item.getID().toString())
-                .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
+                .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}");
+        QAEvent event1 = qBuilder.build();
         context.restoreAuthSystemState();
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
@@ -174,10 +174,19 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                 get("/api/integration/qualityassuranceevents/search/findByTopic")
                     .param("topic", "ENRICH!MISSING!PID")
                     .param("target", uuid))
-            .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(1)))
-            .andExpect(jsonPath("$._embedded.qualityassuranceevents",
-                        Matchers.contains(QAEventMatcher.matchQAEventEntry(event1))))
-                .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(1)));
+            .andExpect(status().isOk()).andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        uuid = item.getID().toString();
+        getClient(authToken)
+        .perform(
+            get("/api/integration/qualityassuranceevents/search/findByTopic")
+                .param("topic", "ENRICH!MISSING!PID")
+                .param("target", uuid))
+        .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(1)))
+        .andExpect(jsonPath("$._embedded.qualityassuranceevents",
+                    Matchers.contains(QAEventMatcher.matchQAEventEntry(event1))))
+        .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(1)));        
     }
 
     @Test
