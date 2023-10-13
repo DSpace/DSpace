@@ -3021,10 +3021,10 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(eperson.getEmail(), password);
 
         getClient(token).perform(get("/api/core/items/" + item.getID()))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
-                        .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Public item 1")))
-                        .andExpect(jsonPath("$.metadata", matchMetadataDoesNotExist("dc.description.provenance")));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", ItemMatcher.matchItemProperties(item)))
+            .andExpect(jsonPath("$.metadata", matchMetadata("dc.title", "Public item 1")))
+            .andExpect(jsonPath("$.metadata", matchMetadata("dc.description.provenance", "Provenance data")));
 
     }
 
