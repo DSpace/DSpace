@@ -206,10 +206,6 @@ public class IndexEventConsumer implements Consumer {
     public void end(Context ctx) throws Exception {
 
         // Change the mode to readonly to improve performance
-        // First, we flush the changes to database, if session is dirty, has pending changes
-        // to synchronize with database, without this flush it could index an old version of
-        // the object
-        ctx.flushDBChanges();
         Context.Mode originalMode = ctx.getCurrentMode();
         ctx.setMode(Context.Mode.READ_ONLY);
 
