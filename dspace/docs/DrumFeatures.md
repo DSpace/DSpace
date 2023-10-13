@@ -145,6 +145,12 @@ See [dspace/docs/DrumCronTasks.md](DrumCronTasks.md) for additional information.
 
 * LIBDRUM-720 - DSpace Cron jobs
 
+## dspace/bin/script-mail-wrapper
+
+The "script-mail-wrapper" runs a specified script, and then emails the output
+of that script to a specified email address. It is mainly intended for use
+with the "load-etd-nightly" script, but is usable by any script.
+
 ## Miscellaneous
 
 * LIBDRUM-662 - Custom "Unit" to manage the UMD Campus Units, and manage access
