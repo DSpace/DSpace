@@ -24,12 +24,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.commons.lang3.RandomUtils;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.rest.model.NotifyServiceInboundPatternRest;
@@ -144,6 +146,41 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                                 .content(mapper.writeValueAsBytes(notifyServiceRest))
                                 .contentType(contentType))
                             .andExpect(status().isForbidden());
+    }
+    
+    @Test
+    public void createTestScoreFail() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+
+        NotifyServiceInboundPatternRest inboundPatternRestOne = new NotifyServiceInboundPatternRest();
+        inboundPatternRestOne.setPattern("patternA");
+        inboundPatternRestOne.setConstraint("itemFilterA");
+        inboundPatternRestOne.setAutomatic(true);
+
+        NotifyServiceInboundPatternRest inboundPatternRestTwo = new NotifyServiceInboundPatternRest();
+        inboundPatternRestTwo.setPattern("patternB");
+        inboundPatternRestTwo.setAutomatic(false);
+
+        NotifyServiceOutboundPatternRest outboundPatternRest = new NotifyServiceOutboundPatternRest();
+        outboundPatternRest.setPattern("patternC");
+        outboundPatternRest.setConstraint("itemFilterC");
+
+        NotifyServiceRest notifyServiceRest = new NotifyServiceRest();
+        notifyServiceRest.setName("service name");
+        notifyServiceRest.setDescription("service description");
+        notifyServiceRest.setUrl("service url");
+        notifyServiceRest.setLdnUrl("service ldn url");
+        notifyServiceRest.setScore(BigDecimal.TEN);
+        notifyServiceRest.setNotifyServiceInboundPatterns(List.of(inboundPatternRestOne, inboundPatternRestTwo));
+        notifyServiceRest.setNotifyServiceOutboundPatterns(List.of(outboundPatternRest));
+        notifyServiceRest.setEnabled(false);
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(post("/api/ldn/ldnservices")
+            .content(mapper.writeValueAsBytes(notifyServiceRest))
+            .contentType(contentType))
+        .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
