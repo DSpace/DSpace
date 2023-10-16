@@ -72,6 +72,8 @@ public class LDNInboxController {
             } else {
                 processor.process(notification);
             }
+        } else {
+            log.warn("LDNMessage " + ldnMsgEntity + " has been received by an untrusted source");
         }
         return ResponseEntity.accepted()
             .body(String.format("Successfully stored notification %s %s",
