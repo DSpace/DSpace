@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.ldn.NotifyServiceInboundPattern;
 import org.dspace.app.ldn.NotifyServiceOutboundPattern;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.model.patch.JsonValueEvaluator;
 import org.dspace.app.rest.model.patch.Operation;
 import org.springframework.stereotype.Component;
 
@@ -28,8 +29,8 @@ import org.springframework.stereotype.Component;
 @Component
 public final class NotifyServicePatchUtils {
 
-    public static final String NOTIFY_SERVICE_OUTBOUND_PATTERNS = "notifyservices_outbound_patterns";
-    public static final String NOTIFY_SERVICE_INBOUND_PATTERNS = "notifyservices_inbound_patterns";
+    public static final String NOTIFY_SERVICE_OUTBOUND_PATTERNS = "notifyServiceOutboundPatterns";
+    public static final String NOTIFY_SERVICE_INBOUND_PATTERNS = "notifyServiceInboundPatterns";
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -47,8 +48,8 @@ public final class NotifyServicePatchUtils {
         NotifyServiceInboundPattern inboundPattern = null;
         try {
             if (operation.getValue() != null) {
-                if (operation.getValue() instanceof String) {
-                    inboundPattern = objectMapper.readValue((String) operation.getValue(),
+                if (operation.getValue() instanceof JsonValueEvaluator) {
+                    inboundPattern = objectMapper.readValue(((JsonValueEvaluator) operation.getValue()).getValueNode().toString(),
                         NotifyServiceInboundPattern.class);
                 }
             }
@@ -73,8 +74,8 @@ public final class NotifyServicePatchUtils {
         NotifyServiceOutboundPattern outboundPattern = null;
         try {
             if (operation.getValue() != null) {
-                if (operation.getValue() instanceof String) {
-                    outboundPattern = objectMapper.readValue((String) operation.getValue(),
+                if (operation.getValue() instanceof JsonValueEvaluator) {
+                    outboundPattern = objectMapper.readValue(((JsonValueEvaluator) operation.getValue()).getValueNode().toString(),
                         NotifyServiceOutboundPattern.class);
                 }
             }

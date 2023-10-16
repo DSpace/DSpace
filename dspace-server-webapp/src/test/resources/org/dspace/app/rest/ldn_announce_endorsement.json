@@ -24,7 +24,7 @@
 	 "id": "urn:uuid:94ecae35-dcfd-4182-8550-22c7164fe23f",
 	 "inReplyTo": "urn:uuid:0370c0fb-bb78-4a9b-87f5-bed307a509dd",
 	 "object": {
-	   "id": "https://overlay-journal.com/articles/00001/",
+	   "id": "<<object>>",
 	   "ietf:cite-as": "https://overlay-journal.com/articles/00001/",
 	   "type": [
 	     "Page",

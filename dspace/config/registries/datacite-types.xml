@@ -53,4 +53,5 @@
     	<qualifier>isSupplementedBy</qualifier>
 		<scope_note>Supplemented by</scope_note>
 	</dc-type>
+
 </dspace-dc-types>
