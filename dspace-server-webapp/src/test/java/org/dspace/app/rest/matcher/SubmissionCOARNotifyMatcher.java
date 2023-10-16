@@ -26,10 +26,9 @@ public class SubmissionCOARNotifyMatcher {
     private SubmissionCOARNotifyMatcher() {
     }
 
-    public static Matcher<? super Object> matchCOARNotifyEntry(String id, String name, List<String> patterns) {
+    public static Matcher<? super Object> matchCOARNotifyEntry(String id, List<String> patterns) {
         return allOf(
             hasJsonPath("$.id", is(id)),
-            hasJsonPath("$.name", is(name)),
             hasJsonPath("$.patterns", is(patterns))
         );
     }

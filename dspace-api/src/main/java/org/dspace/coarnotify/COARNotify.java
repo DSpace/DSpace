@@ -14,7 +14,6 @@ import java.util.List;
  */
 public class COARNotify {
 
-    private String name;
     private String id;
     private List<String> patterns;
 
@@ -22,19 +21,10 @@ public class COARNotify {
 
     }
 
-    public COARNotify(String id, String name, List<String> patterns) {
+    public COARNotify(String id, List<String> patterns) {
         super();
         this.id = id;
-        this.name = name;
         this.patterns = patterns;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getId() {

@@ -36,7 +36,7 @@ public class SubmissionCOARNotifyServiceImpl implements SubmissionCOARNotifyServ
             return null;
         }
 
-        return new COARNotify(id, id, patterns);
+        return new COARNotify(id, patterns);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class SubmissionCOARNotifyServiceImpl implements SubmissionCOARNotifyServ
         List<COARNotify> coarNotifies = new ArrayList<>();
 
         coarNotifyConfigurationService.getPatterns().forEach((id, patterns) ->
-            coarNotifies.add(new COARNotify(id, id, patterns)
+            coarNotifies.add(new COARNotify(id, patterns)
             ));
 
         return coarNotifies;

@@ -33,7 +33,6 @@ public class SubmissionCOARNotifyConverter implements DSpaceConverter<COARNotify
 
         submissionCOARNotifyRest.setProjection(projection);
         submissionCOARNotifyRest.setId(modelObject.getId());
-        submissionCOARNotifyRest.setName(modelObject.getName());
         submissionCOARNotifyRest.setPatterns(modelObject.getPatterns());
         return submissionCOARNotifyRest;
     }

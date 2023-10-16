@@ -14,17 +14,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
 
 /**
- * This class is the REST representation of the CCLicense model object and acts as a data object
- * for the SubmissionCCLicenseResource class.
- * Refer to {@link org.dspace.license.CCLicense} for explanation of the properties
+ * This class is the REST representation of the COARNotify model object and acts as a data object
+ * for the SubmissionCOARNotifyResource class.
+ * Refer to {@link org.dspace.coarnotify.COARNotify} for explanation of the properties
  */
 public class SubmissionCOARNotifyRest extends BaseObjectRest<String> {
-    public static final String NAME = "submissioncoarnotifyservice";
+    public static final String NAME = "submissioncoarnotifyconfig";
     public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
 
     private String id;
-
-    private String name;
 
     private List<String> patterns;
 
@@ -34,14 +32,6 @@ public class SubmissionCOARNotifyRest extends BaseObjectRest<String> {
 
     public void setId(final String id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
     }
 
     public List<String> getPatterns() {
