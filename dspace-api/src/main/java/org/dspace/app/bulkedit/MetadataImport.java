@@ -578,6 +578,10 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                             wfItem = workflowService.startWithoutNotify(c, wsItem);
                         }
                     } else {
+                        // Add provenance info
+                        String provenance = installItemService.getSubmittedByProvenanceMessage(c, wsItem.getItem());
+                        itemService.addMetadata(c, item, MetadataSchemaEnum.DC.getName(),
+                                "description", "provenance", "en", provenance);
                         // Install the item
                         installItemService.installItem(c, wsItem);
                     }
