@@ -101,12 +101,20 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
             throw new UnprocessableEntityException("Error parsing request body", e1);
         }
 
+        if(notifyServiceRest.getScore() != null) {
+            if(notifyServiceRest.getScore().compareTo(java.math.BigDecimal.ZERO) == -1 || 
+                notifyServiceRest.getScore().compareTo(java.math.BigDecimal.ONE) == 1) {
+                throw new UnprocessableEntityException(format("Score out of range [0, 1]", notifyServiceRest.getScore()));
+            }    
+        }
+        
         NotifyServiceEntity notifyServiceEntity = notifyService.create(context);
         notifyServiceEntity.setName(notifyServiceRest.getName());
         notifyServiceEntity.setDescription(notifyServiceRest.getDescription());
         notifyServiceEntity.setUrl(notifyServiceRest.getUrl());
         notifyServiceEntity.setLdnUrl(notifyServiceRest.getLdnUrl());
-
+        notifyServiceEntity.setEnabled(notifyServiceRest.isEnabled());
+        
         if (notifyServiceRest.getNotifyServiceInboundPatterns() != null) {
             appendNotifyServiceInboundPatterns(context, notifyServiceEntity,
                 notifyServiceRest.getNotifyServiceInboundPatterns());
@@ -115,14 +123,6 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
         if (notifyServiceRest.getNotifyServiceOutboundPatterns() != null) {
             appendNotifyServiceOutboundPatterns(context, notifyServiceEntity,
                 notifyServiceRest.getNotifyServiceOutboundPatterns());
-        }
-
-        notifyServiceEntity.setEnabled(notifyServiceRest.isEnabled());
-        if(notifyServiceRest.getScore() != null) {
-            if(notifyServiceRest.getScore().compareTo(java.math.BigDecimal.ZERO) == -1 || 
-                notifyServiceRest.getScore().compareTo(java.math.BigDecimal.ONE) == 1) {
-                throw new UnprocessableEntityException(format("Score out of range [0, 1]", notifyServiceRest.getScore()));
-            }    
         }
         notifyServiceEntity.setScore(notifyServiceRest.getScore());
 
