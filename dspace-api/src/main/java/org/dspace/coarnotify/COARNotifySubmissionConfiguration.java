@@ -10,18 +10,29 @@ package org.dspace.coarnotify;
 import java.util.List;
 
 /**
+ * this class represents the Configuration of Submission COAR Notify
+ *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
-public class COARNotify {
+public class COARNotifySubmissionConfiguration {
 
+    /**
+     * the map key of configured bean of COARNotifyConfigurationService
+     * in coar-notify.xml
+     */
     private String id;
+
+    /**
+     * the map values of configured bean of COARNotifyConfigurationService
+     * in coar-notify.xml
+     */
     private List<String> patterns;
 
-    public COARNotify() {
+    public COARNotifySubmissionConfiguration() {
 
     }
 
-    public COARNotify(String id, List<String> patterns) {
+    public COARNotifySubmissionConfiguration(String id, List<String> patterns) {
         super();
         this.id = id;
         this.patterns = patterns;
@@ -36,16 +47,16 @@ public class COARNotify {
     }
 
     /**
-     * Gets the list of COAR Notify Patterns
+     * Gets the list of configured COAR Notify Patterns
      *
-     * @return the list of COAR Notify Patterns
+     * @return the list of configured COAR Notify Patterns
      */
     public List<String> getPatterns() {
         return patterns;
     }
 
     /**
-     * Sets the list of COAR Notify Patterns
+     * Sets the list of configured COAR Notify Patterns
      * @param patterns
      */
     public void setPatterns(final List<String> patterns) {

@@ -57,7 +57,7 @@ public class COARNotifyStep extends AbstractProcessingStep {
             Operation op, SubmissionStepConfig stepConf) throws Exception {
 
         PatchOperation<?> patchOperation = new PatchOperationFactory().instanceOf(
-            COARNOTIFY_STEP_OPERATION_ENTRY, op.getOp());
+            "coarnotify", op.getOp());
         patchOperation.perform(context, currentRequest, source, op);
     }
 }

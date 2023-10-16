@@ -9,17 +9,18 @@ package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.SubmissionCOARNotifyRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.coarnotify.COARNotify;
+import org.dspace.coarnotify.COARNotifySubmissionConfiguration;
 import org.springframework.stereotype.Component;
 
 /**
  * This converter is responsible for transforming the model representation of an COARNotify to the REST
- * representation of an COARNotify and vice versa
+ * representation of an COARNotifySubmissionConfiguration and vice versa
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  **/
 @Component
-public class SubmissionCOARNotifyConverter implements DSpaceConverter<COARNotify, SubmissionCOARNotifyRest> {
+public class SubmissionCOARNotifyConverter
+    implements DSpaceConverter<COARNotifySubmissionConfiguration, SubmissionCOARNotifyRest> {
 
     /**
      * Convert a COARNotify to its REST representation
@@ -28,9 +29,10 @@ public class SubmissionCOARNotifyConverter implements DSpaceConverter<COARNotify
      * @return the corresponding SubmissionCOARNotifyRest object
      */
     @Override
-    public SubmissionCOARNotifyRest convert(final COARNotify modelObject, final Projection projection) {
-        SubmissionCOARNotifyRest submissionCOARNotifyRest = new SubmissionCOARNotifyRest();
+    public SubmissionCOARNotifyRest convert(final COARNotifySubmissionConfiguration modelObject,
+                                            final Projection projection) {
 
+        SubmissionCOARNotifyRest submissionCOARNotifyRest = new SubmissionCOARNotifyRest();
         submissionCOARNotifyRest.setProjection(projection);
         submissionCOARNotifyRest.setId(modelObject.getId());
         submissionCOARNotifyRest.setPatterns(modelObject.getPatterns());
@@ -38,8 +40,8 @@ public class SubmissionCOARNotifyConverter implements DSpaceConverter<COARNotify
     }
 
     @Override
-    public Class<COARNotify> getModelClass() {
-        return COARNotify.class;
+    public Class<COARNotifySubmissionConfiguration> getModelClass() {
+        return COARNotifySubmissionConfiguration.class;
     }
 
 }

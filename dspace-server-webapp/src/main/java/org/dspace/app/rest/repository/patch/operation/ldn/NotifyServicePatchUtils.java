@@ -49,7 +49,10 @@ public final class NotifyServicePatchUtils {
         try {
             if (operation.getValue() != null) {
                 if (operation.getValue() instanceof JsonValueEvaluator) {
-                    inboundPattern = objectMapper.readValue(((JsonValueEvaluator) operation.getValue()).getValueNode().toString(),
+                    inboundPattern = objectMapper.readValue(((JsonValueEvaluator) operation.getValue())
+                            .getValueNode().toString(), NotifyServiceInboundPattern.class);
+                } else if (operation.getValue() instanceof String) {
+                    inboundPattern = objectMapper.readValue((String) operation.getValue(),
                         NotifyServiceInboundPattern.class);
                 }
             }
@@ -75,7 +78,10 @@ public final class NotifyServicePatchUtils {
         try {
             if (operation.getValue() != null) {
                 if (operation.getValue() instanceof JsonValueEvaluator) {
-                    outboundPattern = objectMapper.readValue(((JsonValueEvaluator) operation.getValue()).getValueNode().toString(),
+                    outboundPattern = objectMapper.readValue(((JsonValueEvaluator) operation.getValue())
+                            .getValueNode().toString(), NotifyServiceOutboundPattern.class);
+                } else if (operation.getValue() instanceof String) {
+                    outboundPattern = objectMapper.readValue((String) operation.getValue(),
                         NotifyServiceOutboundPattern.class);
                 }
             }

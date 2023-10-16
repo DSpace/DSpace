@@ -31,10 +31,10 @@ public class COARNotifyServiceUtils {
     }
 
     public static String extractPattern(String path) {
-        Pattern pattern = Pattern.compile("/coarnotify/([a-zA-Z]+)/");
+        Pattern pattern = Pattern.compile("/([^/]+)/([^/]+)/([^/]+)");
         Matcher matcher = pattern.matcher(path);
         if (matcher.find()) {
-            return matcher.group(1);
+            return matcher.group(3);
         } else {
             throw new DSpaceBadRequestException("Pattern not found in the path");
         }

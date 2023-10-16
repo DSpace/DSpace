@@ -16,13 +16,12 @@ import javax.persistence.criteria.Root;
 import org.dspace.app.ldn.NotifyPatternToTrigger;
 import org.dspace.app.ldn.NotifyPatternToTrigger_;
 import org.dspace.app.ldn.dao.NotifyPatternToTriggerDao;
-import org.dspace.app.ldn.dao.NotifyServiceDao;
 import org.dspace.content.Item;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 
 /**
- * Implementation of {@link NotifyServiceDao}.
+ * Implementation of {@link NotifyPatternToTriggerDao}.
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */

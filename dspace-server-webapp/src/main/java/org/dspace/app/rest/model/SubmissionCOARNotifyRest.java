@@ -12,11 +12,13 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
+import org.dspace.coarnotify.COARNotifySubmissionConfiguration;
 
 /**
- * This class is the REST representation of the COARNotify model object and acts as a data object
- * for the SubmissionCOARNotifyResource class.
- * Refer to {@link org.dspace.coarnotify.COARNotify} for explanation of the properties
+ * This class is the REST representation of the COARNotifySubmissionConfiguration model object
+ * and acts as a data object for the SubmissionCOARNotifyResource class.
+ *
+ * Refer to {@link COARNotifySubmissionConfiguration} for explanation of the properties
  */
 public class SubmissionCOARNotifyRest extends BaseObjectRest<String> {
     public static final String NAME = "submissioncoarnotifyconfig";

@@ -8,7 +8,7 @@
 package org.dspace.app.rest.repository;
 
 import org.dspace.app.rest.model.SubmissionCOARNotifyRest;
-import org.dspace.coarnotify.COARNotify;
+import org.dspace.coarnotify.COARNotifySubmissionConfiguration;
 import org.dspace.coarnotify.service.SubmissionCOARNotifyService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +32,12 @@ public class SubmissionCoarNotifyRestRepository extends DSpaceRestRepository<Sub
     @Override
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public SubmissionCOARNotifyRest findOne(final Context context, final String id) {
-        COARNotify coarNotify = submissionCOARNotifyService.findOne(id);
-        if (coarNotify == null) {
-            throw new ResourceNotFoundException("No COAR Notify could be found for ID: " + id );
+        COARNotifySubmissionConfiguration coarNotifySubmissionConfiguration = submissionCOARNotifyService.findOne(id);
+        if (coarNotifySubmissionConfiguration == null) {
+            throw new ResourceNotFoundException(
+                "No COAR Notify Submission Configuration could be found for ID: " + id );
         }
-        return converter.toRest(coarNotify, utils.obtainProjection());
+        return converter.toRest(coarNotifySubmissionConfiguration, utils.obtainProjection());
     }
 
     @Override

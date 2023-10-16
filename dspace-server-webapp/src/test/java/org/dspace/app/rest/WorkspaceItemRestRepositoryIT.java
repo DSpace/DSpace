@@ -53,10 +53,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.matchers.JsonPathMatchers;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.time.DateUtils;
-import org.dspace.app.ldn.NotifyPatternToTrigger;
 import org.dspace.app.ldn.NotifyServiceEntity;
-import org.dspace.app.ldn.service.NotifyPatternToTriggerService;
-import org.dspace.app.ldn.service.NotifyService;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
@@ -8627,17 +8624,17 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         NotifyServiceEntity notifyServiceOne =
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name one")
-                                .withLdnUrl("service ldn url one")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceTwo =
             NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name two")
-                                .withLdnUrl("service ldn url two")
+                                .withLdnUrl("https://service2.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceThree =
             NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name three")
-                                .withLdnUrl("service ldn url three")
+                                .withLdnUrl("https://service3.ldn.org/inbox")
                                 .build();
 
         // append the three services to the workspace item with different patterns
@@ -8658,15 +8655,10 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.sections.coarnotify[0]", allOf(
                 hasJsonPath("pattern", is("endorsement")),
-                hasJsonPath("services", containsInAnyOrder(
-                    matchNotifyServiceWithoutLinks(notifyServiceTwo.getID(), "service name two",
-                        null, null, "service ldn url two"),
-                    matchNotifyServiceWithoutLinks(notifyServiceThree.getID(), "service name three",
-                        null, null, "service ldn url three"))))))
+                hasJsonPath("services", contains(notifyServiceTwo.getID(), notifyServiceThree.getID())))))
             .andExpect(jsonPath("$.sections.coarnotify[1]", allOf(
                 hasJsonPath("pattern", is("review")),
-                hasJsonPath("services", contains(matchNotifyServiceWithoutLinks(notifyServiceOne.getID(),
-                    "service name one", null, null, "service ldn url one"))))));
+                hasJsonPath("services", contains(notifyServiceOne.getID())))));
     }
 
     @Test
@@ -8687,17 +8679,17 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         NotifyServiceEntity notifyServiceOne =
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name one")
-                                .withLdnUrl("service ldn url one")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceTwo =
             NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name two")
-                                .withLdnUrl("service ldn url two")
+                                .withLdnUrl("https://service2.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceThree =
             NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name three")
-                                .withLdnUrl("service ldn url three")
+                                .withLdnUrl("https://service3.ldn.org/inbox")
                                 .build();
 
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
@@ -8715,8 +8707,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                             .andExpect(status().isOk())
                             .andExpect(jsonPath("$.sections.coarnotify[0].services", hasSize(1)))
                             .andExpect(jsonPath("$.sections.coarnotify[0].services", contains(
-                                matchNotifyServiceWithoutLinks(notifyServiceOne.getID(), "service name one",
-                                    null, null, "service ldn url one"))));
+                                notifyServiceOne.getID()
+                            )));
 
         // try to add new service of review pattern to witem
         List<Operation> addOpts = new ArrayList<Operation>();
@@ -8730,14 +8722,11 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
                             .andExpect(jsonPath("$.sections.coarnotify[0].services", hasSize(3)))
-                            .andExpect(jsonPath("$.sections.coarnotify[0].services", contains(
-                                matchNotifyServiceWithoutLinks(notifyServiceOne.getID(), "service name one",
-                                    null, null, "service ldn url one"),
-                                matchNotifyServiceWithoutLinks(notifyServiceTwo.getID(), "service name two",
-                                    null, null, "service ldn url two"),
-                                matchNotifyServiceWithoutLinks(notifyServiceThree.getID(), "service name three",
-                                    null, null, "service ldn url three")
-                                )));
+                            .andExpect(jsonPath("$.sections.coarnotify[0].services",contains(
+                                notifyServiceOne.getID(),
+                                notifyServiceTwo.getID(),
+                                notifyServiceThree.getID()
+                            )));
 
     }
 
@@ -8759,17 +8748,17 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         NotifyServiceEntity notifyServiceOne =
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name one")
-                                .withLdnUrl("service ldn url one")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceTwo =
             NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name two")
-                                .withLdnUrl("service ldn url two")
+                                .withLdnUrl("https://service2.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceThree =
             NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name three")
-                                .withLdnUrl("service ldn url three")
+                                .withLdnUrl("https://service3.ldn.org/inbox")
                                 .build();
 
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
@@ -8788,10 +8777,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                             .andExpect(status().isOk())
                             .andExpect(jsonPath("$.sections.coarnotify[0].services", hasSize(2)))
                             .andExpect(jsonPath("$.sections.coarnotify[0].services", contains(
-                                matchNotifyServiceWithoutLinks(notifyServiceOne.getID(), "service name one",
-                                    null, null, "service ldn url one"),
-                                matchNotifyServiceWithoutLinks(notifyServiceTwo.getID(), "service name two",
-                                    null, null, "service ldn url two"))));
+                                notifyServiceOne.getID(),
+                                notifyServiceTwo.getID())));
 
         // try to replace the notifyServiceOne of witem with notifyServiceThree of review pattern
         List<Operation> removeOpts = new ArrayList<Operation>();
@@ -8805,11 +8792,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                             .andExpect(status().isOk())
                             .andExpect(jsonPath("$.sections.coarnotify[0].services", hasSize(2)))
                             .andExpect(jsonPath("$.sections.coarnotify[0].services", contains(
-                                matchNotifyServiceWithoutLinks(notifyServiceThree.getID(), "service name three",
-                                    null, null, "service ldn url three"),
-                                matchNotifyServiceWithoutLinks(notifyServiceTwo.getID(), "service name two",
-                                    null, null, "service ldn url two")
-                                )));
+                                notifyServiceThree.getID(), notifyServiceTwo.getID()
+                            )));
 
     }
 
@@ -8831,12 +8815,12 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         NotifyServiceEntity notifyServiceOne =
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name one")
-                                .withLdnUrl("service ldn url one")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceTwo =
             NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name two")
-                                .withLdnUrl("service ldn url two")
+                                .withLdnUrl("https://service2.ldn.org/inbox")
                                 .build();
 
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
@@ -8855,10 +8839,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                             .andExpect(status().isOk())
                             .andExpect(jsonPath("$.sections.coarnotify[0].services", hasSize(2)))
                             .andExpect(jsonPath("$.sections.coarnotify[0].services", contains(
-                                matchNotifyServiceWithoutLinks(notifyServiceOne.getID(), "service name one",
-                                    null, null, "service ldn url one"),
-                                matchNotifyServiceWithoutLinks(notifyServiceTwo.getID(), "service name two",
-                                    null, null, "service ldn url two"))));
+                                notifyServiceOne.getID(), notifyServiceTwo.getID()
+                            )));
 
         // try to remove the notifyServiceOne of witem
         List<Operation> removeOpts = new ArrayList<Operation>();
@@ -8871,10 +8853,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
                             .andExpect(jsonPath("$.sections.coarnotify[0].services", hasSize(1)))
-                            .andExpect(jsonPath("$.sections.coarnotify[0].services", contains(
-                                matchNotifyServiceWithoutLinks(notifyServiceTwo.getID(), "service name two",
-                                    null, null, "service ldn url two"))
-                            ));
+                            .andExpect(jsonPath("$.sections.coarnotify[0].services",contains(
+                                notifyServiceTwo.getID())));
 
     }
 

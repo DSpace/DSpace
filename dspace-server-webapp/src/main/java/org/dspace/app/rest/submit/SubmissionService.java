@@ -20,7 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.atteo.evo.inflector.English;
 import org.dspace.app.ldn.NotifyPatternToTrigger;
-import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.service.NotifyPatternToTriggerService;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -32,7 +31,6 @@ import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CheckSumRest;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.MetadataValueRest;
-import org.dspace.app.rest.model.NotifyServiceRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.step.DataCCLicense;
@@ -488,29 +486,20 @@ public class SubmissionService {
         List<NotifyPatternToTrigger> patternsToTrigger =
             notifyPatternToTriggerService.findByItem(context, obj.getItem());
 
-        Map<String, List<NotifyServiceEntity>> data =
+        Map<String, List<Integer>> data =
             patternsToTrigger.stream()
                              .collect(Collectors.groupingBy(
                                  NotifyPatternToTrigger::getPattern,
-                                 Collectors.mapping(NotifyPatternToTrigger::getNotifyService, Collectors.toList())
+                                 Collectors.mapping(patternToTrigger ->
+                                         patternToTrigger.getNotifyService().getID(),
+                                     Collectors.toList())
                              ));
 
-        data.forEach((pattern, notifyServiceEntities) -> {
-            DataCOARNotify dataCOARNotify = new DataCOARNotify();
-            dataCOARNotify.setPattern(pattern);
-            dataCOARNotify.setServices(convertToNotifyServiceRests(notifyServiceEntities));
-            dataCOARNotifyList.add(dataCOARNotify);
-        });
+        data.forEach((pattern, ids) ->
+            dataCOARNotifyList.add(new DataCOARNotify(pattern, ids))
+        );
 
         return dataCOARNotifyList;
-    }
-
-    private List<NotifyServiceRest> convertToNotifyServiceRests(List<NotifyServiceEntity> notifyServiceList) {
-        return notifyServiceList.stream()
-                                .map(notifyServiceEntity ->
-                                    (NotifyServiceRest) converter.toRest(
-                                        notifyServiceEntity, Projection.DEFAULT))
-                                .collect(Collectors.toList());
     }
 
 }

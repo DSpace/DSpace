@@ -65,24 +65,24 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name one")
                                 .withDescription("service description one")
-                                .withUrl("service url one")
-                                .withLdnUrl("service ldn url one")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceEntityTwo =
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name two")
                                 .withDescription("service description two")
-                                .withUrl("service url two")
-                                .withLdnUrl("service ldn url two")
+                                .withUrl("https://service2.ldn.org/about")
+                                .withLdnUrl("https://service2.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceEntityThree =
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name three")
                                 .withDescription("service description three")
-                                .withUrl("service url three")
-                                .withLdnUrl("service ldn url three")
+                                .withUrl("https://service3.ldn.org/about")
+                                .withLdnUrl("https://service3.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -93,11 +93,11 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.ldnservices", containsInAnyOrder(
                 matchNotifyService(notifyServiceEntityOne.getID(), "service name one", "service description one",
-                    "service url one", "service ldn url one"),
+                    "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                 matchNotifyService(notifyServiceEntityTwo.getID(), "service name two", "service description two",
-                    "service url two", "service ldn url two"),
+                    "https://service2.ldn.org/about", "https://service2.ldn.org/inbox"),
                 matchNotifyService(notifyServiceEntityThree.getID(), "service name three", "service description three",
-                    "service url three", "service ldn url three")
+                    "https://service3.ldn.org/about", "https://service3.ldn.org/inbox")
             )));
     }
 
@@ -122,8 +122,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
         context.restoreAuthSystemState();
 
@@ -133,7 +133,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isOk())
             .andExpect(jsonPath("$",
                 matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                    "service url", "service ldn url")));
+                    "https://service.ldn.org/about", "https://service.ldn.org/inbox")));
     }
 
     @Test
@@ -167,8 +167,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         NotifyServiceRest notifyServiceRest = new NotifyServiceRest();
         notifyServiceRest.setName("service name");
         notifyServiceRest.setDescription("service description");
-        notifyServiceRest.setUrl("service url");
-        notifyServiceRest.setLdnUrl("service ldn url");
+        notifyServiceRest.setUrl("https://service.ldn.org/about");
+        notifyServiceRest.setLdnUrl("https://service.ldn.org/inbox");
         notifyServiceRest.setNotifyServiceInboundPatterns(List.of(inboundPatternRestOne, inboundPatternRestTwo));
         notifyServiceRest.setNotifyServiceOutboundPatterns(List.of(outboundPatternRest));
         notifyServiceRest.setEnabled(false);
@@ -180,7 +180,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                                 .contentType(contentType))
                             .andExpect(status().isCreated())
                             .andExpect(jsonPath("$", matchNotifyService("service name", "service description",
-                                "service url", "service ldn url", false)))
+                                "https://service.ldn.org/about", "https://service.ldn.org/inbox", false)))
                             .andDo(result ->
                                 idRef.set((read(result.getResponse().getContentAsString(), "$.id"))));
 
@@ -191,7 +191,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.notifyServiceOutboundPatterns", hasSize(1)))
             .andExpect(jsonPath("$", allOf(
                 matchNotifyService(idRef.get(), "service name", "service description",
-                        "service url", "service ldn url", false),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox", false),
                 hasJsonPath("$.notifyServiceInboundPatterns", containsInAnyOrder(
                     matchNotifyServicePattern("patternA", "itemFilterA", true),
                     matchNotifyServicePattern("patternB", null, false)
@@ -211,8 +211,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
         context.restoreAuthSystemState();
 
@@ -239,8 +239,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
         context.restoreAuthSystemState();
 
@@ -266,8 +266,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         NotifyServiceEntity notifyServiceEntity =
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .isEnabled(false)
                                 .build();
         context.restoreAuthSystemState();
@@ -285,7 +285,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
-                "add service description", "service url", "service ldn url", false))
+                "add service description", "https://service.ldn.org/about", "https://service.ldn.org/inbox", false))
             );
     }
 
@@ -297,8 +297,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         NotifyServiceEntity notifyServiceEntity =
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
         context.restoreAuthSystemState();
 
@@ -325,8 +325,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
         context.restoreAuthSystemState();
 
@@ -343,7 +343,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
-                "service description replaced", "service url", "service ldn url", false))
+                "service description replaced", "https://service.ldn.org/about",
+                "https://service.ldn.org/inbox", false))
             );
     }
 
@@ -356,8 +357,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .isEnabled(false)
                                 .build();
         context.restoreAuthSystemState();
@@ -375,7 +376,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
-                null, "service url", "service ldn url", false))
+                null, "https://service.ldn.org/about", "https://service.ldn.org/inbox", false))
             );
     }
 
@@ -388,8 +389,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
         context.restoreAuthSystemState();
 
@@ -416,7 +417,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withLdnUrl("service ldn url")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
         context.restoreAuthSystemState();
 
@@ -433,7 +434,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
-                "service description", "add service url", "service ldn url", false))
+                "service description", "add service url", "https://service.ldn.org/inbox", false))
             );
     }
 
@@ -446,7 +447,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withLdnUrl("service ldn url")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
         context.restoreAuthSystemState();
 
@@ -473,8 +474,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .isEnabled(true)
                                 .build();
         context.restoreAuthSystemState();
@@ -492,7 +493,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
-                "service description", "service url replaced", "service ldn url", true))
+                "service description", "service url replaced", "https://service.ldn.org/inbox", true))
             );
     }
 
@@ -505,8 +506,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
         context.restoreAuthSystemState();
 
@@ -523,7 +524,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
-                "service description", null, "service ldn url"))
+                "service description", null, "https://service.ldn.org/inbox"))
             );
     }
 
@@ -535,8 +536,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         NotifyServiceEntity notifyServiceEntity =
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
         context.restoreAuthSystemState();
 
@@ -563,8 +564,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
         context.restoreAuthSystemState();
 
@@ -581,7 +582,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name replaced",
-                "service description", "service url", "service ldn url"))
+                "service description", "https://service.ldn.org/about", "https://service.ldn.org/inbox"))
             );
     }
 
@@ -593,7 +594,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         NotifyServiceEntity notifyServiceEntity =
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
-                                .withUrl("service url")
+                                .withUrl("https://service.ldn.org/about")
                                 .build();
         context.restoreAuthSystemState();
 
@@ -620,8 +621,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
         context.restoreAuthSystemState();
 
@@ -638,7 +639,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
-                "service description", "service url", "service ldn url replaced"))
+                "service description", "https://service.ldn.org/about", "service ldn url replaced"))
             );
     }
 
@@ -651,8 +652,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
         context.restoreAuthSystemState();
 
@@ -679,8 +680,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
         context.restoreAuthSystemState();
 
@@ -719,23 +720,23 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name one")
                                 .withDescription("service description one")
-                                .withUrl("service url one")
-                                .withLdnUrl("service ldn url one")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
       NotifyServiceEntity notifyServiceEntityTwo =
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name two")
                                 .withDescription("service description two")
-                                .withUrl("service url two")
-                                .withLdnUrl("service ldn url two")
+                                .withUrl("https://service2.ldn.org/about")
+                                .withLdnUrl("https://service2.ldn.org/inbox")
                                 .build();
 
       NotifyServiceBuilder.createNotifyServiceBuilder(context)
                           .withName("service name three")
                           .withDescription("service description three")
-                          .withUrl("service url three")
-                          .withLdnUrl("service ldn url three")
+                          .withUrl("https://service3.ldn.org/about")
+                          .withLdnUrl("https://service3.ldn.org/inbox")
                           .build();
 
         context.restoreAuthSystemState();
@@ -747,7 +748,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntityOne.getID(),
                 "service name one", "service description one",
-                "service url one", "service ldn url one")));
+                "https://service.ldn.org/about", "https://service.ldn.org/inbox")));
     }
 
     @Test
@@ -777,7 +778,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
+                                .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("service ldnUrl")
                                 .build();
         context.restoreAuthSystemState();
@@ -801,8 +802,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -829,7 +830,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", containsInAnyOrder(
                         matchNotifyServicePattern("patternA", "itemFilterA", false),
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
@@ -846,8 +847,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -874,7 +875,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", containsInAnyOrder(
                         matchNotifyServicePattern("patternA", "itemFilterA", false),
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
@@ -898,8 +899,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -926,7 +927,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", containsInAnyOrder(
                         matchNotifyServicePattern("patternA", "itemFilterA"),
                         matchNotifyServicePattern("patternB", "itemFilterB")
@@ -943,8 +944,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -971,7 +972,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", containsInAnyOrder(
                         matchNotifyServicePattern("patternA", "itemFilterA"),
                         matchNotifyServicePattern("patternB", "itemFilterB")
@@ -995,8 +996,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -1023,7 +1024,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", containsInAnyOrder(
                         matchNotifyServicePattern("patternA", "itemFilterA", false),
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
@@ -1045,7 +1046,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", hasItem(
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
                     ))
@@ -1061,8 +1062,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -1085,7 +1086,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", containsInAnyOrder(
                         matchNotifyServicePattern("patternA", "itemFilterA", false)
                     ))
@@ -1113,8 +1114,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -1141,7 +1142,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", containsInAnyOrder(
                         matchNotifyServicePattern("patternA", "itemFilterA"),
                         matchNotifyServicePattern("patternB", "itemFilterB")
@@ -1163,7 +1164,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", hasItem(
                         matchNotifyServicePattern("patternB", "itemFilterB")
                     ))
@@ -1179,8 +1180,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -1203,7 +1204,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", hasItem(
                         matchNotifyServicePattern("patternA", "itemFilterA")
                     ))
@@ -1231,8 +1232,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -1259,7 +1260,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", contains(
                         matchNotifyServicePattern("patternA", null, false),
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
@@ -1282,7 +1283,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", contains(
                         matchNotifyServicePattern("patternA", "itemFilterA", false),
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
@@ -1299,8 +1300,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -1327,7 +1328,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", contains(
                         matchNotifyServicePattern("patternA", "itemFilterA", false),
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
@@ -1357,8 +1358,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -1385,7 +1386,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", contains(
                         matchNotifyServicePattern("patternA", "itemFilterA", false),
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
@@ -1408,7 +1409,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", contains(
                         matchNotifyServicePattern("patternA", "itemFilterC", false),
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
@@ -1425,8 +1426,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -1453,7 +1454,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", contains(
                         matchNotifyServicePattern("patternA", null, false),
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
@@ -1483,8 +1484,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -1511,7 +1512,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", containsInAnyOrder(
                         matchNotifyServicePattern("patternA", "itemFilterA", false),
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
@@ -1533,7 +1534,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", containsInAnyOrder(
                         matchNotifyServicePattern("patternA", "itemFilterA", false),
                         matchNotifyServicePattern("patternB", null, true)
@@ -1550,8 +1551,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -1574,7 +1575,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", containsInAnyOrder(
                         matchNotifyServicePattern("patternA", "itemFilterA", false)
                     ))
@@ -1602,8 +1603,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -1630,7 +1631,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", contains(
                         matchNotifyServicePattern("patternA", null),
                         matchNotifyServicePattern("patternB", null)
@@ -1653,7 +1654,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", contains(
                         matchNotifyServicePattern("patternA", null),
                         matchNotifyServicePattern("patternB", "itemFilterB")
@@ -1670,8 +1671,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -1698,7 +1699,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", contains(
                         matchNotifyServicePattern("patternA", "itemFilterA"),
                         matchNotifyServicePattern("patternB", "itemFilterB")
@@ -1728,8 +1729,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -1756,7 +1757,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", contains(
                         matchNotifyServicePattern("patternA", "itemFilterA"),
                         matchNotifyServicePattern("patternB", "itemFilterB")
@@ -1779,7 +1780,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", contains(
                         matchNotifyServicePattern("patternA", "itemFilterA"),
                         matchNotifyServicePattern("patternB", "itemFilterD")
@@ -1796,8 +1797,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -1824,7 +1825,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", contains(
                         matchNotifyServicePattern("patternA", "itemFilterA"),
                         matchNotifyServicePattern("patternB", null)
@@ -1854,8 +1855,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -1882,7 +1883,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", containsInAnyOrder(
                         matchNotifyServicePattern("patternA", "itemFilterA"),
                         matchNotifyServicePattern("patternB", "itemFilterB")
@@ -1904,7 +1905,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", containsInAnyOrder(
                         matchNotifyServicePattern("patternA", null),
                         matchNotifyServicePattern("patternB", "itemFilterB")
@@ -1921,8 +1922,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -1945,7 +1946,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", hasItem(
                         matchNotifyServicePattern("patternA", "itemFilterA")
                     ))
@@ -1973,8 +1974,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -2001,7 +2002,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", contains(
                         matchNotifyServicePattern(null, "itemFilterA", false),
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
@@ -2024,7 +2025,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", contains(
                         matchNotifyServicePattern("patternA", "itemFilterA", false),
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
@@ -2041,8 +2042,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -2069,7 +2070,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", contains(
                         matchNotifyServicePattern("patternA", "itemFilterA", false),
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
@@ -2099,8 +2100,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -2127,7 +2128,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", contains(
                         matchNotifyServicePattern("patternA", "itemFilterA", false),
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
@@ -2150,7 +2151,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", contains(
                         matchNotifyServicePattern("patternC", "itemFilterA", false),
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
@@ -2167,8 +2168,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -2195,7 +2196,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", contains(
                         matchNotifyServicePattern(null, "itemFilterA", false),
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
@@ -2225,8 +2226,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -2253,7 +2254,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", contains(
                         matchNotifyServicePattern("patternA", "itemFilterA", false),
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
@@ -2276,7 +2277,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", contains(
                         matchNotifyServicePattern("patternA", "itemFilterA", true),
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
@@ -2293,8 +2294,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -2321,7 +2322,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", contains(
                         matchNotifyServicePattern("patternA", "itemFilterA", false),
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
@@ -2351,8 +2352,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -2379,7 +2380,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", contains(
                         matchNotifyServicePattern("patternA", "itemFilterA"),
                         matchNotifyServicePattern(null, "itemFilterB")
@@ -2402,7 +2403,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", contains(
                         matchNotifyServicePattern("patternA", "itemFilterA"),
                         matchNotifyServicePattern("patternB", "itemFilterB")
@@ -2419,8 +2420,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -2447,7 +2448,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", contains(
                         matchNotifyServicePattern("patternA", "itemFilterA"),
                         matchNotifyServicePattern("patternB", "itemFilterB")
@@ -2477,8 +2478,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -2505,7 +2506,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", contains(
                         matchNotifyServicePattern("patternA", "itemFilterA"),
                         matchNotifyServicePattern("patternB", "itemFilterB")
@@ -2528,7 +2529,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", contains(
                         matchNotifyServicePattern("patternA", "itemFilterA"),
                         matchNotifyServicePattern("patternD", "itemFilterB")
@@ -2545,8 +2546,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -2573,7 +2574,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", contains(
                         matchNotifyServicePattern("patternA", "itemFilterA"),
                         matchNotifyServicePattern(null, "itemFilterB")
@@ -2603,8 +2604,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -2631,7 +2632,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", containsInAnyOrder(
                         matchNotifyServicePattern("patternA", "itemFilterA", false),
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
@@ -2655,7 +2656,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", containsInAnyOrder(
                         matchNotifyServicePattern("patternC", "itemFilterC", true),
                         matchNotifyServicePattern("patternD", "itemFilterD", true)
@@ -2672,8 +2673,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -2700,7 +2701,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", containsInAnyOrder(
                         matchNotifyServicePattern("patternA", "itemFilterA", false),
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
@@ -2731,8 +2732,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -2759,7 +2760,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", containsInAnyOrder(
                         matchNotifyServicePattern("patternA", "itemFilterA", false),
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
@@ -2789,8 +2790,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -2817,7 +2818,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", containsInAnyOrder(
                         matchNotifyServicePattern("patternA", "itemFilterA"),
                         matchNotifyServicePattern("patternB", "itemFilterB")
@@ -2841,7 +2842,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", containsInAnyOrder(
                         matchNotifyServicePattern("patternC", "itemFilterC"),
                         matchNotifyServicePattern("patternD", "itemFilterD")
@@ -2858,8 +2859,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -2886,7 +2887,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", containsInAnyOrder(
                         matchNotifyServicePattern("patternA", "itemFilterA"),
                         matchNotifyServicePattern("patternB", "itemFilterB")
@@ -2917,8 +2918,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -2945,7 +2946,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", containsInAnyOrder(
                         matchNotifyServicePattern("patternA", "itemFilterA"),
                         matchNotifyServicePattern("patternB", "itemFilterB")
@@ -2975,8 +2976,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -3003,7 +3004,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", containsInAnyOrder(
                         matchNotifyServicePattern("patternA", "itemFilterA", false),
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
@@ -3033,8 +3034,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -3061,7 +3062,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", containsInAnyOrder(
                         matchNotifyServicePattern("patternA", "itemFilterA"),
                         matchNotifyServicePattern("patternB", "itemFilterB")
@@ -3091,8 +3092,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -3119,7 +3120,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", contains(
                         matchNotifyServicePattern("patternA", "itemFilterA", false),
                         matchNotifyServicePattern("patternB", "itemFilterB", true)
@@ -3142,7 +3143,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceInboundPatterns", contains(
                         matchNotifyServicePattern("patternA", "itemFilterA", false),
                         matchNotifyServicePattern("patternC", "itemFilterC", false)
@@ -3159,8 +3160,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
@@ -3187,7 +3188,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", contains(
                         matchNotifyServicePattern("patternA", "itemFilterA"),
                         matchNotifyServicePattern("patternB", "itemFilterB")
@@ -3210,7 +3211,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$",
                 allOf(
                     matchNotifyService(notifyServiceEntity.getID(), "service name", "service description",
-                        "service url", "service ldn url"),
+                        "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                     hasJsonPath("$.notifyServiceOutboundPatterns", contains(
                         matchNotifyServicePattern("patternC", "itemFilterC"),
                         matchNotifyServicePattern("patternB", "itemFilterB")
@@ -3242,33 +3243,33 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name one")
                                 .withDescription("service description one")
-                                .withUrl("service url one")
-                                .withLdnUrl("service ldn url one")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceEntityTwo =
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name two")
                                 .withDescription("service description two")
-                                .withUrl("service url two")
-                                .withLdnUrl("service ldn url two")
+                                .withUrl("https://service2.ldn.org/about")
+                                .withLdnUrl("https://service2.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceEntityThree =
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name three")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url three")
+                                .withUrl("https://service3.ldn.org/about")
+                                .withLdnUrl("https://service3.ldn.org/inbox")
                                 .build();
 
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation inboundAddOperationOne = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationOne = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"review\",\"constraint\":\"itemFilterA\",\"automatic\":\"false\"}");
 
-        AddOperation inboundAddOperationTwo = new AddOperation("notifyservices_inbound_patterns/-",
+        AddOperation inboundAddOperationTwo = new AddOperation("notifyServiceInboundPatterns/-",
             "{\"pattern\":\"review\",\"constraint\":\"itemFilterB\",\"automatic\":\"true\"}");
 
         ops.add(inboundAddOperationOne);
@@ -3304,9 +3305,9 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.page.totalElements", is(2)))
             .andExpect(jsonPath("$._embedded.ldnservices", containsInAnyOrder(
                 matchNotifyService(notifyServiceEntityOne.getID(), "service name one", "service description one",
-                "service url one", "service ldn url one"),
+                "https://service.ldn.org/about", "https://service.ldn.org/inbox"),
                 matchNotifyService(notifyServiceEntityTwo.getID(), "service name two", "service description two",
-                    "service url two", "service ldn url two")
+                    "https://service2.ldn.org/about", "https://service2.ldn.org/inbox")
                 )));
     }
 
@@ -3318,8 +3319,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .isEnabled(true)
                                 .build();
         context.restoreAuthSystemState();
@@ -3338,7 +3339,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.notifyServiceInboundPatterns", empty()))
             .andExpect(jsonPath("$.notifyServiceOutboundPatterns", empty()))
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
-                "service description", "service url", "service ldn url", false)));
+                "service description", "https://service.ldn.org/about", "https://service.ldn.org/inbox", false)));
     }
 
     @Test
@@ -3349,8 +3350,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
         context.restoreAuthSystemState();
 
