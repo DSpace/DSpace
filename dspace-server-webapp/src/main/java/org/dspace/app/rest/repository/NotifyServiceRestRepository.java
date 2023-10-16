@@ -104,7 +104,8 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
         if(notifyServiceRest.getScore() != null) {
             if(notifyServiceRest.getScore().compareTo(java.math.BigDecimal.ZERO) == -1 || 
                 notifyServiceRest.getScore().compareTo(java.math.BigDecimal.ONE) == 1) {
-                throw new UnprocessableEntityException(format("Score out of range [0, 1]", notifyServiceRest.getScore()));
+                throw new UnprocessableEntityException(format("Score out of range [0, 1] %s",
+                    notifyServiceRest.getScore().setScale(4).toPlainString()));
             }    
         }
         

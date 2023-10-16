@@ -3286,7 +3286,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
-    public void NotifyServiceStatusReplaceOperationTestBadRequestTest() throws Exception {
+    public void NotifyServiceScoreReplaceOperationTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
         NotifyServiceEntity notifyServiceEntity =
@@ -3295,11 +3295,12 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                                 .withDescription("service description")
                                 .withUrl("service url")
                                 .withLdnUrl("service ldn url")
+                                .withScore(BigDecimal.ZERO)
                                 .build();
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("/enabled", "test");
+        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("/score", "0.5");
         ops.add(inboundReplaceOperation);
         String patchBody = getPatchContent(ops);
 
@@ -3309,7 +3310,71 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
+                "add service description", "service url", "service ldn url", false))
+            );
     }
+
+    @Test
+    public void NotifyServiceScoreReplaceOperationTestUnprocessableTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("service ldn url")
+                                .withScore(BigDecimal.ZERO)
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("/score", BigDecimal.TEN);
+        ops.add(inboundReplaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        // patch not boolean value
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isUnprocessableEntity());
+    }
+    
+
+    @Test
+    public void notifyServiceScoreAddOperationTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withUrl("service url")
+                                .withLdnUrl("service ldn url")
+                                .isEnabled(false)
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        AddOperation operation = new AddOperation("/score", BigDecimal.ONE);
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
+                "add service description", "service url", "service ldn url", false))
+            );
+    }
+
 
 }
