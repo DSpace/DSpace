@@ -238,7 +238,14 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
         // If excludeGroup is specified, exclude members of that group from results
         // This uses a subquery to find the excluded group & verify that it is not in the EPerson list of "groups"
         if (excludeGroup != null) {
-            queryBuilder.append(" AND (FROM Group g where g.id = :group_id) NOT IN elements (")
+            // If query params exist, then we already have a WHERE clause (see above) and just need to append an AND
+            if (StringUtils.isNotBlank(queryParam)) {
+                queryBuilder.append(" AND ");
+            } else {
+                // no WHERE clause yet, so this is the start of the WHERE
+                queryBuilder.append(" WHERE ");
+            }
+            queryBuilder.append("(FROM Group g where g.id = :group_id) NOT IN elements (")
                         .append(EPerson.class.getSimpleName().toLowerCase()).append(".groups)");
         }
         // Add sort/order by info to query, if specified
