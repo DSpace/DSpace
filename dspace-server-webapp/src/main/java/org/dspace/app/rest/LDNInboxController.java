@@ -55,9 +55,7 @@ public class LDNInboxController {
     public ResponseEntity<Object> inbox(@RequestBody Notification notification) throws Exception {
         Context context = ContextUtil.obtainCurrentRequestContext();
         validate(notification);
-
         log.info("stored notification {} {}", notification.getId(), notification.getType());
-        context.commit();
 
         LDNMessageEntity ldnMsgEntity = ldnMessageService.create(context, notification);
         log.info("stored ldn message {}", ldnMsgEntity);
