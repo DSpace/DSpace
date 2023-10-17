@@ -336,7 +336,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                         + "item_id=" + wfi.getItem().getID()
                         + "collection_id=" + wfi.getCollection().getID()));
 
-// record the start of the workflow w/provenance message
+        // record the start of the workflow w/provenance message
         recordStart(context, wfi.getItem(), firstActionConfig.getProcessingAction());
 
         //Fire an event !
