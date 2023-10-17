@@ -12,11 +12,13 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.NotifyServiceMatcher.matchNotifyService;
 import static org.dspace.app.rest.matcher.NotifyServiceMatcher.matchNotifyServicePattern;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -28,9 +30,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.ws.rs.core.MediaType;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.lang3.RandomUtils;
 import org.dspace.app.ldn.NotifyServiceEntity;
@@ -45,6 +46,8 @@ import org.dspace.app.rest.repository.NotifyServiceRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.NotifyServiceBuilder;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Integration test class for {@link NotifyServiceRestRepository}.
@@ -3287,7 +3290,6 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
     @Test
     public void NotifyServiceScoreReplaceOperationTest() throws Exception {
-
         context.turnOffAuthorisationSystem();
         NotifyServiceEntity notifyServiceEntity =
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
@@ -3300,20 +3302,20 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("/score", "0.5");
+        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("/score", "0.522");
         ops.add(inboundReplaceOperation);
         String patchBody = getPatchContent(ops);
 
         String authToken = getAuthToken(admin.getEmail(), password);
-        // patch not boolean value
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
-                "add service description", "service url", "service ldn url", false))
-            );
+                "service description", "service url", "service ldn url", false)))
+            .andExpect(jsonPath("$.score", notNullValue()))
+            .andExpect(jsonPath("$.score", closeTo(0.522d, 0.001d)));
     }
 
     @Test
@@ -3331,12 +3333,11 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("/score", BigDecimal.TEN);
+        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("/score", "10");
         ops.add(inboundReplaceOperation);
         String patchBody = getPatchContent(ops);
 
         String authToken = getAuthToken(admin.getEmail(), password);
-        // patch not boolean value
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
@@ -3353,6 +3354,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         NotifyServiceEntity notifyServiceEntity =
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
+                                .withDescription("service description")
                                 .withUrl("service url")
                                 .withLdnUrl("service ldn url")
                                 .isEnabled(false)
@@ -3360,7 +3362,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        AddOperation operation = new AddOperation("/score", BigDecimal.ONE);
+        AddOperation operation = new AddOperation("/score", "1");
         ops.add(operation);
 
         String patchBody = getPatchContent(ops);
@@ -3372,8 +3374,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
-                "add service description", "service url", "service ldn url", false))
-            );
+                "service description", "service url", "service ldn url", false)))
+            .andExpect(jsonPath("$.score", notNullValue()))
+            .andExpect(jsonPath("$.score", closeTo(1d, 0.001d)))
+        ;
     }
 
 

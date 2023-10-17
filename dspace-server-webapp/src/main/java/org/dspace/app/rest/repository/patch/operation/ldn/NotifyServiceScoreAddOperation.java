@@ -46,25 +46,25 @@ public class NotifyServiceScoreAddOperation extends PatchOperation<NotifyService
     @Override
     public NotifyServiceEntity perform(Context context, NotifyServiceEntity notifyServiceEntity, Operation operation)
         throws SQLException {
+        checkNonExistingScoreValue(notifyServiceEntity);
         checkOperationValue(operation.getValue());
-
         Object score = operation.getValue();
-
         if (score == null) {
             throw new DSpaceBadRequestException("The /score value must be a decimal number");
         }
+
+        BigDecimal scoreBigDecimal = null;
         try {
-            BigDecimal scoreBigDecimal = new BigDecimal((String)score);
-            if(scoreBigDecimal.compareTo(java.math.BigDecimal.ZERO) == -1 || 
-                scoreBigDecimal.compareTo(java.math.BigDecimal.ONE) == 1) {
-                throw new UnprocessableEntityException(format("Score out of range [0, 1] %s",
-                    scoreBigDecimal.setScale(4).toPlainString()));
-            }
+            scoreBigDecimal = new BigDecimal(score.toString());
         }catch(Exception e) {
-            throw new DSpaceBadRequestException(format("Score out of range [0, 1] %s", (String)score));
+            throw new DSpaceBadRequestException(format("Score out of range [0, 1] %s", score.toString()));
         }
-        checkNonExistingScoreValue(notifyServiceEntity);
-        notifyServiceEntity.setScore((BigDecimal) score);
+        if(scoreBigDecimal.compareTo(java.math.BigDecimal.ZERO) == -1 || 
+            scoreBigDecimal.compareTo(java.math.BigDecimal.ONE) == 1) {
+            throw new UnprocessableEntityException(format("Score out of range [0, 1] %s",
+                scoreBigDecimal.setScale(4).toPlainString()));
+        }
+        notifyServiceEntity.setScore(scoreBigDecimal);
         notifyService.update(context, notifyServiceEntity);
         return notifyServiceEntity;
     }

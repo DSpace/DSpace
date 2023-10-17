@@ -52,14 +52,15 @@ public class NotifyServiceScoreReplaceOperation extends PatchOperation<NotifySer
         if (score == null) {
             throw new DSpaceBadRequestException("The /score value must be a decimal number");
         }
+        BigDecimal scoreBigDecimal = null;
         try {
-            BigDecimal scoreBigDecimal = new BigDecimal((String)score);
-            if(scoreBigDecimal.compareTo(java.math.BigDecimal.ZERO) == -1 || 
-                scoreBigDecimal.compareTo(java.math.BigDecimal.ONE) == 1) {
-                throw new UnprocessableEntityException(format("Score out of range [0, 1]", (String)score));
-            }
+            scoreBigDecimal = new BigDecimal(score.toString());            
         }catch(Exception e) {
-            throw new DSpaceBadRequestException(format("Score out of range [0, 1] %s", (String)score));
+            throw new DSpaceBadRequestException(format("Score out of range [0, 1] %s", score.toString()));
+        }
+        if(scoreBigDecimal.compareTo(java.math.BigDecimal.ZERO) == -1 || 
+            scoreBigDecimal.compareTo(java.math.BigDecimal.ONE) == 1) {
+            throw new UnprocessableEntityException(format("Score out of range [0, 1]", (String)score));
         }
 
         checkModelForExistingValue(notifyServiceEntity);
