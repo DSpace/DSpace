@@ -10,4 +10,4 @@
 -- edit notifyservice table add score column
 -----------------------------------------------------------------------------------
 
-ALTER TABLE notifyservice ADD COLUMN score NUMERIC(6, 5) DEFAULT NULL CHECK (score >= 0 AND score <= 1);
+ALTER TABLE notifyservice ADD COLUMN score NUMERIC(6, 5);
