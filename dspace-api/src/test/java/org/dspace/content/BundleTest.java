@@ -522,6 +522,8 @@ public class BundleTest extends AbstractDSpaceObjectTest {
         doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.WRITE);
         // Allow Bundle ADD permissions
         doNothing().when(authorizeServiceSpy).authorizeAction(context, b, Constants.ADD);
+        // Allow Bundle REMOVE permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, b, Constants.REMOVE);
         // Allow Bitstream WRITE permissions
         doNothing().when(authorizeServiceSpy)
                    .authorizeAction(any(Context.class), any(Bitstream.class), eq(Constants.WRITE));
