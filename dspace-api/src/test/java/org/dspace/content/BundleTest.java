@@ -517,7 +517,8 @@ public class BundleTest extends AbstractDSpaceObjectTest {
      * Test removeBitstream method and also the unsetPrimaryBitstreamID method, of class Bundle.
      */
     @Test
-    public void testRemoveBitstreamAuthAndUnsetPrimaryBitstreamID() throws IOException, SQLException, AuthorizeException {
+    public void testRemoveBitstreamAuthAndUnsetPrimaryBitstreamID()
+            throws IOException, SQLException, AuthorizeException {
         // Allow Item WRITE permissions
         doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.WRITE);
         // Allow Bundle ADD permissions
