@@ -49,7 +49,8 @@ public final class NotifyServicePatchUtils {
         try {
             if (operation.getValue() != null) {
                 if (operation.getValue() instanceof JsonValueEvaluator) {
-                    inboundPattern = objectMapper.readValue(((JsonValueEvaluator) operation.getValue()).getValueNode().toString(),
+                    inboundPattern = objectMapper.readValue(((JsonValueEvaluator) operation.getValue())
+                                    .getValueNode().toString(),
                         NotifyServiceInboundPattern.class);
                 }
             }
@@ -75,7 +76,8 @@ public final class NotifyServicePatchUtils {
         try {
             if (operation.getValue() != null) {
                 if (operation.getValue() instanceof JsonValueEvaluator) {
-                    outboundPattern = objectMapper.readValue(((JsonValueEvaluator) operation.getValue()).getValueNode().toString(),
+                    outboundPattern = objectMapper.readValue(((JsonValueEvaluator) operation.getValue())
+                                    .getValueNode().toString(),
                         NotifyServiceOutboundPattern.class);
                 }
             }
