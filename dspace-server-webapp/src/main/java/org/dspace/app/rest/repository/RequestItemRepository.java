@@ -242,7 +242,10 @@ public class RequestItemRepository
         }
 
         JsonNode responseMessageNode = requestBody.findValue("responseMessage");
-        String message = responseMessageNode.asText();
+        String message = null;
+        if (responseMessageNode != null && !responseMessageNode.isNull()) {
+            message = responseMessageNode.asText();
+        }
 
         ri.setDecision_date(new Date());
         requestItemService.update(context, ri);
