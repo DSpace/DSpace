@@ -8637,9 +8637,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                     "$.sections.upload.files[0].uuid")));
 
         List<Operation> addPrimaryOps = new ArrayList<Operation>();
-        Map<String, String> primaryUUID = new HashMap<String, String>();
-        primaryUUID.put("primary", idRef.get());
-        addPrimaryOps.add(new AddOperation("/sections/upload/primary", primaryUUID));
+        addPrimaryOps.add(new AddOperation("/sections/upload/primary", idRef.get()));
 
         String patchBody = getPatchContent(addPrimaryOps);
         getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
@@ -8692,9 +8690,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                      "$.sections.upload.files[1].uuid")));
 
         List<Operation> addPrimaryOps = new ArrayList<Operation>();
-        Map<String, String> primaryUUID = new HashMap<String, String>();
-        primaryUUID.put("primary", idFirstPdf.get());
-        addPrimaryOps.add(new AddOperation("/sections/upload/primary", primaryUUID));
+        addPrimaryOps.add(new AddOperation("/sections/upload/primary", idFirstPdf.get()));
 
         String patchBody = getPatchContent(addPrimaryOps);
         getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
@@ -8707,9 +8703,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                              .andExpect(jsonPath("$.sections.upload.primary", is(idFirstPdf.get())));
 
         List<Operation> addPrimaryOps2 = new ArrayList<Operation>();
-        Map<String, String> primaryUUID2 = new HashMap<String, String>();
-        primaryUUID2.put("primary", idSecondPdf.get());
-        addPrimaryOps2.add(new AddOperation("/sections/upload/primary", primaryUUID2));
+        addPrimaryOps2.add(new AddOperation("/sections/upload/primary", idSecondPdf.get()));
 
         getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
                              .content(getPatchContent(addPrimaryOps2))
@@ -8750,12 +8744,10 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.sections.upload.primary", nullValue()));
 
-        List<Operation> addPrimaryOps = new ArrayList<Operation>();
-        Map<String, String> primaryUUID = new HashMap<String, String>();
-        primaryUUID.put("primary", UUID.randomUUID().toString());
-        addPrimaryOps.add(new AddOperation("/sections/upload/primary", primaryUUID));
+        List<Operation> addOperations = new ArrayList<Operation>();
+        addOperations.add(new AddOperation("/sections/upload/primary", UUID.randomUUID()));
 
-        String patchBody = getPatchContent(addPrimaryOps);
+        String patchBody = getPatchContent(addOperations);
         getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
                              .content(patchBody)
                              .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
@@ -8795,12 +8787,10 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.sections.upload.primary", nullValue()));
 
-        List<Operation> addPrimaryOps = new ArrayList<Operation>();
-        Map<String, String> primaryUUID = new HashMap<String, String>();
-        primaryUUID.put("primary", "wrong-uuid");
-        addPrimaryOps.add(new AddOperation("/sections/upload/primary", primaryUUID));
+        List<Operation> addOperations = new ArrayList<Operation>();
+        addOperations.add(new AddOperation("/sections/upload/primary", "wrong-uuid"));
 
-        String patchBody = getPatchContent(addPrimaryOps);
+        String patchBody = getPatchContent(addOperations);
         getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
                              .content(patchBody)
                              .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
@@ -8845,9 +8835,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                     "$.sections.upload.files[0].uuid")));
 
         List<Operation> addOperations = new ArrayList<Operation>();
-        Map<String, String> primaryUUID = new HashMap<String, String>();
-        primaryUUID.put("primary", idRef.get());
-        addOperations.add(new AddOperation("/sections/upload/primary", primaryUUID));
+        addOperations.add(new AddOperation("/sections/upload/primary", idRef.get()));
 
         getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
                              .content(getPatchContent(addOperations))
@@ -8910,9 +8898,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                      "$.sections.upload.files[1].uuid")));
 
         List<Operation> addOperations = new ArrayList<Operation>();
-        Map<String, String> primaryUUID = new HashMap<String, String>();
-        primaryUUID.put("primary", idFirstPdf.get());
-        addOperations.add(new AddOperation("/sections/upload/primary", primaryUUID));
+        addOperations.add(new AddOperation("/sections/upload/primary", idFirstPdf.get()));
 
         getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
                              .content(getPatchContent(addOperations))
@@ -8924,9 +8910,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                              .andExpect(jsonPath("$.sections.upload.primary", is(idFirstPdf.get())));
 
         List<Operation> replaceOperations = new ArrayList<Operation>();
-        Map<String, String> primaryUUID2 = new HashMap<String, String>();
-        primaryUUID2.put("primary", idSecondPdf.get());
-        replaceOperations.add(new ReplaceOperation("/sections/upload/primary", primaryUUID2));
+        replaceOperations.add(new ReplaceOperation("/sections/upload/primary", idSecondPdf.get()));
 
         getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
                              .content(getPatchContent(replaceOperations))
@@ -8972,9 +8956,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                     "$.sections.upload.files[0].uuid")));
 
         List<Operation> replaceOperations = new ArrayList<Operation>();
-        Map<String, String> primaryUUID2 = new HashMap<String, String>();
-        primaryUUID2.put("primary", idPdf.get());
-        replaceOperations.add(new ReplaceOperation("/sections/upload/primary", primaryUUID2));
+        replaceOperations.add(new ReplaceOperation("/sections/upload/primary", idPdf.get()));
 
         getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
                              .content(getPatchContent(replaceOperations))
@@ -9018,9 +9000,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                     "$.sections.upload.files[0].uuid")));
 
         List<Operation> addOperations = new ArrayList<Operation>();
-        Map<String, String> primaryUUID = new HashMap<String, String>();
-        primaryUUID.put("primary", idFirstPdf.get());
-        addOperations.add(new AddOperation("/sections/upload/primary", primaryUUID));
+        addOperations.add(new AddOperation("/sections/upload/primary", idFirstPdf.get()));
 
         getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
                              .content(getPatchContent(addOperations))
@@ -9032,9 +9012,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                              .andExpect(jsonPath("$.sections.upload.primary", is(idFirstPdf.get())));
 
         List<Operation> replaceOperations = new ArrayList<Operation>();
-        Map<String, String> primaryUUID2 = new HashMap<String, String>();
-        primaryUUID2.put("primary", UUID.randomUUID().toString());
-        replaceOperations.add(new ReplaceOperation("/sections/upload/primary", primaryUUID2));
+        replaceOperations.add(new ReplaceOperation("/sections/upload/primary", UUID.randomUUID()));
 
         getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
                              .content(getPatchContent(replaceOperations))
