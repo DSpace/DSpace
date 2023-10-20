@@ -12,7 +12,6 @@ import static org.dspace.core.Constants.CONTENT_BUNDLE_NAME;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
-import org.dspace.app.rest.model.PrimaryBitstreamDTO;
 import org.dspace.content.Bundle;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
@@ -25,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
  */
-public class PrimaryBitstreamRemovePatchOperation extends RemovePatchOperation<PrimaryBitstreamDTO> {
+public class PrimaryBitstreamRemovePatchOperation extends RemovePatchOperation<String> {
 
     @Autowired
     private ItemService itemService;
@@ -39,13 +38,13 @@ public class PrimaryBitstreamRemovePatchOperation extends RemovePatchOperation<P
     }
 
     @Override
-    protected Class<PrimaryBitstreamDTO[]> getArrayClassForEvaluation() {
-        return PrimaryBitstreamDTO[].class;
+    protected Class<String[]> getArrayClassForEvaluation() {
+        return null;
     }
 
     @Override
-    protected Class<PrimaryBitstreamDTO> getClassForEvaluation() {
-        return PrimaryBitstreamDTO.class;
+    protected Class<String> getClassForEvaluation() {
+        return null;
     }
 
 }

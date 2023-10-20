@@ -15,8 +15,6 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.exception.UnprocessableEntityException;
-import org.dspace.app.rest.model.PrimaryBitstreamDTO;
-import org.dspace.app.rest.model.patch.LateObjectEvaluator;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.InProgressSubmission;
@@ -24,14 +22,13 @@ import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.json.patch.PatchException;
 
 /**
  * Submission "replace" operation to replace primary bitstream.
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
  */
-public class PrimaryBitstreamReplacePatchOperation extends ReplacePatchOperation<PrimaryBitstreamDTO> {
+public class PrimaryBitstreamReplacePatchOperation extends ReplacePatchOperation<String> {
 
     private final String EX_MESSAGE = "It is impossible to replace primary bitstrem if it wasn't set!";
 
@@ -69,26 +66,23 @@ public class PrimaryBitstreamReplacePatchOperation extends ReplacePatchOperation
     }
 
     private UUID parseValue(Object value) {
-        PrimaryBitstreamDTO primaryBitstreamDTO = null;
+        UUID primaryBitstreamUUID;
         try {
-            primaryBitstreamDTO = evaluateSingleObject((LateObjectEvaluator) value);
-        } catch (PatchException e) {
+            primaryBitstreamUUID = UUID.fromString((String) value);
+        } catch (Exception e) {
             throw new UnprocessableEntityException("The provided value is invalid!", e);
         }
-        if (Objects.isNull(primaryBitstreamDTO) || Objects.isNull(primaryBitstreamDTO.getPrimary())) {
-            throw new UnprocessableEntityException("The provided value is invalid!" + value);
-        }
-        return primaryBitstreamDTO.getPrimary();
+        return primaryBitstreamUUID;
     }
 
     @Override
-    protected Class<PrimaryBitstreamDTO[]> getArrayClassForEvaluation() {
-        return PrimaryBitstreamDTO[].class;
+    protected Class<String[]> getArrayClassForEvaluation() {
+        return null;
     }
 
     @Override
-    protected Class<PrimaryBitstreamDTO> getClassForEvaluation() {
-        return PrimaryBitstreamDTO.class;
+    protected Class<String> getClassForEvaluation() {
+        return null;
     }
 
 }
