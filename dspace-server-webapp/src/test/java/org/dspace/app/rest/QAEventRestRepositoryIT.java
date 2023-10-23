@@ -11,8 +11,10 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
 import static org.dspace.app.rest.matcher.QAEventMatcher.matchQAEventEntry;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
@@ -26,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import javax.ws.rs.core.MediaType;
 
 import org.dspace.app.rest.matcher.ItemMatcher;
@@ -33,6 +36,7 @@ import org.dspace.app.rest.matcher.QAEventMatcher;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EntityTypeBuilder;
@@ -59,6 +63,9 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private QAEventsDao qaEventsDao;
+
+    @Autowired
+    private AuthorizeService authorizeService;
 
     @Test
     public void findAllNotImplementedTest() throws Exception {
@@ -787,4 +794,336 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         assertThat(processedEvent.getEperson().getID(), is(admin.getID()));
 
     }
+
+    @Test
+    public void createNBEventByCorrectionTypeUnAuthorizedTest() throws Exception {
+        getClient().perform(post("/api/integration/nbevents/")
+                       .contentType(org.springframework.http.MediaType.parseMediaType("text/uri-list"))
+                       .content(
+                           "https://localhost:8080/server/api/config/correctiontypes/addpersonalarchive\n" +
+                           "https://localhost:8080/server/api/core/items/" + UUID.randomUUID() + "\n" +
+                           "https://localhost:8080/server/api/core/items/" + UUID.randomUUID()
+                       ))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void createNBEventByCorrectionTypeWithMissingUriTest() throws Exception {
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken).perform(post("/api/integration/nbevents/")
+                                 .contentType(org.springframework.http.MediaType.parseMediaType("text/uri-list"))
+                                 .content(
+                                     "https://localhost:8080/server/api/config/correctiontypes/addpersonalarchive\n" +
+                                     "https://localhost:8080/server/api/core/items/" + UUID.randomUUID()
+                                 ))
+                             .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void createNBEventByCorrectionTypeWithPersonalArchiveAsTargetItemTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        Item personalArchive = ItemBuilder.createItem(context, col1)
+                                          .withEntityType("PersonalArchive")
+                                          .withTitle("personal archive item").build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken)
+            .perform(post("/api/integration/nbevents/")
+                .contentType(org.springframework.http.MediaType.parseMediaType("text/uri-list"))
+                .content(
+                    "https://localhost:8080/server/api/config/correctiontypes/addpersonalarchive\n" +
+                        "https://localhost:8080/server/api/core/items/" + personalArchive.getID() + "\n" +
+                        "https://localhost:8080/server/api/core/items/" + personalArchive.getID()
+                ))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void createNBEventByCorrectionTypeWithPersonalPathAsTargetItemTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        Item personalPath = ItemBuilder.createItem(context, col1)
+                                       .withEntityType("PersonalPath")
+                                       .withTitle("personal path item").build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken)
+            .perform(post("/api/integration/nbevents/")
+                .contentType(org.springframework.http.MediaType.parseMediaType("text/uri-list"))
+                .content(
+                    "https://localhost:8080/server/api/config/correctiontypes/addpersonalarchive\n" +
+                        "https://localhost:8080/server/api/core/items/" + personalPath.getID() + "\n" +
+                        "https://localhost:8080/server/api/core/items/" + personalPath.getID()
+                ))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void createNBEventByNotFoundCorrectionTypeTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        Item targetItem = ItemBuilder.createItem(context, col1)
+                                     .withEntityType("Publication")
+                                     .withTitle("publication item").build();
+
+        Item relatedItem = ItemBuilder.createItem(context, col1)
+                                      .withEntityType("PersonalArchive")
+                                      .withTitle("personal archive item").build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken)
+            .perform(post("/api/integration/nbevents/")
+                .contentType(org.springframework.http.MediaType.parseMediaType("text/uri-list"))
+                .content(
+                    "https://localhost:8080/server/api/config/correctiontypes/test\n" +
+                        "https://localhost:8080/server/api/core/items/" + targetItem.getID() + "\n" +
+                        "https://localhost:8080/server/api/core/items/" + relatedItem.getID()
+                ))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void createNBEventByCorrectionTypeButNotFoundTargetItemTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        Item personalArchive = ItemBuilder.createItem(context, col1)
+                                          .withEntityType("PersonalArchive")
+                                          .withTitle("personal archive item").build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken)
+            .perform(post("/api/integration/nbevents/")
+                .contentType(org.springframework.http.MediaType.parseMediaType("text/uri-list"))
+                .content(
+                    "https://localhost:8080/server/api/config/correctiontypes/addpersonalarchive\n" +
+                    "https://localhost:8080/server/api/core/items/" + UUID.randomUUID() + "\n" +
+                        "https://localhost:8080/server/api/core/items/" + personalArchive.getID()
+                ))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void createNBEventByCorrectionTypeButNotFoundRelatedItemTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+
+        Item item = ItemBuilder.createItem(context, col1)
+                               .withEntityType("Publication")
+                               .withTitle("publication item").build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(adminToken)
+            .perform(post("/api/integration/nbevents/")
+                .contentType(org.springframework.http.MediaType.parseMediaType("text/uri-list"))
+                .content(
+                    "https://localhost:8080/server/api/config/correctiontypes/addpersonalarchive\n" +
+                        "https://localhost:8080/server/api/core/items/" + item.getID() + "\n" +
+                        "https://localhost:8080/server/api/core/items/" + UUID.randomUUID()
+                ))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void createNBEventByCorrectionIsForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+        Item targetItem = ItemBuilder.createItem(context, col1)
+                                     .withEntityType("Publication")
+                                     .withTitle("publication item").build();
+
+        Item relatedItem = ItemBuilder.createItem(context, col1)
+                                      .withEntityType("PersonalArchive")
+                                      .withTitle("personal archive item").build();
+
+        authorizeService.removeAllPolicies(context, targetItem);
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        //WHEN: create nbEvent and accept it
+        getClient(authToken)
+            .perform(post("/api/integration/nbevents/")
+                .contentType(org.springframework.http.MediaType.parseMediaType("text/uri-list"))
+                .content(
+                    "https://localhost:8080/server/api/config/correctiontypes/addpersonalarchive\n" +
+                        "https://localhost:8080/server/api/core/items/" + targetItem.getID() + "\n" +
+                        "https://localhost:8080/server/api/core/items/" + relatedItem.getID()
+                ))
+            .andExpect(status().isForbidden());
+
+    }
+
+    @Test
+    public void createNBEventByCorrectionTypeTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+        Item targetItem = ItemBuilder.createItem(context, col1)
+                                     .withEntityType("Publication")
+                                     .withTitle("publication item").build();
+
+        Item relatedItem = ItemBuilder.createItem(context, col1)
+                                      .withEntityType("PersonalArchive")
+                                      .withTitle("personal archive item").build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        //WHEN: create nbEvent and accept it
+        getClient(adminToken)
+            .perform(post("/api/integration/nbevents/")
+                .contentType(org.springframework.http.MediaType.parseMediaType("text/uri-list"))
+                .content(
+                    "https://localhost:8080/server/api/config/correctiontypes/addpersonalarchive\n" +
+                        "https://localhost:8080/server/api/core/items/" + targetItem.getID() + "\n" +
+                        "https://localhost:8080/server/api/core/items/" + relatedItem.getID()
+                ))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$", allOf(
+                hasJsonPath("$.originalId", is("handle:" + targetItem.getHandle())),
+                hasJsonPath("$.topic",
+                    equalTo("/DSPACEUSERS/RELATIONADD/dc.relation.personalarchive")),
+                hasJsonPath("$.title", is(targetItem.getName())),
+                hasJsonPath("$.trust", is("1.000")),
+                hasJsonPath("$.status", is("PENDING")),
+                hasJsonPath("$.type", is("nbevent")))));
+
+        //THEN: nbEvent has been accepted and metadata has been added
+        getClient(adminToken).perform(get("/api/core/items/" + targetItem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.metadata['dc.relation.personalarchive'].[0].value",
+                                 equalTo(relatedItem.getID().toString())))
+                             .andExpect(jsonPath("$.metadata['dc.relation.personalarchive'].[0].authority",
+                                 equalTo(relatedItem.getID().toString())));
+
+        //THEN: no nbEvents found for the topic
+        getClient(adminToken).perform(get("/api/integration/nbevents/search/findByTopic")
+                                 .param("topic", "/DSPACEUSERS/RELATIONADD/dc.relation.personalarchive"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.page.totalElements", is(0)));
+    }
+
+    @Test
+    public void createNBEventByCorrectionTypeAlreadyLinkedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1").build();
+        Item targetItem = ItemBuilder.createItem(context, col1)
+                                     .withEntityType("Publication")
+                                     .withTitle("publication item").build();
+
+        Item relatedItem = ItemBuilder.createItem(context, col1)
+                                      .withEntityType("PersonalArchive")
+                                      .withTitle("personal archive item").build();
+
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        //WHEN: create nbEvent and accept it
+        getClient(adminToken)
+            .perform(post("/api/integration/nbevents/")
+                .contentType(org.springframework.http.MediaType.parseMediaType("text/uri-list"))
+                .content(
+                    "https://localhost:8080/server/api/config/correctiontypes/addpersonalarchive\n" +
+                        "https://localhost:8080/server/api/core/items/" + targetItem.getID() + "\n" +
+                        "https://localhost:8080/server/api/core/items/" + relatedItem.getID()
+                ))
+            .andExpect(status().isCreated());
+
+        //create nbEvent Item already linked before
+        getClient(adminToken)
+            .perform(post("/api/integration/nbevents/")
+                .contentType(org.springframework.http.MediaType.parseMediaType("text/uri-list"))
+                .content(
+                    "https://localhost:8080/server/api/config/correctiontypes/addpersonalarchive\n" +
+                        "https://localhost:8080/server/api/core/items/" + targetItem.getID() + "\n" +
+                        "https://localhost:8080/server/api/core/items/" + relatedItem.getID()
+                ))
+            .andExpect(status().isUnprocessableEntity());
+
+        //create nbEvent to remove relation metadata
+        getClient(adminToken)
+            .perform(post("/api/integration/nbevents/")
+                .contentType(org.springframework.http.MediaType.parseMediaType("text/uri-list"))
+                .content(
+                    "https://localhost:8080/server/api/config/correctiontypes/removepersonalarchive\n" +
+                    "https://localhost:8080/server/api/core/items/" + targetItem.getID() + "\n" +
+                    "https://localhost:8080/server/api/core/items/" + relatedItem.getID()
+                ))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$", allOf(
+                hasJsonPath("$.originalId", is("handle:" + targetItem.getHandle())),
+                hasJsonPath("$.topic",
+                    equalTo("/DSPACEUSERS/RELATIONREMOVE/dc.relation.personalarchive")),
+                hasJsonPath("$.title", is(targetItem.getName())),
+                hasJsonPath("$.trust", is("1.000")),
+                hasJsonPath("$.status", is("PENDING")),
+                hasJsonPath("$.type", is("nbevent")))));
+
+        //THEN: nbEvent has been accepted and metadata has been removed
+        getClient(adminToken).perform(get("/api/core/items/" + targetItem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.metadata['dc.relation.personalarchive']").doesNotExist())
+                             .andExpect(jsonPath("$.metadata['dc.relation.personalarchive']").doesNotExist());
+
+        //create nbEvent to remove relation metadata not exist
+        getClient(adminToken)
+            .perform(post("/api/integration/nbevents/")
+                .contentType(org.springframework.http.MediaType.parseMediaType("text/uri-list"))
+                .content(
+                    "https://localhost:8080/server/api/config/correctiontypes/removepersonalarchive\n" +
+                        "https://localhost:8080/server/api/core/items/" + targetItem.getID() + "\n" +
+                        "https://localhost:8080/server/api/core/items/" + relatedItem.getID()
+                ))
+            .andExpect(status().isUnprocessableEntity());
+
+
+    }
+
 }

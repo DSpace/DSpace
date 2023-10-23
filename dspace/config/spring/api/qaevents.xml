@@ -25,7 +25,11 @@
                <entry key="ENRICH/MISSING/ABSTRACT" value-ref="AbstractMetadataAction" />
                <entry key="ENRICH/MORE/PID" value-ref="PIDMetadataAction" />
                <entry key="ENRICH/MISSING/PID" value-ref="PIDMetadataAction" />
-            </map>   
+               <entry key="/DSPACEUSERS/RELATIONADD/dc.relation.personalpath" value-ref="AddPersonalPathMetadataAction" />
+               <entry key="/DSPACEUSERS/RELATIONADD/dc.relation.personalarchive" value-ref="AddPersonalArchiveMetadataAction" />
+                <entry key="/DSPACEUSERS/RELATIONREMOVE/dc.relation.personalpath" value-ref="DeletePersonalPathMetadataAction" />
+                <entry key="/DSPACEUSERS/RELATIONREMOVE/dc.relation.personalarchive" value-ref="DeletePersonalArchiveMetadataAction" />
+            </map>
         </property>
      </bean>
      
@@ -64,5 +68,21 @@
 	         </map>
 	     </property>    
      </bean>
-     
+
+    <bean id="AddPersonalArchiveMetadataAction" class="org.dspace.app.nbevent.NBAddMetadataAction">
+        <property name="metadata" value="dc.relation.personalarchive" />
+    </bean>
+
+    <bean id="AddPersonalPathMetadataAction" class="org.dspace.app.nbevent.NBAddMetadataAction">
+        <property name="metadata" value="dc.relation.personalpath" />
+    </bean>
+
+    <bean id="DeletePersonalArchiveMetadataAction" class="org.dspace.app.nbevent.NBDeleteMetadataAction">
+        <property name="metadata" value="dc.relation.personalarchive" />
+    </bean>
+
+    <bean id="DeletePersonalPathMetadataAction" class="org.dspace.app.nbevent.NBDeleteMetadataAction">
+        <property name="metadata" value="dc.relation.personalpath" />
+    </bean>
+
  </beans>

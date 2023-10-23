@@ -31,7 +31,7 @@ public class QAOpenaireSimpleMetadataAction implements QualityAssuranceAction {
     private String metadataElement;
     private String metadataQualifier;
     @Autowired
-    private ItemService itemService;
+    protected ItemService itemService;
 
     public void setItemService(ItemService itemService) {
         this.itemService = itemService;
