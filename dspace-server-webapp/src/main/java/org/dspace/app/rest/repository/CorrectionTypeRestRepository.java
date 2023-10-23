@@ -42,7 +42,7 @@ public class CorrectionTypeRestRepository extends DSpaceRestRepository<Correctio
     @Autowired
     private ItemService itemService;
 
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public CorrectionTypeRest findOne(Context context, String id) {
         CorrectionType correctionType = correctionTypeService.findOne(id);
@@ -52,14 +52,14 @@ public class CorrectionTypeRestRepository extends DSpaceRestRepository<Correctio
         return converter.toRest(correctionType, utils.obtainProjection());
     }
 
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public Page<CorrectionTypeRest> findAll(Context context, Pageable pageable) {
         List<CorrectionType> correctionTypes = correctionTypeService.findAll();
         return converter.toRestPage(correctionTypes, pageable, utils.obtainProjection());
     }
 
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @SearchRestMethod(name = "findByItem")
     public Page<CorrectionTypeRest> findByItem(@Parameter(value = "uuid", required = true) UUID uuid,
                                                Pageable pageable) {
@@ -83,7 +83,7 @@ public class CorrectionTypeRestRepository extends DSpaceRestRepository<Correctio
         }
     }
 
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @SearchRestMethod(name = "findByTopic")
     public CorrectionTypeRest findByTopic(@Parameter(value = "topic", required = true) String topic) {
         CorrectionType correctionType = correctionTypeService.findByTopic(topic);
