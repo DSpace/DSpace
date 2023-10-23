@@ -7,16 +7,20 @@
  */
 package org.dspace.app.rest;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.dspace.app.rest.matcher.ConfigurationMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 /**
- * Integration Tests against the /api/config/properties/[property] endpoint
+ * Integration Tests against the /api/config/properties/[property] and
+ * /api/config/properties/search/exposed endpoints
  */
 public class ConfigurationRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
@@ -51,5 +55,16 @@ public class ConfigurationRestRepositoryIT extends AbstractControllerIntegration
     public void getAll() throws Exception {
         getClient().perform(get("/api/config/properties/"))
             .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    public void getExposed() throws Exception {
+        getClient().perform(get("/api/config/properties/search/exposed"))
+                .andExpect(jsonPath("$._embedded.propertyResources", hasSize(2)))
+                .andExpect(jsonPath("$._embedded.propertyResources", Matchers.containsInAnyOrder(
+                        ConfigurationMatcher.matchConfiguration("configuration.exposed.single.value"),
+                        ConfigurationMatcher.matchConfiguration("configuration.exposed.array.value")
+                )))
+                .andExpect(status().isOk());
     }
 }
