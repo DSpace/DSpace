@@ -7,13 +7,12 @@
  */
 package org.dspace.app.rest.matcher;
 
-import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
-
-
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
+
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 
 public class ConfigurationMatcher {
 
