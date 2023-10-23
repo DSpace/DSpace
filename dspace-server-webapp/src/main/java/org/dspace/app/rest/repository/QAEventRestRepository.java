@@ -30,7 +30,6 @@ import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -80,17 +79,13 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
         Pageable pageable) {
         List<QAEvent> qaEvents = null;
         long count = 0L;
-        boolean ascending = false;
-        if (pageable.getSort() != null && pageable.getSort().getOrderFor(ORDER_FIELD) != null) {
-            ascending = pageable.getSort().getOrderFor(ORDER_FIELD).getDirection() == Direction.ASC;
-        }
         if (target == null) {
             qaEvents = qaEventService.findEventsByTopicAndPage(topic,
-                pageable.getOffset(), pageable.getPageSize(), ORDER_FIELD, ascending);
+                pageable.getOffset(), pageable.getPageSize());
             count = qaEventService.countEventsByTopic(topic);
         } else {
             qaEvents = qaEventService.findEventsByTopicAndPageAndTarget(topic,
-                pageable.getOffset(), pageable.getPageSize(), ORDER_FIELD, ascending, target);
+                pageable.getOffset(), pageable.getPageSize(), target);
             count = qaEventService.countEventsByTopicAndTarget(topic, target);
         }
         if (qaEvents == null) {

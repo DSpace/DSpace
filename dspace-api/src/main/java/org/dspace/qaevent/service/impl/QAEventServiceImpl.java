@@ -347,15 +347,14 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public List<QAEvent> findEventsByTopicAndPage(String topic, long offset,
-        int pageSize, String orderField, boolean ascending) {
+    public List<QAEvent> findEventsByTopicAndPage(String topic, long offset, int pageSize) {
 
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setStart(((Long) offset).intValue());
         if (pageSize != -1) {
             solrQuery.setRows(pageSize);
         }
-        solrQuery.setSort(orderField, ascending ? ORDER.asc : ORDER.desc);
+        solrQuery.setSort(TRUST, ORDER.desc);
         solrQuery.setQuery(TOPIC + ":" + topic.replaceAll("!", "/"));
 
         QueryResponse response;
@@ -378,15 +377,12 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public List<QAEvent> findEventsByTopicAndPageAndTarget(String topic, long offset,
-        int pageSize, String orderField, boolean ascending, UUID target) {
+    public List<QAEvent> findEventsByTopicAndPageAndTarget(String topic, long offset, int pageSize, UUID target) {
 
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setStart(((Long) offset).intValue());
-        if (pageSize != -1) {
-            solrQuery.setRows(pageSize);
-        }
-        solrQuery.setSort(orderField, ascending ? ORDER.asc : ORDER.desc);
+        solrQuery.setRows(pageSize);
+        solrQuery.setSort(TRUST, ORDER.desc);
         solrQuery.setQuery("*:*");
         solrQuery.addFilterQuery(TOPIC + ":" + topic.replaceAll("!", "/"));
         solrQuery.addFilterQuery(RESOURCE_UUID + ":" + target.toString());
@@ -408,11 +404,6 @@ public class QAEventServiceImpl implements QAEventService {
         }
 
         return List.of();
-    }
-
-    @Override
-    public List<QAEvent> findEventsByTopic(String topic) {
-        return findEventsByTopicAndPage(topic, 0, -1, TRUST, false);
     }
 
     @Override

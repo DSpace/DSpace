@@ -58,25 +58,14 @@ public interface QAEventService {
     public long countTopicsBySource(String source);
 
     /**
-     * Find all the events by topic.
+     * Find all the events by topic sorted by trust descending.
      *
      * @param  topic      the topic to search for
      * @param  offset     the offset to apply
      * @param  pageSize   the page size
-     * @param  orderField the field to order for
-     * @param  ascending  true if the order should be ascending, false otherwise
      * @return            the events
      */
-    public List<QAEvent> findEventsByTopicAndPage(String topic, long offset, int pageSize,
-        String orderField, boolean ascending);
-
-    /**
-     * Find all the events by topic.
-     *
-     * @param  topic the topic to search for
-     * @return       the events
-     */
-    public List<QAEvent> findEventsByTopic(String topic);
+    public List<QAEvent> findEventsByTopicAndPage(String topic, long offset, int pageSize);
 
     /**
      * Find all the events by topic.
@@ -157,25 +146,22 @@ public interface QAEventService {
     public boolean isRelatedItemSupported(QAEvent qaevent);
 
     /**
-     * Find all the events by topic and target.
-     *
-     * @param  topic      the topic to search for
-     * @param  target     the item uuid qaEvents are referring to
-     * @param  offset     the offset to apply
-     * @param  pageSize   the page size
-     * @param  orderField the field to order for
-     * @param  ascending  true if the order should be ascending, false otherwise
-     * @return            the events
+     * Find a list of QA events according to the pagination parameters for the specified topic and target sorted by
+     * trust descending
+     * 
+     * @param topic the topic to search for
+     * @param offset the offset to apply
+     * @param pageSize the page size
+     * @param target the uuid of the QA event's target
+     * @return the events
      */
-    List<QAEvent> findEventsByTopicAndPageAndTarget(String topic, long offset, int pageSize, String orderField,
-        boolean ascending, UUID target);
+    public List<QAEvent> findEventsByTopicAndPageAndTarget(String topic, long offset, int pageSize, UUID target);
 
     /**
-     * Find all the events by topic and target.
-     *
-     * @param  target  the item uuid
-     * @param  topic   the topic to search for
-     * @return         the events count
+     * Count the QA events related to the specified topic and target
+     * @param topic      the topic to search for
+     * @param target     the uuid of the QA event's target
+     * @return the count result
      */
     public long countEventsByTopicAndTarget(String topic, UUID target);
 

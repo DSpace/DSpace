@@ -282,46 +282,123 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void findByTargetTest() throws Exception {
         context.turnOffAuthorisationSystem();
+        configurationService.setProperty("qaevent.sources",
+            new String[] { "openaire", "test-source", "test-source-2" });
         parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
-        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+            .withName("Parent Community")
+            .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
-        String uuid = UUID.randomUUID().toString();
-        Item item = ItemBuilder.createItem(context, col1).withTitle("Tracking Papyrus and Parchment Paths")
-                .build();
-        QAEventBuilder.createTarget(context, item)
-                .withTopic("ENRICH/MISSING/PID")
-                .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
-        QAEventBuilder.createTarget(context, col1, "Science and Freedom 2")
-                .withTopic("ENRICH/MISSING/PID")
-                .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
-        QAEventBuilder.createTarget(context, col1, "Science and Freedom 3")
-                .withTopic("ENRICH/MORE/PID")
-                .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"10.2307/2144302\"}").build();
-        QAEventBuilder.createTarget(context, col1, "Science and Freedom 4")
-                .withTopic("ENRICH/MISSING/ABSTRACT")
-                .withMessage(
-                        "{\"abstracts[0]\": \"Descrizione delle caratteristiche...\"}")
-                .build();
+        Item item1 = ItemBuilder.createItem(context, col1).withTitle("Science and Freedom").build();
+        Item item2 = ItemBuilder.createItem(context, col1).withTitle("Science and Freedom 2").build();
+        QAEventBuilder.createTarget(context, item1)
+            .withSource("openaire")
+            .withTopic("ENRICH/MISSING/PID")
+            .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
+        QAEventBuilder.createTarget(context, item1)
+            .withSource("openaire")
+            .withTopic("ENRICH/MISSING/ABSTRACT")
+            .withMessage(
+                "{\"abstracts[0]\": \"Descrizione delle caratteristiche...\"}")
+            .build();
+        QAEventBuilder.createTarget(context, item1)
+            .withTopic("TEST/TOPIC")
+            .withSource("test-source")
+            .build();
+        QAEventBuilder.createTarget(context, item1)
+            .withTopic("TEST/TOPIC/2")
+            .withSource("test-source")
+            .build();
+        QAEventBuilder.createTarget(context, item2)
+            .withTopic("ENRICH/MISSING/PID")
+            .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
+        QAEventBuilder.createTarget(context, item2)
+            .withTopic("ENRICH/MISSING/PID")
+            .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"2144301\"}").build();
         context.restoreAuthSystemState();
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/byTarget")
-            .param("source", "openaire"))
-        .andExpect(status().isBadRequest());
-
-        getClient(authToken)
-            .perform(get("/api/integration/qualityassurancetopics/search/byTarget")
-                .param("target", uuid)
+                .param("target", item1.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.qualityassurancetopics",
+                Matchers.containsInAnyOrder(QATopicMatcher.matchQATopicEntry("ENRICH/MISSING/PID", 1),
+                    QATopicMatcher.matchQATopicEntry("ENRICH/MISSING/ABSTRACT", 1),
+                    QATopicMatcher.matchQATopicEntry("TEST/TOPIC", 1),
+                    QATopicMatcher.matchQATopicEntry("TEST/TOPIC/2", 1))))
+            .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(4)));
+        getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/byTarget")
+                .param("target", item1.getID().toString())
                 .param("source", "openaire"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.qualityassurancetopics",
+                Matchers.containsInAnyOrder(QATopicMatcher.matchQATopicEntry("ENRICH/MISSING/PID", 1),
+                    QATopicMatcher.matchQATopicEntry("ENRICH/MISSING/ABSTRACT", 1))))
+            .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(2)));
+        getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/byTarget")
+            .param("target", item2.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.qualityassurancetopics",
+                Matchers.containsInAnyOrder(QATopicMatcher.matchQATopicEntry("ENRICH/MISSING/PID", 2))))
+            .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(1)));
+        getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/byTarget")
+            .param("target", UUID.randomUUID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$._embedded.qualityassurancetopics").doesNotExist())
             .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(0)));
-
-        getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/byTarget")
-            .param("target", item.getID().toString())
-            .param("source", "openaire"))
-            .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(1)))
-            .andExpect(jsonPath("$._embedded.qualityassurancetopics",
-                Matchers.containsInAnyOrder(QATopicMatcher.matchQATopicEntry("ENRICH/MISSING/PID", 1))));
     }
+
+    @Test
+    public void findByTargetUnauthorizedTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        Item item1 = ItemBuilder.createItem(context, col1).withTitle("Science and Freedom").build();
+        QAEventBuilder.createTarget(context, item1)
+            .withTopic("ENRICH/MISSING/PID").build();
+        context.restoreAuthSystemState();
+        getClient().perform(get("/api/integration/qualityassurancetopics/search/byTarget")
+            .param("target", item1.getID().toString()))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void findByTargetForbiddenTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        Item item1 = ItemBuilder.createItem(context, col1).withTitle("Science and Freedom").build();
+        QAEventBuilder.createTarget(context, item1)
+            .withTopic("ENRICH/MISSING/PID").build();
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/byTarget")
+            .param("target", item1.getID().toString()))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void findByTargetBadRequest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+            .withName("Parent Community")
+            .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        Item item1 = ItemBuilder.createItem(context, col1).withTitle("Science and Freedom").build();
+        QAEventBuilder.createTarget(context, item1)
+            .withSource("test-source")
+            .withTopic("ENRICH/MISSING/PID").build();
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/byTarget")
+            .param("source", "test-source"))
+            .andExpect(status().isBadRequest());
+    }
+
 }

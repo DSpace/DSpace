@@ -177,15 +177,24 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         uuid = item.getID().toString();
+        // check for an existing item but a different topic
         getClient(authToken)
-        .perform(
-            get("/api/integration/qualityassuranceevents/search/findByTopic")
-                .param("topic", "ENRICH!MISSING!PID")
-                .param("target", uuid))
-        .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(1)))
-        .andExpect(jsonPath("$._embedded.qualityassuranceevents",
-                    Matchers.contains(QAEventMatcher.matchQAEventEntry(event1))))
-        .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(1)));
+            .perform(
+                get("/api/integration/qualityassuranceevents/search/findByTopic")
+                    .param("topic", "not-existing")
+                    .param("target", uuid))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
+        // check for an existing item and topic
+        getClient(authToken)
+            .perform(
+                get("/api/integration/qualityassuranceevents/search/findByTopic")
+                    .param("topic", "ENRICH!MISSING!PID")
+                    .param("target", uuid))
+            .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(1)))
+            .andExpect(jsonPath("$._embedded.qualityassuranceevents",
+                        Matchers.contains(QAEventMatcher.matchQAEventEntry(event1))))
+            .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(1)));
     }
 
     @Test
