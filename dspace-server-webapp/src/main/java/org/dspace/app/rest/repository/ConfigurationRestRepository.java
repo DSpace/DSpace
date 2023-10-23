@@ -25,7 +25,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
- * This is the repository responsible of exposing configuration properties
+ * This is the repository responsible for exposing configuration properties
  */
 @Component(PropertyRest.CATEGORY + "." + PropertyRest.NAME)
 public class ConfigurationRestRepository extends DSpaceRestRepository<PropertyRest, String> {
@@ -77,8 +77,8 @@ public class ConfigurationRestRepository extends DSpaceRestRepository<PropertyRe
 
     /**
      * Gets the value of all configuration properties exposed via REST
-     * @param pageable
-     * @return
+     * @param pageable pagination information
+     * @return all configuration properties as an array
      */
     @SearchRestMethod(name = "exposed")
     public Page<PropertyRest> findAllExposed(Pageable pageable) {
