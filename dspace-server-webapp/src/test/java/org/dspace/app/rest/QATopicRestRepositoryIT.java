@@ -13,13 +13,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.UUID;
+
 import org.dspace.app.rest.matcher.QATopicMatcher;
 import org.dspace.app.rest.repository.QATopicRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.QAEventBuilder;
 import org.dspace.content.Collection;
+import org.dspace.content.Item;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -274,4 +278,50 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(status().isForbidden());
     }
 
+
+    @Test
+    public void findByTargetTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        String uuid = UUID.randomUUID().toString();
+        Item item = ItemBuilder.createItem(context, col1).withTitle("Tracking Papyrus and Parchment Paths")
+                .build();
+        QAEventBuilder.createTarget(context, item)
+                .withTopic("ENRICH/MISSING/PID")
+                .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
+        QAEventBuilder.createTarget(context, col1, "Science and Freedom 2")
+                .withTopic("ENRICH/MISSING/PID")
+                .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
+        QAEventBuilder.createTarget(context, col1, "Science and Freedom 3")
+                .withTopic("ENRICH/MORE/PID")
+                .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"10.2307/2144302\"}").build();
+        QAEventBuilder.createTarget(context, col1, "Science and Freedom 4")
+                .withTopic("ENRICH/MISSING/ABSTRACT")
+                .withMessage(
+                        "{\"abstracts[0]\": \"Descrizione delle caratteristiche...\"}")
+                .build();
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/byTarget")
+            .param("source", "openaire"))
+        .andExpect(status().isBadRequest());
+
+        getClient(authToken)
+            .perform(get("/api/integration/qualityassurancetopics/search/byTarget")
+                .param("target", uuid)
+                .param("source", "openaire"))
+            .andExpect(jsonPath("$._embedded.qualityassurancetopics").doesNotExist())
+            .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/byTarget")
+            .param("target", item.getID().toString())
+            .param("source", "openaire"))
+            .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(1)))
+            .andExpect(jsonPath("$._embedded.qualityassurancetopics",
+                Matchers.containsInAnyOrder(QATopicMatcher.matchQATopicEntry("ENRICH/MISSING/PID", 1))));
+    }
 }

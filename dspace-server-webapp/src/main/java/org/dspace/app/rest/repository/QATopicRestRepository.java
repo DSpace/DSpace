@@ -8,7 +8,10 @@
 package org.dspace.app.rest.repository;
 
 import java.util.List;
+import java.util.UUID;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.model.QATopicRest;
@@ -32,6 +35,8 @@ public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, Str
 
     @Autowired
     private QAEventService qaEventService;
+
+    private static final Logger log = LogManager.getLogger();
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -61,6 +66,21 @@ public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, Str
         List<QATopic> topics = qaEventService.findAllTopicsBySource(source,
             pageable.getOffset(), pageable.getPageSize());
         long count = qaEventService.countTopicsBySource(source);
+        if (topics == null) {
+            return null;
+        }
+        return converter.toRestPage(topics, pageable, count, utils.obtainProjection());
+    }
+
+    @SearchRestMethod(name = "byTarget")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Page<QATopicRest> findByTarget(Context context,
+        @Parameter(value = "target", required = true) UUID target,
+        @Parameter(value = "source", required = false) String source,
+        Pageable pageable) {
+        List<QATopic> topics = qaEventService
+            .findAllTopicsBySourceAndTarget(source, target, pageable.getOffset(), pageable.getPageSize());
+        long count = qaEventService.countTopicsBySourceAndTarget(source, target);
         if (topics == null) {
             return null;
         }
