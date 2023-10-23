@@ -54,6 +54,11 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
      */
     public static final Integer QUEUE_STATUS_FAILED = 4;
 
+    /**
+     * Message must not be processed
+     */
+    public static final Integer QUEUE_STATUS_UNTRUSTED = 5;
+
     @Id
     private String id;
 

@@ -27,7 +27,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import javax.ws.rs.core.MediaType;
 
 import org.dspace.app.rest.matcher.ItemMatcher;
@@ -186,7 +185,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(1)))
         .andExpect(jsonPath("$._embedded.qualityassuranceevents",
                     Matchers.contains(QAEventMatcher.matchQAEventEntry(event1))))
-        .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(1)));        
+        .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(1)));
     }
 
     @Test

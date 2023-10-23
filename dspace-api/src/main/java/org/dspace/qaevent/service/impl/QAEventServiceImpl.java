@@ -506,8 +506,8 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     private String[] getSupportedSources() {
-        return configurationService.getArrayProperty("qaevent.sources",
-            new String[] { QAEvent.OPENAIRE_SOURCE, QAEvent.COAR_NOTIFY });
+        return configurationService.getArrayProperty("qaevent.sources", new String[]
+            { QAEvent.OPENAIRE_SOURCE, QAEvent.COAR_NOTIFY });
     }
 
 }
