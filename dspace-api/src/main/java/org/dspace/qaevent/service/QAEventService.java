@@ -58,25 +58,14 @@ public interface QAEventService {
     public long countTopicsBySource(String source);
 
     /**
-     * Find all the events by topic.
+     * Find all the events by topic sorted by trust descending.
      *
      * @param  topic      the topic to search for
      * @param  offset     the offset to apply
      * @param  pageSize   the page size
-     * @param  orderField the field to order for
-     * @param  ascending  true if the order should be ascending, false otherwise
      * @return            the events
      */
-    public List<QAEvent> findEventsByTopicAndPage(String topic, long offset, int pageSize,
-        String orderField, boolean ascending);
-
-    /**
-     * Find all the events by topic.
-     *
-     * @param  topic the topic to search for
-     * @return       the events
-     */
-    public List<QAEvent> findEventsByTopic(String topic);
+    public List<QAEvent> findEventsByTopicAndPage(String topic, long offset, int pageSize);
 
     /**
      * Find all the events by topic.
@@ -155,5 +144,45 @@ public interface QAEventService {
      * @return         true if the event supports a related item, false otherwise.
      */
     public boolean isRelatedItemSupported(QAEvent qaevent);
+
+    /**
+     * Find a list of QA events according to the pagination parameters for the specified topic and target sorted by
+     * trust descending
+     * 
+     * @param topic the topic to search for
+     * @param offset the offset to apply
+     * @param pageSize the page size
+     * @param target the uuid of the QA event's target
+     * @return the events
+     */
+    public List<QAEvent> findEventsByTopicAndPageAndTarget(String topic, long offset, int pageSize, UUID target);
+
+    /**
+     * Count the QA events related to the specified topic and target
+     * @param topic      the topic to search for
+     * @param target     the uuid of the QA event's target
+     * @return the count result
+     */
+    public long countEventsByTopicAndTarget(String topic, UUID target);
+
+    /**
+     * Find all the event's topics related to the given source for a specific item
+     *
+     * @param  source the source to search for
+     * @param  target the item referring to
+     * @param  offset the offset to apply
+     * @param  pageSize  the page size
+     * @return        the topics list
+     */
+    public List<QATopic> findAllTopicsBySourceAndTarget(String source, UUID target, long offset, int pageSize);
+
+    /**
+     * Count all the event's topics related to the given source referring to a specific item
+     *
+     * @param  target  the item uuid
+     * @param  source  the source to search for
+     * @return         the count result
+     */
+    public long countTopicsBySourceAndTarget(String source, UUID target);
 
 }
