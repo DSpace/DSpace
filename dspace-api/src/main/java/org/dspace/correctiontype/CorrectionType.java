@@ -11,21 +11,28 @@ import java.sql.SQLException;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
-import org.dspace.content.NBEvent;
+import org.dspace.content.QAEvent;
 import org.dspace.core.Context;
 
 /**
- * interface class that model the CorrectionType.
+ * Interface class that model the CorrectionType.
  *
- * @author Mohamed Eskander (mohamed.eskander at 4science.com)
+ * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  */
 public interface CorrectionType {
+
     public String getId();
+
     public String getTopic();
-    public String getDiscoveryConfiguration();
-    public String getCreationForm();
+
+    public boolean isRequiredRelatedItem();
+
     public boolean isAllowed(Context context, Item targetItem) throws AuthorizeException, SQLException;
-    public boolean isAllowed(Context context, Item targetItem, Item relatedItem) throws AuthorizeException,
-        SQLException;
-    public NBEvent createCorrection(Context context, Item targetItem, Item relatedItem);
+
+    public boolean isAllowed(Context context, Item targetItem, Item relatedItem) throws AuthorizeException,SQLException;
+
+    public QAEvent createCorrection(Context context, Item targetItem);
+
+    public QAEvent createCorrection(Context context, Item targetItem, Item relatedItem);
+
 }

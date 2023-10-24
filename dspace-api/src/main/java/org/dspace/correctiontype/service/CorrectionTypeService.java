@@ -21,8 +21,13 @@ import org.dspace.correctiontype.CorrectionType;
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
 public interface CorrectionTypeService {
+
     public CorrectionType findOne(String id);
+
     public List<CorrectionType> findAll();
+
     public List<CorrectionType> findByItem(Context context, Item item) throws AuthorizeException, SQLException;
+
     public CorrectionType findByTopic(String topic);
+
 }

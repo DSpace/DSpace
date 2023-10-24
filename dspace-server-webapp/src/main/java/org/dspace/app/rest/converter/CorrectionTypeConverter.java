@@ -19,8 +19,7 @@ import org.springframework.stereotype.Component;
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
 @Component
-public class CorrectionTypeConverter
-    implements DSpaceConverter<CorrectionType, CorrectionTypeRest> {
+public class CorrectionTypeConverter implements DSpaceConverter<CorrectionType, CorrectionTypeRest> {
 
     @Override
     public CorrectionTypeRest convert(CorrectionType target, Projection projection) {

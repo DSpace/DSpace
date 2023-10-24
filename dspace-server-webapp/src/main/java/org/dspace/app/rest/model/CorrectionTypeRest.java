@@ -15,12 +15,15 @@ import org.dspace.app.rest.RestResourceController;
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
 public class CorrectionTypeRest extends BaseObjectRest<String> {
+
+    private static final long serialVersionUID = -8297846719538025938L;
+
     public static final String NAME = "correctiontype";
     public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
 
     private String topic;
-    private String discoveryConfiguration;
     private String creationForm;
+    private String discoveryConfiguration;
 
     public String getTopic() {
         return topic;
@@ -60,4 +63,5 @@ public class CorrectionTypeRest extends BaseObjectRest<String> {
     public Class getController() {
         return RestResourceController.class;
     }
+
 }

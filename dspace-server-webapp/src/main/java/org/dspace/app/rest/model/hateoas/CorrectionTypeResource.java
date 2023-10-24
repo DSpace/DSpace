@@ -19,7 +19,9 @@ import org.dspace.app.rest.utils.Utils;
  */
 @RelNameDSpaceResource(CorrectionTypeRest.NAME)
 public class CorrectionTypeResource extends DSpaceResource<CorrectionTypeRest> {
+
     public CorrectionTypeResource(CorrectionTypeRest target, Utils utils) {
         super(target, utils);
     }
+
 }

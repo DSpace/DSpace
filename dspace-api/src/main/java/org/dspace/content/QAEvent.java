@@ -54,8 +54,7 @@ public class QAEvent {
 
     private String status = "PENDING";
 
-    public QAEvent() {
-    }
+    public QAEvent() {}
 
     public QAEvent(String source, String originalId, String target, String title,
         String topic, double trust, String message, Date lastUpdate) {
@@ -73,7 +72,6 @@ public class QAEvent {
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
         }
-
     }
 
     public String getOriginalId() {

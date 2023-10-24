@@ -19,9 +19,9 @@ import org.dspace.app.rest.RestResourceController;
  */
 @LinksRest(
         links = {
-                @LinkRest(name = "topic", method = "getTopic"),
-                @LinkRest(name = "target", method = "getTarget"),
-                @LinkRest(name = "related", method = "getRelated")
+            @LinkRest(name = "topic", method = "getTopic"),
+            @LinkRest(name = "target", method = "getTarget"),
+            @LinkRest(name = "related", method = "getRelated")
         })
 public class QAEventRest extends BaseObjectRest<String> {
 

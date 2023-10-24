@@ -9,6 +9,7 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.dspace.app.rest.Parameter;
@@ -37,37 +38,31 @@ import org.springframework.stereotype.Component;
 public class CorrectionTypeRestRepository extends DSpaceRestRepository<CorrectionTypeRest, String> {
 
     @Autowired
-    private CorrectionTypeService correctionTypeService;
-
-    @Autowired
     private ItemService itemService;
+    @Autowired
+    private CorrectionTypeService correctionTypeService;
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public CorrectionTypeRest findOne(Context context, String id) {
         CorrectionType correctionType = correctionTypeService.findOne(id);
-        if (null == correctionType) {
-            return null;
-        }
-        return converter.toRest(correctionType, utils.obtainProjection());
+        return Objects.nonNull(correctionType) ? converter.toRest(correctionType, utils.obtainProjection()) : null;
     }
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @Override
     public Page<CorrectionTypeRest> findAll(Context context, Pageable pageable) {
-        List<CorrectionType> correctionTypes = correctionTypeService.findAll();
-        return converter.toRestPage(correctionTypes, pageable, utils.obtainProjection());
+        return converter.toRestPage(correctionTypeService.findAll(), pageable, utils.obtainProjection());
     }
 
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     @SearchRestMethod(name = "findByItem")
-    public Page<CorrectionTypeRest> findByItem(@Parameter(value = "uuid", required = true) UUID uuid,
-                                               Pageable pageable) {
+    public Page<CorrectionTypeRest> findByItem(@Parameter(value = "uuid",required = true) UUID uuid,Pageable pageable) {
         Context context = obtainContext();
         try {
             Item item = itemService.find(context, uuid);
-            if (null == item) {
-                throw new UnprocessableEntityException("item not found");
+            if (Objects.isNull(item)) {
+                throw new UnprocessableEntityException("Item with uuid:" + uuid + " not found");
             }
 
             List<CorrectionType> correctionTypes;
@@ -79,7 +74,7 @@ public class CorrectionTypeRestRepository extends DSpaceRestRepository<Correctio
 
             return converter.toRestPage(correctionTypes, pageable, utils.obtainProjection());
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -87,10 +82,7 @@ public class CorrectionTypeRestRepository extends DSpaceRestRepository<Correctio
     @SearchRestMethod(name = "findByTopic")
     public CorrectionTypeRest findByTopic(@Parameter(value = "topic", required = true) String topic) {
         CorrectionType correctionType = correctionTypeService.findByTopic(topic);
-        if (null == correctionType) {
-            return null;
-        }
-        return converter.toRest(correctionType, utils.obtainProjection());
+        return Objects.nonNull(correctionType) ? converter.toRest(correctionType, utils.obtainProjection()) : null;
     }
 
     @Override

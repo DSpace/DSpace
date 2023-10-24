@@ -4,36 +4,14 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
        default-lazy-init="true">
 
-    <bean id="addPersonalPath" class="org.dspace.correctiontype.AddRelationCorrectionType" >
-        <property name="id" value="addpersonalpath"/>
-        <property name="topic" value="/DSPACEUSERS/RELATIONADD/"/>
-        <property name="discoveryConfiguration" value="RELATION.PersonPath.Items"/>
-        <property name="creationForm" value="manageRelation"/>
-        <property name="targetMetadata" value="dc.relation.personalpath"/>
+    <bean id="withdrawnRequest" class="org.dspace.correctiontype.WithdrawnCorrectionType" >
+        <property name="id" value="withdrawnRequest"/>
+        <property name="topic" value="/REQUEST/WITHDRAWN/"/>
     </bean>
 
-    <bean id="addPersonalArchive" class="org.dspace.correctiontype.AddRelationCorrectionType" >
-        <property name="id" value="addpersonalarchive"/>
-        <property name="topic" value="/DSPACEUSERS/RELATIONADD/"/>
-        <property name="discoveryConfiguration" value="RELATION.PersonArchive.Items"/>
-        <property name="creationForm" value="manageRelation"/>
-        <property name="targetMetadata" value="dc.relation.personalarchive"/>
-    </bean>
-
-    <bean id="removePersonalPath" class="org.dspace.correctiontype.RemoveRelationCorrectionType" >
-        <property name="id" value="removepersonalpath"/>
-        <property name="topic" value="/DSPACEUSERS/RELATIONREMOVE/"/>
-        <property name="discoveryConfiguration" value="RELATION.PersonPath.Items"/>
-        <property name="creationForm" value="manageRelation"/>
-        <property name="targetMetadata" value="dc.relation.personalpath"/>
-    </bean>
-
-    <bean id="removePersonalArchive" class="org.dspace.correctiontype.RemoveRelationCorrectionType" >
-        <property name="id" value="removepersonalarchive"/>
-        <property name="topic" value="/DSPACEUSERS/RELATIONREMOVE/"/>
-        <property name="discoveryConfiguration" value="RELATION.PersonArchive.Items"/>
-        <property name="creationForm" value="manageRelation"/>
-        <property name="targetMetadata" value="dc.relation.personalarchive"/>
+    <bean id="reinstateRequest" class="org.dspace.correctiontype.ReinstateCorrectionType" >
+        <property name="id" value="reinstateRequest"/>
+        <property name="topic" value="/REQUEST/REINSTATE/"/>
     </bean>
 
 </beans>

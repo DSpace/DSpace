@@ -36,10 +36,7 @@ public class ExternalSourceCorrectionTypeUriListHandler extends ExternalSourceEn
     @Override
     @SuppressWarnings("rawtypes")
     public boolean supports(List<String> uriList, String method,Class clazz) {
-        if (clazz != CorrectionType.class) {
-            return false;
-        }
-        return true;
+        return clazz != CorrectionType.class ? false : true;
     }
 
     @Override
@@ -51,10 +48,7 @@ public class ExternalSourceCorrectionTypeUriListHandler extends ExternalSourceEn
     @Override
     public boolean validate(Context context, HttpServletRequest request, List<String> uriList)
         throws AuthorizeException {
-        if (uriList.size() > 1) {
-            return false;
-        }
-        return true;
+        return uriList.size() > 1 ? false : true;
     }
 
 

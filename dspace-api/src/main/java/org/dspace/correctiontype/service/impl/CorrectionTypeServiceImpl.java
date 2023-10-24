@@ -33,19 +33,14 @@ public class CorrectionTypeServiceImpl implements CorrectionTypeService {
     public CorrectionType findOne(String id) {
         List<CorrectionType> correctionTypes = findAll();
         return correctionTypes.stream()
-                              .filter(correctionType ->
-                                  correctionType.getId().equals(id))
-                              .findFirst().orElse(null);
+                              .filter(correctionType -> correctionType.getId().equals(id))
+                              .findFirst()
+                              .orElse(null);
     }
 
     @Override
     public List<CorrectionType> findAll() {
-
-        if (CollectionUtils.isNotEmpty(correctionTypes)) {
-            return correctionTypes;
-        }
-
-        return List.of();
+        return CollectionUtils.isNotEmpty(correctionTypes) ? correctionTypes : List.of();
     }
 
     @Override
@@ -63,8 +58,9 @@ public class CorrectionTypeServiceImpl implements CorrectionTypeService {
     public CorrectionType findByTopic(String topic) {
         List<CorrectionType> correctionTypes = findAll();
         return correctionTypes.stream()
-                              .filter(correctionType ->
-                                  correctionType.getTopic().equals(topic))
-                              .findFirst().orElse(null);
+                              .filter(correctionType -> correctionType.getTopic().equals(topic))
+                              .findFirst()
+                              .orElse(null);
     }
+
 }
