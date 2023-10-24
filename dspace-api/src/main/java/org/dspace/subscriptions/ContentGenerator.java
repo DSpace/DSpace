@@ -78,9 +78,9 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
         if (indexableObjects == null) {
             return EMPTY;
         }
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        out.write("\n".getBytes(UTF_8));
         try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            out.write("\n".getBytes(UTF_8));
             for (IndexableObject indexableObject : indexableObjects) {
                 out.write("\n".getBytes(UTF_8));
                 Item item = (Item) indexableObject.getIndexedObject();
@@ -88,11 +88,12 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
                 Optional.ofNullable(entityType2Disseminator.get(entityType))
                         .orElseGet(() -> entityType2Disseminator.get("Item"))
                         .disseminate(context, item, out);
-            }            
+            }
+            return out.toString();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-        return out.toString();
+        return EMPTY;
     }
 
     public void setEntityType2Disseminator(Map<String, StreamDisseminationCrosswalk> entityType2Disseminator) {
