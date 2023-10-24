@@ -44,7 +44,7 @@ public class ImageContentService extends AbstractResourceService {
      * @return
      */
     protected ImageContentGenerator getImageContent(UUID uuid, String mimetype, ProfileGenerator profile, String path) {
-        return new ImageContentGenerator(IMAGE_SERVICE + uuid + path)
+        return new ImageContentGenerator(IMAGE_SERVICE + uuid + BITSTREAM_PATH_SUFFIX + path)
                 .setFormat(mimetype)
                 .addService(getImageService(profile, uuid.toString()));
     }
@@ -62,7 +62,7 @@ public class ImageContentService extends AbstractResourceService {
      * @return object representing the Image Service
      */
     private ImageServiceGenerator getImageService(ProfileGenerator profile, String uuid) {
-        return new ImageServiceGenerator(IMAGE_SERVICE + uuid).setProfile(profile);
+        return new ImageServiceGenerator(IMAGE_SERVICE + uuid + BITSTREAM_PATH_SUFFIX).setProfile(profile);
     }
 
 }

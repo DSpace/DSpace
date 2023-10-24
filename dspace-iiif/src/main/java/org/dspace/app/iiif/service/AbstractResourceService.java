@@ -78,7 +78,8 @@ public abstract class AbstractResourceService {
            If the variable SLASH_SUBSTITUTE is not empty, replace all occurrences of "/" in BITSTREAM_PATH_PREFIX and
            add it to the IMAGE_SERVICE url.
          */
-        if (SLASH_SUBSTITUTE != null){
+        BITSTREAM_PATH_SUFFIX = BITSTREAM_PATH_SUFFIX != null ? BITSTREAM_PATH_SUFFIX : "";
+        if (SLASH_SUBSTITUTE != null) {
             IMAGE_SERVICE = IMAGE_SERVICE.concat(BITSTREAM_PATH_PREFIX.replace("/",
                     SLASH_SUBSTITUTE)).concat(SLASH_SUBSTITUTE);
             if (BITSTREAM_PATH_SUFFIX != null) {
