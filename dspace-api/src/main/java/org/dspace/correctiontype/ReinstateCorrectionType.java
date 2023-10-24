@@ -7,6 +7,8 @@
  */
 package org.dspace.correctiontype;
 
+import static org.apache.commons.lang.StringUtils.EMPTY;
+
 import java.sql.SQLException;
 import java.util.Date;
 
@@ -99,5 +101,15 @@ public class ReinstateCorrectionType implements CorrectionType, InitializingBean
 
     @Override
     public void afterPropertiesSet() throws Exception {}
+
+    @Override
+    public String getCreationForm() {
+        return EMPTY;
+    }
+
+    @Override
+    public String getDiscoveryConfiguration() {
+        return EMPTY;
+    }
 
 }

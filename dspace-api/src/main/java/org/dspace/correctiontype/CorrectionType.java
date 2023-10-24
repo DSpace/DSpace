@@ -25,6 +25,10 @@ public interface CorrectionType {
 
     public String getTopic();
 
+    public String getCreationForm();
+
+    public String getDiscoveryConfiguration();
+
     public boolean isRequiredRelatedItem();
 
     public boolean isAllowed(Context context, Item targetItem) throws AuthorizeException, SQLException;

@@ -7,6 +7,7 @@
  */
 package org.dspace.correctiontype;
 
+import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.dspace.core.Constants.READ;
 
 import java.sql.SQLException;
@@ -99,5 +100,15 @@ public class WithdrawnCorrectionType implements CorrectionType, InitializingBean
 
     @Override
     public void afterPropertiesSet() throws Exception {}
+
+    @Override
+    public String getCreationForm() {
+        return EMPTY;
+    }
+
+    @Override
+    public String getDiscoveryConfiguration() {
+        return EMPTY;
+    }
 
 }
