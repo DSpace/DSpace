@@ -78,7 +78,7 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             out.write("\n".getBytes(UTF_8));
-            if (indexableObjects != null && !indexableObjects.isEmpty()) {
+            if (indexableObjects != null) {
                 for (IndexableObject indexableObject : indexableObjects) {
                     out.write("\n".getBytes(UTF_8));
                     Item item = (Item) indexableObject.getIndexedObject();
