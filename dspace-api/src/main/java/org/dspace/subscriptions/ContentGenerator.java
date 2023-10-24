@@ -75,24 +75,24 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
     }
 
     private String generateBodyMail(Context context, List<IndexableObject> indexableObjects) {
+        if (indexableObjects == null) {
+            return EMPTY;
+        }
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        out.write("\n".getBytes(UTF_8));
         try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            out.write("\n".getBytes(UTF_8));
-            if (indexableObjects != null) {
-                for (IndexableObject indexableObject : indexableObjects) {
-                    out.write("\n".getBytes(UTF_8));
-                    Item item = (Item) indexableObject.getIndexedObject();
-                    String entityType = itemService.getEntityTypeLabel(item);
-                    Optional.ofNullable(entityType2Disseminator.get(entityType))
-                            .orElseGet(() -> entityType2Disseminator.get("Item"))
-                            .disseminate(context, item, out);
-                }
-                return out.toString();
-            }
+            for (IndexableObject indexableObject : indexableObjects) {
+                out.write("\n".getBytes(UTF_8));
+                Item item = (Item) indexableObject.getIndexedObject();
+                String entityType = itemService.getEntityTypeLabel(item);
+                Optional.ofNullable(entityType2Disseminator.get(entityType))
+                        .orElseGet(() -> entityType2Disseminator.get("Item"))
+                        .disseminate(context, item, out);
+            }            
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-        return EMPTY;
+        return out.toString();
     }
 
     public void setEntityType2Disseminator(Map<String, StreamDisseminationCrosswalk> entityType2Disseminator) {
