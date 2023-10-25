@@ -140,9 +140,9 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
     protected QAEventRest createAndReturn(Context context, List<String> stringList)
             throws SQLException, AuthorizeException {
 
-        if (stringList.size() < 3) {
-            throw new IllegalArgumentException("the request must include three uris for target item, " +
-                "related item and correction type");
+        if (stringList.size() < 2) {
+            throw new IllegalArgumentException("the request must include at least uris for target item, " +
+                "and correction type");
         }
 
         HttpServletRequest request = getRequestService().getCurrentRequest().getHttpServletRequest();

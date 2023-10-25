@@ -13,6 +13,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.dspace.qaevent.service.dto.EmptyMessageDTO;
 import org.dspace.qaevent.service.dto.OpenaireMessageDTO;
 import org.dspace.qaevent.service.dto.QAMessageDTO;
 import org.dspace.util.RawJsonDeserializer;
@@ -30,6 +31,7 @@ public class QAEvent {
     public static final String DISCARDED = "discarded";
 
     public static final String OPENAIRE_SOURCE = "openaire";
+    public static final String INTERNAL_ITEM_SOURCE = "internal-item";
 
     private String source;
 
@@ -195,6 +197,8 @@ public class QAEvent {
         switch (getSource()) {
             case OPENAIRE_SOURCE:
                 return OpenaireMessageDTO.class;
+            case INTERNAL_ITEM_SOURCE:
+                return EmptyMessageDTO.class;
             default:
                 throw new IllegalArgumentException("Unknown event's source: " + getSource());
         }

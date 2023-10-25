@@ -24,8 +24,8 @@
                <entry key="ENRICH/MISSING/ABSTRACT" value-ref="AbstractMetadataAction" />
                <entry key="ENRICH/MORE/PID" value-ref="PIDMetadataAction" />
                <entry key="ENRICH/MISSING/PID" value-ref="PIDMetadataAction" />
-               <entry key="/REQUEST/WITHDRAWN" value-ref="WithdrawnRequestAction" />
-               <entry key="/REQUEST/REINSTATE" value-ref="ReinstateRequestAction" />
+               <entry key="REQUEST/WITHDRAWN" value-ref="WithdrawnRequestAction" />
+               <entry key="REQUEST/REINSTATE" value-ref="ReinstateRequestAction" />
             </map>
         </property>
      </bean>

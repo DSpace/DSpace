@@ -6,12 +6,12 @@
 
     <bean id="withdrawnRequest" class="org.dspace.correctiontype.WithdrawnCorrectionType" >
         <property name="id" value="withdrawnRequest"/>
-        <property name="topic" value="/REQUEST/WITHDRAWN/"/>
+        <property name="topic" value="REQUEST/WITHDRAWN"/>
     </bean>
 
     <bean id="reinstateRequest" class="org.dspace.correctiontype.ReinstateCorrectionType" >
         <property name="id" value="reinstateRequest"/>
-        <property name="topic" value="/REQUEST/REINSTATE/"/>
+        <property name="topic" value="REQUEST/REINSTATE"/>
     </bean>
 
 </beans>
