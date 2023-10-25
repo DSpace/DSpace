@@ -12,9 +12,7 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
 import static org.dspace.app.rest.matcher.QAEventMatcher.matchQAEventEntry;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -38,7 +36,6 @@ import org.dspace.app.rest.matcher.QAEventMatcher;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EntityTypeBuilder;
@@ -66,8 +63,6 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private QAEventsDao qaEventsDao;
-    @Autowired
-    private AuthorizeService authorizeService;
 
     @Test
     public void findAllNotImplementedTest() throws Exception {
