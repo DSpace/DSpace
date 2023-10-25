@@ -40,7 +40,7 @@ public class LDNMessageDaoImpl extends AbstractHibernateDAO<LDNMessageEntity> im
     public List<LDNMessageEntity> findOldestMessageToProcess(Context context, int max_attempts) throws SQLException {
         // looking for oldest failed-processed message
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, LDNMessageEntity.class);
+        CriteriaQuery<LDNMessageEntity> criteriaQuery = getCriteriaQuery(criteriaBuilder, LDNMessageEntity.class);
         Root<LDNMessageEntity> root = criteriaQuery.from(LDNMessageEntity.class);
         criteriaQuery.select(root);
         List<Predicate> andPredicates = new ArrayList<>(3);
@@ -65,7 +65,7 @@ public class LDNMessageDaoImpl extends AbstractHibernateDAO<LDNMessageEntity> im
     public List<LDNMessageEntity> findProcessingTimedoutMessages(Context context, int max_attempts)
         throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, LDNMessageEntity.class);
+        CriteriaQuery<LDNMessageEntity> criteriaQuery = getCriteriaQuery(criteriaBuilder, LDNMessageEntity.class);
         Root<LDNMessageEntity> root = criteriaQuery.from(LDNMessageEntity.class);
         criteriaQuery.select(root);
         List<Predicate> andPredicates = new ArrayList<>(3);

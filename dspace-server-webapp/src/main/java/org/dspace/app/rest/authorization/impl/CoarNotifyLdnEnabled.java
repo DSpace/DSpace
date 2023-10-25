@@ -28,6 +28,7 @@ public class CoarNotifyLdnEnabled implements AuthorizationFeature {
 
     @Autowired
     private ConfigurationService configurationService;
+
     @Override
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException, SearchServiceException {
         return configurationService.getBooleanProperty("coar-notify.enabled", true);
@@ -35,6 +36,7 @@ public class CoarNotifyLdnEnabled implements AuthorizationFeature {
 
     @Override
     public String[] getSupportedTypes() {
-        return new String[]{SiteRest.CATEGORY + "." + SiteRest.NAME};
+        return new String[]{ SiteRest.CATEGORY + "." + SiteRest.NAME };
     }
+
 }

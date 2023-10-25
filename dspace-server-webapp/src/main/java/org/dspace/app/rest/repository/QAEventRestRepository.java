@@ -9,6 +9,7 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.Parameter;
@@ -29,7 +30,6 @@ import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -75,16 +75,19 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
     @SearchRestMethod(name = "findByTopic")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<QAEventRest> findByTopic(Context context, @Parameter(value = "topic", required = true) String topic,
+        @Parameter(value = "target", required = false) UUID target,
         Pageable pageable) {
         List<QAEvent> qaEvents = null;
         long count = 0L;
-        boolean ascending = false;
-        if (pageable.getSort() != null && pageable.getSort().getOrderFor(ORDER_FIELD) != null) {
-            ascending = pageable.getSort().getOrderFor(ORDER_FIELD).getDirection() == Direction.ASC;
+        if (target == null) {
+            qaEvents = qaEventService.findEventsByTopicAndPage(topic,
+                pageable.getOffset(), pageable.getPageSize());
+            count = qaEventService.countEventsByTopic(topic);
+        } else {
+            qaEvents = qaEventService.findEventsByTopicAndPageAndTarget(topic,
+                pageable.getOffset(), pageable.getPageSize(), target);
+            count = qaEventService.countEventsByTopicAndTarget(topic, target);
         }
-        qaEvents = qaEventService.findEventsByTopicAndPage(topic,
-            pageable.getOffset(), pageable.getPageSize(), ORDER_FIELD, ascending);
-        count = qaEventService.countEventsByTopic(topic);
         if (qaEvents == null) {
             return null;
         }

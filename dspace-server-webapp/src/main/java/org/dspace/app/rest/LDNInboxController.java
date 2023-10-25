@@ -55,9 +55,7 @@ public class LDNInboxController {
     public ResponseEntity<Object> inbox(@RequestBody Notification notification) throws Exception {
         Context context = ContextUtil.obtainCurrentRequestContext();
         validate(notification);
-
         log.info("stored notification {} {}", notification.getId(), notification.getType());
-        context.commit();
 
         LDNMessageEntity ldnMsgEntity = ldnMessageService.create(context, notification);
         log.info("stored ldn message {}", ldnMsgEntity);
@@ -68,8 +66,18 @@ public class LDNInboxController {
             log.error(String.format("No processor found for type %s", notification.getType()));
             return ResponseEntity.badRequest()
                 .body(String.format("No processor found for type %s", notification.getType()));
+        }
+        if (ldnMsgEntity.getQueueStatus() != LDNMessageEntity.QUEUE_STATUS_UNTRUSTED) {
+            processor = router.route(ldnMsgEntity);
+            if (processor == null) {
+                log.error(String.format("No processor found for type %s", notification.getType()));
+                return ResponseEntity.badRequest()
+                    .body(String.format("No processor found for type %s", notification.getType()));
+            } else {
+                processor.process(notification);
+            }
         } else {
-            processor.process(notification);
+            log.warn("LDNMessage " + ldnMsgEntity + " has been received by an untrusted source");
         }
         return ResponseEntity.accepted()
             .body(String.format("Successfully stored notification %s %s",
