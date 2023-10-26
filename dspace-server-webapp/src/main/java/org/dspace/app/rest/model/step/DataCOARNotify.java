@@ -7,7 +7,13 @@
  */
 package org.dspace.app.rest.model.step;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Java Bean to expose the COAR Notify Section during in progress submission.
@@ -16,31 +22,28 @@ import java.util.List;
  */
 public class DataCOARNotify implements SectionData {
 
-    private String pattern;
-    private List<Integer> services;
+    private Map<String, List<Integer>> patterns = new HashMap<>();
 
     public DataCOARNotify() {
 
     }
 
-    public DataCOARNotify(String pattern, List<Integer> services) {
-        this.pattern = pattern;
-        this.services = services;
+    @JsonAnySetter
+    public void add(String key, List<Integer> values) {
+        patterns.put(key, values);
     }
 
-    public String getPattern() {
-        return pattern;
+    public DataCOARNotify(Map<String, List<Integer>> patterns) {
+        this.patterns = patterns;
     }
 
-    public void setPattern(String pattern) {
-        this.pattern = pattern;
+    @JsonIgnore
+    public void setPatterns(Map<String, List<Integer>> patterns) {
+        this.patterns = patterns;
     }
 
-    public List<Integer> getServices() {
-        return services;
-    }
-
-    public void setServices(List<Integer> services) {
-        this.services = services;
+    @JsonAnyGetter
+    public Map<String, List<Integer>> getPatterns() {
+        return patterns;
     }
 }

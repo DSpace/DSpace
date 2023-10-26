@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.submit.step;
 
-import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.model.patch.Operation;
@@ -38,9 +37,9 @@ public class COARNotifyStep extends AbstractProcessingStep {
      * @throws Exception
      */
     @Override
-    public ArrayList<DataCOARNotify> getData(SubmissionService submissionService, InProgressSubmission obj,
+    public DataCOARNotify getData(SubmissionService submissionService, InProgressSubmission obj,
                                              SubmissionStepConfig config) throws Exception {
-        return submissionService.getDataCOARNotify(obj);
+        return coarNotifySubmissionService.getDataCOARNotify(obj);
     }
 
     /**
@@ -57,7 +56,7 @@ public class COARNotifyStep extends AbstractProcessingStep {
             Operation op, SubmissionStepConfig stepConf) throws Exception {
 
         PatchOperation<?> patchOperation = new PatchOperationFactory().instanceOf(
-            "coarnotify", op.getOp());
+            COARNOTIFY_STEP_PATH, op.getOp());
         patchOperation.perform(context, currentRequest, source, op);
     }
 }

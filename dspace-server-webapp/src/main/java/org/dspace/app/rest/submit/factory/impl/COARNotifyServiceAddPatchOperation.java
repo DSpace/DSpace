@@ -7,9 +7,8 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
-import static org.dspace.app.rest.submit.factory.impl.COARNotifyServiceUtils.extractPattern;
-
 import java.sql.SQLException;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,11 +18,12 @@ import org.dspace.app.ldn.NotifyPatternToTrigger;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.service.NotifyPatternToTriggerService;
 import org.dspace.app.ldn.service.NotifyService;
-import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.patch.LateObjectEvaluator;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -37,7 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * application/json" -d '[{ "op": "add", "path": "/sections/coarnotify/review/-"}, "value": ["1","2"]'
  * </code>
  */
-public class COARNotifyServiceAddPatchOperation extends AddPatchOperation<String> {
+public class COARNotifyServiceAddPatchOperation extends AddPatchOperation<Integer> {
 
     @Autowired
     private NotifyPatternToTriggerService notifyPatternToTriggerService;
@@ -45,39 +45,43 @@ public class COARNotifyServiceAddPatchOperation extends AddPatchOperation<String
     @Autowired
     private NotifyService notifyService;
 
+    private COARNotifySubmissionService coarNotifySubmissionService = new DSpace().getServiceManager()
+        .getServiceByName("coarNotifySubmissionService", COARNotifySubmissionService.class);
+
     @Override
-    protected Class<String[]> getArrayClassForEvaluation() {
-        return String[].class;
+    protected Class<Integer[]> getArrayClassForEvaluation() {
+        return Integer[].class;
     }
 
     @Override
-    protected Class<String> getClassForEvaluation() {
-        return String.class;
+    protected Class<Integer> getClassForEvaluation() {
+        return Integer.class;
     }
 
     @Override
     void add(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path,
             Object value) throws Exception {
 
-        Set<String> values = evaluateArrayObject((LateObjectEvaluator) value)
-            .stream()
-            .collect(Collectors.toSet());
+        String pattern = coarNotifySubmissionService.extractPattern(path);
+        Set<Integer> servicesIds = new LinkedHashSet<>(evaluateArrayObject((LateObjectEvaluator) value));
+
+        coarNotifySubmissionService.checkCompatibilityWithPattern(context, pattern, servicesIds);
 
         List<NotifyServiceEntity> services =
-            values.stream()
-                  .map(id ->
-                      findService(context, Integer.parseInt(id)))
-                  .collect(Collectors.toList());
+            servicesIds.stream()
+                       .map(id ->
+                           findService(context, id))
+                       .collect(Collectors.toList());
 
         services.forEach(service ->
-            createNotifyPattern(context, source.getItem(), service, extractPattern(path)));
+            createNotifyPattern(context, source.getItem(), service, pattern));
     }
 
     private NotifyServiceEntity findService(Context context, int serviceId) {
         try {
             NotifyServiceEntity service = notifyService.find(context, serviceId);
             if (service == null) {
-                throw new DSpaceBadRequestException("no service found for the provided value: " + serviceId + "");
+                throw new UnprocessableEntityException("no service found for the provided value: " + serviceId + "");
             }
             return service;
         } catch (SQLException e) {

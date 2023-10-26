@@ -35,7 +35,7 @@ public class SubmissionCoarNotifyRestRepository extends DSpaceRestRepository<Sub
         COARNotifySubmissionConfiguration coarNotifySubmissionConfiguration = submissionCOARNotifyService.findOne(id);
         if (coarNotifySubmissionConfiguration == null) {
             throw new ResourceNotFoundException(
-                "No COAR Notify Submission Configuration could be found for ID: " + id );
+                "No COAR Notify Submission Configuration found for ID: " + id );
         }
         return converter.toRest(coarNotifySubmissionConfiguration, utils.obtainProjection());
     }

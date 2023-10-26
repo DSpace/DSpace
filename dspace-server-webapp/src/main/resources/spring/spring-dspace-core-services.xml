@@ -146,4 +146,7 @@
     </bean>
 
     <bean id="org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils" class="org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils"/>
+
+    <bean id="coarNotifySubmissionService" class="org.dspace.app.rest.submit.factory.impl.COARNotifySubmissionService"/>
+
 </beans>

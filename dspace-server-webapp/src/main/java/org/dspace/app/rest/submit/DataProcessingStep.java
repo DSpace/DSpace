@@ -41,6 +41,7 @@ public interface DataProcessingStep extends RestProcessingStep {
     public static final String SHOW_IDENTIFIERS_ENTRY = "identifiers";
 
     public static final String UPLOAD_STEP_METADATA_PATH = "metadata";
+    public static final String COARNOTIFY_STEP_PATH = "coarnotify";
 
     /**
      * Method to expose data in the a dedicated section of the in progress submission. The step needs to return a

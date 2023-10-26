@@ -7,10 +7,8 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
-import static org.dspace.app.rest.submit.factory.impl.COARNotifyServiceUtils.extractIndex;
-import static org.dspace.app.rest.submit.factory.impl.COARNotifyServiceUtils.extractPattern;
-
 import java.util.List;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.ldn.NotifyPatternToTrigger;
@@ -20,6 +18,7 @@ import org.dspace.app.ldn.service.NotifyService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.core.Context;
+import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -33,7 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * application/json" -d '[{ "op": "replace", "path": "/sections/coarnotify/review/0"}, "value": "10"]'
  * </code>
  */
-public class COARNotifyServiceReplacePatchOperation extends ReplacePatchOperation<String> {
+public class COARNotifyServiceReplacePatchOperation extends ReplacePatchOperation<Integer> {
 
     @Autowired
     private NotifyPatternToTriggerService notifyPatternToTriggerService;
@@ -41,24 +40,28 @@ public class COARNotifyServiceReplacePatchOperation extends ReplacePatchOperatio
     @Autowired
     private NotifyService notifyService;
 
+    private COARNotifySubmissionService coarNotifySubmissionService = new DSpace().getServiceManager()
+        .getServiceByName("coarNotifySubmissionService", COARNotifySubmissionService.class);
+
     @Override
-    protected Class<String[]> getArrayClassForEvaluation() {
-        return String[].class;
+    protected Class<Integer[]> getArrayClassForEvaluation() {
+        return Integer[].class;
     }
 
     @Override
-    protected Class<String> getClassForEvaluation() {
-        return String.class;
+    protected Class<Integer> getClassForEvaluation() {
+        return Integer.class;
     }
 
     @Override
     void replace(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path,
             Object value) throws Exception {
 
-        int index = extractIndex(path);
+        int index = coarNotifySubmissionService.extractIndex(path);
+        String pattern = coarNotifySubmissionService.extractPattern(path);
 
         List<NotifyPatternToTrigger> notifyPatterns =
-            notifyPatternToTriggerService.findByItemAndPattern(context, source.getItem(), extractPattern(path));
+            notifyPatternToTriggerService.findByItemAndPattern(context, source.getItem(), pattern);
 
         if (index >= notifyPatterns.size()) {
             throw new DSpaceBadRequestException("the provided index[" + index + "] is out of the rang");
@@ -68,6 +71,9 @@ public class COARNotifyServiceReplacePatchOperation extends ReplacePatchOperatio
         if (notifyServiceEntity == null) {
             throw new DSpaceBadRequestException("no service found for the provided value: " + value + "");
         }
+
+        coarNotifySubmissionService.checkCompatibilityWithPattern(context,
+            pattern, Set.of(notifyServiceEntity.getID()));
 
         NotifyPatternToTrigger notifyPatternToTriggerOld = notifyPatterns.get(index);
         notifyPatternToTriggerOld.setNotifyService(notifyServiceEntity);

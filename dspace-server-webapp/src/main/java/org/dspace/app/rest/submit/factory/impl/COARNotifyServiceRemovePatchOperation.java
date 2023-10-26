@@ -7,19 +7,16 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
-import static org.dspace.app.rest.submit.factory.impl.COARNotifyServiceUtils.extractIndex;
-import static org.dspace.app.rest.submit.factory.impl.COARNotifyServiceUtils.extractPattern;
-
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.ldn.NotifyPatternToTrigger;
 import org.dspace.app.ldn.service.NotifyPatternToTriggerService;
-import org.dspace.app.ldn.service.NotifyService;
-import org.dspace.app.rest.exception.DSpaceBadRequestException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -33,22 +30,22 @@ import org.springframework.beans.factory.annotation.Autowired;
  * application/json" -d '[{ "op": "remove", "path": "/sections/coarnotify/review/0"}]'
  * </code>
  */
-public class COARNotifyServiceRemovePatchOperation extends RemovePatchOperation<String> {
+public class COARNotifyServiceRemovePatchOperation extends RemovePatchOperation<Integer> {
 
     @Autowired
     private NotifyPatternToTriggerService notifyPatternToTriggerService;
 
-    @Autowired
-    private NotifyService notifyService;
+    private COARNotifySubmissionService coarNotifySubmissionService = new DSpace().getServiceManager()
+        .getServiceByName("coarNotifySubmissionService", COARNotifySubmissionService.class);
 
     @Override
-    protected Class<String[]> getArrayClassForEvaluation() {
-        return String[].class;
+    protected Class<Integer[]> getArrayClassForEvaluation() {
+        return Integer[].class;
     }
 
     @Override
-    protected Class<String> getClassForEvaluation() {
-        return String.class;
+    protected Class<Integer> getClassForEvaluation() {
+        return Integer.class;
     }
 
     @Override
@@ -57,14 +54,14 @@ public class COARNotifyServiceRemovePatchOperation extends RemovePatchOperation<
 
         Item item = source.getItem();
 
-        String pattern = extractPattern(path);
-        int index = extractIndex(path);
+        String pattern = coarNotifySubmissionService.extractPattern(path);
+        int index = coarNotifySubmissionService.extractIndex(path);
 
         List<NotifyPatternToTrigger> notifyPatterns =
             notifyPatternToTriggerService.findByItemAndPattern(context, item, pattern);
 
         if (index >= notifyPatterns.size()) {
-            throw new DSpaceBadRequestException("the provided index[" + index + "] is out of the rang");
+            throw new UnprocessableEntityException("the provided index[" + index + "] is out of the rang");
         }
 
         notifyPatternToTriggerService.delete(context, notifyPatterns.get(index));

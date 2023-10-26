@@ -8,7 +8,7 @@
     <bean class="org.dspace.coarnotify.COARNotifyConfigurationService">
         <property name="patterns">
             <map>
-                <entry key="default">
+                <entry key="coarnotify">
                     <list>
                         <value>review</value>
                         <value>endorsement</value>
