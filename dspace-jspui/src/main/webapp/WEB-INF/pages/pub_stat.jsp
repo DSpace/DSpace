@@ -13,6 +13,12 @@
     <h2><%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.general-statistics.stat-sumdu") %></h2>
 
     <h3><%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.general-statistics.calculation") %></h3>
+    <c:set var="totalViews" value="0" scope="page" />
+    <c:set var="totalDownloads" value="0" scope="page" />
+    <c:forEach var="yearStatistics" items="${listYearStatistics}" varStatus="cnt" begin="0" end="${listYearStatistics.size() - 1}">
+        <c:set var="totalViews" value="${totalViews + yearStatistics.totalYearViews}" scope="page" />
+        <c:set var="totalDownloads" value="${totalDownloads + yearStatistics.totalYearDownloads}" scope="page" />
+    </c:forEach>
 
     <table width="95%%" align="center" class="table">
         <tr class="oddRowOddCol">
