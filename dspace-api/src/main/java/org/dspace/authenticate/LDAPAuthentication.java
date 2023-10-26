@@ -494,6 +494,8 @@ public class LDAPAuthentication
                 try {
                     SearchControls ctrls = new SearchControls();
                     ctrls.setSearchScope(ldap_search_scope_value);
+                    // Fetch both user attributes '*' (eg. uid, cn) and operational attributes '+' (eg. memberOf)
+                    ctrls.setReturningAttributes(new String[] {"*", "+"});
 
                     String searchName;
                     if (useTLS) {
@@ -700,13 +702,13 @@ public class LDAPAuthentication
     /*
      * Add authenticated users to the group defined in dspace.cfg by
      * the authentication-ldap.login.groupmap.* key.
-     * 
+     *
      * @param dn
      *  The string containing distinguished name of the user
-     * 
+     *
      * @param group
      *  List of strings with LDAP dn of groups
-     * 
+     *
      * @param context
      *  DSpace context
      */
