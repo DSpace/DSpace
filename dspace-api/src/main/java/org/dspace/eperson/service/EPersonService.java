@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import javax.validation.constraints.NotNull;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
@@ -156,6 +157,19 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      */
     public List<EPerson> findAll(Context context, int sortField, int pageSize, int offset)
         throws SQLException;
+
+    /**
+     * The "System EPerson" is a fake account that exists only to receive email.
+     * It has an email address that should be presumed usable.  It does not
+     * exist in the database and is not complete.
+     *
+     * @param context current DSpace session.
+     * @return an EPerson that can presumably receive email.
+     * @throws SQLException
+     */
+    @NotNull
+    public EPerson getSystemEPerson(Context context)
+            throws SQLException;
 
     /**
      * Create a new eperson

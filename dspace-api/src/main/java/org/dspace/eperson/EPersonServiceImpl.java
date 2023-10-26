@@ -47,6 +47,7 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
 import org.dspace.orcid.service.OrcidTokenService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.util.UUIDUtils;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
@@ -101,6 +102,8 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     protected VersionDAO versionDAO;
     @Autowired(required = true)
     protected ClaimedTaskService claimedTaskService;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
     @Autowired
     protected OrcidTokenService orcidTokenService;
 
@@ -111,6 +114,30 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     @Override
     public EPerson find(Context context, UUID id) throws SQLException {
         return ePersonDAO.findByID(context, EPerson.class, id);
+    }
+
+    /**
+     * Create a fake EPerson which can receive email.  Its address will be the
+     * value of "mail.admin", or "postmaster" if all else fails.
+     * @param c
+     * @return
+     * @throws SQLException
+     */
+    @Override
+    public EPerson getSystemEPerson(Context c)
+            throws SQLException {
+        String adminEmail = configurationService.getProperty("mail.admin");
+        if (null == adminEmail) {
+            adminEmail = "postmaster"; // Last-ditch attempt to send *somewhere*
+        }
+        EPerson systemEPerson = findByEmail(c, adminEmail);
+
+        if (null == systemEPerson) {
+            systemEPerson = new EPerson();
+            systemEPerson.setEmail(adminEmail);
+        }
+
+        return systemEPerson;
     }
 
     @Override
