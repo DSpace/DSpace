@@ -20,7 +20,6 @@ import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.qaevent.service.QAEventActionService;
 import org.dspace.qaevent.service.QAEventService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +39,6 @@ public class ReinstateCorrectionType implements CorrectionType, InitializingBean
     private QAEventService qaEventService;
     @Autowired
     private AuthorizeService authorizeService;
-    @Autowired
-    private QAEventActionService qaEventActionService;
 
     @Override
     public boolean isAllowed(Context context, Item targetItem) throws SQLException, AuthorizeException {
@@ -68,7 +65,6 @@ public class ReinstateCorrectionType implements CorrectionType, InitializingBean
                                       );
 
         qaEventService.store(context, qaEvent);
-        qaEventActionService.accept(context, qaEvent);
         return qaEvent;
     }
 
