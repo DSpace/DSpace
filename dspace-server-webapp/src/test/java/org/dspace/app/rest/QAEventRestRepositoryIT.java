@@ -827,9 +827,14 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                                       .build();
         context.restoreAuthSystemState();
 
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/core/items/" + publication.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.inArchive", is(true)))
+                             .andExpect(jsonPath("$.withdrawn", is(false)));
+
         AtomicReference<String> idRef = new AtomicReference<String>();
 
-        String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(post("/api/integration/qualityassuranceevents")
                              .contentType(RestMediaTypes.TEXT_URI_LIST)
                              .content("https://localhost:8080/server/api/config/correctiontypes/withdrawnRequest\n" +
@@ -839,7 +844,93 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                              .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
         getClient(adminToken).perform(get("/api/integration/qualityassuranceevents/" + idRef.get()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", is(idRef.get())))
+                             .andExpect(jsonPath("$.source", is("internal-item")))
+                             .andExpect(jsonPath("$.title", is(publication.getName())))
+                             .andExpect(jsonPath("$.topic", is("REQUEST/WITHDRAWN")))
+                             .andExpect(jsonPath("$.trust", is("1,000")))
+                             .andExpect(jsonPath("$.status", is("PENDING")));
+
+        getClient(adminToken).perform(get("/api/core/items/" + publication.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.inArchive", is(true)))
+                             .andExpect(jsonPath("$.withdrawn", is(false)));
+
+        List<Operation> acceptOp = new ArrayList<Operation>();
+        acceptOp.add(new ReplaceOperation("/status", QAEvent.ACCEPTED));
+
+        getClient(adminToken).perform(patch("/api/integration/qualityassuranceevents/" + idRef.get())
+                             .content(getPatchContent(acceptOp))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                              .andExpect(status().isOk());
+
+        getClient(adminToken).perform(get("/api/core/items/" + publication.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.inArchive", is(false)))
+                             .andExpect(jsonPath("$.withdrawn", is(true)));
+    }
+
+    @Test
+    public void createQAEventByCorrectionTypeReinstateRequestTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection for Publications")
+                                          .withEntityType("Publication")
+                                          .build();
+
+        Item publication = ItemBuilder.createItem(context, col)
+                                      .withTitle("Publication archived item")
+                                      .withdrawn()
+                                      .build();
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/core/items/" + publication.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.inArchive", is(false)))
+                             .andExpect(jsonPath("$.withdrawn", is(true)));
+
+        AtomicReference<String> idRef = new AtomicReference<String>();
+
+        getClient(adminToken).perform(post("/api/integration/qualityassuranceevents")
+                             .contentType(RestMediaTypes.TEXT_URI_LIST)
+                             .content("https://localhost:8080/server/api/config/correctiontypes/reinstateRequest\n" +
+                                      "https://localhost:8080/server/api/core/items/" + publication.getID()
+                                      ))
+                             .andExpect(status().isCreated())
+                             .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+        getClient(adminToken).perform(get("/api/integration/qualityassuranceevents/" + idRef.get()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", is(idRef.get())))
+                             .andExpect(jsonPath("$.source", is("internal-item")))
+                             .andExpect(jsonPath("$.title", is(publication.getName())))
+                             .andExpect(jsonPath("$.topic", is("REQUEST/REINSTATE")))
+                             .andExpect(jsonPath("$.trust", is("1,000")))
+                             .andExpect(jsonPath("$.status", is("PENDING")));
+
+        getClient(adminToken).perform(get("/api/core/items/" + publication.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.inArchive", is(false)))
+                             .andExpect(jsonPath("$.withdrawn", is(true)));
+
+        List<Operation> acceptOp = new ArrayList<Operation>();
+        acceptOp.add(new ReplaceOperation("/status", QAEvent.ACCEPTED));
+
+        getClient(adminToken).perform(patch("/api/integration/qualityassuranceevents/" + idRef.get())
+                             .content(getPatchContent(acceptOp))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk());
+
+        getClient(adminToken).perform(get("/api/core/items/" + publication.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.inArchive", is(true)))
+                             .andExpect(jsonPath("$.withdrawn", is(false)));
     }
 
 }
