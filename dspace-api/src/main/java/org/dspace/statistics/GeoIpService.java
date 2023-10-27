@@ -37,7 +37,7 @@ public class GeoIpService {
     public DatabaseReader getDatabaseReader() throws IllegalStateException {
         String dbPath = configurationService.getProperty("usage-statistics.dbfile");
         if (StringUtils.isBlank(dbPath)) {
-            throw new IllegalStateException("The required 'dbfile' configuration is missing in solr-statistics.cfg!");
+            throw new IllegalStateException("The required 'dbfile' configuration is missing in usage-statistics.cfg!");
         }
 
         try {

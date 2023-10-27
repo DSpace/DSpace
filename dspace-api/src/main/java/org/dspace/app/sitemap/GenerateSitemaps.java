@@ -189,7 +189,10 @@ public class GenerateSitemaps {
      */
     public static void generateSitemaps(boolean makeHTMLMap, boolean makeSitemapOrg) throws SQLException, IOException {
         String uiURLStem = configurationService.getProperty("dspace.ui.url");
-        String sitemapStem = uiURLStem + "/sitemap";
+        if (!uiURLStem.endsWith("/")) {
+            uiURLStem = uiURLStem + '/';
+        }
+        String sitemapStem = uiURLStem + "sitemap";
 
         File outputDir = new File(configurationService.getProperty("sitemap.dir"));
         if (!outputDir.exists() && !outputDir.mkdir()) {
@@ -212,7 +215,7 @@ public class GenerateSitemaps {
         List<Community> comms = communityService.findAll(c);
 
         for (Community comm : comms) {
-            String url = uiURLStem + "/communities/" + comm.getID();
+            String url = uiURLStem + "communities/" + comm.getID();
 
             if (makeHTMLMap) {
                 html.addURL(url, null);
@@ -227,7 +230,7 @@ public class GenerateSitemaps {
         List<Collection> colls = collectionService.findAll(c);
 
         for (Collection coll : colls) {
-            String url = uiURLStem + "/collections/" + coll.getID();
+            String url = uiURLStem + "collections/" + coll.getID();
 
             if (makeHTMLMap) {
                 html.addURL(url, null);
@@ -259,11 +262,11 @@ public class GenerateSitemaps {
                     && StringUtils.isNotBlank(discoverResult.getSearchDocument(
                         discoverResult.getIndexableObjects().get(0)).get(0).getSearchFieldValues("entityType").get(0))
                 ) {
-                    url = uiURLStem + "/entities/" + StringUtils.lowerCase(discoverResult.getSearchDocument(
+                    url = uiURLStem + "entities/" + StringUtils.lowerCase(discoverResult.getSearchDocument(
                             discoverResult.getIndexableObjects().get(0))
                         .get(0).getSearchFieldValues("entityType").get(0)) + "/" + i.getID();
                 } else {
-                    url = uiURLStem + "/items/" + i.getID();
+                    url = uiURLStem + "items/" + i.getID();
                 }
                 Date lastMod = i.getLastModified();
 
