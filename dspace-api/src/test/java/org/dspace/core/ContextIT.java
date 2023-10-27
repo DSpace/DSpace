@@ -18,7 +18,7 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.builder.CommunityBuilder;
 import org.junit.Test;
 
-public class ContextModeIT extends AbstractIntegrationTestWithDatabase {
+public class ContextIT extends AbstractIntegrationTestWithDatabase {
 
     AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
@@ -26,6 +26,11 @@ public class ContextModeIT extends AbstractIntegrationTestWithDatabase {
     public void testGetPoliciesNewCommunityAfterReadOnlyModeChange() throws Exception {
 
         context.turnOffAuthorisationSystem();
+
+        // First disable the index consumer. The indexing process calls the authorizeService
+        // function used in this test and may affect the test
+        context.setDispatcher("noindex");
+
         parentCommunity = CommunityBuilder.createCommunity(context)
             .withName("Parent Community")
             .build();
