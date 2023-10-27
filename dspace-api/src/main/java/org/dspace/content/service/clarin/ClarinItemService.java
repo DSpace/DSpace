@@ -14,6 +14,7 @@ import java.util.UUID;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
 import org.dspace.core.Context;
 
 /**
@@ -32,6 +33,15 @@ public interface ClarinItemService {
      * @throws SQLException database error
      */
     List<Item> findByBitstreamUUID(Context context, UUID bitstreamUUID) throws SQLException;
+
+    /**
+     * Find Item by the Handle
+     * @param context DSpace context object
+     * @param handle String of the finding item
+     * @return found Item or null
+     * @throws SQLException database error
+     */
+    List<Item> findByHandle(Context context, MetadataField metadataField, String handle) throws SQLException;
 
     /**
      * Get item/collection/community's owning community

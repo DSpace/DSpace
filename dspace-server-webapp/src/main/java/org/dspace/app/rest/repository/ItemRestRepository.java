@@ -38,6 +38,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
@@ -45,6 +46,7 @@ import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
@@ -102,6 +104,9 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
     @Autowired
     private ClarinItemService clarinItemService;
+
+    @Autowired
+    private MetadataFieldService metadataFieldService;
 
     @Autowired
     private SolrOAIReindexer solrOAIReindexer;
@@ -390,6 +395,21 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
             return null;
         }
 
+        return converter.toRestPage(itemList, pageable, utils.obtainProjection());
+    }
+
+    @SearchRestMethod(name = "byHandle")
+    public Page<ItemRest> findByHandle(@Parameter(value = "handle", required = true) String
+                                              handle,
+                                      Pageable pageable) throws SQLException {
+        Context context = obtainContext();
+        MetadataField metadataField = metadataFieldService.findByString(context, "dc.identifier.uri", '.');
+        if (Objects.isNull(metadataField)) {
+            throw new UnprocessableEntityException("Cannot get item by handle because the metadata field ID for " +
+                    "`dc.identifier.uri` wasn't found.");
+        }
+
+        List<Item> itemList = clarinItemService.findByHandle(context, metadataField, handle);
         return converter.toRestPage(itemList, pageable, utils.obtainProjection());
     }
 }

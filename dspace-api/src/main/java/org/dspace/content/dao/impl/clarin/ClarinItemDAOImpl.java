@@ -13,6 +13,7 @@ import java.util.UUID;
 import javax.persistence.Query;
 
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
 import org.dspace.content.dao.clarin.ClarinItemDAO;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
@@ -25,6 +26,18 @@ public class ClarinItemDAOImpl extends AbstractHibernateDAO<Item>
                 "join bundle.bitstreams bitstream WHERE bitstream.id = :bitstreamUUID");
 
         query.setParameter("bitstreamUUID", bitstreamUUID);
+        query.setHint("org.hibernate.cacheable", Boolean.TRUE);
+
+        return list(query);
+    }
+
+    @Override
+    public List<Item> findByHandle(Context context, MetadataField metadataField, String handle) throws SQLException {
+        Query query = createQuery(context, "SELECT item FROM Item as item join item.metadata metadata " +
+                "WHERE metadata.value = :handle AND metadata.metadataField = :metadata_field");
+
+        query.setParameter("handle", handle);
+        query.setParameter("metadata_field", metadataField);
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
 
         return list(query);

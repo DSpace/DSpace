@@ -18,6 +18,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
 import org.dspace.content.dao.clarin.ClarinItemDAO;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.clarin.ClarinItemService;
@@ -43,6 +44,11 @@ public class ClarinItemServiceImpl implements ClarinItemService {
     @Override
     public List<Item> findByBitstreamUUID(Context context, UUID bitstreamUUID) throws SQLException {
         return clarinItemDAO.findByBitstreamUUID(context, bitstreamUUID);
+    }
+
+    @Override
+    public List<Item> findByHandle(Context context, MetadataField metadataField, String handle) throws SQLException {
+        return clarinItemDAO.findByHandle(context, metadataField, handle);
     }
 
     @Override

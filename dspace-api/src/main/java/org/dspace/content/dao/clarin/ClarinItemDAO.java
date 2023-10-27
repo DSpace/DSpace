@@ -12,8 +12,11 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
 import org.dspace.core.Context;
 
 public interface ClarinItemDAO {
     List<Item> findByBitstreamUUID(Context context, UUID bitstreamUUID) throws SQLException;
+
+    List<Item> findByHandle(Context context, MetadataField metadataField, String handle) throws SQLException;
 }

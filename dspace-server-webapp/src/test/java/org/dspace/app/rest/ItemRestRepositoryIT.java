@@ -4800,4 +4800,40 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$", existDescriptionProvenanceMetadataMatcher));
     }
 
+    /**
+     * Should find Item by the full handle identifier.
+     */
+    @Test
+    public void searchByHandle() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+        context.restoreAuthSystemState();
+
+        String handlePrefix = configurationService.getProperty("handle.canonical.prefix");
+        String fullHandleIdentifier = handlePrefix + publicItem1.getHandle();
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/core/items/search/byHandle")
+                .param("handle", fullHandleIdentifier))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(contentType))
+        .andExpect(jsonPath("$._embedded.items", Matchers.containsInRelativeOrder(
+                ItemMatcher.matchItemProperties(publicItem1)
+        )));
+    }
+
 }
