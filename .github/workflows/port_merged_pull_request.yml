@@ -39,6 +39,8 @@ jobs:
           # Copy all labels from original PR to (newly created) port PR
           # NOTE: The labels matching 'label_pattern' are automatically excluded
           copy_labels_pattern: '.*'
+          # Skip any merge commits in the ported PR. This means only non-merge commits are cherry-picked to the new PR
+          merge_commits: 'skip'
           # Use a personal access token (PAT) to create PR as 'dspace-bot' user.
           # A PAT is required in order for the new PR to trigger its own actions (for CI checks)
           github_token: ${{ secrets.PR_PORT_TOKEN }}
