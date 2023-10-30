@@ -447,10 +447,6 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
         Item item = installItemService.installItem(context, workspaceItem);
         Bundle b = bundleService.create(context, item, "TESTBUNDLE");
 
-        // Allow Item WRITE permissions
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.WRITE);
-        // Allow Bundle ADD permissions
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, b, Constants.ADD);
         // Allow Bundle REMOVE permissions
         doNothing().when(authorizeServiceSpy).authorizeAction(context, b, Constants.REMOVE);
         // Allow Bitstream WRITE permissions
