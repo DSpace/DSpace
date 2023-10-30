@@ -11,6 +11,7 @@ import static org.dspace.core.Constants.CONTENT_BUNDLE_NAME;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
@@ -46,20 +47,19 @@ public class PrimaryBitstreamReplacePatchOperation extends ReplacePatchOperation
                                              .findFirst()
                                              .orElseThrow(() -> new UnprocessableEntityException(EX_MESSAGE));
 
-        Bitstream primaryBitstream = null;
+        Optional<Bitstream> primaryBitstream = null;
         for (Bundle bundle : bundles) {
-            primaryBitstream =  bundle.getBitstreams().stream()
-                                                      .filter(b -> b.getID().equals(primaryUUID))
-                                                      .findFirst()
-                                                      .orElse(null);
-            if (Objects.nonNull(primaryBitstream)) {
+            primaryBitstream = bundle.getBitstreams().stream()
+                                                     .filter(b -> b.getID().equals(primaryUUID))
+                                                     .findFirst();
+            if (primaryBitstream.isPresent()) {
                 currentPrimaryBundle.setPrimaryBitstreamID(null);
-                bundle.setPrimaryBitstreamID(primaryBitstream);
+                bundle.setPrimaryBitstreamID(primaryBitstream.get());
                 break;
             }
         }
 
-        if (Objects.isNull(primaryBitstream)) {
+        if (primaryBitstream.isEmpty()) {
             throw new UnprocessableEntityException("The provided uuid: " + primaryUUID +
                                                    " of bitstream to set as primary doesn't match any bitstream!");
         }

@@ -11,6 +11,7 @@ import static org.dspace.core.Constants.CONTENT_BUNDLE_NAME;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
@@ -39,27 +40,25 @@ public class PrimaryBitstreamAddPatchOperation extends AddPatchOperation<String>
         Item item = source.getItem();
         UUID primaryUUID = parseValue(value);
         List<Bundle> bundles = itemService.getBundles(item, CONTENT_BUNDLE_NAME);
-        Bundle currentPrimaryBundle = bundles.stream()
-                                             .filter(bundle -> Objects.nonNull(bundle.getPrimaryBitstream()))
-                                             .findFirst()
-                                             .orElse(null);
+        Optional<Bundle> currentPrimaryBundle = bundles.stream()
+                                                       .filter(bundle -> Objects.nonNull(bundle.getPrimaryBitstream()))
+                                                       .findFirst();
 
-        Bitstream primaryBitstreamToAdd = null;
+        Optional<Bitstream> primaryBitstreamToAdd = null;
         for (Bundle bundle : bundles) {
-            primaryBitstreamToAdd =  bundle.getBitstreams().stream()
-                                                      .filter(b -> b.getID().equals(primaryUUID))
-                                                      .findFirst()
-                                                      .orElse(null);
-            if (Objects.nonNull(primaryBitstreamToAdd)) {
-                if (Objects.nonNull(currentPrimaryBundle)) {
-                    currentPrimaryBundle.setPrimaryBitstreamID(null);
+            primaryBitstreamToAdd = bundle.getBitstreams().stream()
+                                                          .filter(b -> b.getID().equals(primaryUUID))
+                                                          .findFirst();
+            if (primaryBitstreamToAdd.isPresent()) {
+                if (currentPrimaryBundle.isPresent()) {
+                    currentPrimaryBundle.get().setPrimaryBitstreamID(null);
                 }
-                bundle.setPrimaryBitstreamID(primaryBitstreamToAdd);
+                bundle.setPrimaryBitstreamID(primaryBitstreamToAdd.get());
                 break;
             }
         }
 
-        if (Objects.isNull(primaryBitstreamToAdd)) {
+        if (primaryBitstreamToAdd.isEmpty()) {
             throw new UnprocessableEntityException("The provided uuid: " + primaryUUID +
                                                    " of bitstream to set as primary doesn't match any bitstream!");
         }

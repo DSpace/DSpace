@@ -73,7 +73,7 @@ public class UploadStep extends AbstractProcessingStep
     public void doPatchProcessing(Context context, HttpServletRequest currentRequest, InProgressSubmission source,
             Operation op, SubmissionStepConfig stepConf) throws Exception {
 
-        String instance = StringUtils.EMPTY;
+        String instance = null;
         if ("remove".equals(op.getOp())) {
             if (op.getPath().contains(UPLOAD_STEP_METADATA_PATH)) {
                 instance = UPLOAD_STEP_METADATA_OPERATION_ENTRY;
