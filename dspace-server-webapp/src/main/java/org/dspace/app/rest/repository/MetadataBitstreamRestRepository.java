@@ -226,7 +226,8 @@ public class MetadataBitstreamRestRepository extends DSpaceRestRepository<Metada
     private List<FileInfo> processInputStreamToFilePreview(Context context, Bitstream bitstream,
                                                            List<FileInfo> fileInfos, InputStream inputStream)
             throws IOException, SQLException, ParserConfigurationException, SAXException, ArchiveException {
-        if (bitstream.getFormat(context).getMIMEType().equals("text/plain")) {
+        String bitstreamMimeType = bitstream.getFormat(context).getMIMEType();
+        if (bitstreamMimeType.equals("text/plain") || bitstreamMimeType.equals("text/html")) {
             String data = getFileContent(inputStream);
             fileInfos.add(new FileInfo(data, false));
         } else {
