@@ -433,6 +433,55 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     }
 
     /**
+     * Test of delete method, of class Bitstream.
+     */
+    @Test
+    public void testDeleteBitstreamAndUnsetPrimaryBitstreamID()
+            throws IOException, SQLException, AuthorizeException {
+
+        context.turnOffAuthorisationSystem();
+
+        Community owningCommunity = communityService.create(null, context);
+        Collection collection = collectionService.create(context, owningCommunity);
+        WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
+        Item item = installItemService.installItem(context, workspaceItem);
+        Bundle b = bundleService.create(context, item, "TESTBUNDLE");
+
+        // Allow Item WRITE permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, item, Constants.WRITE);
+        // Allow Bundle ADD permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, b, Constants.ADD);
+        // Allow Bundle REMOVE permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, b, Constants.REMOVE);
+        // Allow Bitstream WRITE permissions
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Bitstream.class), eq(Constants.WRITE));
+        // Allow Bitstream DELETE permissions
+        doNothing().when(authorizeServiceSpy)
+                   .authorizeAction(any(Context.class), any(Bitstream.class), eq(Constants.DELETE));
+
+        //set a value different than default
+        File f = new File(testProps.get("test.bitstream").toString());
+
+        // Create a new bitstream, which we can delete.
+        Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
+        bundleService.addBitstream(context, b, bs);
+        // set primary bitstream
+        b.setPrimaryBitstreamID(bs);
+        context.restoreAuthSystemState();
+
+        // Test that delete will flag the bitstream as deleted
+        assertFalse("testDeleteBitstreamAndUnsetPrimaryBitstreamID 0", bs.isDeleted());
+        assertThat("testDeleteBitstreamAndUnsetPrimaryBitstreamID 1", b.getPrimaryBitstream(), equalTo(bs));
+        // Delete bitstream
+        bitstreamService.delete(context, bs);
+        assertTrue("testDeleteBitstreamAndUnsetPrimaryBitstreamID 2", bs.isDeleted());
+
+        // Now test if the primary bitstream was unset from bundle
+        assertThat("testDeleteBitstreamAndUnsetPrimaryBitstreamID 3", b.getPrimaryBitstream(), equalTo(null));
+    }
+
+    /**
      * Test of retrieve method, of class Bitstream.
      */
     @Test
