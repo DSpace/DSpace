@@ -464,18 +464,18 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
         File f = new File(testProps.get("test.bitstream").toString());
 
         // Create a new bitstream, which we can delete.
-        Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
-        bundleService.addBitstream(context, b, bs);
+        Bitstream delBS = bitstreamService.create(context, new FileInputStream(f));
+        bundleService.addBitstream(context, b, delBS);
         // set primary bitstream
-        b.setPrimaryBitstreamID(bs);
+        b.setPrimaryBitstreamID(delBS);
         context.restoreAuthSystemState();
 
         // Test that delete will flag the bitstream as deleted
-        assertFalse("testDeleteBitstreamAndUnsetPrimaryBitstreamID 0", bs.isDeleted());
-        assertThat("testDeleteBitstreamAndUnsetPrimaryBitstreamID 1", b.getPrimaryBitstream(), equalTo(bs));
+        assertFalse("testDeleteBitstreamAndUnsetPrimaryBitstreamID 0", delBS.isDeleted());
+        assertThat("testDeleteBitstreamAndUnsetPrimaryBitstreamID 1", b.getPrimaryBitstream(), equalTo(delBS));
         // Delete bitstream
-        bitstreamService.delete(context, bs);
-        assertTrue("testDeleteBitstreamAndUnsetPrimaryBitstreamID 2", bs.isDeleted());
+        bitstreamService.delete(context, delBS);
+        assertTrue("testDeleteBitstreamAndUnsetPrimaryBitstreamID 2", delBS.isDeleted());
 
         // Now test if the primary bitstream was unset from bundle
         assertThat("testDeleteBitstreamAndUnsetPrimaryBitstreamID 3", b.getPrimaryBitstream(), equalTo(null));
