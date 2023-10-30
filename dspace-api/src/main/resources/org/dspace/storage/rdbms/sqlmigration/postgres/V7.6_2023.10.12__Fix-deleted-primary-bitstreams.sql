@@ -8,7 +8,7 @@
 
 BEGIN;
 
--- Remove all primary bitstreams that are marked as deleted
+-- Unset any primary bitstream that is marked as deleted
 UPDATE bundle
 SET primary_bitstream_id = NULL
 WHERE primary_bitstream_id IN
@@ -17,7 +17,7 @@ WHERE primary_bitstream_id IN
            INNER JOIN bundle as bl ON bs.uuid = bl.primary_bitstream_id
            WHERE bs.deleted IS TRUE );
 
--- Remove all primary bitstreams that don't make part on bundle's bitstreams
+-- Unset any primary bitstream that don't belong to bundle's bitstreams list
 UPDATE bundle
 SET primary_bitstream_id = NULL
 WHERE primary_bitstream_id IN
