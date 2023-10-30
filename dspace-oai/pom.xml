@@ -15,7 +15,7 @@
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/..</root.basedir>
-        <xoai.version>3.3.1-SNAPSHOT</xoai.version>
+        <xoai.version>3.4.0</xoai.version>
         <jtwig.version>5.87.0.RELEASE</jtwig.version>
     </properties>
 
@@ -55,41 +55,10 @@
             <artifactId>xoai</artifactId>
             <version>${xoai.version}</version>
             <exclusions>
+                <!-- Use version provided by SolrJ -->
                 <exclusion>
-                    <groupId>org.hamcrest</groupId>
-                    <artifactId>hamcrest-all</artifactId>
-                </exclusion>
-                <exclusion>
-                    <!--Hard pinned below.-->
-                    <groupId>org.mockito</groupId>
-                    <artifactId>mockito-all</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-lang3</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-                <!-- Later version provided by SolrJ -->
-                <exclusion>
-                    <groupId>org.codehaus.woodstox</groupId>
-                    <artifactId>wstx-asl</artifactId>
-                </exclusion>
-                <!-- Later version provided by Hibernate -->
-                <exclusion>
-                    <groupId>org.dom4j</groupId>
-                    <artifactId>dom4j</artifactId>
-                </exclusion>
-                <!-- We don't use this test framework & it causes dependency convergence issues -->
-                <exclusion>
-                    <groupId>com.lyncode</groupId>
-                    <artifactId>test-support</artifactId>
+                    <groupId>com.fasterxml.woodstox</groupId>
+                    <artifactId>woodstox-core</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
