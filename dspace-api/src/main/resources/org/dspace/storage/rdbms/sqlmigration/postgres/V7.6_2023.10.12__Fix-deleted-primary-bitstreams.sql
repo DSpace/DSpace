@@ -17,7 +17,7 @@ WHERE primary_bitstream_id IN
            INNER JOIN bundle as bl ON bs.uuid = bl.primary_bitstream_id
            WHERE bs.deleted IS TRUE );
 
--- Unset any primary bitstream that don't belong to bundle's bitstreams list
+-- Unset any primary bitstream that don't belong to bundle's bitstream list
 UPDATE bundle
 SET primary_bitstream_id = NULL
 WHERE primary_bitstream_id IN
