@@ -37,7 +37,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -54,8 +53,6 @@ import com.jayway.jsonpath.matchers.JsonPathMatchers;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.dspace.app.ldn.NotifyServiceEntity;
-import org.dspace.app.ldn.NotifyServiceInboundPattern;
-import org.dspace.app.ldn.service.NotifyServiceInboundPatternService;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
@@ -75,6 +72,7 @@ import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.NotifyServiceBuilder;
+import org.dspace.builder.NotifyServiceInboundPatternBuilder;
 import org.dspace.builder.RelationshipBuilder;
 import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
@@ -121,9 +119,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     private ConfigurationService configurationService;
 
     private GroupService groupService;
-
-    @Autowired
-    private NotifyServiceInboundPatternService inboundPatternService;
 
     private Group embargoedGroups;
     private Group embargoedGroup1;
@@ -8701,9 +8696,23 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                                   .withCOARNotifyService(notifyServiceOne, "review")
                                                   .build();
 
-        createNotifyServiceInboundPattern(notifyServiceOne, "review", "itemFilterA");
-        createNotifyServiceInboundPattern(notifyServiceTwo, "review", "itemFilterA");
-        createNotifyServiceInboundPattern(notifyServiceThree, "review", "itemFilterA");
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceOne)
+                                          .withPattern("review")
+                                          .withConstraint("itemFilterA")
+                                          .isAutomatic(false)
+                                          .build();
+
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceTwo)
+                                          .withPattern("review")
+                                          .withConstraint("itemFilterA")
+                                          .isAutomatic(false)
+                                          .build();
+
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceThree)
+                                          .withPattern("review")
+                                          .withConstraint("itemFilterA")
+                                          .isAutomatic(false)
+                                          .build();
 
         context.restoreAuthSystemState();
 
@@ -8917,9 +8926,23 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                 .withLdnUrl("https://service3.ldn.org/inbox")
                                 .build();
 
-        createNotifyServiceInboundPattern(notifyServiceOne, "review", "itemFilterA");
-        createNotifyServiceInboundPattern(notifyServiceTwo, "review", "demo_filter");
-        createNotifyServiceInboundPattern(notifyServiceThree, "review", "demo_filter");
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceOne)
+                                          .withPattern("review")
+                                          .withConstraint("itemFilterA")
+                                          .isAutomatic(false)
+                                          .build();
+
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceTwo)
+                                          .withPattern("review")
+                                          .withConstraint("demo_filter")
+                                          .isAutomatic(false)
+                                          .build();
+
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceThree)
+                                          .withPattern("review")
+                                          .withConstraint("demo_filter")
+                                          .isAutomatic(false)
+                                          .build();
 
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                                                   .withTitle("Test WorkspaceItem")
@@ -9121,9 +9144,23 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                                   .withCOARNotifyService(notifyServiceThree, "review")
                                                   .build();
 
-        createNotifyServiceInboundPattern(notifyServiceOne, "endorsement", "fakeFilterA");
-        createNotifyServiceInboundPattern(notifyServiceTwo, "review", "type_filter");
-        createNotifyServiceInboundPattern(notifyServiceThree, "review", "fakeFilterA");
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceOne)
+                                          .withPattern("endorsement")
+                                          .withConstraint("fakeFilterA")
+                                          .isAutomatic(false)
+                                          .build();
+
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceTwo)
+                                          .withPattern("review")
+                                          .withConstraint("type_filter")
+                                          .isAutomatic(false)
+                                          .build();
+
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceThree)
+                                          .withPattern("review")
+                                          .withConstraint("fakeFilterA")
+                                          .isAutomatic(false)
+                                          .build();
 
         context.restoreAuthSystemState();
 
@@ -9176,8 +9213,17 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                                   .withCOARNotifyService(notifyServiceOne, "endorsement")
                                                   .build();
 
-        createNotifyServiceInboundPattern(notifyServiceOne, "endorsement", "type_filter");
-        createNotifyServiceInboundPattern(notifyServiceOne, "review", "type_filter");
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceOne)
+                                          .withPattern("endorsement")
+                                          .withConstraint("type_filter")
+                                          .isAutomatic(false)
+                                          .build();
+
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceOne)
+                                          .withPattern("review")
+                                          .withConstraint("type_filter")
+                                          .isAutomatic(false)
+                                          .build();
 
         context.restoreAuthSystemState();
 
@@ -9191,17 +9237,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                             .andExpect(jsonPath(
                                 "$.errors[?(@.message=='error.validation.coarnotify.invalidfilter')]").doesNotExist());
 
-    }
-
-    private void createNotifyServiceInboundPattern(NotifyServiceEntity notifyServiceOne,
-                                                   String pattern,
-                                                   String filter) throws SQLException {
-
-        NotifyServiceInboundPattern reviewPatternOne = inboundPatternService.create(context, notifyServiceOne);
-        reviewPatternOne.setPattern(pattern);
-        reviewPatternOne.setConstraint(filter);
-        reviewPatternOne.setAutomatic(false);
-        inboundPatternService.update(context, reviewPatternOne);
     }
 
 }

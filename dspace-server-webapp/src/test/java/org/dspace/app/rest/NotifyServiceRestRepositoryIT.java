@@ -43,6 +43,7 @@ import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.repository.NotifyServiceRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.NotifyServiceBuilder;
+import org.dspace.builder.NotifyServiceInboundPatternBuilder;
 import org.junit.Test;
 
 /**
@@ -3263,41 +3264,39 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                                 .withLdnUrl("https://service3.ldn.org/inbox")
                                 .build();
 
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceEntityOne)
+                                          .withPattern("review")
+                                          .withConstraint("itemFilterA")
+                                          .isAutomatic(false)
+                                          .build();
+
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceEntityOne)
+                                          .withPattern("review")
+                                          .withConstraint("itemFilterB")
+                                          .isAutomatic(true)
+                                          .build();
+
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceEntityTwo)
+                                          .withPattern("review")
+                                          .withConstraint("itemFilterA")
+                                          .isAutomatic(false)
+                                          .build();
+
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceEntityTwo)
+                                          .withPattern("review")
+                                          .withConstraint("itemFilterB")
+                                          .isAutomatic(true)
+                                          .build();
+
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceEntityThree)
+                                          .withPattern("review")
+                                          .withConstraint("itemFilterB")
+                                          .isAutomatic(true)
+                                          .build();
+
         context.restoreAuthSystemState();
 
-        List<Operation> ops = new ArrayList<Operation>();
-        AddOperation inboundAddOperationOne = new AddOperation("notifyServiceInboundPatterns/-",
-            "{\"pattern\":\"review\",\"constraint\":\"itemFilterA\",\"automatic\":\"false\"}");
-
-        AddOperation inboundAddOperationTwo = new AddOperation("notifyServiceInboundPatterns/-",
-            "{\"pattern\":\"review\",\"constraint\":\"itemFilterB\",\"automatic\":\"true\"}");
-
-        ops.add(inboundAddOperationOne);
-        String patchBody = getPatchContent(ops);
-
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken)
-            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntityOne.getID())
-                .content(patchBody)
-                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-            .andExpect(status().isOk());
-
-        getClient(authToken)
-            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntityTwo.getID())
-                .content(patchBody)
-                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-            .andExpect(status().isOk());
-
-        ops.clear();
-        ops.add(inboundAddOperationTwo);
-        patchBody = getPatchContent(ops);
-
-        getClient(authToken)
-            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntityThree.getID())
-                .content(patchBody)
-                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-            .andExpect(status().isOk());
-
         getClient(authToken)
             .perform(get("/api/ldn/ldnservices/search/byInboundPattern")
                 .param("pattern", "review"))

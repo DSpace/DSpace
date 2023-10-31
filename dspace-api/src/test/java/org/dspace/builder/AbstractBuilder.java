@@ -17,6 +17,7 @@ import org.dspace.alerts.service.SystemWideAlertService;
 import org.dspace.app.ldn.factory.NotifyServiceFactory;
 import org.dspace.app.ldn.service.NotifyPatternToTriggerService;
 import org.dspace.app.ldn.service.NotifyService;
+import org.dspace.app.ldn.service.NotifyServiceInboundPatternService;
 import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.suggestion.SolrSuggestionStorageService;
@@ -116,6 +117,7 @@ public abstract class AbstractBuilder<T, S> {
     static SubscribeService subscribeService;
     static SupervisionOrderService supervisionOrderService;
     static NotifyService notifyService;
+    static NotifyServiceInboundPatternService inboundPatternService;
     static NotifyPatternToTriggerService notifyPatternToTriggerService;
 
     static QAEventService qaEventService;
@@ -184,6 +186,7 @@ public abstract class AbstractBuilder<T, S> {
         subscribeService = ContentServiceFactory.getInstance().getSubscribeService();
         supervisionOrderService = SupervisionOrderServiceFactory.getInstance().getSupervisionOrderService();
         notifyService = NotifyServiceFactory.getInstance().getNotifyService();
+        inboundPatternService = NotifyServiceFactory.getInstance().getNotifyServiceInboundPatternService();
         notifyPatternToTriggerService = NotifyServiceFactory.getInstance().getNotifyPatternToTriggerService();
         qaEventService = new DSpace().getSingletonService(QAEventService.class);
         solrSuggestionService = new DSpace().getSingletonService(SolrSuggestionStorageService.class);
@@ -224,6 +227,7 @@ public abstract class AbstractBuilder<T, S> {
         subscribeService = null;
         supervisionOrderService = null;
         notifyService = null;
+        inboundPatternService = null;
         notifyPatternToTriggerService = null;
         qaEventService = null;
 
