@@ -3388,8 +3388,6 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
-                                .withLdnUrl("service ldn url")
                                 .withScore(BigDecimal.ZERO)
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
