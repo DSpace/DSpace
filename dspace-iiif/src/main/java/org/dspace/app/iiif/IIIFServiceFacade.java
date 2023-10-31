@@ -7,6 +7,7 @@
  */
 package org.dspace.app.iiif;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.UUID;
 
@@ -15,6 +16,7 @@ import org.dspace.app.iiif.service.CanvasLookupService;
 import org.dspace.app.iiif.service.ManifestService;
 import org.dspace.app.iiif.service.SearchService;
 import org.dspace.app.iiif.service.utils.IIIFUtils;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
@@ -74,13 +76,15 @@ public class IIIFServiceFacade {
         Item item;
         try {
             item = itemService.find(context, id);
-        } catch (SQLException e) {
+
+            if (item == null || !utils.isIIIFEnabled(item)) {
+                throw new ResourceNotFoundException("IIIF manifest for  id " + id + " not found");
+            }
+
+            return manifestService.getManifest(item, context);
+        } catch (SQLException | IOException | AuthorizeException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        if (item == null || !utils.isIIIFEnabled(item)) {
-            throw new ResourceNotFoundException("IIIF manifest for  id " + id + " not found");
-        }
-        return manifestService.getManifest(item, context);
     }
 
     /**

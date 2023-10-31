@@ -91,6 +91,11 @@ public class Constants {
      */
     public static final String METADATA_BUNDLE_NAME = "METADATA";
 
+    /**
+     * Bundle name for a IIIF manifest
+     */
+    public static final String IIIF_MANIFEST_BUNDLE_NAME = "IIIF_MANIFEST";
+
 
     /**
      * Action of reading, viewing or downloading something
