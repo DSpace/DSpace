@@ -8,6 +8,7 @@
 package org.dspace.qaevent;
 
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * This model class represent the quality assurance broker topic concept. A
@@ -17,16 +18,36 @@ import java.util.Date;
  *
  */
 public class QATopic {
+    private String source;
     private String key;
+    /**
+     * if the QASource stats (see next attributes) are related to a specific target
+     */
+    private UUID focus;
     private long totalEvents;
     private Date lastEvent;
 
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
     public String getKey() {
         return key;
     }
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public void setFocus(UUID focus) {
+        this.focus = focus;
+    }
+
+    public UUID getFocus() {
+        return focus;
     }
 
     public long getTotalEvents() {
@@ -44,4 +65,5 @@ public class QATopic {
     public void setLastEvent(Date lastEvent) {
         this.lastEvent = lastEvent;
     }
+
 }
