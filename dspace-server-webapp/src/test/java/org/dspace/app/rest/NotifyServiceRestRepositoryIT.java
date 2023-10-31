@@ -3406,7 +3406,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
-                "service description", "service url", "service ldn url", false)))
+                "service description", "https://service.ldn.org/about", "https://service.ldn.org/inbox", false)))
             .andExpect(jsonPath("$.score", notNullValue()))
             .andExpect(jsonPath("$.score", closeTo(0.522d, 0.001d)));
     }
