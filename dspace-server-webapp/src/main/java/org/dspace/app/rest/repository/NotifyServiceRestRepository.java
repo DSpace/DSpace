@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.List;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 
@@ -202,6 +203,21 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
                 return null;
             }
             return converter.toRest(notifyServiceEntity, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @SearchRestMethod(name = "byInboundPattern")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    public Page<NotifyServiceRest> findManualServicesByInboundPattern(
+        @Parameter(value = "pattern", required = true) String pattern,
+        Pageable pageable) {
+        try {
+            List<NotifyServiceEntity> notifyServiceEntities =
+                notifyService.findManualServicesByInboundPattern(obtainContext(), pattern);
+
+            return converter.toRestPage(notifyServiceEntities, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

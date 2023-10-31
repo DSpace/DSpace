@@ -21,6 +21,7 @@
     <bean class="org.dspace.app.ldn.service.impl.NotifyServiceInboundPatternServiceImpl"/>
     <bean class="org.dspace.app.ldn.service.impl.NotifyServiceOutboundPatternServiceImpl"/>
     <bean class="org.dspace.app.ldn.service.impl.LDNMessageServiceImpl"/>
+    <bean class="org.dspace.app.ldn.service.impl.NotifyPatternToTriggerImpl"/>
     <bean class="org.dspace.app.ldn.LDNBusinessDelegate"></bean>
 
     <bean name="ldnRouter" class="org.dspace.app.ldn.LDNRouter">
