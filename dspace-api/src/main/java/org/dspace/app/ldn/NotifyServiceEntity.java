@@ -7,6 +7,7 @@
  */
 package org.dspace.app.ldn;
 
+import java.math.BigDecimal;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -55,6 +56,9 @@ public class NotifyServiceEntity implements ReloadableEntity<Integer> {
 
     @Column(name = "enabled")
     private boolean enabled = false;
+
+    @Column(name = "score")
+    private BigDecimal score;
 
     public void setId(Integer id) {
         this.id = id;
@@ -128,5 +132,13 @@ public class NotifyServiceEntity implements ReloadableEntity<Integer> {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public BigDecimal getScore() {
+        return score;
+    }
+
+    public void setScore(BigDecimal score) {
+        this.score = score;
     }
 }

@@ -7,6 +7,7 @@
  */
 package org.dspace.builder;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 
 import org.apache.logging.log4j.LogManager;
@@ -122,6 +123,11 @@ public class NotifyServiceBuilder extends AbstractBuilder<NotifyServiceEntity, N
 
     public NotifyServiceBuilder withLdnUrl(String ldnUrl) {
         notifyServiceEntity.setLdnUrl(ldnUrl);
+        return this;
+    }
+
+    public NotifyServiceBuilder withScore(BigDecimal score) {
+        notifyServiceEntity.setScore(score);
         return this;
     }
 

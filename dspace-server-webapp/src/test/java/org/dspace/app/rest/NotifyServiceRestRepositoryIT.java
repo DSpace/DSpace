@@ -12,11 +12,13 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.NotifyServiceMatcher.matchNotifyService;
 import static org.dspace.app.rest.matcher.NotifyServiceMatcher.matchNotifyServicePattern;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -24,12 +26,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+
 import javax.ws.rs.core.MediaType;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomUtils;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.rest.model.NotifyServiceInboundPatternRest;
@@ -43,6 +46,8 @@ import org.dspace.app.rest.repository.NotifyServiceRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.NotifyServiceBuilder;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Integration test class for {@link NotifyServiceRestRepository}.
@@ -144,6 +149,41 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                                 .content(mapper.writeValueAsBytes(notifyServiceRest))
                                 .contentType(contentType))
                             .andExpect(status().isForbidden());
+    }
+    
+    @Test
+    public void createTestScoreFail() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+
+        NotifyServiceInboundPatternRest inboundPatternRestOne = new NotifyServiceInboundPatternRest();
+        inboundPatternRestOne.setPattern("patternA");
+        inboundPatternRestOne.setConstraint("itemFilterA");
+        inboundPatternRestOne.setAutomatic(true);
+
+        NotifyServiceInboundPatternRest inboundPatternRestTwo = new NotifyServiceInboundPatternRest();
+        inboundPatternRestTwo.setPattern("patternB");
+        inboundPatternRestTwo.setAutomatic(false);
+
+        NotifyServiceOutboundPatternRest outboundPatternRest = new NotifyServiceOutboundPatternRest();
+        outboundPatternRest.setPattern("patternC");
+        outboundPatternRest.setConstraint("itemFilterC");
+
+        NotifyServiceRest notifyServiceRest = new NotifyServiceRest();
+        notifyServiceRest.setName("service name");
+        notifyServiceRest.setDescription("service description");
+        notifyServiceRest.setUrl("service url");
+        notifyServiceRest.setLdnUrl("service ldn url");
+        notifyServiceRest.setScore(BigDecimal.TEN);
+        notifyServiceRest.setNotifyServiceInboundPatterns(List.of(inboundPatternRestOne, inboundPatternRestTwo));
+        notifyServiceRest.setNotifyServiceOutboundPatterns(List.of(outboundPatternRest));
+        notifyServiceRest.setEnabled(false);
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(post("/api/ldn/ldnservices")
+            .content(mapper.writeValueAsBytes(notifyServiceRest))
+            .contentType(contentType))
+        .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
@@ -3249,7 +3289,37 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
-    public void NotifyServiceStatusReplaceOperationTestBadRequestTest() throws Exception {
+    public void NotifyServiceScoreReplaceOperationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("service ldn url")
+                                .withScore(BigDecimal.ZERO)
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("/score", "0.522");
+        ops.add(inboundReplaceOperation);
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
+                "service description", "service url", "service ldn url", false)))
+            .andExpect(jsonPath("$.score", notNullValue()))
+            .andExpect(jsonPath("$.score", closeTo(0.522d, 0.001d)));
+    }
+
+    @Test
+    public void NotifyServiceScoreReplaceOperationTestUnprocessableTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
         NotifyServiceEntity notifyServiceEntity =
@@ -3258,21 +3328,57 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                                 .withDescription("service description")
                                 .withUrl("service url")
                                 .withLdnUrl("service ldn url")
+                                .withScore(BigDecimal.ZERO)
                                 .build();
         context.restoreAuthSystemState();
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("/enabled", "test");
+        ReplaceOperation inboundReplaceOperation = new ReplaceOperation("/score", "10");
         ops.add(inboundReplaceOperation);
         String patchBody = getPatchContent(ops);
 
         String authToken = getAuthToken(admin.getEmail(), password);
-        // patch not boolean value
         getClient(authToken)
             .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
                 .content(patchBody)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isUnprocessableEntity());
     }
+    
+
+    @Test
+    public void notifyServiceScoreAddOperationTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("service ldn url")
+                                .isEnabled(false)
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        AddOperation operation = new AddOperation("/score", "1");
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
+                "service description", "service url", "service ldn url", false)))
+            .andExpect(jsonPath("$.score", notNullValue()))
+            .andExpect(jsonPath("$.score", closeTo(1d, 0.001d)))
+        ;
+    }
+
 
 }
