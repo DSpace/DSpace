@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.repository;
 
+import static java.lang.String.format;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -16,6 +18,7 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.NotifyServiceInboundPattern;
 import org.dspace.app.ldn.NotifyServiceOutboundPattern;
@@ -36,8 +39,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * This is the repository responsible to manage NotifyService Rest object
@@ -97,12 +102,21 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
             throw new UnprocessableEntityException("Error parsing request body", e1);
         }
 
+        if(notifyServiceRest.getScore() != null) {
+            if(notifyServiceRest.getScore().compareTo(java.math.BigDecimal.ZERO) == -1 || 
+                notifyServiceRest.getScore().compareTo(java.math.BigDecimal.ONE) == 1) {
+                throw new UnprocessableEntityException(format("Score out of range [0, 1] %s",
+                    notifyServiceRest.getScore().setScale(4).toPlainString()));
+            }    
+        }
+        
         NotifyServiceEntity notifyServiceEntity = notifyService.create(context);
         notifyServiceEntity.setName(notifyServiceRest.getName());
         notifyServiceEntity.setDescription(notifyServiceRest.getDescription());
         notifyServiceEntity.setUrl(notifyServiceRest.getUrl());
         notifyServiceEntity.setLdnUrl(notifyServiceRest.getLdnUrl());
-
+        notifyServiceEntity.setEnabled(notifyServiceRest.isEnabled());
+        
         if (notifyServiceRest.getNotifyServiceInboundPatterns() != null) {
             appendNotifyServiceInboundPatterns(context, notifyServiceEntity,
                 notifyServiceRest.getNotifyServiceInboundPatterns());
@@ -112,8 +126,8 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
             appendNotifyServiceOutboundPatterns(context, notifyServiceEntity,
                 notifyServiceRest.getNotifyServiceOutboundPatterns());
         }
+        notifyServiceEntity.setScore(notifyServiceRest.getScore());
 
-        notifyServiceEntity.setEnabled(notifyServiceRest.isEnabled());
         notifyService.update(context, notifyServiceEntity);
 
         return converter.toRest(notifyServiceEntity, utils.obtainProjection());

@@ -87,7 +87,7 @@ public class LDNBusinessDelegate {
         String dspaceServerUrl = configurationService.getProperty("dspace.server.url");
         String dspaceUIUrl = configurationService.getProperty("dspace.ui.url");
         String dspaceName = configurationService.getProperty("dspace.name");
-        String dspaceLdnInboxUrl = configurationService.getProperty("ldn.notify.local-inbox-endpoint");
+        String dspaceLdnInboxUrl = configurationService.getProperty("ldn.notify.inbox");
 
         log.info("DSpace Server URL {}", dspaceServerUrl);
         log.info("DSpace UI URL {}", dspaceUIUrl);
