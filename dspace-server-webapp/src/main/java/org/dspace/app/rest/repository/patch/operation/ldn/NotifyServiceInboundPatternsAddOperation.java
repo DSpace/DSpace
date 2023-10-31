@@ -56,7 +56,8 @@ public class NotifyServiceInboundPatternsAddOperation extends PatchOperation<Not
                 NotifyServiceInboundPattern persistInboundPattern = inboundPatternService.findByServiceAndPattern(
                     context, notifyServiceEntity, patchInboundPattern.getPattern());
 
-                if (persistInboundPattern != null) {
+                if (persistInboundPattern != null && persistInboundPattern.getConstraint().equals(patchInboundPattern
+                        .getConstraint())) {
                     throw new DSpaceBadRequestException("the provided InboundPattern is already existed");
                 }
 

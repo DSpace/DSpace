@@ -7,10 +7,7 @@
  */
 package org.dspace.app.ldn.action;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -51,7 +48,7 @@ public class LDNCorrectionAction implements LDNAction {
 
         return result;
     }
-    
+
     public String getQaEventTopic() {
         return qaEventTopic;
     }
