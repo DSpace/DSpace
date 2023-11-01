@@ -382,7 +382,8 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
         // Get all groups which are a member of this group
         List<Group2GroupCache> group2GroupCaches = group2GroupCacheDAO.findByParent(c, g);
-        Set<Group> groups = new HashSet<>();
+        // Initialize HashSet based on List size to avoid Set resizing. See https://stackoverflow.com/a/21822273
+        Set<Group> groups = new HashSet<>((int) (group2GroupCaches.size() / 0.75 + 1));
         for (Group2GroupCache group2GroupCache : group2GroupCaches) {
             groups.add(group2GroupCache.getChild());
         }
@@ -399,7 +400,9 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     public int countAllMembers(Context context, Group group) throws SQLException {
         // Get all groups which are a member of this group
         List<Group2GroupCache> group2GroupCaches = group2GroupCacheDAO.findByParent(context, group);
-        Set<Group> groups = new HashSet<>();
+        // Initialize HashSet based on List size + current 'group' to avoid Set resizing.
+        // See https://stackoverflow.com/a/21822273
+        Set<Group> groups = new HashSet<>((int) ((group2GroupCaches.size() + 1) / 0.75 + 1));
         for (Group2GroupCache group2GroupCache : group2GroupCaches) {
             groups.add(group2GroupCache.getChild());
         }
