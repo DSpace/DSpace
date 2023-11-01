@@ -39,8 +39,8 @@ public interface EPersonDAO extends DSpaceObjectDAO<EPerson>, DSpaceObjectLegacy
     public int searchResultCount(Context context, String query, List<MetadataField> queryFields) throws SQLException;
 
     /**
-     * Find all EPersons who are a member of one or more of the listed groups in a paginated fashion. Order is
-     * indeterminate.
+     * Find all EPersons who are a member of one or more of the listed groups in a paginated fashion. This returns
+     * EPersons ordered by UUID.
      *
      * @param context current Context
      * @param groups Set of group(s) to check membership in
