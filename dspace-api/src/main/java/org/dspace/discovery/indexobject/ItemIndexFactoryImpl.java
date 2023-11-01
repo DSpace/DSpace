@@ -172,13 +172,6 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
             addNamedResourceTypeIndex(doc, acvalue);
         }
 
-        // write the index and close the inputstreamreaders
-        try {
-            log.info("Wrote Item: " + item.getID() + " to Index");
-        } catch (RuntimeException e) {
-            log.error("Error while writing item to discovery index: " + item.getID() + " message:"
-                    + e.getMessage(), e);
-        }
         return doc;
     }
 
@@ -845,7 +838,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
     private void saveFacetPrefixParts(SolrInputDocument doc, DiscoverySearchFilter searchFilter, String value,
                                       String separator, String authority, String preferedLabel) {
         value = StringUtils.normalizeSpace(value);
-        Pattern pattern = Pattern.compile("\\b\\w+\\b", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("\\b\\w+\\b", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CHARACTER_CLASS);
         Matcher matcher = pattern.matcher(value);
         while (matcher.find()) {
             int index = matcher.start();

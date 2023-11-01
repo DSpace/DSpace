@@ -268,8 +268,8 @@ Here's how to fix those issues by migrating your old Postgres data to the new ve
         * Pull down an older version of the image from Dockerhub (using a tag)
         * Or, temporarily rebuild your local image with the old version of Postgres. For example:
           ```
-          # This command will rebuild using PostgreSQL v11 & tag it locally as "dspace-7_x"
-          docker build --build-arg POSTGRES_VERSION=11 -t dspace/dspace-postgres-pgcrypto:dspace-7_x ./dspace/src/main/docker/dspace-postgres-pgcrypto/
+          # This command will rebuild using PostgreSQL v11 & tag it locally as "latest"
+          docker build --build-arg POSTGRES_VERSION=11 -t dspace/dspace-postgres-pgcrypto:latest ./dspace/src/main/docker/dspace-postgres-pgcrypto/
           # Then restart container with that image
           docker-compose -p d7 up -d
           ```
