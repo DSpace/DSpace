@@ -252,14 +252,42 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
     public List<String> getDeleteConstraints(Context context, EPerson ePerson) throws SQLException;
 
     /**
-     * Retrieve all accounts which belong to at least one of the specified groups.
+     * Retrieve all EPerson accounts which belong to at least one of the specified groups.
+     * <P>
+     * WARNING: This method may have bad performance issues for Groups with a very large number of members,
+     * as it will load all member EPerson objects into memory.
+     * <P>
+     * For better performance, use the paginated version of this method.
      *
      * @param c      The relevant DSpace Context.
      * @param groups set of eperson groups
      * @return a list of epeople
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public List<EPerson> findByGroups(Context c, Set<Group> groups) throws SQLException;
+    List<EPerson> findByGroups(Context c, Set<Group> groups) throws SQLException;
+
+    /**
+     * Retrieve all EPerson accounts which belong to at least one of the specified groups, in a paginated fashion.
+     *
+     * @param c      The relevant DSpace Context.
+     * @param groups Set of group(s) to check membership in
+     * @param pageSize number of EPerson objects to load at one time. Set to <=0 to disable pagination
+     * @param offset number of page to load (starting with 1). Set to <=0 to disable pagination
+     * @return a list of epeople
+     * @throws SQLException An exception that provides information on a database access error or other errors.
+     */
+    List<EPerson> findByGroups(Context c, Set<Group> groups, int pageSize, int offset) throws SQLException;
+
+    /**
+     * Count all EPerson accounts which belong to at least one of the specified groups. This provides the total
+     * number of results to expect from corresponding findByGroups() for pagination purposes.
+     *
+     * @param c      The relevant DSpace Context.
+     * @param groups Set of group(s) to check membership in
+     * @return total number of (unique) EPersons who are a member of one or more groups.
+     * @throws SQLException An exception that provides information on a database access error or other errors.
+     */
+    int countByGroups(Context c, Set<Group> groups) throws SQLException;
 
     /**
      * Retrieve all accounts which are subscribed to receive information about new items.

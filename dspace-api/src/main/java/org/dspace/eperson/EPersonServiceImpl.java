@@ -305,10 +305,13 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
             throw new AuthorizeException(
                     "You must be an admin to delete an EPerson");
         }
+        // Get all workflow-related groups that the current EPerson belongs to
         Set<Group> workFlowGroups = getAllWorkFlowGroups(context, ePerson);
         for (Group group: workFlowGroups) {
-            List<EPerson> ePeople = groupService.allMembers(context, group);
-            if (ePeople.size() == 1 && ePeople.contains(ePerson)) {
+            // Get total number of unique EPerson objs who are a member of this group (or subgroup)
+            int totalMembers = groupService.countAllMembers(context, group);
+            // If only one EPerson is a member, then we cannot delete the last member of this group.
+            if (totalMembers == 1) {
                 throw new EmptyWorkflowGroupException(ePerson.getID(), group.getID());
             }
         }
@@ -567,11 +570,26 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
     @Override
     public List<EPerson> findByGroups(Context c, Set<Group> groups) throws SQLException {
+        return findByGroups(c, groups, -1, -1);
+    }
+
+    @Override
+    public List<EPerson> findByGroups(Context c, Set<Group> groups, int pageSize, int offset) throws SQLException {
         //Make sure we at least have one group, if not don't even bother searching.
         if (CollectionUtils.isNotEmpty(groups)) {
-            return ePersonDAO.findByGroups(c, groups);
+            return ePersonDAO.findByGroups(c, groups, pageSize, offset);
         } else {
             return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public int countByGroups(Context c, Set<Group> groups) throws SQLException {
+        //Make sure we at least have one group, if not don't even bother counting.
+        if (CollectionUtils.isNotEmpty(groups)) {
+            return ePersonDAO.countByGroups(c, groups);
+        } else {
+            return 0;
         }
     }
 
