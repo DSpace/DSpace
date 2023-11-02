@@ -71,8 +71,7 @@ public class IIIFServiceFacade {
      */
     @Cacheable(key = "#id.toString()", cacheNames = "manifests")
     @PreAuthorize("hasPermission(#id, 'ITEM', 'READ')")
-    public String getManifest(Context context, UUID id)
-            throws ResourceNotFoundException {
+    public String getManifest(Context context, UUID id) throws ResourceNotFoundException {
         Item item;
         try {
             item = itemService.find(context, id);

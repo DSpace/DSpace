@@ -8,6 +8,7 @@
 package org.dspace.app.iiif.service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -119,18 +120,32 @@ public class ManifestService extends AbstractResourceService {
      * @return manifest as JSON
      */
     public String getManifest(Item item, Context context) throws AuthorizeException, IOException, SQLException {
-        List<Bundle> manifestBundles = itemService.getBundles(item, Constants.IIIF_MANIFEST_BUNDLE_NAME);
+        Bitstream manifestBitstream = getPrimaryOrFirstBitstream(item, Constants.IIIF_MANIFEST_BUNDLE_NAME);
 
-        if (manifestBundles == null || manifestBundles.size() == 0) {
+        if (manifestBitstream == null) {
             return createManifest(item, context);
         }
 
-        return new String(
-            bitstreamService.retrieve(
-                context, manifestBundles.get(0).getPrimaryBitstream()
-            ).readAllBytes(),
-            StandardCharsets.UTF_8
-        );
+        try (InputStream inputStream = bitstreamService.retrieve(context, manifestBitstream)) {
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        }
+    }
+
+    private Bitstream getPrimaryOrFirstBitstream(Item item, String bundleName) throws SQLException {
+        List<Bundle> bundles = itemService.getBundles(item, bundleName);
+
+        if (bundles == null || bundles.isEmpty()) {
+            return null;
+        }
+
+        Bundle bundle = bundles.get(0);
+        Bitstream result = bundle.getPrimaryBitstream();
+
+        if (result == null && !bundle.getBitstreams().isEmpty()) {
+            result = bundle.getBitstreams().get(0);
+        }
+
+        return result;
     }
 
     /**

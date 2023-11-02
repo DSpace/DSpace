@@ -41,7 +41,6 @@ public class IIIFCacheEventConsumer implements Consumer {
     public void initialize() throws Exception {
     }
 
-    // TODO: JohnA - Skip event if IIIF manifest bundle exists for given item in context
     @Override
     public void consume(Context ctx, Event event) throws Exception {
         int st = event.getSubjectType();

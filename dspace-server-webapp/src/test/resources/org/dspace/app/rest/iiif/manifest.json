@@ -1,0 +1,68 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@type": "sc:Manifest",
+  "@id": "http://localhost:8080/server/iiif/5029580c-8c21-491e-88fc-ceb0e2270831/manifest",
+  "label": "Test manifest",
+  "metadata": [
+    {
+      "label": "Title",
+      "value": "Test manifest"
+    },
+    {
+      "label": "Issue Date",
+      "value": "2016"
+    },
+    {
+      "label": "Authors",
+      "value": "User, Demo"
+    },
+    {
+      "label": "Moo",
+      "value": "Moo!"
+    }
+  ],
+  "sequences": [
+    {
+      "@id": "http://localhost:8080/server/iiif/5029580c-8c21-491e-88fc-ceb0e2270831/sequence/s0",
+      "@type": "sc:Sequence",
+      "canvases": [
+        {
+          "@id": "http://localhost:8080/server/iiif/5029580c-8c21-491e-88fc-ceb0e2270831/canvas/c0",
+          "@type": "sc:Canvas",
+          "label": "Page 1",
+          "metadata": [],
+          "thumbnail": {
+            "@id": "http://localhost:8182/iiif/2/2e6e8ec5-86a0-4ca4-8744-5ad3ca84e218/full/90,/0/default.jpg",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "http://localhost:8182/iiif/2/2e6e8ec5-86a0-4ca4-8744-5ad3ca84e218",
+              "profile": "http://iiif.io/api/image/2/level0.json",
+              "protocol": "http://iiif.io/api/image"
+            },
+            "format": "image/jpeg"
+          },
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "http://localhost:8182/iiif/2/2e6e8ec5-86a0-4ca4-8744-5ad3ca84e218/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "http://localhost:8182/iiif/2/2e6e8ec5-86a0-4ca4-8744-5ad3ca84e218",
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg"
+              },
+              "on": "http://localhost:8080/server/iiif/5029580c-8c21-491e-88fc-ceb0e2270831/canvas/c0"
+            }
+          ],
+          "width": 2200,
+          "height": 1600
+        }
+      ]
+    }
+  ]
+}

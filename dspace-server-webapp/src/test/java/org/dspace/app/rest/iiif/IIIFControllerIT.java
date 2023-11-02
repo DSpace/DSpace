@@ -1421,4 +1421,88 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                    .andExpect(jsonPath("$.sequences[0].canvases[0].height", is(64)));
     }
 
+    /**
+     * Test that a provided IIIF_MANIFEST bundle overrides the default
+     * generated manifest. The provided manifest has an added metadata key/value
+     *
+     * @throws Exception
+     */
+    @Test
+    public void customManifestBundle() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                                           .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                      .enableIIIF()
+                                      .build();
+
+        Bundle targetBundle = BundleBuilder.createBundle(context, publicItem1)
+                                           .withName("IIIF_MANIFEST")
+                                           .build();
+
+        try (InputStream is = getClass().getResourceAsStream("manifest.json")) {
+                Bitstream bitstream1 = BitstreamBuilder
+                        .createBitstream(context, targetBundle, is)
+                        .withName("manifest.json")
+                        .withMimeType("application/json")
+                        .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.metadata.length()", is(4)))
+                .andExpect(jsonPath("$.metadata[3].label", is("Moo")))
+                .andExpect(jsonPath("$.metadata[3].value", is("Moo!")));
+    }
+
+    @Test
+    public void customManifestBundleWithPrimaryBitstream() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                                           .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                      .enableIIIF()
+                                      .build();
+
+        Bundle targetBundle = BundleBuilder.createBundle(context, publicItem1)
+                                           .withName("IIIF_MANIFEST")
+                                           .build();
+
+        try (InputStream is = getClass().getResourceAsStream("manifest.json")) {
+                Bitstream bitstream1 = BitstreamBuilder
+                        .createBitstream(context, targetBundle, is)
+                        .withName("manifest.json")
+                        .withMimeType("application/json")
+                        .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.metadata.length()", is(4)))
+                .andExpect(jsonPath("$.metadata[3].label", is("Moo")))
+                .andExpect(jsonPath("$.metadata[3].value", is("Moo!")));
+    }
+
 }
