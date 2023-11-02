@@ -146,4 +146,28 @@ public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupp
      */
     Group findByIdAndMembership(Context context, UUID id, EPerson ePerson) throws SQLException;
 
+    /**
+     * Find all groups which are members of a given parent group.
+     * This provides the same behavior as group.getMemberGroups(), but in a paginated fashion.
+     *
+     * @param context   The DSpace context
+     * @param parent    Parent Group to search within
+     * @param pageSize how many results return
+     * @param offset   the position of the first result to return
+     * @return Groups matching the query
+     * @throws SQLException if database error
+     */
+    List<Group> findByParent(Context context, Group parent, int pageSize, int offset) throws SQLException;
+
+    /**
+     * Returns the number of groups which are members of a given parent group.
+     * This provides the same behavior as group.getMemberGroups().size(), but with better performance for large groups.
+     * This method may be used with findByParent() to perform pagination.
+     *
+     * @param context   The DSpace context
+     * @param parent    Parent Group to search within
+     * @return Number of Groups matching the query
+     * @throws SQLException if database error
+     */
+    int countByParent(Context context, Group parent) throws SQLException;
 }

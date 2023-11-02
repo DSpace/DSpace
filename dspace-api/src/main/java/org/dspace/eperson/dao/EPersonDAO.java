@@ -38,7 +38,29 @@ public interface EPersonDAO extends DSpaceObjectDAO<EPerson>, DSpaceObjectLegacy
 
     public int searchResultCount(Context context, String query, List<MetadataField> queryFields) throws SQLException;
 
-    public List<EPerson> findByGroups(Context context, Set<Group> groups) throws SQLException;
+    /**
+     * Find all EPersons who are a member of one or more of the listed groups in a paginated fashion. This returns
+     * EPersons ordered by UUID.
+     *
+     * @param context current Context
+     * @param groups Set of group(s) to check membership in
+     * @param pageSize number of EPerson objects to load at one time. Set to <=0 to disable pagination
+     * @param offset number of page to load (starting with 1). Set to <=0 to disable pagination
+     * @return List of all EPersons who are a member of one or more groups.
+     * @throws SQLException
+     */
+    List<EPerson> findByGroups(Context context, Set<Group> groups, int pageSize, int offset) throws SQLException;
+
+    /**
+     * Count total number of EPersons who are a member of one or more of the listed groups. This provides the total
+     * number of results to expect from corresponding findByGroups() for pagination purposes.
+     *
+     * @param context current Context
+     * @param groups Set of group(s) to check membership in
+     * @return total number of (unique) EPersons who are a member of one or more groups.
+     * @throws SQLException
+     */
+    int countByGroups(Context context, Set<Group> groups) throws SQLException;
 
     public List<EPerson> findWithPasswordWithoutDigestAlgorithm(Context context) throws SQLException;
 

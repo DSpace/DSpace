@@ -196,4 +196,28 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
         return count(createQuery(context, "SELECT count(*) FROM Group"));
     }
 
+    @Override
+    public List<Group> findByParent(Context context, Group parent, int pageSize, int offset) throws SQLException {
+        Query query = createQuery(context,
+                                  "SELECT g FROM Group g JOIN g.parentGroups pg " +
+                                      "WHERE pg.id = :parent_id");
+        query.setParameter("parent_id", parent.getID());
+        if (pageSize > 0) {
+            query.setMaxResults(pageSize);
+        }
+        if (offset > 0) {
+            query.setFirstResult(offset);
+        }
+        query.setHint("org.hibernate.cacheable", Boolean.TRUE);
+
+        return list(query);
+    }
+
+    public int countByParent(Context context, Group parent) throws SQLException {
+        Query query = createQuery(context, "SELECT count(g) FROM Group g JOIN g.parentGroups pg " +
+                                            "WHERE pg.id = :parent_id");
+        query.setParameter("parent_id", parent.getID());
+
+        return count(query);
+    }
 }

@@ -179,8 +179,13 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                 for (CollectionRole collectionRole : collectionRoles) {
                     if (StringUtils.equals(collectionRole.getRoleId(), role.getId())
                             && claimedTask.getWorkflowItem().getCollection() == collectionRole.getCollection()) {
-                        List<EPerson> ePeople = allMembers(context, group);
-                        if (ePeople.size() == 1 && ePeople.contains(ePerson)) {
+                        // Count number of EPersons who are *direct* members of this group
+                        int totalDirectEPersons = ePersonService.countByGroups(context, Set.of(group));
+                        // Count number of Groups which have this groupParent as a direct parent
+                        int totalChildGroups = countByParent(context, group);
+                        // If this group has only one direct EPerson and *zero* child groups, then we cannot delete the
+                        // EPerson or we will leave this group empty.
+                        if (totalDirectEPersons == 1 && totalChildGroups == 0) {
                             throw new IllegalStateException(
                                     "Refused to remove user " + ePerson
                                             .getID() + " from workflow group because the group " + group
@@ -191,8 +196,13 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                 }
             }
             if (!poolTasks.isEmpty()) {
-                List<EPerson> ePeople = allMembers(context, group);
-                if (ePeople.size() == 1 && ePeople.contains(ePerson)) {
+                // Count number of EPersons who are *direct* members of this group
+                int totalDirectEPersons = ePersonService.countByGroups(context, Set.of(group));
+                // Count number of Groups which have this groupParent as a direct parent
+                int totalChildGroups = countByParent(context, group);
+                // If this group has only one direct EPerson and *zero* child groups, then we cannot delete the
+                // EPerson or we will leave this group empty.
+                if (totalDirectEPersons == 1 && totalChildGroups == 0) {
                     throw new IllegalStateException(
                             "Refused to remove user " + ePerson
                                     .getID() + " from workflow group because the group " + group
@@ -212,9 +222,13 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         if (!collectionRoles.isEmpty()) {
             List<PoolTask> poolTasks = poolTaskService.findByGroup(context, groupParent);
             if (!poolTasks.isEmpty()) {
-                List<EPerson> parentPeople = allMembers(context, groupParent);
-                List<EPerson> childPeople = allMembers(context, childGroup);
-                if (childPeople.containsAll(parentPeople)) {
+                // Count number of Groups which have this groupParent as a direct parent
+                int totalChildGroups = countByParent(context, groupParent);
+                // Count number of EPersons who are *direct* members of this group
+                int totalDirectEPersons = ePersonService.countByGroups(context, Set.of(groupParent));
+                // If this group has only one childGroup and *zero* direct EPersons, then we cannot delete the
+                // childGroup or we will leave this group empty.
+                if (totalChildGroups == 1 && totalDirectEPersons == 0) {
                     throw new IllegalStateException(
                             "Refused to remove sub group " + childGroup
                                     .getID() + " from workflow group because the group " + groupParent
@@ -368,7 +382,8 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
         // Get all groups which are a member of this group
         List<Group2GroupCache> group2GroupCaches = group2GroupCacheDAO.findByParent(c, g);
-        Set<Group> groups = new HashSet<>();
+        // Initialize HashSet based on List size to avoid Set resizing. See https://stackoverflow.com/a/21822273
+        Set<Group> groups = new HashSet<>((int) (group2GroupCaches.size() / 0.75 + 1));
         for (Group2GroupCache group2GroupCache : group2GroupCaches) {
             groups.add(group2GroupCache.getChild());
         }
@@ -379,6 +394,23 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         childGroupChildren.addAll(g.getMembers());
 
         return new ArrayList<>(childGroupChildren);
+    }
+
+    @Override
+    public int countAllMembers(Context context, Group group) throws SQLException {
+        // Get all groups which are a member of this group
+        List<Group2GroupCache> group2GroupCaches = group2GroupCacheDAO.findByParent(context, group);
+        // Initialize HashSet based on List size + current 'group' to avoid Set resizing.
+        // See https://stackoverflow.com/a/21822273
+        Set<Group> groups = new HashSet<>((int) ((group2GroupCaches.size() + 1) / 0.75 + 1));
+        for (Group2GroupCache group2GroupCache : group2GroupCaches) {
+            groups.add(group2GroupCache.getChild());
+        }
+        // Append current group as well
+        groups.add(group);
+
+        // Return total number of unique EPerson objects in any of these groups
+        return ePersonService.countByGroups(context, groups);
     }
 
     @Override
@@ -828,5 +860,21 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     @Override
     public String getName(Group dso) {
         return dso.getName();
+    }
+
+    @Override
+    public List<Group> findByParent(Context context, Group parent, int pageSize, int offset) throws SQLException {
+        if (parent == null) {
+            return null;
+        }
+        return groupDAO.findByParent(context, parent, pageSize, offset);
+    }
+
+    @Override
+    public int countByParent(Context context, Group parent) throws SQLException {
+        if (parent == null) {
+            return 0;
+        }
+        return groupDAO.countByParent(context, parent);
     }
 }
