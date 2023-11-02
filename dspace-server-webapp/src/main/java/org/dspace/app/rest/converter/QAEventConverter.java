@@ -14,13 +14,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import org.dspace.app.rest.model.EmptyQAEventMessageRest;
+import org.dspace.app.rest.model.CorrectionTypeQAEventMessageRest;
 import org.dspace.app.rest.model.OpenaireQAEventMessageRest;
 import org.dspace.app.rest.model.QAEventMessageRest;
 import org.dspace.app.rest.model.QAEventRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.QAEvent;
-import org.dspace.qaevent.service.dto.EmptyMessageDTO;
+import org.dspace.qaevent.service.dto.CorrectionTypeMessageDTO;
 import org.dspace.qaevent.service.dto.OpenaireMessageDTO;
 import org.dspace.qaevent.service.dto.QAMessageDTO;
 import org.dspace.services.ConfigurationService;
@@ -56,9 +56,9 @@ public class QAEventConverter implements DSpaceConverter<QAEvent, QAEventRest> {
         rest.setId(modelObject.getEventId());
         try {
             rest.setMessage(convertMessage(jsonMapper.readValue(modelObject.getMessage(),
-                modelObject.getMessageDtoClass())));
+                                                                modelObject.getMessageDtoClass())));
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e.getMessage(), e);
         }
         rest.setSource(modelObject.getSource());
         rest.setOriginalId(modelObject.getOriginalId());
@@ -76,10 +76,17 @@ public class QAEventConverter implements DSpaceConverter<QAEvent, QAEventRest> {
         if (dto instanceof OpenaireMessageDTO) {
             return convertOpenaireMessage(dto);
         }
-        if (dto instanceof EmptyMessageDTO) {
-            return new EmptyQAEventMessageRest();
+        if (dto instanceof CorrectionTypeMessageDTO) {
+            return convertCorrectionTypeMessage(dto);
         }
         throw new IllegalArgumentException("Unknown message type: " + dto.getClass());
+    }
+
+    private QAEventMessageRest convertCorrectionTypeMessage(QAMessageDTO dto) {
+        CorrectionTypeMessageDTO correctionTypeDto = (CorrectionTypeMessageDTO) dto;
+        CorrectionTypeQAEventMessageRest message = new CorrectionTypeQAEventMessageRest();
+        message.setReason(correctionTypeDto.getReason());
+        return message;
     }
 
     private QAEventMessageRest convertOpenaireMessage(QAMessageDTO dto) {

@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
 
 /**
@@ -23,7 +24,6 @@ public class CorrectionTypeRest extends BaseObjectRest<String> {
 
     private String topic;
     private String creationForm;
-    private String discoveryConfiguration;
 
     public String getTopic() {
         return topic;
@@ -31,14 +31,6 @@ public class CorrectionTypeRest extends BaseObjectRest<String> {
 
     public void setTopic(String topic) {
         this.topic = topic;
-    }
-
-    public String getDiscoveryConfiguration() {
-        return discoveryConfiguration;
-    }
-
-    public void setDiscoveryConfiguration(String discoveryConfiguration) {
-        this.discoveryConfiguration = discoveryConfiguration;
     }
 
     public String getCreationForm() {
@@ -55,6 +47,7 @@ public class CorrectionTypeRest extends BaseObjectRest<String> {
     }
 
     @Override
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {
         return NAME;
     }

@@ -5,12 +5,13 @@
        default-lazy-init="true">
 
     <bean id="withdrawnRequest" class="org.dspace.correctiontype.WithdrawnCorrectionType" >
-        <property name="id" value="withdrawnRequest"/>
+        <property name="id" value="request-withdrawn"/>
         <property name="topic" value="REQUEST/WITHDRAWN"/>
+        <property name="creationForm" value="provideReason"/>
     </bean>
 
     <bean id="reinstateRequest" class="org.dspace.correctiontype.ReinstateCorrectionType" >
-        <property name="id" value="reinstateRequest"/>
+        <property name="id" value="request-reinstate"/>
         <property name="topic" value="REQUEST/REINSTATE"/>
     </bean>
 

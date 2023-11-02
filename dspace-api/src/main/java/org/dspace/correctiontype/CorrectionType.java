@@ -13,6 +13,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
 import org.dspace.core.Context;
+import org.dspace.qaevent.service.dto.QAMessageDTO;
 
 /**
  * Interface class that model the CorrectionType.
@@ -27,16 +28,14 @@ public interface CorrectionType {
 
     public String getCreationForm();
 
-    public String getDiscoveryConfiguration();
-
     public boolean isRequiredRelatedItem();
 
     public boolean isAllowed(Context context, Item targetItem) throws AuthorizeException, SQLException;
 
     public boolean isAllowed(Context context, Item targetItem, Item relatedItem) throws AuthorizeException,SQLException;
 
-    public QAEvent createCorrection(Context context, Item targetItem);
+    public QAEvent createCorrection(Context context, Item targetItem, QAMessageDTO reason);
 
-    public QAEvent createCorrection(Context context, Item targetItem, Item relatedItem);
+    public QAEvent createCorrection(Context context, Item targetItem, Item relatedItem, QAMessageDTO reason);
 
 }

@@ -17,5 +17,4 @@ import org.dspace.content.QAEvent;
  */
 public interface QAMessageDTO {
 
-
 }

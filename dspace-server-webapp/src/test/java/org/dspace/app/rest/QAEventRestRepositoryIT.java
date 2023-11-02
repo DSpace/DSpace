@@ -31,6 +31,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.QAEventMatcher;
 import org.dspace.app.rest.model.patch.Operation;
@@ -48,6 +49,7 @@ import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
 import org.dspace.content.QAEventProcessed;
 import org.dspace.qaevent.dao.QAEventsDao;
+import org.dspace.qaevent.service.dto.CorrectionTypeMessageDTO;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -890,6 +892,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
+        String ePersonToken = getAuthToken(eperson.getEmail(), password);
         getClient(adminToken).perform(get("/api/core/items/" + publication.getID()))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.inArchive", is(false)))
@@ -897,13 +900,16 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         AtomicReference<String> idRef = new AtomicReference<String>();
 
-        getClient(adminToken).perform(post("/api/integration/qualityassuranceevents")
-                             .contentType(RestMediaTypes.TEXT_URI_LIST)
-                             .content("https://localhost:8080/server/api/config/correctiontypes/reinstateRequest\n" +
-                                      "https://localhost:8080/server/api/core/items/" + publication.getID()
-                                      ))
-                             .andExpect(status().isCreated())
-                             .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+        ObjectMapper mapper = new ObjectMapper();
+        CorrectionTypeMessageDTO dto = new CorrectionTypeMessageDTO("provided reason!");
+
+        getClient(ePersonToken).perform(post("/api/integration/qualityassuranceevents")
+                               .param("correctionType", "request-withdrawn")
+                               .param("target", publication.getID().toString())
+                               .contentType(contentType)
+                               .content(mapper.writeValueAsBytes(dto)))
+                               .andExpect(status().isCreated())
+                               .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
         getClient(adminToken).perform(get("/api/integration/qualityassuranceevents/" + idRef.get()))
                              .andExpect(status().isOk())

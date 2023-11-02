@@ -7,31 +7,34 @@
  */
 package org.dspace.app.rest.repository;
 
-import static org.dspace.core.Constants.ITEM;
-
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.QAEventRest;
 import org.dspace.app.rest.model.patch.Patch;
-import org.dspace.app.rest.repository.handler.service.UriListHandlerService;
 import org.dspace.app.rest.repository.patch.ResourcePatch;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.correctiontype.CorrectionType;
+import org.dspace.correctiontype.service.CorrectionTypeService;
 import org.dspace.eperson.EPerson;
 import org.dspace.qaevent.dao.QAEventsDao;
 import org.dspace.qaevent.service.QAEventService;
+import org.dspace.qaevent.service.dto.CorrectionTypeMessageDTO;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -64,7 +67,7 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
     private ResourcePatch<QAEvent> resourcePatch;
 
     @Autowired
-    private UriListHandlerService uriListHandlerService;
+    private CorrectionTypeService correctionTypeService;
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -137,45 +140,56 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
 
     @Override
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    protected QAEventRest createAndReturn(Context context, List<String> stringList)
-            throws SQLException, AuthorizeException {
+    protected QAEventRest createAndReturn(Context context) throws SQLException, AuthorizeException {
+        ServletRequest request = getRequestService().getCurrentRequest().getServletRequest();
 
-        if (stringList.size() < 2) {
-            throw new IllegalArgumentException("the request must include at least uris for target item, " +
-                "and correction type");
+        String itemUUID = request.getParameter("target");
+        String relatedItemUUID = request.getParameter("related");
+        String correctionTypeStr = request.getParameter("correctionType");
+
+
+        if (StringUtils.isBlank(correctionTypeStr) || StringUtils.isBlank(itemUUID)) {
+            throw new UnprocessableEntityException("The target item and correctionType must be provided!");
         }
 
-        HttpServletRequest request = getRequestService().getCurrentRequest().getHttpServletRequest();
-        CorrectionType correctionType = uriListHandlerService.handle(context, request, List.of(stringList.get(0)),
-                                                                     CorrectionType.class);
+        Item targetItem = null;
+        Item relatedItem = null;
+        try {
+            targetItem = itemService.find(context, UUID.fromString(itemUUID));
+            relatedItem =  StringUtils.isNotBlank(relatedItemUUID) ?
+                                       itemService.find(context, UUID.fromString(relatedItemUUID)) : null;
+        } catch (Exception e) {
+            throw new UnprocessableEntityException(e.getMessage(), e);
+        }
+
+        if (Objects.isNull(targetItem)) {
+            throw new UnprocessableEntityException("The target item UUID is not valid!");
+        }
+
+        CorrectionType correctionType = correctionTypeService.findOne(correctionTypeStr);
         if (Objects.isNull(correctionType)) {
             throw new UnprocessableEntityException("The given correction type in the request is not valid!");
         }
 
-        List<DSpaceObject> list = utils.constructDSpaceObjectList(context, stringList);
+        if (correctionType.isRequiredRelatedItem() && Objects.isNull(relatedItem)) {
+            throw new UnprocessableEntityException("The given correction type in the request is not valid!");
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        CorrectionTypeMessageDTO reason = null;
+        try {
+            reason = mapper.readValue(request.getInputStream(), CorrectionTypeMessageDTO.class);
+        } catch (IOException exIO) {
+            throw new UnprocessableEntityException("error parsing the body " + exIO.getMessage(), exIO);
+        }
 
         QAEvent qaEvent;
-        List<Item> items = getItems(list, correctionType);
         if (correctionType.isRequiredRelatedItem()) {
-            qaEvent = correctionType.createCorrection(context, items.get(0), items.get(1));
+            qaEvent = correctionType.createCorrection(context, targetItem, relatedItem, reason);
         } else {
-            qaEvent = correctionType.createCorrection(context, items.get(0));
+            qaEvent = correctionType.createCorrection(context, targetItem, reason);
         }
         return converter.toRest(qaEvent, utils.obtainProjection());
-    }
-
-    private List<Item> getItems(List<DSpaceObject> list, CorrectionType correctionType) {
-        if (correctionType.isRequiredRelatedItem()) {
-            if (list.size() == 2 && list.get(0).getType() == ITEM && list.get(1).getType() == ITEM) {
-                return List.of((Item) list.get(0), (Item) list.get(1));
-            } else {
-                throw new UnprocessableEntityException("The given items in the request were not valid!");
-            }
-        } else if (list.size() != 1) {
-            throw new UnprocessableEntityException("The given item in the request were not valid!");
-        } else {
-            return List.of((Item) list.get(0));
-        }
     }
 
     @Override

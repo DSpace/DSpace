@@ -292,7 +292,7 @@ public class QAEventServiceImpl implements QAEventService {
             solrQuery.setRows(pageSize);
         }
         solrQuery.setSort(orderField, ascending ? ORDER.asc : ORDER.desc);
-        solrQuery.setQuery(TOPIC + ":" + topic.replaceAll("!", "/"));
+        solrQuery.setQuery(TOPIC + ":" + topic.replaceAll("!", "\\\\/"));
 
         QueryResponse response;
         try {

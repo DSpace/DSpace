@@ -7,7 +7,6 @@
  */
 package org.dspace.correctiontype;
 
-import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.dspace.content.QAEvent.INTERNAL_ITEM_SOURCE;
 import static org.dspace.core.Constants.READ;
 
@@ -21,6 +20,8 @@ import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
 import org.dspace.core.Context;
 import org.dspace.qaevent.service.QAEventService;
+import org.dspace.qaevent.service.dto.CorrectionTypeMessageDTO;
+import org.dspace.qaevent.service.dto.QAMessageDTO;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -34,6 +35,7 @@ public class WithdrawnCorrectionType implements CorrectionType, InitializingBean
 
     private String id;
     private String topic;
+    private String creationForm;
 
     @Autowired
     private QAEventService qaEventService;
@@ -47,13 +49,14 @@ public class WithdrawnCorrectionType implements CorrectionType, InitializingBean
     }
 
     @Override
-    public QAEvent createCorrection(Context context, Item targetItem) {
+    public QAEvent createCorrection(Context context, Item targetItem, QAMessageDTO reason) {
+        CorrectionTypeMessageDTO mesasge = (CorrectionTypeMessageDTO) reason;
         QAEvent qaEvent = new QAEvent(INTERNAL_ITEM_SOURCE,
                                       "handle:" + targetItem.getHandle(),
                                       targetItem.getID().toString(),
                                       targetItem.getName(),
                                       this.getTopic(), 1.0,
-                                      new Gson().toJson(new Object()),
+                                      new Gson().toJson(mesasge),
                                       new Date()
                                       );
 
@@ -68,8 +71,8 @@ public class WithdrawnCorrectionType implements CorrectionType, InitializingBean
     }
 
     @Override
-    public QAEvent createCorrection(Context context, Item targetItem, Item relatedItem) {
-        return createCorrection(context, targetItem);
+    public QAEvent createCorrection(Context context, Item targetItem, Item relatedItem, QAMessageDTO reason) {
+        return createCorrection(context, targetItem, reason);
     }
 
     @Override
@@ -100,12 +103,11 @@ public class WithdrawnCorrectionType implements CorrectionType, InitializingBean
 
     @Override
     public String getCreationForm() {
-        return EMPTY;
+        return this.creationForm;
     }
 
-    @Override
-    public String getDiscoveryConfiguration() {
-        return EMPTY;
+    public void setCreationForm(String creationForm) {
+        this.creationForm = creationForm;
     }
 
 }
