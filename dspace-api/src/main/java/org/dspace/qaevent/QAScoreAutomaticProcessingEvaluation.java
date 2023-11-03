@@ -18,16 +18,44 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * the Implementation of {@link QAEventAutomaticProcessingEvaluation}
+ * A configurable implementation of {@link QAEventAutomaticProcessingEvaluation} allowing to define thresholds for
+ * automatic acceptance, rejection or ignore of {@link QAEvent} matching a specific, optional, item filter
+ * {@link LogicalStatement}. If the item filter is not defined only the score threshold will be used.
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
 public class QAScoreAutomaticProcessingEvaluation implements QAEventAutomaticProcessingEvaluation {
+    /**
+     * The minimum score of QAEvent to be considered for automatic approval (trust must be greater or equals to that)
+     */
     private double scoreToApprove;
+
+    /**
+     * The threshold under which QAEvent are considered for automatic ignore (trust must be less or equals to that)
+     */
     private double scoreToIgnore;
+
+    /**
+     * The threshold under which QAEvent are considered for automatic rejection (trust must be less or equals to that)
+     */
     private double scoreToReject;
+
+    /**
+     * The optional logical statement that must pass for item target of a QAEvent to be considered for automatic
+     * approval
+     */
     private LogicalStatement itemFilterToApprove;
+
+    /**
+     * The optional logical statement that must pass for item target of a QAEvent to be considered for automatic
+     * ignore
+     */
     private LogicalStatement itemFilterToIgnore;
+
+    /**
+     * The optional logical statement that must pass for item target of a QAEvent to be considered for automatic
+     * rejection
+     */
     private LogicalStatement itemFilterToReject;
 
     @Autowired

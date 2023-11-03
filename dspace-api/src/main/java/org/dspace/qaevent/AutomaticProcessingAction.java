@@ -8,7 +8,7 @@
 package org.dspace.qaevent;
 
 /**
- * actions of {@link org.dspace.content.QAEvent} to apply the correction
+ * Enumeration of possible actions to perform over a {@link org.dspace.content.QAEvent}
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */

@@ -334,14 +334,14 @@ public class QAEventServiceImpl implements QAEventService {
 
                 getSolr().commit();
 
-                evaluateAutomaticProcessingIfNeeded(context, dto);
+                performAutomaticProcessingIfNeeded(context, dto);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void evaluateAutomaticProcessingIfNeeded(Context context, QAEvent qaEvent) {
+    private void performAutomaticProcessingIfNeeded(Context context, QAEvent qaEvent) {
         QAEventAutomaticProcessingEvaluation evaluation = qaAutomaticProcessingMap.get(qaEvent.getSource());
 
         if (evaluation == null) {
@@ -364,6 +364,8 @@ public class QAEventServiceImpl implements QAEventService {
             case ACCEPT:
                 qaEventActionService.accept(context, qaEvent);
                 break;
+            default:
+                throw new IllegalStateException("Unknown automatic action requested " + action);
         }
 
     }

@@ -76,6 +76,13 @@
 	     </property>    
      </bean>
 
+    <!-- 
+        To configure rules to automatic process specific qaevent you must provide a qaAutomaticProcessingMap
+        where the keys are the qaevent source provider name and the value is a reference to a 
+        AutomaticProcessingEvaluation implementation. Below you can find an example of configuration defining
+        some thresholds rules for the coar-notify generated QAEvent to be approved, rejected and ignored
+     -->
+    <!-- 
     <util:map id="qaAutomaticProcessingMap">
         <entry key="coar-notify" value-ref="qaScoreEvaluation"/>
     </util:map>
@@ -88,5 +95,5 @@
         <property name="itemFilterToIgnore" ref="simple-demo_filter" />
         <property name="itemFilterToApprove" ref="simple-demo_filter" />
     </bean>
-
+    -->
  </beans>

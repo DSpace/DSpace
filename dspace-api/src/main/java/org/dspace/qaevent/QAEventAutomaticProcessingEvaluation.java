@@ -11,19 +11,20 @@ import org.dspace.content.QAEvent;
 import org.dspace.core.Context;
 
 /**
- * this interface responsible for the Automation Processing of {@link QAEvent}
- * by returning the expected action related to QAEvent to be taken
+ * This interface allows the implemnetation of Automation Processing rules
+ * defining which {@link AutomaticProcessingAction} should be eventually
+ * performed on a specific {@link QAEvent}
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
 public interface QAEventAutomaticProcessingEvaluation {
 
     /**
-     * evaluate automatic processing and return the expected action or null
+     * Evaluate a {@link QAEvent} to decide which, if any, {@link AutomaticProcessingAction} should be performed
      *
-     * @param context the context
+     * @param context the DSpace context
      * @param qaEvent the quality assurance event
-     * @return an action of {@link AutomaticProcessingAction} or null
+     * @return        an action of {@link AutomaticProcessingAction} or null if no automatic action should be performed
      */
     AutomaticProcessingAction evaluateAutomaticProcessing(Context context, QAEvent qaEvent);
 
