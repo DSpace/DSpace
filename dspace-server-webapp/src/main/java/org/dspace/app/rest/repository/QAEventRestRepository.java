@@ -75,19 +75,19 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
     @SearchRestMethod(name = "findByTopic")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<QAEventRest> findByTopic(Context context, @Parameter(value = "topic", required = true) String topic,
-        @Parameter(value = "target", required = false) UUID target,
         Pageable pageable) {
+        String[] topicIdSplitted = topic.split(":", 3);
+        if (topicIdSplitted.length < 2) {
+            return null;
+        }
+        String sourceName = topicIdSplitted[0];
+        String topicName = topicIdSplitted[1].replaceAll("!", "/");
+        UUID target = topicIdSplitted.length == 3 ? UUID.fromString(topicIdSplitted[2]) : null;
         List<QAEvent> qaEvents = null;
         long count = 0L;
-        if (target == null) {
-            qaEvents = qaEventService.findEventsByTopicAndPage(topic,
-                pageable.getOffset(), pageable.getPageSize());
-            count = qaEventService.countEventsByTopic(topic);
-        } else {
-            qaEvents = qaEventService.findEventsByTopicAndPageAndTarget(topic,
-                pageable.getOffset(), pageable.getPageSize(), target);
-            count = qaEventService.countEventsByTopicAndTarget(topic, target);
-        }
+        qaEvents = qaEventService.findEventsByTopicAndPageAndTarget(sourceName, topicName,
+            pageable.getOffset(), pageable.getPageSize(), target);
+        count = qaEventService.countEventsByTopicAndTarget(sourceName, topicName, target);
         if (qaEvents == null) {
             return null;
         }

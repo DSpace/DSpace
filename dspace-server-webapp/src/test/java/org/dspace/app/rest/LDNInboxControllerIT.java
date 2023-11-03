@@ -7,9 +7,10 @@
  */
 package org.dspace.app.rest;
 
-import static org.dspace.content.QAEvent.OPENAIRE_SOURCE;
+import static org.dspace.content.QAEvent.COAR_NOTIFY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -118,9 +119,9 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
                 .contentType("application/ld+json")
                 .content(message))
             .andExpect(status().isAccepted());
-        assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 1L)));
+        assertThat(qaEventService.findAllSources(0, 20), hasItem(QASourceMatcher.with(COAR_NOTIFY, 1L)));
 
-        assertThat(qaEventService.findAllTopics(0, 20), contains(
+        assertThat(qaEventService.findAllTopicsBySource(COAR_NOTIFY, 0, 20), contains(
             QATopicMatcher.with("ENRICH/MORE/REVIEW", 1L)));
 
     }

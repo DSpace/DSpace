@@ -14,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
+import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.QATopicRest;
 import org.dspace.core.Context;
 import org.dspace.qaevent.QATopic;
@@ -41,7 +42,14 @@ public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, Str
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     public QATopicRest findOne(Context context, String id) {
-        QATopic topic = qaEventService.findTopicByTopicId(id);
+        String[] topicIdSplitted = id.split(":", 3);
+        if (topicIdSplitted.length < 2) {
+            return null;
+        }
+        String sourceName = topicIdSplitted[0];
+        String topicName = topicIdSplitted[1].replaceAll("!", "/");
+        UUID target = topicIdSplitted.length == 3 ? UUID.fromString(topicIdSplitted[2]) : null;
+        QATopic topic = qaEventService.findTopicBySourceAndNameAndTarget(sourceName, topicName, target);
         if (topic == null) {
             return null;
         }
@@ -49,14 +57,8 @@ public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, Str
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
     public Page<QATopicRest> findAll(Context context, Pageable pageable) {
-        List<QATopic> topics = qaEventService.findAllTopics(pageable.getOffset(), pageable.getPageSize());
-        long count = qaEventService.countTopics();
-        if (topics == null) {
-            return null;
-        }
-        return converter.toRestPage(topics, pageable, count, utils.obtainProjection());
+        throw new RepositoryMethodNotImplementedException("Method not allowed!", "");
     }
 
     @SearchRestMethod(name = "bySource")
@@ -76,7 +78,7 @@ public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, Str
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<QATopicRest> findByTarget(Context context,
         @Parameter(value = "target", required = true) UUID target,
-        @Parameter(value = "source", required = false) String source,
+        @Parameter(value = "source", required = true) String source,
         Pageable pageable) {
         List<QATopic> topics = qaEventService
             .findAllTopicsBySourceAndTarget(source, target, pageable.getOffset(), pageable.getPageSize());

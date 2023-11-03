@@ -24,15 +24,6 @@ import org.dspace.qaevent.QATopic;
 public interface QAEventService {
 
     /**
-     * Find all the event's topics.
-     *
-     * @param  offset   the offset to apply
-     * @param  pageSize the page size
-     * @return          the topics list
-     */
-    public List<QATopic> findAllTopics(long offset, long pageSize);
-
-    /**
      * Find all the event's topics related to the given source.
      *
      * @param  source the source to search for
@@ -40,14 +31,17 @@ public interface QAEventService {
      * @param  count  the page size
      * @return        the topics list
      */
-    public List<QATopic> findAllTopicsBySource(String source, long offset, long count);
+    public List<QATopic> findAllTopicsBySource(String source, long offset, int count);
 
     /**
-     * Count all the event's topics.
+     * Find a specific topic by its name, source and optionally a target.
      *
-     * @return         the count result
+     * @param  sourceName the name of the source
+     * @param  topicName  the topic name to search for
+     * @param  target     (nullable) the uuid of the target to focus on
+     * @return            the topic
      */
-    public long countTopics();
+    public QATopic findTopicBySourceAndNameAndTarget(String sourceName, String topicName, UUID target);
 
     /**
      * Count all the event's topics related to the given source.
@@ -60,12 +54,13 @@ public interface QAEventService {
     /**
      * Find all the events by topic sorted by trust descending.
      *
+     * @param  source     the source name
      * @param  topic      the topic to search for
      * @param  offset     the offset to apply
      * @param  pageSize   the page size
      * @return            the events
      */
-    public List<QAEvent> findEventsByTopicAndPage(String topic, long offset, int pageSize);
+    public List<QAEvent> findEventsByTopicAndPage(String source, String topic, long offset, int pageSize);
 
     /**
      * Find all the events by topic.
@@ -73,7 +68,7 @@ public interface QAEventService {
      * @param  topic   the topic to search for
      * @return         the events count
      */
-    public long countEventsByTopic(String topic);
+    public long countEventsByTopic(String source, String topic);
 
     /**
      * Find an event by the given id.
@@ -106,20 +101,21 @@ public interface QAEventService {
     public void deleteEventsByTargetId(UUID targetId);
 
     /**
-     * Find a specific topid by the given id.
-     *
-     * @param  topicId the topic id to search for
-     * @return         the topic
-     */
-    public QATopic findTopicByTopicId(String topicId);
-
-    /**
      * Find a specific source by the given name.
      *
      * @param  source the source name
      * @return        the source
      */
     public QASource findSource(String source);
+
+    /**
+     * Find a specific source by the given name including the stats focused on the target item.
+     *
+     * @param  source the source name
+     * @param  target the uuid of the item target
+     * @return        the source
+     */
+    public QASource findSource(String source, UUID target);
 
     /**
      * Find all the event's sources.
@@ -149,26 +145,30 @@ public interface QAEventService {
      * Find a list of QA events according to the pagination parameters for the specified topic and target sorted by
      * trust descending
      * 
+     * @param source the source name
      * @param topic the topic to search for
      * @param offset the offset to apply
      * @param pageSize the page size
      * @param target the uuid of the QA event's target
      * @return the events
      */
-    public List<QAEvent> findEventsByTopicAndPageAndTarget(String topic, long offset, int pageSize, UUID target);
+    public List<QAEvent> findEventsByTopicAndPageAndTarget(String source, String topic, long offset, int pageSize,
+            UUID target);
 
     /**
      * Count the QA events related to the specified topic and target
+     * 
+     * @param source     the source name
      * @param topic      the topic to search for
      * @param target     the uuid of the QA event's target
      * @return the count result
      */
-    public long countEventsByTopicAndTarget(String topic, UUID target);
+    public long countEventsByTopicAndTarget(String source, String topic, UUID target);
 
     /**
      * Find all the event's topics related to the given source for a specific item
      *
-     * @param  source the source to search for
+     * @param  source (not null) the source to search for
      * @param  target the item referring to
      * @param  offset the offset to apply
      * @param  pageSize  the page size
@@ -184,5 +184,23 @@ public interface QAEventService {
      * @return         the count result
      */
     public long countTopicsBySourceAndTarget(String source, UUID target);
+
+    /**
+     * Find all the event's sources related to a specific item
+     *
+     * @param  target the item referring to
+     * @param  offset the offset to apply
+     * @param  pageSize  the page size
+     * @return        the source list
+     */
+    public List<QASource> findAllSourcesByTarget(UUID target, long offset, int pageSize);
+
+    /**
+     * Count all the event's sources related to a specific item
+     *
+     * @param  target  the item uuid
+     * @return         the count result
+     */
+    public long countSourcesByTarget(UUID target);
 
 }
