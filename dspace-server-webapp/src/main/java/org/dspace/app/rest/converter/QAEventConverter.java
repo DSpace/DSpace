@@ -14,11 +14,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import org.dspace.app.rest.model.NotifyQAEventMessageRest;
 import org.dspace.app.rest.model.OpenaireQAEventMessageRest;
 import org.dspace.app.rest.model.QAEventMessageRest;
 import org.dspace.app.rest.model.QAEventRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.QAEvent;
+import org.dspace.qaevent.service.dto.NotifyMessageDTO;
 import org.dspace.qaevent.service.dto.OpenaireMessageDTO;
 import org.dspace.qaevent.service.dto.QAMessageDTO;
 import org.dspace.services.ConfigurationService;
@@ -72,8 +74,20 @@ public class QAEventConverter implements DSpaceConverter<QAEvent, QAEventRest> {
     private QAEventMessageRest convertMessage(QAMessageDTO dto) {
         if (dto instanceof OpenaireMessageDTO) {
             return convertOpenaireMessage(dto);
+        } else if (dto instanceof NotifyMessageDTO) {
+            return convertNotifyMessage(dto);
         }
         throw new IllegalArgumentException("Unknown message type: " + dto.getClass());
+    }
+
+    private QAEventMessageRest convertNotifyMessage(QAMessageDTO dto) {
+        NotifyMessageDTO notifyDto = (NotifyMessageDTO) dto;
+        NotifyQAEventMessageRest message = new NotifyQAEventMessageRest();
+        message.setServiceName(notifyDto.getServiceName());
+        message.setServiceId(notifyDto.getServiceId());
+        message.setHref(notifyDto.getHref());
+        message.setRelationship(notifyDto.getRelationship());
+        return message;
     }
 
     private QAEventMessageRest convertOpenaireMessage(QAMessageDTO dto) {

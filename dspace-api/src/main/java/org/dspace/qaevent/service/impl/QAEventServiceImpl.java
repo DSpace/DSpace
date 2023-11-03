@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
@@ -60,6 +61,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  */
 public class QAEventServiceImpl implements QAEventService {
+
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(QAEventServiceImpl.class);
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;
@@ -516,19 +519,26 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     private String getResourceUUID(Context context, String originalId) throws Exception {
-        String id = getHandleFromOriginalId(originalId);
-        if (id != null) {
-            Item item = (Item) handleService.resolveToObject(context, id);
-            if (item != null) {
-                final String itemUuid = item.getID().toString();
-                context.uncacheEntity(item);
-                return itemUuid;
-            } else {
-                return null;
-            }
-        } else {
-            throw new IllegalArgumentException("Malformed originalId " + originalId);
+        Item item = null;
+        try {
+            String handleResolver = configurationService.getProperty("handle.canonical.prefix", "https://hdl.handle.net/");
+            String handle = originalId.substring(handleResolver.length());
+            item = (Item) handleService.resolveToObject(context, handle);
+        } catch (Exception e) {
+            log.warn("OriginalId given is not an handle url", originalId);
         }
+        if (item == null) {
+            String id = getHandleFromOriginalId(originalId);
+            if (id != null) {
+                item = (Item) handleService.resolveToObject(context, id);
+            }
+        }
+        if (item != null) {
+            final String itemUuid = item.getID().toString();
+            context.uncacheEntity(item);
+            return itemUuid;
+        }
+        return null;
     }
 
     // oai:www.openstarts.units.it:10077/21486
@@ -562,7 +572,7 @@ public class QAEventServiceImpl implements QAEventService {
 
     private String[] getSupportedSources() {
         return configurationService.getArrayProperty("qaevent.sources",
-            new String[] { QAEvent.OPENAIRE_SOURCE, QAEvent.COAR_NOTIFY });
+            new String[] { QAEvent.OPENAIRE_SOURCE, QAEvent.COAR_NOTIFY_SOURCE });
     }
 
 }

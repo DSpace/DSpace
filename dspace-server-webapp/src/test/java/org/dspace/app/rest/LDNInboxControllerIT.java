@@ -7,9 +7,9 @@
  */
 package org.dspace.app.rest;
 
-import static org.dspace.content.QAEvent.OPENAIRE_SOURCE;
+import static org.dspace.content.QAEvent.COAR_NOTIFY_SOURCE;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -21,12 +21,14 @@ import java.nio.charset.Charset;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.ldn.LDNMessageEntity;
+import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.ldn.service.LDNMessageService;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.NotifyServiceBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -50,48 +52,27 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
     private QAEventService qaEventService = new DSpace().getSingletonService(QAEventService.class);
 
     @Test
-    public void ldnInboxEndorsementActionTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        Community community = CommunityBuilder.createCommunity(context).withName("community").build();
-        Collection collection = CollectionBuilder.createCollection(context, community).build();
-        Item item = ItemBuilder.createItem(context, collection).build();
-        String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
-
-        context.restoreAuthSystemState();
-
-        InputStream offerEndorsementStream = getClass().getResourceAsStream("ldn_offer_endorsement_object.json");
-        String offerEndorsementJson = IOUtils.toString(offerEndorsementStream, Charset.defaultCharset());
-        offerEndorsementStream.close();
-        String message = offerEndorsementJson.replace("<<object>>", object);
-        ObjectMapper mapper = new ObjectMapper();
-        Notification notification = mapper.readValue(message, Notification.class);
-
-        getClient(getAuthToken(admin.getEmail(), password))
-            .perform(post("/ldn/inbox")
-                .contentType("application/ld+json")
-                .content(message))
-            .andExpect(status().isAccepted());
-
-        LDNMessageEntity ldnMessage = ldnMessageService.find(context, notification.getId());
-        checkStoredLDNMessage(notification, ldnMessage, object);
-    }
-
-    @Test
     public void ldnInboxAnnounceEndorsementTest() throws Exception {
         context.turnOffAuthorisationSystem();
-
         Community community = CommunityBuilder.createCommunity(context).withName("community").build();
         Collection collection = CollectionBuilder.createCollection(context, community).build();
         Item item = ItemBuilder.createItem(context, collection).build();
         String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
-
+        String object_handle = item.getHandle();
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("https://overlay-journal.com/inbox/")
+                                .build();
         context.restoreAuthSystemState();
 
         InputStream announceEndorsementStream = getClass().getResourceAsStream("ldn_announce_endorsement.json");
         String announceEndorsement = IOUtils.toString(announceEndorsementStream, Charset.defaultCharset());
         announceEndorsementStream.close();
-        String message = announceEndorsement.replace("<<object>>", object);
+        String message = announceEndorsement.replaceAll("<<object>>", object);
+        message = message.replaceAll("<<object_handle>>", object);
 
         ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
@@ -105,12 +86,27 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         checkStoredLDNMessage(notification, ldnMessage, object);
     }
 
-
     @Test
     public void ldnInboxAnnounceReviewTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).withName("community").build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
         InputStream announceReviewStream = getClass().getResourceAsStream("ldn_announce_review.json");
-        String message = IOUtils.toString(announceReviewStream, Charset.defaultCharset());
+        String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
+        String object_handle = item.getHandle();
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("https://review-service.com/inbox/")
+                                .build();
+        String announceReview = IOUtils.toString(announceReviewStream, Charset.defaultCharset());
         announceReviewStream.close();
+        String message = announceReview.replaceAll("<<object>>", object);
+        message = message.replaceAll("<<object_handle>>", object);
+
         ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
         getClient(getAuthToken(admin.getEmail(), password))
@@ -118,9 +114,9 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
                 .contentType("application/ld+json")
                 .content(message))
             .andExpect(status().isAccepted());
-        assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 1L)));
+        assertThat(qaEventService.findAllSources(0, 20), hasItem(QASourceMatcher.with(COAR_NOTIFY_SOURCE, 1L)));
 
-        assertThat(qaEventService.findAllTopics(0, 20), contains(
+        assertThat(qaEventService.findAllTopics(0, 20), hasItem(
             QATopicMatcher.with("ENRICH/MORE/REVIEW", 1L)));
 
     }

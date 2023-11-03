@@ -55,10 +55,10 @@
      <bean id="AbstractMetadataAction" class="org.dspace.qaevent.action.QAOpenaireSimpleMetadataAction">
         <property name="metadata" value="dc.description.abstract" />
      </bean>
-     <bean id="AddReviewMetadataAction" class="org.dspace.qaevent.action.QAOpenaireSimpleMetadataAction">
+     <bean id="AddReviewMetadataAction" class="org.dspace.qaevent.action.QANotifySimpleMetadataAction">
         <property name="metadata" value="datacite.relation.isReviewedBy" />
      </bean>
-     <bean id="AddEndorsedMetadataAction" class="org.dspace.qaevent.action.QAOpenaireSimpleMetadataAction">
+     <bean id="AddEndorsedMetadataAction" class="org.dspace.qaevent.action.QANotifySimpleMetadataAction">
         <property name="metadata" value="notify.relation.endorsedBy"/>
      </bean>
      <!-- Add a new identifier to the given item, using the defined types mapping -->

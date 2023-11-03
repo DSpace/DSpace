@@ -9,6 +9,7 @@ package org.dspace.app.ldn.action;
 
 import java.util.Date;
 
+import com.google.gson.Gson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.model.Notification;
@@ -17,10 +18,17 @@ import org.dspace.content.QAEvent;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.qaevent.service.QAEventService;
+import org.dspace.qaevent.service.dto.NotifyMessageDTO;
 import org.dspace.services.ConfigurationService;
 import org.dspace.web.ContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
+
+/**
+ * Implementation for LDN Correction Action. It creates a QA Event according to the LDN Message received *
+ * @author Francesco Bacchelli (francesco.bacchelli at 4science.it)
+ *
+ */
 public class LDNCorrectionAction implements LDNAction {
 
     private static final Logger log = LogManager.getLogger(LDNEmailAction.class);
@@ -39,27 +47,29 @@ public class LDNCorrectionAction implements LDNAction {
         ActionStatus result = ActionStatus.ABORT;
         Context context = ContextUtil.obtainCurrentRequestContext();
         String itemName = itemService.getName(item);
-        String value = "";
         QAEvent qaEvent = null;
-        if (notification.getObject().getIetfCiteAs() != null) {
-            value = notification.getObject().getIetfCiteAs();
-            qaEvent = new QAEvent(QAEvent.COAR_NOTIFY,
+        if (notification.getObject() != null) {
+            String citeAs = notification.getObject().getIetfCiteAs();
+            if (citeAs == null || citeAs.isEmpty()) {
+                citeAs = notification.getObject().getId();
+            }
+            NotifyMessageDTO message = new NotifyMessageDTO();
+            message.setHref(citeAs);
+            message.setRelationship(notification.getObject().getAsRelationship());
+            if (notification.getOrigin() != null) {
+                message.setServiceId(notification.getOrigin().getId());
+                message.setServiceName(notification.getOrigin().getInbox());
+            }
+            Gson gson = new Gson();
+            // "oai:www.dspace.org:" + item.getHandle(),
+            qaEvent = new QAEvent(QAEvent.COAR_NOTIFY_SOURCE,
                 notification.getObject().getId(), item.getID().toString(), itemName,
                 this.getQaEventTopic(), 1d,
-                "{\"abstracts[0]\": \"" + value + "\"}"
+                gson.toJson(message)
                 , new Date());
-        } else if (notification.getObject().getAsRelationship() != null) {
-            String type = notification.getObject().getAsRelationship();
-            value = notification.getObject().getAsObject();
-            qaEvent = new QAEvent(QAEvent.COAR_NOTIFY,
-                notification.getObject().getId(), item.getID().toString(), itemName,
-                this.getQaEventTopic(), 1d,
-                "{\"pids[0].value\":\"" + value + "\"," +
-                "\"pids[0].type\":\"" +  type + "\"}"
-                , new Date());
+            qaEventService.store(context, qaEvent);
+            result = ActionStatus.CONTINUE;
         }
-        qaEventService.store(context, qaEvent);
-        result = ActionStatus.CONTINUE;
 
         return result;
     }
