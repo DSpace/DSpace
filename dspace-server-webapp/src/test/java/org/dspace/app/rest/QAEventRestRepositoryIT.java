@@ -53,7 +53,6 @@ import org.dspace.qaevent.service.dto.CorrectionTypeMessageDTO;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.RestMediaTypes;
 
 /**
  * Integration tests for {@link QAEventRestRepository}.
@@ -797,19 +796,19 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void createQAEventByCorrectionTypeUnAuthorizedTest() throws Exception {
         getClient().perform(post("/api/integration/qualityassuranceevents")
-                   .contentType(RestMediaTypes.TEXT_URI_LIST)
-                   .content("https://localhost:8080/server/api/config/correctiontypes/withdrawnRequest\n" +
-                            "https://localhost:8080/server/api/core/items/" + UUID.randomUUID()))
+                   .param("correctionType", "request-withdrawn")
+                   .param("target", UUID.randomUUID().toString())
+                   .contentType(contentType))
                    .andExpect(status().isUnauthorized());
     }
 
     @Test
-    public void createQAEventByCorrectionTypeWithMissingUriTest() throws Exception {
+    public void createQAEventByCorrectionTypeWithMissingTargetTest() throws Exception {
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(post("/api/integration/qualityassuranceevents")
-                             .contentType(RestMediaTypes.TEXT_URI_LIST)
-                             .content("https://localhost:8080/server/api/config/correctiontypes/withdrawnRequest"))
-                             .andExpect(status().isBadRequest());
+                             .param("correctionType", "request-withdrawn")
+                             .contentType(contentType))
+                             .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
@@ -838,10 +837,9 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         AtomicReference<String> idRef = new AtomicReference<String>();
 
         getClient(adminToken).perform(post("/api/integration/qualityassuranceevents")
-                             .contentType(RestMediaTypes.TEXT_URI_LIST)
-                             .content("https://localhost:8080/server/api/config/correctiontypes/withdrawnRequest\n" +
-                                      "https://localhost:8080/server/api/core/items/" + publication.getID()
-                                      ))
+                             .param("correctionType", "request-withdrawn")
+                             .param("target", publication.getID().toString())
+                             .contentType(contentType))
                              .andExpect(status().isCreated())
                              .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
 
