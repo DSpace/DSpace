@@ -10,6 +10,7 @@ package org.dspace.app.rest;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
 import static org.dspace.app.rest.matcher.QAEventMatcher.matchQAEventEntry;
+import static org.dspace.content.QAEvent.COAR_NOTIFY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
@@ -864,4 +865,140 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         assertThat(processedEvent.getEperson().getID(), is(admin.getID()));
 
     }
+
+    @Test
+    public void createQAEventsAndAcceptAutomaticallyByScoreAndFilterTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        Item item = ItemBuilder.createItem(context, col1).withTitle("demo").build();
+
+        QAEvent event =
+            QAEventBuilder.createTarget(context, item)
+                          .withSource(COAR_NOTIFY)
+                          .withTrust(0.8)
+                          .withTopic("ENRICH/MORE/REVIEW")
+                          .withMessage("{\"abstracts[0]\": \"https://doi.org/10.3214/987654\"}")
+                          .build();
+
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(get("/api/core/items/" + item.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.metadata['datacite.relation.isReviewedBy'][0].value",
+                                is("https://doi.org/10.3214/987654")));
+
+        getClient(authToken).perform(get("/api/integration/qualityassuranceevents/" + event.getEventId()))
+                            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void createQAEventsAndIgnoreAutomaticallyByScoreAndFilterTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        Item item = ItemBuilder.createItem(context, col1).withTitle("demo").build();
+
+        QAEvent event =
+            QAEventBuilder.createTarget(context, item)
+                          .withSource(COAR_NOTIFY)
+                          .withTrust(0.4)
+                          .withTopic("ENRICH/MORE/REVIEW")
+                          .withMessage("{\"abstracts[0]\": \"https://doi.org/10.3214/987654\"}")
+                          .build();
+
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(get("/api/core/items/" + item.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.metadata['datacite.relation.isReviewedBy']").doesNotExist());
+
+        getClient(authToken).perform(get("/api/integration/qualityassuranceevents/" + event.getEventId()))
+                            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void createQAEventsAndRejectAutomaticallyByScoreAndFilterTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        Item item = ItemBuilder.createItem(context, col1).withTitle("demo").build();
+
+        QAEvent event =
+            QAEventBuilder.createTarget(context, item)
+                          .withSource(COAR_NOTIFY)
+                          .withTrust(0.3)
+                          .withTopic("ENRICH/MORE/REVIEW")
+                          .withMessage("{\"abstracts[0]\": \"https://doi.org/10.3214/987654\"}")
+                          .build();
+
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(get("/api/core/items/" + item.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.metadata['datacite.relation.isReviewedBy']").doesNotExist());
+
+        getClient(authToken).perform(get("/api/integration/qualityassuranceevents/" + event.getEventId()))
+                            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void createQAEventsAndDoNothingScoreNotInRangTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        Item item = ItemBuilder.createItem(context, col1).withTitle("demo").build();
+
+        QAEvent event =
+            QAEventBuilder.createTarget(context, item)
+                          .withSource(COAR_NOTIFY)
+                          .withTrust(0.7)
+                          .withTopic("ENRICH/MORE/REVIEW")
+                          .withMessage("{\"abstracts[0]\": \"https://doi.org/10.3214/987654\"}")
+                          .build();
+
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(get("/api/core/items/" + item.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.metadata['datacite.relation.isReviewedBy']").doesNotExist());
+
+        getClient(authToken).perform(get("/api/integration/qualityassuranceevents/" + event.getEventId())
+                                .param("projection", "full"))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$", QAEventMatcher.matchQAEventFullEntry(event)));
+    }
+
+    @Test
+    public void createQAEventsAndDoNothingFilterNotCompatibleWithItemTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        Item item = ItemBuilder.createItem(context, col1).withTitle("item title").build();
+
+        QAEvent event =
+            QAEventBuilder.createTarget(context, item)
+                          .withSource(COAR_NOTIFY)
+                          .withTrust(0.8)
+                          .withTopic("ENRICH/MORE/REVIEW")
+                          .withMessage("{\"abstracts[0]\": \"https://doi.org/10.3214/987654\"}")
+                          .build();
+
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(get("/api/core/items/" + item.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.metadata['datacite.relation.isReviewedBy']").doesNotExist());
+
+        getClient(authToken).perform(get("/api/integration/qualityassuranceevents/" + event.getEventId())
+                                .param("projection", "full"))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$", QAEventMatcher.matchQAEventFullEntry(event)));
+    }
+
 }

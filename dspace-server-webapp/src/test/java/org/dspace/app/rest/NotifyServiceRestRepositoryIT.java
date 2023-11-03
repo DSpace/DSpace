@@ -31,9 +31,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-
 import javax.ws.rs.core.MediaType;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomUtils;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.rest.model.NotifyServiceInboundPatternRest;
@@ -48,8 +48,6 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.NotifyServiceBuilder;
 import org.dspace.builder.NotifyServiceInboundPatternBuilder;
 import org.junit.Test;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Integration test class for {@link NotifyServiceRestRepository}.

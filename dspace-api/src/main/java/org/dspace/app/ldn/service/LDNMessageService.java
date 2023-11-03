@@ -11,7 +11,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.app.ldn.LDNMessageEntity;
+import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.model.Notification;
+import org.dspace.app.ldn.model.Service;
 import org.dspace.core.Context;
 
 /**
@@ -94,4 +96,14 @@ public interface LDNMessageService {
      * @param context The DSpace context
      */
     public int extractAndProcessMessageFromQueue(Context context) throws SQLException;
+
+    /**
+     * find the related notify service entity
+     *
+     * @param context the context
+     * @param service the service
+     * @return the NotifyServiceEntity
+     * @throws SQLException if something goes wrong
+     */
+    public NotifyServiceEntity findNotifyService(Context context, Service service) throws SQLException;
 }

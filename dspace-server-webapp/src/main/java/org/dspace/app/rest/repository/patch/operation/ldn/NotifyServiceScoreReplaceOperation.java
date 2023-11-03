@@ -54,11 +54,11 @@ public class NotifyServiceScoreReplaceOperation extends PatchOperation<NotifySer
         }
         BigDecimal scoreBigDecimal = null;
         try {
-            scoreBigDecimal = new BigDecimal(score.toString());            
-        }catch(Exception e) {
+            scoreBigDecimal = new BigDecimal(score.toString());
+        } catch (Exception e) {
             throw new DSpaceBadRequestException(format("Score out of range [0, 1] %s", score));
         }
-        if(scoreBigDecimal.compareTo(java.math.BigDecimal.ZERO) == -1 || 
+        if (scoreBigDecimal.compareTo(java.math.BigDecimal.ZERO) == -1 ||
             scoreBigDecimal.compareTo(java.math.BigDecimal.ONE) == 1) {
             throw new UnprocessableEntityException(format("Score out of range [0, 1] %s", score));
         }

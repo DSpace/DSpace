@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -41,14 +42,18 @@ import org.dspace.content.QAEvent;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
+import org.dspace.qaevent.AutomaticProcessingAction;
+import org.dspace.qaevent.QAEventAutomaticProcessingEvaluation;
 import org.dspace.qaevent.QASource;
 import org.dspace.qaevent.QATopic;
 import org.dspace.qaevent.dao.QAEventsDao;
 import org.dspace.qaevent.dao.impl.QAEventsDaoImpl;
+import org.dspace.qaevent.service.QAEventActionService;
 import org.dspace.qaevent.service.QAEventService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * Implementation of {@link QAEventService} that use Solr to store events. When
@@ -72,6 +77,13 @@ public class QAEventServiceImpl implements QAEventService {
 
     @Autowired
     private QAEventsDaoImpl qaEventsDao;
+
+    @Autowired
+    @Qualifier("qaAutomaticProcessingMap")
+    private Map<String, QAEventAutomaticProcessingEvaluation> qaAutomaticProcessingMap;
+
+    @Autowired
+    private QAEventActionService qaEventActionService;
 
     private ObjectMapper jsonMapper;
 
@@ -269,10 +281,41 @@ public class QAEventServiceImpl implements QAEventService {
                 updateRequest.process(getSolr());
 
                 getSolr().commit();
+
+                performAutomaticProcessingIfNeeded(context, dto);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void performAutomaticProcessingIfNeeded(Context context, QAEvent qaEvent) {
+        QAEventAutomaticProcessingEvaluation evaluation = qaAutomaticProcessingMap.get(qaEvent.getSource());
+
+        if (evaluation == null) {
+            return;
+        }
+
+        AutomaticProcessingAction action = evaluation.evaluateAutomaticProcessing(context, qaEvent);
+
+        if (action == null) {
+            return;
+        }
+
+        switch (action) {
+            case REJECT:
+                qaEventActionService.reject(context, qaEvent);
+                break;
+            case IGNORE:
+                qaEventActionService.discard(context, qaEvent);
+                break;
+            case ACCEPT:
+                qaEventActionService.accept(context, qaEvent);
+                break;
+            default:
+                throw new IllegalStateException("Unknown automatic action requested " + action);
+        }
+
     }
 
     @Override
