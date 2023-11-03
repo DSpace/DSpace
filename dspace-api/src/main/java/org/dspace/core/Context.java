@@ -810,6 +810,15 @@ public class Context implements AutoCloseable {
             readOnlyCache.clear();
         }
 
+        // When going to READ_ONLY, flush database changes to ensure that the current data is retrieved
+        if (newMode == Mode.READ_ONLY && mode != Mode.READ_ONLY) {
+            try {
+                dbConnection.flushSession();
+            } catch (SQLException ex) {
+                log.warn("Unable to flush database changes after switching to READ_ONLY mode", ex);
+            }
+        }
+
         //save the new mode
         mode = newMode;
     }
