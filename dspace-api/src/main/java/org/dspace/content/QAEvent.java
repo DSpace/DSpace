@@ -197,6 +197,7 @@ public class QAEvent {
     public Class<? extends QAMessageDTO> getMessageDtoClass() {
         switch (getSource()) {
             case OPENAIRE_SOURCE:
+            case COAR_NOTIFY:
                 return OpenaireMessageDTO.class;
             default:
                 throw new IllegalArgumentException("Unknown event's source: " + getSource());

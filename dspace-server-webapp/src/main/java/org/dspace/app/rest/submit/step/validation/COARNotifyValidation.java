@@ -25,7 +25,7 @@ import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.coarnotify.COARNotifyConfigurationService;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
-import org.dspace.content.logic.Filter;
+import org.dspace.content.logic.LogicalStatement;
 import org.dspace.core.Context;
 import org.dspace.utils.DSpace;
 
@@ -62,9 +62,9 @@ public class COARNotifyValidation extends AbstractValidation {
                         .filter(inboundPattern -> !inboundPattern.isAutomatic() &&
                             !inboundPattern.getConstraint().isEmpty())
                         .forEach(inboundPattern -> {
-                            Filter filter =
+                            LogicalStatement filter =
                                 new DSpace().getServiceManager()
-                                            .getServiceByName(inboundPattern.getConstraint(), Filter.class);
+                                            .getServiceByName(inboundPattern.getConstraint(), LogicalStatement.class);
 
                             if (filter == null || !filter.getResult(context, item)) {
                                 addError(errors, ERROR_VALIDATION_INVALID_FILTER,
