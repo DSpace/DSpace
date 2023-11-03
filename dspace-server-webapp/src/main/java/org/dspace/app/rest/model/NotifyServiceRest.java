@@ -10,9 +10,8 @@ package org.dspace.app.rest.model;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.dspace.app.rest.RestResourceController;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.dspace.app.rest.RestResourceController;
 
 /**
  * The NotifyServiceEntity REST Resource
@@ -113,6 +112,5 @@ public class NotifyServiceRest extends BaseObjectRest<Integer> {
     public void setScore(BigDecimal score) {
         this.score = score;
     }
-    
-    
+
 }
