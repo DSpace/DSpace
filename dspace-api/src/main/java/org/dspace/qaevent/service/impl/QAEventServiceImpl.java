@@ -412,7 +412,7 @@ public class QAEventServiceImpl implements QAEventService {
         solrQuery.setRows(0);
         solrQuery.addFilterQuery(SOURCE + ":\"" + sourceName + "\"");
         if (target != null) {
-            solrQuery.addFilterQuery(target + ":" + target.toString());
+            solrQuery.addFilterQuery("resource_uuid:" + target.toString());
         }
         solrQuery.setFacet(true);
         solrQuery.setFacetMinCount(1);
@@ -463,6 +463,7 @@ public class QAEventServiceImpl implements QAEventService {
         return Arrays.stream(getSupportedSources())
                 .map((sourceName) -> findSource(sourceName, target))
                 .sorted(comparing(QASource::getTotalEvents).reversed())
+                .filter(source -> source.getTotalEvents() > 0)
                 .skip(offset)
                 .limit(pageSize)
                 .collect(Collectors.toList());

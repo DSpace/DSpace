@@ -21,6 +21,7 @@ import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.QAEventBuilder;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
 import org.dspace.services.ConfigurationService;
@@ -189,11 +190,119 @@ public class QASourceRestRepositoryIT extends AbstractControllerIntegrationTest 
 
     }
 
+    @Test
+    public void testFindAllByTarget() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        Community com = CommunityBuilder.createCommunity(context).withName("Test community").build();
+        Collection col = CollectionBuilder.createCollection(context, com).withName("Test collection").build();
+        Item target1 = ItemBuilder.createItem(context, col).withTitle("Test item1").build();
+        Item target2 = ItemBuilder.createItem(context, col).withTitle("Test item2").build();
+        createEvent("openaire", "TOPIC/OPENAIRE/1", target1);
+        createEvent("openaire", "TOPIC/OPENAIRE/2", target1);
+        createEvent("test-source", "TOPIC/TEST/1", target1);
+        createEvent("test-source", "TOPIC/TEST/1", target2);
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken)
+                .perform(get("/api/integration/qualityassurancesources/search/byTarget").param("target",
+                        target1.getID().toString()))
+                .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.qualityassurancesources",
+                        contains(matchQASourceEntry("openaire:" + target1.getID().toString(), 2),
+                                matchQASourceEntry("test-source:" + target1.getID().toString(), 1))))
+                .andExpect(jsonPath("$.page.size", is(20)))
+                .andExpect(jsonPath("$.page.totalElements", is(2)));
+
+        getClient(authToken)
+                .perform(get("/api/integration/qualityassurancesources/search/byTarget").param("target",
+                        target2.getID().toString()))
+                .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.qualityassurancesources",
+                        contains(matchQASourceEntry("test-source:" + target2.getID().toString(), 1))))
+                .andExpect(jsonPath("$.page.size", is(20)))
+                .andExpect(jsonPath("$.page.totalElements", is(1)));
+    }
+
+    @Test
+    public void testFindByTargetBadRequest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        Community com = CommunityBuilder.createCommunity(context).withName("Test community").build();
+        Collection col = CollectionBuilder.createCollection(context, com).withName("Test collection").build();
+        Item target1 = ItemBuilder.createItem(context, col).withTitle("Test item1").build();
+        Item target2 = ItemBuilder.createItem(context, col).withTitle("Test item2").build();
+        createEvent("openaire", "TOPIC/OPENAIRE/1", target1);
+        createEvent("openaire", "TOPIC/OPENAIRE/2", target1);
+        createEvent("test-source", "TOPIC/TEST/1", target1);
+        createEvent("test-source", "TOPIC/TEST/1", target2);
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken)
+                .perform(get("/api/integration/qualityassurancesources/search/byTarget"))
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    public void testFindByTargetUnauthorized() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        Community com = CommunityBuilder.createCommunity(context).withName("Test community").build();
+        Collection col = CollectionBuilder.createCollection(context, com).withName("Test collection").build();
+        Item target1 = ItemBuilder.createItem(context, col).withTitle("Test item1").build();
+        Item target2 = ItemBuilder.createItem(context, col).withTitle("Test item2").build();
+        createEvent("openaire", "TOPIC/OPENAIRE/1", target1);
+        createEvent("openaire", "TOPIC/OPENAIRE/2", target1);
+        createEvent("test-source", "TOPIC/TEST/1", target1);
+        createEvent("test-source", "TOPIC/TEST/1", target2);
+
+        context.restoreAuthSystemState();
+
+        getClient()
+                .perform(get("/api/integration/qualityassurancesources/search/byTarget").param("target",
+                        target1.getID().toString()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void testFindByTargetForbidden() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+        Community com = CommunityBuilder.createCommunity(context).withName("Test community").build();
+        Collection col = CollectionBuilder.createCollection(context, com).withName("Test collection").build();
+        Item target1 = ItemBuilder.createItem(context, col).withTitle("Test item1").build();
+        Item target2 = ItemBuilder.createItem(context, col).withTitle("Test item2").build();
+        createEvent("openaire", "TOPIC/OPENAIRE/1", target1);
+        createEvent("openaire", "TOPIC/OPENAIRE/2", target1);
+        createEvent("test-source", "TOPIC/TEST/1", target1);
+        createEvent("test-source", "TOPIC/TEST/1", target2);
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken)
+                .perform(get("/api/integration/qualityassurancesources/search/byTarget").param("target",
+                        target1.getID().toString()))
+                .andExpect(status().isForbidden());
+    }
+
     private QAEvent createEvent(String source, String topic, String title) {
         return QAEventBuilder.createTarget(context, target)
             .withSource(source)
             .withTopic(topic)
             .withTitle(title)
+            .build();
+    }
+
+    private QAEvent createEvent(String source, String topic, Item item) {
+        return QAEventBuilder.createTarget(context, item)
+            .withSource(source)
+            .withTopic(topic)
+            .withTitle(item.getName())
             .build();
     }
 
