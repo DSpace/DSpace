@@ -9,7 +9,7 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
-import static org.dspace.app.rest.matcher.QAEventMatcher.matchQAEventEntry;
+import static org.dspace.content.QAEvent.COAR_NOTIFY_SOURCE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
@@ -171,8 +171,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(authToken)
             .perform(
                 get("/api/integration/qualityassuranceevents/search/findByTopic")
-                    .param("topic", "ENRICH!MISSING!PID")
-                    .param("target", uuid))
+                    .param("topic", QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID:" + uuid.toString()))
             .andExpect(status().isOk()).andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
@@ -181,16 +180,31 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(authToken)
             .perform(
                 get("/api/integration/qualityassuranceevents/search/findByTopic")
-                    .param("topic", "not-existing")
-                    .param("target", uuid))
+                    .param("topic", QAEvent.OPENAIRE_SOURCE + ":not-existing:" + uuid.toString()))
             .andExpect(status().isOk()).andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
+        // check for an existing topic but a different source
+        getClient(authToken)
+            .perform(
+                get("/api/integration/qualityassuranceevents/search/findByTopic")
+                    .param("topic", QAEvent.COAR_NOTIFY_SOURCE + ":ENRICH!MISSING!PID"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
+
         // check for an existing item and topic
         getClient(authToken)
             .perform(
                 get("/api/integration/qualityassuranceevents/search/findByTopic")
-                    .param("topic", "ENRICH!MISSING!PID")
-                    .param("target", uuid))
+                    .param("topic", QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID:" + uuid.toString()))
+            .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(1)))
+            .andExpect(jsonPath("$._embedded.qualityassuranceevents",
+                        Matchers.contains(QAEventMatcher.matchQAEventEntry(event1))))
+            .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(1)));
+        // check for an existing topic
+        getClient(authToken)
+            .perform(
+                get("/api/integration/qualityassuranceevents/search/findByTopic")
+                    .param("topic", QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"))
             .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(1)))
             .andExpect(jsonPath("$._embedded.qualityassuranceevents",
                         Matchers.contains(QAEventMatcher.matchQAEventEntry(event1))))
@@ -218,21 +232,23 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(
-                get("/api/integration/qualityassuranceevents/search/findByTopic").param("topic", "ENRICH!MISSING!PID"))
+                get("/api/integration/qualityassuranceevents/search/findByTopic")
+                    .param("topic", QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"))
             .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(2)))
             .andExpect(jsonPath("$._embedded.qualityassuranceevents",
                         Matchers.containsInAnyOrder(QAEventMatcher.matchQAEventEntry(event1),
                                 QAEventMatcher.matchQAEventEntry(event2))))
                 .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(2)));
         getClient(authToken)
-            .perform(get("/api/integration/qualityassuranceevents/search/findByTopic").param("topic",
-                "ENRICH!MISSING!ABSTRACT"))
+            .perform(get("/api/integration/qualityassuranceevents/search/findByTopic")
+                    .param("topic", QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!ABSTRACT"))
             .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(1)))
             .andExpect(jsonPath("$._embedded.qualityassuranceevents",
                         Matchers.containsInAnyOrder(QAEventMatcher.matchQAEventEntry(event4))))
                 .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(1)));
         getClient(authToken)
-            .perform(get("/api/integration/qualityassuranceevents/search/findByTopic").param("topic", "not-existing"))
+            .perform(get("/api/integration/qualityassuranceevents/search/findByTopic")
+                    .param("topic", QAEvent.OPENAIRE_SOURCE + ":not-existing"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.page.size", is(20)))
                 .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
@@ -261,8 +277,9 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(
-                get("/api/integration/qualityassuranceevents/search/findByTopic").param("topic", "ENRICH!MISSING!PID")
-                        .param("size", "2"))
+                get("/api/integration/qualityassuranceevents/search/findByTopic")
+                    .param("topic", QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID")
+                    .param("size", "2"))
             .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(2)))
             .andExpect(jsonPath("$._embedded.qualityassuranceevents",
                         Matchers.containsInAnyOrder(
@@ -271,22 +288,25 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.allOf(
                     Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                                Matchers.containsString("topic=ENRICH!MISSING!PID"),
+                                Matchers.containsString("topic=" + QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"),
                                 Matchers.containsString("size=2"))))
                 .andExpect(jsonPath("$._links.next.href",
                         Matchers.allOf(
                     Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                                Matchers.containsString("topic=ENRICH!MISSING!PID"), Matchers.containsString("page=1"),
+                                Matchers.containsString("topic=" + QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"),
+                                Matchers.containsString("page=1"),
                                 Matchers.containsString("size=2"))))
                 .andExpect(jsonPath("$._links.last.href",
                         Matchers.allOf(
                     Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                                Matchers.containsString("topic=ENRICH!MISSING!PID"), Matchers.containsString("page=2"),
+                                Matchers.containsString("topic=" + QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"),
+                                Matchers.containsString("page=2"),
                                 Matchers.containsString("size=2"))))
                 .andExpect(jsonPath("$._links.first.href",
                         Matchers.allOf(
                     Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                                Matchers.containsString("topic=ENRICH!MISSING!PID"), Matchers.containsString("page=0"),
+                                Matchers.containsString("topic=" + QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"),
+                                Matchers.containsString("page=0"),
                                 Matchers.containsString("size=2"))))
                 .andExpect(jsonPath("$._links.prev.href").doesNotExist())
                 .andExpect(jsonPath("$.page.size", is(2)))
@@ -295,7 +315,8 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient(authToken)
             .perform(
-                get("/api/integration/qualityassuranceevents/search/findByTopic").param("topic", "ENRICH!MISSING!PID")
+                get("/api/integration/qualityassuranceevents/search/findByTopic")
+                    .param("topic", QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID")
                         .param("size", "2").param("page", "1"))
             .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(2)))
             .andExpect(jsonPath("$._embedded.qualityassuranceevents",
@@ -305,27 +326,32 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.allOf(
                     Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                                Matchers.containsString("topic=ENRICH!MISSING!PID"), Matchers.containsString("page=1"),
+                                Matchers.containsString("topic=" + QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"),
+                                Matchers.containsString("page=1"),
                                 Matchers.containsString("size=2"))))
                 .andExpect(jsonPath("$._links.next.href",
                         Matchers.allOf(
                     Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                                Matchers.containsString("topic=ENRICH!MISSING!PID"), Matchers.containsString("page=2"),
+                                Matchers.containsString("topic=" + QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"),
+                                Matchers.containsString("page=2"),
                                 Matchers.containsString("size=2"))))
                 .andExpect(jsonPath("$._links.last.href",
                         Matchers.allOf(
                     Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                                Matchers.containsString("topic=ENRICH!MISSING!PID"), Matchers.containsString("page=2"),
+                                Matchers.containsString("topic=" + QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"),
+                                Matchers.containsString("page=2"),
                                 Matchers.containsString("size=2"))))
                 .andExpect(jsonPath("$._links.first.href",
                         Matchers.allOf(
                     Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                                Matchers.containsString("topic=ENRICH!MISSING!PID"), Matchers.containsString("page=0"),
+                                Matchers.containsString("topic=" + QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"),
+                                Matchers.containsString("page=0"),
                                 Matchers.containsString("size=2"))))
                 .andExpect(jsonPath("$._links.prev.href",
                         Matchers.allOf(
                     Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                                Matchers.containsString("topic=ENRICH!MISSING!PID"), Matchers.containsString("page=0"),
+                                Matchers.containsString("topic=" + QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"),
+                                Matchers.containsString("page=0"),
                                 Matchers.containsString("size=2"))))
                 .andExpect(jsonPath("$.page.size", is(2)))
                 .andExpect(jsonPath("$.page.totalPages", is(3)))
@@ -333,7 +359,8 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient(authToken)
             .perform(
-                get("/api/integration/qualityassuranceevents/search/findByTopic").param("topic", "ENRICH!MISSING!PID")
+                get("/api/integration/qualityassuranceevents/search/findByTopic")
+                    .param("topic", QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID")
                     .param("size", "2").param("page", "2"))
             .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(1)))
             .andExpect(jsonPath("$._embedded.qualityassuranceevents",
@@ -342,23 +369,27 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$._links.self.href",
                     Matchers.allOf(
                     Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                            Matchers.containsString("topic=ENRICH!MISSING!PID"), Matchers.containsString("page=2"),
+                            Matchers.containsString("topic=" + QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"),
+                            Matchers.containsString("page=2"),
                             Matchers.containsString("size=2"))))
             .andExpect(jsonPath("$._links.next.href").doesNotExist())
             .andExpect(jsonPath("$._links.last.href",
                     Matchers.allOf(
                     Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                            Matchers.containsString("topic=ENRICH!MISSING!PID"), Matchers.containsString("page=2"),
+                            Matchers.containsString("topic=" + QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"),
+                            Matchers.containsString("page=2"),
                             Matchers.containsString("size=2"))))
             .andExpect(jsonPath("$._links.first.href",
                     Matchers.allOf(
                     Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                            Matchers.containsString("topic=ENRICH!MISSING!PID"), Matchers.containsString("page=0"),
+                            Matchers.containsString("topic=" + QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"),
+                            Matchers.containsString("page=0"),
                             Matchers.containsString("size=2"))))
             .andExpect(jsonPath("$._links.prev.href",
                     Matchers.allOf(
                     Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                            Matchers.containsString("topic=ENRICH!MISSING!PID"), Matchers.containsString("page=1"),
+                            Matchers.containsString("topic=" + QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"),
+                            Matchers.containsString("page=1"),
                             Matchers.containsString("size=2"))))
             .andExpect(jsonPath("$.page.size", is(2)))
             .andExpect(jsonPath("$.page.totalPages", is(3)))
@@ -386,7 +417,8 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         getClient()
             .perform(
-                get("/api/integration/qualityassuranceevents/search/findByTopic").param("topic", "ENRICH!MISSING!PID"))
+                get("/api/integration/qualityassuranceevents/search/findByTopic")
+                    .param("topic", QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -411,7 +443,8 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         String epersonToken = getAuthToken(eperson.getEmail(), password);
         getClient(epersonToken)
             .perform(
-                get("/api/integration/qualityassuranceevents/search/findByTopic").param("topic", "ENRICH!MISSING!PID"))
+                get("/api/integration/qualityassuranceevents/search/findByTopic")
+                    .param("topic", QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"))
                 .andExpect(status().isForbidden());
     }
 
@@ -618,11 +651,11 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$",
                     hasNoJsonPath("$.metadata['dc.description.abstract']")));
         // no pending qa events should be longer available
-        getClient(authToken).perform(get("/api/integration/qualityassurancetopics")).andExpect(status().isOk())
+        getClient(authToken).perform(get("/api/integration/qualityassurancesources/" + QAEvent.OPENAIRE_SOURCE))
+            .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(0)));
-        // we should have stored the decision into the database as well
+            .andExpect(jsonPath("$.totalEvents", is(0)));
     }
 
     @Test
@@ -761,13 +794,13 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
-            .perform(
-                get("/api/integration/qualityassuranceevents/search/findByTopic").param("topic", "ENRICH!MISSING!PID"))
+                .perform(get("/api/integration/qualityassuranceevents/search/findByTopic").param("topic",
+                        QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"))
             .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(2)))
             .andExpect(jsonPath("$._embedded.qualityassuranceevents",
                         Matchers.containsInAnyOrder(QAEventMatcher.matchQAEventEntry(event1),
                                 QAEventMatcher.matchQAEventEntry(event2))))
-                .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(2)));
+            .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(2)));
 
         getClient(authToken).perform(delete("/api/core/items/" + event1.getTarget()))
                 .andExpect(status().is(204));
@@ -776,8 +809,8 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(status().is(404));
 
         getClient(authToken)
-            .perform(
-                get("/api/integration/qualityassuranceevents/search/findByTopic").param("topic", "ENRICH!MISSING!PID"))
+            .perform(get("/api/integration/qualityassuranceevents/search/findByTopic").param("topic",
+                    QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"))
             .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(1)))
             .andExpect(jsonPath("$._embedded.qualityassuranceevents",
                         Matchers.containsInAnyOrder(
@@ -809,7 +842,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient(authToken).perform(get("/api/integration/qualityassuranceevents/" + event.getEventId()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$", matchQAEventEntry(event)));
+            .andExpect(jsonPath("$", QAEventMatcher.matchQAEventEntry(event)));
 
         List<QAEventProcessed> processedEvents = qaEventsDao.findAll(context);
         assertThat(processedEvents, empty());
@@ -831,4 +864,142 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         assertThat(processedEvent.getEperson().getID(), is(admin.getID()));
 
     }
+
+    @Test
+    public void createQAEventsAndAcceptAutomaticallyByScoreAndFilterTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        Item item = ItemBuilder.createItem(context, col1).withTitle("demo").build();
+
+        QAEvent event =
+            QAEventBuilder.createTarget(context, item)
+                          .withSource(COAR_NOTIFY_SOURCE)
+                          .withTrust(0.8)
+                          .withTopic("ENRICH/MORE/REVIEW")
+                          .withMessage("{"
+                                  + "\"href\": \"https://doi.org/10.3214/987654\","
+                                  + "\"relationship\": \"some-rel\"}")
+                          .build();
+
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(get("/api/core/items/" + item.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.metadata['datacite.relation.isReviewedBy'][0].value",
+                                is("https://doi.org/10.3214/987654")));
+
+        getClient(authToken).perform(get("/api/integration/qualityassuranceevents/" + event.getEventId()))
+                            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void createQAEventsAndIgnoreAutomaticallyByScoreAndFilterTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        Item item = ItemBuilder.createItem(context, col1).withTitle("demo").build();
+
+        QAEvent event =
+            QAEventBuilder.createTarget(context, item)
+                          .withSource(COAR_NOTIFY_SOURCE)
+                          .withTrust(0.4)
+                          .withTopic("ENRICH/MORE/REVIEW")
+                          .withMessage("{\"abstracts[0]\": \"https://doi.org/10.3214/987654\"}")
+                          .build();
+
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(get("/api/core/items/" + item.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.metadata['datacite.relation.isReviewedBy']").doesNotExist());
+
+        getClient(authToken).perform(get("/api/integration/qualityassuranceevents/" + event.getEventId()))
+                            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void createQAEventsAndRejectAutomaticallyByScoreAndFilterTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        Item item = ItemBuilder.createItem(context, col1).withTitle("demo").build();
+
+        QAEvent event =
+            QAEventBuilder.createTarget(context, item)
+                          .withSource(COAR_NOTIFY_SOURCE)
+                          .withTrust(0.3)
+                          .withTopic("ENRICH/MORE/REVIEW")
+                          .withMessage("{\"abstracts[0]\": \"https://doi.org/10.3214/987654\"}")
+                          .build();
+
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(get("/api/core/items/" + item.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.metadata['datacite.relation.isReviewedBy']").doesNotExist());
+
+        getClient(authToken).perform(get("/api/integration/qualityassuranceevents/" + event.getEventId()))
+                            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void createQAEventsAndDoNothingScoreNotInRangTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        Item item = ItemBuilder.createItem(context, col1).withTitle("demo").build();
+
+        QAEvent event =
+            QAEventBuilder.createTarget(context, item)
+                          .withSource(COAR_NOTIFY_SOURCE)
+                          .withTrust(0.7)
+                          .withTopic("ENRICH/MORE/REVIEW")
+                          .withMessage("{\"abstracts[0]\": \"https://doi.org/10.3214/987654\"}")
+                          .build();
+
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(get("/api/core/items/" + item.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.metadata['datacite.relation.isReviewedBy']").doesNotExist());
+
+        getClient(authToken).perform(get("/api/integration/qualityassuranceevents/" + event.getEventId())
+                                .param("projection", "full"))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$", QAEventMatcher.matchQAEventFullEntry(event)));
+    }
+
+    @Test
+    public void createQAEventsAndDoNothingFilterNotCompatibleWithItemTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        Item item = ItemBuilder.createItem(context, col1).withTitle("item title").build();
+
+        QAEvent event =
+            QAEventBuilder.createTarget(context, item)
+                          .withSource(COAR_NOTIFY_SOURCE)
+                          .withTrust(0.8)
+                          .withTopic("ENRICH/MORE/REVIEW")
+                          .withMessage("{\"abstracts[0]\": \"https://doi.org/10.3214/987654\"}")
+                          .build();
+
+        context.restoreAuthSystemState();
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        getClient(authToken).perform(get("/api/core/items/" + item.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.metadata['datacite.relation.isReviewedBy']").doesNotExist());
+
+        getClient(authToken).perform(get("/api/integration/qualityassuranceevents/" + event.getEventId())
+                                .param("projection", "full"))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$", QAEventMatcher.matchQAEventFullEntry(event)));
+    }
+
 }

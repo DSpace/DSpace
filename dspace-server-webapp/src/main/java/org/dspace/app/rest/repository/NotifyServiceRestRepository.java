@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.repository;
 
+import static java.lang.String.format;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -96,11 +98,20 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
             throw new UnprocessableEntityException("Error parsing request body", e1);
         }
 
+        if (notifyServiceRest.getScore() != null) {
+            if (notifyServiceRest.getScore().compareTo(java.math.BigDecimal.ZERO) == -1 ||
+                notifyServiceRest.getScore().compareTo(java.math.BigDecimal.ONE) == 1) {
+                throw new UnprocessableEntityException(format("Score out of range [0, 1] %s",
+                    notifyServiceRest.getScore().setScale(4).toPlainString()));
+            }
+        }
+
         NotifyServiceEntity notifyServiceEntity = notifyService.create(context);
         notifyServiceEntity.setName(notifyServiceRest.getName());
         notifyServiceEntity.setDescription(notifyServiceRest.getDescription());
         notifyServiceEntity.setUrl(notifyServiceRest.getUrl());
         notifyServiceEntity.setLdnUrl(notifyServiceRest.getLdnUrl());
+        notifyServiceEntity.setEnabled(notifyServiceRest.isEnabled());
 
         if (notifyServiceRest.getNotifyServiceInboundPatterns() != null) {
             appendNotifyServiceInboundPatterns(context, notifyServiceEntity,
@@ -111,8 +122,8 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
             appendNotifyServiceOutboundPatterns(context, notifyServiceEntity,
                 notifyServiceRest.getNotifyServiceOutboundPatterns());
         }
+        notifyServiceEntity.setScore(notifyServiceRest.getScore());
 
-        notifyServiceEntity.setEnabled(notifyServiceRest.isEnabled());
         notifyService.update(context, notifyServiceEntity);
 
         return converter.toRest(notifyServiceEntity, utils.obtainProjection());
@@ -188,6 +199,21 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
                 return null;
             }
             return converter.toRest(notifyServiceEntity, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @SearchRestMethod(name = "byInboundPattern")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    public Page<NotifyServiceRest> findManualServicesByInboundPattern(
+        @Parameter(value = "pattern", required = true) String pattern,
+        Pageable pageable) {
+        try {
+            List<NotifyServiceEntity> notifyServiceEntities =
+                notifyService.findManualServicesByInboundPattern(obtainContext(), pattern);
+
+            return converter.toRestPage(notifyServiceEntities, pageable, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

@@ -52,6 +52,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.matchers.JsonPathMatchers;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
@@ -70,6 +71,8 @@ import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.NotifyServiceBuilder;
+import org.dspace.builder.NotifyServiceInboundPatternBuilder;
 import org.dspace.builder.RelationshipBuilder;
 import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
@@ -8603,4 +8606,637 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(status().isCreated());
 
     }
+
+    @Test
+    public void testSubmissionWithCOARNotifyServicesSection() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Collection 1")
+                                                 .build();
+
+        // create three notify services
+        NotifyServiceEntity notifyServiceOne =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name one")
+                                .withLdnUrl("https://service.ldn.org/inbox")
+                                .build();
+
+        NotifyServiceEntity notifyServiceTwo =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name two")
+                                .withLdnUrl("https://service2.ldn.org/inbox")
+                                .build();
+
+        NotifyServiceEntity notifyServiceThree =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name three")
+                                .withLdnUrl("https://service3.ldn.org/inbox")
+                                .build();
+
+        // append the three services to the workspace item with different patterns
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+                                                          .withTitle("Workspace Item")
+                                                          .withIssueDate("2024-10-10")
+                                                          .withCOARNotifyService(notifyServiceOne, "review")
+                                                          .withCOARNotifyService(notifyServiceTwo, "endorsement")
+                                                          .withCOARNotifyService(notifyServiceThree, "endorsement")
+                                                          .build();
+
+        context.restoreAuthSystemState();
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // check coarnotify section data
+        getClient(adminToken)
+            .perform(get("/api/submission/workspaceitems/" + workspaceItem.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.sections.coarnotify.endorsement", contains(
+                notifyServiceTwo.getID(), notifyServiceThree.getID())))
+            .andExpect(jsonPath("$.sections.coarnotify.review", contains(
+                notifyServiceOne.getID())));
+    }
+
+    @Test
+    public void patchCOARNotifyServiceAddTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+
+        NotifyServiceEntity notifyServiceOne =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name one")
+                                .withLdnUrl("https://service.ldn.org/inbox")
+                                .build();
+
+        NotifyServiceEntity notifyServiceTwo =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name two")
+                                .withLdnUrl("https://service2.ldn.org/inbox")
+                                .build();
+
+        NotifyServiceEntity notifyServiceThree =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name three")
+                                .withLdnUrl("https://service3.ldn.org/inbox")
+                                .build();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("Test WorkspaceItem")
+                                                  .withIssueDate("2017-10-17")
+                                                  .withCOARNotifyService(notifyServiceOne, "review")
+                                                  .build();
+
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceOne)
+                                          .withPattern("review")
+                                          .withConstraint("itemFilterA")
+                                          .isAutomatic(false)
+                                          .build();
+
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceTwo)
+                                          .withPattern("review")
+                                          .withConstraint("itemFilterA")
+                                          .isAutomatic(false)
+                                          .build();
+
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceThree)
+                                          .withPattern("review")
+                                          .withConstraint("itemFilterA")
+                                          .isAutomatic(false)
+                                          .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        // try to add new service of review pattern to witem
+        List<Operation> addOpts = new ArrayList<Operation>();
+        addOpts.add(new AddOperation("/sections/coarnotify/review/-",
+            List.of(notifyServiceTwo.getID(), notifyServiceThree.getID())));
+
+        String patchBody = getPatchContent(addOpts);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                                .content(patchBody)
+                                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.sections.coarnotify.review", hasSize(3)))
+                            .andExpect(jsonPath("$.sections.coarnotify.review",contains(
+                                notifyServiceOne.getID(),
+                                notifyServiceTwo.getID(),
+                                notifyServiceThree.getID()
+                            )));
+
+    }
+
+    @Test
+    public void patchCOARNotifyServiceAddWithInCompatibleServicesTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+
+        NotifyServiceEntity notifyServiceOne =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name one")
+                                .withLdnUrl("https://service.ldn.org/inbox")
+                                .build();
+
+        NotifyServiceEntity notifyServiceTwo =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name two")
+                                .withLdnUrl("https://service2.ldn.org/inbox")
+                                .build();
+
+        NotifyServiceEntity notifyServiceThree =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name three")
+                                .withLdnUrl("https://service3.ldn.org/inbox")
+                                .build();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("Test WorkspaceItem")
+                                                  .withIssueDate("2017-10-17")
+                                                  .withCOARNotifyService(notifyServiceOne, "review")
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        // check the coar notify services of witem
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.sections.coarnotify.review", hasSize(1)))
+                            .andExpect(jsonPath("$.sections.coarnotify.review", contains(
+                                notifyServiceOne.getID()
+                            )));
+
+        // try to add new service of review pattern to witem
+        List<Operation> addOpts = new ArrayList<Operation>();
+        addOpts.add(new AddOperation("/sections/coarnotify/review/-",
+            List.of(notifyServiceTwo.getID(), notifyServiceThree.getID())));
+
+        String patchBody = getPatchContent(addOpts);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                                .content(patchBody)
+                                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isUnprocessableEntity());
+
+    }
+
+    @Test
+    public void patchCOARNotifyServiceAddWithInvalidPatternTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+
+        NotifyServiceEntity notifyServiceOne =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name one")
+                                .withLdnUrl("https://service.ldn.org/inbox")
+                                .build();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("Test WorkspaceItem")
+                                                  .withIssueDate("2017-10-17")
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        // try to add new service of unknown pattern to witem
+        List<Operation> addOpts = new ArrayList<Operation>();
+        addOpts.add(new AddOperation("/sections/coarnotify/unknown/-", List.of(notifyServiceOne.getID())));
+
+        String patchBody = getPatchContent(addOpts);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                                .content(patchBody)
+                                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isUnprocessableEntity());
+
+    }
+
+    @Test
+    public void patchCOARNotifyServiceAddWithInvalidServiceIdTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+
+        NotifyServiceEntity notifyServiceOne =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name one")
+                                .withLdnUrl("https://service.ldn.org/inbox")
+                                .build();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("Test WorkspaceItem")
+                                                  .withIssueDate("2017-10-17")
+                                                  .withCOARNotifyService(notifyServiceOne, "review")
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        // check the coar notify services of witem
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.sections.coarnotify.review", contains(
+                                notifyServiceOne.getID()
+                            )));
+
+        // try to add new service of review pattern to witem but service not exist
+        List<Operation> addOpts = new ArrayList<Operation>();
+        addOpts.add(new AddOperation("/sections/coarnotify/review/-", List.of("123456789")));
+
+        String patchBody = getPatchContent(addOpts);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                                .content(patchBody)
+                                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isUnprocessableEntity());
+
+    }
+
+    @Test
+    public void patchCOARNotifyServiceReplaceTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+
+        NotifyServiceEntity notifyServiceOne =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name one")
+                                .withLdnUrl("https://service.ldn.org/inbox")
+                                .build();
+
+        NotifyServiceEntity notifyServiceTwo =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name two")
+                                .withLdnUrl("https://service2.ldn.org/inbox")
+                                .build();
+
+        NotifyServiceEntity notifyServiceThree =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name three")
+                                .withLdnUrl("https://service3.ldn.org/inbox")
+                                .build();
+
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceOne)
+                                          .withPattern("review")
+                                          .withConstraint("itemFilterA")
+                                          .isAutomatic(false)
+                                          .build();
+
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceTwo)
+                                          .withPattern("review")
+                                          .withConstraint("demo_filter")
+                                          .isAutomatic(false)
+                                          .build();
+
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceThree)
+                                          .withPattern("review")
+                                          .withConstraint("demo_filter")
+                                          .isAutomatic(false)
+                                          .build();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("Test WorkspaceItem")
+                                                  .withIssueDate("2017-10-17")
+                                                  .withCOARNotifyService(notifyServiceOne, "review")
+                                                  .withCOARNotifyService(notifyServiceTwo, "review")
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        // check the coar notify services of witem
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.sections.coarnotify.review", hasSize(2)))
+                            .andExpect(jsonPath("$.sections.coarnotify.review", contains(
+                                notifyServiceOne.getID(),
+                                notifyServiceTwo.getID())));
+
+        // try to replace the notifyServiceOne of witem with notifyServiceThree of review pattern
+        List<Operation> replaceOpts = new ArrayList<Operation>();
+        replaceOpts.add(new ReplaceOperation("/sections/coarnotify/review/0", notifyServiceThree.getID()));
+
+        String patchBody = getPatchContent(replaceOpts);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                                .content(patchBody)
+                                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.sections.coarnotify.review", hasSize(2)))
+                            .andExpect(jsonPath("$.sections.coarnotify.review", contains(
+                                notifyServiceThree.getID(), notifyServiceTwo.getID()
+                            )));
+
+    }
+
+    @Test
+    public void patchCOARNotifyServiceReplaceWithInCompatibleServicesTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+
+        NotifyServiceEntity notifyServiceOne =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name one")
+                                .withLdnUrl("https://service.ldn.org/inbox")
+                                .build();
+
+        NotifyServiceEntity notifyServiceTwo =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name two")
+                                .withLdnUrl("https://service2.ldn.org/inbox")
+                                .build();
+
+        NotifyServiceEntity notifyServiceThree =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name three")
+                                .withLdnUrl("https://service3.ldn.org/inbox")
+                                .build();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("Test WorkspaceItem")
+                                                  .withIssueDate("2017-10-17")
+                                                  .withCOARNotifyService(notifyServiceOne, "review")
+                                                  .withCOARNotifyService(notifyServiceTwo, "review")
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        // check the coar notify services of witem
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.sections.coarnotify.review", hasSize(2)))
+                            .andExpect(jsonPath("$.sections.coarnotify.review", contains(
+                                notifyServiceOne.getID(),
+                                notifyServiceTwo.getID())));
+
+        // try to replace the notifyServiceOne of witem with notifyServiceThree of review pattern
+        List<Operation> replaceOpts = new ArrayList<Operation>();
+        replaceOpts.add(new ReplaceOperation("/sections/coarnotify/review/0", notifyServiceThree.getID()));
+
+        String patchBody = getPatchContent(replaceOpts);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                                .content(patchBody)
+                                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isUnprocessableEntity());
+
+    }
+
+    @Test
+    public void patchCOARNotifyServiceRemoveTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+
+        NotifyServiceEntity notifyServiceOne =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name one")
+                                .withLdnUrl("https://service.ldn.org/inbox")
+                                .build();
+
+        NotifyServiceEntity notifyServiceTwo =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name two")
+                                .withLdnUrl("https://service2.ldn.org/inbox")
+                                .build();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("Test WorkspaceItem")
+                                                  .withIssueDate("2017-10-17")
+                                                  .withCOARNotifyService(notifyServiceOne, "review")
+                                                  .withCOARNotifyService(notifyServiceTwo, "review")
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        // check the coar notify services of witem
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.sections.coarnotify.review", hasSize(2)))
+                            .andExpect(jsonPath("$.sections.coarnotify.review", contains(
+                                notifyServiceOne.getID(), notifyServiceTwo.getID()
+                            )));
+
+        // try to remove the notifyServiceOne of witem
+        List<Operation> removeOpts = new ArrayList<Operation>();
+        removeOpts.add(new RemoveOperation("/sections/coarnotify/review/0"));
+
+        String patchBody = getPatchContent(removeOpts);
+
+        getClient(authToken).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                                .content(patchBody)
+                                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.sections.coarnotify.review", hasSize(1)))
+                            .andExpect(jsonPath("$.sections.coarnotify.review",contains(
+                                notifyServiceTwo.getID())));
+
+    }
+
+    @Test
+    public void submissionCOARNotifyServicesSectionWithValidationErrorsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+
+        NotifyServiceEntity notifyServiceOne =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name one")
+                                .withLdnUrl("https://service.ldn.org/inbox")
+                                .build();
+
+        NotifyServiceEntity notifyServiceTwo =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name two")
+                                .withLdnUrl("https://service2.ldn.org/inbox")
+                                .build();
+
+        NotifyServiceEntity notifyServiceThree =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name three")
+                                .withLdnUrl("https://service3.ldn.org/inbox")
+                                .build();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("Test WorkspaceItem")
+                                                  .withIssueDate("2017-10-17")
+                                                  .withType("Journal Article")
+                                                  .withCOARNotifyService(notifyServiceOne, "endorsement")
+                                                  .withCOARNotifyService(notifyServiceTwo, "review")
+                                                  .withCOARNotifyService(notifyServiceThree, "review")
+                                                  .build();
+
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceOne)
+                                          .withPattern("endorsement")
+                                          .withConstraint("fakeFilterA")
+                                          .isAutomatic(false)
+                                          .build();
+
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceTwo)
+                                          .withPattern("review")
+                                          .withConstraint("type_filter")
+                                          .isAutomatic(false)
+                                          .build();
+
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceThree)
+                                          .withPattern("review")
+                                          .withConstraint("fakeFilterA")
+                                          .isAutomatic(false)
+                                          .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        // check the coar notify services of witem also check the errors
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.sections.coarnotify.review", hasSize(2)))
+                            .andExpect(jsonPath("$.sections.coarnotify.review", contains(
+                                notifyServiceTwo.getID(),
+                                notifyServiceThree.getID())))
+                            .andExpect(jsonPath("$.sections.coarnotify.endorsement", hasSize(1)))
+                            .andExpect(jsonPath("$.sections.coarnotify.endorsement", contains(
+                                notifyServiceOne.getID())))
+                            .andExpect(jsonPath("$.errors[?(@.message=='error.validation.coarnotify.invalidfilter')]",
+                                Matchers.contains(
+                                    hasJsonPath("$.paths", Matchers.containsInAnyOrder(
+                                        "/sections/coarnotify/review/1",
+                                        "/sections/coarnotify/endorsement/0")))));
+
+    }
+
+    @Test
+    public void submissionCOARNotifyServicesSectionWithoutValidationErrorsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                                           .withName("Sub Community")
+                                           .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+
+        NotifyServiceEntity notifyServiceOne =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name one")
+                                .withLdnUrl("https://service.ldn.org/inbox")
+                                .build();
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("Test WorkspaceItem")
+                                                  .withIssueDate("2017-10-17")
+                                                  .withType("Journal Article")
+                                                  .withCOARNotifyService(notifyServiceOne, "review")
+                                                  .withCOARNotifyService(notifyServiceOne, "endorsement")
+                                                  .build();
+
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceOne)
+                                          .withPattern("endorsement")
+                                          .withConstraint("type_filter")
+                                          .isAutomatic(false)
+                                          .build();
+
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceOne)
+                                          .withPattern("review")
+                                          .withConstraint("type_filter")
+                                          .isAutomatic(false)
+                                          .build();
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+
+        // check the coar notify services of witem also check the errors
+        getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.sections.coarnotify.review", hasSize(1)))
+                            .andExpect(jsonPath("$.sections.coarnotify.review", contains(notifyServiceOne.getID())))
+                            .andExpect(jsonPath(
+                                "$.errors[?(@.message=='error.validation.coarnotify.invalidfilter')]").doesNotExist());
+
+    }
+
 }

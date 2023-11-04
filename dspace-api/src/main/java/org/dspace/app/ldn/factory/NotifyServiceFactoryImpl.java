@@ -7,7 +7,9 @@
  */
 package org.dspace.app.ldn.factory;
 
+import org.dspace.app.ldn.service.NotifyPatternToTriggerService;
 import org.dspace.app.ldn.service.NotifyService;
+import org.dspace.app.ldn.service.NotifyServiceInboundPatternService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -21,9 +23,25 @@ public class NotifyServiceFactoryImpl extends NotifyServiceFactory {
     @Autowired(required = true)
     private NotifyService notifyService;
 
+    @Autowired(required = true)
+    private NotifyServiceInboundPatternService notifyServiceInboundPatternService;
+
+    @Autowired(required = true)
+    private NotifyPatternToTriggerService notifyPatternToTriggerService;
+
     @Override
     public NotifyService getNotifyService() {
         return notifyService;
+    }
+
+    @Override
+    public NotifyServiceInboundPatternService getNotifyServiceInboundPatternService() {
+        return notifyServiceInboundPatternService;
+    }
+
+    @Override
+    public NotifyPatternToTriggerService getNotifyPatternToTriggerService() {
+        return notifyPatternToTriggerService;
     }
 
 }

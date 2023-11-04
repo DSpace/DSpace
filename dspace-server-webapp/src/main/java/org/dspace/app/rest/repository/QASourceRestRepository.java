@@ -8,7 +8,10 @@
 package org.dspace.app.rest.repository;
 
 import java.util.List;
+import java.util.UUID;
 
+import org.dspace.app.rest.Parameter;
+import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.model.QASourceRest;
 import org.dspace.core.Context;
 import org.dspace.qaevent.QASource;
@@ -49,6 +52,19 @@ public class QASourceRestRepository extends DSpaceRestRepository<QASourceRest, S
         return converter.toRestPage(qaSources, pageable, count, utils.obtainProjection());
     }
 
+    @SearchRestMethod(name = "byTarget")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Page<QASourceRest> findByTarget(Context context,
+        @Parameter(value = "target", required = true) UUID target,
+        Pageable pageable) {
+        List<QASource> topics = qaEventService
+            .findAllSourcesByTarget(target, pageable.getOffset(), pageable.getPageSize());
+        long count = qaEventService.countSourcesByTarget(target);
+        if (topics == null) {
+            return null;
+        }
+        return converter.toRestPage(topics, pageable, count, utils.obtainProjection());
+    }
 
     @Override
     public Class<QASourceRest> getDomainClass() {

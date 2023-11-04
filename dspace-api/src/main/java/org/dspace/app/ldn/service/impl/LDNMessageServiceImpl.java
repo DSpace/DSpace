@@ -148,7 +148,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
         return null;
     }
 
-    private NotifyServiceEntity findNotifyService(Context context, Service service) throws SQLException {
+    public NotifyServiceEntity findNotifyService(Context context, Service service) throws SQLException {
         return notifyServiceDao.findByLdnUrl(context, service.getInbox());
     }
 

@@ -52,9 +52,12 @@ public class QAEventTopicLinkRepository extends AbstractDSpaceRestRepository imp
         if (qaEvent == null) {
             throw new ResourceNotFoundException("No qa event with ID: " + id);
         }
-        QATopic topic = qaEventService.findTopicByTopicId(qaEvent.getTopic().replace("/", "!"));
+        String source = qaEvent.getSource();
+        String topicName = qaEvent.getTopic();
+        QATopic topic = qaEventService
+                .findTopicBySourceAndNameAndTarget(source, topicName, null);
         if (topic == null) {
-            throw new ResourceNotFoundException("No topic found with id : " + id);
+            throw new ResourceNotFoundException("No topic found with source: " + source + " topic: " + topicName);
         }
         return converter.toRest(topic, projection);
     }

@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -76,7 +77,7 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
 
         ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
-        getClient(getAuthToken(admin.getEmail(), password))
+        getClient()
             .perform(post("/ldn/inbox")
                 .contentType("application/ld+json")
                 .content(message))
@@ -95,12 +96,12 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         InputStream announceReviewStream = getClass().getResourceAsStream("ldn_announce_review.json");
         String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
         String object_handle = item.getHandle();
-        NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+        NotifyServiceEntity notifyServiceEntity = NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
-                                .withUrl("service url")
+                                .withUrl("https://review-service.com/inbox/about/")
                                 .withLdnUrl("https://review-service.com/inbox/")
+                                .withScore(BigDecimal.valueOf(0.6d))
                                 .build();
         String announceReview = IOUtils.toString(announceReviewStream, Charset.defaultCharset());
         announceReviewStream.close();
@@ -109,16 +110,15 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
 
         ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
-        getClient(getAuthToken(admin.getEmail(), password))
+        getClient()
             .perform(post("/ldn/inbox")
                 .contentType("application/ld+json")
                 .content(message))
             .andExpect(status().isAccepted());
         assertThat(qaEventService.findAllSources(0, 20), hasItem(QASourceMatcher.with(COAR_NOTIFY_SOURCE, 1L)));
 
-        assertThat(qaEventService.findAllTopics(0, 20), hasItem(
+        assertThat(qaEventService.findAllTopicsBySource(COAR_NOTIFY_SOURCE, 0, 20), hasItem(
             QATopicMatcher.with("ENRICH/MORE/REVIEW", 1L)));
-
     }
 
     @Test
@@ -129,7 +129,7 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         offerEndorsementStream.close();
         ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
-        getClient(getAuthToken(admin.getEmail(), password))
+        getClient()
             .perform(post("/ldn/inbox")
                 .contentType("application/ld+json")
                 .content(message))
