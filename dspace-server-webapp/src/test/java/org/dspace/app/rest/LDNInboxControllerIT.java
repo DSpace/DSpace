@@ -17,17 +17,20 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.ldn.LDNMessageEntity;
+import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.ldn.service.LDNMessageService;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.NotifyServiceBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -58,7 +61,6 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         Collection collection = CollectionBuilder.createCollection(context, community).build();
         Item item = ItemBuilder.createItem(context, collection).build();
         String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
-
         context.restoreAuthSystemState();
 
         InputStream offerEndorsementStream = getClass().getResourceAsStream("ldn_offer_endorsement_object.json");
@@ -68,7 +70,7 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
 
-        getClient(getAuthToken(admin.getEmail(), password))
+        getClient()
             .perform(post("/ldn/inbox")
                 .contentType("application/ld+json")
                 .content(message))
@@ -96,7 +98,7 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
 
         ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
-        getClient(getAuthToken(admin.getEmail(), password))
+        getClient()
             .perform(post("/ldn/inbox")
                 .contentType("application/ld+json")
                 .content(message))
@@ -109,12 +111,22 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void ldnInboxAnnounceReviewTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        NotifyServiceEntity serviceEntity = NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                .withName("Review Service")
+                .withLdnUrl("https://review-service.com/inbox/")
+                .withScore(BigDecimal.valueOf(0.6d))
+                .build();
+        Community com = CommunityBuilder.createCommunity(context).withName("Test Community").build();
+        Collection col = CollectionBuilder.createCollection(context, com).withName("Test Collection").build();
+        Item item = ItemBuilder.createItem(context, col).withHandle("123456789/9999").withTitle("Test Item").build();
+        context.restoreAuthSystemState();
         InputStream announceReviewStream = getClass().getResourceAsStream("ldn_announce_review.json");
         String message = IOUtils.toString(announceReviewStream, Charset.defaultCharset());
         announceReviewStream.close();
         ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
-        getClient(getAuthToken(admin.getEmail(), password))
+        getClient()
             .perform(post("/ldn/inbox")
                 .contentType("application/ld+json")
                 .content(message))
@@ -134,7 +146,7 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         offerEndorsementStream.close();
         ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
-        getClient(getAuthToken(admin.getEmail(), password))
+        getClient()
             .perform(post("/ldn/inbox")
                 .contentType("application/ld+json")
                 .content(message))

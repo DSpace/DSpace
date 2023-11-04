@@ -9,7 +9,7 @@
     "type": "Service"
   },
   "context": {
-    "id": "oai:http://localhost:4000/handle:123456789/12",
+    "id": "http://localhost:4000/handle/123456789/9999",
     "ietf:cite-as": "https://doi.org/10.5555/12345680",
     "type": "sorg:AboutPage",
     "url": {

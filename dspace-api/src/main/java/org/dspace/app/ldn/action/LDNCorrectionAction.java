@@ -44,8 +44,10 @@ public class LDNCorrectionAction implements LDNAction {
     public ActionStatus execute(Notification notification, Item item) throws Exception {
         ActionStatus result;
         Context context = ContextUtil.obtainCurrentRequestContext();
+        //FIXME the original id should be just an (optional) identifier/reference of the event in
+        // the external system. The target Item should be passed as a constructor argument
         QAEvent qaEvent = new QAEvent(QAEvent.COAR_NOTIFY,
-            notification.getObject().getId(), item.getID().toString(), item.getName(),
+            "oai:localhost:" + item.getHandle(), item.getID().toString(), item.getName(),
             this.getQaEventTopic(), getScore(context, notification).doubleValue(),
             "{\"abstracts[0]\": \"" + notification.getObject().getIetfCiteAs() + "\"}"
             , new Date());

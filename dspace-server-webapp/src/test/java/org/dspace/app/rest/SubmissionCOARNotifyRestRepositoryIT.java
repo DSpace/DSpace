@@ -41,7 +41,7 @@ public class SubmissionCOARNotifyRestRepositoryIT extends AbstractControllerInte
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
                    .andExpect(jsonPath("$._embedded.submissioncoarnotifyconfigs", Matchers.containsInAnyOrder(
-                       SubmissionCOARNotifyMatcher.matchCOARNotifyEntry("default",
+                       SubmissionCOARNotifyMatcher.matchCOARNotifyEntry("coarnotify",
                            List.of("review", "endorsement", "ingest"))
                    )));
     }
@@ -64,11 +64,11 @@ public class SubmissionCOARNotifyRestRepositoryIT extends AbstractControllerInte
     public void findOneTest() throws Exception {
         String epersonToken = getAuthToken(eperson.getEmail(), password);
 
-        getClient(epersonToken).perform(get("/api/config/submissioncoarnotifyconfigs/default"))
+        getClient(epersonToken).perform(get("/api/config/submissioncoarnotifyconfigs/coarnotify"))
                                .andExpect(status().isOk())
                                .andExpect(content().contentType(contentType))
                                .andExpect(jsonPath("$", Matchers.is(
-                                   SubmissionCOARNotifyMatcher.matchCOARNotifyEntry("default",
+                                   SubmissionCOARNotifyMatcher.matchCOARNotifyEntry("coarnotify",
                                        List.of("review", "endorsement", "ingest"))
                                )));
     }
