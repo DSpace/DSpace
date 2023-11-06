@@ -7,15 +7,8 @@
  */
 package org.dspace.app.sitemap;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Iterator;
@@ -29,7 +22,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
@@ -87,11 +79,6 @@ public class GenerateSitemaps {
                           "do not generate sitemaps.org protocol sitemap");
         options.addOption("b", "no_htmlmap", false,
                           "do not generate a basic HTML sitemap");
-        options.addOption("a", "ping_all", false,
-                          "ping configured search engines");
-        options
-            .addOption("p", "ping", true,
-                       "ping specified search engine URL");
         options
             .addOption("d", "delete", false,
                 "delete sitemaps dir and its contents");
@@ -116,14 +103,13 @@ public class GenerateSitemaps {
         }
 
         /*
-         * Sanity check -- if no sitemap generation or pinging to do, or deletion, print usage
+         * Sanity check -- if no sitemap generation or deletion, print usage
          */
         if (line.getArgs().length != 0 || line.hasOption('d') || line.hasOption('b')
             && line.hasOption('s') && !line.hasOption('g')
-            && !line.hasOption('m') && !line.hasOption('y')
-            && !line.hasOption('p')) {
+            && !line.hasOption('m') && !line.hasOption('y')) {
             System.err
-                .println("Nothing to do (no sitemap to generate, no search engines to ping)");
+                .println("Nothing to do (no sitemap to generate)");
             hf.printHelp(usage, options);
             System.exit(1);
         }
@@ -135,20 +121,6 @@ public class GenerateSitemaps {
 
         if (line.hasOption('d')) {
             deleteSitemaps();
-        }
-
-        if (line.hasOption('a')) {
-            pingConfiguredSearchEngines();
-        }
-
-        if (line.hasOption('p')) {
-            try {
-                pingSearchEngine(line.getOptionValue('p'));
-            } catch (MalformedURLException me) {
-                System.err
-                    .println("Bad search engine URL (include all except sitemap URL)");
-                System.exit(1);
-            }
         }
 
         System.exit(0);
@@ -302,80 +274,5 @@ public class GenerateSitemaps {
         }
 
         c.abort();
-    }
-
-    /**
-     * Ping all search engines configured in {@code dspace.cfg}.
-     *
-     * @throws UnsupportedEncodingException theoretically should never happen
-     */
-    public static void pingConfiguredSearchEngines()
-        throws UnsupportedEncodingException {
-        String[] engineURLs = configurationService
-            .getArrayProperty("sitemap.engineurls");
-
-        if (ArrayUtils.isEmpty(engineURLs)) {
-            log.warn("No search engine URLs configured to ping");
-            return;
-        }
-
-        for (int i = 0; i < engineURLs.length; i++) {
-            try {
-                pingSearchEngine(engineURLs[i]);
-            } catch (MalformedURLException me) {
-                log.warn("Bad search engine URL in configuration: "
-                             + engineURLs[i]);
-            }
-        }
-    }
-
-    /**
-     * Ping the given search engine.
-     *
-     * @param engineURL Search engine URL minus protocol etc, e.g.
-     *                  {@code www.google.com}
-     * @throws MalformedURLException        if the passed in URL is malformed
-     * @throws UnsupportedEncodingException theoretically should never happen
-     */
-    public static void pingSearchEngine(String engineURL)
-        throws MalformedURLException, UnsupportedEncodingException {
-        // Set up HTTP proxy
-        if ((StringUtils.isNotBlank(configurationService.getProperty("http.proxy.host")))
-            && (StringUtils.isNotBlank(configurationService.getProperty("http.proxy.port")))) {
-            System.setProperty("proxySet", "true");
-            System.setProperty("proxyHost", configurationService
-                .getProperty("http.proxy.host"));
-            System.getProperty("proxyPort", configurationService
-                .getProperty("http.proxy.port"));
-        }
-
-        String sitemapURL = configurationService.getProperty("dspace.ui.url")
-            + "/sitemap";
-
-        URL url = new URL(engineURL + URLEncoder.encode(sitemapURL, "UTF-8"));
-
-        try {
-            HttpURLConnection connection = (HttpURLConnection) url
-                .openConnection();
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(
-                connection.getInputStream()));
-
-            String inputLine;
-            StringBuffer resp = new StringBuffer();
-            while ((inputLine = in.readLine()) != null) {
-                resp.append(inputLine).append("\n");
-            }
-            in.close();
-
-            if (connection.getResponseCode() == 200) {
-                log.info("Pinged " + url.toString() + " successfully");
-            } else {
-                log.warn("Error response pinging " + url.toString() + ":\n"
-                             + resp);
-            }
-        } catch (IOException e) {
-            log.warn("Error pinging " + url.toString(), e);
-        }
     }
 }
