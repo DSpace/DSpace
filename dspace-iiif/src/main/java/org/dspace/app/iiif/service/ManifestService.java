@@ -149,8 +149,7 @@ public class ManifestService extends AbstractResourceService {
     }
 
     /**
-     * Create a default manifest, add it as a bitstream to the item and
-     * return it
+     * Create a default manifest
      *
      * @param item the DSpace item
      * @param context DSpace context
@@ -163,9 +162,7 @@ public class ManifestService extends AbstractResourceService {
         guessCanvasDimension = (wid == null && hgt == null);
         populateManifest(item, context);
 
-        String json = utils.asJson(manifestGenerator.generateResource());
-
-        return json;
+        return utils.asJson(manifestGenerator.generateResource());
     }
 
     /**

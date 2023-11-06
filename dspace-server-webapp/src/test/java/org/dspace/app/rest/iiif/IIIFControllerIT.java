@@ -43,6 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class IIIFControllerIT extends AbstractControllerIntegrationTest {
 
     public static final String IIIFBundle = "RANGETEST";
+    public static final String IIIFManifestBundle = "IIIF_MANIFEST";
 
     @Autowired
     ItemService itemService;
@@ -1466,6 +1467,16 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.metadata[3].value", is("Moo!")));
     }
 
+    /**
+     * Test when multiple bitstreams are added to the IIIF_MANIFEST bundle
+     * Note: is this a realistic test case to exercise? Would it instead be reasonable
+     * behavior to just return the 1st bitstream in the bundle, negating the need
+     * for the extra logic to check the "primary" in the bundle
+     *
+     * Ideally, this selection logic would be in a unit test, instead of an IT
+     *
+     * @throws Exception
+     */
     @Test
     public void customManifestBundleWithPrimaryBitstream() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -1488,21 +1499,31 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                                            .withName("IIIF_MANIFEST")
                                            .build();
 
-        try (InputStream is = getClass().getResourceAsStream("manifest.json")) {
+        try (
+                InputStream manifestStream1 = getClass().getResourceAsStream("manifest.json");
+                InputStream manifestStream2 = getClass().getResourceAsStream("manifest2.json");
+        ) {
                 Bitstream bitstream1 = BitstreamBuilder
-                        .createBitstream(context, targetBundle, is)
+                        .createBitstream(context, targetBundle, manifestStream1)
                         .withName("manifest.json")
                         .withMimeType("application/json")
                         .build();
+                Bitstream bitstream2 = BitstreamBuilder
+                        .createBitstream(context, targetBundle, manifestStream2)
+                        .withName("manifest2.json")
+                        .withMimeType("application/json")
+                        .build();
+
+                // Should have 2 bitstreams now, but the 2nd will be "primary"
+                targetBundle.setPrimaryBitstreamID(bitstream2);
         }
 
         context.restoreAuthSystemState();
 
+        // 1st bitstream would have $.label == "Test manifest"
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.metadata.length()", is(4)))
-                .andExpect(jsonPath("$.metadata[3].label", is("Moo")))
-                .andExpect(jsonPath("$.metadata[3].value", is("Moo!")));
+                .andExpect(jsonPath("$.label", is("Lily in Spider Web Costume (edited)")));
     }
 
 }
