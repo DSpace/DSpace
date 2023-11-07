@@ -236,8 +236,37 @@ public class SitemapRestControllerIT extends AbstractControllerIntegrationTest {
                                       .andReturn();
 
         String response = result.getResponse().getContentAsString();
+        // contains a link to communities: [dspace.ui.url]/communities/<uuid>
+        assertTrue(response
+                .contains(configurationService.getProperty("dspace.ui.url") + "/communities/" + community.getID()));
+        // contains a link to collections: [dspace.ui.url]/collections/<uuid>
+        assertTrue(response
+                .contains(configurationService.getProperty("dspace.ui.url") + "/collections/" + collection.getID()));
         // contains a link to items: [dspace.ui.url]/items/<uuid>
         assertTrue(response.contains(configurationService.getProperty("dspace.ui.url") + "/items/" + item1.getID()));
         assertTrue(response.contains(configurationService.getProperty("dspace.ui.url") + "/items/" + item2.getID()));
+        // contains proper link to entities items
+        assertTrue(response.contains(configurationService.getProperty("dspace.ui.url") + "/entities/publication/"
+                + entityPublication.getID()));
+        assertFalse(response
+                .contains(configurationService.getProperty("dspace.ui.url") + "/items/" + entityPublication.getID()));
+        // does not contain links to restricted content
+        assertFalse(response.contains(
+                configurationService.getProperty("dspace.ui.url") + "/communities/" + communityRestricted.getID()));
+        assertFalse(response.contains(
+                configurationService.getProperty("dspace.ui.url") + "/collections/" + collectionRestricted.getID()));
+        assertFalse(response
+                .contains(configurationService.getProperty("dspace.ui.url") + "/items/" + itemRestricted.getID()));
+        assertFalse(response.contains(configurationService.getProperty("dspace.ui.url") + "/entities/publication/"
+                + entityPublicationRestricted.getID()));
+        assertFalse(response.contains(
+                configurationService.getProperty("dspace.ui.url") + "/items/" + entityPublicationRestricted.getID()));
+        // does not contain links to undiscoverable content
+        assertFalse(response
+                .contains(configurationService.getProperty("dspace.ui.url") + "/items/" + itemUndiscoverable.getID()));
+        assertFalse(response.contains(configurationService.getProperty("dspace.ui.url") + "/entities/publication/"
+                + entityPublicationUndiscoverable.getID()));
+        assertFalse(response.contains(configurationService.getProperty("dspace.ui.url") + "/items/"
+                + entityPublicationUndiscoverable.getID()));
     }
 }
