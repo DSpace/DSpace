@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
@@ -24,9 +23,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
@@ -35,6 +31,7 @@ import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.IndexableObject;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
@@ -60,6 +57,7 @@ public class GenerateSitemaps {
     private static final ConfigurationService configurationService =
         DSpaceServicesFactory.getInstance().getConfigurationService();
     private static final SearchService searchService = SearchUtils.getSearchService();
+    private static final int PAGE_SIZE = 100;
 
     /**
      * Default constructor
@@ -183,96 +181,113 @@ public class GenerateSitemaps {
         }
 
         Context c = new Context(Context.Mode.READ_ONLY);
+        int offset = 0;
+        long commsCount = 0;
+        long collsCount = 0;
+        long itemsCount = 0;
 
-        List<Community> comms = communityService.findAll(c);
+        try {
+            DiscoverQuery discoveryQuery = new DiscoverQuery();
+            discoveryQuery.setMaxResults(PAGE_SIZE);
+            discoveryQuery.setQuery("search.resourcetype:Community");
+            do {
+                discoveryQuery.setStart(offset);
+                DiscoverResult discoverResult = searchService.search(c, discoveryQuery);
+                List<IndexableObject> docs = discoverResult.getIndexableObjects();
+                commsCount = discoverResult.getTotalSearchResults();
 
-        for (Community comm : comms) {
-            String url = uiURLStem + "communities/" + comm.getID();
+                for (IndexableObject doc : docs) {
+                    String url = uiURLStem + "communities/" + doc.getID();
+                    c.uncacheEntity(doc.getIndexedObject());
+
+                    if (makeHTMLMap) {
+                        html.addURL(url, null);
+                    }
+                    if (makeSitemapOrg) {
+                        sitemapsOrg.addURL(url, null);
+                    }
+                }
+                offset += PAGE_SIZE;
+            } while (offset < commsCount);
+
+            offset = 0;
+            discoveryQuery = new DiscoverQuery();
+            discoveryQuery.setMaxResults(PAGE_SIZE);
+            discoveryQuery.setQuery("search.resourcetype:Collection");
+            do {
+                discoveryQuery.setStart(offset);
+                DiscoverResult discoverResult = searchService.search(c, discoveryQuery);
+                List<IndexableObject> docs = discoverResult.getIndexableObjects();
+                collsCount = discoverResult.getTotalSearchResults();
+
+                for (IndexableObject doc : docs) {
+                    String url = uiURLStem + "collections/" + doc.getID();
+                    c.uncacheEntity(doc.getIndexedObject());
+
+                    if (makeHTMLMap) {
+                        html.addURL(url, null);
+                    }
+                    if (makeSitemapOrg) {
+                        sitemapsOrg.addURL(url, null);
+                    }
+                }
+                offset += PAGE_SIZE;
+            } while (offset < collsCount);
+
+            offset = 0;
+            discoveryQuery = new DiscoverQuery();
+            discoveryQuery.setMaxResults(PAGE_SIZE);
+            discoveryQuery.setQuery("search.resourcetype:Item");
+            discoveryQuery.addSearchField("search.entitytype");
+            do {
+
+                discoveryQuery.setStart(offset);
+                DiscoverResult discoverResult = searchService.search(c, discoveryQuery);
+                List<IndexableObject> docs = discoverResult.getIndexableObjects();
+                itemsCount = discoverResult.getTotalSearchResults();
+
+                for (IndexableObject doc : docs) {
+                    String url;
+                    List<String> entityTypeFieldValues = discoverResult.getSearchDocument(doc).get(0)
+                                            .getSearchFieldValues("search.entitytype");
+                    if (CollectionUtils.isNotEmpty(entityTypeFieldValues)) {
+                        url = uiURLStem + "entities/" + StringUtils.lowerCase(entityTypeFieldValues.get(0)) + "/"
+                                + doc.getID();
+                    } else {
+                        url = uiURLStem + "items/" + doc.getID();
+                    }
+                    Date lastMod = doc.getLastModified();
+                    c.uncacheEntity(doc.getIndexedObject());
+
+                    if (makeHTMLMap) {
+                        html.addURL(url, null);
+                    }
+                    if (makeSitemapOrg) {
+                        sitemapsOrg.addURL(url, null);
+                    }
+                }
+                offset += PAGE_SIZE;
+            } while (offset < itemsCount);
 
             if (makeHTMLMap) {
-                html.addURL(url, null);
+                int files = html.finish();
+                log.info(LogHelper.getHeader(c, "write_sitemap",
+                                              "type=html,num_files=" + files + ",communities="
+                                                  + commsCount + ",collections=" + collsCount
+                                                  + ",items=" + itemsCount));
             }
+
             if (makeSitemapOrg) {
-                sitemapsOrg.addURL(url, null);
+                int files = sitemapsOrg.finish();
+                log.info(LogHelper.getHeader(c, "write_sitemap",
+                                              "type=html,num_files=" + files + ",communities="
+                                                  + commsCount + ",collections=" + collsCount
+                                                  + ",items=" + itemsCount));
             }
-
-            c.uncacheEntity(comm);
+        } catch (SearchServiceException e) {
+            throw new RuntimeException(e);
+        } finally {
+            c.abort();
         }
-
-        List<Collection> colls = collectionService.findAll(c);
-
-        for (Collection coll : colls) {
-            String url = uiURLStem + "collections/" + coll.getID();
-
-            if (makeHTMLMap) {
-                html.addURL(url, null);
-            }
-            if (makeSitemapOrg) {
-                sitemapsOrg.addURL(url, null);
-            }
-
-            c.uncacheEntity(coll);
-        }
-
-        Iterator<Item> allItems = itemService.findAll(c);
-        int itemCount = 0;
-
-        while (allItems.hasNext()) {
-            Item i = allItems.next();
-
-            DiscoverQuery entityQuery = new DiscoverQuery();
-            entityQuery.setQuery("search.uniqueid:\"Item-" + i.getID() + "\" and entityType:*");
-            entityQuery.addSearchField("entityType");
-
-            try {
-                DiscoverResult discoverResult = searchService.search(c, entityQuery);
-
-                String url;
-                if (CollectionUtils.isNotEmpty(discoverResult.getIndexableObjects())
-                    && CollectionUtils.isNotEmpty(discoverResult.getSearchDocument(
-                        discoverResult.getIndexableObjects().get(0)).get(0).getSearchFieldValues("entityType"))
-                    && StringUtils.isNotBlank(discoverResult.getSearchDocument(
-                        discoverResult.getIndexableObjects().get(0)).get(0).getSearchFieldValues("entityType").get(0))
-                ) {
-                    url = uiURLStem + "entities/" + StringUtils.lowerCase(discoverResult.getSearchDocument(
-                            discoverResult.getIndexableObjects().get(0))
-                        .get(0).getSearchFieldValues("entityType").get(0)) + "/" + i.getID();
-                } else {
-                    url = uiURLStem + "items/" + i.getID();
-                }
-                Date lastMod = i.getLastModified();
-
-                if (makeHTMLMap) {
-                    html.addURL(url, lastMod);
-                }
-                if (makeSitemapOrg) {
-                    sitemapsOrg.addURL(url, lastMod);
-                }
-            } catch (SearchServiceException e) {
-                log.error("Failed getting entitytype through solr for item " + i.getID() + ": " + e.getMessage());
-            }
-
-            c.uncacheEntity(i);
-
-            itemCount++;
-        }
-
-        if (makeHTMLMap) {
-            int files = html.finish();
-            log.info(LogHelper.getHeader(c, "write_sitemap",
-                                          "type=html,num_files=" + files + ",communities="
-                                              + comms.size() + ",collections=" + colls.size()
-                                              + ",items=" + itemCount));
-        }
-
-        if (makeSitemapOrg) {
-            int files = sitemapsOrg.finish();
-            log.info(LogHelper.getHeader(c, "write_sitemap",
-                                          "type=html,num_files=" + files + ",communities="
-                                              + comms.size() + ",collections=" + colls.size()
-                                              + ",items=" + itemCount));
-        }
-
-        c.abort();
     }
 }
