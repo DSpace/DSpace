@@ -115,6 +115,9 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
                 .contentType("application/ld+json")
                 .content(message))
             .andExpect(status().isAccepted());
+
+        ldnMessageService.extractAndProcessMessageFromQueue(context);
+
         assertThat(qaEventService.findAllSources(0, 20), hasItem(QASourceMatcher.with(COAR_NOTIFY_SOURCE, 1L)));
 
         assertThat(qaEventService.findAllTopicsBySource(COAR_NOTIFY_SOURCE, 0, 20), hasItem(

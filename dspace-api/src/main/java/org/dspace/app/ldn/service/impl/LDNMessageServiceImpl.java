@@ -198,7 +198,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
                         update(context, msg);
                         ObjectMapper mapper = new ObjectMapper();
                         Notification notification = mapper.readValue(msg.getMessage(), Notification.class);
-                        processor.process(notification);
+                        processor.process(context, notification);
                         msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_PROCESSED);
                         result = 1;
                     } catch (JsonSyntaxException jse) {

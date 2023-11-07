@@ -21,10 +21,10 @@ import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.handle.service.HandleService;
 import org.dspace.qaevent.service.QAEventService;
 import org.dspace.qaevent.service.dto.NotifyMessageDTO;
 import org.dspace.services.ConfigurationService;
-import org.dspace.web.ContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -47,11 +47,12 @@ public class LDNCorrectionAction implements LDNAction {
     private QAEventService qaEventService;
     @Autowired
     private LDNMessageService ldnMessageService;
+    @Autowired
+    private HandleService handleService;
 
     @Override
-    public ActionStatus execute(Notification notification, Item item) throws Exception {
+    public ActionStatus execute(Context context, Notification notification, Item item) throws Exception {
         ActionStatus result = ActionStatus.ABORT;
-        Context context = ContextUtil.obtainCurrentRequestContext();
         String itemName = itemService.getName(item);
         QAEvent qaEvent = null;
         if (notification.getObject() != null) {
@@ -67,12 +68,13 @@ public class LDNCorrectionAction implements LDNAction {
                 message.setServiceName(notification.getOrigin().getInbox());
             }
             Gson gson = new Gson();
-            // "oai:www.dspace.org:" + item.getHandle(),
             BigDecimal score = getScore(context, notification);
-            double doubleValue = score != null ? score.doubleValue() : 0d;
+            double doubleScoreValue = score != null ? score.doubleValue() : 0d;
+            /* String fullHandleUrl = configurationService.getProperty("dspace.ui.url") + "/handle/"
+                + handleService.findHandle(context, item); */
             qaEvent = new QAEvent(QAEvent.COAR_NOTIFY_SOURCE,
-                "oai:localhost:" + item.getHandle(), item.getID().toString(), item.getName(),
-                this.getQaEventTopic(), doubleValue,
+                handleService.findHandle(context, item), item.getID().toString(), itemName,
+                this.getQaEventTopic(), doubleScoreValue,
                 gson.toJson(message)
                 , new Date());
             qaEventService.store(context, qaEvent);

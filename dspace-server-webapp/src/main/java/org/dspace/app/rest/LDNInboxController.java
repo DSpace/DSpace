@@ -14,7 +14,6 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.LDNMessageEntity;
 import org.dspace.app.ldn.LDNRouter;
 import org.dspace.app.ldn.model.Notification;
-import org.dspace.app.ldn.processor.LDNProcessor;
 import org.dspace.app.ldn.service.LDNMessageService;
 import org.dspace.app.rest.exception.InvalidLDNMessageException;
 import org.dspace.core.Context;
@@ -61,24 +60,6 @@ public class LDNInboxController {
         log.info("stored ldn message {}", ldnMsgEntity);
         context.commit();
 
-        LDNProcessor processor = router.route(ldnMsgEntity);
-        if (processor == null) {
-            log.error(String.format("No processor found for type %s", notification.getType()));
-            return ResponseEntity.badRequest()
-                .body(String.format("No processor found for type %s", notification.getType()));
-        }
-        if (ldnMsgEntity.getQueueStatus() != LDNMessageEntity.QUEUE_STATUS_UNTRUSTED) {
-            processor = router.route(ldnMsgEntity);
-            if (processor == null) {
-                log.error(String.format("No processor found for type %s", notification.getType()));
-                return ResponseEntity.badRequest()
-                    .body(String.format("No processor found for type %s", notification.getType()));
-            } else {
-                processor.process(notification);
-            }
-        } else {
-            log.warn("LDNMessage " + ldnMsgEntity + " has been received by an untrusted source");
-        }
         return ResponseEntity.accepted()
             .body(String.format("Successfully stored notification %s %s",
                 notification.getId(), notification.getType()));

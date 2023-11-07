@@ -568,7 +568,7 @@ public class QAEventServiceImpl implements QAEventService {
         if (startPosition != -1) {
             return originalId.substring(startPosition + 1, originalId.length());
         } else {
-            return null;
+            return originalId;
         }
     }
 

@@ -24,20 +24,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.ws.rs.core.MediaType;
 
+import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.rest.matcher.ItemMatcher;
+import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.matcher.QAEventMatcher;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
+import org.dspace.app.rest.repository.QAEventRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.NotifyServiceBuilder;
 import org.dspace.builder.QAEventBuilder;
 import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.content.Collection;
@@ -45,6 +50,8 @@ import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
 import org.dspace.content.QAEventProcessed;
+import org.dspace.content.service.ItemService;
+import org.dspace.qaevent.action.ASimpleMetadataAction;
 import org.dspace.qaevent.dao.QAEventsDao;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -60,6 +67,15 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private QAEventsDao qaEventsDao;
+
+    @Autowired
+    private ItemService itemService;
+
+    @Autowired
+    private ASimpleMetadataAction AddReviewMetadataAction;
+
+    @Autowired
+    private ASimpleMetadataAction AddEndorsedMetadataAction;
 
     @Test
     public void findAllNotImplementedTest() throws Exception {
@@ -656,6 +672,91 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(content().contentType(contentType))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.totalEvents", is(0)));
+    }
+
+    @Test
+    public void recordDecisionNotifyTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType project = EntityTypeBuilder.createEntityTypeBuilder(context, "Project").build();
+        RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publication, project, "isProjectOfPublication",
+                "isPublicationOfProject", 0, null, 0,
+                null).withCopyToRight(true).build();
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+            .withEntityType("Publication")
+            .withName("Collection 1").build();
+        Collection colFunding = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Collection Fundings")
+            .withEntityType("Project").build();
+        Item item = ItemBuilder.createItem(context, colFunding).withTitle("Tracking Papyrus and Parchment Paths")
+                .build();
+        NotifyServiceEntity notifyServiceEntity = NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("https://review-service.com/inbox/about/")
+                                .withLdnUrl("https://review-service.com/inbox/")
+                                .withScore(BigDecimal.valueOf(0.6d))
+                                .build();
+        String href = "EC";
+        QAEvent eventMoreReview = QAEventBuilder.createTarget(context, col1, "Science and Freedom with project")
+                .withSource(COAR_NOTIFY_SOURCE)
+                .withTopic("ENRICH/MORE/REVIEW")
+                .withMessage(
+                        "{"
+                        + "\"serviceName\":\"" + notifyServiceEntity.getName() + "\","
+                        + "\"serviceId\":\"" + notifyServiceEntity.getID() + "\","
+                        + "\"href\":\"" + href + "\","
+                        + "\"relationship\":\"H2020\""
+                        + "}")
+                .withRelatedItem(item.getID().toString())
+                .build();
+        QAEvent eventMoreEndorsement = QAEventBuilder.createTarget(context, col1, "Science and Freedom with project")
+            .withSource(COAR_NOTIFY_SOURCE)
+            .withTopic("ENRICH/MORE/ENDORSEMENT")
+            .withMessage(
+                    "{"
+                    + "\"serviceName\":\"" + notifyServiceEntity.getName() + "\","
+                    + "\"serviceId\":\"" + notifyServiceEntity.getID() + "\","
+                    + "\"href\":\"" + href + "\","
+                    + "\"relationship\":\"H2020\""
+                    + "}")
+            .withRelatedItem(item.getID().toString())
+            .build();
+        context.restoreAuthSystemState();
+        List<Operation> acceptOp = new ArrayList<Operation>();
+        acceptOp.add(new ReplaceOperation("/status", QAEvent.ACCEPTED));
+        String patchAccept = getPatchContent(acceptOp);
+        String authToken = getAuthToken(admin.getEmail(), password);
+        eventMoreEndorsement.setStatus(QAEvent.ACCEPTED);
+        eventMoreReview.setStatus(QAEvent.ACCEPTED);
+        // MORE REVIEW
+        getClient(authToken).perform(patch("/api/integration/qualityassuranceevents/" + eventMoreReview.getEventId())
+            .content(patchAccept)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", QAEventMatcher.matchQAEventNotifyEntry(eventMoreReview)));
+        getClient(authToken).perform(get("/api/core/items/" + eventMoreReview.getTarget())
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$",
+                hasJsonPath("$.metadata",
+                        MetadataMatcher.matchMetadata(AddReviewMetadataAction.getMetadata(), href))));
+        // MORE ENDORSEMENT
+        getClient(authToken).perform(patch("/api/integration/qualityassuranceevents/"
+            + eventMoreEndorsement.getEventId())
+            .content(patchAccept)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", QAEventMatcher.matchQAEventNotifyEntry(eventMoreEndorsement)));
+
+        getClient(authToken).perform(get("/api/core/items/" + eventMoreEndorsement.getTarget())
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$",
+                hasJsonPath("$.metadata",
+                        MetadataMatcher.matchMetadata(AddEndorsedMetadataAction.getMetadata(), href))));
+
     }
 
     @Test

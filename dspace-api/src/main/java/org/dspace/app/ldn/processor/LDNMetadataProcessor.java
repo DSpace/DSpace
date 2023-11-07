@@ -14,7 +14,6 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -38,7 +37,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
-import org.dspace.web.ContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -85,27 +83,22 @@ public class LDNMetadataProcessor implements LDNProcessor {
      * @throws Exception something went wrong processing the notification
      */
     @Override
-    public void process(Notification notification) throws Exception {
-        Iterator<Notification> iterator = repeater.iterator(notification);
-
-        while (iterator.hasNext()) {
-            Notification contextNotification = iterator.next();
-            Item item = doProcess(contextNotification);
-            runActions(contextNotification, item);
-        }
+    public void process(Context context, Notification notification) throws Exception {
+        Item item = doProcess(context, notification);
+        runActions(context, notification, item);
     }
 
     /**
      * Perform the actual notification processing. Applies all defined metadata
      * changes.
      *
+     * @param context  the current context
      * @param notification current context notification
      * @return Item associated item which persist notification details
      * @throws Exception failed to process notification
      */
-    private Item doProcess(Notification notification) throws Exception {
+    private Item doProcess(Context context, Notification notification) throws Exception {
         log.info("Processing notification {} {}", notification.getId(), notification.getType());
-        Context context = ContextUtil.obtainCurrentRequestContext();
         boolean updated = false;
         VelocityContext velocityContext = prepareTemplateContext(notification);
 
@@ -203,7 +196,7 @@ public class LDNMetadataProcessor implements LDNProcessor {
      *
      * @throws Exception failed execute the action
      */
-    private ActionStatus runActions(Notification notification, Item item) throws Exception {
+    private ActionStatus runActions(Context context, Notification notification, Item item) throws Exception {
         ActionStatus operation = ActionStatus.CONTINUE;
         for (LDNAction action : actions) {
             log.info("Running action {} for notification {} {}",
@@ -211,7 +204,7 @@ public class LDNMetadataProcessor implements LDNProcessor {
                     notification.getId(),
                     notification.getType());
 
-            operation = action.execute(notification, item);
+            operation = action.execute(context, notification, item);
             if (operation == ActionStatus.ABORT) {
                 break;
             }
