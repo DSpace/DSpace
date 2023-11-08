@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -139,40 +140,48 @@ public class XmlWorkflowCuratorServiceImpl
             item.setOwningCollection(wfi.getCollection());
             for (Task task : step.tasks) {
                 curator.addTask(task.name);
-                curator.curate(c, item);
-                int status = curator.getStatus(task.name);
-                String result = curator.getResult(task.name);
-                String action = "none";
-                switch (status) {
-                    case Curator.CURATE_FAIL:
-                        // task failed - notify any contacts the task has assigned
-                        if (task.powers.contains("reject")) {
-                            action = "reject";
-                        }
-                        notifyContacts(c, wfi, task, "fail", action, result);
-                        // if task so empowered, reject submission and terminate
-                        if ("reject".equals(action)) {
-                            workflowService.sendWorkflowItemBackSubmission(c, wfi,
-                                    c.getCurrentUser(), null,
-                                    task.name + ": " + result);
-                            return false;
-                        }
-                        break;
-                    case Curator.CURATE_SUCCESS:
-                        if (task.powers.contains("approve")) {
-                            action = "approve";
-                        }
-                        notifyContacts(c, wfi, task, "success", action, result);
-                        if ("approve".equals(action)) {
-                            // cease further task processing and advance submission
-                            return true;
-                        }
-                        break;
-                    case Curator.CURATE_ERROR:
-                        notifyContacts(c, wfi, task, "error", action, result);
-                        break;
-                    default:
-                        break;
+
+                // Check whether the task is configured to be queued rather than automatically run
+                if (StringUtils.isNotEmpty(step.queue)) {
+                    // queue attribute has been set in the FlowStep configuration: add task to configured queue
+                    curator.queue(c, item.getID().toString(), step.queue);
+                } else {
+                    // Task is configured to be run automatically
+                    curator.curate(c, item);
+                    int status = curator.getStatus(task.name);
+                    String result = curator.getResult(task.name);
+                    String action = "none";
+                    switch (status) {
+                        case Curator.CURATE_FAIL:
+                            // task failed - notify any contacts the task has assigned
+                            if (task.powers.contains("reject")) {
+                                action = "reject";
+                            }
+                            notifyContacts(c, wfi, task, "fail", action, result);
+                            // if task so empowered, reject submission and terminate
+                            if ("reject".equals(action)) {
+                                workflowService.sendWorkflowItemBackSubmission(c, wfi,
+                                        c.getCurrentUser(), null,
+                                        task.name + ": " + result);
+                                return false;
+                            }
+                            break;
+                        case Curator.CURATE_SUCCESS:
+                            if (task.powers.contains("approve")) {
+                                action = "approve";
+                            }
+                            notifyContacts(c, wfi, task, "success", action, result);
+                            if ("approve".equals(action)) {
+                                // cease further task processing and advance submission
+                                return true;
+                            }
+                            break;
+                        case Curator.CURATE_ERROR:
+                            notifyContacts(c, wfi, task, "error", action, result);
+                            break;
+                        default:
+                            break;
+                    }
                 }
                 curator.clear();
             }
