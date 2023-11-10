@@ -44,6 +44,8 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
 
     public static final String IIIFBundle = "RANGETEST";
 
+    protected static final String ANNOTATION_BUNDLE = "ANNOTATIONS";
+
     @Autowired
     ItemService itemService;
 
@@ -195,14 +197,18 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                     .withIIIFCanvasHeight(4220)
                     .build();
         }
+        Bitstream annotationBitstream;
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-            BitstreamBuilder
+            annotationBitstream = BitstreamBuilder
                     .createBitstream(context, publicItem1, is)
-                    .withName("Bitstream2.jpg")
                     .withMimeType("image/jpeg")
                     .build();
         }
+
+        annotationBitstream.setName(context,annotationBitstream.getID() + ".json");
+
         context.restoreAuthSystemState();
+
         // Expect canvas label, width and height to match bitstream description.
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
                 .andExpect(status().isOk())
@@ -220,6 +226,136 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.structures").doesNotExist())
                 .andExpect(jsonPath("$.service").exists());
     }
+
+    @Test
+    public void findOneBitstreamAnnotationIT() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                                           .build();
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                      .enableIIIF()
+                                      .withIIIFCanvasWidth(2000)
+                                      .withIIIFCanvasHeight(3000)
+                                      .withIIIFCanvasNaming("Global")
+                                      .enableIIIFSearch()
+                                      .build();
+
+        String bitstreamContent = "{\"id\":\"https://demo.edu/server/iiif/e3ara370-62a5-nd81-t62d" +
+            "-3jj168356191/canvas/c1\",\"items\":" +
+            "[{\"body\":{\"type\":\"TextualBody\",\"value\":\"annotation test\"}," +
+            "\"id\":\"998994af-93ab-48c6-a8ae-63672658b16d\",\"motivation\":\"commenting\"," +
+            "\"target\":{\"source\":\"https://demo" +
+            ".edu/server/iiif/e3ara370-62a5-nd81-t62d-3jj168356191/canvas/c1\"," +
+            "\"selector\":[{\"type\":\"FragmentSelector\",\"value\":\"xywh=304,612,1194,2011\"}]}}]}";
+
+        Bitstream bitstream;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder
+                .createBitstream(context, publicItem1, is, ANNOTATION_BUNDLE)
+                .withMimeType("application/json")
+                .build();
+        }
+        bitstream.setName(context,bitstream.getID() + ".json");
+        context.restoreAuthSystemState();
+
+        // Expect annotation list
+        getClient().perform(get("/iiif/" + bitstream.getID() + "/list/annotation"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.id",
+                       is("https://demo.edu/server/iiif/e3ara370-62a5-nd81-t62d-3jj168356191/canvas/c1")))
+                   .andExpect(jsonPath("$.items[0].body.type", is("TextualBody")))
+                   .andExpect(jsonPath("$.items[0].body.value", is("annotation test")));
+    }
+
+    @Test
+    public void findOneIIIFImageAnnotationsIT() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                                           .build();
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                      .enableIIIF()
+                                      .withIIIFCanvasWidth(2000)
+                                      .withIIIFCanvasHeight(3000)
+                                      .withIIIFCanvasNaming("Global")
+                                      .enableIIIFSearch()
+                                      .build();
+
+        String bitstreamContent = "dummy text";
+        String bitstreamAnnotationContent = "{\"id\":\"https://demo.edu/server/iiif/e3ara370-62a5-nd81-t62d" +
+            "-3jj168356191/canvas/c1\",\"items\":[{\"body\":{\"type\":\"TextualBody\",\"value\":\"test\"}," +
+            "\"id\":\"998994af-93ab-48c6-a8ae-63672658b16d\",\"motivation\":\"commenting\"," +
+            "\"target\":{\"source\":\"https://demo" +
+            ".edu/server/iiif/e3ara370-62a5-nd81-t62d-3jj168356191/canvas/c1\"," +
+            "\"selector\":[{\"type\":\"FragmentSelector\",\"value\":\"xywh=304,612,1194,2011\"}]}}]}";
+
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            BitstreamBuilder
+                .createBitstream(context, publicItem1, is)
+                .withName("Bitstream1.jpg")
+                .withMimeType("image/jpeg")
+                .withIIIFLabel("Custom Label")
+                .withIIIFCanvasWidth(3163)
+                .withIIIFCanvasHeight(4220)
+                .build();
+        }
+        Bitstream annotatedBitstream;
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            annotatedBitstream = BitstreamBuilder
+                .createBitstream(context, publicItem1, is)
+                .withName("Bitstream2.jpg")
+                .withMimeType("image/jpeg")
+                .withIIIFLabel("Global 2")
+                .withIIIFCanvasWidth(2000)
+                .withIIIFCanvasHeight(3000)
+                .build();
+        }
+
+        // Add JSON bitstream to ANNOTATIONS Bundle.
+        Bitstream annotation;
+        try (InputStream is = IOUtils.toInputStream(bitstreamAnnotationContent, CharEncoding.UTF_8)) {
+            annotation = BitstreamBuilder
+                .createBitstream(context, publicItem1, is, ANNOTATION_BUNDLE)
+                .withMimeType("application/json")
+                .build();
+        }
+        // Set name of the JSON file
+        annotation.setName(context,annotatedBitstream.getID() + ".json");
+
+        context.restoreAuthSystemState();
+
+        // Expect second canvas to include AnnotationList
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.@context",
+                       is("http://iiif.io/api/presentation/2/context.json")))
+                   .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
+                       Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c0")))
+                   .andExpect(jsonPath("$.sequences[0].canvases[0].label", is("Custom Label")))
+                   .andExpect(jsonPath("$.sequences[0].canvases[0].width", is(3163)))
+                   .andExpect(jsonPath("$.sequences[0].canvases[0].height", is(4220)))
+                   .andExpect(jsonPath("$.sequences[0].canvases[1].@id",
+                       Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c1")))
+                   .andExpect(jsonPath("$.sequences[0].canvases[1].label", is("Global 2")))
+                   .andExpect(jsonPath("$.sequences[0].canvases[1].width", is(2000)))
+                   .andExpect(jsonPath("$.sequences[0].canvases[1].otherContent[0].@type",
+                       is("sc:AnnotationList")))
+                   .andExpect(jsonPath("$.sequences[0].canvases[1].height", is(3000)))
+                   .andExpect(jsonPath("$.structures").doesNotExist())
+                   .andExpect(jsonPath("$.service").exists());
+    }
+
 
     @Test
     public void findOneIIIFSearchableWithCustomBundleAndConfigIT() throws Exception {

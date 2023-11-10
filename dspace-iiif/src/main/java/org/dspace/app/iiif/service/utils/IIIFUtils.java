@@ -46,14 +46,9 @@ public class IIIFUtils {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(IIIFUtils.class);
 
-    // The DSpace bundle for other content related to item.
-    protected static final String OTHER_CONTENT_BUNDLE = "OtherContent";
-
     // The canvas position will be appended to this string.
     private static final String CANVAS_PATH_BASE = "/canvas/c";
 
-    // metadata used to enable the iiif features on the item
-    public static final String METADATA_IIIF_ENABLED = "dspace.iiif.enabled";
     // metadata used to enable the iiif search service on the item
     public static final String METADATA_IIIF_SEARCH_ENABLED = "iiif.search.enabled";
     // metadata used to override the title/name exposed as label to iiif client
@@ -139,7 +134,7 @@ public class IIIFUtils {
      */
     public boolean isIIIFBitstream(Context context, Bitstream b) {
         return checkImageMimeType(getBitstreamMimeType(b, context)) && b.getMetadata().stream()
-                .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
+                .filter(m -> m.getMetadataField().toString('.').contentEquals(IIIFSharedUtils.METADATA_IIIF_ENABLED))
                 .noneMatch(m -> m.getValue().equalsIgnoreCase("false") || m.getValue().equalsIgnoreCase("no"));
     }
 
@@ -244,7 +239,7 @@ public class IIIFUtils {
      */
     public List<Bitstream> getSeeAlsoBitstreams(Item item) {
         List<Bitstream> seeAlsoBitstreams = new ArrayList<>();
-        List<Bundle> bundles = item.getBundles(OTHER_CONTENT_BUNDLE);
+        List<Bundle> bundles = item.getBundles(IIIFSharedUtils.OTHER_CONTENT_BUNDLE);
         if (bundles.size() > 0) {
             for (Bundle bundle : bundles) {
                 List<Bitstream> bitstreams = bundle.getBitstreams();

@@ -28,12 +28,18 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  */
 public class IIIFSharedUtils {
 
-    // metadata used to enable the iiif features on the item
+    /**
+     * The DSpace bundle for image (canvas) annotations
+     */
+    public static final String ANNOTATIONS_BUNDLE = "ANNOTATIONS";
+    /**
+     * The DSpace bundle for other content related to item.
+     */
+    public static final String OTHER_CONTENT_BUNDLE = "OtherContent";
+    /**
+     * Metadata field used to enable the iiif features on the item
+     */
     public static final String METADATA_IIIF_ENABLED = "dspace.iiif.enabled";
-    // The DSpace bundle for other content related to item.
-    protected static final String OTHER_CONTENT_BUNDLE = "OtherContent";
-    // The IIIF image server url from configuration
-    protected static final String IMAGE_SERVER_PATH = "iiif.image.server";
     // IIIF metadata definitions
     public static final String METADATA_IIIF_SCHEMA  = "iiif";
     public static final String METADATA_IIIF_IMAGE_ELEMENT = "image";
@@ -41,6 +47,8 @@ public class IIIFSharedUtils {
     public static final String METADATA_IIIF_LABEL_ELEMENT = "label";
     public static final String METADATA_IIIF_HEIGHT_QUALIFIER = "height";
     public static final String METADATA_IIIF_WIDTH_QUALIFIER = "width";
+    // The IIIF image server url from configuration
+    protected static final String IMAGE_SERVER_PATH = "iiif.image.server";
 
     protected static final ConfigurationService configurationService
         = DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -90,7 +98,7 @@ public class IIIFSharedUtils {
 
     /**
      * Utility method to check is a bundle can contain bitstreams to use as IIIF
-     * resources
+     * canvas resources.
      *
      * @param b the DSpace bundle to check
      * @return true if the bundle can contain bitstreams to use as IIIF resources
@@ -98,7 +106,7 @@ public class IIIFSharedUtils {
     public static boolean isIIIFBundle(Bundle b) {
         return !StringUtils.equalsAnyIgnoreCase(b.getName(), Constants.LICENSE_BUNDLE_NAME,
             Constants.METADATA_BUNDLE_NAME, CreativeCommonsServiceImpl.CC_BUNDLE_NAME, "THUMBNAIL",
-            "BRANDED_PREVIEW", "TEXT", OTHER_CONTENT_BUNDLE)
+            "BRANDED_PREVIEW", "TEXT", OTHER_CONTENT_BUNDLE, ANNOTATIONS_BUNDLE)
             && b.getMetadata().stream()
                 .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
                 .noneMatch(m -> m.getValue().equalsIgnoreCase("false") || m.getValue().equalsIgnoreCase("no"));

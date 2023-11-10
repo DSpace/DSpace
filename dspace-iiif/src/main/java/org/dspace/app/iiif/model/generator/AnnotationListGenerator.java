@@ -56,6 +56,7 @@ public class AnnotationListGenerator implements IIIFResource {
         }
         AnnotationList annotationList = new AnnotationList(identifier);
         annotationList.setResources(annotations);
+
         return annotationList;
     }
 }

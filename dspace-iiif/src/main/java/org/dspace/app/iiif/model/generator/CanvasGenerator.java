@@ -13,6 +13,7 @@ import javax.validation.constraints.NotNull;
 
 import de.digitalcollections.iiif.model.ImageContent;
 import de.digitalcollections.iiif.model.MetadataEntry;
+import de.digitalcollections.iiif.model.sharedcanvas.AnnotationList;
 import de.digitalcollections.iiif.model.sharedcanvas.Canvas;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
 
@@ -31,6 +32,8 @@ public class CanvasGenerator implements IIIFResource {
     private Integer height;
     private Integer width;
     private ImageContent thumbnail;
+    private AnnotationList annotationService;
+
 
     /**
      * Constructor
@@ -104,6 +107,10 @@ public class CanvasGenerator implements IIIFResource {
         metadata.add(metadataEntryGenerator.generateValue());
     }
 
+    public void addAnnotations(AnnotationListGenerator annotationService) {
+        this.annotationService = (AnnotationList) annotationService.generateResource();
+    }
+
     /**
      * Returns the canvas.
      * @return canvas model
@@ -139,6 +146,9 @@ public class CanvasGenerator implements IIIFResource {
             for (MetadataEntry meta : metadata) {
                 canvas.addMetadata(meta);
             }
+        }
+        if (annotationService != null) {
+            canvas.addOtherContent(annotationService);
         }
         return canvas;
     }

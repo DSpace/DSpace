@@ -26,6 +26,7 @@ public abstract class AbstractResourceService {
      * These values are defined in dspace configuration.
      */
     protected String IIIF_ENDPOINT;
+    protected String IIIF_ANNOTATIONS_ENDPOINT;
     protected String IMAGE_SERVICE;
     protected String SEARCH_URL;
     protected String CLIENT_URL;
@@ -65,6 +66,7 @@ public abstract class AbstractResourceService {
     protected void setConfiguration(ConfigurationService configurationService) {
         this.configurationService = configurationService;
         IIIF_ENDPOINT = configurationService.getProperty("dspace.server.url") + "/iiif/";
+        IIIF_ANNOTATIONS_ENDPOINT = configurationService.getProperty("iiif.annotation.server");
         IMAGE_SERVICE = configurationService.getProperty("iiif.image.server");
         SEARCH_URL = configurationService.getProperty("iiif.search.url");
         BITSTREAM_PATH_PREFIX = configurationService.getProperty("dspace.server.url") + "/api/core/bitstreams";
