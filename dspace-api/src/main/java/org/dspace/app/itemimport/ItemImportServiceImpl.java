@@ -1820,7 +1820,6 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
             rp.setdSpaceObject(bs);
             rp.setAction(actionID);
-            rp.setGroup(g);
             rp.setRpType(rpType);
 
             resourcePolicyService.update(c, rp);
