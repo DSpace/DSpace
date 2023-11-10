@@ -136,6 +136,38 @@ public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupp
     int countByNameLike(Context context, String groupName) throws SQLException;
 
     /**
+     * Search all groups via their name (fuzzy match), limited to those groups which are NOT a member of the given
+     * parent group. This may be used to search across groups which are valid to add to the given parent group.
+     * <P>
+     * NOTE: The parent group itself is also excluded from the search.
+     *
+     * @param context The DSpace context
+     * @param groupName Group name to fuzzy match against.
+     * @param excludeParent  Parent Group to exclude results from. Groups under this parent will never be returned.
+     * @param offset    Offset to use for pagination (-1 to disable)
+     * @param limit     The maximum number of results to return (-1 to disable)
+     * @return Groups matching the query (which are not members of the given parent)
+     * @throws SQLException if database error
+     */
+    List<Group> findByNameLikeAndNotMember(Context context, String groupName, Group excludeParent,
+                                           int offset, int limit) throws SQLException;
+
+    /**
+     * Count number of groups that match a given name (fuzzy match), limited to those groups which are NOT a member of
+     * the given parent group. This may be used (with findByNameLikeAndNotMember()) to search across groups which are
+     * valid to add to the given parent group.
+     * <P>
+     * NOTE: The parent group itself is also excluded from the count.
+     *
+     * @param context The DSpace context
+     * @param groupName Group name to fuzzy match against.
+     * @param excludeParent  Parent Group to exclude results from. Groups under this parent will never be returned.
+     * @return Groups matching the query (which are not members of the given parent)
+     * @throws SQLException if database error
+     */
+    int countByNameLikeAndNotMember(Context context, String groupName, Group excludeParent) throws SQLException;
+
+    /**
      * Find a group by its name and the membership of the given EPerson
      *
      * @param context The DSpace context

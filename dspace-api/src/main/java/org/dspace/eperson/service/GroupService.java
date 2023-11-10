@@ -261,37 +261,67 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
     public List<Group> findAll(Context context, int sortField) throws SQLException;
 
     /**
-     * Find the groups that match the search query across eperson_group_id or name
+     * Find the Groups that match the query across both Group name and Group ID.  This is an unpaginated search,
+     * which means it will load all matching groups into memory at once. This may provide POOR PERFORMANCE when a large
+     * number of groups are matched.
      *
-     * @param context         DSpace context
-     * @param groupIdentifier The group name or group ID
-     * @return array of Group objects
+     * @param context   DSpace context
+     * @param query     The search string used to search across group name or group ID
+     * @return List of matching Group objects
      * @throws SQLException if error
      */
-    public List<Group> search(Context context, String groupIdentifier) throws SQLException;
+    List<Group> search(Context context, String query) throws SQLException;
 
     /**
-     * Find the groups that match the search query across eperson_group_id or name
+     * Find the Groups that match the query across both Group name and Group ID. This method supports pagination,
+     * which provides better performance than the above non-paginated search() method.
      *
-     * @param context         DSpace context
-     * @param groupIdentifier The group name or group ID
-     * @param offset          Inclusive offset
-     * @param limit           Maximum number of matches returned
-     * @return array of Group objects
+     * @param context   DSpace context
+     * @param query     The search string used to search across group name or group ID
+     * @param offset    Inclusive offset (the position of the first result to return)
+     * @param limit     Maximum number of matches returned
+     * @return List of matching Group objects
      * @throws SQLException if error
      */
-    public List<Group> search(Context context, String groupIdentifier, int offset, int limit) throws SQLException;
+    List<Group> search(Context context, String query, int offset, int limit) throws SQLException;
 
     /**
-     * Returns the total number of groups returned by a specific query, without the overhead
-     * of creating the Group objects to store the results.
+     * Returns the total number of Groups returned by a specific query. Search is performed based on Group name
+     * and Group ID. May be used with search() above to support pagination of matching Groups.
      *
      * @param context DSpace context
-     * @param query   The search string
+     * @param query   The search string used to search across group name or group ID
      * @return the number of groups matching the query
      * @throws SQLException if error
      */
-    public int searchResultCount(Context context, String query) throws SQLException;
+    int searchResultCount(Context context, String query) throws SQLException;
+
+    /**
+     * Find the groups that match the search query which are NOT currently members (subgroups)
+     * of the given parentGroup
+     *
+     * @param context               DSpace context
+     * @param query                 The search string used to search across group name or group ID
+     * @param excludeParentGroup    Parent group to exclude results from
+     * @param offset                Inclusive offset (the position of the first result to return)
+     * @param limit                 Maximum number of matches returned
+     * @return List of matching Group objects
+     * @throws SQLException if error
+     */
+    List<Group> searchNonMembers(Context context, String query, Group excludeParentGroup,
+                                 int offset, int limit) throws SQLException;
+
+    /**
+     * Returns the total number of groups that match the search query which are NOT currently members (subgroups)
+     * of the given parentGroup. Can be used with searchNonMembers() to support pagination.
+     *
+     * @param context               DSpace context
+     * @param query                 The search string used to search across group name or group ID
+     * @param excludeParentGroup    Parent group to exclude results from
+     * @return the number of Groups matching the query
+     * @throws SQLException if error
+     */
+    int searchNonMembersCount(Context context, String query, Group excludeParentGroup) throws SQLException;
 
     /**
      * Return true if group has no direct or indirect members

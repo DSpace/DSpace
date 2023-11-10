@@ -460,17 +460,17 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     }
 
     @Override
-    public List<Group> search(Context context, String groupIdentifier) throws SQLException {
-        return search(context, groupIdentifier, -1, -1);
+    public List<Group> search(Context context, String query) throws SQLException {
+        return search(context, query, -1, -1);
     }
 
     @Override
-    public List<Group> search(Context context, String groupIdentifier, int offset, int limit) throws SQLException {
+    public List<Group> search(Context context, String query, int offset, int limit) throws SQLException {
         List<Group> groups = new ArrayList<>();
-        UUID uuid = UUIDUtils.fromString(groupIdentifier);
+        UUID uuid = UUIDUtils.fromString(query);
         if (uuid == null) {
             //Search by group name
-            groups = groupDAO.findByNameLike(context, groupIdentifier, offset, limit);
+            groups = groupDAO.findByNameLike(context, query, offset, limit);
         } else {
             //Search by group id
             Group group = find(context, uuid);
@@ -483,12 +483,12 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     }
 
     @Override
-    public int searchResultCount(Context context, String groupIdentifier) throws SQLException {
+    public int searchResultCount(Context context, String query) throws SQLException {
         int result = 0;
-        UUID uuid = UUIDUtils.fromString(groupIdentifier);
+        UUID uuid = UUIDUtils.fromString(query);
         if (uuid == null) {
             //Search by group name
-            result = groupDAO.countByNameLike(context, groupIdentifier);
+            result = groupDAO.countByNameLike(context, query);
         } else {
             //Search by group id
             Group group = find(context, uuid);
@@ -497,6 +497,44 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             }
         }
 
+        return result;
+    }
+
+    @Override
+    public List<Group> searchNonMembers(Context context, String query, Group excludeParentGroup,
+                                        int offset, int limit) throws SQLException {
+        List<Group> groups = new ArrayList<>();
+        UUID uuid = UUIDUtils.fromString(query);
+        if (uuid == null) {
+            // Search by group name
+            groups = groupDAO.findByNameLikeAndNotMember(context, query, excludeParentGroup, offset, limit);
+        } else if (!uuid.equals(excludeParentGroup.getID())) {
+            // Search by group id
+            Group group = find(context, uuid);
+            // Verify it is NOT a member of the given excludeParentGroup before adding
+            if (group != null && !isMember(excludeParentGroup, group)) {
+                groups.add(group);
+            }
+        }
+
+        return groups;
+    }
+
+    @Override
+    public int searchNonMembersCount(Context context, String query, Group excludeParentGroup) throws SQLException {
+        int result = 0;
+        UUID uuid = UUIDUtils.fromString(query);
+        if (uuid == null) {
+            // Search by group name
+            result = groupDAO.countByNameLikeAndNotMember(context, query, excludeParentGroup);
+        } else if (!uuid.equals(excludeParentGroup.getID())) {
+            // Search by group id
+            Group group = find(context, uuid);
+            // Verify it is NOT a member of the given excludeParentGroup before adding
+            if (group != null && !isMember(excludeParentGroup, group)) {
+                result = 1;
+            }
+        }
         return result;
     }
 
