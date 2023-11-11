@@ -40,7 +40,7 @@ public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, Str
     private static final Logger log = LogManager.getLogger();
 
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasPermission(#id, 'QUALITYASSURANCETOPIC', 'READ')")
     public QATopicRest findOne(Context context, String id) {
         String[] topicIdSplitted = id.split(":", 3);
         if (topicIdSplitted.length < 2) {
@@ -49,7 +49,7 @@ public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, Str
         String sourceName = topicIdSplitted[0];
         String topicName = topicIdSplitted[1].replaceAll("!", "/");
         UUID target = topicIdSplitted.length == 3 ? UUID.fromString(topicIdSplitted[2]) : null;
-        QATopic topic = qaEventService.findTopicBySourceAndNameAndTarget(sourceName, topicName, target);
+        QATopic topic = qaEventService.findTopicBySourceAndNameAndTarget(context, sourceName, topicName, target);
         if (topic == null) {
             return null;
         }
@@ -62,12 +62,13 @@ public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, Str
     }
 
     @SearchRestMethod(name = "bySource")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public Page<QATopicRest> findBySource(Context context,
-        @Parameter(value = "source", required = true) String source, Pageable pageable) {
-        List<QATopic> topics = qaEventService.findAllTopicsBySource(source,
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    public Page<QATopicRest> findBySource(@Parameter(value = "source", required = true) String source,
+            Pageable pageable) {
+        Context context = obtainContext();
+        List<QATopic> topics = qaEventService.findAllTopicsBySource(context, source,
             pageable.getOffset(), pageable.getPageSize());
-        long count = qaEventService.countTopicsBySource(source);
+        long count = qaEventService.countTopicsBySource(context, source);
         if (topics == null) {
             return null;
         }
@@ -75,14 +76,14 @@ public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, Str
     }
 
     @SearchRestMethod(name = "byTarget")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public Page<QATopicRest> findByTarget(Context context,
-        @Parameter(value = "target", required = true) UUID target,
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    public Page<QATopicRest> findByTarget(@Parameter(value = "target", required = true) UUID target,
         @Parameter(value = "source", required = true) String source,
         Pageable pageable) {
+        Context context = obtainContext();
         List<QATopic> topics = qaEventService
-            .findAllTopicsBySourceAndTarget(source, target, pageable.getOffset(), pageable.getPageSize());
-        long count = qaEventService.countTopicsBySourceAndTarget(source, target);
+            .findAllTopicsBySourceAndTarget(context, source, target, pageable.getOffset(), pageable.getPageSize());
+        long count = qaEventService.countTopicsBySourceAndTarget(context, source, target);
         if (topics == null) {
             return null;
         }

@@ -17,6 +17,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -41,6 +43,7 @@ import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.handle.service.HandleService;
 import org.dspace.qaevent.AutomaticProcessingAction;
 import org.dspace.qaevent.QAEventAutomaticProcessingEvaluation;
@@ -49,6 +52,7 @@ import org.dspace.qaevent.QATopic;
 import org.dspace.qaevent.dao.QAEventsDao;
 import org.dspace.qaevent.dao.impl.QAEventsDaoImpl;
 import org.dspace.qaevent.service.QAEventActionService;
+import org.dspace.qaevent.service.QAEventSecurityService;
 import org.dspace.qaevent.service.QAEventService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -68,6 +72,9 @@ public class QAEventServiceImpl implements QAEventService {
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;
+
+    @Autowired(required = true)
+    protected QAEventSecurityService qaSecurityService;
 
     @Autowired(required = true)
     protected ItemService itemService;
@@ -118,10 +125,16 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public long countTopicsBySource(String source) {
+    public long countTopicsBySource(Context context, String source) {
+        if (isNotSupportedSource(source)
+                || !qaSecurityService.canSeeSource(context, context.getCurrentUser(), source)) {
+            return 0;
+        }
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
-        solrQuery.setQuery("*:*");
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context,
+                context.getCurrentUser(), source);
+        solrQuery.setQuery(securityQuery.orElse("*:*"));
         solrQuery.setFacet(true);
         solrQuery.setFacetMinCount(1);
         solrQuery.addFacetField(TOPIC);
@@ -136,10 +149,16 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public long countTopicsBySourceAndTarget(String source, UUID target) {
+    public long countTopicsBySourceAndTarget(Context context, String source, UUID target) {
+        if (isNotSupportedSource(source)
+                || !qaSecurityService.canSeeSource(context, context.getCurrentUser(), source)) {
+            return 0;
+        }
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
-        solrQuery.setQuery("*:*");
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context,
+                context.getCurrentUser(), source);
+        solrQuery.setQuery(securityQuery.orElse("*:*"));
         solrQuery.setFacet(true);
         solrQuery.setFacetMinCount(1);
         solrQuery.addFacetField(TOPIC);
@@ -177,15 +196,22 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public QATopic findTopicBySourceAndNameAndTarget(String sourceName, String topicName, UUID target) {
+    public QATopic findTopicBySourceAndNameAndTarget(Context context, String sourceName, String topicName,
+            UUID target) {
+        if (isNotSupportedSource(sourceName)
+                || !qaSecurityService.canSeeSource(context, context.getCurrentUser(), sourceName)) {
+            return null;
+        }
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context,
+                context.getCurrentUser(), sourceName);
+        solrQuery.setQuery(securityQuery.orElse("*:*"));
+
         solrQuery.addFilterQuery(SOURCE + ":\"" + sourceName + "\"");
         solrQuery.addFilterQuery(TOPIC + ":\"" + topicName + "\"");
         if (target != null) {
-            solrQuery.setQuery(RESOURCE_UUID + ":\"" + target.toString() + "\"");
-        } else {
-            solrQuery.setQuery("*:*");
+            solrQuery.addFilterQuery(RESOURCE_UUID + ":\"" + target.toString() + "\"");
         }
         solrQuery.setFacet(true);
         solrQuery.setFacetMinCount(1);
@@ -211,18 +237,22 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public List<QATopic> findAllTopicsBySource(String source, long offset, int count) {
-        return findAllTopicsBySourceAndTarget(source, null, offset, count);
+    public List<QATopic> findAllTopicsBySource(Context context, String source, long offset, int count) {
+        return findAllTopicsBySourceAndTarget(context, source, null, offset, count);
     }
 
     @Override
-    public List<QATopic> findAllTopicsBySourceAndTarget(String source, UUID target, long offset, int count) {
-        if (source != null && isNotSupportedSource(source)) {
-            return null;
+    public List<QATopic> findAllTopicsBySourceAndTarget(Context context, String source, UUID target, long offset,
+            int count) {
+        if (isNotSupportedSource(source)
+                || !qaSecurityService.canSeeSource(context, context.getCurrentUser(), source)) {
+            return List.of();
         }
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
-        solrQuery.setQuery("*:*");
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context,
+                context.getCurrentUser(), source);
+        solrQuery.setQuery(securityQuery.orElse("*:*"));
         solrQuery.setFacet(true);
         solrQuery.setFacetMinCount(1);
         solrQuery.setFacetLimit((int) (offset + count));
@@ -319,8 +349,9 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public QAEvent findEventByEventId(String eventId) {
-        SolrQuery param = new SolrQuery(EVENT_ID + ":" + eventId);
+    public QAEvent findEventByEventId(Context context, String eventId) {
+        SolrQuery param = new SolrQuery("*:*");
+        param.addFilterQuery(EVENT_ID + ":\"" + eventId + "\"");
         QueryResponse response;
         try {
             response = getSolr().query(param);
@@ -338,8 +369,31 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public List<QAEvent> findEventsByTopicAndPage(String source, String topic, long offset, int pageSize) {
+    public boolean qaEventsInSource(Context context, EPerson user, String eventId, String source) {
+        SolrQuery solrQuery = new SolrQuery();
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context,
+                user, source);
+        solrQuery.setQuery(securityQuery.orElse("*:*"));
+        solrQuery.addFilterQuery(EVENT_ID + ":\"" + eventId + "\"");
+        QueryResponse response;
+        try {
+            response = getSolr().query(solrQuery);
+            if (response != null) {
+                return response.getResults().getNumFound() == 1;
+            }
+        } catch (SolrServerException | IOException e) {
+            throw new RuntimeException("Exception querying Solr", e);
+        }
+        return false;
+    }
 
+    @Override
+    public List<QAEvent> findEventsByTopicAndPage(Context context, String source, String topic, long offset,
+            int pageSize) {
+        if (isNotSupportedSource(source)
+                || !qaSecurityService.canSeeSource(context, context.getCurrentUser(), source)) {
+            return List.of();
+        }
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setStart(((Long) offset).intValue());
         if (pageSize != -1) {
@@ -369,17 +423,21 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public List<QAEvent> findEventsByTopicAndPageAndTarget(String source, String topic, long offset, int pageSize,
-            UUID target) {
-
+    public List<QAEvent> findEventsByTopicAndPageAndTarget(Context context, String source, String topic, long offset,
+            int pageSize, UUID target) {
+        if (isNotSupportedSource(source)
+                || !qaSecurityService.canSeeSource(context, context.getCurrentUser(), source)) {
+            return List.of();
+        }
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setStart(((Long) offset).intValue());
         solrQuery.setRows(pageSize);
         solrQuery.setSort(TRUST, ORDER.desc);
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context,
+                context.getCurrentUser(), source);
+        solrQuery.setQuery(securityQuery.orElse("*:*"));
         if (target != null) {
-            solrQuery.setQuery(RESOURCE_UUID + ":\"" + target.toString() + "\"");
-        } else {
-            solrQuery.setQuery("*:*");
+            solrQuery.addFilterQuery(RESOURCE_UUID + ":\"" + target.toString() + "\"");
         }
         solrQuery.addFilterQuery(SOURCE + ":\"" + source + "\"");
         solrQuery.addFilterQuery(TOPIC + ":\"" + topic + "\"");
@@ -404,10 +462,17 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public long countEventsByTopic(String source, String topic) {
+    public long countEventsByTopic(Context context, String source, String topic) {
+        if (isNotSupportedSource(source)
+                || !qaSecurityService.canSeeSource(context, context.getCurrentUser(), source)) {
+            return 0;
+        }
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
-        solrQuery.setQuery(TOPIC + ":\"" + topic + "\"");
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, context.getCurrentUser(),
+                source);
+        solrQuery.setQuery(securityQuery.orElse("*:*"));
+        solrQuery.addFilterQuery(TOPIC + ":\"" + topic + "\"");
         solrQuery.addFilterQuery(SOURCE + ":\"" + source + "\"");
         QueryResponse response = null;
         try {
@@ -419,13 +484,18 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public long countEventsByTopicAndTarget(String source, String topic, UUID target) {
+    public long countEventsByTopicAndTarget(Context context, String source, String topic, UUID target) {
+        if (isNotSupportedSource(source)
+                || !qaSecurityService.canSeeSource(context, context.getCurrentUser(), source)) {
+            return 0;
+        }
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, context.getCurrentUser(),
+                source);
+        solrQuery.setQuery(securityQuery.orElse("*:*"));
         if (target != null) {
-            solrQuery.setQuery(RESOURCE_UUID + ":\"" + target.toString() + "\"");
-        } else {
-            solrQuery.setQuery("*:*");
+            solrQuery.addFilterQuery(RESOURCE_UUID + ":\"" + target.toString() + "\"");
         }
         solrQuery.addFilterQuery(SOURCE + ":\"" + source + "\"");
         solrQuery.addFilterQuery(TOPIC + ":\"" + topic + "\"");
@@ -439,19 +509,23 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public QASource findSource(String sourceName) {
+    public QASource findSource(Context context, String sourceName) {
         String[] split = sourceName.split(":");
-        return findSource(split[0], split.length == 2 ? UUID.fromString(split[1]) : null);
+        return findSource(context, split[0], split.length == 2 ? UUID.fromString(split[1]) : null);
     }
 
     @Override
-    public QASource findSource(String sourceName, UUID target) {
+    public QASource findSource(Context context, String sourceName, UUID target) {
 
-        if (isNotSupportedSource(sourceName)) {
+        if (isNotSupportedSource(sourceName)
+                || !qaSecurityService.canSeeSource(context, context.getCurrentUser(), sourceName)) {
             return null;
         }
 
-        SolrQuery solrQuery = new SolrQuery("*:*");
+        SolrQuery solrQuery = new SolrQuery();
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, context.getCurrentUser(),
+                sourceName);
+        solrQuery.setQuery(securityQuery.orElse("*:*"));
         solrQuery.setRows(0);
         solrQuery.addFilterQuery(SOURCE + ":\"" + sourceName + "\"");
         if (target != null) {
@@ -487,9 +561,10 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public List<QASource> findAllSources(long offset, int pageSize) {
+    public List<QASource> findAllSources(Context context, long offset, int pageSize) {
         return Arrays.stream(getSupportedSources())
-            .map((sourceName) -> findSource(sourceName))
+            .map((sourceName) -> findSource(context, sourceName))
+            .filter(Objects::nonNull)
             .sorted(comparing(QASource::getTotalEvents).reversed())
             .skip(offset)
             .limit(pageSize)
@@ -497,14 +572,19 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public long countSources() {
-        return getSupportedSources().length;
+    public long countSources(Context context) {
+        return Arrays.stream(getSupportedSources())
+                .map((sourceName) -> findSource(context, sourceName))
+                .filter(Objects::nonNull)
+                .filter(source -> source.getTotalEvents() > 0)
+                .count();
     }
 
     @Override
-    public List<QASource> findAllSourcesByTarget(UUID target, long offset, int pageSize) {
+    public List<QASource> findAllSourcesByTarget(Context context, UUID target, long offset, int pageSize) {
         return Arrays.stream(getSupportedSources())
-                .map((sourceName) -> findSource(sourceName, target))
+                .map((sourceName) -> findSource(context, sourceName, target))
+                .filter(Objects::nonNull)
                 .sorted(comparing(QASource::getTotalEvents).reversed())
                 .filter(source -> source.getTotalEvents() > 0)
                 .skip(offset)
@@ -513,8 +593,12 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public long countSourcesByTarget(UUID target) {
-        return getSupportedSources().length;
+    public long countSourcesByTarget(Context context, UUID target) {
+        return Arrays.stream(getSupportedSources())
+                .map((sourceName) -> findSource(context, sourceName, target))
+                .filter(Objects::nonNull)
+                .filter(source -> source.getTotalEvents() > 0)
+                .count();
     }
 
     @Override

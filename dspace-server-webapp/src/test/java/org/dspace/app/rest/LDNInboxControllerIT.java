@@ -131,9 +131,9 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
                 .contentType("application/ld+json")
                 .content(message))
             .andExpect(status().isAccepted());
-        assertThat(qaEventService.findAllSources(0, 20), hasItem(QASourceMatcher.with(COAR_NOTIFY, 1L)));
+        assertThat(qaEventService.findAllSources(context, 0, 20), hasItem(QASourceMatcher.with(COAR_NOTIFY, 1L)));
 
-        assertThat(qaEventService.findAllTopicsBySource(COAR_NOTIFY, 0, 20), contains(
+        assertThat(qaEventService.findAllTopicsBySource(context, COAR_NOTIFY, 0, 20), contains(
             QATopicMatcher.with("ENRICH/MORE/REVIEW", 1L)));
 
     }

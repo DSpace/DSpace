@@ -79,7 +79,7 @@ public class QAEventRelatedRestController {
 
         Context context = ContextUtil.obtainCurrentRequestContext();
 
-        QAEvent qaevent = qaEventService.findEventByEventId(qaeventId);
+        QAEvent qaevent = qaEventService.findEventByEventId(context, qaeventId);
         if (qaevent == null) {
             throw new ResourceNotFoundException("No such qa event: " + qaeventId);
         }
@@ -122,7 +122,7 @@ public class QAEventRelatedRestController {
         throws SQLException, AuthorizeException, IOException {
 
         Context context = ContextUtil.obtainCurrentRequestContext();
-        QAEvent qaevent = qaEventService.findEventByEventId(qaeventId);
+        QAEvent qaevent = qaEventService.findEventByEventId(context, qaeventId);
 
         if (qaevent == null) {
             throw new ResourceNotFoundException("No such qa event: " + qaeventId);

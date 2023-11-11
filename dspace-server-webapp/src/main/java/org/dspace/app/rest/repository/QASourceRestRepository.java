@@ -35,9 +35,9 @@ public class QASourceRestRepository extends DSpaceRestRepository<QASourceRest, S
     private QAEventService qaEventService;
 
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasPermission(#id, 'QUALITYASSURANCESOURCE', 'READ')")
     public QASourceRest findOne(Context context, String id) {
-        QASource qaSource = qaEventService.findSource(id);
+        QASource qaSource = qaEventService.findSource(context, id);
         if (qaSource == null) {
             return null;
         }
@@ -45,21 +45,21 @@ public class QASourceRestRepository extends DSpaceRestRepository<QASourceRest, S
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public Page<QASourceRest> findAll(Context context, Pageable pageable) {
-        List<QASource> qaSources = qaEventService.findAllSources(pageable.getOffset(), pageable.getPageSize());
-        long count = qaEventService.countSources();
+        List<QASource> qaSources = qaEventService.findAllSources(context, pageable.getOffset(), pageable.getPageSize());
+        long count = qaEventService.countSources(context);
         return converter.toRestPage(qaSources, pageable, count, utils.obtainProjection());
     }
 
     @SearchRestMethod(name = "byTarget")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public Page<QASourceRest> findByTarget(Context context,
-        @Parameter(value = "target", required = true) UUID target,
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    public Page<QASourceRest> findByTarget(@Parameter(value = "target", required = true) UUID target,
         Pageable pageable) {
+        Context context = obtainContext();
         List<QASource> topics = qaEventService
-            .findAllSourcesByTarget(target, pageable.getOffset(), pageable.getPageSize());
-        long count = qaEventService.countSourcesByTarget(target);
+            .findAllSourcesByTarget(context, target, pageable.getOffset(), pageable.getPageSize());
+        long count = qaEventService.countSourcesByTarget(context, target);
         if (topics == null) {
             return null;
         }
