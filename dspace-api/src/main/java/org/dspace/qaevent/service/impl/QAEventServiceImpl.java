@@ -85,7 +85,7 @@ public class QAEventServiceImpl implements QAEventService {
     @Autowired
     private QAEventsDaoImpl qaEventsDao;
 
-    @Autowired
+    @Autowired(required = false)
     @Qualifier("qaAutomaticProcessingMap")
     private Map<String, QAEventAutomaticProcessingEvaluation> qaAutomaticProcessingMap;
 

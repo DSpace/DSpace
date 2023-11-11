@@ -10,9 +10,9 @@
             <map>
                 <entry key="coarnotify">
                     <list>
-                        <value>review</value>
-                        <value>endorsement</value>
-                        <value>ingest</value>
+                        <value>request-review</value>
+                        <value>request-endorsement</value>
+                        <value>request-ingest</value>
                     </list>
                 </entry>
             </map>
