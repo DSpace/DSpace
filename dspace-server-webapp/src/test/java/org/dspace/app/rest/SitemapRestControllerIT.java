@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static org.dspace.builder.ItemBuilder.createItem;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -16,6 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import javax.servlet.ServletException;
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.content.Collection;
@@ -38,10 +40,22 @@ public class SitemapRestControllerIT extends AbstractControllerIntegrationTest {
     @Autowired
     ConfigurationService configurationService;
 
+    @Autowired
+    ResourcePolicyService policyService;
+
     private final static String SITEMAPS_ENDPOINT = "sitemaps";
 
     private Item item1;
     private Item item2;
+    private Item itemRestricted;
+    private Item itemUndiscoverable;
+    private Item entityPublication;
+    private Item entityPublicationRestricted;
+    private Item entityPublicationUndiscoverable;
+    private Community community;
+    private Community communityRestricted;
+    private Collection collection;
+    private Collection collectionRestricted;
 
     @Before
     @Override
@@ -52,8 +66,16 @@ public class SitemapRestControllerIT extends AbstractControllerIntegrationTest {
 
         context.turnOffAuthorisationSystem();
 
-        Community community = CommunityBuilder.createCommunity(context).build();
-        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        community = CommunityBuilder.createCommunity(context).build();
+        communityRestricted = CommunityBuilder.createCommunity(context).build();
+        policyService.removeAllPolicies(context, communityRestricted);
+        collection = CollectionBuilder.createCollection(context, community).build();
+        collectionRestricted = CollectionBuilder.createCollection(context, community).build();
+        Collection publicationCollection = CollectionBuilder.createCollection(context, community)
+                .withEntityType("Publication")
+                .withName("Publication Collection").build();
+        policyService.removeAllPolicies(context, collectionRestricted);
+
         this.item1 = createItem(context, collection)
             .withTitle("Test 1")
             .withIssueDate("2010-10-17")
@@ -62,6 +84,30 @@ public class SitemapRestControllerIT extends AbstractControllerIntegrationTest {
             .withTitle("Test 2")
             .withIssueDate("2015-8-3")
             .build();
+        this.itemRestricted = createItem(context, collection)
+                .withTitle("Test 3")
+                .withIssueDate("2015-8-3")
+                .build();
+        policyService.removeAllPolicies(context, itemRestricted);
+        this.itemUndiscoverable = createItem(context, collection)
+                .withTitle("Test 4")
+                .withIssueDate("2015-8-3")
+                .makeUnDiscoverable()
+                .build();
+        this.entityPublication = createItem(context, publicationCollection)
+                .withTitle("Item Publication")
+                .withIssueDate("2015-8-3")
+                .build();
+        this.entityPublicationRestricted = createItem(context, publicationCollection)
+                .withTitle("Item Publication Restricted")
+                .withIssueDate("2015-8-3")
+                .build();
+        policyService.removeAllPolicies(context, entityPublicationRestricted);
+        this.entityPublicationUndiscoverable = createItem(context, publicationCollection)
+                .withTitle("Item Publication")
+                .withIssueDate("2015-8-3")
+                .makeUnDiscoverable()
+                .build();
 
         runDSpaceScript("generate-sitemaps");
 
@@ -127,9 +173,39 @@ public class SitemapRestControllerIT extends AbstractControllerIntegrationTest {
                                       .andReturn();
 
         String response = result.getResponse().getContentAsString();
+        // contains a link to communities: [dspace.ui.url]/communities/<uuid>
+        assertTrue(response
+                .contains(configurationService.getProperty("dspace.ui.url") + "/communities/" + community.getID()));
+        // contains a link to collections: [dspace.ui.url]/collections/<uuid>
+        assertTrue(response
+                .contains(configurationService.getProperty("dspace.ui.url") + "/collections/" + collection.getID()));
         // contains a link to items: [dspace.ui.url]/items/<uuid>
         assertTrue(response.contains(configurationService.getProperty("dspace.ui.url") + "/items/" + item1.getID()));
         assertTrue(response.contains(configurationService.getProperty("dspace.ui.url") + "/items/" + item2.getID()));
+        // contains proper link to entities items
+        assertTrue(response.contains(configurationService.getProperty("dspace.ui.url") + "/entities/publication/"
+                + entityPublication.getID()));
+        assertFalse(response
+                .contains(configurationService.getProperty("dspace.ui.url") + "/items/" + entityPublication.getID()));
+        // does not contain links to restricted content
+        assertFalse(response.contains(
+                configurationService.getProperty("dspace.ui.url") + "/communities/" + communityRestricted.getID()));
+        assertFalse(response.contains(
+                configurationService.getProperty("dspace.ui.url") + "/collections/" + collectionRestricted.getID()));
+        assertFalse(response
+                .contains(configurationService.getProperty("dspace.ui.url") + "/items/" + itemRestricted.getID()));
+        assertFalse(response.contains(configurationService.getProperty("dspace.ui.url") + "/entities/publication/"
+                + entityPublicationRestricted.getID()));
+        assertFalse(response.contains(
+                configurationService.getProperty("dspace.ui.url") + "/items/" + entityPublicationRestricted.getID()));
+        // does not contain links to undiscoverable content
+        assertFalse(response
+                .contains(configurationService.getProperty("dspace.ui.url") + "/items/" + itemUndiscoverable.getID()));
+        assertFalse(response.contains(configurationService.getProperty("dspace.ui.url") + "/entities/publication/"
+                + entityPublicationUndiscoverable.getID()));
+        assertFalse(response.contains(configurationService.getProperty("dspace.ui.url") + "/items/"
+                + entityPublicationUndiscoverable.getID()));
+
     }
 
     @Test
@@ -160,8 +236,37 @@ public class SitemapRestControllerIT extends AbstractControllerIntegrationTest {
                                       .andReturn();
 
         String response = result.getResponse().getContentAsString();
+        // contains a link to communities: [dspace.ui.url]/communities/<uuid>
+        assertTrue(response
+                .contains(configurationService.getProperty("dspace.ui.url") + "/communities/" + community.getID()));
+        // contains a link to collections: [dspace.ui.url]/collections/<uuid>
+        assertTrue(response
+                .contains(configurationService.getProperty("dspace.ui.url") + "/collections/" + collection.getID()));
         // contains a link to items: [dspace.ui.url]/items/<uuid>
         assertTrue(response.contains(configurationService.getProperty("dspace.ui.url") + "/items/" + item1.getID()));
         assertTrue(response.contains(configurationService.getProperty("dspace.ui.url") + "/items/" + item2.getID()));
+        // contains proper link to entities items
+        assertTrue(response.contains(configurationService.getProperty("dspace.ui.url") + "/entities/publication/"
+                + entityPublication.getID()));
+        assertFalse(response
+                .contains(configurationService.getProperty("dspace.ui.url") + "/items/" + entityPublication.getID()));
+        // does not contain links to restricted content
+        assertFalse(response.contains(
+                configurationService.getProperty("dspace.ui.url") + "/communities/" + communityRestricted.getID()));
+        assertFalse(response.contains(
+                configurationService.getProperty("dspace.ui.url") + "/collections/" + collectionRestricted.getID()));
+        assertFalse(response
+                .contains(configurationService.getProperty("dspace.ui.url") + "/items/" + itemRestricted.getID()));
+        assertFalse(response.contains(configurationService.getProperty("dspace.ui.url") + "/entities/publication/"
+                + entityPublicationRestricted.getID()));
+        assertFalse(response.contains(
+                configurationService.getProperty("dspace.ui.url") + "/items/" + entityPublicationRestricted.getID()));
+        // does not contain links to undiscoverable content
+        assertFalse(response
+                .contains(configurationService.getProperty("dspace.ui.url") + "/items/" + itemUndiscoverable.getID()));
+        assertFalse(response.contains(configurationService.getProperty("dspace.ui.url") + "/entities/publication/"
+                + entityPublicationUndiscoverable.getID()));
+        assertFalse(response.contains(configurationService.getProperty("dspace.ui.url") + "/items/"
+                + entityPublicationUndiscoverable.getID()));
     }
 }

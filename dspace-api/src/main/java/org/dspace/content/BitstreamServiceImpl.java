@@ -276,6 +276,11 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         //Remove our bitstream from all our bundles
         final List<Bundle> bundles = bitstream.getBundles();
         for (Bundle bundle : bundles) {
+            authorizeService.authorizeAction(context, bundle, Constants.REMOVE);
+            //We also need to remove the bitstream id when it's set as bundle's primary bitstream
+            if (bitstream.equals(bundle.getPrimaryBitstream())) {
+                bundle.unsetPrimaryBitstreamID();
+            }
             bundle.removeBitstream(bitstream);
         }
 
