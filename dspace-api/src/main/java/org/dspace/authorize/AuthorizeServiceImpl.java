@@ -451,7 +451,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         if (e == null) {
             return false; // anonymous users can't be admins....
         } else {
-            return groupService.isMember(c, e, Group.ADMIN);
+            return groupService.isMember(c, e, c.getAdminGroup());
         }
     }
 
