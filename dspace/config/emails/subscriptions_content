@@ -5,13 +5,13 @@
 #set($subject = "${config.get('dspace.name')} Subscriptions")
 This email is sent from ${config.get('dspace.name')} based on the chosen subscription preferences.
 
-#if ("$params[0]" != "")
+#if( not( "$params[0]" == "" ))
 Community Subscriptions:
 ------------------------
 List of changed items : ${params[0]}
 
 #end
-#if ("$params[1]" != "")
+#if( not( "$params[1]" == "" ))
 Collection Subscriptions:
 -------------------------
 List of changed items : ${params[1]}
