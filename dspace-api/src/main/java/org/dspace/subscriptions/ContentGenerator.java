@@ -75,7 +75,7 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
     }
 
     private String generateBodyMail(Context context, List<IndexableObject> indexableObjects) {
-        if (indexableObjects == null) {
+        if (indexableObjects == null || indexableObjects.isEmpty()) {
             return EMPTY;
         }
         try {
