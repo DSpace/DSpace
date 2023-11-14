@@ -57,14 +57,14 @@ public class ContentGenerator implements SubscriptionGenerator<IndexableObject> 
                 Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "subscriptions_content"));
                 email.addRecipient(ePerson.getEmail());
 
-                String bodyCommunitites = generateBodyMail(context, indexableComm);
+                String bodyCommunities = generateBodyMail(context, indexableComm);
                 String bodyCollections = generateBodyMail(context, indexableColl);
-                if (bodyCommunitites.equals(EMPTY) && bodyCollections.equals(EMPTY)) {
+                if (bodyCommunities.equals(EMPTY) && bodyCollections.equals(EMPTY)) {
                     log.debug("subscription(s) of eperson {} do(es) not match any new items: nothing to send" +
                             " - exit silently", ePerson::getID);
                     return;
                 }
-                email.addArgument(bodyCommunitites);
+                email.addArgument(bodyCommunities);
                 email.addArgument(bodyCollections);
                 email.send();
             }
