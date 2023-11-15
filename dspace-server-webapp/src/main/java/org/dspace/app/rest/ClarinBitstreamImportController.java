@@ -127,11 +127,10 @@ public class ClarinBitstreamImportController {
                 log.info("SequenceId is null. Bitstream UUID: " + bitstream.getID());
             }
             //add bitstream format
-            String bitstreamFormatIdString = request.getParameter("bitstreamFormat");
-            Integer bitstreamFormatId = getIntegerFromString(bitstreamFormatIdString);
+            String bitstreamFormatMimeType = request.getParameter("bitstreamFormat");
             BitstreamFormat bitstreamFormat = null;
-            if (!Objects.isNull(bitstreamFormatId)) {
-                bitstreamFormat = bitstreamFormatService.find(context, bitstreamFormatId);
+            if (StringUtils.isNotBlank(bitstreamFormatMimeType)) {
+                bitstreamFormat = bitstreamFormatService.findByMIMEType(context, bitstreamFormatMimeType);
             }
             bitstream.setFormat(context, bitstreamFormat);
             String deletedString = request.getParameter("deleted");

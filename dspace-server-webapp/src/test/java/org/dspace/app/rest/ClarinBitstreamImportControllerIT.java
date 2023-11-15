@@ -95,7 +95,7 @@ public class ClarinBitstreamImportControllerIT extends AbstractEntityIntegration
                 .withName("TESTINGBUNDLE")
                 .build();
         token = getAuthToken(admin.getEmail(), password);
-        bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context).build();
+        bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context).withMimeType("application/pdf").build();
         String input = "Hello, World!";
         MockMultipartFile file = new MockMultipartFile("file", "hello.txt",
                 MediaType.TEXT_PLAIN_VALUE,
@@ -147,7 +147,7 @@ public class ClarinBitstreamImportControllerIT extends AbstractEntityIntegration
                         .contentType(contentType)
                         .param("internal_id", internalId)
                         .param("storeNumber", Integer.toString(storeNumber))
-                        .param("bitstreamFormat", Integer.toString(bitstreamFormat.getID()))
+                        .param("bitstreamFormat", bitstreamFormat.getMIMEType())
                         .param("deleted", Boolean.toString(deleted))
                         .param("sequenceId", Integer.toString(sequence))
                         .param("primaryBundle_id", "")
@@ -156,8 +156,8 @@ public class ClarinBitstreamImportControllerIT extends AbstractEntityIntegration
                         .andReturn().getResponse().getContentAsString(),
                 "$.id"));
 
-        checkCreatedBitstream(uuid, internalId, storeNumber, bitstreamFormat.getID(), sequence, deleted, sizeBytes,
-                checkSum);
+        checkCreatedBitstream(uuid, internalId, storeNumber, bitstreamFormat.getMIMEType(), sequence, deleted,
+                sizeBytes, checkSum);
 
         //clean all
         context.turnOffAuthorisationSystem();
@@ -182,7 +182,7 @@ public class ClarinBitstreamImportControllerIT extends AbstractEntityIntegration
                                 .contentType(contentType)
                                 .param("internal_id", internalId)
                                 .param("storeNumber", Integer.toString(storeNumber))
-                                .param("bitstreamFormat", Integer.toString(bitstreamFormat.getID()))
+                                .param("bitstreamFormat", bitstreamFormat.getMIMEType())
                                 .param("deleted", Boolean.toString(deleted))
                                 .param("sequenceId", Integer.toString(sequence))
                                 .param("primaryBundle_id", "")
@@ -191,8 +191,8 @@ public class ClarinBitstreamImportControllerIT extends AbstractEntityIntegration
                         .andReturn().getResponse().getContentAsString(),
                 "$.id"));
 
-        checkCreatedBitstream(uuid, internalId, storeNumber, bitstreamFormat.getID(), sequence, deleted, sizeBytes,
-                checkSum);
+        checkCreatedBitstream(uuid, internalId, storeNumber, bitstreamFormat.getMIMEType(), sequence, deleted,
+                sizeBytes, checkSum);
 
         //clean all
         context.turnOffAuthorisationSystem();
@@ -217,7 +217,7 @@ public class ClarinBitstreamImportControllerIT extends AbstractEntityIntegration
                                 .contentType(contentType)
                                 .param("internal_id", internalId)
                                 .param("storeNumber", Integer.toString(storeNumber))
-                                .param("bitstreamFormat", Integer.toString(bitstreamFormat.getID()))
+                                .param("bitstreamFormat", bitstreamFormat.getMIMEType())
                                 .param("deleted", Boolean.toString(deleted))
                                 .param("sequenceId", Integer.toString(sequence))
                                 .param("primaryBundle_id", bundle.getID().toString())
@@ -226,8 +226,8 @@ public class ClarinBitstreamImportControllerIT extends AbstractEntityIntegration
                         .andReturn().getResponse().getContentAsString(),
                 "$.id"));
 
-        checkCreatedBitstream(uuid, internalId, storeNumber, bitstreamFormat.getID(), sequence, deleted, sizeBytes,
-                checkSum);
+        checkCreatedBitstream(uuid, internalId, storeNumber, bitstreamFormat.getMIMEType(), sequence, deleted,
+                sizeBytes, checkSum);
         bundle = bundleService.find(context, bundle.getID());
         assertEquals(bundle.getPrimaryBitstream().getID(), bitstream.getID());
 
@@ -257,7 +257,7 @@ public class ClarinBitstreamImportControllerIT extends AbstractEntityIntegration
                         .contentType(contentType)
                         .param("internal_id", internalId)
                         .param("storeNumber", Integer.toString(storeNumber))
-                        .param("bitstreamFormat", Integer.toString(bitstreamFormat.getID()))
+                        .param("bitstreamFormat", bitstreamFormat.getMIMEType())
                         .param("deleted", Boolean.toString(deleted))
                         .param("sequenceId", Integer.toString(sequence))
                         .param("primaryBundle_id", "")
@@ -271,12 +271,12 @@ public class ClarinBitstreamImportControllerIT extends AbstractEntityIntegration
     }
 
     private void checkCreatedBitstream(UUID uuid, String internalId, int storeNumber,
-                                       Integer bitstreamFormat, int sequence, boolean deleted, long sizeBytes,
+                                       String bitstreamFormat, int sequence, boolean deleted, long sizeBytes,
                                        String checkSum) throws SQLException {
         bitstream = bitstreamService.find(context, uuid);
         assertEquals(bitstream.getChecksum(), checkSum);
         assertEquals(bitstream.getSizeBytes(), sizeBytes);
-        assertEquals(bitstream.getFormat(context).getID(), bitstreamFormat);
+        assertEquals(bitstream.getFormat(context).getMIMEType(), bitstreamFormat);
         assertEquals(bitstream.getInternalId(), internalId);
         assertEquals(bitstream.getStoreNumber(), storeNumber);
         assertEquals(bitstream.getSequenceID(), sequence);
