@@ -4,7 +4,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-parent</artifactId>
     <packaging>pom</packaging>
-    <version>7.6.1-SNAPSHOT</version>
+    <version>7.6.1</version>
     <name>DSpace Parent Project</name>
     <description>
    	DSpace open source software is a turnkey institutional repository application.
@@ -872,14 +872,14 @@
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>7.6.1-SNAPSHOT</version>
+                       <version>7.6.1</version>
                        <type>jar</type>
                        <classifier>classes</classifier>
                    </dependency>
                    <dependency>
                        <groupId>org.dspace</groupId>
                        <artifactId>dspace-rest</artifactId>
-                       <version>7.6.1-SNAPSHOT</version>
+                       <version>7.6.1</version>
                        <type>war</type>
                    </dependency>
                </dependencies>
@@ -1030,69 +1030,69 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
-                <version>7.6.1-SNAPSHOT</version>
+                <version>7.6.1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
                 <type>test-jar</type>
-                <version>7.6.1-SNAPSHOT</version>
+                <version>7.6.1</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>additions</artifactId>
-                <version>7.6.1-SNAPSHOT</version>
+                <version>7.6.1</version>
             </dependency>
 
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
-                <version>7.6.1-SNAPSHOT</version>
+                <version>7.6.1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-swordv2</artifactId>
-                <version>7.6.1-SNAPSHOT</version>
+                <version>7.6.1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
-                <version>7.6.1-SNAPSHOT</version>
+                <version>7.6.1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-services</artifactId>
-                <version>7.6.1-SNAPSHOT</version>
+                <version>7.6.1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
                 <type>test-jar</type>
-                <version>7.6.1-SNAPSHOT</version>
+                <version>7.6.1</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rdf</artifactId>
-                <version>7.6.1-SNAPSHOT</version>
+                <version>7.6.1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-iiif</artifactId>
-                <version>7.6.1-SNAPSHOT</version>
+                <version>7.6.1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>7.6.1-SNAPSHOT</version>
+                <version>7.6.1</version>
                 <type>jar</type>
                 <classifier>classes</classifier>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>7.6.1-SNAPSHOT</version>
+                <version>7.6.1</version>
                 <type>war</type>
             </dependency>
             <!-- DSpace API Localization Packages -->
@@ -1927,7 +1927,7 @@
         <connection>scm:git:git@github.com:DSpace/DSpace.git</connection>
         <developerConnection>scm:git:git@github.com:DSpace/DSpace.git</developerConnection>
         <url>git@github.com:DSpace/DSpace.git</url>
-        <tag>dspace-7_x</tag>
+        <tag>dspace-7.6.1</tag>
     </scm>
 
 
