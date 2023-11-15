@@ -60,6 +60,7 @@ public class QAEventConverter implements DSpaceConverter<QAEvent, QAEventRest> {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+        rest.setSource(modelObject.getSource());
         rest.setOriginalId(modelObject.getOriginalId());
         rest.setProjection(projection);
         rest.setTitle(modelObject.getTitle());

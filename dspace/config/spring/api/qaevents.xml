@@ -86,6 +86,24 @@
 	     </property>    
      </bean>
 
+    <bean id="org.dspace.qaevent.service.QAEventSecurityService" class="org.dspace.qaevent.service.impl.QAEventSecurityServiceImpl">
+        <property name="defaultSecurity">
+            <bean class="org.dspace.qaevent.security.AdministratorsOnlyQASecurity" />
+        </property>
+        <property name="qaSecurityConfiguration">
+            <map>
+                <entry key="coar-notify" value-ref="submitterQASecurity" />
+            </map>
+        </property>    
+    </bean>
+
+    <bean id="submitterQASecurity" class="org.dspace.qaevent.security.UserBasedFilterQASecurity">
+        <property name="filterTemplate">
+            <!-- we need to escape the { as it as a special meaning for the message format -->
+            <!-- argument {0} will be replaced with the uuid of the loggedin user -->
+            <value>'{'!join from=search.resourceid to=resource_uuid fromIndex=${solr.multicorePrefix}search}submitter_authority:{0}</value>
+        </property>    
+    </bean>
     <!-- 
         To configure rules to automatic process specific qaevent you must provide a qaAutomaticProcessingMap
         where the keys are the qaevent source provider name and the value is a reference to a 

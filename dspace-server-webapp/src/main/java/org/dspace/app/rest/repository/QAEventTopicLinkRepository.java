@@ -44,18 +44,18 @@ public class QAEventTopicLinkRepository extends AbstractDSpaceRestRepository imp
      * @param projection the projection object
      * @return the qa topic rest representation
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasPermission(#id, 'QUALITYASSURANCEEVENT', 'READ')")
     public QATopicRest getTopic(@Nullable HttpServletRequest request, String id, @Nullable Pageable pageable,
             Projection projection) {
         Context context = obtainContext();
-        QAEvent qaEvent = qaEventService.findEventByEventId(id);
+        QAEvent qaEvent = qaEventService.findEventByEventId(context, id);
         if (qaEvent == null) {
             throw new ResourceNotFoundException("No qa event with ID: " + id);
         }
         String source = qaEvent.getSource();
         String topicName = qaEvent.getTopic();
         QATopic topic = qaEventService
-                .findTopicBySourceAndNameAndTarget(source, topicName, null);
+                .findTopicBySourceAndNameAndTarget(context, source, topicName, null);
         if (topic == null) {
             throw new ResourceNotFoundException("No topic found with source: " + source + " topic: " + topicName);
         }

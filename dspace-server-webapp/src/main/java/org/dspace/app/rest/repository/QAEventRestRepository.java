@@ -57,9 +57,9 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
     private ResourcePatch<QAEvent> resourcePatch;
 
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasPermission(#id, 'QUALITYASSURANCEEVENT', 'READ')")
     public QAEventRest findOne(Context context, String id) {
-        QAEvent qaEvent = qaEventService.findEventByEventId(id);
+        QAEvent qaEvent = qaEventService.findEventByEventId(context, id);
         if (qaEvent == null) {
             // check if this request is part of a patch flow
             qaEvent = (QAEvent) requestService.getCurrentRequest().getAttribute("patchedNotificationEvent");
@@ -73,9 +73,10 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
     }
 
     @SearchRestMethod(name = "findByTopic")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public Page<QAEventRest> findByTopic(Context context, @Parameter(value = "topic", required = true) String topic,
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    public Page<QAEventRest> findByTopic(@Parameter(value = "topic", required = true) String topic,
         Pageable pageable) {
+        Context context = obtainContext();
         String[] topicIdSplitted = topic.split(":", 3);
         if (topicIdSplitted.length < 2) {
             return null;
@@ -85,9 +86,9 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
         UUID target = topicIdSplitted.length == 3 ? UUID.fromString(topicIdSplitted[2]) : null;
         List<QAEvent> qaEvents = null;
         long count = 0L;
-        qaEvents = qaEventService.findEventsByTopicAndPageAndTarget(sourceName, topicName,
+        qaEvents = qaEventService.findEventsByTopicAndPageAndTarget(context, sourceName, topicName,
             pageable.getOffset(), pageable.getPageSize(), target);
-        count = qaEventService.countEventsByTopicAndTarget(sourceName, topicName, target);
+        count = qaEventService.countEventsByTopicAndTarget(context, sourceName, topicName, target);
         if (qaEvents == null) {
             return null;
         }
@@ -95,6 +96,7 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'QUALITYASSURANCEEVENT', 'DELETE')")
     protected void delete(Context context, String eventId) throws AuthorizeException {
         Item item = findTargetItem(context, eventId);
         EPerson eperson = context.getCurrentUser();
@@ -108,15 +110,15 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasPermission(#id, 'QUALITYASSURANCEEVENT', 'WRITE')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model,
         String id, Patch patch) throws SQLException, AuthorizeException {
-        QAEvent qaEvent = qaEventService.findEventByEventId(id);
+        QAEvent qaEvent = qaEventService.findEventByEventId(context, id);
         resourcePatch.patch(context, qaEvent, patch.getOperations());
     }
 
     private Item findTargetItem(Context context, String eventId) {
-        QAEvent qaEvent = qaEventService.findEventByEventId(eventId);
+        QAEvent qaEvent = qaEventService.findEventByEventId(context, eventId);
         if (qaEvent == null) {
             return null;
         }

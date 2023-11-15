@@ -118,9 +118,10 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
 
         ldnMessageService.extractAndProcessMessageFromQueue(context);
 
-        assertThat(qaEventService.findAllSources(0, 20), hasItem(QASourceMatcher.with(COAR_NOTIFY_SOURCE, 1L)));
+        assertThat(qaEventService.findAllSources(context, 0, 20),
+            hasItem(QASourceMatcher.with(COAR_NOTIFY_SOURCE, 1L)));
 
-        assertThat(qaEventService.findAllTopicsBySource(COAR_NOTIFY_SOURCE, 0, 20), hasItem(
+        assertThat(qaEventService.findAllTopicsBySource(context, COAR_NOTIFY_SOURCE, 0, 20), hasItem(
             QATopicMatcher.with("ENRICH/MORE/REVIEW", 1L)));
     }
 
