@@ -2,7 +2,7 @@
 ##
 ## See org.dspace.core.Email for information on the format of this file.
 ##
-#set($subject = "Welcome new registered ${config.get('dspace.name')} user!")
+#set($subject = "Welcome new registered ${config.get('dspace.shortname')} user!")
 Thank you for registering an account. Your new account can be used immediately
 to subscribe to notices of new content arriving in collections of your choice.
 
@@ -11,4 +11,4 @@ edit and/or approve submissions.
 
 If you need assistance with your account, please email ${config.get("mail.helpdesk")}.
 
-The ${config.get('dspace.name')} Team
+The ${config.get('dspace.shortname')} Team

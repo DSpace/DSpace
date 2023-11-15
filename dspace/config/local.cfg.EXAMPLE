@@ -58,6 +58,7 @@ dspace.ui.url = http://localhost:4000
 # Name of the site
 # UMD Customization
 dspace.name = Digital Repository at the University of Maryland (DRUM)
+dspace.shortname = DRUM
 # End UMD Customization
 
 # Assetstore configurations have moved to config/modules/assetstore.cfg

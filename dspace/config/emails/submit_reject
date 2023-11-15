@@ -6,7 +6,7 @@
 ## {3}  Reason for the rejection
 ## {4}  Link to 'My DSpace' page
 ##
-#set($subject = "${config.get('dspace.name')}: Submission Rejected")
+#set($subject = "${config.get('dspace.shortname')}: Submission Rejected")
 
 You submitted: ${params[0]}
 
@@ -19,4 +19,4 @@ ${params[3]}
 
 Your submission has not been deleted. You can access it from your "My${config.get('dspace.shortname')}" page: ${params[4]}
 
-The ${config.get('dspace.name')} Team
+The ${config.get('dspace.shortname')} Team

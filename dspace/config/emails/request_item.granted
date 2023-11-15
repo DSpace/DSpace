@@ -14,7 +14,7 @@ Dear ${params[0]}:
 Your request for a copy of the file(s) from the below document has been approved by ${params[3]}.  You may find the requested file(s) attached.
 
     ${params[2]}
-    ${params[1]} 
+    ${params[1]}
 #if( $params[5] )
 
 An additional message from ${params[3]} follows:
@@ -23,4 +23,4 @@ ${params[5]}
 #end
 
 Best regards,
-The ${config.get('dspace.name')} Team
+The ${config.get('dspace.shortname')} Team

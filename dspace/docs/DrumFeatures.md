@@ -54,6 +54,13 @@ for additional information
 * LIBDRUM-679 - Added "Embargo List" page for administrators reporting all the
   embargoed bitstreams, and enabling CSV download for administrators.
 
+## Email Templates
+
+The email templates in "dspace/config/emails" have been modified to use the
+"dspace.shortname" property, in place of the "dspace.name" property, as the
+DRUM "dspace.name" value is too long to comfortably fit in email "Subject"
+lines and signatures.
+
 ## Submissions
 
 * LIBDRUM-675 - For default submission workflow:
