@@ -39,6 +39,8 @@ import org.dspace.builder.ClarinLicenseResourceUserAllowanceBuilder;
 import org.dspace.builder.ClarinUserRegistrationBuilder;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
+import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
@@ -52,6 +54,11 @@ import org.dspace.content.clarin.ClarinUserRegistration;
 import org.dspace.content.service.clarin.ClarinLicenseLabelService;
 import org.dspace.content.service.clarin.ClarinLicenseResourceMappingService;
 import org.dspace.content.service.clarin.ClarinLicenseService;
+import org.dspace.core.Constants;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,8 +66,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class AuthorizationRestControllerIT extends AbstractControllerIntegrationTest {
 
-    private static final String CLARIN_LICENSE_NAME = "Test Clarin License";
-    private static final String TEXT_PLAIN_UTF_8 = "text/plain;charset=UTF-8";
+    public static final String CLARIN_LICENSE_NAME = "Test Clarin License";
+    public static final String TEXT_PLAIN_UTF_8 = "text/plain;charset=UTF-8";
 
     @Autowired
     ClarinLicenseService clarinLicenseService;
@@ -72,6 +79,8 @@ public class AuthorizationRestControllerIT extends AbstractControllerIntegration
     Item item;
     WorkspaceItem witem;
     ClarinLicense clarinLicense;
+    EPerson ePerson2;
+    String eperson2Password = "secret";
 
     @Before
     public void setup() throws Exception {
@@ -89,6 +98,19 @@ public class AuthorizationRestControllerIT extends AbstractControllerIntegration
         context.setCurrentUser(eperson);
         InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
 
+        // Create another person to try downloading the bitstream as anonymous user.
+        ePerson2 = EPersonBuilder.createEPerson(context)
+                .withCanLogin(true)
+                .withEmail("test@dtq.com")
+                .withPassword("secret")
+                .withNameInMetadata("Test", "User")
+                .build();
+
+        // The new user is not added into anonymous group by default
+        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+        Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
+        groupService.addMember(context, anonymousGroup, ePerson2);
+
         witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                 .withTitle("Test WorkspaceItem")
                 .withIssueDate("2017-10-17")
@@ -96,9 +118,16 @@ public class AuthorizationRestControllerIT extends AbstractControllerIntegration
                 .build();
 
         item = witem.getItem();
+        Bitstream bitstream = item.getBundles().get(0).getBitstreams().get(0);
+
+        // Create resource policy to allow anonymous user download the bitstream
+        ResourcePolicyBuilder.createResourcePolicy(context).withUser(ePerson2)
+                .withAction(Constants.READ)
+                .withGroup(anonymousGroup)
+                .withDspaceObject(bitstream).build();
 
         // Create clarin license with clarin license label
-        clarinLicense = createClarinLicense(CLARIN_LICENSE_NAME, "Test Def", "Test R Info", 1);
+        clarinLicense = createClarinLicense(CLARIN_LICENSE_NAME, "Test Def", "Test R Info", 3);
         context.restoreAuthSystemState();
     }
 
@@ -118,12 +147,12 @@ public class AuthorizationRestControllerIT extends AbstractControllerIntegration
     // DownloadTokenExpiredException, 401
     @Test
     public void shouldNotAuthorizeUserByWrongToken() throws Exception {
-        // Admin is not the submitter.
-        String authTokenAdmin = getAuthToken(admin.getEmail(), password);
+        // The user is not submitter.
+        String authTokenUser = getAuthToken(ePerson2.getEmail(), eperson2Password);
 
         // Load bitstream from the item.
         Bitstream bitstream = item.getBundles().get(0).getBitstreams().get(0);
-        getClient(authTokenAdmin).perform(get("/api/authrn/" +
+        getClient(authTokenUser).perform(get("/api/authrn/" +
                         bitstream.getID().toString() + "?dtoken=wrongToken"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(status().reason(is(Matchers.is(DownloadTokenExpiredException.NAME))));
@@ -192,10 +221,10 @@ public class AuthorizationRestControllerIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         Bitstream bitstream = witem.getItem().getBundles().get(0).getBitstreams().get(0);
-        // Admin is not the submitter
-        String authTokenAdmin = getAuthToken(admin.getEmail(), password);
-        // The admin should be authorized to download the bitstream with token
-        getClient(authTokenAdmin).perform(get("/api/authrn/" +
+        // The user is not submitter
+        String authTokenUser = getAuthToken(ePerson2.getEmail(), eperson2Password);
+        // The user should not be authorized to download the bitstream with expired token
+        getClient(authTokenUser).perform(get("/api/authrn/" +
                         bitstream.getID().toString() + "?dtoken=" + token))
                 .andExpect(status().isUnauthorized())
                 .andExpect(status().reason(is(Matchers.is(DownloadTokenExpiredException.NAME))));
@@ -254,8 +283,8 @@ public class AuthorizationRestControllerIT extends AbstractControllerIntegration
 
         Bitstream bitstream = witem.getItem().getBundles().get(0).getBitstreams().get(0);
         // Admin is not the submitter
-        String authTokenAdmin = getAuthToken(admin.getEmail(), password);
-        getClient(authTokenAdmin).perform(get("/api/authrn/" + bitstream.getID().toString()))
+        String eperson2Token = getAuthToken(ePerson2.getEmail(), eperson2Password);
+        getClient(eperson2Token).perform(get("/api/authrn/" + bitstream.getID().toString()))
                 .andExpect(status().isUnauthorized())
                 .andExpect(status().reason(is(Matchers.is(MissingLicenseAgreementException.NAME))));
     }
