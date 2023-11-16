@@ -35,12 +35,19 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.matcher.QASourceMatcher;
 import org.dspace.matcher.QATopicMatcher;
+import org.dspace.qaevent.QANotifyPatterns;
 import org.dspace.qaevent.service.QAEventService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+
+/**
+ * LDN Controller test class. Simulate receiving external LDN messages
+ * @author Francesco Bacchelli (francesco.bacchelli at 4science.it)
+ *
+ */
 
 public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
 
@@ -59,7 +66,6 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         Collection collection = CollectionBuilder.createCollection(context, community).build();
         Item item = ItemBuilder.createItem(context, collection).build();
         String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
-        String object_handle = item.getHandle();
         NotifyServiceEntity notifyServiceEntity =
             NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
@@ -95,7 +101,6 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         Item item = ItemBuilder.createItem(context, collection).build();
         InputStream announceReviewStream = getClass().getResourceAsStream("ldn_announce_review.json");
         String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
-        String object_handle = item.getHandle();
         NotifyServiceEntity notifyServiceEntity = NotifyServiceBuilder.createNotifyServiceBuilder(context)
                                 .withName("service name")
                                 .withDescription("service description")
@@ -122,7 +127,8 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
             hasItem(QASourceMatcher.with(COAR_NOTIFY_SOURCE, 1L)));
 
         assertThat(qaEventService.findAllTopicsBySource(context, COAR_NOTIFY_SOURCE, 0, 20), hasItem(
-            QATopicMatcher.with("ENRICH/MORE/REVIEW", 1L)));
+            QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MORE_REVIEW, 1L)));
+
     }
 
     @Test
