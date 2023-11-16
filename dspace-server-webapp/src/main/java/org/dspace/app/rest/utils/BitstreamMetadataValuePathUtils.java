@@ -12,6 +12,9 @@ import org.dspace.app.rest.submit.step.UploadStep;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.submit.model.UploadConfiguration;
+import org.dspace.submit.model.UploadConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Utils class offering methods to validate patch operations for bitstream metadata in the submission
@@ -21,6 +24,9 @@ import org.dspace.app.util.DCInputsReaderException;
 public class BitstreamMetadataValuePathUtils {
 
     private DCInputsReader inputReader;
+
+    @Autowired
+    UploadConfigurationService uploadConfigurationService;
 
     BitstreamMetadataValuePathUtils() throws DCInputsReaderException {
         inputReader = new DCInputsReader();
@@ -36,13 +42,14 @@ public class BitstreamMetadataValuePathUtils {
      * @throws UnprocessableEntityException if the path is invalid
      */
     public void validate(String absolutePath) throws DCInputsReaderException {
+        UploadConfiguration uploadService = uploadConfigurationService.getMap().get(UploadStep.UPLOAD_STEP_ID);
+        DCInputSet inputConfig = inputReader.getInputsByFormName(uploadService.getMetadata());
         String[] split = absolutePath.split("/");
-        DCInputSet inputConfig = inputReader.getInputsByFormName(UploadStep.UPLOAD_STEP_METADATA_SECTION);
         // according to the rest contract the absolute path must be something like files/:idx/metadata/dc.title
         if (split.length >= 4) {
             if (!inputConfig.isFieldPresent(split[3])) {
                 throw new UnprocessableEntityException("The field " + split[3] + " is not present in section "
-                                                                    + UploadStep.UPLOAD_STEP_METADATA_SECTION);
+                                                                    + UploadStep.UPLOAD_STEP_ID);
             }
         } else {
             throw new UnprocessableEntityException("The path " + absolutePath + " cannot be patched ");
