@@ -25,6 +25,7 @@ import org.dspace.builder.QAEventBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
+import org.dspace.qaevent.QANotifyPatterns;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -49,16 +50,16 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 2")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 3")
-                .withTopic("ENRICH/MORE/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MORE_PID)
                 .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"10.2307/2144302\"}").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 4")
-                .withTopic("ENRICH/MISSING/ABSTRACT")
+                .withTopic(org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT)
                 .withMessage(
                         "{\"abstracts[0]\": \"Descrizione delle caratteristiche...\"}")
                 .build();
@@ -78,16 +79,16 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 2")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 3")
-                .withTopic("ENRICH/MORE/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MORE_PID)
                 .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"10.2307/2144302\"}").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 4")
-                .withTopic("ENRICH/MISSING/ABSTRACT")
+                .withTopic(org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT)
                 .withMessage(
                         "{\"test\": \"Test...\"}")
                 .build();
@@ -101,13 +102,16 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/integration/qualityassurancetopics/openaire:ENRICH!MISSING!PID"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", QATopicMatcher.matchQATopicEntry("ENRICH/MISSING/PID", 2)));
+                .andExpect(jsonPath("$",
+                    QATopicMatcher.matchQATopicEntry(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID, 2)));
         getClient(authToken).perform(get("/api/integration/qualityassurancetopics/openaire:ENRICH!MISSING!ABSTRACT"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", QATopicMatcher.matchQATopicEntry("ENRICH/MISSING/ABSTRACT", 1)));
+                .andExpect(jsonPath("$",
+                    QATopicMatcher.matchQATopicEntry(QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 1)));
         getClient(authToken).perform(get("/api/integration/qualityassurancetopics/test-source:TOPIC!TEST"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", QATopicMatcher.matchQATopicEntry("test-source", "TOPIC/TEST", 1)));
+                .andExpect(jsonPath("$",
+                    QATopicMatcher.matchQATopicEntry("test-source", "TOPIC/TEST", 1)));
     }
 
     @Test
@@ -120,7 +124,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
         context.restoreAuthSystemState();
         String authToken = getAuthToken(admin.getEmail(), password);
@@ -144,7 +148,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-                .withTopic("ENRICH/MISSING/PID").build();
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID).build();
         context.restoreAuthSystemState();
         getClient().perform(get("/api/integration/qualityassurancetopics/openaire:ENRICH!MISSING!PID"))
                 .andExpect(status().isUnauthorized());
@@ -160,7 +164,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-                .withTopic("ENRICH/MISSING/PID").build();
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID).build();
         context.restoreAuthSystemState();
         String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken).perform(get("/api/integration/qualityassurancetopics/openaire:ENRICH!MISSING!PID"))
@@ -179,16 +183,16 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
             .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-            .withTopic("ENRICH/MISSING/PID")
+            .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
             .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 2")
-            .withTopic("ENRICH/MISSING/PID")
+            .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
             .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 3")
-            .withTopic("ENRICH/MORE/PID")
+            .withTopic(QANotifyPatterns.TOPIC_ENRICH_MORE_PID)
             .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"10.2307/2144302\"}").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 4")
-            .withTopic("ENRICH/MISSING/ABSTRACT")
+            .withTopic(org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT)
             .withMessage(
                 "{\"abstracts[0]\": \"Descrizione delle caratteristiche...\"}")
             .build();
@@ -211,9 +215,10 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$._embedded.qualityassurancetopics",
-                Matchers.containsInAnyOrder(QATopicMatcher.matchQATopicEntry("ENRICH/MISSING/PID", 2),
-                    QATopicMatcher.matchQATopicEntry("ENRICH/MISSING/ABSTRACT", 1),
-                    QATopicMatcher.matchQATopicEntry("ENRICH/MORE/PID", 1))))
+                Matchers.containsInAnyOrder(
+                    QATopicMatcher.matchQATopicEntry(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID, 2),
+                    QATopicMatcher.matchQATopicEntry(QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 1),
+                    QATopicMatcher.matchQATopicEntry(QANotifyPatterns.TOPIC_ENRICH_MORE_PID, 1))))
             .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(3)));
         getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/bySource")
             .param("source", "test-source"))
@@ -242,16 +247,16 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
         //create collection
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-            .withTopic("ENRICH/MISSING/PID")
+            .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
             .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 2")
-            .withTopic("ENRICH/MISSING/PID")
+            .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
             .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 3")
-            .withTopic("ENRICH/MORE/PID")
+            .withTopic(QANotifyPatterns.TOPIC_ENRICH_MORE_PID)
             .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"10.2307/2144302\"}").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 4")
-            .withTopic("ENRICH/MISSING/ABSTRACT")
+            .withTopic(org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT)
             .withMessage(
                 "{\"abstracts[0]\": \"Descrizione delle caratteristiche...\"}")
             .build();
@@ -301,7 +306,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
             .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-            .withTopic("ENRICH/MISSING/PID").build();
+            .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID).build();
         context.restoreAuthSystemState();
         getClient().perform(get("/api/integration/qualityassurancetopics/search/bySource")
             .param("source", "openaire"))
@@ -316,7 +321,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
             .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-            .withTopic("ENRICH/MISSING/PID").build();
+            .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID).build();
         context.restoreAuthSystemState();
         String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/bySource")
@@ -337,12 +342,12 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
         Item item1 = ItemBuilder.createItem(context, col1).withTitle("Science and Freedom").build();
         Item item2 = ItemBuilder.createItem(context, col1).withTitle("Science and Freedom 2").build();
         QAEventBuilder.createTarget(context, item1)
-            .withSource("openaire")
-            .withTopic("ENRICH/MISSING/PID")
+            .withSource(QAEvent.OPENAIRE_SOURCE)
+            .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
             .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
         QAEventBuilder.createTarget(context, item1)
-            .withSource("openaire")
-            .withTopic("ENRICH/MISSING/ABSTRACT")
+            .withSource(QAEvent.OPENAIRE_SOURCE)
+            .withTopic(org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT)
             .withMessage(
                 "{\"abstracts[0]\": \"Descrizione delle caratteristiche...\"}")
             .build();
@@ -355,24 +360,26 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
             .withSource("test-source")
             .build();
         QAEventBuilder.createTarget(context, item2)
-            .withTopic("ENRICH/MISSING/PID")
+            .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
             .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
         QAEventBuilder.createTarget(context, item2)
-            .withTopic("ENRICH/MISSING/PID")
+            .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
             .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"2144301\"}").build();
         context.restoreAuthSystemState();
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/byTarget")
                 .param("target", item1.getID().toString())
-                .param("source", "openaire"))
+                .param("source", QAEvent.OPENAIRE_SOURCE))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$._embedded.qualityassurancetopics",
                         Matchers.containsInAnyOrder(
-                                QATopicMatcher.matchQATopicEntry("openaire", "ENRICH/MISSING/PID",
+                                QATopicMatcher.matchQATopicEntry(QAEvent.OPENAIRE_SOURCE,
+                                    QANotifyPatterns.TOPIC_ENRICH_MISSING_PID,
                                         item1.getID().toString(), 1),
-                                QATopicMatcher.matchQATopicEntry("openaire", "ENRICH/MISSING/ABSTRACT",
-                                        item1.getID().toString(), 1))))
+                                QATopicMatcher.matchQATopicEntry(QAEvent.OPENAIRE_SOURCE,
+                                    QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT,
+                                    item1.getID().toString(), 1))))
             .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(2)));
         getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/byTarget")
                 .param("target", item2.getID().toString())
@@ -381,12 +388,13 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$._embedded.qualityassurancetopics",
                     Matchers.containsInAnyOrder(
-                            QATopicMatcher.matchQATopicEntry("openaire", "ENRICH/MISSING/PID",
+                            QATopicMatcher.matchQATopicEntry(QAEvent.OPENAIRE_SOURCE,
+                                QANotifyPatterns.TOPIC_ENRICH_MISSING_PID,
                                     item2.getID().toString(), 2))))
             .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(1)));
         getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/byTarget")
             .param("target", UUID.randomUUID().toString())
-            .param("source", "openaire"))
+            .param("source", QAEvent.OPENAIRE_SOURCE))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$._embedded.qualityassurancetopics").doesNotExist())
@@ -410,10 +418,10 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         Item item1 = ItemBuilder.createItem(context, col1).withTitle("Science and Freedom").build();
         QAEventBuilder.createTarget(context, item1)
-            .withTopic("ENRICH/MISSING/PID").build();
+            .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID).build();
         context.restoreAuthSystemState();
         getClient().perform(get("/api/integration/qualityassurancetopics/search/byTarget")
-                .param("source", "openaire")
+                .param("source", QAEvent.OPENAIRE_SOURCE)
                 .param("target", item1.getID().toString()))
             .andExpect(status().isUnauthorized());
     }
@@ -427,7 +435,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         Item item1 = ItemBuilder.createItem(context, col1).withTitle("Science and Freedom").build();
         QAEventBuilder.createTarget(context, item1)
-            .withTopic("ENRICH/MISSING/PID").build();
+            .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID).build();
         context.restoreAuthSystemState();
         String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/byTarget")
@@ -446,7 +454,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
         Item item1 = ItemBuilder.createItem(context, col1).withTitle("Science and Freedom").build();
         QAEventBuilder.createTarget(context, item1)
             .withSource("test-source")
-            .withTopic("ENRICH/MISSING/PID").build();
+            .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID).build();
         context.restoreAuthSystemState();
         String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/byTarget")

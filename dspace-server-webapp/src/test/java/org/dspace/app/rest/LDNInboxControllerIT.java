@@ -36,6 +36,7 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.matcher.QASourceMatcher;
 import org.dspace.matcher.QATopicMatcher;
+import org.dspace.qaevent.QANotifyPatterns;
 import org.dspace.qaevent.service.QAEventService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
@@ -134,7 +135,7 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         assertThat(qaEventService.findAllSources(context, 0, 20), hasItem(QASourceMatcher.with(COAR_NOTIFY, 1L)));
 
         assertThat(qaEventService.findAllTopicsBySource(context, COAR_NOTIFY, 0, 20), contains(
-            QATopicMatcher.with("ENRICH/MORE/REVIEW", 1L)));
+            QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MORE_REVIEW, 1L)));
 
     }
 
