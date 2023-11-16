@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Date;
 
-import com.google.gson.Gson;
+import com.github.jsonldjava.utils.JsonUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.NotifyServiceEntity;
@@ -67,7 +67,6 @@ public class LDNCorrectionAction implements LDNAction {
                 message.setServiceId(notification.getOrigin().getId());
                 message.setServiceName(notification.getOrigin().getInbox());
             }
-            Gson gson = new Gson();
             BigDecimal score = getScore(context, notification);
             double doubleScoreValue = score != null ? score.doubleValue() : 0d;
             /* String fullHandleUrl = configurationService.getProperty("dspace.ui.url") + "/handle/"
@@ -75,7 +74,7 @@ public class LDNCorrectionAction implements LDNAction {
             qaEvent = new QAEvent(QAEvent.COAR_NOTIFY_SOURCE,
                 handleService.findHandle(context, item), item.getID().toString(), itemName,
                 this.getQaEventTopic(), doubleScoreValue,
-                gson.toJson(message)
+                JsonUtils.toString(message)
                 , new Date());
             qaEventService.store(context, qaEvent);
             result = ActionStatus.CONTINUE;
