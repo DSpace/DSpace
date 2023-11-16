@@ -11,7 +11,7 @@
 ##             8 corresponding author email
 ##             9 configuration property "dspace.name"
 ##             10 configuration property "mail.helpdesk"
-#set($subject = "${config.get('dspace.name')}: Request copy of document")
+#set($subject = "${config.get('dspace.shortname')}: Request copy of document")
 
 Dear ${params[7]},
 
@@ -29,4 +29,4 @@ IF YOU ARE AN AUTHOR OF THE REQUESTED DOCUMENT, thank you for your cooperation!
 
 If you have any questions concerning this request, please contact ${params[10]}.
 
-The ${config.get('dspace.name')} Team
+The ${config.get('dspace.shortname')} Team

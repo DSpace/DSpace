@@ -47,12 +47,19 @@ for additional information
 
 * LIBDRUM-678 - ETD Embargo Policies
   * ETD embargo policies for date-based and "forever" embargoes
-  * Embargoed files are marked as "Restriced Access" in the GUI
+  * Embargoed files are marked as "Restricted Access" in the GUI
   * Restricted access page some different messages based on date-based
     and "forever" embargoes.
 
 * LIBDRUM-679 - Added "Embargo List" page for administrators reporting all the
   embargoed bitstreams, and enabling CSV download for administrators.
+
+## Email Templates
+
+The email templates in "dspace/config/emails" have been modified to use the
+"dspace.shortname" property, in place of the "dspace.name" property, as the
+DRUM "dspace.name" value is too long to comfortably fit in email "Subject"
+lines and signatures.
 
 ## Submissions
 
@@ -78,17 +85,17 @@ for additional information
 * LIBDRUM-682:
   * Modified submission form fields based on item type of "Dataset" or
     "Software"
-  * "Dataset" or "Sofware" items automatically mapped to "UMD Data Community"
+  * "Dataset" or "Software" items automatically mapped to "UMD Data Community"
 
 ## Minority Health and Health Equity Archive (MHHEA)
 
-* LIBDRUM-684 - Created custom workdfow and submission form for submissions to
+* LIBDRUM-684 - Created custom workflow and submission form for submissions to
   the MHHEA group
 * See also LIBDRUM-728
 
 ## Community Groups
 
-* LIBDRUM-664 - Enable communities to orgranized to groups (i.e.,
+* LIBDRUM-664 - Enable communities to organized to groups (i.e.,
   "UM Community", "Faculty (UM Department)", "UM Libraries").
 * See also LIBDRUM-701
 
@@ -109,14 +116,14 @@ information.
 
 * General UI Changes
   * LIBDRUM-654 - Standard UMD header banner added
-  * LIBDRUM-655 - SSDR-standard Envirnoment Banners added for non-production servers
+  * LIBDRUM-655 - SSDR-standard Environment Banners added for non-production servers
   * LIBDRUM-659 - Custom "DRUM" theme
   * LIBDRUM-745 - Page Footer modifications
   * LIBDRUM-737 - Replaced "DSpace" text with "DRUM"
 * Home page modifications:
   * LIBDRUM-702 - Display community lists grouped by community groups
   * LIBDRUM-704 - Display "Recent Submissions" list
-* LIBDRUM-656 - Bitstream download count added on item pages, vieweable by any user (including
+* LIBDRUM-656 - Bitstream download count added on item pages, viewable by any user (including
   users that are not logged in).
 * LIBDRUM-658 - Following fields added to the "Simple" item view:
   * Citation: dc.identifier.citation
@@ -125,10 +132,10 @@ information.
   * LIBDRUM-740 - Fields/Labels displayed based on item type
 * LIBDRUM-685 - "Author" browse index only displays values from
   "contributor.author" index
-* LIBDRUM-698 - Standard DSpace "End User Agreement" is suppresed
+* LIBDRUM-698 - Standard DSpace "End User Agreement" is suppressed
 * LIBDRUM-735 - Default License Agreement for submissions was updated for DRUM
 * LIBDRUM-738 - "Statistics" navigation bar entry removed for non-administrators
-  * "No. of Downloads" for bitstreams displays for all (even anoynomous) users
+  * "No. of Downloads" for bitstreams displays for all (even anonymous) users
 * LIBDRUM-739 - "Has Files" removed from search options
 * LIBDRUM-746 - "Abstract" field modified to not preserve line breaks when
   displayed

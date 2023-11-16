@@ -280,11 +280,76 @@ as part of their operation. The development Docker images do not, by themselves,
 support running the DSpace scripts or sending emails.
 
 The following changes enable the DSpace scripts to be run in the "dspace"
-Docker container, with email being captured by the "MailHog" application, which
-is accessible at <http://localhost:8025/>.
+Docker container, with email being captured by the "MailHog" application.
 
 **Note:** After making the following changes, the "Dockerfile.dev-base" and
 "Dockerfile.dev-additions" Docker images need to be rebuilt.
+
+### Dockerfile.dev-additions
+
+Add the following lines to the "Dockerfile.dev-additions" file, just after the
+`FROM tomcat:9-jdk${JDK_VERSION}` line, to include the packages needed for the
+script and email functionality:
+
+```text
+FROM tomcat:9-jdk${JDK_VERSION}
+
+# Dependencies for email functionality
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+      csh \
+      postfix \
+      s-nail \
+      libgetopt-complete-perl \
+      libconfig-properties-perl \
+    && apt-get purge -y --auto-remove \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkfifo /var/spool/postfix/public/pickup
+# End Dependencies for email functionality
+```
+
+### docker-compose.yml
+
+Add the following lines to the "docker-compose.yml" file, in the "service"
+stanza, to enable the "MailHog" (<https://github.com/mailhog/MailHog>) SMTP
+capture tool as part of the Docker Compose stack:
+
+```yaml
+services:
+  ...
+  # MailHog SMTP Capture
+  mailhog:
+    container_name: mailhog
+    image: mailhog/mailhog:v1.0.1
+    networks:
+      dspacenet:
+    logging:
+      driver: 'none'  # disable saving logs
+    ports:
+      - 1025:1025 # smtp server
+      - 8025:8025 # web ui
+  # End MailHog SMTP Capture
+```
+
+### dspace/config/local.cfg
+
+Set the following values in the "dspace/config/local.cfg" file, replacing the
+existing values:
+
+```text
+mail.server = mailhog
+mail.server.port = 1025
+```
+
+### Running the MailHog application
+
+With the above changes, the MailHog application can be run using:
+
+```zsh
+$ docker compose -p d7 up mailhog
+```
+
+The MailHog application will be accessible at <http://localhost:8025/>.
 
 ## Testing File Download Counts
 
@@ -325,62 +390,6 @@ $ cp /tmp/dbip-city-lite.mmdb dspace/config/
 
 ```zsh
 usage-statistics.dbfile = /dspace/config/dbip-city-lite.mmdb
-```
-
-### Dockerfile.dev-additions
-
-Add the following lines to the "Dockerfile.dev-additions" file, just after the
-`FROM tomcat:9-jdk${JDK_VERSION}` line, to include the packages needed for the
-script and email functionality:
-
-```text
-FROM tomcat:9-jdk${JDK_VERSION}
-
-# Dependencies for email functionality
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y \
-      csh \
-      postfix \
-      s-nail \
-      libgetopt-complete-perl \
-      libconfig-properties-perl \
-    && apt-get purge -y --auto-remove \
-    && rm -rf /var/lib/apt/lists/* \
-    && mkfifo /var/spool/postfix/public/pickup
-# End Dependencies for email functionality
-```
-
-### docker-compose.yml
-
-Add the following lines to the "docker-compose.yml" file, in the "service"
-stanza, to enable the "MailHog" (<https://github.com/mailhog/MailHog>) SMTP
-capture tool as part of the Docker Compose stack:
-
-```yaml
-service:
-  ...
-  # MailHog SMTP Capture
-  mailhog:
-    container_name: mailhog
-    image: mailhog/mailhog:v1.0.1
-    networks:
-      dspacenet:
-    logging:
-      driver: 'none'  # disable saving logs
-    ports:
-      - 1025:1025 # smtp server
-      - 8025:8025 # web ui
-  # End MailHog SMTP Capture
-```
-
-### dspace/config/local.cfg
-
-Set the following values in the "dspace/config/local.cfg" file, replacing the
-existing values:
-
-```text
-mail.server = mailhog
-mail.server.port = 1025
 ```
 
 ---

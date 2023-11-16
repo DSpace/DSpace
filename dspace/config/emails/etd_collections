@@ -1,5 +1,5 @@
 ## Email sent by DRUM when a mapped collection is not found
-#set($subject = 'DRUM: incoming etd is missing mapped collection(s)')
+#set($subject = "${config.get('dspace.shortname')}: incoming etd is missing mapped collection(s)")
 Unable to map DISS_inst_contact to additional collection(s).
 
 title:      ${params[0]}
