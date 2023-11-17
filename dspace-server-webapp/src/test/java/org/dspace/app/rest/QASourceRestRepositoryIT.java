@@ -135,10 +135,10 @@ public class QASourceRestRepositoryIT extends AbstractControllerIntegrationTest 
 
         createEvent("test-source", "TOPIC/TEST/1", "Title 4");
         createEvent("test-source", "TOPIC/TEST/1", "Title 5");
-        createEvent(QAEvent.COAR_NOTIFY, "TOPIC", "Title 7");
+        createEvent(QAEvent.COAR_NOTIFY_SOURCE, "TOPIC", "Title 7");
         context.setCurrentUser(eperson);
-        createEvent(QAEvent.COAR_NOTIFY, "TOPIC", "Title 8");
-        createEvent(QAEvent.COAR_NOTIFY, "TOPIC", "Title 9");
+        createEvent(QAEvent.COAR_NOTIFY_SOURCE, "TOPIC", "Title 8");
+        createEvent(QAEvent.COAR_NOTIFY_SOURCE, "TOPIC", "Title 9");
         context.setCurrentUser(null);
         context.restoreAuthSystemState();
 
@@ -228,9 +228,9 @@ public class QASourceRestRepositoryIT extends AbstractControllerIntegrationTest 
         context.setCurrentUser(eperson);
         Item target3 = ItemBuilder.createItem(context, col).withTitle("Test item3").build();
         context.setCurrentUser(null);
-        createEvent(QAEvent.COAR_NOTIFY, "TOPIC", target3);
-        createEvent(QAEvent.COAR_NOTIFY, "TOPIC2", target3);
-        createEvent(QAEvent.COAR_NOTIFY, "TOPIC", target2);
+        createEvent(QAEvent.COAR_NOTIFY_SOURCE, "TOPIC", target3);
+        createEvent(QAEvent.COAR_NOTIFY_SOURCE, "TOPIC2", target3);
+        createEvent(QAEvent.COAR_NOTIFY_SOURCE, "TOPIC", target2);
         context.restoreAuthSystemState();
 
         String authToken = getAuthToken(admin.getEmail(), password);
@@ -250,7 +250,7 @@ public class QASourceRestRepositoryIT extends AbstractControllerIntegrationTest 
                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.qualityassurancesources",
                         contains(
-                                matchQASourceEntry(QAEvent.COAR_NOTIFY + ":" + target2.getID().toString(), 1),
+                                matchQASourceEntry(QAEvent.COAR_NOTIFY_SOURCE + ":" + target2.getID().toString(), 1),
                                 matchQASourceEntry("test-source:" + target2.getID().toString(), 1))))
                 .andExpect(jsonPath("$.page.size", is(20)))
                 .andExpect(jsonPath("$.page.totalElements", is(2)));

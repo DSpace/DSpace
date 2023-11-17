@@ -88,7 +88,7 @@ public class LDNContextRepeater {
                 }
 
                 JsonNode contextArrayNode = topContextNode.get(repeatOver);
-                if (contextArrayNode.isNull()) {
+                if (contextArrayNode == null || contextArrayNode.isNull()) {
                     log.error("Notification context {} is not defined", repeatOver);
                     return;
                 }

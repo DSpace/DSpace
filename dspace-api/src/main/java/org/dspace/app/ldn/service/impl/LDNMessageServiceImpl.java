@@ -22,7 +22,6 @@ import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.LDNMessageEntity;
-import org.dspace.app.ldn.LDNQueueExtractor;
 import org.dspace.app.ldn.LDNRouter;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.dao.LDNMessageDao;
@@ -37,6 +36,7 @@ import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
+
 
 /**
  * Implementation of {@link LDNMessageService}
@@ -58,7 +58,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
     @Autowired(required = true)
     private LDNRouter ldnRouter;
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(LDNQueueExtractor.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(LDNMessageServiceImpl.class);
 
     protected LDNMessageServiceImpl() {
 
@@ -198,7 +198,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
                         update(context, msg);
                         ObjectMapper mapper = new ObjectMapper();
                         Notification notification = mapper.readValue(msg.getMessage(), Notification.class);
-                        processor.process(notification);
+                        processor.process(context, notification);
                         msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_PROCESSED);
                         result = 1;
                     } catch (JsonSyntaxException jse) {

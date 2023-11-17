@@ -24,7 +24,7 @@
             	<!--The key are the TOPIC, the value must be a valid implementation of the 
             		org.dspace.qaevent.QAEventAction interface -->
                <entry value-ref="ProjectLinkedEntityAction">
-                  <key><util:constant static-field="org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MORE_PROJECT"/></key>
+                  <key><util:constant static-field="org.dspace.qaevent.\.TOPIC_ENRICH_MORE_PROJECT"/></key>
                </entry>
                <entry value-ref="ProjectLinkedEntityAction">
                   <key><util:constant static-field="org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_PROJECT"/></key>
@@ -71,10 +71,10 @@
      <bean id="AbstractMetadataAction" class="org.dspace.qaevent.action.QAOpenaireSimpleMetadataAction">
         <property name="metadata" value="dc.description.abstract" />
      </bean>
-     <bean id="AddReviewMetadataAction" class="org.dspace.qaevent.action.QAOpenaireSimpleMetadataAction">
+     <bean id="AddReviewMetadataAction" class="org.dspace.qaevent.action.QANotifySimpleMetadataAction">
         <property name="metadata" value="datacite.relation.isReviewedBy" />
      </bean>
-     <bean id="AddEndorsedMetadataAction" class="org.dspace.qaevent.action.QAOpenaireSimpleMetadataAction">
+     <bean id="AddEndorsedMetadataAction" class="org.dspace.qaevent.action.QANotifySimpleMetadataAction">
         <property name="metadata" value="notify.relation.endorsedBy"/>
      </bean>
      <!-- Add a new identifier to the given item, using the defined types mapping -->
@@ -86,6 +86,15 @@
                <entry key="default" value="dc.identifier.other" />
                <!-- <entry key="doi" value="dc.identifier.doi" />
                <entry key="pmid" value="dc.identifier.pmid" /> -->
+	         </map>
+	     </property>    
+     </bean>
+
+     <bean id="RelationMetadataAction" class="org.dspace.qaevent.action.QANotifyMetadataMapAction">
+	     <property name="types">
+	         <map>
+               <entry key="default" value="datacite.relation.isReferencedBy" />
+               <entry key="http://purl.org/vocab/frbr/core#supplement" value="datacite.relation.isSupplementedBy" />
 	         </map>
 	     </property>    
      </bean>

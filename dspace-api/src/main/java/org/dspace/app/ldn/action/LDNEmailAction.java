@@ -24,7 +24,6 @@ import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.services.ConfigurationService;
-import org.dspace.web.ContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -71,9 +70,7 @@ public class LDNEmailAction implements LDNAction {
      * @throws Exception
      */
     @Override
-    public ActionStatus execute(Notification notification, Item item) throws Exception {
-        Context context = ContextUtil.obtainCurrentRequestContext();
-
+    public ActionStatus execute(Context context, Notification notification, Item item) throws Exception {
         try {
             Locale supportedLocale = I18nUtil.getEPersonLocale(context.getCurrentUser());
             Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, actionSendEmailTextFile));

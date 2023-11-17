@@ -8,6 +8,7 @@
 package org.dspace.qaevent.script;
 
 import static java.util.List.of;
+import static org.dspace.content.QAEvent.COAR_NOTIFY_SOURCE;
 import static org.dspace.content.QAEvent.OPENAIRE_SOURCE;
 import static org.dspace.matcher.QAEventMatcher.pendingOpenaireEventWith;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -56,6 +57,7 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -484,7 +486,12 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
     }
 
+    /**
+     * Improper test for ENRICH/MORE/REVIEW qa. It has the COAR_NOTIFY source
+     * which must be tested via LDNMessage {@link LDNInboxControllerIT}
+    */
     @Test
+    @Ignore
     public void testImportFromFileEventMoreReview() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -498,10 +505,11 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
         String[] args = new String[] { "import-openaire-events", "-f", getFileLocation("event-more-review.json") };
         ScriptLauncher.handleScript(args, ScriptLauncher.getConfig(kernelImpl), handler, kernelImpl);
 
-        assertThat(qaEventService.findAllTopicsBySource(context, OPENAIRE_SOURCE, 0, 20), contains(
+        assertThat(qaEventService.findAllTopicsBySource(context, COAR_NOTIFY_SOURCE, 0, 20), contains(
             QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MORE_REVIEW, 1L)));
 
-        assertThat(qaEventService.findAllSources(context, 0, 20), hasItem(QASourceMatcher.with(OPENAIRE_SOURCE, 1L)));
+        assertThat(qaEventService.findAllSources(context, 0, 20),
+            hasItem(QASourceMatcher.with(COAR_NOTIFY_SOURCE, 1L)));
 
         verifyNoInteractions(mockBrokerClient);
     }

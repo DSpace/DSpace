@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
@@ -69,6 +70,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
  *
  */
 public class QAEventServiceImpl implements QAEventService {
+
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(QAEventServiceImpl.class);
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;
@@ -649,7 +652,7 @@ public class QAEventServiceImpl implements QAEventService {
         if (startPosition != -1) {
             return originalId.substring(startPosition + 1, originalId.length());
         } else {
-            return null;
+            return originalId;
         }
     }
 
@@ -673,8 +676,8 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     private String[] getSupportedSources() {
-        return configurationService.getArrayProperty("qaevent.sources", new String[]
-            { QAEvent.OPENAIRE_SOURCE, QAEvent.COAR_NOTIFY });
+        return configurationService.getArrayProperty("qaevent.sources",
+            new String[] { QAEvent.OPENAIRE_SOURCE, QAEvent.COAR_NOTIFY_SOURCE });
     }
 
 }
