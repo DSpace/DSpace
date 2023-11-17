@@ -24,7 +24,7 @@
             	<!--The key are the TOPIC, the value must be a valid implementation of the 
             		org.dspace.qaevent.QAEventAction interface -->
                <entry value-ref="ProjectLinkedEntityAction">
-                  <key><util:constant static-field="org.dspace.qaevent.\.TOPIC_ENRICH_MORE_PROJECT"/></key>
+                  <key><util:constant static-field="org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MORE_PROJECT"/></key>
                </entry>
                <entry value-ref="ProjectLinkedEntityAction">
                   <key><util:constant static-field="org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_PROJECT"/></key>
