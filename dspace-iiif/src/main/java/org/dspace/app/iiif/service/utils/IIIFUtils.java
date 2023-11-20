@@ -12,6 +12,9 @@ import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_IMAGE_ELEMENT;
 import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_SCHEMA;
 import static org.dspace.iiif.util.IIIFSharedUtils.METADATA_IIIF_WIDTH_QUALIFIER;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +29,7 @@ import de.digitalcollections.iiif.model.sharedcanvas.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.iiif.model.ObjectMapperFactory;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
@@ -33,6 +37,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.iiif.IIIFApiQueryService;
 import org.dspace.iiif.util.IIIFSharedUtils;
@@ -455,6 +460,35 @@ public class IIIFUtils {
         return item.getMetadata().stream()
                 .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_CANVAS_NAMING))
                 .findFirst().map(m -> m.getValue()).orElse(defaultNaming);
+    }
+
+    /**
+     * Return an item's custom IIIF manifest from its IIIF_MANIFEST bundle or NULL
+     * if not present
+     * 
+     * TODO: Possibly cache this bitstream access, since it will be needed for
+     * all IIIF REST requests (get manifest, canvas, search, etc)
+     * 
+     * @param item DSpace item
+     * @param context DSpace context
+     * @return first bitstream in the item's IIIF_MANIFEST bundle or NULL
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
+     */
+    // Cacheable(key = "#item.getID().toString()", cacheNames = "manifestbitstream")
+    public String getManifestBitstream(Item item, Context context) throws SQLException, IOException, AuthorizeException {
+        Bitstream manifestBitstream = bitstreamService.getFirstBitstream(item, Constants.IIIF_MANIFEST_BUNDLE_NAME);
+
+        if (manifestBitstream == null) {
+            return null;
+        }
+
+        try (InputStream inputStream = bitstreamService.retrieve(context, manifestBitstream)) {
+            String manifest = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            // Possibly do sanity-checks/validation before output here?
+            return manifest;
+        }
     }
 
 }

@@ -8,8 +8,6 @@
 package org.dspace.app.iiif.service;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,9 +28,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
-import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,9 +55,6 @@ public class ManifestService extends AbstractResourceService {
 
     @Autowired
     protected ItemService itemService;
-
-    @Autowired
-    protected BitstreamService bitstreamService;
 
     @Autowired
     CanvasService canvasService;
@@ -112,40 +105,24 @@ public class ManifestService extends AbstractResourceService {
     /**
      * Returns JSON manifest response for a DSpace item.
      * 
-     * Will retrieve the item's manifest bundle or generate a "default" manifest
-     * if the bundle isn't found.
+     * Will retrieve a customized manifest from the first bitstream in the
+     * item's manifest bundle or generate a "default" manifest if the bundle isn't found.
      *
      * @param item the DSpace Item
      * @param context the DSpace context
      * @return manifest as JSON
+     * @throws AuthorizeException
+     * @throws IOExpcetion
+     * @throws SQLException
      */
     public String getManifest(Item item, Context context) throws AuthorizeException, IOException, SQLException {
-        Bitstream manifestBitstream = getPrimaryOrFirstBitstream(item, Constants.IIIF_MANIFEST_BUNDLE_NAME);
+        String manifestFromBundle = utils.getManifestBitstream(item, context);
 
-        if (manifestBitstream == null) {
+        if (manifestFromBundle == null) {
             return createManifest(item, context);
         }
 
-        try (InputStream inputStream = bitstreamService.retrieve(context, manifestBitstream)) {
-            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-        }
-    }
-
-    private Bitstream getPrimaryOrFirstBitstream(Item item, String bundleName) throws SQLException {
-        List<Bundle> bundles = itemService.getBundles(item, bundleName);
-
-        if (bundles == null || bundles.isEmpty()) {
-            return null;
-        }
-
-        Bundle bundle = bundles.get(0);
-        Bitstream result = bundle.getPrimaryBitstream();
-
-        if (result == null && !bundle.getBitstreams().isEmpty()) {
-            result = bundle.getBitstreams().get(0);
-        }
-
-        return result;
+        return manifestFromBundle;
     }
 
     /**
