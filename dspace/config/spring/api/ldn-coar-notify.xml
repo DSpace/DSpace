@@ -25,7 +25,7 @@
     <bean class="org.dspace.app.ldn.LDNBusinessDelegate"></bean>
 
     <bean name="ldnRouter" class="org.dspace.app.ldn.LDNRouter">
-        <property name="processors">
+        <property name="incomingProcessors">
             <map key-type="java.util.Set" value-type="org.dspace.app.ldn.LDNProcessor">
                 <entry>
                     <key>
@@ -71,6 +71,37 @@
                         </set>
                     </key>
                     <ref bean="announceReleaseAction" />
+                </entry>
+            </map>
+        </property>
+        <property name="outcomingProcessors">
+            <map key-type="java.util.Set" value-type="org.dspace.app.ldn.LDNProcessor">
+                <entry>
+                    <key>
+                        <set>
+                            <value>Announce</value>
+                            <value>coar-notify:ReviewAction</value>
+                        </set>
+                    </key>
+                    <ref bean="outcomingAnnounceReviewAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Announce</value>
+                            <value>coar-notify:EndorsementAction</value>
+                        </set>
+                    </key>
+                    <ref bean="outcomingAnnounceEndorsementAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Announce</value>
+                            <value>coar-notify:IngestAction</value>
+                        </set>
+                    </key>
+                    <ref bean="outcomingAnnounceIngestAction" />
                 </entry>
             </map>
         </property>
@@ -265,6 +296,42 @@
                     <property name="actionSendFilter" value="william_welling@harvard.edu" />
                     <property name="actionSendEmailTextFile" value="coar_notify_released" />
                 </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="outcomingAnnounceReviewAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <!--                <bean class="org.dspace.app.ldn.action.LDNEmailAction">-->
+                <!--                    <property name="actionSendFilter" value="william_welling@harvard.edu" />-->
+                <!--                    <property name="actionSendEmailTextFile" value="coar_notify_reviewed" />-->
+                <!--                </bean>-->
+                <bean class="org.dspace.app.ldn.action.SendLDNMessageAction"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="outcomingAnnounceEndorsementAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <!--                <bean class="org.dspace.app.ldn.action.LDNEmailAction">-->
+                <!--                    <property name="actionSendFilter" value="william_welling@harvard.edu" />-->
+                <!--                    <property name="actionSendEmailTextFile" value="coar_notify_reviewed" />-->
+                <!--                </bean>-->
+                <bean class="org.dspace.app.ldn.action.SendLDNMessageAction"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="outcomingAnnounceIngestAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <!--                <bean class="org.dspace.app.ldn.action.LDNEmailAction">-->
+                <!--                    <property name="actionSendFilter" value="william_welling@harvard.edu" />-->
+                <!--                    <property name="actionSendEmailTextFile" value="coar_notify_reviewed" />-->
+                <!--                </bean>-->
+                <bean class="org.dspace.app.ldn.action.SendLDNMessageAction"/>
             </list>
         </property>
     </bean>

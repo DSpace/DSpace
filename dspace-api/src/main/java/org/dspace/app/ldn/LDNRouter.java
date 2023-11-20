@@ -21,7 +21,8 @@ import org.dspace.app.ldn.processor.LDNProcessor;
  */
 public class LDNRouter {
 
-    private Map<Set<String>, LDNProcessor> processors = new HashMap<>();
+    private Map<Set<String>, LDNProcessor> incomingProcessors = new HashMap<>();
+    private Map<Set<String>, LDNProcessor> outcomingProcessors = new HashMap<>();
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(LDNRouter.class);
 
     /**
@@ -41,26 +42,50 @@ public class LDNRouter {
         Set<String> ldnMessageTypeSet = new HashSet<String>();
         ldnMessageTypeSet.add(ldnMessage.getActivityStreamType());
         ldnMessageTypeSet.add(ldnMessage.getCoarNotifyType());
-        LDNProcessor processor = processors.get(ldnMessageTypeSet);
+
+        LDNProcessor processor = null;
+        if (ldnMessage.getTarget() == null) {
+            processor = incomingProcessors.get(ldnMessageTypeSet);
+        } else if (ldnMessage.getOrigin() == null) {
+            processor = outcomingProcessors.get(ldnMessageTypeSet);
+        }
+
         return processor;
     }
 
     /**
-     * Get all routes.
+     * Get all incoming routes.
      *
      * @return Map<Set<String>, LDNProcessor>
      */
-    public Map<Set<String>, LDNProcessor> getProcessors() {
-        return processors;
+    public Map<Set<String>, LDNProcessor> getIncomingProcessors() {
+        return incomingProcessors;
     }
 
     /**
-     * Set all routes.
+     * Set all incoming routes.
      *
-     * @param processors
+     * @param incomingProcessors
      */
-    public void setProcessors(Map<Set<String>, LDNProcessor> processors) {
-        this.processors = processors;
+    public void setIncomingProcessors(Map<Set<String>, LDNProcessor> incomingProcessors) {
+        this.incomingProcessors = incomingProcessors;
     }
 
+    /**
+     * Get all outcoming routes.
+     *
+     * @return Map<Set<String>, LDNProcessor>
+     */
+    public Map<Set<String>, LDNProcessor> getOutcomingProcessors() {
+        return outcomingProcessors;
+    }
+
+    /**
+     * Set all outcoming routes.
+     *
+     * @param outcomingProcessors
+     */
+    public void setOutcomingProcessors(Map<Set<String>, LDNProcessor> outcomingProcessors) {
+        this.outcomingProcessors = outcomingProcessors;
+    }
 }

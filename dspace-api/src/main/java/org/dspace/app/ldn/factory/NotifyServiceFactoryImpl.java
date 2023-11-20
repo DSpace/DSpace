@@ -7,6 +7,7 @@
  */
 package org.dspace.app.ldn.factory;
 
+import org.dspace.app.ldn.service.LDNMessageService;
 import org.dspace.app.ldn.service.NotifyPatternToTriggerService;
 import org.dspace.app.ldn.service.NotifyService;
 import org.dspace.app.ldn.service.NotifyServiceInboundPatternService;
@@ -29,6 +30,9 @@ public class NotifyServiceFactoryImpl extends NotifyServiceFactory {
     @Autowired(required = true)
     private NotifyPatternToTriggerService notifyPatternToTriggerService;
 
+    @Autowired(required = true)
+    private LDNMessageService ldnMessageService;
+
     @Override
     public NotifyService getNotifyService() {
         return notifyService;
@@ -42,6 +46,11 @@ public class NotifyServiceFactoryImpl extends NotifyServiceFactory {
     @Override
     public NotifyPatternToTriggerService getNotifyPatternToTriggerService() {
         return notifyPatternToTriggerService;
+    }
+
+    @Override
+    public LDNMessageService getLDNMessageService() {
+        return ldnMessageService;
     }
 
 }
