@@ -12,11 +12,11 @@ import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.ldn.model.ItemRequests;
+import org.dspace.app.ldn.model.NotifyRequestStatus;
 import org.dspace.app.ldn.service.LDNMessageService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.model.LDNItemRequestsRest;
+import org.dspace.app.rest.model.NotifyRequestStatusRest;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,22 +28,22 @@ import org.springframework.stereotype.Component;
  *
  * @author Francesco Bacchelli (francesco.bacchelli at 4science dot it)
  */
-@Component(LDNItemRequestsRest.CATEGORY + "." + LDNItemRequestsRest.NAME)
-public class LDNItemRequestsRestRepository extends DSpaceRestRepository<LDNItemRequestsRest, String> {
+@Component(NotifyRequestStatusRest.CATEGORY + "." + NotifyRequestStatusRest.NAME)
+public class NotifyRequestStatusRestRepository extends DSpaceRestRepository<NotifyRequestStatusRest, String> {
 
-    private static final Logger log = LogManager.getLogger(LDNItemRequestsRestRepository.class);
+    private static final Logger log = LogManager.getLogger(NotifyRequestStatusRestRepository.class);
 
     @Autowired
     private LDNMessageService ldnMessageService;
 
-    @SearchRestMethod(name = LDNItemRequestsRest.GET_ITEM_REQUESTS)
+    @SearchRestMethod(name = NotifyRequestStatusRest.GET_ITEM_REQUESTS)
     //@PreAuthorize("hasAuthority('AUTHENTICATED')")
-    public LDNItemRequestsRest findItemRequests(
+    public NotifyRequestStatusRest findItemRequests(
         @Parameter(value = "itemuuid", required = true) UUID itemUuid) {
 
         log.info("START findItemRequests looking for requests for item " + itemUuid);
         Context context = obtainContext();
-        ItemRequests resultRequests = new ItemRequests();
+        NotifyRequestStatus resultRequests = new NotifyRequestStatus();
         try {
             resultRequests = ldnMessageService.findRequestsByItemUUID(context, itemUuid);
         } catch (SQLException e) {
@@ -54,19 +54,19 @@ public class LDNItemRequestsRestRepository extends DSpaceRestRepository<LDNItemR
     }
 
     @Override
-    public LDNItemRequestsRest findOne(Context context, String id) {
+    public NotifyRequestStatusRest findOne(Context context, String id) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Page<LDNItemRequestsRest> findAll(Context context, Pageable pageable) {
+    public Page<NotifyRequestStatusRest> findAll(Context context, Pageable pageable) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Class<LDNItemRequestsRest> getDomainClass() {
+    public Class<NotifyRequestStatusRest> getDomainClass() {
         // TODO Auto-generated method stub
         return null;
     }

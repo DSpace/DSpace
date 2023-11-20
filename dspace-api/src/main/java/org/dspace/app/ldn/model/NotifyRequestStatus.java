@@ -27,39 +27,12 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * 
  * @author Francesco Bacchelli (francesco.bacchelli at 4science dot it)
  */
-public class ItemRequests extends Base {
+public class NotifyRequestStatus extends Base {
 
-    private ItemRequest endorsements;
-    private ItemRequest ingests;
-    private ItemRequest reviews;
     private UUID itemUuid;
 
-    public ItemRequests() {
+    public NotifyRequestStatus() {
         super();
-    }
-
-    public ItemRequest getEndorsements() {
-        return endorsements;
-    }
-
-    public void setEndorsements(ItemRequest endorsements) {
-        this.endorsements = endorsements;
-    }
-
-    public ItemRequest getIngests() {
-        return ingests;
-    }
-
-    public void setIngests(ItemRequest ingests) {
-        this.ingests = ingests;
-    }
-
-    public ItemRequest getReviews() {
-        return reviews;
-    }
-
-    public void setReviews(ItemRequest reviews) {
-        this.reviews = reviews;
     }
 
     public UUID getItemUuid() {
@@ -70,12 +43,6 @@ public class ItemRequests extends Base {
         this.itemUuid = itemUuid;
     }
 
-    public class ItemRequest {
-        Integer count;
-        Boolean accepted;
-        Boolean rejected;
-        Boolean tentative;
-    }
 }
 
 

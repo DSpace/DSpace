@@ -7,8 +7,8 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.dspace.app.ldn.model.ItemRequests;
-import org.dspace.app.rest.model.LDNItemRequestsRest;
+import org.dspace.app.ldn.model.NotifyRequestStatus;
+import org.dspace.app.rest.model.NotifyRequestStatusRest;
 import org.dspace.app.rest.projection.Projection;
 import org.springframework.stereotype.Component;
 
@@ -19,18 +19,18 @@ import org.springframework.stereotype.Component;
  * @author Francesco Bacchelli (francesco.bacchelli at 4science.it)
  */
 @Component
-public class LDNItemRequestsConverter  implements DSpaceConverter<ItemRequests, LDNItemRequestsRest> {
+public class NotifyRequestStatusConverter implements DSpaceConverter<NotifyRequestStatus, NotifyRequestStatusRest> {
 
     @Override
-    public LDNItemRequestsRest convert(ItemRequests modelObject, Projection projection) {
-        LDNItemRequestsRest result = new LDNItemRequestsRest();
+    public NotifyRequestStatusRest convert(NotifyRequestStatus modelObject, Projection projection) {
+        NotifyRequestStatusRest result = new NotifyRequestStatusRest();
         result.setItemuuid(modelObject.getItemUuid());
         return result;
     }
 
     @Override
-    public Class<ItemRequests> getModelClass() {
-        return ItemRequests.class;
+    public Class<NotifyRequestStatus> getModelClass() {
+        return NotifyRequestStatus.class;
     }
 
 }

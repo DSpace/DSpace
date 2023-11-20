@@ -26,9 +26,8 @@ import org.dspace.app.ldn.LDNRouter;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.dao.LDNMessageDao;
 import org.dspace.app.ldn.dao.NotifyServiceDao;
-import org.dspace.app.ldn.model.ItemRequests;
-import org.dspace.app.ldn.model.ItemRequests.ItemRequest;
 import org.dspace.app.ldn.model.Notification;
+import org.dspace.app.ldn.model.NotifyRequestStatus;
 import org.dspace.app.ldn.model.Service;
 import org.dspace.app.ldn.processor.LDNProcessor;
 import org.dspace.app.ldn.service.LDNMessageService;
@@ -272,11 +271,9 @@ public class LDNMessageServiceImpl implements LDNMessageService {
     }
 
     @Override
-    public ItemRequests findRequestsByItemUUID(Context context, UUID itemId) throws SQLException {
-        ItemRequests result = new ItemRequests();
+    public NotifyRequestStatus findRequestsByItemUUID(Context context, UUID itemId) throws SQLException {
+        NotifyRequestStatus result = new NotifyRequestStatus();
         result.setItemUuid(itemId);
-        ItemRequest ingests = result.getIngests();
-        result.setIngests(ingests);
         /* TODO SEARCH FOR LDN MESSAGES */
         return result;
     }

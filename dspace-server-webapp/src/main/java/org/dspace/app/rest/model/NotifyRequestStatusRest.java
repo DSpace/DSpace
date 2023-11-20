@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -19,47 +20,19 @@ import org.dspace.app.rest.RestResourceController;
  * @author Francesco Bacchelli (francesco.bacchelli at 4science dot it)
  */
 @JsonPropertyOrder(value = {
-    "itemuuid",
-    "endorsements",
-    "ingests",
-    "reviews"
+    "notifyStatus",
+    "itemuuid"
 })
-public class LDNItemRequestsRest extends BaseObjectRest<Integer>  {
+public class NotifyRequestStatusRest extends RestAddressableModel {
     public static final String CATEGORY = RestAddressableModel.LDN;
     public static final String NAME = "ldnitemservice";
     public static final String GET_ITEM_REQUESTS = "getItemRequests";
 
-    private ItemRequest endorsements;
-    private ItemRequest ingests;
-    private ItemRequest reviews;
+    private List<NotifyRequestsStatus> notifyStatus;
     private UUID itemuuid;
 
-    public LDNItemRequestsRest() {
+    public NotifyRequestStatusRest() {
         super();
-    }
-
-    public ItemRequest getEndorsements() {
-        return endorsements;
-    }
-
-    public void setEndorsements(ItemRequest endorsements) {
-        this.endorsements = endorsements;
-    }
-
-    public ItemRequest getIngests() {
-        return ingests;
-    }
-
-    public void setIngests(ItemRequest ingests) {
-        this.ingests = ingests;
-    }
-
-    public ItemRequest getReviews() {
-        return reviews;
-    }
-
-    public void setReviews(ItemRequest reviews) {
-        this.reviews = reviews;
     }
 
     public UUID getItemuuid() {
@@ -87,9 +60,12 @@ public class LDNItemRequestsRest extends BaseObjectRest<Integer>  {
 
 }
 
-class ItemRequest {
-    Integer count;
-    Boolean accepted;
-    Boolean rejected;
-    Boolean tentative;
+enum NotifyStatus {
+    REJECTED, ACCEPTED, REQUESTED
+}
+
+class NotifyRequestsStatus {
+    String serviceName;
+    String serviceUrl;
+    NotifyStatus status;
 }
