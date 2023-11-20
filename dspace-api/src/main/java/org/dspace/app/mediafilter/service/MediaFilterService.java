@@ -7,10 +7,12 @@
  */
 package org.dspace.app.mediafilter.service;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
 import org.dspace.app.mediafilter.FormatFilter;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -90,6 +92,22 @@ public interface MediaFilterService {
      */
     public boolean processBitstream(Context context, Item item, Bitstream source, FormatFilter formatFilter)
         throws Exception;
+
+    /**
+     * update resource polices of derivative bitstreams
+     * related to source bitstream.
+     * set derivative bitstreams to be publicly accessible or
+     * replace derivative bitstreams policies using
+     * the same in the source bitstream.
+     *
+     * @param context context
+     * @param item item containing bitstreams
+     * @param source source bitstream
+     * @throws SQLException If something goes wrong in the database
+     * @throws AuthorizeException if authorization error
+     */
+    public void updatePoliciesOfDerivativeBitstreams(Context context, Item item, Bitstream source)
+        throws SQLException, AuthorizeException;
 
     /**
      * Return the item that is currently being processed/filtered

@@ -3091,6 +3091,343 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     }
 
+    // Test of /groups/[uuid]/epersons pagination
+    @Test
+    public void epersonMemberPaginationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                                         .withEmail("test1@example.com")
+                                         .withNameInMetadata("Test1", "User")
+                                         .build();
+        EPerson eperson2 = EPersonBuilder.createEPerson(context)
+                                         .withEmail("test2@example.com")
+                                         .withNameInMetadata("Test2", "User")
+                                         .build();
+        EPerson eperson3 = EPersonBuilder.createEPerson(context)
+                                         .withEmail("test3@example.com")
+                                         .withNameInMetadata("Test3", "User")
+                                         .build();
+        EPerson eperson4 = EPersonBuilder.createEPerson(context)
+                                         .withEmail("test4@example.com")
+                                         .withNameInMetadata("Test4", "User")
+                                         .build();
+        EPerson eperson5 = EPersonBuilder.createEPerson(context)
+                                         .withEmail("test5@example.com")
+                                         .withNameInMetadata("Test5", "User")
+                                         .build();
+
+        Group group = GroupBuilder.createGroup(context)
+                                  .withName("Test group")
+                                  .addMember(eperson1)
+                                  .addMember(eperson2)
+                                  .addMember(eperson3)
+                                  .addMember(eperson4)
+                                  .addMember(eperson5)
+                                  .build();
+
+        context.restoreAuthSystemState();
+
+        String authTokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(authTokenAdmin).perform(get("/api/eperson/groups/" + group.getID() + "/epersons")
+                                              .param("page", "0")
+                                              .param("size", "2"))
+                                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$._embedded.epersons", Matchers.everyItem(
+                                     hasJsonPath("$.type", is("eperson")))
+                                 ))
+                                 .andExpect(jsonPath("$._embedded.epersons").value(Matchers.hasSize(2)))
+                                 .andExpect(jsonPath("$.page.size", is(2)))
+                                 .andExpect(jsonPath("$.page.number", is(0)))
+                                 .andExpect(jsonPath("$.page.totalPages", is(3)))
+                                 .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(authTokenAdmin).perform(get("/api/eperson/groups/" + group.getID() + "/epersons")
+                                              .param("page", "1")
+                                              .param("size", "2"))
+                                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$._embedded.epersons", Matchers.everyItem(
+                                     hasJsonPath("$.type", is("eperson")))
+                                 ))
+                                 .andExpect(jsonPath("$._embedded.epersons").value(Matchers.hasSize(2)))
+                                 .andExpect(jsonPath("$.page.size", is(2)))
+                                 .andExpect(jsonPath("$.page.number", is(1)))
+                                 .andExpect(jsonPath("$.page.totalPages", is(3)))
+                                 .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(authTokenAdmin).perform(get("/api/eperson/groups/" + group.getID() + "/epersons")
+                                              .param("page", "2")
+                                              .param("size", "2"))
+                                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$._embedded.epersons", Matchers.everyItem(
+                                     hasJsonPath("$.type", is("eperson")))
+                                 ))
+                                 .andExpect(jsonPath("$._embedded.epersons").value(Matchers.hasSize(1)))
+                                 .andExpect(jsonPath("$.page.size", is(2)))
+                                 .andExpect(jsonPath("$.page.number", is(2)))
+                                 .andExpect(jsonPath("$.page.totalPages", is(3)))
+                                 .andExpect(jsonPath("$.page.totalElements", is(5)));
+    }
+
+    // Test of /groups/[uuid]/subgroups pagination
+    @Test
+    public void subgroupPaginationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group group = GroupBuilder.createGroup(context)
+                                  .withName("Test group")
+                                  .build();
+
+        GroupBuilder.createGroup(context)
+                    .withParent(group)
+                    .withName("Test subgroup 1")
+                    .build();
+        GroupBuilder.createGroup(context)
+                    .withParent(group)
+                    .withName("Test subgroup 2")
+                    .build();
+        GroupBuilder.createGroup(context)
+                    .withParent(group)
+                    .withName("Test subgroup 3")
+                    .build();
+        GroupBuilder.createGroup(context)
+                    .withParent(group)
+                    .withName("Test subgroup 4")
+                    .build();
+        GroupBuilder.createGroup(context)
+                    .withParent(group)
+                    .withName("Test subgroup 5")
+                    .build();
+
+        context.restoreAuthSystemState();
+
+        String authTokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(authTokenAdmin).perform(get("/api/eperson/groups/" + group.getID() + "/subgroups")
+                                              .param("page", "0")
+                                              .param("size", "2"))
+                                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$._embedded.subgroups", Matchers.everyItem(
+                                     hasJsonPath("$.type", is("group")))
+                                 ))
+                                 .andExpect(jsonPath("$._embedded.subgroups").value(Matchers.hasSize(2)))
+                                 .andExpect(jsonPath("$.page.size", is(2)))
+                                 .andExpect(jsonPath("$.page.number", is(0)))
+                                 .andExpect(jsonPath("$.page.totalPages", is(3)))
+                                 .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(authTokenAdmin).perform(get("/api/eperson/groups/" + group.getID() + "/subgroups")
+                                              .param("page", "1")
+                                              .param("size", "2"))
+                                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$._embedded.subgroups", Matchers.everyItem(
+                                     hasJsonPath("$.type", is("group")))
+                                 ))
+                                 .andExpect(jsonPath("$._embedded.subgroups").value(Matchers.hasSize(2)))
+                                 .andExpect(jsonPath("$.page.size", is(2)))
+                                 .andExpect(jsonPath("$.page.number", is(1)))
+                                 .andExpect(jsonPath("$.page.totalPages", is(3)))
+                                 .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(authTokenAdmin).perform(get("/api/eperson/groups/" + group.getID() + "/subgroups")
+                                              .param("page", "2")
+                                              .param("size", "2"))
+                                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$._embedded.subgroups", Matchers.everyItem(
+                                     hasJsonPath("$.type", is("group")))
+                                 ))
+                                 .andExpect(jsonPath("$._embedded.subgroups").value(Matchers.hasSize(1)))
+                                 .andExpect(jsonPath("$.page.size", is(2)))
+                                 .andExpect(jsonPath("$.page.number", is(2)))
+                                 .andExpect(jsonPath("$.page.totalPages", is(3)))
+                                 .andExpect(jsonPath("$.page.totalElements", is(5)));
+    }
+
+    // Test of /groups/search/isNotMemberOf pagination
+    // NOTE: Additional tests of 'isNotMemberOf' search functionality can be found in GroupTest in 'dspace-api'
+    @Test
+    public void searchIsNotMemberOfPaginationTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        Group group = GroupBuilder.createGroup(context)
+                                  .withName("Test Parent group")
+                                  .build();
+        // Create two subgroups of main group. These SHOULD NOT be included in pagination
+        GroupBuilder.createGroup(context)
+                    .withParent(group)
+                    .withName("Test group 1")
+                    .build();
+        GroupBuilder.createGroup(context)
+                    .withParent(group)
+                    .withName("Test group 2")
+                    .build();
+
+        // Create five non-member groups. These SHOULD be included in pagination
+        GroupBuilder.createGroup(context)
+                    .withName("Test group 3")
+                    .build();
+        GroupBuilder.createGroup(context)
+                    .withName("Test group 4")
+                    .build();
+        GroupBuilder.createGroup(context)
+                    .withName("Test group 5")
+                    .build();
+        GroupBuilder.createGroup(context)
+                    .withName("Test group 6")
+                    .build();
+        GroupBuilder.createGroup(context)
+                    .withName("Test group 7")
+                    .build();
+
+        context.restoreAuthSystemState();
+
+        String authTokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(authTokenAdmin).perform(get("/api/eperson/groups/search/isNotMemberOf")
+                                              .param("group", group.getID().toString())
+                                              .param("query", "test group")
+                                              .param("page", "0")
+                                              .param("size", "2"))
+                                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$._embedded.groups", Matchers.everyItem(
+                                     hasJsonPath("$.type", is("group")))
+                                 ))
+                                 .andExpect(jsonPath("$._embedded.groups").value(Matchers.hasSize(2)))
+                                 .andExpect(jsonPath("$.page.size", is(2)))
+                                 .andExpect(jsonPath("$.page.number", is(0)))
+                                 .andExpect(jsonPath("$.page.totalPages", is(3)))
+                                 .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(authTokenAdmin).perform(get("/api/eperson/groups/search/isNotMemberOf")
+                                              .param("group", group.getID().toString())
+                                              .param("query", "test group")
+                                              .param("page", "1")
+                                              .param("size", "2"))
+                                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$._embedded.groups", Matchers.everyItem(
+                                     hasJsonPath("$.type", is("group")))
+                                 ))
+                                 .andExpect(jsonPath("$._embedded.groups").value(Matchers.hasSize(2)))
+                                 .andExpect(jsonPath("$.page.size", is(2)))
+                                 .andExpect(jsonPath("$.page.number", is(1)))
+                                 .andExpect(jsonPath("$.page.totalPages", is(3)))
+                                 .andExpect(jsonPath("$.page.totalElements", is(5)));
+
+        getClient(authTokenAdmin).perform(get("/api/eperson/groups/search/isNotMemberOf")
+                                              .param("group", group.getID().toString())
+                                              .param("query", "test group")
+                                              .param("page", "2")
+                                              .param("size", "2"))
+                                 .andExpect(status().isOk()).andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$._embedded.groups", Matchers.everyItem(
+                                     hasJsonPath("$.type", is("group")))
+                                 ))
+                                 .andExpect(jsonPath("$._embedded.groups").value(Matchers.hasSize(1)))
+                                 .andExpect(jsonPath("$.page.size", is(2)))
+                                 .andExpect(jsonPath("$.page.number", is(2)))
+                                 .andExpect(jsonPath("$.page.totalPages", is(3)))
+                                 .andExpect(jsonPath("$.page.totalElements", is(5)));
+    }
+
+    @Test
+    public void searchIsNotMemberOfByUUID() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create two groups which have no parent group
+        Group group1 = GroupBuilder.createGroup(context)
+                                  .withName("Test Parent group 1")
+                                  .build();
+
+        Group group2 = GroupBuilder.createGroup(context)
+                                  .withName("Test Parent group 2")
+                                  .build();
+
+        // Create a subgroup of parent group 1
+        Group group3 = GroupBuilder.createGroup(context)
+                                   .withParent(group1)
+                                   .withName("Test subgroup")
+                                   .build();
+        context.restoreAuthSystemState();
+
+        String authTokenAdmin = getAuthToken(admin.getEmail(), password);
+        // Search for UUID in a group that the subgroup already belongs to.  Should return ZERO results.
+        getClient(authTokenAdmin).perform(get("/api/eperson/groups/search/isNotMemberOf")
+                                              .param("group", group1.getID().toString())
+                                              .param("query", group3.getID().toString()))
+                                 .andExpect(status().isOk())
+                                 .andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        // Search for UUID in a group that the subgroup does NOT belong to.  Should return group via exact match
+        getClient(authTokenAdmin).perform(get("/api/eperson/groups/search/isNotMemberOf")
+                                              .param("group", group2.getID().toString())
+                                              .param("query", group3.getID().toString()))
+                                 .andExpect(status().isOk())
+                                 .andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$._embedded.groups", Matchers.contains(
+                                     GroupMatcher.matchGroupEntry(group3.getID(), group3.getName())
+                                 )))
+                                 .andExpect(jsonPath("$.page.totalElements", is(1)));
+
+        // Search for UUID of the group in the "group" param. Should return ZERO results, as "group" param is excluded
+        getClient(authTokenAdmin).perform(get("/api/eperson/groups/search/isNotMemberOf")
+                                              .param("group", group1.getID().toString())
+                                              .param("query", group1.getID().toString()))
+                                 .andExpect(status().isOk())
+                                 .andExpect(content().contentType(contentType))
+                                 .andExpect(jsonPath("$.page.totalElements", is(0)));
+    }
+
+    @Test
+    public void searchIsNotMemberOfUnauthorized() throws Exception {
+        // To avoid creating data, just use the Admin & Anon groups for this test
+        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
+
+        getClient().perform(get("/api/eperson/groups/search/isNotMemberOf")
+                                .param("query", anonGroup.getID().toString())
+                                .param("group", adminGroup.getID().toString()))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void searchIsNotMemberOfForbidden() throws Exception {
+        // To avoid creating data, just use the Admin & Anon groups for this test
+        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
+
+        String authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/groups/search/isNotMemberOf")
+                                         .param("query", anonGroup.getID().toString())
+                                         .param("group", adminGroup.getID().toString()))
+                            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void searchIsNotMemberOfMissingOrInvalidParameter() throws Exception {
+        // To avoid creating data, just use the Admin & Anon groups for this test
+        GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/groups/search/isNotMemberOf"))
+                            .andExpect(status().isBadRequest());
+
+        getClient(authToken).perform(get("/api/eperson/groups/search/isNotMemberOf")
+                                         .param("query", anonGroup.getID().toString()))
+                            .andExpect(status().isBadRequest());
+
+        getClient(authToken).perform(get("/api/eperson/groups/search/isNotMemberOf")
+                                         .param("group", adminGroup.getID().toString()))
+                            .andExpect(status().isBadRequest());
+
+        // Test invalid group UUID
+        getClient(authToken).perform(get("/api/eperson/groups/search/isNotMemberOf")
+                                         .param("query", anonGroup.getID().toString())
+                                         .param("group", "not-a-uuid"))
+                            .andExpect(status().isBadRequest());
+    }
+
     @Test
     public void commAdminAndColAdminCannotExploitItemReadGroupTest() throws Exception {
 

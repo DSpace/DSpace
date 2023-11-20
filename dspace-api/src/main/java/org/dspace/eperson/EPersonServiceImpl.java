@@ -47,6 +47,7 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
 import org.dspace.orcid.service.OrcidTokenService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.util.UUIDUtils;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
@@ -101,6 +102,8 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     protected VersionDAO versionDAO;
     @Autowired(required = true)
     protected ClaimedTaskService claimedTaskService;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
     @Autowired
     protected OrcidTokenService orcidTokenService;
 
@@ -111,6 +114,30 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     @Override
     public EPerson find(Context context, UUID id) throws SQLException {
         return ePersonDAO.findByID(context, EPerson.class, id);
+    }
+
+    /**
+     * Create a fake EPerson which can receive email.  Its address will be the
+     * value of "mail.admin", or "postmaster" if all else fails.
+     * @param c
+     * @return
+     * @throws SQLException
+     */
+    @Override
+    public EPerson getSystemEPerson(Context c)
+            throws SQLException {
+        String adminEmail = configurationService.getProperty("mail.admin");
+        if (null == adminEmail) {
+            adminEmail = "postmaster"; // Last-ditch attempt to send *somewhere*
+        }
+        EPerson systemEPerson = findByEmail(c, adminEmail);
+
+        if (null == systemEPerson) {
+            systemEPerson = new EPerson();
+            systemEPerson.setEmail(adminEmail);
+        }
+
+        return systemEPerson;
     }
 
     @Override
@@ -157,32 +184,98 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
     @Override
     public List<EPerson> search(Context context, String query, int offset, int limit) throws SQLException {
-        try {
-            List<EPerson> ePerson = new ArrayList<>();
-            EPerson person = find(context, UUID.fromString(query));
-            if (person != null) {
-                ePerson.add(person);
-            }
-            return ePerson;
-        } catch (IllegalArgumentException e) {
+        List<EPerson> ePersons = new ArrayList<>();
+        UUID uuid = UUIDUtils.fromString(query);
+        if (uuid == null) {
+            // Search by firstname & lastname (NOTE: email will also be included automatically)
             MetadataField firstNameField = metadataFieldService.findByElement(context, "eperson", "firstname", null);
             MetadataField lastNameField = metadataFieldService.findByElement(context, "eperson", "lastname", null);
             if (StringUtils.isBlank(query)) {
                 query = null;
             }
-            return ePersonDAO.search(context, query, Arrays.asList(firstNameField, lastNameField),
-                    Arrays.asList(firstNameField, lastNameField), offset, limit);
+            ePersons = ePersonDAO.search(context, query, Arrays.asList(firstNameField, lastNameField),
+                                         Arrays.asList(firstNameField, lastNameField), offset, limit);
+        } else {
+            // Search by UUID
+            EPerson person = find(context, uuid);
+            if (person != null) {
+                ePersons.add(person);
+            }
         }
+        return ePersons;
     }
 
     @Override
     public int searchResultCount(Context context, String query) throws SQLException {
-        MetadataField firstNameField = metadataFieldService.findByElement(context, "eperson", "firstname", null);
-        MetadataField lastNameField = metadataFieldService.findByElement(context, "eperson", "lastname", null);
-        if (StringUtils.isBlank(query)) {
-            query = null;
+        int result = 0;
+        UUID uuid = UUIDUtils.fromString(query);
+        if (uuid == null) {
+            // Count results found by firstname & lastname (email is also included automatically)
+            MetadataField firstNameField = metadataFieldService.findByElement(context, "eperson", "firstname", null);
+            MetadataField lastNameField = metadataFieldService.findByElement(context, "eperson", "lastname", null);
+            if (StringUtils.isBlank(query)) {
+                query = null;
+            }
+            result = ePersonDAO.searchResultCount(context, query, Arrays.asList(firstNameField, lastNameField));
+        } else {
+            // Search by UUID
+            EPerson person = find(context, uuid);
+            if (person != null) {
+                result = 1;
+            }
         }
-        return ePersonDAO.searchResultCount(context, query, Arrays.asList(firstNameField, lastNameField));
+        return result;
+    }
+
+    @Override
+    public List<EPerson> searchNonMembers(Context context, String query, Group excludeGroup, int offset, int limit)
+        throws SQLException {
+        List<EPerson> ePersons = new ArrayList<>();
+        UUID uuid = UUIDUtils.fromString(query);
+        if (uuid == null) {
+            // Search by firstname & lastname (NOTE: email will also be included automatically)
+            MetadataField firstNameField = metadataFieldService.findByElement(context, "eperson", "firstname", null);
+            MetadataField lastNameField = metadataFieldService.findByElement(context, "eperson", "lastname", null);
+            if (StringUtils.isBlank(query)) {
+                query = null;
+            }
+            ePersons = ePersonDAO.searchNotMember(context, query, Arrays.asList(firstNameField, lastNameField),
+                                                  excludeGroup, Arrays.asList(firstNameField, lastNameField),
+                                                  offset, limit);
+        } else {
+            // Search by UUID
+            EPerson person = find(context, uuid);
+            // Verify EPerson is NOT a member of the given excludeGroup before adding
+            if (person != null && !groupService.isDirectMember(excludeGroup, person)) {
+                ePersons.add(person);
+            }
+        }
+
+        return ePersons;
+    }
+
+    @Override
+    public int searchNonMembersCount(Context context, String query, Group excludeGroup) throws SQLException {
+        int result = 0;
+        UUID uuid = UUIDUtils.fromString(query);
+        if (uuid == null) {
+            // Count results found by firstname & lastname (email is also included automatically)
+            MetadataField firstNameField = metadataFieldService.findByElement(context, "eperson", "firstname", null);
+            MetadataField lastNameField = metadataFieldService.findByElement(context, "eperson", "lastname", null);
+            if (StringUtils.isBlank(query)) {
+                query = null;
+            }
+            result = ePersonDAO.searchNotMemberCount(context, query, Arrays.asList(firstNameField, lastNameField),
+                                                    excludeGroup);
+        } else {
+            // Search by UUID
+            EPerson person = find(context, uuid);
+            // Verify EPerson is NOT a member of the given excludeGroup before counting
+            if (person != null && !groupService.isDirectMember(excludeGroup, person)) {
+                result = 1;
+            }
+        }
+        return result;
     }
 
     @Override
@@ -278,10 +371,13 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
             throw new AuthorizeException(
                     "You must be an admin to delete an EPerson");
         }
+        // Get all workflow-related groups that the current EPerson belongs to
         Set<Group> workFlowGroups = getAllWorkFlowGroups(context, ePerson);
         for (Group group: workFlowGroups) {
-            List<EPerson> ePeople = groupService.allMembers(context, group);
-            if (ePeople.size() == 1 && ePeople.contains(ePerson)) {
+            // Get total number of unique EPerson objs who are a member of this group (or subgroup)
+            int totalMembers = groupService.countAllMembers(context, group);
+            // If only one EPerson is a member, then we cannot delete the last member of this group.
+            if (totalMembers == 1) {
                 throw new EmptyWorkflowGroupException(ePerson.getID(), group.getID());
             }
         }
@@ -540,11 +636,26 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
     @Override
     public List<EPerson> findByGroups(Context c, Set<Group> groups) throws SQLException {
+        return findByGroups(c, groups, -1, -1);
+    }
+
+    @Override
+    public List<EPerson> findByGroups(Context c, Set<Group> groups, int pageSize, int offset) throws SQLException {
         //Make sure we at least have one group, if not don't even bother searching.
         if (CollectionUtils.isNotEmpty(groups)) {
-            return ePersonDAO.findByGroups(c, groups);
+            return ePersonDAO.findByGroups(c, groups, pageSize, offset);
         } else {
             return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public int countByGroups(Context c, Set<Group> groups) throws SQLException {
+        //Make sure we at least have one group, if not don't even bother counting.
+        if (CollectionUtils.isNotEmpty(groups)) {
+            return ePersonDAO.countByGroups(c, groups);
+        } else {
+            return 0;
         }
     }
 

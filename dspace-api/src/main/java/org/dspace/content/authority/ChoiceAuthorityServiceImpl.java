@@ -15,7 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.DCInput;
@@ -23,14 +25,17 @@ import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionConfig;
-import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.content.Collection;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.core.Utils;
 import org.dspace.core.service.PluginService;
+import org.dspace.discovery.configuration.DiscoveryConfigurationService;
+import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.services.ConfigurationService;
+import org.dspace.submit.factory.SubmissionServiceFactory;
+import org.dspace.submit.service.SubmissionConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -80,13 +85,18 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     protected Map<String, Map<String, List<String>>> authoritiesFormDefinitions =
             new HashMap<String, Map<String, List<String>>>();
 
+    // Map of vocabulary authorities to and their index info equivalent
+    protected Map<String, DSpaceControlledVocabularyIndex> vocabularyIndexMap = new HashMap<>();
+
     // the item submission reader
-    private SubmissionConfigReader itemSubmissionConfigReader;
+    private SubmissionConfigService submissionConfigService;
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;
     @Autowired(required = true)
     protected PluginService pluginService;
+    @Autowired
+    private DiscoveryConfigurationService searchConfigurationService;
 
     final static String CHOICES_PLUGIN_PREFIX = "choices.plugin.";
     final static String CHOICES_PRESENTATION_PREFIX = "choices.presentation.";
@@ -126,7 +136,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     private synchronized void init() {
         if (!initialized) {
             try {
-                itemSubmissionConfigReader = new SubmissionConfigReader();
+                submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
             } catch (SubmissionConfigReaderException e) {
                 // the system is in an illegal state as the submission definition is not valid
                 throw new IllegalStateException("Error reading the item submission configuration: " + e.getMessage(),
@@ -231,7 +241,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
             // there is an authority configured for the metadata valid for some collections,
             // check if it is the requested collection
             Map<String, ChoiceAuthority> controllerFormDef = controllerFormDefinitions.get(fieldKey);
-            SubmissionConfig submissionConfig = itemSubmissionConfigReader
+            SubmissionConfig submissionConfig = submissionConfigService
                     .getSubmissionConfigByCollection(collection.getHandle());
             String submissionName = submissionConfig.getSubmissionName();
             // check if the requested collection has a submission definition that use an authority for the metadata
@@ -253,14 +263,14 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     }
 
     @Override
-    public void clearCache() {
+    public void clearCache() throws SubmissionConfigReaderException {
         controller.clear();
         authorities.clear();
         presentation.clear();
         closed.clear();
         controllerFormDefinitions.clear();
         authoritiesFormDefinitions.clear();
-        itemSubmissionConfigReader = null;
+        submissionConfigService.reload();
         initialized = false;
     }
 
@@ -310,7 +320,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
      */
     private void autoRegisterChoiceAuthorityFromInputReader() {
         try {
-            List<SubmissionConfig> submissionConfigs = itemSubmissionConfigReader
+            List<SubmissionConfig> submissionConfigs = submissionConfigService
                     .getAllSubmissionConfigs(Integer.MAX_VALUE, 0);
             DCInputsReader dcInputsReader = new DCInputsReader();
 
@@ -481,10 +491,11 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
         init();
         ChoiceAuthority ma = controller.get(fieldKey);
         if (ma == null && collection != null) {
-            SubmissionConfigReader configReader;
+            SubmissionConfigService configReaderService;
             try {
-                configReader = new SubmissionConfigReader();
-                SubmissionConfig submissionName = configReader.getSubmissionConfigByCollection(collection.getHandle());
+                configReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
+                SubmissionConfig submissionName = configReaderService
+                        .getSubmissionConfigByCollection(collection.getHandle());
                 ma = controllerFormDefinitions.get(fieldKey).get(submissionName.getSubmissionName());
             } catch (SubmissionConfigReaderException e) {
                 // the system is in an illegal state as the submission definition is not valid
@@ -539,5 +550,66 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     public Choice getParentChoice(String authorityName, String vocabularyId, String locale) {
         HierarchicalAuthority ma = (HierarchicalAuthority) getChoiceAuthorityByAuthorityName(authorityName);
         return ma.getParentChoice(authorityName, vocabularyId, locale);
+    }
+
+    @Override
+    public DSpaceControlledVocabularyIndex getVocabularyIndex(String nameVocab) {
+        if (this.vocabularyIndexMap.containsKey(nameVocab)) {
+            return this.vocabularyIndexMap.get(nameVocab);
+        } else {
+            init();
+            ChoiceAuthority source = this.getChoiceAuthorityByAuthorityName(nameVocab);
+            if (source != null && source instanceof DSpaceControlledVocabulary) {
+
+                // First, check if this vocabulary index is disabled
+                String[] vocabulariesDisabled = configurationService
+                    .getArrayProperty("webui.browse.vocabularies.disabled");
+                if (vocabulariesDisabled != null && ArrayUtils.contains(vocabulariesDisabled, nameVocab)) {
+                    // Discard this vocabulary browse index
+                    return null;
+                }
+
+                Set<String> metadataFields = new HashSet<>();
+                Map<String, List<String>> formsToFields = this.authoritiesFormDefinitions.get(nameVocab);
+                for (Map.Entry<String, List<String>> formToField : formsToFields.entrySet()) {
+                    metadataFields.addAll(formToField.getValue().stream().map(value ->
+                                    StringUtils.replace(value, "_", "."))
+                            .collect(Collectors.toList()));
+                }
+                DiscoverySearchFilterFacet matchingFacet = null;
+                for (DiscoverySearchFilterFacet facetConfig : searchConfigurationService.getAllFacetsConfig()) {
+                    boolean coversAllFieldsFromVocab = true;
+                    for (String fieldFromVocab: metadataFields) {
+                        boolean coversFieldFromVocab = false;
+                        for (String facetMdField: facetConfig.getMetadataFields()) {
+                            if (facetMdField.startsWith(fieldFromVocab)) {
+                                coversFieldFromVocab = true;
+                                break;
+                            }
+                        }
+                        if (!coversFieldFromVocab) {
+                            coversAllFieldsFromVocab = false;
+                            break;
+                        }
+                    }
+                    if (coversAllFieldsFromVocab) {
+                        matchingFacet = facetConfig;
+                        break;
+                    }
+                }
+
+                // If there is no matching facet, return null to ignore this vocabulary index
+                if (matchingFacet == null) {
+                    return null;
+                }
+
+                DSpaceControlledVocabularyIndex vocabularyIndex =
+                        new DSpaceControlledVocabularyIndex((DSpaceControlledVocabulary) source, metadataFields,
+                                matchingFacet);
+                this.vocabularyIndexMap.put(nameVocab, vocabularyIndex);
+                return vocabularyIndex;
+            }
+            return null;
+        }
     }
 }
