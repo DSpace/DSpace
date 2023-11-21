@@ -39,7 +39,6 @@ import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -70,9 +69,14 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
     private CorrectionTypeService correctionTypeService;
 
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
+    public Page<QAEventRest> findAll(Context context, Pageable pageable) {
+        throw new RepositoryMethodNotImplementedException(QAEventRest.NAME, "findAll");
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#id, 'QUALITYASSURANCEEVENT', 'READ')")
     public QAEventRest findOne(Context context, String id) {
-        QAEvent qaEvent = qaEventService.findEventByEventId(id);
+        QAEvent qaEvent = qaEventService.findEventByEventId(context, id);
         if (qaEvent == null) {
             // check if this request is part of a patch flow
             qaEvent = (QAEvent) requestService.getCurrentRequest().getAttribute("patchedNotificationEvent");
@@ -85,26 +89,26 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
         return converter.toRest(qaEvent, utils.obtainProjection());
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
     @SearchRestMethod(name = "findByTopic")
-    public Page<QAEventRest> findByTopic(Context context, @Parameter(value = "topic", required = true) String topic,
-        Pageable pageable) {
-        List<QAEvent> qaEvents = null;
-        long count = 0L;
-        boolean ascending = false;
-        if (pageable.getSort() != null && pageable.getSort().getOrderFor(ORDER_FIELD) != null) {
-            ascending = pageable.getSort().getOrderFor(ORDER_FIELD).getDirection() == Direction.ASC;
-        }
-        qaEvents = qaEventService.findEventsByTopicAndPage(topic,
-            pageable.getOffset(), pageable.getPageSize(), ORDER_FIELD, ascending);
-        count = qaEventService.countEventsByTopic(topic);
-        if (qaEvents == null) {
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    public Page<QAEventRest> findByTopic(@Parameter(value = "topic", required = true) String topic, Pageable pageable) {
+        Context context = obtainContext();
+        String[] topicIdSplitted = topic.split(":", 2);
+        if (topicIdSplitted.length != 2) {
             return null;
         }
+        String sourceName = topicIdSplitted[0];
+        String topicName = topicIdSplitted[1].replaceAll("!", "/");
+
+        List<QAEvent> qaEvents = qaEventService.findEventsByTopic(context, sourceName, topicName,
+                                                                  pageable.getOffset(),
+                                                                  pageable.getPageSize());
+        long count = qaEventService.countEventsByTopic(context, sourceName, topicName);
         return converter.toRestPage(qaEvents, pageable, count, utils.obtainProjection());
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'QUALITYASSURANCEEVENT', 'DELETE')")
     protected void delete(Context context, String eventId) throws AuthorizeException {
         Item item = findTargetItem(context, eventId);
         EPerson eperson = context.getCurrentUser();
@@ -113,20 +117,15 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
     }
 
     @Override
-    public Page<QAEventRest> findAll(Context context, Pageable pageable) {
-        throw new RepositoryMethodNotImplementedException(QAEventRest.NAME, "findAll");
-    }
-
-    @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasPermission(#id, 'QUALITYASSURANCEEVENT', 'WRITE')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model,
         String id, Patch patch) throws SQLException, AuthorizeException {
-        QAEvent qaEvent = qaEventService.findEventByEventId(id);
+        QAEvent qaEvent = qaEventService.findEventByEventId(context, id);
         resourcePatch.patch(context, qaEvent, patch.getOperations());
     }
 
     private Item findTargetItem(Context context, String eventId) {
-        QAEvent qaEvent = qaEventService.findEventByEventId(eventId);
+        QAEvent qaEvent = qaEventService.findEventByEventId(context, eventId);
         if (qaEvent == null) {
             return null;
         }

@@ -48,13 +48,13 @@ public class QAEventTargetLinkRepository extends AbstractDSpaceRestRepository im
      * @param id         the qa event id
      * @param pageable   the optional pageable
      * @param projection the projection object
-     * @return the item rest representation of the qa event target
+     * @return           the item rest representation of the qa event target
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasPermission(#id, 'QUALITYASSURANCEEVENT', 'READ')")
     public ItemRest getTarget(@Nullable HttpServletRequest request, String id, @Nullable Pageable pageable,
             Projection projection) {
         Context context = obtainContext();
-        QAEvent qaEvent = qaEventService.findEventByEventId(id);
+        QAEvent qaEvent = qaEventService.findEventByEventId(context, id);
         if (qaEvent == null) {
             throw new ResourceNotFoundException("No qa event with ID: " + id);
         }

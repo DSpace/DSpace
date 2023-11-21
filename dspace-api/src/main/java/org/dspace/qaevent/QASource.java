@@ -8,6 +8,7 @@
 package org.dspace.qaevent;
 
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * This model class represent the source/provider of the QA events (as OpenAIRE).
@@ -16,9 +17,16 @@ import java.util.Date;
  *
  */
 public class QASource {
+
+    /**
+     * if the QASource stats (see next attributes) are related to a specific target
+     */
+    private UUID focus;
+
     private String name;
-    private long totalEvents;
     private Date lastEvent;
+    private long totalEvents;
+
 
     public String getName() {
         return name;
@@ -42,5 +50,13 @@ public class QASource {
 
     public void setLastEvent(Date lastEvent) {
         this.lastEvent = lastEvent;
+    }
+
+    public UUID getFocus() {
+        return focus;
+    }
+
+    public void setFocus(UUID focus) {
+        this.focus = focus;
     }
 }
