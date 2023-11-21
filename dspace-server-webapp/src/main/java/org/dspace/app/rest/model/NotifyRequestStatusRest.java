@@ -7,12 +7,15 @@
  */
 package org.dspace.app.rest.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import org.dspace.app.rest.RestResourceController;
+import org.dspace.app.ldn.model.RequestStatus;
+import org.dspace.app.rest.NotifyRequestStatusRestController;
+
 
 /**
  * Rest entity for LDN requests targeting items
@@ -25,14 +28,18 @@ import org.dspace.app.rest.RestResourceController;
 })
 public class NotifyRequestStatusRest extends RestAddressableModel {
     public static final String CATEGORY = RestAddressableModel.LDN;
-    public static final String NAME = "ldnitemservice";
-    public static final String GET_ITEM_REQUESTS = "getItemRequests";
+    public static final String NAME = "notifyrequests";
+    public static final String FIND_BY_ITEM = "findbyitem";
 
-    private List<NotifyRequestsStatus> notifyStatus;
+    private List<RequestStatus> notifyStatus;
     private UUID itemuuid;
 
+    public NotifyRequestStatusRest(NotifyRequestStatusRest instance) {
+        this.notifyStatus = instance.getNotifyStatus();
+    }
+
     public NotifyRequestStatusRest() {
-        super();
+        this.notifyStatus = new ArrayList<RequestStatus>();
     }
 
     public UUID getItemuuid() {
@@ -55,17 +62,15 @@ public class NotifyRequestStatusRest extends RestAddressableModel {
     }
 
     public Class getController() {
-        return RestResourceController.class;
+        return NotifyRequestStatusRestController.class;
     }
 
-}
+    public List<RequestStatus> getNotifyStatus() {
+        return notifyStatus;
+    }
 
-enum NotifyStatus {
-    REJECTED, ACCEPTED, REQUESTED
-}
+    public void setNotifyStatus(List<RequestStatus> notifyStatus) {
+        this.notifyStatus = notifyStatus;
+    }
 
-class NotifyRequestsStatus {
-    String serviceName;
-    String serviceUrl;
-    NotifyStatus status;
 }

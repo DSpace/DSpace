@@ -57,7 +57,7 @@
                 <entry>
                     <key>
                         <set>
-                            <value>Reject</value>
+                            <value>TentativeReject</value>
                             <value>coar-notify:ReviewAction</value>
                         </set>
                     </key>
@@ -72,7 +72,67 @@
                     </key>
                     <ref bean="announceReleaseAction" />
                 </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Offer</value>
+                            <value>coar-notify:ReviewAction</value>
+                        </set>
+                    </key>
+                    <ref bean="offerReviewAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Offer</value>
+                            <value>coar-notify:IngestAction</value>
+                        </set>
+                    </key>
+                    <ref bean="offerIngestAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Offer</value>
+                            <value>coar-notify:EndorsementAction</value>
+                        </set>
+                    </key>
+                    <ref bean="offerEndorsementAction" />
+                </entry>
             </map>
+        </property>
+    </bean>
+
+    <bean name="offerEndorsementAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.LDNEmailAction">
+                    <property name="actionSendFilter" value="william_welling@harvard.edu" />
+                    <property name="actionSendEmailTextFile" value="coar_notify_reviewed" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="offerIngestAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.LDNEmailAction">
+                    <property name="actionSendFilter" value="william_welling@harvard.edu" />
+                    <property name="actionSendEmailTextFile" value="coar_notify_reviewed" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="offerReviewAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.LDNEmailAction">
+                    <property name="actionSendFilter" value="william_welling@harvard.edu" />
+                    <property name="actionSendEmailTextFile" value="coar_notify_reviewed" />
+                </bean>
+            </list>
         </property>
     </bean>
 

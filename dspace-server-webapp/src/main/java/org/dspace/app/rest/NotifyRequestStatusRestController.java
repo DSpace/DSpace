@@ -5,7 +5,9 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.repository;
+package org.dspace.app.rest;
+
+import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
 
 import java.sql.SQLException;
 import java.util.UUID;
@@ -14,60 +16,71 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.model.NotifyRequestStatus;
 import org.dspace.app.ldn.service.LDNMessageService;
-import org.dspace.app.rest.Parameter;
-import org.dspace.app.rest.SearchRestMethod;
+import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.NotifyRequestStatusRest;
+import org.dspace.app.rest.model.hateoas.NotifyRequestStatusResource;
+import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.app.rest.utils.Utils;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Item;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
+import org.springframework.data.rest.webmvc.ControllerUtils;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Rest Repository for LDN requests targeting items
+ * Rest Controller for NotifyRequestStatus targeting items
  *
  * @author Francesco Bacchelli (francesco.bacchelli at 4science dot it)
  */
-@Component(NotifyRequestStatusRest.CATEGORY + "." + NotifyRequestStatusRest.NAME)
-public class NotifyRequestStatusRestRepository extends DSpaceRestRepository<NotifyRequestStatusRest, String> {
+@RestController
+@RequestMapping("/api/" + NotifyRequestStatusRest.CATEGORY + "/" + NotifyRequestStatusRest.NAME +
+    REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
+public class NotifyRequestStatusRestController {
 
-    private static final Logger log = LogManager.getLogger(NotifyRequestStatusRestRepository.class);
+    private static final Logger log = LogManager.getLogger(NotifyRequestStatusRestController.class);
+
+    @Autowired
+    private ConverterService converterService;
+
+    @Autowired
+    private Utils utils;
 
     @Autowired
     private LDNMessageService ldnMessageService;
 
-    @SearchRestMethod(name = NotifyRequestStatusRest.GET_ITEM_REQUESTS)
+    @Autowired
+    private ItemService itemService;
+
+    @GetMapping
     //@PreAuthorize("hasAuthority('AUTHENTICATED')")
-    public NotifyRequestStatusRest findItemRequests(
-        @Parameter(value = "itemuuid", required = true) UUID itemUuid) {
+    public ResponseEntity<RepresentationModel<?>> findByItem(@PathVariable UUID uuid)
+        throws SQLException, AuthorizeException {
 
-        log.info("START findItemRequests looking for requests for item " + itemUuid);
-        Context context = obtainContext();
-        NotifyRequestStatus resultRequests = new NotifyRequestStatus();
-        try {
-            resultRequests = ldnMessageService.findRequestsByItemUUID(context, itemUuid);
-        } catch (SQLException e) {
-            log.error(e);
+        log.info("START findItemRequests looking for requests for item " + uuid);
+
+        Context context = ContextUtil.obtainCurrentRequestContext();
+        Item item = itemService.find(context, uuid);
+        if (item == null) {
+            throw new ResourceNotFoundException("No such item: " + uuid);
         }
-        log.info("END findItemRequests");
-        return converter.toRest(resultRequests, utils.obtainProjection());
+        NotifyRequestStatus resultRequests = ldnMessageService.findRequestsByItem(context, item);
+        NotifyRequestStatusRest resultRequestStatusRests = converterService.toRest(
+            resultRequests, utils.obtainProjection());
+        NotifyRequestStatusResource resultRequestStatusResource = converterService.toResource(resultRequestStatusRests);
+
+        context.complete();
+
+        return ControllerUtils.toResponseEntity(HttpStatus.OK, new HttpHeaders(), resultRequestStatusResource);
     }
 
-    @Override
-    public NotifyRequestStatusRest findOne(Context context, String id) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Page<NotifyRequestStatusRest> findAll(Context context, Pageable pageable) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Class<NotifyRequestStatusRest> getDomainClass() {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }

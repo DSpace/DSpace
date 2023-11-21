@@ -9,13 +9,13 @@ package org.dspace.app.ldn.service;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.UUID;
 
 import org.dspace.app.ldn.LDNMessageEntity;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.ldn.model.NotifyRequestStatus;
 import org.dspace.app.ldn.model.Service;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 
 /**
@@ -113,9 +113,9 @@ public interface LDNMessageService {
      * find the ldn messages of Requests by item uuid
      *
      * @param context the context
-     * @param itemId the item uuid
+     * @param item the item
      * @return the item requests object
      * @throws SQLException If something goes wrong in the database
      */
-    public NotifyRequestStatus findRequestsByItemUUID(Context context, UUID itemId) throws SQLException;
+    public NotifyRequestStatus findRequestsByItem(Context context, Item item) throws SQLException;
 }

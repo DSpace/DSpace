@@ -13,7 +13,7 @@ import org.dspace.app.rest.projection.Projection;
 import org.springframework.stereotype.Component;
 
 /**
- * This is the converter from/to the ItemRequests in the DSpace API data model and
+ * This is the converter from/to the NotifyRequestStatus in the DSpace API data model and
  * the REST data model
  *
  * @author Francesco Bacchelli (francesco.bacchelli at 4science.it)
@@ -25,6 +25,7 @@ public class NotifyRequestStatusConverter implements DSpaceConverter<NotifyReque
     public NotifyRequestStatusRest convert(NotifyRequestStatus modelObject, Projection projection) {
         NotifyRequestStatusRest result = new NotifyRequestStatusRest();
         result.setItemuuid(modelObject.getItemUuid());
+        result.setNotifyStatus(modelObject.getNotifyStatus());
         return result;
     }
 
