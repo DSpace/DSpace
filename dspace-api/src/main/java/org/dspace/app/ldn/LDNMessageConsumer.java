@@ -11,14 +11,22 @@ import static java.lang.String.format;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.ldn.factory.NotifyServiceFactory;
+import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.ldn.service.LDNMessageService;
 import org.dspace.app.ldn.service.NotifyPatternToTriggerService;
 import org.dspace.content.Bitstream;
@@ -79,7 +87,7 @@ public class LDNMessageConsumer implements Consumer {
         patternsToTrigger.forEach(patternToTrigger -> {
             try {
                 createLDNMessage(context, patternToTrigger);
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
@@ -87,17 +95,29 @@ public class LDNMessageConsumer implements Consumer {
     }
 
     private void createLDNMessage(Context context, NotifyPatternToTrigger patternToTrigger)
-        throws SQLException {
+        throws SQLException, JsonMappingException, JsonProcessingException {
 
         LDN ldn = getLDNMessage(patternToTrigger.getPattern());
-
         LDNMessageEntity ldnMessage =
             ldnMessageService.create(context, format("urn:uuid:%s", UUID.randomUUID()));
 
         ldnMessage.setObject(patternToTrigger.getItem());
         ldnMessage.setTarget(patternToTrigger.getNotifyService());
         ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_QUEUED);
+        ldnMessage.setQueueTimeout(new Date());
+
         appendGeneratedMessage(ldn, ldnMessage, patternToTrigger.getPattern());
+
+        ObjectMapper mapper = new ObjectMapper();
+        Notification notification = mapper.readValue(ldnMessage.getMessage(), Notification.class);
+        ldnMessage.setType(StringUtils.joinWith(",", notification.getType()));
+
+        ArrayList<String> notificationTypeArrayList = new ArrayList<String>(notification.getType());
+        // sorting the list
+        Collections.sort(notificationTypeArrayList);
+        ldnMessage.setActivityStreamType(notificationTypeArrayList.get(0));
+        ldnMessage.setCoarNotifyType(notificationTypeArrayList.get(1));
+
         ldnMessageService.update(context, ldnMessage);
     }
 
