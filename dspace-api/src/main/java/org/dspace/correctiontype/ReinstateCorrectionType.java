@@ -7,7 +7,7 @@
  */
 package org.dspace.correctiontype;
 
-import static org.dspace.content.QAEvent.INTERNAL_ITEM_SOURCE;
+import static org.dspace.content.QAEvent.DSPACE_USERS_SOURCE;
 
 import java.sql.SQLException;
 import java.util.Date;
@@ -57,8 +57,8 @@ public class ReinstateCorrectionType implements CorrectionType, InitializingBean
     @Override
     public QAEvent createCorrection(Context context, Item targetItem, QAMessageDTO reason) {
         CorrectionTypeMessageDTO mesasge = (CorrectionTypeMessageDTO) reason;
-        QAEvent qaEvent = new QAEvent(INTERNAL_ITEM_SOURCE,
-                                      "handle:" + targetItem.getHandle(),
+        QAEvent qaEvent = new QAEvent(DSPACE_USERS_SOURCE,
+                                      context.getCurrentUser().getID().toString(),
                                       targetItem.getID().toString(),
                                       targetItem.getName(),
                                       this.getTopic(),

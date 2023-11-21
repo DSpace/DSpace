@@ -31,7 +31,7 @@ public class QAEvent {
     public static final String DISCARDED = "discarded";
 
     public static final String OPENAIRE_SOURCE = "openaire";
-    public static final String INTERNAL_ITEM_SOURCE = "internal-item";
+    public static final String DSPACE_USERS_SOURCE = "DSpaceUsers";
 
     private String source;
 
@@ -197,7 +197,7 @@ public class QAEvent {
         switch (getSource()) {
             case OPENAIRE_SOURCE:
                 return OpenaireMessageDTO.class;
-            case INTERNAL_ITEM_SOURCE:
+            case DSPACE_USERS_SOURCE:
                 return CorrectionTypeMessageDTO.class;
             default:
                 throw new IllegalArgumentException("Unknown event's source: " + getSource());

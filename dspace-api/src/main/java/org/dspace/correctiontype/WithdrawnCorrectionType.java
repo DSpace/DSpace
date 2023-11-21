@@ -7,7 +7,7 @@
  */
 package org.dspace.correctiontype;
 
-import static org.dspace.content.QAEvent.INTERNAL_ITEM_SOURCE;
+import static org.dspace.content.QAEvent.DSPACE_USERS_SOURCE;
 import static org.dspace.core.Constants.READ;
 
 import java.sql.SQLException;
@@ -51,8 +51,8 @@ public class WithdrawnCorrectionType implements CorrectionType, InitializingBean
     @Override
     public QAEvent createCorrection(Context context, Item targetItem, QAMessageDTO reason) {
         CorrectionTypeMessageDTO mesasge = (CorrectionTypeMessageDTO) reason;
-        QAEvent qaEvent = new QAEvent(INTERNAL_ITEM_SOURCE,
-                                      "handle:" + targetItem.getHandle(),
+        QAEvent qaEvent = new QAEvent(DSPACE_USERS_SOURCE,
+                                      context.getCurrentUser().getID().toString(),
                                       targetItem.getID().toString(),
                                       targetItem.getName(),
                                       this.getTopic(), 1.0,
