@@ -7,6 +7,7 @@
  */
 package org.dspace.app.ldn.factory;
 
+import org.dspace.app.ldn.service.LDNMessageService;
 import org.dspace.app.ldn.service.NotifyPatternToTriggerService;
 import org.dspace.app.ldn.service.NotifyService;
 import org.dspace.app.ldn.service.NotifyServiceInboundPatternService;
@@ -25,6 +26,8 @@ public abstract class NotifyServiceFactory {
     public abstract NotifyServiceInboundPatternService getNotifyServiceInboundPatternService();
 
     public abstract NotifyPatternToTriggerService getNotifyPatternToTriggerService();
+
+    public abstract LDNMessageService getLDNMessageService();
 
     public static NotifyServiceFactory getInstance() {
         return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(
