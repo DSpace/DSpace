@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.converter.JsonLdHttpMessageConverter;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.content.Item;
+import org.dspace.core.Context;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -37,7 +38,7 @@ public class SendLDNMessageAction implements LDNAction {
     }
 
     @Override
-    public ActionStatus execute(Notification notification, Item item) throws Exception {
+    public ActionStatus execute(Context context, Notification notification, Item item) throws Exception {
         //TODO authorization with Bearer token should be supported.
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", APPLICATION_JSON_LD.toString());

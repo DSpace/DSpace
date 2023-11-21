@@ -209,10 +209,6 @@
     <bean name="outcomingAnnounceReviewAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
         <property name="actions">
             <list value-type="org.dspace.app.ldn.action.LDNAction">
-                <!--                <bean class="org.dspace.app.ldn.action.LDNEmailAction">-->
-                <!--                    <property name="actionSendFilter" value="william_welling@harvard.edu" />-->
-                <!--                    <property name="actionSendEmailTextFile" value="coar_notify_reviewed" />-->
-                <!--                </bean>-->
                 <bean class="org.dspace.app.ldn.action.SendLDNMessageAction"/>
             </list>
         </property>
@@ -221,10 +217,6 @@
     <bean name="outcomingAnnounceEndorsementAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
         <property name="actions">
             <list value-type="org.dspace.app.ldn.action.LDNAction">
-                <!--                <bean class="org.dspace.app.ldn.action.LDNEmailAction">-->
-                <!--                    <property name="actionSendFilter" value="william_welling@harvard.edu" />-->
-                <!--                    <property name="actionSendEmailTextFile" value="coar_notify_reviewed" />-->
-                <!--                </bean>-->
                 <bean class="org.dspace.app.ldn.action.SendLDNMessageAction"/>
             </list>
         </property>
@@ -233,10 +225,6 @@
     <bean name="outcomingAnnounceIngestAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
         <property name="actions">
             <list value-type="org.dspace.app.ldn.action.LDNAction">
-                <!--                <bean class="org.dspace.app.ldn.action.LDNEmailAction">-->
-                <!--                    <property name="actionSendFilter" value="william_welling@harvard.edu" />-->
-                <!--                    <property name="actionSendEmailTextFile" value="coar_notify_reviewed" />-->
-                <!--                </bean>-->
                 <bean class="org.dspace.app.ldn.action.SendLDNMessageAction"/>
             </list>
         </property>
