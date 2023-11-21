@@ -8,19 +8,19 @@
 package org.dspace.qaevent.action;
 
 import org.dspace.qaevent.QualityAssuranceAction;
-import org.dspace.qaevent.service.dto.OpenaireMessageDTO;
+import org.dspace.qaevent.service.dto.NotifyMessageDTO;
 import org.dspace.qaevent.service.dto.QAMessageDTO;
 
 /**
  * Implementation of {@link QualityAssuranceAction} that add a simple metadata to the given
  * item.
  *
- * @author Andrea Bollini (andrea.bollini at 4science.it)
+ * @author Francesco Bacchelli (francesco.bacchelli at 4science.it)
  *
  */
-public class QAOpenaireSimpleMetadataAction extends ASimpleMetadataAction {
+public class QANotifySimpleMetadataAction extends ASimpleMetadataAction {
 
     public String extractMetadataValue(QAMessageDTO message) {
-        return ((OpenaireMessageDTO) message).getAbstracts();
+        return ((NotifyMessageDTO) message).getHref();
     }
 }

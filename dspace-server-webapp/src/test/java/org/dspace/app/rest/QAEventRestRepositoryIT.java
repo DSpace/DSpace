@@ -9,8 +9,8 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
-import static org.dspace.app.rest.matcher.QAEventMatcher.matchQAEventEntry;
-import static org.dspace.content.QAEvent.COAR_NOTIFY;
+import static org.dspace.content.QAEvent.COAR_NOTIFY_SOURCE;
+import static org.dspace.content.QAEvent.OPENAIRE_SOURCE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
@@ -25,21 +25,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.ws.rs.core.MediaType;
 
+import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.rest.matcher.ItemMatcher;
+import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.matcher.QAEventMatcher;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
+import org.dspace.app.rest.repository.QAEventRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.EntityTypeBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.NotifyServiceBuilder;
 import org.dspace.builder.QAEventBuilder;
 import org.dspace.builder.RelationshipTypeBuilder;
 import org.dspace.content.Collection;
@@ -47,7 +52,10 @@ import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
 import org.dspace.content.QAEventProcessed;
+import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
+import org.dspace.qaevent.QANotifyPatterns;
+import org.dspace.qaevent.action.ASimpleMetadataAction;
 import org.dspace.qaevent.dao.QAEventsDao;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -63,6 +71,15 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private QAEventsDao qaEventsDao;
+
+    @Autowired
+    private ItemService itemService;
+
+    @Autowired
+    private ASimpleMetadataAction AddReviewMetadataAction;
+
+    @Autowired
+    private ASimpleMetadataAction AddEndorsedMetadataAction;
 
     @Test
     public void findAllNotImplementedTest() throws Exception {
@@ -81,17 +98,17 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         QAEvent event1 = QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
         QAEvent event2 = QAEventBuilder.createTarget(context, col1, "Science and Freedom 4")
-                .withTopic("ENRICH/MISSING/ABSTRACT")
+                .withTopic(org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT)
                 .withMessage("{\"abstracts[0]\": \"Descrizione delle caratteristiche...\"}").build();
         EPerson anotherSubmitter = EPersonBuilder.createEPerson(context).withEmail("another-submitter@example.com")
                 .withPassword(password).build();
         context.setCurrentUser(anotherSubmitter);
         QAEvent event3 = QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-                .withSource(COAR_NOTIFY)
-                .withTopic("ENRICH/MORE/REVIEW")
+                .withSource(COAR_NOTIFY_SOURCE)
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MORE_REVIEW)
                 .withMessage("{\"abstracts[0]\": \"Descrizione delle caratteristiche...\"}").build();
         context.restoreAuthSystemState();
         String authToken = getAuthToken(admin.getEmail(), password);
@@ -117,10 +134,10 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         QAEvent event1 = QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
         QAEvent event5 = QAEventBuilder.createTarget(context, col1, "Science and Freedom 5")
-                .withTopic("ENRICH/MISSING/PROJECT")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PROJECT)
                 .withMessage(
                         "{\"projects[0].acronym\":\"PAThs\","
                         + "\"projects[0].code\":\"687567\","
@@ -151,7 +168,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         QAEvent event1 = QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
         context.restoreAuthSystemState();
         getClient().perform(get("/api/integration/qualityassuranceevents/" + event1.getEventId()))
@@ -164,14 +181,14 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         QAEvent event1 = QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
         EPerson anotherSubmitter = EPersonBuilder.createEPerson(context).withEmail("another_submitter@example.com")
                 .build();
         context.setCurrentUser(anotherSubmitter);
         QAEvent event2 = QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-                .withSource(COAR_NOTIFY)
-                .withTopic("ENRICH/MORE/REVIEW")
+                .withSource(COAR_NOTIFY_SOURCE)
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MORE_REVIEW)
                 .withMessage("{\"href\":\"https://doi.org/10.2307/2144300\"}").build();
         context.restoreAuthSystemState();
         String authToken = getAuthToken(eperson.getEmail(), password);
@@ -190,20 +207,20 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         Item item = ItemBuilder.createItem(context, col1).withTitle("Tracking Papyrus and Parchment Paths")
                 .build();
         QAEvent event1 = QAEventBuilder.createTarget(context, item)
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}")
                 .build();
         QAEvent event2 = QAEventBuilder.createTarget(context, item)
-                .withSource(COAR_NOTIFY)
-                .withTopic("ENRICH/MORE/REVIEW")
+                .withSource(COAR_NOTIFY_SOURCE)
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MORE_REVIEW)
                 .withMessage("{\"href\":\"https://doi.org/10.2307/2144301\"}").build();
         EPerson anotherSubmitter = EPersonBuilder.createEPerson(context).withEmail("another-submitter@example.com")
                 .withPassword(password).build();
         context.setCurrentUser(anotherSubmitter);
         // this event is related to a new item not submitted by eperson
         QAEvent event3 = QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-                .withSource(COAR_NOTIFY)
-                .withTopic("ENRICH/MORE/REVIEW")
+                .withSource(COAR_NOTIFY_SOURCE)
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MORE_REVIEW)
                 .withMessage("{\"href\":\"https://doi.org/10.2307/2144300\"}").build();
         context.restoreAuthSystemState();
         String authToken = getAuthToken(admin.getEmail(), password);
@@ -226,7 +243,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(authToken)
             .perform(
                 get("/api/integration/qualityassuranceevents/search/findByTopic")
-                    .param("topic", QAEvent.COAR_NOTIFY + ":ENRICH!MISSING!PID"))
+                    .param("topic", QAEvent.COAR_NOTIFY_SOURCE + ":ENRICH!MISSING!PID"))
             .andExpect(status().isOk()).andExpect(jsonPath("$.page.size", is(20)))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
@@ -243,7 +260,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(authToken)
             .perform(
                 get("/api/integration/qualityassuranceevents/search/findByTopic")
-                    .param("topic", QAEvent.COAR_NOTIFY + ":ENRICH!MORE!REVIEW:" + uuid.toString()))
+                    .param("topic", QAEvent.COAR_NOTIFY_SOURCE + ":ENRICH!MORE!REVIEW:" + uuid.toString()))
             .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(1)))
             .andExpect(jsonPath("$._embedded.qualityassuranceevents",
                         Matchers.contains(QAEventMatcher.matchQAEventEntry(event2))))
@@ -261,7 +278,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(authToken)
             .perform(
                 get("/api/integration/qualityassuranceevents/search/findByTopic")
-                    .param("topic", QAEvent.COAR_NOTIFY + ":ENRICH!MORE!REVIEW"))
+                    .param("topic", QAEvent.COAR_NOTIFY_SOURCE + ":ENRICH!MORE!REVIEW"))
             .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(2)))
             .andExpect(jsonPath("$._embedded.qualityassuranceevents",
                     Matchers.containsInAnyOrder(
@@ -283,7 +300,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(authToken)
             .perform(
                 get("/api/integration/qualityassuranceevents/search/findByTopic")
-                    .param("topic", QAEvent.COAR_NOTIFY + ":ENRICH!MORE!REVIEW:" + uuid.toString()))
+                    .param("topic", QAEvent.COAR_NOTIFY_SOURCE + ":ENRICH!MORE!REVIEW:" + uuid.toString()))
             .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(1)))
             .andExpect(jsonPath("$._embedded.qualityassuranceevents",
                         Matchers.contains(QAEventMatcher.matchQAEventEntry(event2))))
@@ -305,45 +322,45 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         QAEvent event1 = QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
         QAEvent event2 = QAEventBuilder.createTarget(context, col1, "Science and Freedom 2")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
         QAEvent event3 = QAEventBuilder.createTarget(context, col1, "Science and Freedom 3")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144302\"}").build();
         QAEvent event4 = QAEventBuilder.createTarget(context, col1, "Science and Freedom 4")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"pmc\",\"pids[0].value\":\"2144303\"}").build();
         QAEvent event5 = QAEventBuilder.createTarget(context, col1, "Science and Freedom 5")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"2144304\"}").build();
         QAEvent event6 = QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-                .withSource(COAR_NOTIFY)
-                .withTopic("ENRICH/MISSING/PID")
+                .withSource(OPENAIRE_SOURCE)
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
         QAEvent event7 = QAEventBuilder.createTarget(context, col1, "Science and Freedom 2")
-                .withSource(COAR_NOTIFY)
-                .withTopic("ENRICH/MISSING/PID")
+                .withSource(OPENAIRE_SOURCE)
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
         QAEvent event8 = QAEventBuilder.createTarget(context, col1, "Science and Freedom 3")
-                .withSource(COAR_NOTIFY)
-                .withTopic("ENRICH/MISSING/PID")
+                .withSource(OPENAIRE_SOURCE)
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144302\"}").build();
         QAEvent event9 = QAEventBuilder.createTarget(context, col1, "Science and Freedom 4")
-                .withSource(COAR_NOTIFY)
-                .withTopic("ENRICH/MISSING/PID")
+                .withSource(OPENAIRE_SOURCE)
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"pmc\",\"pids[0].value\":\"2144303\"}").build();
         QAEvent event10 = QAEventBuilder.createTarget(context, col1, "Science and Freedom 5")
-                .withSource(COAR_NOTIFY)
-                .withTopic("ENRICH/MISSING/PID")
+                .withSource(OPENAIRE_SOURCE)
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"2144304\"}").build();
         context.setCurrentUser(admin);
         // this event will be related to an item submitted by the admin
         QAEvent event11 = QAEventBuilder.createTarget(context, col1, "Science and Freedom 5")
-                .withSource(COAR_NOTIFY)
-                .withTopic("ENRICH/MISSING/PID")
+                .withSource(OPENAIRE_SOURCE)
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"2144304\"}").build();
 
         context.restoreAuthSystemState();
@@ -373,7 +390,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                         Matchers.allOf(
                     Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
                                 Matchers.containsString("topic=" + QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"),
-                                Matchers.containsString("page=2"),
+                                Matchers.containsString("page=5"),
                                 Matchers.containsString("size=2"))))
                 .andExpect(jsonPath("$._links.first.href",
                         Matchers.allOf(
@@ -383,8 +400,8 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 Matchers.containsString("size=2"))))
                 .andExpect(jsonPath("$._links.prev.href").doesNotExist())
                 .andExpect(jsonPath("$.page.size", is(2)))
-                .andExpect(jsonPath("$.page.totalPages", is(3)))
-                .andExpect(jsonPath("$.page.totalElements", is(5)));
+                .andExpect(jsonPath("$.page.totalPages", is(6)))
+                .andExpect(jsonPath("$.page.totalElements", is(11)));
 
         getClient(authToken)
             .perform(
@@ -412,7 +429,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                         Matchers.allOf(
                     Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
                                 Matchers.containsString("topic=" + QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"),
-                                Matchers.containsString("page=2"),
+                                Matchers.containsString("page=5"),
                                 Matchers.containsString("size=2"))))
                 .andExpect(jsonPath("$._links.first.href",
                         Matchers.allOf(
@@ -427,30 +444,35 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                                 Matchers.containsString("page=0"),
                                 Matchers.containsString("size=2"))))
                 .andExpect(jsonPath("$.page.size", is(2)))
-                .andExpect(jsonPath("$.page.totalPages", is(3)))
-                .andExpect(jsonPath("$.page.totalElements", is(5)));
+                .andExpect(jsonPath("$.page.totalPages", is(6)))
+                .andExpect(jsonPath("$.page.totalElements", is(11)));
 
         getClient(authToken)
             .perform(
                 get("/api/integration/qualityassuranceevents/search/findByTopic")
                     .param("topic", QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID")
                     .param("size", "2").param("page", "2"))
-            .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(1)))
+            .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(2)))
             .andExpect(jsonPath("$._embedded.qualityassuranceevents",
-                    Matchers.containsInAnyOrder(
+                    Matchers.hasItem(
                             QAEventMatcher.matchQAEventEntry(event5))))
             .andExpect(jsonPath("$._links.self.href",
-                    Matchers.allOf(
-                    Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                            Matchers.containsString("topic=" + QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"),
-                            Matchers.containsString("page=2"),
-                            Matchers.containsString("size=2"))))
-            .andExpect(jsonPath("$._links.next.href").doesNotExist())
+                Matchers.allOf(
+                Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
+                        Matchers.containsString("topic=" + QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"),
+                        Matchers.containsString("page=2"),
+                        Matchers.containsString("size=2"))))
+            .andExpect(jsonPath("$._links.next.href",
+                Matchers.allOf(
+                Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
+                        Matchers.containsString("topic=" + QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"),
+                        Matchers.containsString("page=3"),
+                        Matchers.containsString("size=2"))))
             .andExpect(jsonPath("$._links.last.href",
                     Matchers.allOf(
                     Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
                             Matchers.containsString("topic=" + QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"),
-                            Matchers.containsString("page=2"),
+                            Matchers.containsString("page=5"),
                             Matchers.containsString("size=2"))))
             .andExpect(jsonPath("$._links.first.href",
                     Matchers.allOf(
@@ -465,130 +487,21 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                             Matchers.containsString("page=1"),
                             Matchers.containsString("size=2"))))
             .andExpect(jsonPath("$.page.size", is(2)))
-            .andExpect(jsonPath("$.page.totalPages", is(3)))
-            .andExpect(jsonPath("$.page.totalElements", is(5)));
+            .andExpect(jsonPath("$.page.totalPages", is(6)))
+            .andExpect(jsonPath("$.page.totalElements", is(11)));
 
         // check if the pagination is working properly also when a security filter is in place
         authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken)
             .perform(
                 get("/api/integration/qualityassuranceevents/search/findByTopic")
-                    .param("topic", QAEvent.COAR_NOTIFY + ":ENRICH!MISSING!PID")
+                    .param("topic", QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID")
                     .param("size", "2"))
-            .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(2)))
-            .andExpect(jsonPath("$._embedded.qualityassuranceevents",
-                        Matchers.containsInAnyOrder(
-                                QAEventMatcher.matchQAEventEntry(event6),
-                                QAEventMatcher.matchQAEventEntry(event7))))
-                .andExpect(jsonPath("$._links.self.href",
-                        Matchers.allOf(
-                    Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                                Matchers.containsString("topic=" + QAEvent.COAR_NOTIFY + ":ENRICH!MISSING!PID"),
-                                Matchers.containsString("size=2"))))
-                .andExpect(jsonPath("$._links.next.href",
-                        Matchers.allOf(
-                    Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                                Matchers.containsString("topic=" + QAEvent.COAR_NOTIFY + ":ENRICH!MISSING!PID"),
-                                Matchers.containsString("page=1"),
-                                Matchers.containsString("size=2"))))
-                .andExpect(jsonPath("$._links.last.href",
-                        Matchers.allOf(
-                    Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                                Matchers.containsString("topic=" + QAEvent.COAR_NOTIFY + ":ENRICH!MISSING!PID"),
-                                Matchers.containsString("page=2"),
-                                Matchers.containsString("size=2"))))
-                .andExpect(jsonPath("$._links.first.href",
-                        Matchers.allOf(
-                    Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                                Matchers.containsString("topic=" + QAEvent.COAR_NOTIFY + ":ENRICH!MISSING!PID"),
-                                Matchers.containsString("page=0"),
-                                Matchers.containsString("size=2"))))
-                .andExpect(jsonPath("$._links.prev.href").doesNotExist())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasNoJsonPath("$._embedded.qualityassuranceevents")))
                 .andExpect(jsonPath("$.page.size", is(2)))
-                .andExpect(jsonPath("$.page.totalPages", is(3)))
-                .andExpect(jsonPath("$.page.totalElements", is(5)));
-
-        getClient(authToken)
-            .perform(
-                get("/api/integration/qualityassuranceevents/search/findByTopic")
-                    .param("topic", QAEvent.COAR_NOTIFY + ":ENRICH!MISSING!PID")
-                        .param("size", "2").param("page", "1"))
-            .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(2)))
-            .andExpect(jsonPath("$._embedded.qualityassuranceevents",
-                        Matchers.containsInAnyOrder(
-                                QAEventMatcher.matchQAEventEntry(event8),
-                                QAEventMatcher.matchQAEventEntry(event9))))
-                .andExpect(jsonPath("$._links.self.href",
-                        Matchers.allOf(
-                    Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                                Matchers.containsString("topic=" + QAEvent.COAR_NOTIFY + ":ENRICH!MISSING!PID"),
-                                Matchers.containsString("page=1"),
-                                Matchers.containsString("size=2"))))
-                .andExpect(jsonPath("$._links.next.href",
-                        Matchers.allOf(
-                    Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                                Matchers.containsString("topic=" + QAEvent.COAR_NOTIFY + ":ENRICH!MISSING!PID"),
-                                Matchers.containsString("page=2"),
-                                Matchers.containsString("size=2"))))
-                .andExpect(jsonPath("$._links.last.href",
-                        Matchers.allOf(
-                    Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                                Matchers.containsString("topic=" + QAEvent.COAR_NOTIFY + ":ENRICH!MISSING!PID"),
-                                Matchers.containsString("page=2"),
-                                Matchers.containsString("size=2"))))
-                .andExpect(jsonPath("$._links.first.href",
-                        Matchers.allOf(
-                    Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                                Matchers.containsString("topic=" + QAEvent.COAR_NOTIFY + ":ENRICH!MISSING!PID"),
-                                Matchers.containsString("page=0"),
-                                Matchers.containsString("size=2"))))
-                .andExpect(jsonPath("$._links.prev.href",
-                        Matchers.allOf(
-                    Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                                Matchers.containsString("topic=" + QAEvent.COAR_NOTIFY + ":ENRICH!MISSING!PID"),
-                                Matchers.containsString("page=0"),
-                                Matchers.containsString("size=2"))))
-                .andExpect(jsonPath("$.page.size", is(2)))
-                .andExpect(jsonPath("$.page.totalPages", is(3)))
-                .andExpect(jsonPath("$.page.totalElements", is(5)));
-
-        getClient(authToken)
-            .perform(
-                get("/api/integration/qualityassuranceevents/search/findByTopic")
-                    .param("topic", QAEvent.COAR_NOTIFY + ":ENRICH!MISSING!PID")
-                    .param("size", "2").param("page", "2"))
-            .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(1)))
-            .andExpect(jsonPath("$._embedded.qualityassuranceevents",
-                    Matchers.containsInAnyOrder(
-                            QAEventMatcher.matchQAEventEntry(event10))))
-            .andExpect(jsonPath("$._links.self.href",
-                    Matchers.allOf(
-                    Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                            Matchers.containsString("topic=" + QAEvent.COAR_NOTIFY + ":ENRICH!MISSING!PID"),
-                            Matchers.containsString("page=2"),
-                            Matchers.containsString("size=2"))))
-            .andExpect(jsonPath("$._links.next.href").doesNotExist())
-            .andExpect(jsonPath("$._links.last.href",
-                    Matchers.allOf(
-                    Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                            Matchers.containsString("topic=" + QAEvent.COAR_NOTIFY + ":ENRICH!MISSING!PID"),
-                            Matchers.containsString("page=2"),
-                            Matchers.containsString("size=2"))))
-            .andExpect(jsonPath("$._links.first.href",
-                    Matchers.allOf(
-                    Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                            Matchers.containsString("topic=" + QAEvent.COAR_NOTIFY + ":ENRICH!MISSING!PID"),
-                            Matchers.containsString("page=0"),
-                            Matchers.containsString("size=2"))))
-            .andExpect(jsonPath("$._links.prev.href",
-                    Matchers.allOf(
-                    Matchers.containsString("/api/integration/qualityassuranceevents/search/findByTopic?"),
-                            Matchers.containsString("topic=" + QAEvent.COAR_NOTIFY + ":ENRICH!MISSING!PID"),
-                            Matchers.containsString("page=1"),
-                            Matchers.containsString("size=2"))))
-            .andExpect(jsonPath("$.page.size", is(2)))
-            .andExpect(jsonPath("$.page.totalPages", is(3)))
-            .andExpect(jsonPath("$.page.totalElements", is(5)));
+                .andExpect(jsonPath("$.page.totalPages", is(0)))
+                .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
@@ -597,16 +510,16 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         QAEvent event1 = QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
         QAEvent event2 = QAEventBuilder.createTarget(context, col1, "Science and Freedom 2")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
         QAEvent event3 = QAEventBuilder.createTarget(context, col1, "Science and Freedom 3")
-                .withTopic("ENRICH/MORE/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MORE_PID)
                 .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"10.2307/2144302\"}").build();
         QAEvent event4 = QAEventBuilder.createTarget(context, col1, "Science and Freedom 4")
-                .withTopic("ENRICH/MISSING/ABSTRACT")
+                .withTopic(org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT)
                 .withMessage("{\"abstracts[0]\": \"Descrizione delle caratteristiche...\"}").build();
         context.restoreAuthSystemState();
         getClient()
@@ -622,16 +535,16 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         QAEvent event1 = QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
         QAEvent event2 = QAEventBuilder.createTarget(context, col1, "Science and Freedom 2")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
         QAEvent event3 = QAEventBuilder.createTarget(context, col1, "Science and Freedom 3")
-                .withTopic("ENRICH/MORE/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MORE_PID)
                 .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"10.2307/2144302\"}").build();
         QAEvent event4 = QAEventBuilder.createTarget(context, col1, "Science and Freedom 4")
-                .withTopic("ENRICH/MISSING/ABSTRACT")
+                .withTopic(org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT)
                 .withMessage("{\"abstracts[0]\": \"Descrizione delle caratteristiche...\"}").build();
         context.restoreAuthSystemState();
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -657,7 +570,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         Item funding = ItemBuilder.createItem(context, colFunding).withTitle("Tracking Papyrus and Parchment Paths")
                 .build();
         QAEvent eventProjectBound = QAEventBuilder.createTarget(context, col1, "Science and Freedom with project")
-                .withTopic("ENRICH/MISSING/PROJECT")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PROJECT)
                 .withMessage(
                         "{\"projects[0].acronym\":\"PAThs\","
                         + "\"projects[0].code\":\"687567\","
@@ -673,7 +586,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .build();
         QAEvent eventProjectNoBound = QAEventBuilder
                 .createTarget(context, col1, "Science and Freedom with unrelated project")
-                .withTopic("ENRICH/MISSING/PROJECT")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PROJECT)
                 .withMessage(
                         "{\"projects[0].acronym\":\"NEW\","
                         + "\"projects[0].code\":\"123456\","
@@ -684,24 +597,24 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                         + "\"projects[0].title\":\"A new project\"}")
                 .build();
         QAEvent eventMissingPID1 = QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
         QAEvent eventMissingPID2 = QAEventBuilder.createTarget(context, col1, "Science and Freedom 2")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
         QAEvent eventMissingUnknownPID = QAEventBuilder.createTarget(context, col1, "Science and Freedom URN PID")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage(
                         "{\"pids[0].type\":\"urn\",\"pids[0].value\":\"http://thesis2.sba.units.it/store/handle/item/12937\"}")
                 .build();
         QAEvent eventMorePID = QAEventBuilder.createTarget(context, col1, "Science and Freedom 3")
-                .withTopic("ENRICH/MORE/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MORE_PID)
                 .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"2144302\"}").build();
         QAEvent eventAbstract = QAEventBuilder.createTarget(context, col1, "Science and Freedom 4")
-                .withTopic("ENRICH/MISSING/ABSTRACT")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT)
                 .withMessage("{\"abstracts[0]\": \"An abstract to add...\"}").build();
         QAEvent eventAbstractToDiscard = QAEventBuilder.createTarget(context, col1, "Science and Freedom 7")
-                .withTopic("ENRICH/MISSING/ABSTRACT")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT)
                 .withMessage("{\"abstracts[0]\": \"Abstract to discard...\"}").build();
         context.restoreAuthSystemState();
         // prepare the different patches for our decisions
@@ -827,6 +740,91 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void recordDecisionNotifyTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType project = EntityTypeBuilder.createEntityTypeBuilder(context, "Project").build();
+        RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publication, project, "isProjectOfPublication",
+                "isPublicationOfProject", 0, null, 0,
+                null).withCopyToRight(true).build();
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+            .withEntityType("Publication")
+            .withName("Collection 1").build();
+        Collection colFunding = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Collection Fundings")
+            .withEntityType("Project").build();
+        Item item = ItemBuilder.createItem(context, colFunding).withTitle("Tracking Papyrus and Parchment Paths")
+                .build();
+        NotifyServiceEntity notifyServiceEntity = NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("https://review-service.com/inbox/about/")
+                                .withLdnUrl("https://review-service.com/inbox/")
+                                .withScore(BigDecimal.valueOf(0.6d))
+                                .build();
+        String href = "EC";
+        QAEvent eventMoreReview = QAEventBuilder.createTarget(context, col1, "Science and Freedom with project")
+                .withSource(COAR_NOTIFY_SOURCE)
+                .withTopic("ENRICH/MORE/REVIEW")
+                .withMessage(
+                        "{"
+                        + "\"serviceName\":\"" + notifyServiceEntity.getName() + "\","
+                        + "\"serviceId\":\"" + notifyServiceEntity.getID() + "\","
+                        + "\"href\":\"" + href + "\","
+                        + "\"relationship\":\"H2020\""
+                        + "}")
+                .withRelatedItem(item.getID().toString())
+                .build();
+        QAEvent eventMoreEndorsement = QAEventBuilder.createTarget(context, col1, "Science and Freedom with project")
+            .withSource(COAR_NOTIFY_SOURCE)
+            .withTopic("ENRICH/MORE/ENDORSEMENT")
+            .withMessage(
+                    "{"
+                    + "\"serviceName\":\"" + notifyServiceEntity.getName() + "\","
+                    + "\"serviceId\":\"" + notifyServiceEntity.getID() + "\","
+                    + "\"href\":\"" + href + "\","
+                    + "\"relationship\":\"H2020\""
+                    + "}")
+            .withRelatedItem(item.getID().toString())
+            .build();
+        context.restoreAuthSystemState();
+        List<Operation> acceptOp = new ArrayList<Operation>();
+        acceptOp.add(new ReplaceOperation("/status", QAEvent.ACCEPTED));
+        String patchAccept = getPatchContent(acceptOp);
+        String authToken = getAuthToken(admin.getEmail(), password);
+        eventMoreEndorsement.setStatus(QAEvent.ACCEPTED);
+        eventMoreReview.setStatus(QAEvent.ACCEPTED);
+        // MORE REVIEW
+        getClient(authToken).perform(patch("/api/integration/qualityassuranceevents/" + eventMoreReview.getEventId())
+            .content(patchAccept)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", QAEventMatcher.matchQAEventNotifyEntry(eventMoreReview)));
+        getClient(authToken).perform(get("/api/core/items/" + eventMoreReview.getTarget())
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$",
+                hasJsonPath("$.metadata",
+                        MetadataMatcher.matchMetadata(AddReviewMetadataAction.getMetadata(), href))));
+        // MORE ENDORSEMENT
+        getClient(authToken).perform(patch("/api/integration/qualityassuranceevents/"
+            + eventMoreEndorsement.getEventId())
+            .content(patchAccept)
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", QAEventMatcher.matchQAEventNotifyEntry(eventMoreEndorsement)));
+
+        getClient(authToken).perform(get("/api/core/items/" + eventMoreEndorsement.getTarget())
+            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$",
+                hasJsonPath("$.metadata",
+                        MetadataMatcher.matchMetadata(AddEndorsedMetadataAction.getMetadata(), href))));
+
+    }
+
+    @Test
     public void setRelatedTest() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
@@ -834,7 +832,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         Collection colFunding = CollectionBuilder.createCollection(context, parentCommunity)
                 .withName("Collection Fundings").build();
         QAEvent event = QAEventBuilder.createTarget(context, col1, "Science and Freedom 5")
-                .withTopic("ENRICH/MISSING/PROJECT")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PROJECT)
                 .withMessage(
                         "{\"projects[0].acronym\":\"PAThs\","
                         + "\"projects[0].code\":\"687567\","
@@ -883,7 +881,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         Item funding = ItemBuilder.createItem(context, colFunding).withTitle("Tracking Papyrus and Parchment Paths")
                 .build();
         QAEvent event = QAEventBuilder.createTarget(context, col1, "Science and Freedom 5")
-                .withTopic("ENRICH/MISSING/PROJECT")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PROJECT)
                 .withMessage(
                         "{\"projects[0].acronym\":\"PAThs\","
                         + "\"projects[0].code\":\"687567\","
@@ -926,7 +924,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         Collection colFunding = CollectionBuilder.createCollection(context, parentCommunity)
                 .withName("Collection Fundings").build();
         QAEvent event = QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
         Item funding = ItemBuilder.createItem(context, colFunding).withTitle("Tracking Papyrus and Parchment Paths")
                 .build();
@@ -954,10 +952,10 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         QAEvent event1 = QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
         QAEvent event2 = QAEventBuilder.createTarget(context, col1, "Science and Freedom 2")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
         context.restoreAuthSystemState();
         String authToken = getAuthToken(admin.getEmail(), password);
@@ -1000,7 +998,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
             .build();
 
         QAEvent event = QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-            .withTopic("ENRICH/MISSING/PID")
+            .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
             .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}")
             .build();
 
@@ -1010,7 +1008,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient(authToken).perform(get("/api/integration/qualityassuranceevents/" + event.getEventId()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$", matchQAEventEntry(event)));
+            .andExpect(jsonPath("$", QAEventMatcher.matchQAEventEntry(event)));
 
         List<QAEventProcessed> processedEvents = qaEventsDao.findAll(context);
         assertThat(processedEvents, empty());
@@ -1042,10 +1040,12 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         QAEvent event =
             QAEventBuilder.createTarget(context, item)
-                          .withSource(COAR_NOTIFY)
+                          .withSource(COAR_NOTIFY_SOURCE)
                           .withTrust(0.8)
-                          .withTopic("ENRICH/MORE/REVIEW")
-                          .withMessage("{\"abstracts[0]\": \"https://doi.org/10.3214/987654\"}")
+                          .withTopic(QANotifyPatterns.TOPIC_ENRICH_MORE_REVIEW)
+                          .withMessage("{"
+                                  + "\"href\": \"https://doi.org/10.3214/987654\","
+                                  + "\"relationship\": \"some-rel\"}")
                           .build();
 
         context.restoreAuthSystemState();
@@ -1069,9 +1069,9 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         QAEvent event =
             QAEventBuilder.createTarget(context, item)
-                          .withSource(COAR_NOTIFY)
+                          .withSource(COAR_NOTIFY_SOURCE)
                           .withTrust(0.4)
-                          .withTopic("ENRICH/MORE/REVIEW")
+                          .withTopic(QANotifyPatterns.TOPIC_ENRICH_MORE_REVIEW)
                           .withMessage("{\"abstracts[0]\": \"https://doi.org/10.3214/987654\"}")
                           .build();
 
@@ -1095,9 +1095,9 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         QAEvent event =
             QAEventBuilder.createTarget(context, item)
-                          .withSource(COAR_NOTIFY)
+                          .withSource(COAR_NOTIFY_SOURCE)
                           .withTrust(0.3)
-                          .withTopic("ENRICH/MORE/REVIEW")
+                          .withTopic(QANotifyPatterns.TOPIC_ENRICH_MORE_REVIEW)
                           .withMessage("{\"abstracts[0]\": \"https://doi.org/10.3214/987654\"}")
                           .build();
 
@@ -1121,9 +1121,9 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         QAEvent event =
             QAEventBuilder.createTarget(context, item)
-                          .withSource(COAR_NOTIFY)
+                          .withSource(COAR_NOTIFY_SOURCE)
                           .withTrust(0.7)
-                          .withTopic("ENRICH/MORE/REVIEW")
+                          .withTopic(QANotifyPatterns.TOPIC_ENRICH_MORE_REVIEW)
                           .withMessage("{\"abstracts[0]\": \"https://doi.org/10.3214/987654\"}")
                           .build();
 
@@ -1149,9 +1149,9 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         QAEvent event =
             QAEventBuilder.createTarget(context, item)
-                          .withSource(COAR_NOTIFY)
+                          .withSource(COAR_NOTIFY_SOURCE)
                           .withTrust(0.8)
-                          .withTopic("ENRICH/MORE/REVIEW")
+                          .withTopic(QANotifyPatterns.TOPIC_ENRICH_MORE_REVIEW)
                           .withMessage("{\"abstracts[0]\": \"https://doi.org/10.3214/987654\"}")
                           .build();
 

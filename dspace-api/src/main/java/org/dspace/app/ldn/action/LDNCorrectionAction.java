@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Date;
 
+import com.github.jsonldjava.utils.JsonUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.NotifyServiceEntity;
@@ -20,11 +21,18 @@ import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.handle.service.HandleService;
 import org.dspace.qaevent.service.QAEventService;
+import org.dspace.qaevent.service.dto.NotifyMessageDTO;
 import org.dspace.services.ConfigurationService;
-import org.dspace.web.ContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
+
+/**
+ * Implementation for LDN Correction Action. It creates a QA Event according to the LDN Message received *
+ * @author Francesco Bacchelli (francesco.bacchelli at 4science.it)
+ *
+ */
 public class LDNCorrectionAction implements LDNAction {
 
     private static final Logger log = LogManager.getLogger(LDNEmailAction.class);
@@ -39,20 +47,38 @@ public class LDNCorrectionAction implements LDNAction {
     private QAEventService qaEventService;
     @Autowired
     private LDNMessageService ldnMessageService;
+    @Autowired
+    private HandleService handleService;
 
     @Override
-    public ActionStatus execute(Notification notification, Item item) throws Exception {
-        ActionStatus result;
-        Context context = ContextUtil.obtainCurrentRequestContext();
-        //FIXME the original id should be just an (optional) identifier/reference of the event in
-        // the external system. The target Item should be passed as a constructor argument
-        QAEvent qaEvent = new QAEvent(QAEvent.COAR_NOTIFY,
-            "oai:localhost:" + item.getHandle(), item.getID().toString(), item.getName(),
-            this.getQaEventTopic(), getScore(context, notification).doubleValue(),
-            "{\"abstracts[0]\": \"" + notification.getObject().getIetfCiteAs() + "\"}"
-            , new Date());
-        qaEventService.store(context, qaEvent);
-        result = ActionStatus.CONTINUE;
+    public ActionStatus execute(Context context, Notification notification, Item item) throws Exception {
+        ActionStatus result = ActionStatus.ABORT;
+        String itemName = itemService.getName(item);
+        QAEvent qaEvent = null;
+        if (notification.getObject() != null) {
+            String citeAs = notification.getObject().getIetfCiteAs();
+            if (citeAs == null || citeAs.isEmpty()) {
+                citeAs = notification.getObject().getId();
+            }
+            NotifyMessageDTO message = new NotifyMessageDTO();
+            message.setHref(citeAs);
+            message.setRelationship(notification.getObject().getAsRelationship());
+            if (notification.getOrigin() != null) {
+                message.setServiceId(notification.getOrigin().getId());
+                message.setServiceName(notification.getOrigin().getInbox());
+            }
+            BigDecimal score = getScore(context, notification);
+            double doubleScoreValue = score != null ? score.doubleValue() : 0d;
+            /* String fullHandleUrl = configurationService.getProperty("dspace.ui.url") + "/handle/"
+                + handleService.findHandle(context, item); */
+            qaEvent = new QAEvent(QAEvent.COAR_NOTIFY_SOURCE,
+                handleService.findHandle(context, item), item.getID().toString(), itemName,
+                this.getQaEventTopic(), doubleScoreValue,
+                JsonUtils.toString(message)
+                , new Date());
+            qaEventService.store(context, qaEvent);
+            result = ActionStatus.CONTINUE;
+        }
 
         return result;
     }

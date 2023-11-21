@@ -23,13 +23,27 @@
             <map>
             	<!--The key are the TOPIC, the value must be a valid implementation of the 
             		org.dspace.qaevent.QAEventAction interface -->
-               <entry key="ENRICH/MORE/PROJECT" value-ref="ProjectLinkedEntityAction" />
-               <entry key="ENRICH/MISSING/PROJECT" value-ref="ProjectLinkedEntityAction" />
-               <entry key="ENRICH/MISSING/ABSTRACT" value-ref="AbstractMetadataAction" />
-               <entry key="ENRICH/MORE/REVIEW" value-ref="AddReviewMetadataAction" />
-               <entry key="ENRICH/MORE/ENDORSEMENT" value-ref="AddEndorsedMetadataAction"/>
-               <entry key="ENRICH/MORE/PID" value-ref="PIDMetadataAction" />
-               <entry key="ENRICH/MISSING/PID" value-ref="PIDMetadataAction" />
+               <entry value-ref="ProjectLinkedEntityAction">
+                  <key><util:constant static-field="org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MORE_PROJECT"/></key>
+               </entry>
+               <entry value-ref="ProjectLinkedEntityAction">
+                  <key><util:constant static-field="org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_PROJECT"/></key>
+			   </entry>
+               <entry value-ref="AbstractMetadataAction">
+                  <key><util:constant static-field="org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT"/></key>
+               </entry>
+               <entry value-ref="AddReviewMetadataAction">
+                  <key><util:constant static-field="org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MORE_REVIEW"/></key>
+               </entry>
+               <entry value-ref="AddEndorsedMetadataAction">
+                  <key><util:constant static-field="org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MORE_ENDORSEMENT"/></key>
+               </entry>
+               <entry value-ref="PIDMetadataAction">
+                  <key><util:constant static-field="org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MORE_PID"/></key>
+               </entry>
+               <entry value-ref="PIDMetadataAction">
+                  <key><util:constant static-field="org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_PID"/></key>
+               </entry>
             </map>   
         </property>
      </bean>
@@ -57,10 +71,10 @@
      <bean id="AbstractMetadataAction" class="org.dspace.qaevent.action.QAOpenaireSimpleMetadataAction">
         <property name="metadata" value="dc.description.abstract" />
      </bean>
-     <bean id="AddReviewMetadataAction" class="org.dspace.qaevent.action.QAOpenaireSimpleMetadataAction">
+     <bean id="AddReviewMetadataAction" class="org.dspace.qaevent.action.QANotifySimpleMetadataAction">
         <property name="metadata" value="datacite.relation.isReviewedBy" />
      </bean>
-     <bean id="AddEndorsedMetadataAction" class="org.dspace.qaevent.action.QAOpenaireSimpleMetadataAction">
+     <bean id="AddEndorsedMetadataAction" class="org.dspace.qaevent.action.QANotifySimpleMetadataAction">
         <property name="metadata" value="notify.relation.endorsedBy"/>
      </bean>
      <!-- Add a new identifier to the given item, using the defined types mapping -->
@@ -72,6 +86,15 @@
                <entry key="default" value="dc.identifier.other" />
                <!-- <entry key="doi" value="dc.identifier.doi" />
                <entry key="pmid" value="dc.identifier.pmid" /> -->
+	         </map>
+	     </property>    
+     </bean>
+
+     <bean id="RelationMetadataAction" class="org.dspace.qaevent.action.QANotifyMetadataMapAction">
+	     <property name="types">
+	         <map>
+               <entry key="default" value="datacite.relation.isReferencedBy" />
+               <entry key="http://purl.org/vocab/frbr/core#supplement" value="datacite.relation.isSupplementedBy" />
 	         </map>
 	     </property>    
      </bean>
@@ -100,7 +123,7 @@
         AutomaticProcessingEvaluation implementation. Below you can find an example of configuration defining
         some thresholds rules for the coar-notify generated QAEvent to be approved, rejected and ignored
      -->
-    <!-- 
+    <!--
     <util:map id="qaAutomaticProcessingMap">
         <entry key="coar-notify" value-ref="qaScoreEvaluation"/>
     </util:map>
@@ -113,5 +136,5 @@
         <property name="itemFilterToIgnore" ref="simple-demo_filter" />
         <property name="itemFilterToApprove" ref="simple-demo_filter" />
     </bean>
-    -->
+	-->
  </beans>

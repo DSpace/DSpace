@@ -7,7 +7,7 @@
  */
 package org.dspace.qaevent.action;
 
-import org.dspace.qaevent.service.dto.OpenaireMessageDTO;
+import org.dspace.qaevent.service.dto.NotifyMessageDTO;
 import org.dspace.qaevent.service.dto.QAMessageDTO;
 
 /**
@@ -16,16 +16,16 @@ import org.dspace.qaevent.service.dto.QAMessageDTO;
  * @author Francesco Bacchelli (francesco.bacchelli at 4science.it)
  *
  */
-public class QAOpenaireMetadataMapAction extends AMetadataMapAction {
+public class QANotifyMetadataMapAction extends AMetadataMapAction {
 
     @Override
     public String extractMetadataType(QAMessageDTO message) {
-        return ((OpenaireMessageDTO)message).getType();
+        return ((NotifyMessageDTO)message).getRelationship();
     }
 
     @Override
     public String extractMetadataValue(QAMessageDTO message) {
-        return ((OpenaireMessageDTO)message).getValue();
+        return ((NotifyMessageDTO)message).getHref();
     }
 
 }
