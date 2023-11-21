@@ -119,6 +119,47 @@ public class SendLDNMessageActionIT extends AbstractIntegrationTestWithDatabase 
     }
 
     @Test
+    public void testLDNMessageConsumerRequestReviewGotRedirection() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+
+        context.turnOffAuthorisationSystem();
+
+        // ldnUrl should be https://notify-inbox.info/inbox/
+        // but used https://notify-inbox.info/inbox for redirection
+        NotifyServiceEntity notifyService =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("https://www.notify-inbox.info/")
+                                .withLdnUrl("https://notify-inbox.info/inbox")
+                                .build();
+
+        //3. a workspace item ready to go
+        WorkspaceItem workspaceItem =
+            WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+                                .withTitle("Submission Item")
+                                .withIssueDate("2023-11-20")
+                                .withCOARNotifyService(notifyService, "request-review")
+                                .withFulltext("test.txt", "test", InputStream.nullInputStream())
+                                .grantLicense()
+                                .build();
+
+        WorkflowItem workflowItem = workflowService.start(context, workspaceItem);
+        Item item = workflowItem.getItem();
+        context.dispatchEvents();
+        context.restoreAuthSystemState();
+
+        LDNMessageEntity ldnMessage =
+            ldnMessageService.findAll(context).stream().findFirst().orElse(null);
+
+        ldnMessage.getQueueStatus();
+
+        Notification notification = mapper.readValue(ldnMessage.getMessage(), Notification.class);
+
+        assertEquals(sendLDNMessageAction.execute(context, notification, item), CONTINUE);
+    }
+
+    @Test
     public void testLDNMessageConsumerRequestReviewWithInvalidLdnUrl() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
 

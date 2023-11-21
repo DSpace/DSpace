@@ -47,24 +47,51 @@ public class SendLDNMessageAction implements LDNAction {
 
         log.info("Announcing notification {}", request);
 
-        ResponseEntity<String> response;
-
         try {
-            response = restTemplate.postForEntity(
+            ResponseEntity<String> response = restTemplate.postForEntity(
                 notification.getTarget().getInbox(),
                 request,
                 String.class);
+
+            if (isSuccessful(response.getStatusCode())) {
+                return ActionStatus.CONTINUE;
+            } else if (isRedirect(response.getStatusCode())) {
+                return handleRedirect(response, request);
+            } else {
+                return ActionStatus.ABORT;
+            }
         } catch (Exception e) {
             log.error(e);
             return ActionStatus.ABORT;
         }
+    }
 
-        if (response.getStatusCode() == HttpStatus.ACCEPTED ||
-            response.getStatusCode() == HttpStatus.CREATED) {
-            return ActionStatus.CONTINUE;
+    private boolean isSuccessful(HttpStatus statusCode) {
+        return statusCode == HttpStatus.ACCEPTED ||
+            statusCode == HttpStatus.CREATED;
+    }
+
+    private boolean isRedirect(HttpStatus statusCode) {
+        return statusCode == HttpStatus.PERMANENT_REDIRECT ||
+            statusCode == HttpStatus.TEMPORARY_REDIRECT;
+    }
+
+    private ActionStatus handleRedirect(ResponseEntity<String> response,
+                                        HttpEntity<Notification> request) {
+
+        String url = response.getHeaders().getFirst(HttpHeaders.LOCATION);
+
+        try {
+            ResponseEntity<String> responseEntity =
+                restTemplate.postForEntity(url, request, String.class);
+
+            if (isSuccessful(responseEntity.getStatusCode())) {
+                return ActionStatus.CONTINUE;
+            }
+        } catch (Exception e) {
+            log.error("Error following redirect:", e);
         }
 
         return ActionStatus.ABORT;
     }
-
 }
