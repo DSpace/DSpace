@@ -29,11 +29,12 @@ import org.dspace.eperson.EPerson;
  * @author kevinvandevelde at atmire.com
  */
 public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
-    Iterator<Item> findAll(Context context, boolean archived) throws SQLException;
+    public Iterator<Item> findAll(Context context, boolean archived) throws SQLException;
 
-    Iterator<Item> findAll(Context context, boolean archived, int limit, int offset) throws SQLException;
+    public Iterator<Item> findAll(Context context, boolean archived, int limit, int offset) throws SQLException;
 
-    @Deprecated Iterator<Item> findAll(Context context, boolean archived, boolean withdrawn) throws SQLException;
+    @Deprecated
+    public Iterator<Item> findAll(Context context, boolean archived, boolean withdrawn) throws SQLException;
 
     /**
      * Find all items that are:
@@ -46,7 +47,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @return iterator over all regular items.
      * @throws SQLException if database error.
      */
-    Iterator<Item> findAllRegularItems(Context context) throws SQLException;
+    public Iterator<Item> findAllRegularItems(Context context) throws SQLException;
 
     /**
      * Find all Items modified since a Date.
@@ -56,10 +57,10 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @return iterator over items
      * @throws SQLException if database error
      */
-    Iterator<Item> findByLastModifiedSince(Context context, Date since)
+    public Iterator<Item> findByLastModifiedSince(Context context, Date since)
         throws SQLException;
 
-    Iterator<Item> findBySubmitter(Context context, EPerson eperson) throws SQLException;
+    public Iterator<Item> findBySubmitter(Context context, EPerson eperson) throws SQLException;
 
     /**
      * Find all the items by a given submitter. The order is
@@ -71,13 +72,13 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @return an iterator over the items submitted by eperson
      * @throws SQLException if database error
      */
-    Iterator<Item> findBySubmitter(Context context, EPerson eperson, boolean retrieveAllItems)
+    public Iterator<Item> findBySubmitter(Context context, EPerson eperson, boolean retrieveAllItems)
         throws SQLException;
 
-    Iterator<Item> findBySubmitter(Context context, EPerson eperson, MetadataField metadataField, int limit)
+    public Iterator<Item> findBySubmitter(Context context, EPerson eperson, MetadataField metadataField, int limit)
         throws SQLException;
 
-    Iterator<Item> findByMetadataField(Context context, MetadataField metadataField, String value,
+    public Iterator<Item> findByMetadataField(Context context, MetadataField metadataField, String value,
                                               boolean inArchive) throws SQLException;
 
     @Deprecated(forRemoval = true) Iterator<Item> findByMetadataQuery(Context context,
@@ -106,10 +107,10 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
     long countForMetadataQuery(Context context, List<QueryPredicate> queryPredicates,
             List<UUID> collectionUuids, String regexClause) throws SQLException;
 
-    Iterator<Item> findByAuthorityValue(Context context, MetadataField metadataField, String authority,
+    public Iterator<Item> findByAuthorityValue(Context context, MetadataField metadataField, String authority,
                                                boolean inArchive) throws SQLException;
 
-    Iterator<Item> findArchivedByCollection(Context context, Collection collection, Integer limit,
+    public Iterator<Item> findArchivedByCollection(Context context, Collection collection, Integer limit,
                                                    Integer offset) throws SQLException;
 
     /**
@@ -122,7 +123,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @return              An iterator containing the items for which the constraints hold true
      * @throws SQLException If something goes wrong
      */
-    Iterator<Item> findArchivedByCollectionExcludingOwning(Context context, Collection collection, Integer limit,
+    public Iterator<Item> findArchivedByCollectionExcludingOwning(Context context, Collection collection, Integer limit,
                                                                   Integer offset) throws SQLException;
 
     /**
@@ -133,11 +134,11 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @return              The total amount of items that fit the constraints
      * @throws SQLException If something goes wrong
      */
-    int countArchivedByCollectionExcludingOwning(Context context, Collection collection) throws SQLException;
+    public int countArchivedByCollectionExcludingOwning(Context context, Collection collection) throws SQLException;
 
-    Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException;
+    public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException;
 
-    Iterator<Item> findAllByCollection(Context context, Collection collection, Integer limit, Integer offset)
+    public Iterator<Item> findAllByCollection(Context context, Collection collection, Integer limit, Integer offset)
         throws SQLException;
 
     /**
@@ -150,7 +151,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @return item count
      * @throws SQLException if database error
      */
-    int countItems(Context context, Collection collection, boolean includeArchived, boolean includeWithdrawn)
+    public int countItems(Context context, Collection collection, boolean includeArchived, boolean includeWithdrawn)
         throws SQLException;
 
     /**
@@ -166,7 +167,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @return item count
      * @throws SQLException if database error
      */
-    int countItems(Context context, List<Collection> collections, boolean includeArchived,
+    public int countItems(Context context, List<Collection> collections, boolean includeArchived,
                           boolean includeWithdrawn) throws SQLException;
 
     /**
@@ -180,7 +181,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @return iterator over items
      * @throws SQLException if database error
      */
-    Iterator<Item> findAll(Context context, boolean archived,
+    public Iterator<Item> findAll(Context context, boolean archived,
                                   boolean withdrawn, boolean discoverable, Date lastModified)
         throws SQLException;
 
@@ -214,7 +215,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @return count of items
      * @throws SQLException if database error
      */
-    int countItems(Context context, EPerson submitter, boolean includeArchived, boolean includeWithdrawn)
+    public int countItems(Context context, EPerson submitter, boolean includeArchived, boolean includeWithdrawn)
         throws SQLException;
 
 }

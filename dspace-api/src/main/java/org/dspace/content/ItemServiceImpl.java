@@ -271,8 +271,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
                                               + template.getID()));
 
             return template;
+        } else {
+            return collection.getTemplateItem();
         }
-        return collection.getTemplateItem();
     }
 
     @Override
@@ -1180,8 +1181,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         if (item.getOwningCollection() == null) {
             if (!isInProgressSubmission(context, item)) {
                 return true;
+            } else {
+                return false;
             }
-            return false;
         }
 
         return collectionService.canEditBoolean(context, item.getOwningCollection(), false);
@@ -1273,8 +1275,8 @@ prevent the generation of resource policy entry values with null dspace_object a
             if (!authorizeService
                 .isAnIdenticalPolicyAlreadyInPlace(context, dso, defaultPolicy.getGroup(), Constants.READ,
                     defaultPolicy.getID()) &&
-                   ((!appendMode && isNotAlreadyACustomRPOfThisTypeOnDSO(context, dso)) ||
-                    (appendMode && shouldBeAppended(context, dso, defaultPolicy)))) {
+                   (!appendMode && this.isNotAlreadyACustomRPOfThisTypeOnDSO(context, dso) ||
+                    appendMode && this.shouldBeAppended(context, dso, defaultPolicy))) {
                 ResourcePolicy newPolicy = resourcePolicyService.clone(context, defaultPolicy);
                 newPolicy.setdSpaceObject(dso);
                 newPolicy.setAction(Constants.READ);
@@ -1373,8 +1375,9 @@ prevent the generation of resource policy entry values with null dspace_object a
 
         if (Item.ANY.equals(value)) {
             return itemDAO.findByMetadataField(context, mdf, null, true);
+        } else {
+            return itemDAO.findByMetadataField(context, mdf, value, true);
         }
-        return itemDAO.findByMetadataField(context, mdf, value, true);
     }
 
     @Override
@@ -1418,8 +1421,9 @@ prevent the generation of resource policy entry values with null dspace_object a
 
         if (Item.ANY.equals(value)) {
             return itemDAO.findByMetadataField(context, mdf, null, true);
+        } else {
+            return itemDAO.findByMetadataField(context, mdf, value, true);
         }
-        return itemDAO.findByMetadataField(context, mdf, value, true);
     }
 
     @Deprecated(forRemoval = true)
@@ -1512,19 +1516,20 @@ prevent the generation of resource policy entry values with null dspace_object a
         Collection ownCollection = item.getOwningCollection();
         if (ownCollection != null) {
             return ownCollection;
-        }
-        InProgressSubmission inprogress = ContentServiceFactory.getInstance().getWorkspaceItemService()
-                                                               .findByItem(context,
-                                                                           item);
-        if (inprogress == null) {
-            inprogress = WorkflowServiceFactory.getInstance().getWorkflowItemService().findByItem(context, item);
-        }
+        } else {
+            InProgressSubmission inprogress = ContentServiceFactory.getInstance().getWorkspaceItemService()
+                                                                   .findByItem(context,
+                                                                               item);
+            if (inprogress == null) {
+                inprogress = WorkflowServiceFactory.getInstance().getWorkflowItemService().findByItem(context, item);
+            }
 
-        if (inprogress != null) {
-            return inprogress.getCollection();
+            if (inprogress != null) {
+                return inprogress.getCollection();
+            }
+            // is a template item?
+            return item.getTemplateItemOf();
         }
-        // is a template item?
-        return item.getTemplateItemOf();
     }
 
     @Override
@@ -1623,8 +1628,9 @@ prevent the generation of resource policy entry values with null dspace_object a
     public Item findByIdOrLegacyId(Context context, String id) throws SQLException {
         if (StringUtils.isNumeric(id)) {
             return findByLegacyId(context, Integer.parseInt(id));
+        } else {
+            return find(context, UUID.fromString(id));
         }
-        return find(context, UUID.fromString(id));
     }
 
     @Override

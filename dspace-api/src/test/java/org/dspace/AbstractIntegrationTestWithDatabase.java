@@ -258,8 +258,9 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             int status =  ScriptLauncher.handleScript(args, commandConfigs, testDSpaceRunnableHandler, kernelImpl);
             if (testDSpaceRunnableHandler.getException() != null) {
                 throw testDSpaceRunnableHandler.getException();
+            } else {
+                return status;
             }
-            return status;
         } finally {
             if (!context.isValid()) {
                 setUp();
