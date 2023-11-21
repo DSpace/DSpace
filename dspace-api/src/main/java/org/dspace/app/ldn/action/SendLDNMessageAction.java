@@ -47,13 +47,17 @@ public class SendLDNMessageAction implements LDNAction {
 
         log.info("Announcing notification {}", request);
 
-        // https://notify-inbox.info/inbox/ for test
+        ResponseEntity<String> response;
 
-        ResponseEntity<String> response = restTemplate.postForEntity(
-            notification.getTarget().getInbox(),
-            request,
-            String.class
-        );
+        try {
+            response = restTemplate.postForEntity(
+                notification.getTarget().getInbox(),
+                request,
+                String.class);
+        } catch (Exception e) {
+            log.error(e);
+            return ActionStatus.ABORT;
+        }
 
         if (response.getStatusCode() == HttpStatus.ACCEPTED ||
             response.getStatusCode() == HttpStatus.CREATED) {
