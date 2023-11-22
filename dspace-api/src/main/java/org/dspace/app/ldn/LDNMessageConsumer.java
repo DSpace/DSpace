@@ -29,12 +29,14 @@ import org.dspace.app.ldn.factory.NotifyServiceFactory;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.ldn.service.LDNMessageService;
 import org.dspace.app.ldn.service.NotifyPatternToTriggerService;
+import org.dspace.app.ldn.service.NotifyServiceInboundPatternService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.logic.LogicalStatement;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
@@ -45,6 +47,7 @@ import org.dspace.event.Consumer;
 import org.dspace.event.Event;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.utils.DSpace;
 import org.dspace.web.ContextUtil;
 
 /**
@@ -55,6 +58,7 @@ import org.dspace.web.ContextUtil;
 public class LDNMessageConsumer implements Consumer {
 
     private NotifyPatternToTriggerService notifyPatternToTriggerService;
+    private NotifyServiceInboundPatternService inboundPatternService;
     private LDNMessageService ldnMessageService;
     private ConfigurationService configurationService;
     private ItemService itemService;
@@ -67,6 +71,7 @@ public class LDNMessageConsumer implements Consumer {
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         itemService = ContentServiceFactory.getInstance().getItemService();
         bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+        inboundPatternService = NotifyServiceFactory.getInstance().getNotifyServiceInboundPatternService();
     }
 
     @Override
@@ -77,36 +82,53 @@ public class LDNMessageConsumer implements Consumer {
             return;
         }
 
-        createLDNMessages(context, (Item) event.getSubject(context));
+        Item item = (Item) event.getSubject(context);
+        createManualLDNMessages(context, item);
+        createAutomaticLDNMessages(context, item);
     }
 
-    private void createLDNMessages(Context context, Item item) throws SQLException {
+    private void createManualLDNMessages(Context context, Item item) throws SQLException, JsonProcessingException {
         List<NotifyPatternToTrigger> patternsToTrigger =
             notifyPatternToTriggerService.findByItem(context, item);
 
-        patternsToTrigger.forEach(patternToTrigger -> {
-            try {
-                createLDNMessage(context, patternToTrigger);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-
+        for (NotifyPatternToTrigger patternToTrigger : patternsToTrigger) {
+            createLDNMessage(context,patternToTrigger.getItem(),
+                patternToTrigger.getNotifyService(), patternToTrigger.getPattern());
+        }
     }
 
-    private void createLDNMessage(Context context, NotifyPatternToTrigger patternToTrigger)
+    private void createAutomaticLDNMessages(Context context, Item item) throws SQLException, JsonProcessingException {
+
+        List<NotifyServiceInboundPattern> inboundPatterns = inboundPatternService.findAutomaticPatterns(context);
+
+        for (NotifyServiceInboundPattern inboundPattern : inboundPatterns) {
+            if (inboundPattern.getConstraint() == null ||
+                evaluateFilter(context, item, inboundPattern.getConstraint())) {
+                createLDNMessage(context, item, inboundPattern.getNotifyService(), inboundPattern.getPattern());
+            }
+        }
+    }
+
+    private boolean evaluateFilter(Context context, Item item, String constraint) {
+        LogicalStatement filter =
+            new DSpace().getServiceManager().getServiceByName(constraint, LogicalStatement.class);
+
+        return filter != null && filter.getResult(context, item);
+    }
+
+    private void createLDNMessage(Context context, Item item, NotifyServiceEntity service, String pattern)
         throws SQLException, JsonMappingException, JsonProcessingException {
 
-        LDN ldn = getLDNMessage(patternToTrigger.getPattern());
+        LDN ldn = getLDNMessage(pattern);
         LDNMessageEntity ldnMessage =
             ldnMessageService.create(context, format("urn:uuid:%s", UUID.randomUUID()));
 
-        ldnMessage.setObject(patternToTrigger.getItem());
-        ldnMessage.setTarget(patternToTrigger.getNotifyService());
+        ldnMessage.setObject(item);
+        ldnMessage.setTarget(service);
         ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_QUEUED);
         ldnMessage.setQueueTimeout(new Date());
 
-        appendGeneratedMessage(ldn, ldnMessage, patternToTrigger.getPattern());
+        appendGeneratedMessage(ldn, ldnMessage, pattern);
 
         ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(ldnMessage.getMessage(), Notification.class);

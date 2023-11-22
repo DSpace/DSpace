@@ -30,6 +30,7 @@ import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.NotifyServiceBuilder;
+import org.dspace.builder.NotifyServiceInboundPatternBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -105,6 +106,83 @@ public class LDNMessageConsumerIT extends AbstractIntegrationTestWithDatabase {
                                 .withTitle("Submission Item")
                                 .withIssueDate("2023-11-20")
                                 .withCOARNotifyService(notifyService, "request-review")
+                                .withFulltext("test.txt", "test", InputStream.nullInputStream())
+                                .grantLicense()
+                                .build();
+
+        WorkflowItem workflowItem = workflowService.start(context, workspaceItem);
+        Item item = workflowItem.getItem();
+        context.dispatchEvents();
+        context.restoreAuthSystemState();
+
+        LDNMessageEntity ldnMessage =
+            ldnMessageService.findAll(context).stream().findFirst().orElse(null);
+
+
+        assertThat(notifyService, matchesNotifyServiceEntity(ldnMessage.getTarget()));
+        assertEquals(workflowItem.getItem().getID(), ldnMessage.getObject().getID());
+        assertEquals(QUEUE_STATUS_QUEUED, ldnMessage.getQueueStatus());
+        assertNull(ldnMessage.getOrigin());
+        assertNotNull(ldnMessage.getMessage());
+
+        ObjectMapper mapper = new ObjectMapper();
+        Notification notification = mapper.readValue(ldnMessage.getMessage(), Notification.class);
+
+        // check id
+        assertThat(notification.getId(), containsString("urn:uuid:"));
+
+        // check object
+        assertEquals(notification.getObject().getId(),
+            configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle());
+        assertEquals(notification.getObject().getIetfCiteAs(),
+            itemService.getMetadataByMetadataString(item, "dc.identifier.uri").get(0).getValue());
+        assertEquals(notification.getObject().getUrl().getId(),
+            configurationService.getProperty("dspace.ui.url") + "/bitstreams/" +
+                item.getBundles(Constants.CONTENT_BUNDLE_NAME).get(0).getBitstreams().get(0).getID() + "/download");
+
+        // check target
+        assertEquals(notification.getTarget().getId(), notifyService.getUrl());
+        assertEquals(notification.getTarget().getInbox(), notifyService.getLdnUrl());
+        assertEquals(notification.getTarget().getType(), Set.of("Service"));
+
+        // check origin
+        assertEquals(notification.getOrigin().getId(), configurationService.getProperty("dspace.ui.url"));
+        assertEquals(notification.getOrigin().getInbox(), configurationService.getProperty("ldn.notify.inbox"));
+        assertEquals(notification.getOrigin().getType(), Set.of("Service"));
+
+        // check actor
+        assertEquals(notification.getActor().getId(), configurationService.getProperty("dspace.ui.url"));
+        assertEquals(notification.getActor().getName(), configurationService.getProperty("dspace.name"));
+        assertEquals(notification.getOrigin().getType(), Set.of("Service"));
+
+        // check types
+        assertEquals(notification.getType(), Set.of("coar-notify:ReviewAction", "Offer"));
+
+    }
+
+    @Test
+    public void testLDNMessageConsumerRequestReviewAutomatic() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyService =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
+                                .build();
+
+        NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyService)
+                                          .withPattern("request-review")
+                                          .withConstraint("simple-demo_filter")
+                                          .isAutomatic(true)
+                                          .build();
+
+        //3. a workspace item ready to go
+        WorkspaceItem workspaceItem =
+            WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+                                .withTitle("demo Item")
+                                .withIssueDate("2023-11-20")
                                 .withFulltext("test.txt", "test", InputStream.nullInputStream())
                                 .grantLicense()
                                 .build();
