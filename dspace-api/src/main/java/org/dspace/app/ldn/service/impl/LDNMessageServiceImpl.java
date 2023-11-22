@@ -73,6 +73,11 @@ public class LDNMessageServiceImpl implements LDNMessageService {
     }
 
     @Override
+    public List<LDNMessageEntity> findAll(Context context) throws SQLException {
+        return ldnMessageDao.findAll(context, LDNMessageEntity.class);
+    }
+
+    @Override
     public LDNMessageEntity create(Context context, String id) throws SQLException {
         return ldnMessageDao.create(context, new LDNMessageEntity(id));
     }
@@ -304,4 +309,9 @@ public class LDNMessageServiceImpl implements LDNMessageService {
         }
         return result;
     }
+
+    public void delete(Context context, LDNMessageEntity ldnMessage) throws SQLException {
+        ldnMessageDao.delete(context, ldnMessage);
+    }
+
 }

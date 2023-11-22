@@ -9,30 +9,20 @@ package org.dspace.app.ldn.processor;
 
 import static java.lang.String.format;
 
-import java.io.StringWriter;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
-import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
-import org.apache.velocity.runtime.resource.util.StringResourceRepository;
 import org.dspace.app.ldn.action.ActionStatus;
 import org.dspace.app.ldn.action.LDNAction;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.ldn.utility.LDNUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -49,10 +39,6 @@ public class LDNMetadataProcessor implements LDNProcessor {
 
     private final static Logger log = LogManager.getLogger(LDNMetadataProcessor.class);
 
-    private final static String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-
-    private final VelocityEngine velocityEngine;
-
     @Autowired
     private ItemService itemService;
 
@@ -63,16 +49,11 @@ public class LDNMetadataProcessor implements LDNProcessor {
 
     private List<LDNAction> actions = new ArrayList<>();
 
-    private List<LDNMetadataChange> changes = new ArrayList<>();
-
     /**
      * Initialize velocity engine for templating.
      */
     private LDNMetadataProcessor() {
-        velocityEngine = new VelocityEngine();
-        velocityEngine.setProperty(Velocity.RESOURCE_LOADERS, "string");
-        velocityEngine.setProperty("resource.loader.string.class", StringResourceLoader.class.getName());
-        velocityEngine.init();
+
     }
 
     /**
@@ -84,106 +65,8 @@ public class LDNMetadataProcessor implements LDNProcessor {
      */
     @Override
     public void process(Context context, Notification notification) throws Exception {
-        Item item = doProcess(context, notification);
-        runActions(context, notification, item);
-    }
-
-    /**
-     * Perform the actual notification processing. Applies all defined metadata
-     * changes.
-     *
-     * @param context  the current context
-     * @param notification current context notification
-     * @return Item associated item which persist notification details
-     * @throws Exception failed to process notification
-     */
-    private Item doProcess(Context context, Notification notification) throws Exception {
-        log.info("Processing notification {} {}", notification.getId(), notification.getType());
-        boolean updated = false;
-        VelocityContext velocityContext = prepareTemplateContext(notification);
-
         Item item = lookupItem(context, notification);
-
-        List<MetadataValue> metadataValuesToRemove = new ArrayList<>();
-
-        for (LDNMetadataChange change : changes) {
-            String condition = renderTemplate(velocityContext, change.getConditionTemplate());
-
-            boolean proceed = Boolean.parseBoolean(condition);
-
-            if (!proceed) {
-                continue;
-            }
-
-            if (change instanceof LDNMetadataAdd) {
-                LDNMetadataAdd add = ((LDNMetadataAdd) change);
-                String value = renderTemplate(velocityContext, add.getValueTemplate());
-                log.info(
-                        "Adding {}.{}.{} {} {}",
-                        add.getSchema(),
-                        add.getElement(),
-                        add.getQualifier(),
-                        add.getLanguage(),
-                        value);
-                itemService.addMetadata(
-                        context,
-                        item,
-                        add.getSchema(),
-                        add.getElement(),
-                        add.getQualifier(),
-                        add.getLanguage(),
-                        value);
-                updated = true;
-            } else if (change instanceof LDNMetadataRemove) {
-                LDNMetadataRemove remove = (LDNMetadataRemove) change;
-
-                for (String qualifier : remove.getQualifiers()) {
-                    List<MetadataValue> itemMetadata = itemService.getMetadata(
-                            item,
-                            change.getSchema(),
-                            change.getElement(),
-                            qualifier,
-                            Item.ANY);
-
-                    for (MetadataValue metadatum : itemMetadata) {
-                        boolean delete = true;
-                        for (String valueTemplate : remove.getValueTemplates()) {
-                            String value = renderTemplate(velocityContext, valueTemplate);
-                            if (!metadatum.getValue().contains(value)) {
-                                delete = false;
-                            }
-                        }
-                        if (delete) {
-                            log.info("Removing {}.{}.{} {} {}",
-                                    remove.getSchema(),
-                                    remove.getElement(),
-                                    qualifier,
-                                    remove.getLanguage(),
-                                    metadatum.getValue());
-
-                            metadataValuesToRemove.add(metadatum);
-                        }
-                    }
-                }
-            }
-        }
-
-        if (!metadataValuesToRemove.isEmpty()) {
-            itemService.removeMetadataValues(context, item, metadataValuesToRemove);
-            updated = true;
-        }
-
-        if (updated) {
-            context.turnOffAuthorisationSystem();
-            try {
-                itemService.update(context, item);
-                context.commit();
-            } finally {
-                context.restoreAuthSystemState();
-            }
-        }
-
-        return item;
+        runActions(context, notification, item);
     }
 
     /**
@@ -242,20 +125,6 @@ public class LDNMetadataProcessor implements LDNProcessor {
     }
 
     /**
-     * @return List<LDNMetadataChange>
-     */
-    public List<LDNMetadataChange> getChanges() {
-        return changes;
-    }
-
-    /**
-     * @param changes
-     */
-    public void setChanges(List<LDNMetadataChange> changes) {
-        this.changes = changes;
-    }
-
-    /**
      * Lookup associated item to the notification context. If UUID in URL, lookup bu
      * UUID, else lookup by handle.
      *
@@ -310,43 +179,6 @@ public class LDNMetadataProcessor implements LDNProcessor {
         }
 
         return item;
-    }
-
-    /**
-     * Prepare velocity template context with notification, timestamp and some
-     * static utilities.
-     *
-     * @param notification current context notification
-     * @return VelocityContext prepared velocity context
-     */
-    private VelocityContext prepareTemplateContext(Notification notification) {
-        VelocityContext velocityContext = new VelocityContext();
-
-        String timestamp = new SimpleDateFormat(DATE_PATTERN).format(Calendar.getInstance().getTime());
-
-        velocityContext.put("notification", notification);
-        velocityContext.put("timestamp", timestamp);
-        velocityContext.put("LDNUtils", LDNUtils.class);
-        velocityContext.put("Objects", Objects.class);
-        velocityContext.put("StringUtils", StringUtils.class);
-
-        return velocityContext;
-    }
-
-    /**
-     * Render velocity template with provided context.
-     *
-     * @param context  velocity context
-     * @param template template to render
-     * @return String results of rendering
-     */
-    private String renderTemplate(VelocityContext context, String template) {
-        StringWriter writer = new StringWriter();
-        StringResourceRepository repository = StringResourceLoader.getRepository();
-        repository.putStringResource("template", template);
-        velocityEngine.getTemplate("template").merge(context, writer);
-
-        return writer.toString();
     }
 
 }

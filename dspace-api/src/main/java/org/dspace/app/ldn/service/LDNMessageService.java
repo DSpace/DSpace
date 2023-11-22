@@ -36,6 +36,15 @@ public interface LDNMessageService {
     public LDNMessageEntity find(Context context, String id) throws SQLException;
 
     /**
+     * find all ldn messages
+     *
+     * @param context the context
+     * @return all ldn messages by id
+     * @throws SQLException If something goes wrong in the database
+     */
+    public List<LDNMessageEntity> findAll(Context context) throws SQLException;
+
+    /**
      * Creates a new LDNMessage
      *
      * @param context The DSpace context
@@ -118,4 +127,12 @@ public interface LDNMessageService {
      * @throws SQLException If something goes wrong in the database
      */
     public NotifyRequestStatus findRequestsByItem(Context context, Item item) throws SQLException;
+    /**
+     * delete the provided ldn message
+     *
+     * @param context the context
+     * @param ldnMessage the ldn message
+     * @throws SQLException if something goes wrong
+     */
+    public void delete(Context context, LDNMessageEntity ldnMessage) throws SQLException;
 }

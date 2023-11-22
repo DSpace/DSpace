@@ -22,10 +22,9 @@
     <bean class="org.dspace.app.ldn.service.impl.NotifyServiceOutboundPatternServiceImpl"/>
     <bean class="org.dspace.app.ldn.service.impl.LDNMessageServiceImpl"/>
     <bean class="org.dspace.app.ldn.service.impl.NotifyPatternToTriggerImpl"/>
-    <bean class="org.dspace.app.ldn.LDNBusinessDelegate"></bean>
 
     <bean name="ldnRouter" class="org.dspace.app.ldn.LDNRouter">
-        <property name="processors">
+        <property name="incomingProcessors">
             <map key-type="java.util.Set" value-type="org.dspace.app.ldn.LDNProcessor">
                 <entry>
                     <key>
@@ -52,7 +51,7 @@
                             <value>coar-notify:ReviewAction</value>
                         </set>
                     </key>
-                    <ref bean="acceptReviewAction" />
+                    <ref bean="acceptAckAction" />
                 </entry>
                 <entry>
                     <key>
@@ -61,7 +60,43 @@
                             <value>coar-notify:ReviewAction</value>
                         </set>
                     </key>
-                    <ref bean="rejectReviewAction" />
+                    <ref bean="rejectAckAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Accept</value>
+                            <value>coar-notify:EndorsementAction</value>
+                        </set>
+                    </key>
+                    <ref bean="acceptAckAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Reject</value>
+                            <value>coar-notify:EndorsementAction</value>
+                        </set>
+                    </key>
+                    <ref bean="rejectAckAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Accept</value>
+                            <value>coar-notify:IngestAction</value>
+                        </set>
+                    </key>
+                    <ref bean="acceptAckAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Reject</value>
+                            <value>coar-notify:IngestAction</value>
+                        </set>
+                    </key>
+                    <ref bean="rejectAckAction" />
                 </entry>
                 <entry>
                     <key>
@@ -98,6 +133,37 @@
                         </set>
                     </key>
                     <ref bean="offerEndorsementAction" />
+                </entry>
+            </map>
+        </property>
+        <property name="outcomingProcessors">
+            <map key-type="java.util.Set" value-type="org.dspace.app.ldn.LDNProcessor">
+                <entry>
+                    <key>
+                        <set>
+                            <value>Offer</value>
+                            <value>coar-notify:ReviewAction</value>
+                        </set>
+                    </key>
+                    <ref bean="outcomingAnnounceReviewAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Offer</value>
+                            <value>coar-notify:EndorsementAction</value>
+                        </set>
+                    </key>
+                    <ref bean="outcomingAnnounceEndorsementAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Offer</value>
+                            <value>coar-notify:IngestAction</value>
+                        </set>
+                    </key>
+                    <ref bean="outcomingAnnounceIngestAction" />
                 </entry>
             </map>
         </property>
@@ -140,7 +206,7 @@
         <property name="actions">
             <list value-type="org.dspace.app.ldn.action.LDNAction">
                 <bean class="org.dspace.app.ldn.action.LDNEmailAction">
-                    <property name="actionSendFilter" value="william_welling@harvard.edu" />
+                    <property name="actionSendFilter" value="${ldn.notification.email}" />
                     <property name="actionSendEmailTextFile" value="coar_notify_reviewed" />
                 </bean>
                 <bean class="org.dspace.app.ldn.action.LDNCorrectionAction">
@@ -154,7 +220,7 @@
         <property name="actions">
             <list value-type="org.dspace.app.ldn.action.LDNAction">
                 <bean class="org.dspace.app.ldn.action.LDNEmailAction">
-                    <property name="actionSendFilter" value="william_welling@harvard.edu" />
+                    <property name="actionSendFilter" value="${ldn.notification.email}" />
                     <property name="actionSendEmailTextFile" value="coar_notify_endorsed" />
                 </bean>
                 <bean class="org.dspace.app.ldn.action.LDNCorrectionAction">
@@ -164,82 +230,22 @@
         </property>
     </bean>
 
-    <bean name="acceptReviewAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
-        <property name="changes">
-            <list value-type="org.dspace.app.ldn.processor.LDNMetadataChange">
-                <bean class="org.dspace.app.ldn.processor.LDNMetadataRemove">
-                    <property name="qualifiers">
-                        <list value-type="java.lang.String">
-                            <value>requestreview</value>
-                            <value>refused</value>
-                        </list>
-                    </property>
-                    <property name="valueTemplates">
-                        <list value-type="java.lang.String">
-                            <value>$LDNUtils.removedProtocol($notification.origin.id)</value>
-                        </list>
-                    </property>
-                </bean>
-                <bean class="org.dspace.app.ldn.processor.LDNMetadataRemove">
-                    <property name="conditionTemplate" value="$StringUtils.isNotEmpty($notification.inReplyTo)" />
-                    <property name="qualifiers">
-                        <list value-type="java.lang.String">
-                            <value>refused</value>
-                        </list>
-                    </property>
-                    <property name="valueTemplates">
-                        <list value-type="java.lang.String">
-                            <value>$LDNUtils.removedProtocol($notification.origin.id)</value>
-                            <value>$notification.inReplyTo</value>
-                        </list>
-                    </property>
-                </bean>
-                <bean class="org.dspace.app.ldn.processor.LDNMetadataAdd">
-                    <property name="conditionTemplate" value="$StringUtils.isNotEmpty($notification.inReplyTo)" />
-                    <property name="qualifier" value="examination" />
-                    <property name="valueTemplate" value="$timestamp||$LDNUtils.removedProtocol($notification.origin.id)||$notification.inReplyTo" />
-                </bean>
-            </list>
-        </property>
+    <bean name="acceptAckAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
         <property name="actions">
             <list value-type="org.dspace.app.ldn.action.LDNAction">
                 <bean class="org.dspace.app.ldn.action.LDNEmailAction">
-                    <property name="actionSendFilter" value="william_welling@harvard.edu" />
+                    <property name="actionSendFilter" value="${ldn.notification.email}" />
                     <property name="actionSendEmailTextFile" value="coar_notify_accepted" />
                 </bean>
             </list>
         </property>
     </bean>
 
-    <bean name="rejectReviewAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
-        <property name="changes">
-            <list value-type="org.dspace.app.ldn.processor.LDNMetadataChange">
-                <bean class="org.dspace.app.ldn.processor.LDNMetadataRemove">
-                    <property name="conditionTemplate" value="$StringUtils.isNotEmpty($notification.inReplyTo)" />
-                    <property name="qualifiers">
-                        <list value-type="java.lang.String">
-                            <value>examination</value>
-                            <value>requestreview</value>
-                            <value>requestendorsement</value>
-                        </list>
-                    </property>
-                    <property name="valueTemplates">
-                        <list value-type="java.lang.String">
-                            <value>$LDNUtils.removedProtocol($notification.origin.id)</value>
-                            <value>$notification.inReplyTo</value>
-                        </list>
-                    </property>
-                </bean>
-                <bean class="org.dspace.app.ldn.processor.LDNMetadataAdd">
-                    <property name="qualifier" value="refused" />
-                    <property name="valueTemplate" value="$timestamp||$LDNUtils.removedProtocol($notification.origin.id)||$notification.inReplyTo" />
-                </bean>
-            </list>
-        </property>
+    <bean name="rejectAckAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
         <property name="actions">
             <list value-type="org.dspace.app.ldn.action.LDNAction">
                 <bean class="org.dspace.app.ldn.action.LDNEmailAction">
-                    <property name="actionSendFilter" value="william_welling@harvard.edu" />
+                    <property name="actionSendFilter" value="${ldn.notification.email}" />
                     <property name="actionSendEmailTextFile" value="coar_notify_rejected" />
                 </bean>
             </list>
@@ -250,12 +256,36 @@
         <property name="actions">
             <list value-type="org.dspace.app.ldn.action.LDNAction">
                 <bean class="org.dspace.app.ldn.action.LDNEmailAction">
-                    <property name="actionSendFilter" value="william_welling@harvard.edu" />
+                    <property name="actionSendFilter" value="${ldn.notification.email}" />
                     <property name="actionSendEmailTextFile" value="coar_notify_relationship" />
                 </bean>
                 <bean class="org.dspace.app.ldn.action.LDNCorrectionAction">
                 	<property name="qaEventTopic" value="ENRICH/MORE/LINK"/>
                 </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="outcomingAnnounceReviewAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.SendLDNMessageAction"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="outcomingAnnounceEndorsementAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.SendLDNMessageAction"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="outcomingAnnounceIngestAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.SendLDNMessageAction"/>
             </list>
         </property>
     </bean>
