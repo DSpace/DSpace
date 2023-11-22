@@ -173,7 +173,7 @@
         <property name="actions">
             <list value-type="org.dspace.app.ldn.action.LDNAction">
                 <bean class="org.dspace.app.ldn.action.LDNEmailAction">
-                    <property name="actionSendFilter" value="william_welling@harvard.edu" />
+                    <property name="actionSendFilter" value="${ldn.notification.email}" />
                     <property name="actionSendEmailTextFile" value="coar_notify_reviewed" />
                 </bean>
             </list>
@@ -184,7 +184,7 @@
         <property name="actions">
             <list value-type="org.dspace.app.ldn.action.LDNAction">
                 <bean class="org.dspace.app.ldn.action.LDNEmailAction">
-                    <property name="actionSendFilter" value="william_welling@harvard.edu" />
+                    <property name="actionSendFilter" value="${ldn.notification.email}" />
                     <property name="actionSendEmailTextFile" value="coar_notify_reviewed" />
                 </bean>
             </list>
@@ -195,7 +195,7 @@
         <property name="actions">
             <list value-type="org.dspace.app.ldn.action.LDNAction">
                 <bean class="org.dspace.app.ldn.action.LDNEmailAction">
-                    <property name="actionSendFilter" value="william_welling@harvard.edu" />
+                    <property name="actionSendFilter" value="${ldn.notification.email}" />
                     <property name="actionSendEmailTextFile" value="coar_notify_reviewed" />
                 </bean>
             </list>

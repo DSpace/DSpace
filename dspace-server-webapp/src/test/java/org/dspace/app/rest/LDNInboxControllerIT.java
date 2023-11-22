@@ -146,6 +146,59 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
             .andExpect(status().isBadRequest());
     }
 
+    @Test
+    public void ldnInboxOfferReviewAndACKTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).withName("community").build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+        String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
+        NotifyServiceEntity notifyServiceEntity = NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("https://review-service.com/inbox/about/")
+                                .withLdnUrl("https://review-service.com/inbox/")
+                                .withScore(BigDecimal.valueOf(0.6d))
+                                .build();
+        InputStream offerReviewStream = getClass().getResourceAsStream("ldn_offer_review.json");
+        String announceReview = IOUtils.toString(offerReviewStream, Charset.defaultCharset());
+        offerReviewStream.close();
+        String message = announceReview.replaceAll("<<object_handle>>", object);
+
+        ObjectMapper mapper = new ObjectMapper();
+        Notification notification = mapper.readValue(message, Notification.class);
+        getClient()
+            .perform(post("/ldn/inbox")
+                .contentType("application/ld+json")
+                .content(message))
+            .andExpect(status().isAccepted());
+
+        int processed = ldnMessageService.extractAndProcessMessageFromQueue(context);
+        assertEquals(processed, 1);
+        processed = ldnMessageService.extractAndProcessMessageFromQueue(context);
+        assertEquals(processed, 0);
+
+        InputStream ackReviewStream = getClass().getResourceAsStream("ldn_ack_review_reject.json");
+        String ackReview = IOUtils.toString(ackReviewStream, Charset.defaultCharset());
+        offerReviewStream.close();
+        String ackMessage = ackReview.replaceAll("<<object_handle>>", object);
+
+        ObjectMapper ackMapper = new ObjectMapper();
+        Notification ackNotification = mapper.readValue(ackMessage, Notification.class);
+        getClient()
+            .perform(post("/ldn/inbox")
+                .contentType("application/ld+json")
+                .content(ackMessage))
+            .andExpect(status().isAccepted());
+
+        int ackProcessed = ldnMessageService.extractAndProcessMessageFromQueue(context);
+        assertEquals(ackProcessed, 1);
+        ackProcessed = ldnMessageService.extractAndProcessMessageFromQueue(context);
+        assertEquals(ackProcessed, 0);
+
+
+    }
+
     private void checkStoredLDNMessage(Notification notification, LDNMessageEntity ldnMessage, String object)
         throws Exception {
 
