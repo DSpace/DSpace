@@ -283,11 +283,10 @@ public class LDNMessageServiceImpl implements LDNMessageService {
         if (msgs != null && !msgs.isEmpty()) {
             for (LDNMessageEntity msg : msgs) {
                 RequestStatus offer = new RequestStatus();
-                offer.setServiceName(msg.getCoarNotifyType());
+                offer.setServiceName(msg.getTarget().getName());
                 offer.setServiceUrl(msg.getTarget().getLdnUrl());
-                String msgId = msg.getID();
                 List<LDNMessageEntity> acks = ldnMessageDao.findAllRelatedMessagesByItem(
-                    context, msgId, item, "Accept", "TentativeReject", "TentativeAccept");
+                    context, msg, item, "Accept", "TentativeReject", "TentativeAccept");
                 if (acks == null || acks.isEmpty()) {
                     offer.setStatus(NotifyRequestStatusEnum.REQUESTED);
                 } else if (acks.stream()

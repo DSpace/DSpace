@@ -22,9 +22,11 @@ import org.dspace.app.rest.model.hateoas.NotifyRequestStatusResource;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -32,6 +34,7 @@ import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,8 +64,11 @@ public class NotifyRequestStatusRestController {
     @Autowired
     private ItemService itemService;
 
+    @Autowired
+    private AuthorizeService authorizeService;
+
     @GetMapping
-    //@PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public ResponseEntity<RepresentationModel<?>> findByItem(@PathVariable UUID uuid)
         throws SQLException, AuthorizeException {
 
@@ -72,6 +78,10 @@ public class NotifyRequestStatusRestController {
         Item item = itemService.find(context, uuid);
         if (item == null) {
             throw new ResourceNotFoundException("No such item: " + uuid);
+        }
+        EPerson currentUser = context.getCurrentUser();
+        if (!currentUser.equals(item.getSubmitter()) && !authorizeService.isAdmin(context)) {
+            throw new AuthorizeException("User unauthorized");
         }
         NotifyRequestStatus resultRequests = ldnMessageService.findRequestsByItem(context, item);
         NotifyRequestStatusRest resultRequestStatusRests = converterService.toRest(

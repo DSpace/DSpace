@@ -89,7 +89,7 @@ public class LDNMessageDaoImpl extends AbstractHibernateDAO<LDNMessageEntity> im
 
     @Override
     public List<LDNMessageEntity> findAllRelatedMessagesByItem(
-        Context context, String msgId, Item item, String... relatedTypes) throws SQLException {
+        Context context, LDNMessageEntity msg, Item item, String... relatedTypes) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<LDNMessageEntity> criteriaQuery = getCriteriaQuery(criteriaBuilder, LDNMessageEntity.class);
         Root<LDNMessageEntity> root = criteriaQuery.from(LDNMessageEntity.class);
@@ -103,10 +103,10 @@ public class LDNMessageDaoImpl extends AbstractHibernateDAO<LDNMessageEntity> im
         andPredicates.add(
             criteriaBuilder.isNull(root.get(LDNMessageEntity_.target)));
         andPredicates.add(
-            criteriaBuilder.equal(root.get(LDNMessageEntity_.inReplyTo), msgId));
+            criteriaBuilder.equal(root.get(LDNMessageEntity_.inReplyTo), msg));
         if (relatedTypes != null && relatedTypes.length > 0) {
-            /*relatedtypePredicate = root.get(LDNMessageEntity_.activityStreamType).in(relatedTypes);
-            andPredicates.add(relatedtypePredicate);*/
+            relatedtypePredicate = root.get(LDNMessageEntity_.activityStreamType).in(relatedTypes);
+            andPredicates.add(relatedtypePredicate);
         }
         criteriaQuery.where(criteriaBuilder.and(andPredicates.toArray(new Predicate[] {})));
         List<Order> orderList = new LinkedList<>();
@@ -137,8 +137,8 @@ public class LDNMessageDaoImpl extends AbstractHibernateDAO<LDNMessageEntity> im
         andPredicates.add(
             criteriaBuilder.isNull(root.get(LDNMessageEntity_.origin)));
         if (activities != null && activities.length > 0) {
-            /*activityPredicate = root.get(LDNMessageEntity_.activityStreamType).in(activities);
-            andPredicates.add(activityPredicate);*/
+            activityPredicate = root.get(LDNMessageEntity_.activityStreamType).in(activities);
+            andPredicates.add(activityPredicate);
         }
         criteriaQuery.where(criteriaBuilder.and(andPredicates.toArray(new Predicate[] {})));
         List<Order> orderList = new LinkedList<>();

@@ -33,5 +33,5 @@ public interface LDNMessageDao extends GenericDAO<LDNMessageEntity> {
         Context context, Item item, String... activities) throws SQLException;
 
     public List<LDNMessageEntity> findAllRelatedMessagesByItem(
-        Context context, String msgId, Item item, String... relatedTypes) throws SQLException;
+        Context context, LDNMessageEntity msg, Item item, String... relatedTypes) throws SQLException;
 }
