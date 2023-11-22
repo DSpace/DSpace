@@ -27,16 +27,19 @@ import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.dao.LDNMessageDao;
 import org.dspace.app.ldn.dao.NotifyServiceDao;
 import org.dspace.app.ldn.model.Notification;
+import org.dspace.app.ldn.model.NotifyRequestStatus;
+import org.dspace.app.ldn.model.NotifyRequestStatusEnum;
+import org.dspace.app.ldn.model.RequestStatus;
 import org.dspace.app.ldn.model.Service;
 import org.dspace.app.ldn.processor.LDNProcessor;
 import org.dspace.app.ldn.service.LDNMessageService;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
-
 
 /**
  * Implementation of {@link LDNMessageService}
@@ -109,7 +112,9 @@ public class LDNMessageServiceImpl implements LDNMessageService {
         // sorting the list
         Collections.sort(notificationTypeArrayList);
         ldnMessage.setActivityStreamType(notificationTypeArrayList.get(0));
-        ldnMessage.setCoarNotifyType(notificationTypeArrayList.get(1));
+        if (notificationTypeArrayList.size() > 1) {
+            ldnMessage.setCoarNotifyType(notificationTypeArrayList.get(1));
+        }
         ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_QUEUED);
         //CST-12126 if source is untrusted, set the queue_status of the
         //ldnMsgEntity to UNTRUSTED
@@ -275,6 +280,36 @@ public class LDNMessageServiceImpl implements LDNMessageService {
     }
 
     @Override
+    public NotifyRequestStatus findRequestsByItem(Context context, Item item) throws SQLException {
+        NotifyRequestStatus result = new NotifyRequestStatus();
+        result.setItemUuid(item.getID());
+        List<LDNMessageEntity> msgs = ldnMessageDao.findAllMessagesByItem(
+            context, item, "Offer");
+        if (msgs != null && !msgs.isEmpty()) {
+            for (LDNMessageEntity msg : msgs) {
+                RequestStatus offer = new RequestStatus();
+                offer.setServiceName(msg.getTarget().getName());
+                offer.setServiceUrl(msg.getTarget().getLdnUrl());
+                List<LDNMessageEntity> acks = ldnMessageDao.findAllRelatedMessagesByItem(
+                    context, msg, item, "Accept", "TentativeReject", "TentativeAccept");
+                if (acks == null || acks.isEmpty()) {
+                    offer.setStatus(NotifyRequestStatusEnum.REQUESTED);
+                } else if (acks.stream()
+                    .filter(c -> (c.getActivityStreamType().equalsIgnoreCase("TentativeAccept") ||
+                        c.getActivityStreamType().equalsIgnoreCase("Accept")))
+                    .findAny().isPresent()) {
+                    offer.setStatus(NotifyRequestStatusEnum.ACCEPTED);
+                } else if (acks.stream()
+                    .filter(c -> c.getActivityStreamType().equalsIgnoreCase("TentativeReject"))
+                    .findAny().isPresent()) {
+                    offer.setStatus(NotifyRequestStatusEnum.REJECTED);
+                }
+                result.addRequestStatus(offer);
+            }
+        }
+        return result;
+    }
+
     public void delete(Context context, LDNMessageEntity ldnMessage) throws SQLException {
         ldnMessageDao.delete(context, ldnMessage);
     }

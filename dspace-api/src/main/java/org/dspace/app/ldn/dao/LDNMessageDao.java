@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.app.ldn.LDNMessageEntity;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
 
@@ -28,4 +29,9 @@ public interface LDNMessageDao extends GenericDAO<LDNMessageEntity> {
 
     public List<LDNMessageEntity> findProcessingTimedoutMessages(Context context, int max_attempts) throws SQLException;
 
+    public List<LDNMessageEntity> findAllMessagesByItem(
+        Context context, Item item, String... activities) throws SQLException;
+
+    public List<LDNMessageEntity> findAllRelatedMessagesByItem(
+        Context context, LDNMessageEntity msg, Item item, String... relatedTypes) throws SQLException;
 }

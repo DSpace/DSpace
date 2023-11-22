@@ -137,14 +137,12 @@ public class LDNMetadataProcessor implements LDNProcessor {
      */
     private Item lookupItem(Context context, Notification notification) throws SQLException {
         Item item = null;
-
         String url = null;
-        if (notification.getContext() != null) {
-            url = notification.getContext().getId();
-        } else {
+        if (notification.getObject() != null) {
             url = notification.getObject().getId();
+        } else if (notification.getContext() != null) {
+            url = notification.getContext().getId();
         }
-
         log.info("Looking up item {}", url);
 
         if (LDNUtils.hasUUIDInURL(url)) {

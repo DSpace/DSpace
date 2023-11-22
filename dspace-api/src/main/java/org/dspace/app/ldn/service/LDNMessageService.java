@@ -13,7 +13,9 @@ import java.util.List;
 import org.dspace.app.ldn.LDNMessageEntity;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.model.Notification;
+import org.dspace.app.ldn.model.NotifyRequestStatus;
 import org.dspace.app.ldn.model.Service;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 
 /**
@@ -115,6 +117,16 @@ public interface LDNMessageService {
      * @throws SQLException if something goes wrong
      */
     public NotifyServiceEntity findNotifyService(Context context, Service service) throws SQLException;
+
+    /**
+     * find the ldn messages of Requests by item uuid
+     *
+     * @param context the context
+     * @param item the item
+     * @return the item requests object
+     * @throws SQLException If something goes wrong in the database
+     */
+    public NotifyRequestStatus findRequestsByItem(Context context, Item item) throws SQLException;
     /**
      * delete the provided ldn message
      *
