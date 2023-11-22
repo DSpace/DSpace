@@ -10,6 +10,7 @@ package org.dspace.app.rest;
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
@@ -27,9 +28,11 @@ import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -48,7 +51,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/" + NotifyRequestStatusRest.CATEGORY + "/" + NotifyRequestStatusRest.NAME +
     REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
-public class NotifyRequestStatusRestController {
+public class NotifyRequestStatusRestController implements InitializingBean {
 
     private static final Logger log = LogManager.getLogger(NotifyRequestStatusRestController.class);
 
@@ -66,6 +69,16 @@ public class NotifyRequestStatusRestController {
 
     @Autowired
     private AuthorizeService authorizeService;
+
+    @Autowired
+    private DiscoverableEndpointsService discoverableEndpointsService;
+
+    @Override
+    public void afterPropertiesSet() {
+        discoverableEndpointsService.register(this,
+            List.of(Link.of("/api/" + NotifyRequestStatusRest.CATEGORY + "/" + NotifyRequestStatusRest.NAME,
+                NotifyRequestStatusRest.NAME)));
+    }
 
     @GetMapping
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
