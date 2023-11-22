@@ -183,7 +183,7 @@ jobs:
       # Get Metadata for docker_build_test step below
       - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-test' image
         id: meta_build_test
-        uses: docker/metadata-action@5
+        uses: docker/metadata-action@v5
         with:
           images: dspace/dspace
           tags: ${{ env.IMAGE_TAGS }}
