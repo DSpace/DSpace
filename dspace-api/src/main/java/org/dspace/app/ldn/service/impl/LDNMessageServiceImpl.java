@@ -118,7 +118,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
         ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_QUEUED);
         //CST-12126 if source is untrusted, set the queue_status of the
         //ldnMsgEntity to UNTRUSTED
-        if (ldnMessage.getOrigin() == null) {
+        if (ldnMessage.getOrigin() == null && !"Offer".equalsIgnoreCase(ldnMessage.getActivityStreamType())) {
             ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_UNTRUSTED);
         }
         ldnMessage.setQueueTimeout(new Date());
