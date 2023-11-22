@@ -77,6 +77,15 @@ public interface ServiceManager {
     public List<String> getServicesNames();
 
     /**
+     * Get the names of all registered service singletons.  By
+     * convention, the name typically matches the fully qualified class
+     * name).
+     *
+     * @return the list of all current registered services
+     */
+    public <T> Map<String, T> getServicesWithNamesByType(Class<T> type);
+
+    /**
      * Allows adding singleton services and providers in at runtime or
      * after the service manager has started up.
      * This is primarily useful for registering providers, filters, and
