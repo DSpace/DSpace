@@ -128,6 +128,8 @@ public class QASourceRestRepositoryIT extends AbstractControllerIntegrationTest 
     public void testFindOne() throws Exception {
 
         context.turnOffAuthorisationSystem();
+        Community com = CommunityBuilder.createCommunity(context).withName("Test community").build();
+        Collection col = CollectionBuilder.createCollection(context, com).withName("Test collection").build();
 
         createEvent(QAEvent.OPENAIRE_SOURCE, "TOPIC/OPENAIRE/1", "Title 1");
         createEvent(QAEvent.OPENAIRE_SOURCE, "TOPIC/OPENAIRE/2", "Title 2");
@@ -135,7 +137,9 @@ public class QASourceRestRepositoryIT extends AbstractControllerIntegrationTest 
 
         createEvent("test-source", "TOPIC/TEST/1", "Title 4");
         createEvent("test-source", "TOPIC/TEST/1", "Title 5");
-        createEvent(QAEvent.COAR_NOTIFY_SOURCE, "TOPIC", "Title 7");
+        context.setCurrentUser(admin);
+        Item target1 = ItemBuilder.createItem(context, col).withTitle("Title 7").build();
+        createEvent(QAEvent.COAR_NOTIFY_SOURCE, "TOPIC", target1);
         context.setCurrentUser(eperson);
         createEvent(QAEvent.COAR_NOTIFY_SOURCE, "TOPIC", "Title 8");
         createEvent(QAEvent.COAR_NOTIFY_SOURCE, "TOPIC", "Title 9");
