@@ -11,6 +11,7 @@ import static org.dspace.app.rest.repository.patch.operation.ldn.NotifyServicePa
 
 import java.sql.SQLException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.NotifyServiceInboundPattern;
 import org.dspace.app.ldn.service.NotifyServiceInboundPatternService;
@@ -56,8 +57,9 @@ public class NotifyServiceInboundPatternsAddOperation extends PatchOperation<Not
                 NotifyServiceInboundPattern persistInboundPattern = inboundPatternService.findByServiceAndPattern(
                     context, notifyServiceEntity, patchInboundPattern.getPattern());
 
-                if (persistInboundPattern != null && persistInboundPattern.getConstraint().equals(patchInboundPattern
-                        .getConstraint())) {
+                if (persistInboundPattern != null && (StringUtils.isNotBlank(persistInboundPattern.getConstraint())
+                    && persistInboundPattern.getConstraint().equals(patchInboundPattern
+                        .getConstraint()))) {
                     throw new DSpaceBadRequestException("the provided InboundPattern is already existed");
                 }
 

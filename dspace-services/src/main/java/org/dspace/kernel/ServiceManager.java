@@ -85,7 +85,6 @@ public interface ServiceManager {
      * @param type the type for the requested service (this will typically be the interface class but can be concrete
      *            as well)
      * @return map with service's name and service singletons
-     * @return the list of all current registered services
      */
     public <T> Map<String, T> getServicesWithNamesByType(Class<T> type);
 
