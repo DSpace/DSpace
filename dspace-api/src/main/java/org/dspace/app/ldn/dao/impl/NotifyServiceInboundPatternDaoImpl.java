@@ -8,6 +8,7 @@
 package org.dspace.app.ldn.dao.impl;
 
 import java.sql.SQLException;
+import java.util.List;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -41,5 +42,18 @@ public class NotifyServiceInboundPatternDaoImpl
                 inboundPatternRoot.get(NotifyServiceInboundPattern_.pattern), pattern)
         ));
         return uniqueResult(context, criteriaQuery, false, NotifyServiceInboundPattern.class);
+    }
+
+    @Override
+    public List<NotifyServiceInboundPattern> findAutomaticPatterns(Context context) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, NotifyServiceInboundPattern.class);
+        Root<NotifyServiceInboundPattern> inboundPatternRoot = criteriaQuery.from(NotifyServiceInboundPattern.class);
+        criteriaQuery.select(inboundPatternRoot);
+        criteriaQuery.where(
+            criteriaBuilder.equal(
+                inboundPatternRoot.get(NotifyServiceInboundPattern_.automatic), true)
+        );
+        return list(context, criteriaQuery, false, NotifyServiceInboundPattern.class, -1, -1);
     }
 }

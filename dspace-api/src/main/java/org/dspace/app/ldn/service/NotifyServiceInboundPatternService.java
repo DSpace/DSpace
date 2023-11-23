@@ -8,6 +8,7 @@
 package org.dspace.app.ldn.service;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.NotifyServiceInboundPattern;
@@ -34,6 +35,15 @@ public interface NotifyServiceInboundPatternService {
     public NotifyServiceInboundPattern findByServiceAndPattern(Context context,
                                                                NotifyServiceEntity notifyServiceEntity,
                                                                String pattern) throws SQLException;
+
+    /**
+     * find all automatic notifyServiceInboundPatterns
+     *
+     * @param context the context
+     * @return all automatic notifyServiceInboundPatterns
+     * @throws SQLException if database error
+     */
+    public List<NotifyServiceInboundPattern> findAutomaticPatterns(Context context) throws SQLException;
 
     /**
      * create new notifyServiceInboundPattern
