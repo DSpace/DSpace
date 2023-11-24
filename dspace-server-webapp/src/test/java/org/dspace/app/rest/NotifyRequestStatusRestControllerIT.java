@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.model.Notification;
@@ -31,15 +32,13 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.services.ConfigurationService;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Rest Controller for NotifyRequestStatus targeting items IT
- * class {@link NotifyRequestStatusRestController} 
+ * class {@link NotifyRequestStatusRestController}
  *
  * @author Francesco Bacchelli (francesco.bacchelli at 4science dot it)
  */
@@ -50,9 +49,8 @@ public class NotifyRequestStatusRestControllerIT extends AbstractControllerInteg
 
     @Autowired
     private LDNMessageService ldnMessageService;
-    
+
     @Test
-    @Ignore
     public void oneStatusReviewedTest() throws Exception {
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).withName("community").build();
@@ -66,11 +64,11 @@ public class NotifyRequestStatusRestControllerIT extends AbstractControllerInteg
                                 .withLdnUrl("https://review-service.com/inbox/")
                                 .withScore(BigDecimal.valueOf(0.6d))
                                 .build();
+        //SEND OFFER REVIEW
         InputStream offerReviewStream = getClass().getResourceAsStream("ldn_offer_review.json");
         String announceReview = IOUtils.toString(offerReviewStream, Charset.defaultCharset());
         offerReviewStream.close();
         String message = announceReview.replaceAll("<<object_handle>>", object);
-        //SEND OFFER REVIEW
         ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
         getClient()
@@ -83,23 +81,21 @@ public class NotifyRequestStatusRestControllerIT extends AbstractControllerInteg
         assertEquals(processed, 1);
         processed = ldnMessageService.extractAndProcessMessageFromQueue(context);
         assertEquals(processed, 0);
-        
+
         //CHECK THE SERVICE ON ITS notifystatus ARRAY
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
             .perform(get("/api/" + NotifyRequestStatusRest.CATEGORY + "/"
                 + NotifyRequestStatusRest.NAME + "/" + item.getID())
-                .contentType("application/ld+json")
-                .content(message))
-            .andExpect(status().isAccepted())
-            .andExpect(jsonPath("$.notifystatus").isArray())
-            .andExpect(jsonPath("$.notifystatus").isNotEmpty())
-            .andExpect(jsonPath("$.notifystatus[0].status").isString())
+                .contentType("application/ld+json"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.notifyStatus").isArray())
+            .andExpect(jsonPath("$.notifyStatus").isNotEmpty())
+            .andExpect(jsonPath("$.notifyStatus[0].status").value("REQUESTED"))
             ;
     }
 
     @Test
-    @Ignore
     public void oneStatusRejectedTest() throws Exception {
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).withName("community").build();
@@ -114,11 +110,10 @@ public class NotifyRequestStatusRestControllerIT extends AbstractControllerInteg
                                 .withScore(BigDecimal.valueOf(0.6d))
                                 .build();
         //SEND OFFER REVIEW
-        InputStream offerReviewStream = getClass().getResourceAsStream("ldn_offer_review.json");
+        InputStream offerReviewStream = getClass().getResourceAsStream("ldn_offer_review2.json");
         String announceReview = IOUtils.toString(offerReviewStream, Charset.defaultCharset());
         offerReviewStream.close();
         String message = announceReview.replaceAll("<<object_handle>>", object);
-
         ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
         getClient()
@@ -130,12 +125,15 @@ public class NotifyRequestStatusRestControllerIT extends AbstractControllerInteg
         int processed = ldnMessageService.extractAndProcessMessageFromQueue(context);
         assertEquals(processed, 1);
         processed = ldnMessageService.extractAndProcessMessageFromQueue(context);
+
         assertEquals(processed, 0);
         //SEND ACK REVIEW REJECTED
         InputStream ackReviewStream = getClass().getResourceAsStream("ldn_ack_review_reject.json");
         String ackReview = IOUtils.toString(ackReviewStream, Charset.defaultCharset());
         ackReviewStream.close();
         String ackMessage = ackReview.replaceAll("<<object_handle>>", object);
+        ackMessage = ackMessage.replaceAll(
+            "<<ldn_offer_review_uuid>>", "urn:uuid:0370c0fb-bb78-4a9b-87f5-bed307a509df");
 
         ObjectMapper ackMapper = new ObjectMapper();
         Notification ackNotification = ackMapper.readValue(ackMessage, Notification.class);
@@ -149,5 +147,18 @@ public class NotifyRequestStatusRestControllerIT extends AbstractControllerInteg
         assertEquals(ackProcessed, 1);
         ackProcessed = ldnMessageService.extractAndProcessMessageFromQueue(context);
         assertEquals(ackProcessed, 0);
+        
+
+        //CHECK THE SERVICE ON ITS notifystatus ARRAY
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken)
+            .perform(get("/api/" + NotifyRequestStatusRest.CATEGORY + "/"
+                + NotifyRequestStatusRest.NAME + "/" + item.getID())
+                .contentType("application/ld+json"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.notifyStatus").isArray())
+            .andExpect(jsonPath("$.notifyStatus").isNotEmpty())
+            .andExpect(jsonPath("$.notifyStatus[0].status").value("REJECTED"))
+            ;
     }
 }
