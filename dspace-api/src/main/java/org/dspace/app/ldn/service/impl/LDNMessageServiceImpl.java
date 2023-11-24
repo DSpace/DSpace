@@ -223,6 +223,9 @@ public class LDNMessageServiceImpl implements LDNMessageService {
                     }
                 } else {
                     log.info("Found x" + msgs.size() + " LDN messages but none processor found.");
+                    msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_UNMAPPED_ACTION);
+                    msg.setQueueAttempts(msg.getQueueAttempts() + 1);
+                    update(context, msg);
                 }
             }
         } catch (SQLException e) {
