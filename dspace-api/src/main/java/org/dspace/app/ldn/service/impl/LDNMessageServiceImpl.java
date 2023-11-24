@@ -193,11 +193,13 @@ public class LDNMessageServiceImpl implements LDNMessageService {
                 LDNProcessor processor = null;
                 for (int i = 0; processor == null && i < msgs.size() && msgs.get(i) != null; i++) {
                     processor = ldnRouter.route(msgs.get(i));
+                    msg = msgs.get(i);
                     if (processor == null) {
                         log.info(
                             "No processor found for LDN message " + msgs.get(i));
-                    } else {
-                        msg = msgs.get(i);
+                        msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_UNMAPPED_ACTION);
+                        msg.setQueueAttempts(msg.getQueueAttempts() + 1);
+                        update(context, msg);
                     }
                 }
                 if (processor != null) {
@@ -223,9 +225,6 @@ public class LDNMessageServiceImpl implements LDNMessageService {
                     }
                 } else {
                     log.info("Found x" + msgs.size() + " LDN messages but none processor found.");
-                    msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_UNMAPPED_ACTION);
-                    msg.setQueueAttempts(msg.getQueueAttempts() + 1);
-                    update(context, msg);
                 }
             }
         } catch (SQLException e) {
@@ -291,8 +290,8 @@ public class LDNMessageServiceImpl implements LDNMessageService {
         if (msgs != null && !msgs.isEmpty()) {
             for (LDNMessageEntity msg : msgs) {
                 RequestStatus offer = new RequestStatus();
-                offer.setServiceName(msg.getTarget().getName());
-                offer.setServiceUrl(msg.getTarget().getLdnUrl());
+                offer.setServiceName(msg.getTarget() == null ? "Unknown Service" : msg.getTarget().getName());
+                offer.setServiceUrl(msg.getTarget() == null ? "" : msg.getTarget().getLdnUrl());
                 List<LDNMessageEntity> acks = ldnMessageDao.findAllRelatedMessagesByItem(
                     context, msg, item, "Accept", "TentativeReject", "TentativeAccept", "Announce");
                 if (acks == null || acks.isEmpty()) {
