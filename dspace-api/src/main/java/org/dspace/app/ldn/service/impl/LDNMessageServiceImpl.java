@@ -294,12 +294,13 @@ public class LDNMessageServiceImpl implements LDNMessageService {
                 offer.setServiceName(msg.getTarget().getName());
                 offer.setServiceUrl(msg.getTarget().getLdnUrl());
                 List<LDNMessageEntity> acks = ldnMessageDao.findAllRelatedMessagesByItem(
-                    context, msg, item, "Accept", "TentativeReject", "TentativeAccept");
+                    context, msg, item, "Accept", "TentativeReject", "TentativeAccept", "Announce");
                 if (acks == null || acks.isEmpty()) {
                     offer.setStatus(NotifyRequestStatusEnum.REQUESTED);
                 } else if (acks.stream()
                     .filter(c -> (c.getActivityStreamType().equalsIgnoreCase("TentativeAccept") ||
-                        c.getActivityStreamType().equalsIgnoreCase("Accept")))
+                        c.getActivityStreamType().equalsIgnoreCase("Accept") ||
+                        c.getActivityStreamType().equalsIgnoreCase("Announce")))
                     .findAny().isPresent()) {
                     offer.setStatus(NotifyRequestStatusEnum.ACCEPTED);
                 } else if (acks.stream()
