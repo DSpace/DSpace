@@ -242,14 +242,15 @@ public class QAEventServiceImpl implements QAEventService {
 
     @Override
     public List<QATopic> findAllTopicsBySource(Context context, String source, long offset, long count) {
-
-        if (source != null && isNotSupportedSource(source)) {
-            return null;
+        var currentUser = context.getCurrentUser();
+        if (isNotSupportedSource(source) || !qaSecurityService.canSeeSource(context, currentUser, source)) {
+            return List.of();
         }
 
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, source);
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
-        solrQuery.setQuery("*:*");
+        solrQuery.setQuery(securityQuery.orElse("*:*"));
         solrQuery.setFacet(true);
         solrQuery.setFacetMinCount(1);
         solrQuery.setFacetLimit((int) (offset + count));
@@ -269,6 +270,7 @@ public class QAEventServiceImpl implements QAEventService {
                     continue;
                 }
                 QATopic topic = new QATopic();
+                topic.setSource(source);
                 topic.setKey(c.getName());
                 topic.setTotalEvents(c.getCount());
                 topic.setLastEvent(new Date());

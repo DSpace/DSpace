@@ -12,6 +12,7 @@ import java.util.UUID;
 
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
+import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.QATopicRest;
 import org.dspace.core.Context;
 import org.dspace.qaevent.QATopic;
@@ -35,6 +36,11 @@ public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, Str
     private QAEventService qaEventService;
 
     @Override
+    public Page<QATopicRest> findAll(Context context, Pageable pageable) {
+        throw new RepositoryMethodNotImplementedException("Method not allowed!", "");
+    }
+
+    @Override
     @PreAuthorize("hasPermission(#id, 'QUALITYASSURANCETOPIC', 'READ')")
     public QATopicRest findOne(Context context, String id) {
         QATopic topic = qaEventService.findTopicByTopicId(id);
@@ -44,21 +50,11 @@ public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, Str
         return converter.toRest(topic, utils.obtainProjection());
     }
 
-    @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public Page<QATopicRest> findAll(Context context, Pageable pageable) {
-        List<QATopic> topics = qaEventService.findAllTopics(context, pageable.getOffset(), pageable.getPageSize());
-        long count = qaEventService.countTopics();
-        if (topics == null) {
-            return null;
-        }
-        return converter.toRestPage(topics, pageable, count, utils.obtainProjection());
-    }
-
     @SearchRestMethod(name = "bySource")
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    public Page<QATopicRest> findBySource(Context context, @Parameter(value = "source", required = true) String source,
+    public Page<QATopicRest> findBySource(@Parameter(value = "source", required = true) String source,
            Pageable pageable) {
+        Context context = obtainContext();
         List<QATopic> topics = qaEventService.findAllTopicsBySource(context, source,
                                               pageable.getOffset(), pageable.getPageSize());
         long count = qaEventService.countTopicsBySource(context, source);

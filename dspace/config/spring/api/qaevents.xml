@@ -85,7 +85,7 @@
         <property name="filterTemplate">
             <!-- we need to escape the { as it as a special meaning for the message format -->
             <!-- argument {0} will be replaced with the uuid of the loggedin user -->
-            <value>original_id:{0} AND '{'!join from=search.resourceid to=resource_uuid fromIndex=${solr.multicorePrefix}search'}'*:*</value>
+            <value>original_id:{0}</value>
         </property>    
     </bean>
 
