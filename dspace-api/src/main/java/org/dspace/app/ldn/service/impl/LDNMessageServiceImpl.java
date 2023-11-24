@@ -299,8 +299,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
                     offer.setStatus(NotifyRequestStatusEnum.REQUESTED);
                 } else if (acks.stream()
                     .filter(c -> (c.getActivityStreamType().equalsIgnoreCase("TentativeAccept") ||
-                        c.getActivityStreamType().equalsIgnoreCase("Accept") ||
-                        c.getActivityStreamType().equalsIgnoreCase("Announce")))
+                        c.getActivityStreamType().equalsIgnoreCase("Accept")))
                     .findAny().isPresent()) {
                     offer.setStatus(NotifyRequestStatusEnum.ACCEPTED);
                 } else if (acks.stream()
@@ -308,7 +307,11 @@ public class LDNMessageServiceImpl implements LDNMessageService {
                     .findAny().isPresent()) {
                     offer.setStatus(NotifyRequestStatusEnum.REJECTED);
                 }
-                result.addRequestStatus(offer);
+                if (acks.stream().filter(
+                    c -> c.getActivityStreamType().equalsIgnoreCase("Announce"))
+                    .findAny().isEmpty()) {
+                    result.addRequestStatus(offer);
+                }
             }
         }
         return result;
