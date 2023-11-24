@@ -8,6 +8,7 @@
 package org.dspace.app.ldn.service.impl;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.NotifyServiceInboundPattern;
@@ -31,6 +32,11 @@ public class NotifyServiceInboundPatternServiceImpl implements NotifyServiceInbo
                                                                NotifyServiceEntity notifyServiceEntity,
                                                                String pattern) throws SQLException {
         return inboundPatternDao.findByServiceAndPattern(context, notifyServiceEntity, pattern);
+    }
+
+    @Override
+    public List<NotifyServiceInboundPattern> findAutomaticPatterns(Context context) throws SQLException {
+        return inboundPatternDao.findAutomaticPatterns(context);
     }
 
     @Override

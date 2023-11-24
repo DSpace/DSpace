@@ -59,6 +59,11 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
      */
     public static final Integer QUEUE_STATUS_UNTRUSTED = 5;
 
+    /**
+     * Message is not processed since action is not mapped
+     */
+    public static final Integer QUEUE_STATUS_UNMAPPED_ACTION = 6;
+
     @Id
     private String id;
 

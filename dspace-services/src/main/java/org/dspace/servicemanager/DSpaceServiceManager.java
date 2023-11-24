@@ -505,6 +505,21 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
     }
 
     @Override
+    public <T> Map<String, T> getServicesWithNamesByType(Class<T> type) {
+        checkRunning();
+
+        if (type == null) {
+            throw new IllegalArgumentException("type cannot be null");
+        }
+
+        try {
+            return applicationContext.getBeansOfType(type, true, true);
+        } catch (BeansException e) {
+            throw new RuntimeException("Failed to get beans of type (" + type + "): " + e.getMessage(), e);
+        }
+    }
+
+    @Override
     public boolean isServiceExists(String name) {
         checkRunning();
         if (name == null) {
