@@ -9,12 +9,12 @@
     "type": "Service"
   },
   "context": {
-    "id": "https://some-organisation.org/resource/0021",
+    "id": "<<object_handle>>",
     "ietf:cite-as": "https://doi.org/10.4598/12123487",
     "type": "Document"
   },
   "id": "urn:uuid:668f26e0-2c8d-4117-a0d2-ee713523bcb4",
-  "inReplyTo": "urn:uuid:0370c0fb-bb78-4a9b-87f5-bed307a509de",
+  "inReplyTo": "<<ldn_offer_review_uuid>>",
   "object": {
     "id": "<<object_handle>>",
     "object": "https://some-organisation.org/resource/0021",

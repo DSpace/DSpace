@@ -186,7 +186,8 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         String ackReview = IOUtils.toString(ackReviewStream, Charset.defaultCharset());
         offerReviewStream.close();
         String ackMessage = ackReview.replaceAll("<<object_handle>>", object);
-
+        ackMessage = ackMessage.replaceAll("<<ldn_offer_review_uuid>>",
+            "urn:uuid:0370c0fb-bb78-4a9b-87f5-bed307a509de");
         ObjectMapper ackMapper = new ObjectMapper();
         Notification ackNotification = mapper.readValue(ackMessage, Notification.class);
         getClient()

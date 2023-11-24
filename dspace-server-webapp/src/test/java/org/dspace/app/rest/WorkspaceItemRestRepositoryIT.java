@@ -8638,14 +8638,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                 .build();
 
         // append the three services to the workspace item with different patterns
-        WorkspaceItem workspaceItem =
-            WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                                .withTitle("Workspace Item")
-                                .withIssueDate("2024-10-10")
-                                .withCOARNotifyService(notifyServiceOne, "request-review")
-                                .withCOARNotifyService(notifyServiceTwo, "request-endorsement")
-                                .withCOARNotifyService(notifyServiceThree, "request-endorsement")
-                                .build();
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+                  .withTitle("Workspace Item")
+                  .withIssueDate("2024-10-10")
+                  .withCOARNotifyService(notifyServiceOne, "request-review")
+                  .withCOARNotifyService(notifyServiceTwo, "request-endorsement")
+                  .withCOARNotifyService(notifyServiceThree, "request-endorsement")
+                  .build();
 
         context.restoreAuthSystemState();
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -9237,7 +9236,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                             .andExpect(jsonPath("$.sections.coarnotify.request-review",
                                 contains(notifyServiceOne.getID())))
                             .andExpect(jsonPath(
-                                "$.errors[?(@.message=='error.validation.coarnotify.invalidfilter')]").doesNotExist());
+                                "$.errors[?(@.message=='error.validation.coarnotify.invalidfilter')]")
+                                    .doesNotExist());
 
     }
 
