@@ -98,8 +98,8 @@ public class LDNMessageDaoImpl extends AbstractHibernateDAO<LDNMessageEntity> im
         Predicate relatedtypePredicate = null;
         andPredicates.add(
             criteriaBuilder.equal(root.get(LDNMessageEntity_.queueStatus), LDNMessageEntity.QUEUE_STATUS_PROCESSED));
-        andPredicates.add(
-            criteriaBuilder.equal(root.get(LDNMessageEntity_.object), item));
+        /*andPredicates.add(
+            criteriaBuilder.equal(root.get(LDNMessageEntity_.object), item));*/
         andPredicates.add(
             criteriaBuilder.isNull(root.get(LDNMessageEntity_.target)));
         andPredicates.add(

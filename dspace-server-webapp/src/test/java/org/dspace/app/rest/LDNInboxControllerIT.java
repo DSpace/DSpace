@@ -18,8 +18,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.sql.SQLException;
+import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.ldn.LDNMessageEntity;
 import org.dspace.app.ldn.NotifyServiceEntity;
@@ -39,6 +42,7 @@ import org.dspace.qaevent.QANotifyPatterns;
 import org.dspace.qaevent.service.QAEventService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
+import org.junit.After;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -182,7 +186,8 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         String ackReview = IOUtils.toString(ackReviewStream, Charset.defaultCharset());
         offerReviewStream.close();
         String ackMessage = ackReview.replaceAll("<<object_handle>>", object);
-
+        ackMessage = ackMessage.replaceAll("<<ldn_offer_review_uuid>>",
+            "urn:uuid:0370c0fb-bb78-4a9b-87f5-bed307a509de");
         ObjectMapper ackMapper = new ObjectMapper();
         Notification ackNotification = mapper.readValue(ackMessage, Notification.class);
         getClient()
@@ -222,4 +227,20 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         assertEquals(notification.getType(), storedMessage.getType());
     }
 
+    @Override
+    @After
+    public void destroy() throws Exception {
+        List<LDNMessageEntity> ldnMessageEntities = ldnMessageService.findAll(context);
+        if (CollectionUtils.isNotEmpty(ldnMessageEntities)) {
+            ldnMessageEntities.forEach(ldnMessage -> {
+                try {
+                    ldnMessageService.delete(context, ldnMessage);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+
+        super.destroy();
+    }
 }

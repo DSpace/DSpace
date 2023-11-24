@@ -84,12 +84,15 @@ public class QAEventActionServiceImpl implements QAEventActionService {
                 log.error(msg);
                 throw new RuntimeException(msg);
             }
+            context.turnOffAuthorisationSystem();
             topicsToActions.get(qaevent.getTopic()).applyCorrection(context, item, related,
                 jsonMapper.readValue(qaevent.getMessage(), qaevent.getMessageDtoClass()));
             qaEventService.deleteEventByEventId(qaevent.getEventId());
             makeAcknowledgement(qaevent.getEventId(), qaevent.getSource(), QAEvent.ACCEPTED);
         } catch (SQLException | JsonProcessingException e) {
             throw new RuntimeException(e);
+        } finally {
+            context.restoreAuthSystemState();
         }
     }
 

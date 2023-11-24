@@ -8639,12 +8639,12 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // append the three services to the workspace item with different patterns
         WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
-                                                          .withTitle("Workspace Item")
-                                                          .withIssueDate("2024-10-10")
-                                                          .withCOARNotifyService(notifyServiceOne, "review")
-                                                          .withCOARNotifyService(notifyServiceTwo, "endorsement")
-                                                          .withCOARNotifyService(notifyServiceThree, "endorsement")
-                                                          .build();
+                  .withTitle("Workspace Item")
+                  .withIssueDate("2024-10-10")
+                  .withCOARNotifyService(notifyServiceOne, "request-review")
+                  .withCOARNotifyService(notifyServiceTwo, "request-endorsement")
+                  .withCOARNotifyService(notifyServiceThree, "request-endorsement")
+                  .build();
 
         context.restoreAuthSystemState();
         String adminToken = getAuthToken(admin.getEmail(), password);
@@ -8653,9 +8653,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         getClient(adminToken)
             .perform(get("/api/submission/workspaceitems/" + workspaceItem.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.sections.coarnotify.endorsement", contains(
+            .andExpect(jsonPath("$.sections.coarnotify.request-endorsement", contains(
                 notifyServiceTwo.getID(), notifyServiceThree.getID())))
-            .andExpect(jsonPath("$.sections.coarnotify.review", contains(
+            .andExpect(jsonPath("$.sections.coarnotify.request-review", contains(
                 notifyServiceOne.getID())));
     }
 
@@ -8693,23 +8693,23 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                                                   .withTitle("Test WorkspaceItem")
                                                   .withIssueDate("2017-10-17")
-                                                  .withCOARNotifyService(notifyServiceOne, "review")
+                                                  .withCOARNotifyService(notifyServiceOne, "request-review")
                                                   .build();
 
         NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceOne)
-                                          .withPattern("review")
+                                          .withPattern("request-review")
                                           .withConstraint("itemFilterA")
                                           .isAutomatic(false)
                                           .build();
 
         NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceTwo)
-                                          .withPattern("review")
+                                          .withPattern("request-review")
                                           .withConstraint("itemFilterA")
                                           .isAutomatic(false)
                                           .build();
 
         NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceThree)
-                                          .withPattern("review")
+                                          .withPattern("request-review")
                                           .withConstraint("itemFilterA")
                                           .isAutomatic(false)
                                           .build();
@@ -8720,7 +8720,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // try to add new service of review pattern to witem
         List<Operation> addOpts = new ArrayList<Operation>();
-        addOpts.add(new AddOperation("/sections/coarnotify/review/-",
+        addOpts.add(new AddOperation("/sections/coarnotify/request-review/-",
             List.of(notifyServiceTwo.getID(), notifyServiceThree.getID())));
 
         String patchBody = getPatchContent(addOpts);
@@ -8729,8 +8729,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                 .content(patchBody)
                                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.sections.coarnotify.review", hasSize(3)))
-                            .andExpect(jsonPath("$.sections.coarnotify.review",contains(
+                            .andExpect(jsonPath("$.sections.coarnotify.request-review", hasSize(3)))
+                            .andExpect(jsonPath("$.sections.coarnotify.request-review",contains(
                                 notifyServiceOne.getID(),
                                 notifyServiceTwo.getID(),
                                 notifyServiceThree.getID()
@@ -8772,7 +8772,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                                                   .withTitle("Test WorkspaceItem")
                                                   .withIssueDate("2017-10-17")
-                                                  .withCOARNotifyService(notifyServiceOne, "review")
+                                                  .withCOARNotifyService(notifyServiceOne, "request-review")
                                                   .build();
 
         context.restoreAuthSystemState();
@@ -8782,14 +8782,14 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // check the coar notify services of witem
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.sections.coarnotify.review", hasSize(1)))
-                            .andExpect(jsonPath("$.sections.coarnotify.review", contains(
+                            .andExpect(jsonPath("$.sections.coarnotify.request-review", hasSize(1)))
+                            .andExpect(jsonPath("$.sections.coarnotify.request-review", contains(
                                 notifyServiceOne.getID()
                             )));
 
         // try to add new service of review pattern to witem
         List<Operation> addOpts = new ArrayList<Operation>();
-        addOpts.add(new AddOperation("/sections/coarnotify/review/-",
+        addOpts.add(new AddOperation("/sections/coarnotify/request-review/-",
             List.of(notifyServiceTwo.getID(), notifyServiceThree.getID())));
 
         String patchBody = getPatchContent(addOpts);
@@ -8868,7 +8868,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                                                   .withTitle("Test WorkspaceItem")
                                                   .withIssueDate("2017-10-17")
-                                                  .withCOARNotifyService(notifyServiceOne, "review")
+                                                  .withCOARNotifyService(notifyServiceOne, "request-review")
                                                   .build();
 
         context.restoreAuthSystemState();
@@ -8878,13 +8878,13 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // check the coar notify services of witem
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.sections.coarnotify.review", contains(
+                            .andExpect(jsonPath("$.sections.coarnotify.request-review", contains(
                                 notifyServiceOne.getID()
                             )));
 
         // try to add new service of review pattern to witem but service not exist
         List<Operation> addOpts = new ArrayList<Operation>();
-        addOpts.add(new AddOperation("/sections/coarnotify/review/-", List.of("123456789")));
+        addOpts.add(new AddOperation("/sections/coarnotify/request-review/-", List.of("123456789")));
 
         String patchBody = getPatchContent(addOpts);
 
@@ -8927,19 +8927,19 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                 .build();
 
         NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceOne)
-                                          .withPattern("review")
+                                          .withPattern("request-review")
                                           .withConstraint("itemFilterA")
                                           .isAutomatic(false)
                                           .build();
 
         NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceTwo)
-                                          .withPattern("review")
+                                          .withPattern("request-review")
                                           .withConstraint("demo_filter")
                                           .isAutomatic(false)
                                           .build();
 
         NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceThree)
-                                          .withPattern("review")
+                                          .withPattern("request-review")
                                           .withConstraint("demo_filter")
                                           .isAutomatic(false)
                                           .build();
@@ -8947,8 +8947,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                                                   .withTitle("Test WorkspaceItem")
                                                   .withIssueDate("2017-10-17")
-                                                  .withCOARNotifyService(notifyServiceOne, "review")
-                                                  .withCOARNotifyService(notifyServiceTwo, "review")
+                                                  .withCOARNotifyService(notifyServiceOne, "request-review")
+                                                  .withCOARNotifyService(notifyServiceTwo, "request-review")
                                                   .build();
 
         context.restoreAuthSystemState();
@@ -8958,14 +8958,14 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // check the coar notify services of witem
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.sections.coarnotify.review", hasSize(2)))
-                            .andExpect(jsonPath("$.sections.coarnotify.review", contains(
+                            .andExpect(jsonPath("$.sections.coarnotify.request-review", hasSize(2)))
+                            .andExpect(jsonPath("$.sections.coarnotify.request-review", contains(
                                 notifyServiceOne.getID(),
                                 notifyServiceTwo.getID())));
 
         // try to replace the notifyServiceOne of witem with notifyServiceThree of review pattern
         List<Operation> replaceOpts = new ArrayList<Operation>();
-        replaceOpts.add(new ReplaceOperation("/sections/coarnotify/review/0", notifyServiceThree.getID()));
+        replaceOpts.add(new ReplaceOperation("/sections/coarnotify/request-review/0", notifyServiceThree.getID()));
 
         String patchBody = getPatchContent(replaceOpts);
 
@@ -8973,8 +8973,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                 .content(patchBody)
                                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.sections.coarnotify.review", hasSize(2)))
-                            .andExpect(jsonPath("$.sections.coarnotify.review", contains(
+                            .andExpect(jsonPath("$.sections.coarnotify.request-review", hasSize(2)))
+                            .andExpect(jsonPath("$.sections.coarnotify.request-review", contains(
                                 notifyServiceThree.getID(), notifyServiceTwo.getID()
                             )));
 
@@ -9014,8 +9014,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                                                   .withTitle("Test WorkspaceItem")
                                                   .withIssueDate("2017-10-17")
-                                                  .withCOARNotifyService(notifyServiceOne, "review")
-                                                  .withCOARNotifyService(notifyServiceTwo, "review")
+                                                  .withCOARNotifyService(notifyServiceOne, "request-review")
+                                                  .withCOARNotifyService(notifyServiceTwo, "request-review")
                                                   .build();
 
         context.restoreAuthSystemState();
@@ -9025,14 +9025,14 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // check the coar notify services of witem
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.sections.coarnotify.review", hasSize(2)))
-                            .andExpect(jsonPath("$.sections.coarnotify.review", contains(
+                            .andExpect(jsonPath("$.sections.coarnotify.request-review", hasSize(2)))
+                            .andExpect(jsonPath("$.sections.coarnotify.request-review", contains(
                                 notifyServiceOne.getID(),
                                 notifyServiceTwo.getID())));
 
         // try to replace the notifyServiceOne of witem with notifyServiceThree of review pattern
         List<Operation> replaceOpts = new ArrayList<Operation>();
-        replaceOpts.add(new ReplaceOperation("/sections/coarnotify/review/0", notifyServiceThree.getID()));
+        replaceOpts.add(new ReplaceOperation("/sections/coarnotify/request-review/0", notifyServiceThree.getID()));
 
         String patchBody = getPatchContent(replaceOpts);
 
@@ -9072,8 +9072,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                                                   .withTitle("Test WorkspaceItem")
                                                   .withIssueDate("2017-10-17")
-                                                  .withCOARNotifyService(notifyServiceOne, "review")
-                                                  .withCOARNotifyService(notifyServiceTwo, "review")
+                                                  .withCOARNotifyService(notifyServiceOne, "request-review")
+                                                  .withCOARNotifyService(notifyServiceTwo, "request-review")
                                                   .build();
 
         context.restoreAuthSystemState();
@@ -9083,14 +9083,14 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // check the coar notify services of witem
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.sections.coarnotify.review", hasSize(2)))
-                            .andExpect(jsonPath("$.sections.coarnotify.review", contains(
+                            .andExpect(jsonPath("$.sections.coarnotify.request-review", hasSize(2)))
+                            .andExpect(jsonPath("$.sections.coarnotify.request-review", contains(
                                 notifyServiceOne.getID(), notifyServiceTwo.getID()
                             )));
 
         // try to remove the notifyServiceOne of witem
         List<Operation> removeOpts = new ArrayList<Operation>();
-        removeOpts.add(new RemoveOperation("/sections/coarnotify/review/0"));
+        removeOpts.add(new RemoveOperation("/sections/coarnotify/request-review/0"));
 
         String patchBody = getPatchContent(removeOpts);
 
@@ -9098,8 +9098,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                 .content(patchBody)
                                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.sections.coarnotify.review", hasSize(1)))
-                            .andExpect(jsonPath("$.sections.coarnotify.review",contains(
+                            .andExpect(jsonPath("$.sections.coarnotify.request-review", hasSize(1)))
+                            .andExpect(jsonPath("$.sections.coarnotify.request-review",contains(
                                 notifyServiceTwo.getID())));
 
     }
@@ -9139,25 +9139,25 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                                   .withTitle("Test WorkspaceItem")
                                                   .withIssueDate("2017-10-17")
                                                   .withType("Journal Article")
-                                                  .withCOARNotifyService(notifyServiceOne, "endorsement")
-                                                  .withCOARNotifyService(notifyServiceTwo, "review")
-                                                  .withCOARNotifyService(notifyServiceThree, "review")
+                                                  .withCOARNotifyService(notifyServiceOne, "request-endorsement")
+                                                  .withCOARNotifyService(notifyServiceTwo, "request-review")
+                                                  .withCOARNotifyService(notifyServiceThree, "request-review")
                                                   .build();
 
         NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceOne)
-                                          .withPattern("endorsement")
+                                          .withPattern("request-endorsement")
                                           .withConstraint("fakeFilterA")
                                           .isAutomatic(false)
                                           .build();
 
         NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceTwo)
-                                          .withPattern("review")
+                                          .withPattern("request-review")
                                           .withConstraint("type_filter")
                                           .isAutomatic(false)
                                           .build();
 
         NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceThree)
-                                          .withPattern("review")
+                                          .withPattern("request-review")
                                           .withConstraint("fakeFilterA")
                                           .isAutomatic(false)
                                           .build();
@@ -9169,18 +9169,18 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // check the coar notify services of witem also check the errors
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.sections.coarnotify.review", hasSize(2)))
-                            .andExpect(jsonPath("$.sections.coarnotify.review", contains(
+                            .andExpect(jsonPath("$.sections.coarnotify.request-review", hasSize(2)))
+                            .andExpect(jsonPath("$.sections.coarnotify.request-review", contains(
                                 notifyServiceTwo.getID(),
                                 notifyServiceThree.getID())))
-                            .andExpect(jsonPath("$.sections.coarnotify.endorsement", hasSize(1)))
-                            .andExpect(jsonPath("$.sections.coarnotify.endorsement", contains(
+                            .andExpect(jsonPath("$.sections.coarnotify.request-endorsement", hasSize(1)))
+                            .andExpect(jsonPath("$.sections.coarnotify.request-endorsement", contains(
                                 notifyServiceOne.getID())))
                             .andExpect(jsonPath("$.errors[?(@.message=='error.validation.coarnotify.invalidfilter')]",
                                 Matchers.contains(
                                     hasJsonPath("$.paths", Matchers.containsInAnyOrder(
-                                        "/sections/coarnotify/review/1",
-                                        "/sections/coarnotify/endorsement/0")))));
+                                        "/sections/coarnotify/request-review/1",
+                                        "/sections/coarnotify/request-endorsement/0")))));
 
     }
 
@@ -9209,18 +9209,18 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                                   .withTitle("Test WorkspaceItem")
                                                   .withIssueDate("2017-10-17")
                                                   .withType("Journal Article")
-                                                  .withCOARNotifyService(notifyServiceOne, "review")
-                                                  .withCOARNotifyService(notifyServiceOne, "endorsement")
+                                                  .withCOARNotifyService(notifyServiceOne, "request-review")
+                                                  .withCOARNotifyService(notifyServiceOne, "request-endorsement")
                                                   .build();
 
         NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceOne)
-                                          .withPattern("endorsement")
+                                          .withPattern("request-endorsement")
                                           .withConstraint("type_filter")
                                           .isAutomatic(false)
                                           .build();
 
         NotifyServiceInboundPatternBuilder.createNotifyServiceInboundPatternBuilder(context, notifyServiceOne)
-                                          .withPattern("review")
+                                          .withPattern("request-review")
                                           .withConstraint("type_filter")
                                           .isAutomatic(false)
                                           .build();
@@ -9232,10 +9232,12 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // check the coar notify services of witem also check the errors
         getClient(authToken).perform(get("/api/submission/workspaceitems/" + witem.getID()))
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("$.sections.coarnotify.review", hasSize(1)))
-                            .andExpect(jsonPath("$.sections.coarnotify.review", contains(notifyServiceOne.getID())))
+                            .andExpect(jsonPath("$.sections.coarnotify.request-review", hasSize(1)))
+                            .andExpect(jsonPath("$.sections.coarnotify.request-review",
+                                contains(notifyServiceOne.getID())))
                             .andExpect(jsonPath(
-                                "$.errors[?(@.message=='error.validation.coarnotify.invalidfilter')]").doesNotExist());
+                                "$.errors[?(@.message=='error.validation.coarnotify.invalidfilter')]")
+                                    .doesNotExist());
 
     }
 
