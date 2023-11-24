@@ -45,7 +45,8 @@ public class WithdrawnCorrectionType implements CorrectionType, InitializingBean
     @Override
     public boolean isAllowed(Context context, Item targetItem) throws AuthorizeException, SQLException {
         authorizeService.authorizeAction(context, targetItem, READ);
-        return targetItem.isArchived() && !targetItem.isWithdrawn();
+        long tot = qaEventService.countSourcesByTarget(context, targetItem.getID());
+        return tot == 0 && targetItem.isArchived() && !targetItem.isWithdrawn();
     }
 
     @Override

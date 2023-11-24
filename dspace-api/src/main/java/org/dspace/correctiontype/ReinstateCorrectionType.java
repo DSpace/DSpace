@@ -45,7 +45,8 @@ public class ReinstateCorrectionType implements CorrectionType, InitializingBean
     @Override
     public boolean isAllowed(Context context, Item targetItem) throws SQLException, AuthorizeException {
         authorizeService.authorizeAction(context, targetItem, Constants.READ);
-        return targetItem.isWithdrawn();
+        long tot = qaEventService.countSourcesByTarget(context, targetItem.getID());
+        return tot == 0 && targetItem.isWithdrawn();
     }
 
     @Override
