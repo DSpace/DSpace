@@ -74,7 +74,7 @@
                 <entry>
                     <key>
                         <set>
-                            <value>Reject</value>
+                            <value>TentativeReject</value>
                             <value>coar-notify:EndorsementAction</value>
                         </set>
                     </key>
@@ -92,7 +92,7 @@
                 <entry>
                     <key>
                         <set>
-                            <value>Reject</value>
+                            <value>TentativeReject</value>
                             <value>coar-notify:IngestAction</value>
                         </set>
                     </key>
