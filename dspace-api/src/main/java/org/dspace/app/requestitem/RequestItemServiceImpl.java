@@ -26,6 +26,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.core.Utils;
+import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -45,6 +46,9 @@ public class RequestItemServiceImpl implements RequestItemService {
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
+
+    @Autowired(required = true)
+    protected GroupService groupService;
 
     @Autowired(required = true)
     protected ResourcePolicyService resourcePolicyService;
@@ -117,15 +121,19 @@ public class RequestItemServiceImpl implements RequestItemService {
     }
 
     @Override
-    public boolean isRestricted(Context context, DSpaceObject o)
-            throws SQLException {
-        List<ResourcePolicy> policies = authorizeService
-                .getPoliciesActionFilter(context, o, Constants.READ);
+    public boolean isRestricted(Context context, DSpaceObject o) throws SQLException {
+        List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, o, Constants.READ);
+
         for (ResourcePolicy rp : policies) {
-            if (resourcePolicyService.isDateValid(rp)) {
+            if (rp.getEPerson() != null && !rp.getEPerson().equals(context.getCurrentUser())
+                || !groupService.isMember(context, rp.getGroup())) {
+                continue;
+            }
+            if (!List.of("restricted", "reserved").contains(rp.getRpName()) && resourcePolicyService.isDateValid(rp)) {
                 return false;
             }
         }
+
         return true;
     }
 }
