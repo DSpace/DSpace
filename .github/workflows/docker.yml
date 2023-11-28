@@ -16,22 +16,6 @@ on:
 permissions:
   contents: read  #  to fetch code (actions/checkout)
 
-# Define shared environment variables for all jobs below
-env:
-  # Define tags to use for Docker images based on Git tags/branches (for docker/metadata-action)
-  # For a new commit on default branch (main), use the literal tag 'latest' on Docker image.
-  # For a new commit on other branches, use the branch name as the tag for Docker image.
-  # For a new tag, copy that tag name as the tag for Docker image.
-  IMAGE_TAGS: |
-    type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
-    type=ref,event=branch,enable=${{ !endsWith(github.ref, github.event.repository.default_branch) }}
-    type=ref,event=tag
-  # Define default tag "flavor" for docker/metadata-action per
-  # https://github.com/docker/metadata-action#flavor-input
-  # We manage the 'latest' tag ourselves to the 'main' branch (see settings above)
-  TAGS_FLAVOR: |
-    latest=false
-
 jobs:
   ####################################################
   # Build/Push the 'dspace/dspace-dependencies' image.
