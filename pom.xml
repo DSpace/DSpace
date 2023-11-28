@@ -39,7 +39,7 @@
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
         <jetty.version>9.4.53.v20231009</jetty.version>
         <log4j.version>2.20.0</log4j.version>
-        <pdfbox-version>2.0.29</pdfbox-version>
+        <pdfbox-version>2.0.30</pdfbox-version>
         <rome.version>1.19.0</rome.version>
         <slf4j.version>1.7.36</slf4j.version>
         <tika.version>2.5.0</tika.version>
