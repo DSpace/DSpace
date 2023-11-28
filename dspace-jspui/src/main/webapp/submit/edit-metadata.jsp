@@ -420,12 +420,12 @@
             sb.append("</div>");
             if (i % 2 == 0) {
                 script.append("  function selectItem" + (i / 2) + " (li) { " +
-//                        "    jQuery(\"#" + fieldName + "_last_" + (i + 1) + "\").val(li.extra[5]); " +
-//                        "    jQuery(\"#" + fieldName + "_first_" + (i + 1) + "\").val(li.extra[6]); " +
-                        "    jQuery(\"#" + fieldName + "_last_" + (i + 2) + "\").val(li.extra[3]); " +
-                        "    jQuery(\"#" + fieldName + "_first_" + (i + 2) + "\").val(li.extra[4]); " +
-                        "    jQuery(\"#" + fieldName + "_last_" + (i + 3) + "\").val(li.extra[1]); " +
-                        "    jQuery(\"#" + fieldName + "_first_" + (i + 3) + "\").val(li.extra[2]); " +
+                        "    jQuery(\"#" + fieldName + "_last_" + (i + 1) + "\").val(li.extra[5]); " +
+                        "    jQuery(\"#" + fieldName + "_first_" + (i + 1) + "\").val(li.extra[6]); " +
+//                        "    jQuery(\"#" + fieldName + "_last_" + (i + 2) + "\").val(li.extra[3]); " +
+//                        "    jQuery(\"#" + fieldName + "_first_" + (i + 2) + "\").val(li.extra[4]); " +
+                        "    jQuery(\"#" + fieldName + "_last_" + (i + 2) + "\").val(li.extra[1]); " +
+                        "    jQuery(\"#" + fieldName + "_first_" + (i + 2) + "\").val(li.extra[2]); " +
                         "changeButtonStatus();"+
                         "  } ");
             }
