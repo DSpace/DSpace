@@ -92,6 +92,7 @@ public class NotifyRequestStatusRestControllerIT extends AbstractControllerInteg
             .andExpect(jsonPath("$.notifyStatus").isArray())
             .andExpect(jsonPath("$.notifyStatus").isNotEmpty())
             .andExpect(jsonPath("$.notifyStatus[0].status").value("REQUESTED"))
+            .andExpect(jsonPath("$.notifyStatus[0].serviceUrl").value("https://review-service.com/inbox/about/"))
             ;
     }
 
@@ -159,6 +160,7 @@ public class NotifyRequestStatusRestControllerIT extends AbstractControllerInteg
             .andExpect(jsonPath("$.notifyStatus").isArray())
             .andExpect(jsonPath("$.notifyStatus").isNotEmpty())
             .andExpect(jsonPath("$.notifyStatus[0].status").value("REJECTED"))
+            .andExpect(jsonPath("$.notifyStatus[0].serviceUrl").value("https://review-service.com/inbox/about/"))
             ;
     }
 }

@@ -291,7 +291,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
             for (LDNMessageEntity msg : msgs) {
                 RequestStatus offer = new RequestStatus();
                 offer.setServiceName(msg.getTarget() == null ? "Unknown Service" : msg.getTarget().getName());
-                offer.setServiceUrl(msg.getTarget() == null ? "" : msg.getTarget().getLdnUrl());
+                offer.setServiceUrl(msg.getTarget() == null ? "" : msg.getTarget().getUrl());
                 List<LDNMessageEntity> acks = ldnMessageDao.findAllRelatedMessagesByItem(
                     context, msg, item, "Accept", "TentativeReject", "TentativeAccept", "Announce");
                 if (acks == null || acks.isEmpty()) {
