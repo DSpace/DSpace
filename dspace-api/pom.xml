@@ -865,32 +865,32 @@
           <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-buffer</artifactId>
-            <version>4.1.94.Final</version>
+            <version>4.1.106.Final</version>
           </dependency>
           <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-transport</artifactId>
-            <version>4.1.94.Final</version>
+            <version>4.1.106.Final</version>
           </dependency>
           <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-transport-native-unix-common</artifactId>
-            <version>4.1.94.Final</version>
+            <version>4.1.106.Final</version>
            </dependency>
           <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-common</artifactId>
-            <version>4.1.94.Final</version>
+            <version>4.1.106.Final</version>
           </dependency>
           <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-handler</artifactId>
-            <version>4.1.94.Final</version>
+            <version>4.1.106.Final</version>
           </dependency>
           <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-codec</artifactId>
-            <version>4.1.94.Final</version>
+            <version>4.1.106.Final</version>
           </dependency>
           <dependency>
             <groupId>org.apache.velocity</groupId>
