@@ -252,7 +252,7 @@
     {
         String authorityType = getAuthorityType(pageContext, fieldName, collection);
         List<MetadataValue> defaults = ContentServiceFactory.getInstance().getItemService().getMetadata(item, schema, element, qualifier, Item.ANY);
-        int fieldCount = defaults.size() + fieldCountIncr;
+        int fieldCount = defaults.size() +  fieldCountIncr;
         StringBuffer headers = new StringBuffer();
         StringBuffer sb = new StringBuffer();
         org.dspace.content.DCPersonName dpn;
@@ -275,8 +275,8 @@
         sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">").append(label).append("</label>");
         sb.append("<div class=\"col-md-10\" id = \"authors_block\">");
         out.write(headers.toString());
-        fieldCount = (fieldCount / 3 + (fieldCount % 3 == 0 ? 0 : 1)) * 3;
-        String[] locals = {"uk", "ru", "en"};
+        fieldCount = (fieldCount / 2 + (fieldCount % 2 == 0 ? 0 : 1)) * 2;
+        String[] locals = {"uk", "en", "ru" };
         String lastNameEn = "Prykhodko";
         String lastNameRu = "Приходько";
         String lastNameUk = "Приходько";
@@ -291,9 +291,12 @@
                 "  } ");
         for (int i = 0; i < fieldCount; i++)
         {
-            if ((i % 3 == 0) && (i != 0))
+            //if(i % 3 == 2) continue;
+            String hiddenDiv = (i % 3 == 2) ? "" : "";
+            String ContainDiv = (i % 3 == 2) ? "" : "";
+            if ((i % 2 == 0) && (i != 0))
                 sb.append("<hr/>");
-            sb.append("<div class=\"row col-md-12\">");
+            sb.append("<div class=\"row col-md-12\" " + hiddenDiv + ">");
             if ("lookup".equalsIgnoreCase(authorityType))
             {
                 sb.append("<div class=\"row col-md-10\">");
@@ -319,14 +322,15 @@
                 conf = unknownConfidence;
             }
             String entity = "";
-            if (i % 3 == 0) {
+            if (i % 2 == 0) {
                 entity = lastNameUk;
-            } else if (i % 3 == 1) {
-                entity = lastNameRu;
-            } else {
+            } else if (i % 2 == 1) {
                 entity = lastNameEn;
+            } else {
+                entity = lastNameRu;
             }
-            sb.append("<label class=\"col-md-2\">" + LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.locale_" + locals[i % 3]) + "</label>")
+
+            sb.append("<label class=\"col-md-2\" >" + LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.locale_" + locals[i % 2]) + "</label>")
                     .append("<span class=\"col-md-4\"><input placeholder=\"")
                     .append(Utils.addEntities(entity))
                     .append("\" class=\"form-control keyboard_layout\" type=\"text\" name=\"")
@@ -341,16 +345,24 @@
             {
                 sb.append("disabled=\"disabled\" ");
             }
-            if (i % 3 == 0) {
+            if (i % 2 == 0) {
                 entity = firstNameUk;
-            } else if (i % 3 == 1) {
-                entity = firstNameRu;
-            } else {
+            } else if (i % 2 == 1) {
                 entity = firstNameEn;
+            } else {
+                entity = firstNameRu;
             }
-            sb.append("value=\"")
-                    .append(dpn.getLastName().replaceAll("\"", "&quot;")) // Encode "
-                    .append("\"/></span><span class=\"col-md-4\"><input placeholder=\"")
+            if( i % 2 == 2) {
+                sb.append("value= " + "\"" + ContainDiv + "\"");
+            }
+            else{
+                sb.append("value=\"")
+                        .append(dpn.getLastName().replaceAll("\"", "&quot;")) ;// Encode "
+
+            }
+
+                    sb.append("\"/>")
+                    .append("</span><span class=\"col-md-4\"><input placeholder=\"")
                     .append(Utils.addEntities(entity))
                     .append("\" class=\"form-control keyboard_layout\" type=\"text\" name=\"")
                     .append(first.toString())
@@ -362,8 +374,16 @@
             {
                 sb.append("disabled=\"disabled\" ");
             }
-            sb.append("value=\"")
-                    .append(dpn.getFirstNames()).append("\"/></span>");
+            if( i % 2 == 2) {
+                sb.append("value= " + "\"" + ContainDiv + "\"");
+            }
+            else{
+                sb.append("value=\"")
+                        .append(dpn.getFirstNames().replaceAll("\"", "&quot;")) ;// Encode "
+
+            }
+                    sb.append("\"/>")
+                      .append("</span>");
             sb.append("<script>jQuery('#" + last.toString() + "').autocomplete()</script>");
             if ("lookup".equalsIgnoreCase(authorityType))
             {
@@ -371,7 +391,7 @@
                         auth, conf, true, repeatable, defaults, null, collection));
                 sb.append("</div>");
             }
-            if (repeatable && !readonly && i < defaults.size() && i % 3 == 0)
+            if (repeatable && !readonly && i < defaults.size() && i % 2 == 0)
             {
                 name.setLength(0);
                 name.append(Utils.addEntities(dpn.getLastName()))
@@ -398,10 +418,10 @@
                         .append("</button>");
             }
             sb.append("</div>");
-            if (i % 3 == 0) {
-                script.append("  function selectItem" + (i / 3) + " (li) { " +
-                        "    jQuery(\"#" + fieldName + "_last_" + (i + 1) + "\").val(li.extra[5]); " +
-                        "    jQuery(\"#" + fieldName + "_first_" + (i + 1) + "\").val(li.extra[6]); " +
+            if (i % 2 == 0) {
+                script.append("  function selectItem" + (i / 2) + " (li) { " +
+//                        "    jQuery(\"#" + fieldName + "_last_" + (i + 1) + "\").val(li.extra[5]); " +
+//                        "    jQuery(\"#" + fieldName + "_first_" + (i + 1) + "\").val(li.extra[6]); " +
                         "    jQuery(\"#" + fieldName + "_last_" + (i + 2) + "\").val(li.extra[3]); " +
                         "    jQuery(\"#" + fieldName + "_first_" + (i + 2) + "\").val(li.extra[4]); " +
                         "    jQuery(\"#" + fieldName + "_last_" + (i + 3) + "\").val(li.extra[1]); " +
@@ -411,7 +431,7 @@
             }
             script.append("  jQuery(document).ready(function(){ " +
                     " jQuery(\"#" + last.toString() + "\").autocomplete(\"autocomplete\", { delay:10, minChars:2, matchSubset:1, autoFill:true, matchContains:1, cacheLength:10,  " +
-                    " selectFirst:true, formatItem:liFormat, maxItemsToShow:15, onItemSelect:selectItem" + (i / 3) + ",  extraParams:{'locale':'" + locals[i % 3] + "'} }); }); \n ");
+                    " selectFirst:true, formatItem:liFormat, maxItemsToShow:15, onItemSelect:selectItem" + (i / 2) + ",  extraParams:{'locale':'" + locals[i % 2] + "'} }); }); \n ");
         }
         script.append(" </script> ");
         sb.append("</div></div><br/>");
@@ -604,6 +624,7 @@
 
         for (int i = 0; i < fieldCount; i++)
         {
+            String HideDiv = (i % 3 == 1) ? "hidden" : "";
             if (i < defaults.size())
             {
                 val = defaults.get(i).getValue();
@@ -615,11 +636,11 @@
                 val = "";
                 auth = "";
             }
-            sb.append("<div class=\"row col-md-12\">\n");
+            sb.append("<div class=\"row col-md-12\" "+ HideDiv +">\n");
             String fieldNameIdx = fieldName + ((repeating && i != fieldCount-1)?"_" + (i+1):"");
 
             if (descriptionAbstract) {
-                sb.append("<div class=\"row col-md-10\"><label>" + LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.locale_" + lang[i]) + "</label></div>");
+                sb.append("<div class=\"row col-md-10\" "+ HideDiv + "><label>" + LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.locale_" + lang[i]) + "</label></div>");
             }
 
             sb.append("<div class=\"col-md-10\">");
@@ -1344,23 +1365,28 @@
         StringBuffer sb = new StringBuffer();
         StringBuffer headers = new StringBuffer();
         String fieldParam = "";
+        String HiddenDiv = "hidden";
         if (fieldCount == 0)
             fieldCount = 1;
-        fieldCount = (fieldCount / 3 + (fieldCount % 3 == 0 ? 0 : 1)) * 3;
+        fieldCount = (fieldCount / 2 + (fieldCount % 2 == 0 ? 0 : 1)) * 2; // 2
+
         sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
                 .append(label)
                 .append("</label>");
         sb.append("<div class=\"col-md-10\">");
         sb.append("<div class=\"row col-md-12\"><div class=\"col-md-4\"><label>");
         sb.append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.locale_uk"));
-        sb.append("</label></div><div class=\"col-md-4\"><label>");
-        sb.append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.locale_ru"));
+        //sb.append("</label></div><div class=\"col-md-4\"><label>");
+        //sb.append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.locale_ru"));
         sb.append("</label></div><div class=\"col-md-4\"><label>");
         sb.append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.locale_en"));
         sb.append("</label></div></div>");
+        //"+ HiddenDiv +"
+
         for (int i = 0; i < fieldCount; i++)
         {
             sb.append("<div class=\"row col-md-12\">");
+            /*
             if(i != fieldCount)
             {
                 //param is field name and index, starting from 1 (e.g. myfield_2)
@@ -1393,7 +1419,7 @@
                             .append("\"><span class=\"glyphicon glyphicon-trash\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove")+"</button>");
                 }
                 else {
-                    sb.append("<span class=\"col-md-2\">&nbsp;</span>");
+                    sb.append("<span class=\"col-md-2\" "+ HiddenDiv +">&nbsp;</span>");
                 }
             }
             else
@@ -1407,7 +1433,12 @@
                         .append("</span>\n")
                         .append("<span class=\"col-md-2\">&nbsp;</span>");
             }
+
+
             i++;
+            */
+
+
             if(i != fieldCount)
             {
                 //param is field name and index, starting from 1 (e.g. myfield_2)
@@ -1870,6 +1901,7 @@
         }
         function changeButtonStatus() {
             var fields = jQuery('[id^=dc_contributor_author_]');
+            //var fields = jQuery('[id^=dc_contributor_author_]:not([hidden])');
             var count = 0;
             jQuery.each(fields, function(element, value) {
                     if(jQuery(value).attr('value').length > 0) {
@@ -1877,7 +1909,8 @@
                     }
                 }
             )
-            if(count == fields.length) {
+
+            if(count == fields.lengt || true) {
                 enableSubmitButton();
             } else {
                 disableSubmitButton();
