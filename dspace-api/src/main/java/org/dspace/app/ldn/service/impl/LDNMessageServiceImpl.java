@@ -33,6 +33,7 @@ import org.dspace.app.ldn.model.RequestStatus;
 import org.dspace.app.ldn.model.Service;
 import org.dspace.app.ldn.processor.LDNProcessor;
 import org.dspace.app.ldn.service.LDNMessageService;
+import org.dspace.app.ldn.utility.LDNUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
@@ -40,6 +41,7 @@ import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
+
 
 /**
  * Implementation of {@link LDNMessageService}
@@ -292,6 +294,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
                 RequestStatus offer = new RequestStatus();
                 offer.setServiceName(msg.getTarget() == null ? "Unknown Service" : msg.getTarget().getName());
                 offer.setServiceUrl(msg.getTarget() == null ? "" : msg.getTarget().getUrl());
+                offer.setOfferType(LDNUtils.getNotifyType(msg.getCoarNotifyType()));
                 List<LDNMessageEntity> acks = ldnMessageDao.findAllRelatedMessagesByItem(
                     context, msg, item, "Accept", "TentativeReject", "TentativeAccept", "Announce");
                 if (acks == null || acks.isEmpty()) {

@@ -16,6 +16,7 @@ public class RequestStatus {
 
     private String serviceName;
     private String serviceUrl;
+    private String offerType;
     private NotifyRequestStatusEnum status;
 
     public String getServiceName() {
@@ -35,6 +36,12 @@ public class RequestStatus {
     }
     public void setStatus(NotifyRequestStatusEnum status) {
         this.status = status;
+    }
+    public String getOfferType() {
+        return offerType;
+    }
+    public void setOfferType(String offerType) {
+        this.offerType = offerType;
     }
 
 }
