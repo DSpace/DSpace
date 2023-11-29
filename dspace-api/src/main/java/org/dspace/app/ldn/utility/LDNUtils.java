@@ -80,4 +80,17 @@ public class LDNUtils {
         return resolverId;
     }
 
+    /**
+     * Clear the coarNotifyType from the source code.
+     *
+     * @param coarNotifyType coar Notify Type to sanitize
+     * @return String just the notify type
+     */
+    public static String getNotifyType(String coarNotifyType) {
+        String justNotifyType = coarNotifyType;
+        justNotifyType = justNotifyType.substring(justNotifyType.lastIndexOf(":") + 1);
+        justNotifyType = justNotifyType.replace("Action",  "");
+        return justNotifyType;
+    }
+
 }

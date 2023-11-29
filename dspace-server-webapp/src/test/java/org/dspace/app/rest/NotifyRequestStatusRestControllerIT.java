@@ -148,7 +148,6 @@ public class NotifyRequestStatusRestControllerIT extends AbstractControllerInteg
         assertEquals(ackProcessed, 1);
         ackProcessed = ldnMessageService.extractAndProcessMessageFromQueue(context);
         assertEquals(ackProcessed, 0);
-        
 
         //CHECK THE SERVICE ON ITS notifystatus ARRAY
         String authToken = getAuthToken(admin.getEmail(), password);
@@ -161,6 +160,7 @@ public class NotifyRequestStatusRestControllerIT extends AbstractControllerInteg
             .andExpect(jsonPath("$.notifyStatus").isNotEmpty())
             .andExpect(jsonPath("$.notifyStatus[0].status").value("REJECTED"))
             .andExpect(jsonPath("$.notifyStatus[0].serviceUrl").value("https://review-service.com/inbox/about/"))
+            .andExpect(jsonPath("$.notifyStatus[0].offerType").value("Review"))
             ;
     }
 }

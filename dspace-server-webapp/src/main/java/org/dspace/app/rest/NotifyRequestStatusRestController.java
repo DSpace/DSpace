@@ -13,13 +13,14 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.model.NotifyRequestStatus;
 import org.dspace.app.ldn.service.LDNMessageService;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.NotifyRequestStatusRest;
-import org.dspace.app.rest.model.hateoas.NotifyRequestStatusResource;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
@@ -30,11 +31,8 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.RepresentationModel;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -42,6 +40,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 
 /**
  * Rest Controller for NotifyRequestStatus targeting items
@@ -80,12 +79,10 @@ public class NotifyRequestStatusRestController implements InitializingBean {
                 NotifyRequestStatusRest.NAME)));
     }
 
-    @GetMapping
+    @GetMapping(produces = "application/json")
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    public ResponseEntity<RepresentationModel<?>> findByItem(@PathVariable UUID uuid)
-        throws SQLException, AuthorizeException {
-
-        log.info("START findItemRequests looking for requests for item " + uuid);
+    public ResponseEntity<String> findByItem(@PathVariable UUID uuid)
+        throws SQLException, AuthorizeException, JsonProcessingException {
 
         Context context = ContextUtil.obtainCurrentRequestContext();
         Item item = itemService.find(context, uuid);
@@ -99,11 +96,12 @@ public class NotifyRequestStatusRestController implements InitializingBean {
         NotifyRequestStatus resultRequests = ldnMessageService.findRequestsByItem(context, item);
         NotifyRequestStatusRest resultRequestStatusRests = converterService.toRest(
             resultRequests, utils.obtainProjection());
-        NotifyRequestStatusResource resultRequestStatusResource = converterService.toResource(resultRequestStatusRests);
 
         context.complete();
+        String result = new ObjectMapper()
+            .writerWithDefaultPrettyPrinter().writeValueAsString(resultRequestStatusRests);
 
-        return ControllerUtils.toResponseEntity(HttpStatus.OK, new HttpHeaders(), resultRequestStatusResource);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
 }

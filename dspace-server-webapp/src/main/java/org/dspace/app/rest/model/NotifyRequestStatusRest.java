@@ -27,9 +27,10 @@ import org.dspace.app.rest.NotifyRequestStatusRestController;
     "itemuuid"
 })
 public class NotifyRequestStatusRest extends RestAddressableModel {
+
+    private static final long serialVersionUID = 1L;
     public static final String CATEGORY = RestAddressableModel.LDN;
     public static final String NAME = "notifyrequests";
-    public static final String FIND_BY_ITEM = "findbyitem";
 
     private List<RequestStatus> notifyStatus;
     private UUID itemuuid;
