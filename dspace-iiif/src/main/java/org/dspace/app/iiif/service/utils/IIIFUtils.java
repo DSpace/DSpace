@@ -477,7 +477,8 @@ public class IIIFUtils {
      * @throws AuthorizeException
      */
     // Cacheable(key = "#item.getID().toString()", cacheNames = "manifestbitstream")
-    public String getManifestBitstream(Item item, Context context) throws SQLException, IOException, AuthorizeException {
+    public String getManifestBitstream(Item item, Context context)
+        throws SQLException, IOException, AuthorizeException {
         Bitstream manifestBitstream = bitstreamService.getFirstBitstream(item, Constants.IIIF_MANIFEST_BUNDLE_NAME);
 
         if (manifestBitstream == null) {
