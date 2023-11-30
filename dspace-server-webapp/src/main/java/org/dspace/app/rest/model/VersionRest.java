@@ -138,4 +138,9 @@ public class VersionRest extends BaseObjectRest<Integer> {
     public String getType() {
         return NAME;
     }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
 }

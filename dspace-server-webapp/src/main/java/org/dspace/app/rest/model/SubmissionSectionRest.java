@@ -52,6 +52,11 @@ public class SubmissionSectionRest extends BaseObjectRest<String> {
         return NAME;
     }
 
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
     public ScopeEnum getScope() {
         return scope;
     }

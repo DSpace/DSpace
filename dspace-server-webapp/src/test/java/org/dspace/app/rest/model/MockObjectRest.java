@@ -67,6 +67,11 @@ public class MockObjectRest extends BaseObjectRest<Long> {
         return NAME;
     }
 
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
     public String getValue() {
         return value;
     }

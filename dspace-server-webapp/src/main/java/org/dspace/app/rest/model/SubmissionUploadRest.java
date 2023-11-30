@@ -55,6 +55,11 @@ public class SubmissionUploadRest extends BaseObjectRest<String> {
     }
 
     @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
+    @Override
     public Class getController() {
         return RestResourceController.class;
     }

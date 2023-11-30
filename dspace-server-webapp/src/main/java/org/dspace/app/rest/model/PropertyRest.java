@@ -60,4 +60,9 @@ public class PropertyRest extends BaseObjectRest<String> {
     public String getType() {
         return NAME;
     }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
 }

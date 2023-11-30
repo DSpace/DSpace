@@ -57,6 +57,11 @@ public class UsageReportRest extends BaseObjectRest<String> {
         return NAME;
     }
 
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
     /**
      * Returns the report type of this UsageReport, options listed in
      * {@link org.dspace.app.rest.utils.UsageReportUtils}, e.g.

@@ -38,6 +38,11 @@ public class WorkflowItemRest extends AInprogressSubmissionRest {
     }
 
     @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
+    @Override
     public Class getController() {
         return RestResourceController.class;
     }

@@ -37,6 +37,14 @@ public class AuthorizationRest extends BaseObjectRest<String> {
         return NAME;
     }
 
+    /**
+     * The plural name is the same as the singular name
+     */
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
     @Override
     public String getCategory() {
         return CATEGORY;

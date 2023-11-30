@@ -44,6 +44,11 @@ public class SearchEventRest extends BaseObjectRest<UUID> {
         return NAME;
     }
 
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
     public String getQuery() {
         return query;
     }

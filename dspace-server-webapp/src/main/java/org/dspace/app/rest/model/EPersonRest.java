@@ -53,6 +53,11 @@ public class EPersonRest extends DSpaceObjectRest {
         return NAME;
     }
 
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
     public String getNetid() {
         return netid;
     }

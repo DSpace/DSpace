@@ -67,6 +67,11 @@ public class SubmissionCCLicenseRest extends BaseObjectRest<String> {
     }
 
     @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
+    @Override
     @JsonIgnore
     public Class getController() {
         return RestResourceController.class;

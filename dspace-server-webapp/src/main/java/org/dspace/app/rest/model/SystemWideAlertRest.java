@@ -35,6 +35,11 @@ public class SystemWideAlertRest extends BaseObjectRest<Integer> {
         return NAME;
     }
 
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
     private Integer alertId;
     private String message;
     private String allowSessions;

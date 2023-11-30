@@ -74,4 +74,9 @@ public class RegistrationRest extends RestAddressableModel {
     public String getType() {
         return NAME;
     }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
 }

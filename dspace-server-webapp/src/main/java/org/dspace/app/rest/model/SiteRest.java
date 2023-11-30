@@ -31,6 +31,11 @@ public class SiteRest extends DSpaceObjectRest {
     }
 
     @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
+    @Override
     public boolean equals(Object object) {
         return (object instanceof SiteRest &&
             new EqualsBuilder().append(this.getCategory(), ((SiteRest) object).getCategory())

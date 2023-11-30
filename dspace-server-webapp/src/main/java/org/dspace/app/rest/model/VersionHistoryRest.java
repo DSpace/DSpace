@@ -52,6 +52,11 @@ public class VersionHistoryRest extends BaseObjectRest<Integer> {
         return NAME;
     }
 
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
     /**
      * Generic getter for the id
      * @return the id value of this VersionHistoryRest

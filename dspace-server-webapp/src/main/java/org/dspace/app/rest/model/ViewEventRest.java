@@ -68,4 +68,9 @@ public class ViewEventRest extends BaseObjectRest<UUID> {
     public String getType() {
         return NAME;
     }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
 }

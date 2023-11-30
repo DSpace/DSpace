@@ -21,7 +21,7 @@ import org.dspace.xmlworkflow.state.actions.ActionAdvancedInfo;
  */
 public class WorkflowActionRest extends BaseObjectRest<String> {
 
-    public static final String CATEGORY = "config";
+    public static final String CATEGORY = RestModel.CONFIGURATION;
     public static final String NAME = "workflowaction";
     public static final String PLURAL_NAME = "workflowactions";
 
@@ -42,6 +42,11 @@ public class WorkflowActionRest extends BaseObjectRest<String> {
     @Override
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     public List<String> getOptions() {

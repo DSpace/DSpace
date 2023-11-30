@@ -29,7 +29,7 @@ import org.dspace.app.rest.RestResourceController;
 })
 public class WorkflowDefinitionRest extends BaseObjectRest<String> {
 
-    public static final String CATEGORY = "config";
+    public static final String CATEGORY = RestModel.CONFIGURATION;
     public static final String NAME = "workflowdefinition";
     public static final String PLURAL_NAME = "workflowdefinitions";
 
@@ -53,6 +53,11 @@ public class WorkflowDefinitionRest extends BaseObjectRest<String> {
     @Override
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     @Override

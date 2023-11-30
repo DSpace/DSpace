@@ -53,6 +53,11 @@ public class GroupRest extends DSpaceObjectRest {
         return NAME;
     }
 
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
     public String getName() {
         return name;
     }

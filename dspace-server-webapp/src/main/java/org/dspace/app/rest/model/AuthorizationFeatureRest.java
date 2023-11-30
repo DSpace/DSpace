@@ -36,6 +36,11 @@ public class AuthorizationFeatureRest extends BaseObjectRest<String> {
     }
 
     @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
+    @Override
     public String getCategory() {
         return CATEGORY;
     }

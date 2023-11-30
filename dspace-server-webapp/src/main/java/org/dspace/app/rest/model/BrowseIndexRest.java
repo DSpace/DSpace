@@ -80,6 +80,11 @@ public class BrowseIndexRest extends BaseObjectRest<String> {
         return NAME;
     }
 
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
     public List<String> getMetadataList() {
         return metadataList;
     }

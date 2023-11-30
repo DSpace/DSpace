@@ -69,6 +69,11 @@ public class TemplateItemRest extends BaseObjectRest<UUID> {
     }
 
     @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
+    @Override
     public UUID getId() {
         return uuid;
     }

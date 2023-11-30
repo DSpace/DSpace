@@ -60,6 +60,11 @@ public class SubmissionDefinitionRest extends BaseObjectRest<String> {
         return NAME;
     }
 
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
     public void setDefaultConf(boolean isDefault) {
         this.defaultConf = isDefault;
     }

@@ -22,7 +22,7 @@ public class SubscriptionRest extends BaseObjectRest<Integer> {
 
     public static final String NAME = "subscription";
     public static final String PLURAL_NAME = "subscriptions";
-    public static final String CATEGORY = "core";
+    public static final String CATEGORY = RestModel.CORE;
     public static final String DSPACE_OBJECT = "resource";
     public static final String EPERSON = "eperson";
 
@@ -43,6 +43,11 @@ public class SubscriptionRest extends BaseObjectRest<Integer> {
     @Override
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     public void setSubscriptionType(String type) {

@@ -71,6 +71,11 @@ public class ResearcherProfileRest extends BaseObjectRest<UUID> {
     }
 
     @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
