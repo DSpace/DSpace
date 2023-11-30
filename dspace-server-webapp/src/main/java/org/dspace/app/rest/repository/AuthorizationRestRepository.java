@@ -31,6 +31,7 @@ import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
+import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.slf4j.Logger;
@@ -124,7 +125,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
                 // restore the real current user
                 context.restoreContextUser();
             }
-        } catch (SQLException e) {
+        } catch (SQLException | SearchServiceException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
 
@@ -151,7 +152,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
     @SearchRestMethod(name = "object")
     public Page<AuthorizationRest> findByObject(@Parameter(value = "uri", required = true) String uri,
             @Parameter(value = "eperson") UUID epersonUuid, @Parameter(value = "feature") String featureName,
-            Pageable pageable) throws AuthorizeException, SQLException {
+            Pageable pageable) throws AuthorizeException, SQLException, SearchServiceException {
 
         Context context = obtainContext();
 
@@ -234,7 +235,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
         Context context,
         EPerson user,
         String uri,
-        String featureName) throws SQLException {
+        String featureName) throws SQLException, SearchServiceException {
 
         BaseObjectRest restObject = utils.getBaseObjectRestFromUri(context, uri);
         return authorizationsForObject(context, user, featureName, restObject);
@@ -244,7 +245,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
         Context context,
         EPerson user, String featureName,
         BaseObjectRest obj)
-        throws SQLException {
+        throws SQLException, SearchServiceException {
 
         if (obj == null) {
             return new ArrayList<>();
@@ -269,7 +270,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
 
     private List<Authorization> findByObjectAndFeature(
             Context context, EPerson user, BaseObjectRest obj, String featureName
-    ) throws SQLException {
+    ) throws SQLException, SearchServiceException {
 
         AuthorizationFeature feature = authorizationFeatureService.find(featureName);
 

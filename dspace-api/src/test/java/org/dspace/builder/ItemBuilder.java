@@ -353,9 +353,9 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     }
 
     /**
-     * Create an admin group for the collection with the specified members
+     * Assign the admin permission to the specified eperson
      *
-     * @param ePerson epersons to add to the admin group
+     * @param ePerson the eperson that will get the ADMIN permission on the item
      * @return this builder
      * @throws SQLException
      * @throws AuthorizeException

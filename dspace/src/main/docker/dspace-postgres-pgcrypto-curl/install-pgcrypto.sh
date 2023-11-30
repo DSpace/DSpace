@@ -11,15 +11,33 @@ set -e
 
 CHECKFILE=/pgdata/ingest.hasrun.flag
 
+# If $LOADSQL environment variable set, use 'curl' to download that SQL and run it in PostgreSQL
+# This can be used to initialize a database based on test data available on the web.
 if [ ! -f $CHECKFILE -a ! -z ${LOADSQL} ]
 then
-  curl ${LOADSQL} -L -s --output /tmp/dspace.sql
-  psql -U $POSTGRES_USER < /tmp/dspace.sql
+  # Download SQL file to /tmp/dspace-db-init.sql
+  curl ${LOADSQL} -L -s --output /tmp/dspace-db-init.sql
+  # Load into PostgreSQL
+  psql -U $POSTGRES_USER < /tmp/dspace-db-init.sql
+  # Remove downloaded file
+  rm /tmp/dspace-db-init.sql
 
   touch $CHECKFILE
   exit
 fi
 
+# If $LOCALSQL environment variable set, then simply run it in PostgreSQL
+# This can be used to restore data from a pg_dump or similar.
+if [ ! -f $CHECKFILE -a ! -z ${LOCALSQL} ]
+then
+  # Load into PostgreSQL
+  psql -U $POSTGRES_USER < ${LOCALSQL}
+
+  touch $CHECKFILE
+  exit
+fi
+
+# Then, setup pgcrypto on this database
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<-EOSQL
   -- Create a new schema in this database named "extensions" (or whatever you want to name it)
   CREATE SCHEMA extensions;

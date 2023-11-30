@@ -80,4 +80,15 @@
         <property name="description" value="Batch Export to Simple Archive Format (SAF)"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.itemexport.ItemExportCLI"/>
     </bean>
+
+    <bean id="subscription-send" class="org.dspace.subscriptions.SubscriptionEmailNotificationCliScriptConfiguration">
+        <property name="description" value="Send emails related to Community/Collection/Item subscriptions"/>
+        <property name="dspaceRunnableClass" value="org.dspace.subscriptions.SubscriptionEmailNotificationCli"/>
+    </bean>
+
+    <bean id="bulk-access-control" class="org.dspace.app.bulkaccesscontrol.BulkAccessControlCliScriptConfiguration" primary="true">
+        <property name="description" value="Bulk access control"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkaccesscontrol.BulkAccessControlCli"/>
+    </bean>
+
 </beans>

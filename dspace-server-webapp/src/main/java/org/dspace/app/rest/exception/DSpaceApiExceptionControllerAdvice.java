@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -97,6 +98,13 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         sendErrorResponse(request, response, ex, "Request is invalid or incorrect", HttpServletResponse.SC_BAD_REQUEST);
     }
 
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    protected void handleMaxUploadSizeExceededException(HttpServletRequest request, HttpServletResponse response,
+                                               Exception ex) throws IOException {
+        sendErrorResponse(request, response, ex, "Request entity is too large",
+                          HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+    }
+
     @ExceptionHandler(SQLException.class)
     protected void handleSQLException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
@@ -124,7 +132,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                                                       Exception ex) throws IOException {
         //422 is not defined in HttpServletResponse.  Its meaning is "Unprocessable Entity".
         //Using the value from HttpStatus.
-        sendErrorResponse(request, response, null,
+        sendErrorResponse(request, response, ex,
                 "Unprocessable or invalid entity",
                 HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
@@ -132,7 +140,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     @ExceptionHandler( {InvalidSearchRequestException.class})
     protected void handleInvalidSearchRequestException(HttpServletRequest request, HttpServletResponse response,
                                                       Exception ex) throws IOException {
-        sendErrorResponse(request, response, null,
+        sendErrorResponse(request, response, ex,
                 "Invalid search request",
                 HttpStatus.UNPROCESSABLE_ENTITY.value());
     }
@@ -166,12 +174,13 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
         GroupNameNotProvidedException.class,
         GroupHasPendingWorkflowTasksException.class,
         PasswordNotValidException.class,
+        RESTBitstreamNotFoundException.class
     })
     protected void handleCustomUnprocessableEntityException(HttpServletRequest request, HttpServletResponse response,
                                                             TranslatableException ex) throws IOException {
         Context context = ContextUtil.obtainContext(request);
         sendErrorResponse(
-            request, response, null, ex.getLocalizedMessage(context), HttpStatus.UNPROCESSABLE_ENTITY.value()
+            request, response, (Exception) ex, ex.getLocalizedMessage(context), HttpStatus.UNPROCESSABLE_ENTITY.value()
         );
     }
 
@@ -179,7 +188,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     protected void ParameterConversionException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
         // we want the 400 status for missing parameters, see https://jira.lyrasis.org/browse/DS-4428
-        sendErrorResponse(request, response, null,
+        sendErrorResponse(request, response, ex,
                           "A required parameter is invalid",
                           HttpStatus.BAD_REQUEST.value());
     }
@@ -188,7 +197,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
     protected void MissingParameterException(HttpServletRequest request, HttpServletResponse response, Exception ex)
         throws IOException {
         // we want the 400 status for missing parameters, see https://jira.lyrasis.org/browse/DS-4428
-        sendErrorResponse(request, response, null,
+        sendErrorResponse(request, response, ex,
                           "A required parameter is missing",
                           HttpStatus.BAD_REQUEST.value());
     }

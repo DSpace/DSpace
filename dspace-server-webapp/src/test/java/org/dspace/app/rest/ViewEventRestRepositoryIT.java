@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -17,6 +18,9 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocumentList;
 import org.dspace.app.rest.model.ViewEventRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.BitstreamBuilder;
@@ -29,9 +33,13 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.Site;
+import org.dspace.statistics.SolrStatisticsCore;
+import org.dspace.utils.DSpace;
 import org.junit.Test;
 
 public class ViewEventRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    private final SolrStatisticsCore solrStatisticsCore = new DSpace().getSingletonService(SolrStatisticsCore.class);
 
     @Test
     public void findAllTestThrowNotImplementedException() throws Exception {
@@ -492,6 +500,53 @@ public class ViewEventRestRepositoryIT extends AbstractControllerIntegrationTest
                                 .contentType(contentType))
                    .andExpect(status().isCreated());
 
+    }
+
+    @Test
+    public void postTestReferrer() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        ViewEventRest viewEventRest = new ViewEventRest();
+        viewEventRest.setTargetType("item");
+        viewEventRest.setTargetId(publicItem1.getID());
+        viewEventRest.setReferrer("test-referrer");
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        getClient().perform(post("/api/statistics/viewevents")
+                        .content(mapper.writeValueAsBytes(viewEventRest))
+                        .contentType(contentType))
+                .andExpect(status().isCreated());
+        solrStatisticsCore.getSolr().commit();
+
+        // Query all statistics and verify it contains a document with the correct referrer
+        SolrQuery solrQuery = new SolrQuery("*:*");
+        QueryResponse queryResponse = solrStatisticsCore.getSolr().query(solrQuery);
+        SolrDocumentList responseList = queryResponse.getResults();
+        assertEquals(1, responseList.size());
+        assertEquals("test-referrer", responseList.get(0).get("referrer"));
     }
 
 

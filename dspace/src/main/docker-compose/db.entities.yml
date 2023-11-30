@@ -10,7 +10,7 @@ version: "3.7"
 
 services:
   dspacedb:
-    image: dspace/dspace-postgres-pgcrypto:loadsql
+    image: dspace/dspace-postgres-pgcrypto:dspace-7_x-loadsql
     environment:
       # This SQL is available from https://github.com/DSpace-Labs/AIP-Files/releases/tag/demo-entities-data
       - LOADSQL=https://github.com/DSpace-Labs/AIP-Files/releases/download/demo-entities-data/dspace7-entities-data.sql

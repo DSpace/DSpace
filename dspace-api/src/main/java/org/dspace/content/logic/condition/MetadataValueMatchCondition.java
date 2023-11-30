@@ -23,7 +23,6 @@ import org.dspace.core.Context;
  * in a given metadata field
  *
  * @author Kim Shepherd
- * @version $Revision$
  */
 public class MetadataValueMatchCondition extends AbstractCondition {
 

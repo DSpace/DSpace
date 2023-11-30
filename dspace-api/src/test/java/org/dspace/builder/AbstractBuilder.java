@@ -13,8 +13,10 @@ import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.alerts.service.SystemWideAlertService;
 import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
 import org.dspace.app.requestitem.service.RequestItemService;
+import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -42,6 +44,7 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
+import org.dspace.eperson.service.SubscribeService;
 import org.dspace.orcid.factory.OrcidServiceFactory;
 import org.dspace.orcid.service.OrcidHistoryService;
 import org.dspace.orcid.service.OrcidQueueService;
@@ -49,6 +52,10 @@ import org.dspace.orcid.service.OrcidTokenService;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.submit.factory.SubmissionServiceFactory;
+import org.dspace.submit.service.SubmissionConfigService;
+import org.dspace.supervision.factory.SupervisionOrderServiceFactory;
+import org.dspace.supervision.service.SupervisionOrderService;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
@@ -102,6 +109,11 @@ public abstract class AbstractBuilder<T, S> {
     static OrcidHistoryService orcidHistoryService;
     static OrcidQueueService orcidQueueService;
     static OrcidTokenService orcidTokenService;
+    static SystemWideAlertService systemWideAlertService;
+    static SubmissionConfigService submissionConfigService;
+    static SubscribeService subscribeService;
+    static SupervisionOrderService supervisionOrderService;
+
 
     protected Context context;
 
@@ -161,6 +173,15 @@ public abstract class AbstractBuilder<T, S> {
         orcidHistoryService = OrcidServiceFactory.getInstance().getOrcidHistoryService();
         orcidQueueService = OrcidServiceFactory.getInstance().getOrcidQueueService();
         orcidTokenService = OrcidServiceFactory.getInstance().getOrcidTokenService();
+        systemWideAlertService = DSpaceServicesFactory.getInstance().getServiceManager()
+                                                      .getServicesByType(SystemWideAlertService.class).get(0);
+        try {
+            submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
+        } catch (SubmissionConfigReaderException e) {
+            log.error(e.getMessage(), e);
+        }
+        subscribeService = ContentServiceFactory.getInstance().getSubscribeService();
+        supervisionOrderService = SupervisionOrderServiceFactory.getInstance().getSupervisionOrderService();
     }
 
 
@@ -194,6 +215,10 @@ public abstract class AbstractBuilder<T, S> {
         requestItemService = null;
         versioningService = null;
         orcidTokenService = null;
+        systemWideAlertService = null;
+        submissionConfigService = null;
+        subscribeService = null;
+        supervisionOrderService = null;
 
     }
 

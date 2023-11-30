@@ -11,7 +11,8 @@
  
  <!ELEMENT name-map EMPTY >
  <!ATTLIST name-map 
-           collection-handle CDATA #REQUIRED
+           collection-handle CDATA #IMPLIED
+           collection-entity-type CDATA #IMPLIED
            submission-name NMTOKEN #REQUIRED>
 
  <!-- 'step-definitions' must contain at least one 'step-definition' node -->

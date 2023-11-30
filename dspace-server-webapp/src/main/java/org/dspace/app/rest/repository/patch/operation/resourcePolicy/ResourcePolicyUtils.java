@@ -7,13 +7,12 @@
  */
 package org.dspace.app.rest.repository.patch.operation.resourcePolicy;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.util.MultiFormatDateParser;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,8 +23,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ResourcePolicyUtils {
-
-    public static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     /**
      * Paths in json body of patched that use these resourcePolicy operations
@@ -112,13 +109,12 @@ public class ResourcePolicyUtils {
      */
     public void checkResourcePolicyForConsistentStartDateValue(ResourcePolicy resource, Operation operation) {
         String dateS = (String) operation.getValue();
-        try {
-            Date date = simpleDateFormat.parse(dateS);
-            if (resource.getEndDate() != null && resource.getEndDate().before(date)) {
-                throw new DSpaceBadRequestException("Attempting to set an invalid startDate greater than the endDate.");
-            }
-        } catch (ParseException e) {
-            throw new DSpaceBadRequestException("Invalid startDate value", e);
+        Date date = MultiFormatDateParser.parse(dateS);
+        if (date == null) {
+            throw new DSpaceBadRequestException("Invalid startDate value " + dateS);
+        }
+        if (resource.getEndDate() != null && resource.getEndDate().before(date)) {
+            throw new DSpaceBadRequestException("Attempting to set an invalid startDate greater than the endDate.");
         }
     }
 
@@ -134,13 +130,12 @@ public class ResourcePolicyUtils {
      */
     public void checkResourcePolicyForConsistentEndDateValue(ResourcePolicy resource, Operation operation) {
         String dateS = (String) operation.getValue();
-        try {
-            Date date = simpleDateFormat.parse(dateS);
-            if (resource.getStartDate() != null && resource.getStartDate().after(date)) {
-                throw new DSpaceBadRequestException("Attempting to set an invalid endDate smaller than the startDate.");
-            }
-        } catch (ParseException e) {
-            throw new DSpaceBadRequestException("Invalid endDate value", e);
+        Date date = MultiFormatDateParser.parse(dateS);
+        if (date == null) {
+            throw new DSpaceBadRequestException("Invalid endDate value " + dateS);
+        }
+        if (resource.getStartDate() != null && resource.getStartDate().after(date)) {
+            throw new DSpaceBadRequestException("Attempting to set an invalid endDate smaller than the startDate.");
         }
     }
 }

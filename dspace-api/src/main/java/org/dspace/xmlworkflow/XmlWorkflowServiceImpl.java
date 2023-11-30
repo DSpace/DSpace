@@ -221,6 +221,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                 //Get our next step, if none is found, archive our item
                 firstStep = wf.getNextStep(context, wfi, firstStep, ActionResult.OUTCOME_COMPLETE);
                 if (firstStep == null) {
+                    // record the submitted provenance message
+                    recordStart(context, wfi.getItem(),null);
                     archive(context, wfi);
                 } else {
                     activateFirstStep(context, wf, firstStep, wfi);
@@ -1076,6 +1078,53 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         return wsi;
     }
 
+    @Override
+    public void restartWorkflow(Context context, XmlWorkflowItem wi, EPerson decliner, String provenance)
+        throws SQLException, AuthorizeException, IOException, WorkflowException {
+        if (!authorizeService.isAdmin(context)) {
+            throw new AuthorizeException("You must be an admin to restart a workflow");
+        }
+        context.turnOffAuthorisationSystem();
+
+        // rejection provenance
+        Item myitem = wi.getItem();
+
+        // Here's what happened
+        String provDescription =
+            provenance + " Declined by " + getEPersonName(decliner) + " on " + DCDate.getCurrent().toString() +
+                " (GMT) ";
+
+        // Add to item as a DC field
+        itemService
+            .addMetadata(context, myitem, MetadataSchemaEnum.DC.getName(),
+                "description", "provenance", "en", provDescription);
+
+        //Clear any workflow schema related metadata
+        itemService
+            .clearMetadata(context, myitem, WorkflowRequirementsService.WORKFLOW_SCHEMA, Item.ANY, Item.ANY, Item.ANY);
+
+        itemService.update(context, myitem);
+
+        // remove policy for controller
+        removeUserItemPolicies(context, myitem, decliner);
+        revokeReviewerPolicies(context, myitem);
+
+        // convert into personal workspace
+        WorkspaceItem wsi = returnToWorkspace(context, wi);
+
+        // Because of issue of xmlWorkflowItemService not realising wfi wrapper has been deleted
+        context.commit();
+        wsi = context.reloadEntity(wsi);
+
+        log.info(LogHelper.getHeader(context, "decline_workflow", "workflow_item_id="
+            + wi.getID() + "item_id=" + wi.getItem().getID() + "collection_id=" + wi.getCollection().getID() +
+            "eperson_id=" + decliner.getID()));
+
+        // Restart workflow
+        this.startWithoutNotify(context, wsi);
+        context.restoreAuthSystemState();
+    }
+
     /**
      * Return the workflow item to the workspace of the submitter. The workflow
      * item is removed, and a workspace item created.
@@ -1140,25 +1189,30 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         DCDate now = DCDate.getCurrent();
 
         // Create provenance description
-        String provmessage = "";
+        StringBuffer provmessage = new StringBuffer();
 
         if (myitem.getSubmitter() != null) {
-            provmessage = "Submitted by " + myitem.getSubmitter().getFullName()
-                + " (" + myitem.getSubmitter().getEmail() + ") on "
-                + now.toString() + " workflow start=" + action.getProvenanceStartId() + "\n";
+            provmessage.append("Submitted by ").append(myitem.getSubmitter().getFullName())
+                .append(" (").append(myitem.getSubmitter().getEmail()).append(") on ")
+                .append(now.toString());
         } else {
             // else, null submitter
-            provmessage = "Submitted by unknown (probably automated) on"
-                + now.toString() + " workflow start=" + action.getProvenanceStartId() + "\n";
+            provmessage.append("Submitted by unknown (probably automated) on")
+                .append(now.toString());
+        }
+        if (action != null) {
+            provmessage.append(" workflow start=").append(action.getProvenanceStartId()).append("\n");
+        } else {
+            provmessage.append("\n");
         }
 
         // add sizes and checksums of bitstreams
-        provmessage += installItemService.getBitstreamProvenanceMessage(context, myitem);
+        provmessage.append(installItemService.getBitstreamProvenanceMessage(context, myitem));
 
         // Add message to the DC
         itemService
             .addMetadata(context, myitem, MetadataSchemaEnum.DC.getName(),
-                         "description", "provenance", "en", provmessage);
+                         "description", "provenance", "en", provmessage.toString());
         itemService.update(context, myitem);
     }
 

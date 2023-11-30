@@ -64,6 +64,7 @@ import org.dspace.app.rest.model.PropertyRest;
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
+import org.dspace.app.rest.model.SupervisionOrderRest;
 import org.dspace.app.rest.model.VersionHistoryRest;
 import org.dspace.app.rest.model.VocabularyRest;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
@@ -150,18 +151,48 @@ public class Utils {
     public <T> Page<T> getPage(List<T> fullContents, @Nullable Pageable optionalPageable) {
         Pageable pageable = getPageable(optionalPageable);
         int total = fullContents.size();
-        List<T> pageContent = null;
         if (pageable.getOffset() > total) {
             throw new PaginationException(total);
         } else {
-            if (pageable.getOffset() + pageable.getPageSize() > total) {
-                pageContent = fullContents.subList(Math.toIntExact(pageable.getOffset()), total);
-            } else {
-                pageContent = fullContents.subList(Math.toIntExact(pageable.getOffset()),
-                        Math.toIntExact(pageable.getOffset()) + pageable.getPageSize());
-            }
+            List<T> pageContent = getListSlice(fullContents, pageable);
             return new PageImpl<>(pageContent, pageable, total);
         }
+    }
+
+    /**
+     * Returns list of objects for the current page.
+     * @param fullList the complete list of objects
+     * @param optionalPageable
+     * @return list of page objects
+     * @param <T>
+     */
+    public <T> List<T> getPageObjectList(List<T> fullList, @Nullable Pageable optionalPageable) {
+        Pageable pageable = getPageable(optionalPageable);
+        int total = fullList.size();
+        if (pageable.getOffset() > total) {
+            throw new PaginationException(total);
+        } else {
+            return getListSlice(fullList, pageable);
+        }
+    }
+
+    /**
+     * Returns the list elements required for the page
+     * @param fullList the complete list of objects
+     * @param pageable
+     * @return list of page objects
+     * @param <T>
+     */
+    private <T> List<T> getListSlice(List<T> fullList, Pageable pageable) {
+        int total = fullList.size();
+        List<T> pageContent = null;
+        if (pageable.getOffset() + pageable.getPageSize() > total) {
+            pageContent = fullList.subList(Math.toIntExact(pageable.getOffset()), total);
+        } else {
+            pageContent = fullList.subList(Math.toIntExact(pageable.getOffset()),
+                Math.toIntExact(pageable.getOffset()) + pageable.getPageSize());
+        }
+        return pageContent;
     }
 
     /**
@@ -295,6 +326,9 @@ public class Utils {
         }
         if (StringUtils.equals(modelPlural, "orcidhistories")) {
             return OrcidHistoryRest.NAME;
+        }
+        if (StringUtils.equals(modelPlural, "supervisionorders")) {
+            return SupervisionOrderRest.NAME;
         }
         return modelPlural.replaceAll("s$", "");
     }

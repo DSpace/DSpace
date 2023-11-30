@@ -56,37 +56,18 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
          * new DSpace.getServiceManager().getServiceByName("org.dspace.discovery.SolrIndexer");
          */
 
-        if (indexClientOptions == IndexClientOptions.REMOVE) {
-            handler.logInfo("Removing " + commandLine.getOptionValue("r") + " from Index");
-            indexer.unIndexContent(context, commandLine.getOptionValue("r"));
-        } else if (indexClientOptions == IndexClientOptions.CLEAN) {
-            handler.logInfo("Cleaning Index");
-            indexer.cleanIndex();
-        } else if (indexClientOptions == IndexClientOptions.DELETE) {
-            handler.logInfo("Deleting Index");
-            indexer.deleteIndex();
-        } else if (indexClientOptions == IndexClientOptions.BUILD ||
-            indexClientOptions == IndexClientOptions.BUILDANDSPELLCHECK) {
-            handler.logInfo("(Re)building index from scratch.");
-            indexer.deleteIndex();
-            indexer.createIndex(context);
-            if (indexClientOptions == IndexClientOptions.BUILDANDSPELLCHECK) {
-                checkRebuildSpellCheck(commandLine, indexer);
-            }
-        } else if (indexClientOptions == IndexClientOptions.OPTIMIZE) {
-            handler.logInfo("Optimizing search core.");
-            indexer.optimize();
-        } else if (indexClientOptions == IndexClientOptions.SPELLCHECK) {
-            checkRebuildSpellCheck(commandLine, indexer);
-        } else if (indexClientOptions == IndexClientOptions.INDEX) {
-            final String param = commandLine.getOptionValue('i');
+        Optional<IndexableObject> indexableObject = Optional.empty();
+
+        if (indexClientOptions == IndexClientOptions.REMOVE || indexClientOptions == IndexClientOptions.INDEX) {
+            final String param = indexClientOptions == IndexClientOptions.REMOVE ? commandLine.getOptionValue('r') :
+                    commandLine.getOptionValue('i');
             UUID uuid = null;
             try {
                 uuid = UUID.fromString(param);
             } catch (Exception e) {
-                // nothing to do, it should be an handle
+                // nothing to do, it should be a handle
             }
-            Optional<IndexableObject> indexableObject = Optional.empty();
+
             if (uuid != null) {
                 final Item item = ContentServiceFactory.getInstance().getItemService().find(context, uuid);
                 if (item != null) {
@@ -118,7 +99,32 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
             if (!indexableObject.isPresent()) {
                 throw new IllegalArgumentException("Cannot resolve " + param + " to a DSpace object");
             }
-            handler.logInfo("Indexing " + param + " force " + commandLine.hasOption("f"));
+        }
+
+        if (indexClientOptions == IndexClientOptions.REMOVE) {
+            handler.logInfo("Removing " + commandLine.getOptionValue("r") + " from Index");
+            indexer.unIndexContent(context, indexableObject.get().getUniqueIndexID());
+        } else if (indexClientOptions == IndexClientOptions.CLEAN) {
+            handler.logInfo("Cleaning Index");
+            indexer.cleanIndex();
+        } else if (indexClientOptions == IndexClientOptions.DELETE) {
+            handler.logInfo("Deleting Index");
+            indexer.deleteIndex();
+        } else if (indexClientOptions == IndexClientOptions.BUILD ||
+            indexClientOptions == IndexClientOptions.BUILDANDSPELLCHECK) {
+            handler.logInfo("(Re)building index from scratch.");
+            indexer.deleteIndex();
+            indexer.createIndex(context);
+            if (indexClientOptions == IndexClientOptions.BUILDANDSPELLCHECK) {
+                checkRebuildSpellCheck(commandLine, indexer);
+            }
+        } else if (indexClientOptions == IndexClientOptions.OPTIMIZE) {
+            handler.logInfo("Optimizing search core.");
+            indexer.optimize();
+        } else if (indexClientOptions == IndexClientOptions.SPELLCHECK) {
+            checkRebuildSpellCheck(commandLine, indexer);
+        } else if (indexClientOptions == IndexClientOptions.INDEX) {
+            handler.logInfo("Indexing " + commandLine.getOptionValue('i') + " force " + commandLine.hasOption("f"));
             final long startTimeMillis = System.currentTimeMillis();
             final long count = indexAll(indexer, ContentServiceFactory.getInstance().
                     getItemService(), context, indexableObject.get());
@@ -179,7 +185,7 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
         indexingService.indexContent(context, dso, true, true);
         count++;
         if (dso.getIndexedObject() instanceof Community) {
-            final Community community = (Community) dso;
+            final Community community = (Community) dso.getIndexedObject();
             final String communityHandle = community.getHandle();
             for (final Community subcommunity : community.getSubcommunities()) {
                 count += indexAll(indexingService, itemService, context, new IndexableCommunity(subcommunity));

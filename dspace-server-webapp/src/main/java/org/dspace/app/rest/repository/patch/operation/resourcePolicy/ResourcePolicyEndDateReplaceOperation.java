@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.repository.patch.operation.resourcePolicy;
 
-import java.text.ParseException;
 import java.util.Date;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -15,6 +14,7 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.repository.patch.operation.PatchOperation;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.core.Context;
+import org.dspace.util.MultiFormatDateParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -58,12 +58,11 @@ public class ResourcePolicyEndDateReplaceOperation<R> extends PatchOperation<R> 
      */
     private void replace(ResourcePolicy resourcePolicy, Operation operation) {
         String dateS = (String) operation.getValue();
-        try {
-            Date date = resourcePolicyUtils.simpleDateFormat.parse(dateS);
-            resourcePolicy.setEndDate(date);
-        } catch (ParseException e) {
-            throw new DSpaceBadRequestException("Invalid endDate value", e);
+        Date date = MultiFormatDateParser.parse(dateS);
+        if (date == null) {
+            throw new DSpaceBadRequestException("Invalid endDate value " + dateS);
         }
+        resourcePolicy.setEndDate(date);
     }
 
     @Override

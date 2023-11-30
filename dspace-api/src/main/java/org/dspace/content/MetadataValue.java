@@ -19,6 +19,7 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
@@ -59,7 +60,7 @@ public class MetadataValue implements ReloadableEntity<Integer> {
      * The value of the field
      */
     @Lob
-    @Type(type = "org.dspace.storage.rdbms.hibernate.DatabaseAwareLobType")
+    @Type(type = "org.hibernate.type.TextType")
     @Column(name = "text_value")
     private String value;
 
@@ -169,6 +170,14 @@ public class MetadataValue implements ReloadableEntity<Integer> {
 
     public void setMetadataField(MetadataField metadataField) {
         this.metadataField = metadataField;
+    }
+
+    /**
+     * @return {@code MetadataField#getID()}
+     */
+    @Transient
+    protected Integer getMetadataFieldId() {
+        return getMetadataField().getID();
     }
 
     /**

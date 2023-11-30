@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static java.lang.Thread.sleep;
+import static org.dspace.app.rest.matcher.GroupMatcher.matchGroupWithName;
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_UUID;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
@@ -1395,64 +1396,6 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void testShortLivedTokenUsingGet() throws Exception {
-        String token = getAuthToken(eperson.getEmail(), password);
-
-        // Verify the main session salt doesn't change
-        String salt = eperson.getSessionSalt();
-
-        getClient(token).perform(
-            get("/api/authn/shortlivedtokens")
-                .with(ip(TRUSTED_IP))
-        )
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.token", notNullValue()))
-            .andExpect(jsonPath("$.type", is("shortlivedtoken")))
-            .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/authn/shortlivedtokens")))
-            // Verify generating short-lived token doesn't change our CSRF token
-            // (so, neither the CSRF cookie nor header are sent back)
-            .andExpect(cookie().doesNotExist("DSPACE-XSRF-COOKIE"))
-            .andExpect(header().doesNotExist("DSPACE-XSRF-TOKEN"));
-
-        assertEquals(salt, eperson.getSessionSalt());
-
-        // Logout, invalidating token
-        getClient(token).perform(post("/api/authn/logout"))
-                .andExpect(status().isNoContent());
-    }
-
-    @Test
-    public void testShortLivedTokenUsingGetFromUntrustedIpShould403() throws Exception {
-        String token = getAuthToken(eperson.getEmail(), password);
-
-        getClient(token).perform(
-            get("/api/authn/shortlivedtokens")
-                .with(ip(UNTRUSTED_IP))
-        )
-            .andExpect(status().isForbidden());
-
-        // Logout, invalidating token
-        getClient(token).perform(post("/api/authn/logout"))
-                .andExpect(status().isNoContent());
-    }
-
-    @Test
-    public void testShortLivedTokenUsingGetFromUntrustedIpWithForwardHeaderShould403() throws Exception {
-        String token = getAuthToken(eperson.getEmail(), password);
-
-        getClient(token).perform(
-            get("/api/authn/shortlivedtokens")
-                .with(ip(UNTRUSTED_IP))
-                .header("X-Forwarded-For", TRUSTED_IP) // this should not affect the test result
-        )
-            .andExpect(status().isForbidden());
-
-        // Logout, invalidating token
-        getClient(token).perform(post("/api/authn/logout"))
-                .andExpect(status().isNoContent());
-    }
-
-    @Test
     public void testShortLivedTokenWithCSRFSentViaParam() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
 
@@ -1473,15 +1416,6 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     @Test
     public void testShortLivedTokenNotAuthenticated() throws Exception {
         getClient().perform(post("/api/authn/shortlivedtokens"))
-            .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    public void testShortLivedTokenNotAuthenticatedUsingGet() throws Exception {
-        getClient().perform(
-            get("/api/authn/shortlivedtokens")
-                .with(ip(TRUSTED_IP))
-        )
             .andExpect(status().isUnauthorized());
     }
 
@@ -1599,22 +1533,6 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void testGenerateShortLivedTokenWithShortLivedTokenUsingGet() throws Exception {
-        String token = getAuthToken(eperson.getEmail(), password);
-        String shortLivedToken = getShortLivedToken(token);
-
-        getClient().perform(
-            get("/api/authn/shortlivedtokens?authentication-token=" + shortLivedToken)
-                .with(ip(TRUSTED_IP))
-        )
-            .andExpect(status().isForbidden());
-
-        // Logout, invalidating token
-        getClient(token).perform(post("/api/authn/logout"))
-                .andExpect(status().isNoContent());
-    }
-
-    @Test
     public void testStatusOrcidAuthenticatedWithCookie() throws Exception {
 
         configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", ORCID_ONLY);
@@ -1722,6 +1640,71 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         } finally {
             orcidConfiguration.setClientId(originalClientId);
         }
+    }
+
+    @Test
+    public void testAreSpecialGroupsApplicable() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        GroupBuilder.createGroup(context)
+            .withName("specialGroupPwd")
+            .build();
+        GroupBuilder.createGroup(context)
+            .withName("specialGroupShib")
+            .build();
+
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_AND_PASS);
+        configurationService.setProperty("authentication-password.login.specialgroup", "specialGroupPwd");
+        configurationService.setProperty("authentication-shibboleth.role.faculty", "specialGroupShib");
+        configurationService.setProperty("authentication-shibboleth.default-roles", "faculty");
+
+        context.restoreAuthSystemState();
+
+        String passwordToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(passwordToken).perform(get("/api/authn/status").param("projection", "full"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchFullEmbeds()))
+            .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchLinks()))
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.okay", is(true)))
+            .andExpect(jsonPath("$.authenticated", is(true)))
+            .andExpect(jsonPath("$.authenticationMethod", is("password")))
+            .andExpect(jsonPath("$.type", is("status")))
+            .andExpect(jsonPath("$._links.specialGroups.href", startsWith(REST_SERVER_URL)))
+            .andExpect(jsonPath("$._embedded.specialGroups._embedded.specialGroups",
+                Matchers.containsInAnyOrder(matchGroupWithName("specialGroupPwd"))));
+
+        getClient(passwordToken).perform(get("/api/authn/status/specialGroups").param("projection", "full"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.specialGroups",
+                Matchers.containsInAnyOrder(matchGroupWithName("specialGroupPwd"))));
+
+        String shibToken = getClient().perform(post("/api/authn/login")
+            .requestAttr("SHIB-MAIL", eperson.getEmail())
+            .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty;staff"))
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER).replace(AUTHORIZATION_TYPE, "");
+
+        getClient(shibToken).perform(get("/api/authn/status").param("projection", "full"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchFullEmbeds()))
+            .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchLinks()))
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.okay", is(true)))
+            .andExpect(jsonPath("$.authenticated", is(true)))
+            .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")))
+            .andExpect(jsonPath("$.type", is("status")))
+            .andExpect(jsonPath("$._links.specialGroups.href", startsWith(REST_SERVER_URL)))
+            .andExpect(jsonPath("$._embedded.specialGroups._embedded.specialGroups",
+                Matchers.containsInAnyOrder(matchGroupWithName("specialGroupShib"))));
+
+        getClient(shibToken).perform(get("/api/authn/status/specialGroups").param("projection", "full"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.specialGroups",
+                Matchers.containsInAnyOrder(matchGroupWithName("specialGroupShib"))));
     }
 
     // Get a short-lived token based on an active login token

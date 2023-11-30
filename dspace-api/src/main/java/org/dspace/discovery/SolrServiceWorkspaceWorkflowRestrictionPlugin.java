@@ -40,6 +40,11 @@ public class SolrServiceWorkspaceWorkflowRestrictionPlugin implements SolrServic
      */
     public static final String DISCOVER_WORKFLOW_ADMIN_CONFIGURATION_NAME = "workflowAdmin";
 
+    /**
+     * The name of the discover configuration used by administrators to search for workspace and workflow tasks
+     */
+    public static final String DISCOVER_SUPERVISION_CONFIGURATION_NAME = "supervision";
+
     @Autowired(required = true)
     protected GroupService groupService;
 
@@ -60,18 +65,22 @@ public class SolrServiceWorkspaceWorkflowRestrictionPlugin implements SolrServic
         );
         boolean isWorkflowAdmin = isAdmin(context)
                 && DISCOVER_WORKFLOW_ADMIN_CONFIGURATION_NAME.equals(discoveryQuery.getDiscoveryConfigurationName());
+
+        boolean isSupervision =
+            DISCOVER_SUPERVISION_CONFIGURATION_NAME.equals(discoveryQuery.getDiscoveryConfigurationName());
+
         EPerson currentUser = context.getCurrentUser();
 
         // extra security check to avoid the possibility that an anonymous user
         // get access to workspace or workflow
-        if (currentUser == null && (isWorkflow || isWorkspace)) {
+        if (currentUser == null && (isWorkflow || isWorkspace || isSupervision)) {
             throw new IllegalStateException(
                     "An anonymous user cannot perform a workspace or workflow search");
         }
         if (isWorkspace) {
             // insert filter by submitter
             solrQuery.addFilterQuery("submitter_authority:(" + currentUser.getID() + ")");
-        } else if (isWorkflow && !isWorkflowAdmin) {
+        } else if ((isWorkflow && !isWorkflowAdmin) || (isSupervision && !isAdmin(context))) {
             // Retrieve all the groups the current user is a member of !
             Set<Group> groups;
             try {

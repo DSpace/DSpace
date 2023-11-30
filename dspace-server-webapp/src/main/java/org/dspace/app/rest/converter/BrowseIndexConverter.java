@@ -7,12 +7,17 @@
  */
 package org.dspace.app.rest.converter;
 
+import static org.dspace.app.rest.model.BrowseIndexRest.BROWSE_TYPE_FLAT;
+import static org.dspace.app.rest.model.BrowseIndexRest.BROWSE_TYPE_HIERARCHICAL;
+import static org.dspace.app.rest.model.BrowseIndexRest.BROWSE_TYPE_VALUE_LIST;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.dspace.app.rest.model.BrowseIndexRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.browse.BrowseIndex;
+import org.dspace.content.authority.DSpaceControlledVocabularyIndex;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
 import org.springframework.stereotype.Component;
@@ -30,18 +35,29 @@ public class BrowseIndexConverter implements DSpaceConverter<BrowseIndex, Browse
     public BrowseIndexRest convert(BrowseIndex obj, Projection projection) {
         BrowseIndexRest bir = new BrowseIndexRest();
         bir.setProjection(projection);
-        bir.setId(obj.getName());
-        bir.setDataType(obj.getDataType());
-        bir.setOrder(obj.getDefaultOrder());
-        bir.setMetadataBrowse(obj.isMetadataIndex());
         List<String> metadataList = new ArrayList<String>();
-        if (obj.isMetadataIndex()) {
+        String id = obj.getName();
+        if (obj instanceof DSpaceControlledVocabularyIndex) {
+            DSpaceControlledVocabularyIndex vocObj = (DSpaceControlledVocabularyIndex) obj;
+            metadataList = new ArrayList<>(vocObj.getMetadataFields());
+            id = vocObj.getVocabulary().getPluginInstanceName();
+            bir.setFacetType(vocObj.getFacetConfig().getIndexFieldName());
+            bir.setVocabulary(vocObj.getVocabulary().getPluginInstanceName());
+            bir.setBrowseType(BROWSE_TYPE_HIERARCHICAL);
+        } else if (obj.isMetadataIndex()) {
             for (String s : obj.getMetadata().split(",")) {
                 metadataList.add(s.trim());
             }
+            bir.setDataType(obj.getDataType());
+            bir.setOrder(obj.getDefaultOrder());
+            bir.setBrowseType(BROWSE_TYPE_VALUE_LIST);
         } else {
             metadataList.add(obj.getSortOption().getMetadata());
+            bir.setDataType(obj.getDataType());
+            bir.setOrder(obj.getDefaultOrder());
+            bir.setBrowseType(BROWSE_TYPE_FLAT);
         }
+        bir.setId(id);
         bir.setMetadataList(metadataList);
 
         List<BrowseIndexRest.SortOption> sortOptionsList = new ArrayList<BrowseIndexRest.SortOption>();
@@ -52,7 +68,9 @@ public class BrowseIndexConverter implements DSpaceConverter<BrowseIndex, Browse
         } catch (SortException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        bir.setSortOptions(sortOptionsList);
+        if (!bir.getBrowseType().equals(BROWSE_TYPE_HIERARCHICAL)) {
+            bir.setSortOptions(sortOptionsList);
+        }
         return bir;
     }
 

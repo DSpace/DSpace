@@ -15,22 +15,17 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.RequestItem;
-import org.dspace.app.requestitem.RequestItemAuthor;
-import org.dspace.app.requestitem.RequestItemAuthorExtractor;
 import org.dspace.app.requestitem.RequestItemEmailNotifier;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.rest.converter.RequestItemConverter;
@@ -52,7 +47,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-
+import org.springframework.web.util.HtmlUtils;
 /**
  * Component to expose item requests.
  *
@@ -76,10 +71,10 @@ public class RequestItemRepository
     protected RequestItemConverter requestItemConverter;
 
     @Autowired(required = true)
-    protected RequestItemAuthorExtractor requestItemAuthorExtractor;
+    protected ConfigurationService configurationService;
 
     @Autowired(required = true)
-    protected ConfigurationService configurationService;
+    protected RequestItemEmailNotifier requestItemEmailNotifier;
 
     /*
      * DSpaceRestRepository
@@ -177,11 +172,11 @@ public class RequestItemRepository
             username = user.getFullName();
         } else { // An anonymous session may provide a name.
             // Escape username to evade nasty XSS attempts
-            username = StringEscapeUtils.escapeHtml4(rir.getRequestName());
+            username = HtmlUtils.htmlEscape(rir.getRequestName(),"UTF-8");
         }
 
         // Requester's message text, escaped to evade nasty XSS attempts
-        String message = StringEscapeUtils.escapeHtml4(rir.getRequestMessage());
+        String message = HtmlUtils.htmlEscape(rir.getRequestMessage(),"UTF-8");
 
         // Create the request.
         String token;
@@ -199,18 +194,18 @@ public class RequestItemRepository
             responseLink = getLinkTokenEmail(ri.getToken());
         } catch (URISyntaxException | MalformedURLException e) {
             LOG.warn("Impossible URL error while composing email:  {}",
-                    e.getMessage());
+                    e::getMessage);
             throw new RuntimeException("Request not sent:  " + e.getMessage());
         }
 
         // Send the request email
         try {
-            RequestItemEmailNotifier.sendRequest(ctx, ri, responseLink);
+            requestItemEmailNotifier.sendRequest(ctx, ri, responseLink);
         } catch (IOException | SQLException ex) {
             throw new RuntimeException("Request not sent.", ex);
         }
-
-        return requestItemConverter.convert(ri, Projection.DEFAULT);
+        // #8636 - Security issue: Should not return RequestItemRest to avoid token exposure
+        return null;
     }
 
     // NOTICE:  there is no service method for this -- requests are never deleted?
@@ -221,31 +216,13 @@ public class RequestItemRepository
     }
 
     @Override
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("permitAll()")
     public RequestItemRest put(Context context, HttpServletRequest request,
             String apiCategory, String model, String token, JsonNode requestBody)
             throws AuthorizeException {
         RequestItem ri = requestItemService.findByToken(context, token);
         if (null == ri) {
             throw new UnprocessableEntityException("Item request not found");
-        }
-
-        // Check for authorized user
-        List<RequestItemAuthor> authorizers;
-        try {
-            authorizers = requestItemAuthorExtractor.getRequestItemAuthor(context, ri.getItem());
-        } catch (SQLException ex) {
-            LOG.warn("Failed to find an authorizer:  {}", ex.getMessage());
-            authorizers = Collections.EMPTY_LIST;
-        }
-
-        boolean authorized = false;
-        String requester = context.getCurrentUser().getEmail();
-        for (RequestItemAuthor authorizer : authorizers) {
-            authorized |= authorizer.getEmail().equals(requester);
-        }
-        if (!authorized) {
-            throw new AuthorizeException("Not authorized to approve this request");
         }
 
         // Do not permit updates after a decision has been given.
@@ -265,7 +242,10 @@ public class RequestItemRepository
         }
 
         JsonNode responseMessageNode = requestBody.findValue("responseMessage");
-        String message = responseMessageNode.asText();
+        String message = null;
+        if (responseMessageNode != null && !responseMessageNode.isNull()) {
+            message = responseMessageNode.asText();
+        }
 
         ri.setDecision_date(new Date());
         requestItemService.update(context, ri);
@@ -273,18 +253,18 @@ public class RequestItemRepository
         // Send the response email
         String subject = requestBody.findValue("subject").asText();
         try {
-            RequestItemEmailNotifier.sendResponse(context, ri, subject, message);
+            requestItemEmailNotifier.sendResponse(context, ri, subject, message);
         } catch (IOException ex) {
-            LOG.warn("Response not sent:  {}", ex.getMessage());
+            LOG.warn("Response not sent:  {}", ex::getMessage);
             throw new RuntimeException("Response not sent", ex);
         }
 
         // Perhaps send Open Access request to admin.s.
         if (requestBody.findValue("suggestOpenAccess").asBoolean(false)) {
             try {
-                RequestItemEmailNotifier.requestOpenAccess(context, ri);
+                requestItemEmailNotifier.requestOpenAccess(context, ri);
             } catch (IOException ex) {
-                LOG.warn("Open access request not sent:  {}", ex.getMessage());
+                LOG.warn("Open access request not sent:  {}", ex::getMessage);
                 throw new RuntimeException("Open access request not sent", ex);
             }
         }
