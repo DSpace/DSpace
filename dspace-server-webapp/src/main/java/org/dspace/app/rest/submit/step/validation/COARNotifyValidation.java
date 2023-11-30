@@ -59,6 +59,7 @@ public class COARNotifyValidation extends AbstractValidation {
                 services.get(i)
                         .getInboundPatterns()
                         .stream()
+                        .filter(inboundPattern -> inboundPattern.getPattern().equals(pattern))
                         .filter(inboundPattern -> !inboundPattern.isAutomatic() &&
                             !inboundPattern.getConstraint().isEmpty())
                         .forEach(inboundPattern -> {
