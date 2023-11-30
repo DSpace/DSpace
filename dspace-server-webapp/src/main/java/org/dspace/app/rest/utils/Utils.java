@@ -343,11 +343,10 @@ public class Utils {
      * @return
      */
     public LinkRestRepository getLinkResourceRepository(String apiCategory, String modelPlural, String rel) {
-        String model = makeSingular(modelPlural);
         try {
-            return applicationContext.getBean(apiCategory + "." + model + "." + rel, LinkRestRepository.class);
+            return applicationContext.getBean(apiCategory + "." + modelPlural + "." + rel, LinkRestRepository.class);
         } catch (NoSuchBeanDefinitionException e) {
-            throw new RepositoryNotFoundException(apiCategory, model);
+            throw new RepositoryNotFoundException(apiCategory, modelPlural);
         }
     }
 
@@ -742,7 +741,7 @@ public class Utils {
         }
         Projection projection = resource.getContent().getProjection();
         LinkRestRepository linkRepository = getLinkResourceRepository(resource.getContent().getCategory(),
-                resource.getContent().getType(), rel);
+                resource.getContent().getTypePlural(), rel);
         if (linkRepository.isEmbeddableRelation(resource.getContent(), rel)) {
             Method method = requireMethod(linkRepository.getClass(), linkRest.method());
             Object contentId = getContentIdForLinkMethod(resource.getContent(), method);
