@@ -21,7 +21,7 @@ public class SubscriptionRest extends BaseObjectRest<Integer> {
     private static final long serialVersionUID = 1L;
 
     public static final String NAME = "subscription";
-    public static final String NAME_PLURAL = "subscriptions";
+    public static final String PLURAL_NAME = "subscriptions";
     public static final String CATEGORY = "core";
     public static final String DSPACE_OBJECT = "resource";
     public static final String EPERSON = "eperson";

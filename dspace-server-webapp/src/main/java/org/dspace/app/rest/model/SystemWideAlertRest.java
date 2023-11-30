@@ -19,6 +19,7 @@ import org.dspace.app.rest.RestResourceController;
  */
 public class SystemWideAlertRest extends BaseObjectRest<Integer> {
     public static final String NAME = "systemwidealert";
+    public static final String PLURAL_NAME = "systemwidealerts";
     public static final String CATEGORY = RestAddressableModel.SYSTEM;
 
     public String getCategory() {

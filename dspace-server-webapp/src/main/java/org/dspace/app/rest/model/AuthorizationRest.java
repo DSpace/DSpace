@@ -24,6 +24,7 @@ import org.dspace.app.rest.RestResourceController;
 })
 public class AuthorizationRest extends BaseObjectRest<String> {
     public static final String NAME = "authorization";
+    public static final String PLURAL_NAME = "authorizations";
     public static final String CATEGORY = RestAddressableModel.AUTHORIZATION;
 
     public static final String EPERSON = "eperson";

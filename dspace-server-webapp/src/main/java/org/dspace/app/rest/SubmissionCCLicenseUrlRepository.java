@@ -133,8 +133,8 @@ public class SubmissionCCLicenseUrlRepository extends DSpaceRestRepository<Submi
     public void afterPropertiesSet() {
         discoverableEndpointsService.register(this, Arrays.asList(
                 Link.of("/api/" + SubmissionCCLicenseUrlRest.CATEGORY + "/" +
-                        SubmissionCCLicenseUrlRest.PLURAL + "/search",
-                        SubmissionCCLicenseUrlRest.PLURAL + "-search")));
+                        SubmissionCCLicenseUrlRest.PLURAL_NAME + "/search",
+                        SubmissionCCLicenseUrlRest.PLURAL_NAME + "-search")));
     }
 
 }

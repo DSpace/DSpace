@@ -20,6 +20,7 @@ import org.dspace.app.rest.RestResourceController;
  */
 public class UsageReportRest extends BaseObjectRest<String> {
     public static final String NAME = "usagereport";
+    public static final String PLURAL_NAME = "usagereports";
     public static final String CATEGORY = RestModel.STATISTICS;
 
     @JsonProperty(value = "report-type")

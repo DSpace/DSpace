@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "relationships" subresource of an individual item.
  */
-@Component(ItemRest.CATEGORY + "." + ItemRest.NAME + "." + ItemRest.RELATIONSHIPS)
+@Component(ItemRest.CATEGORY + "." + ItemRest.PLURAL_NAME + "." + ItemRest.RELATIONSHIPS)
 public class ItemRelationshipLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 /**
  * LinkRepository for the ParentCommunity object for a Community
  */
-@Component(CommunityRest.CATEGORY + "." + CommunityRest.NAME + "." + CommunityRest.PARENT_COMMUNITY)
+@Component(CommunityRest.CATEGORY + "." + CommunityRest.PLURAL_NAME + "." + CommunityRest.PARENT_COMMUNITY)
 public class CommunityParentCommunityLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
 

@@ -21,6 +21,7 @@ public abstract class DiscoveryResultsRest extends BaseObjectRest<String> {
 
     @JsonIgnore
     public static final String NAME = "discover";
+    public static final String PLURAL_NAME = "discovers";
     public static final String CATEGORY = RestModel.DISCOVER;
     private String scope;
     private String query;

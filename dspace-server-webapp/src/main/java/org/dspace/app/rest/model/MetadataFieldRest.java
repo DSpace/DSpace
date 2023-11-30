@@ -18,7 +18,7 @@ import org.dspace.app.rest.RestResourceController;
  */
 public class MetadataFieldRest extends BaseObjectRest<Integer> {
     public static final String NAME = "metadatafield";
-    public static final String NAME_PLURAL = "metadatafields";
+    public static final String PLURAL_NAME = "metadatafields";
     public static final String CATEGORY = RestAddressableModel.CORE;
 
     @JsonIgnore

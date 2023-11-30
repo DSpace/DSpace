@@ -23,7 +23,7 @@ public class WorkflowActionRest extends BaseObjectRest<String> {
 
     public static final String CATEGORY = "config";
     public static final String NAME = "workflowaction";
-    public static final String NAME_PLURAL = "workflowactions";
+    public static final String PLURAL_NAME = "workflowactions";
 
     private List<String> options;
     private List<String> advancedOptions;

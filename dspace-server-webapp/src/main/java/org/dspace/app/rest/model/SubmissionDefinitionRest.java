@@ -20,6 +20,7 @@ import org.dspace.app.rest.RestResourceController;
  */
 public class SubmissionDefinitionRest extends BaseObjectRest<String> {
     public static final String NAME = "submissiondefinition";
+    public static final String PLURAL_NAME = "submissiondefinitions";
     public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
 
     private String name;

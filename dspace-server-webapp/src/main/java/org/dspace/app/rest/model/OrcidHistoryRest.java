@@ -25,6 +25,7 @@ public class OrcidHistoryRest extends BaseObjectRest<Integer> {
 
     public static final String CATEGORY = RestModel.EPERSON;
     public static final String NAME = "orcidhistory";
+    public static final String PLURAL_NAME = "orcidhistories";
 
     private UUID profileItemId;
 

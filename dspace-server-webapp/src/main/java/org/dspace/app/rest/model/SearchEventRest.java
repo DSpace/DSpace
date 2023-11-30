@@ -19,6 +19,7 @@ import org.dspace.app.rest.RestResourceController;
 public class SearchEventRest extends BaseObjectRest<UUID> {
 
     public static final String NAME = "searchevent";
+    public static final String PLURAL_NAME = "searchevents";
     public static final String CATEGORY = RestAddressableModel.STATISTICS;
 
     private String query;

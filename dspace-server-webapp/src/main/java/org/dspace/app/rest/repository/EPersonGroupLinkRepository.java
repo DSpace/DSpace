@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for the direct "groups" subresource of an individual eperson.
  */
-@Component(EPersonRest.CATEGORY + "." + EPersonRest.NAME + "." + EPersonRest.GROUPS)
+@Component(EPersonRest.CATEGORY + "." + EPersonRest.PLURAL_NAME + "." + EPersonRest.GROUPS)
 public class EPersonGroupLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 
