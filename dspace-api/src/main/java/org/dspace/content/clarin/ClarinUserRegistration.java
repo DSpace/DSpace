@@ -28,7 +28,11 @@ import org.dspace.core.ReloadableEntity;
 @Table(name = "user_registration")
 public class ClarinUserRegistration implements ReloadableEntity<Integer> {
 
+    // Anonymous user
     public static final String ANONYMOUS_USER_REGISTRATION = "anonymous";
+
+    // Registered user without organization
+    public static final String UNKNOWN_USER_REGISTRATION = "Unknown";
 
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(ClarinUserRegistration.class);
 
