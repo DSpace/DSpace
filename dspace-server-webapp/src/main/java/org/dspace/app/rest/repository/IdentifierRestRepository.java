@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.NotSupportedException;
 
-import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
@@ -277,8 +276,7 @@ public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRes
             if (dso != null) {
                 // Convert and respond with a redirect to the object itself
                 DSpaceObjectRest dsor = converter.toRest(dso, utils.obtainProjection());
-                URI link = linkTo(dsor.getController(), dsor.getCategory(),
-                        English.plural(dsor.getType()))
+                URI link = linkTo(dsor.getController(), dsor.getCategory(), dsor.getTypePlural())
                         .slash(dsor.getId()).toUri();
                 response.setStatus(HttpServletResponse.SC_FOUND);
                 response.sendRedirect(link.toString());

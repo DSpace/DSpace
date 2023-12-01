@@ -11,7 +11,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 import java.util.LinkedList;
 
-import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.RestResourceController;
 import org.dspace.app.rest.model.SubmissionAccessOptionRest;
 import org.dspace.app.rest.model.SubmissionFormRest;
@@ -37,19 +36,22 @@ public class SubmissionSectionHalLinkFactory extends HalLinkFactory<SubmissionSe
         SubmissionSectionRest sd = halResource.getContent();
 
         if (SubmissionStepConfig.INPUT_FORM_STEP_NAME.equals(sd.getSectionType())) {
-            buildLink(list, sd, SubmissionFormRest.CATEGORY, SubmissionFormRest.NAME);
+            buildLink(list, sd, SubmissionFormRest.CATEGORY, SubmissionFormRest.NAME, SubmissionFormRest.PLURAL_NAME);
         }
         if (SubmissionStepConfig.UPLOAD_STEP_NAME.equals(sd.getSectionType())) {
-            buildLink(list, sd, SubmissionUploadRest.CATEGORY, SubmissionUploadRest.NAME);
+            buildLink(list, sd, SubmissionUploadRest.CATEGORY, SubmissionUploadRest.NAME,
+                      SubmissionUploadRest.PLURAL_NAME);
         }
         if (SubmissionStepConfig.ACCESS_CONDITION_STEP_NAME.equals(sd.getSectionType())) {
-            buildLink(list, sd, SubmissionAccessOptionRest.CATEGORY, SubmissionAccessOptionRest.NAME);
+            buildLink(list, sd, SubmissionAccessOptionRest.CATEGORY, SubmissionAccessOptionRest.NAME,
+                      SubmissionAccessOptionRest.PLURAL_NAME);
         }
     }
 
-    private void buildLink(final LinkedList<Link> list, SubmissionSectionRest sd, String category, String name) {
+    private void buildLink(final LinkedList<Link> list, SubmissionSectionRest sd, String category, String name,
+                           String plural) {
         UriComponentsBuilder uriComponentsBuilder = linkTo(getMethodOn(category, name)
-                    .findRel(null, null, category, English.plural(name), sd.getId(), "", null, null))
+                    .findRel(null, null, category, plural, sd.getId(), "", null, null))
                     .toUriComponentsBuilder();
         String uribuilder = uriComponentsBuilder.build().toString();
         list.add(buildLink(NAME_LINK_ON_PANEL, uribuilder.substring(0, uribuilder.lastIndexOf("/"))));
