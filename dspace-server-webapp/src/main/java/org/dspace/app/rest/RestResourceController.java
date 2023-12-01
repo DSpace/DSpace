@@ -890,7 +890,7 @@ public class RestResourceController implements InitializingBean {
             int start = Math.toIntExact(page.getOffset());
             int end = (start + page.getPageSize()) > fullList.size() ? fullList.size() : (start + page.getPageSize());
             DSpaceRestRepository<RestAddressableModel, ?> resourceRepository = utils
-                .getResourceRepository(fullList.get(0).getCategory(), fullList.get(0).getType());
+                .getResourceRepository(fullList.get(0).getCategory(), fullList.get(0).getTypePlural());
             PageImpl<RestAddressableModel> pageResult = new PageImpl(fullList.subList(start, end), page,
                                                                      fullList.size());
             return assembler.toModel(pageResult.map(converter::toResource));

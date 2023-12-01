@@ -267,8 +267,7 @@ public class Utils {
      */
     public DSpaceRestRepository getResourceRepository(String apiCategory, String modelPlural)
             throws RepositoryNotFoundException {
-        String model = makeSingular(modelPlural);
-        return getResourceRepositoryByCategoryAndModel(apiCategory, model);
+        return getResourceRepositoryByCategoryAndModel(apiCategory, modelPlural);
     }
 
     /**
@@ -276,16 +275,16 @@ public class Utils {
      * as returned by the {@link RestAddressableModel#getType()} method
      *
      * @param apiCategory
-     * @param modelSingular
+     * @param modelPlural
      * @return the requested repository.
      * @throws RepositoryNotFoundException if no such repository can be found.
      */
-    public DSpaceRestRepository getResourceRepositoryByCategoryAndModel(String apiCategory, String modelSingular)
+    public DSpaceRestRepository getResourceRepositoryByCategoryAndModel(String apiCategory, String modelPlural)
             throws RepositoryNotFoundException {
         try {
-            return applicationContext.getBean(apiCategory + "." + modelSingular, DSpaceRestRepository.class);
+            return applicationContext.getBean(apiCategory + "." + modelPlural, DSpaceRestRepository.class);
         } catch (NoSuchBeanDefinitionException e) {
-            throw new RepositoryNotFoundException(apiCategory, modelSingular);
+            throw new RepositoryNotFoundException(apiCategory, modelPlural);
         }
     }
 
@@ -972,7 +971,7 @@ public class Utils {
     public Object getDSpaceAPIObjectFromRest(Context context, BaseObjectRest restObj)
             throws IllegalArgumentException, SQLException {
         DSpaceRestRepository repository = getResourceRepositoryByCategoryAndModel(restObj.getCategory(),
-                restObj.getType());
+                restObj.getTypePlural());
         Serializable pk = castToPKClass((ReloadableEntityObjectRepository) repository, restObj.getId().toString());
         return ((ReloadableEntityObjectRepository) repository).findDomainObjectByPk(context, pk);
     }
