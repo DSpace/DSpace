@@ -259,7 +259,7 @@
                     <property name="actionSendFilter" value="${ldn.notification.email}" />
                     <property name="actionSendEmailTextFile" value="coar_notify_relationship" />
                 </bean>
-                <bean class="org.dspace.app.ldn.action.LDNCorrectionAction">
+                <bean class="org.dspace.app.ldn.action.LDNRelationCorrectionAction">
                 	<property name="qaEventTopic" value="ENRICH/MORE/LINK"/>
                 </bean>
             </list>
