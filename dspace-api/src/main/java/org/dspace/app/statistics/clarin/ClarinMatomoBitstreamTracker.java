@@ -8,6 +8,7 @@
 package org.dspace.app.statistics.clarin;
 
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +23,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.clarin.ClarinItemService;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.matomo.java.tracking.CustomVariable;
@@ -132,6 +134,24 @@ public class ClarinMatomoBitstreamTracker extends ClarinMatomoTracker {
             return;
         }
 
+        // Log the user which is downloading the bitstream
+        this.logUserDownloadingBitstream(context, bit);
+        // Track the bitstream downloading event
         trackPage(context, request, item, "Bitstream Download / Single File");
+    }
+
+    /**
+     * Log the user which is downloading the bitstream
+     * @param context DSpace context object
+     * @param bit Bitstream which is downloading
+     */
+    private void logUserDownloadingBitstream(Context context, Bitstream bit) {
+        EPerson eperson = context.getCurrentUser();
+        String pattern = "The user name: {0}, uuid: {1} is downloading bitstream name: {2}, uuid: {3}.";
+        String logMessage = Objects.isNull(eperson)
+                ? MessageFormat.format(pattern, "ANONYMOUS", "null", bit.getName(), bit.getID())
+                : MessageFormat.format(pattern, eperson.getFullName(), eperson.getID(), bit.getName(), bit.getID());
+
+        log.info(logMessage);
     }
 }
