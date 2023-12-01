@@ -20,8 +20,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class HarvestedCollectionRest extends BaseObjectRest<Integer> {
 
-    public static final String NAME = "collections";
-    public static final String PLURAL_NAME = NAME;
+    public static final String NAME = "harvestedcollection";
+    public static final String PLURAL_NAME = "harvestedcollections";
     public static final String CATEGORY = RestModel.CORE;
 
     @JsonProperty("harvest_type")

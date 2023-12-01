@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component;
 /**
  * The repository for the SystemWideAlert workload
  */
-@Component(SystemWideAlertRest.CATEGORY + "." + SystemWideAlertRest.NAME)
+@Component(SystemWideAlertRest.CATEGORY + "." + SystemWideAlertRest.PLURAL_NAME)
 public class SystemWideAlertRestRepository extends DSpaceRestRepository<SystemWideAlertRest, Integer> {
 
     private static final Logger log = LogManager.getLogger();

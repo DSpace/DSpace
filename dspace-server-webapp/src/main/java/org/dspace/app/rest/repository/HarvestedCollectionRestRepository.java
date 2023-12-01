@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Jelle Pelgrims (jelle.pelgrims at atmire.com)
  */
-@Component(HarvestedCollectionRest.CATEGORY + "." + HarvestedCollectionRest.NAME)
+@Component(HarvestedCollectionRest.CATEGORY + "." + HarvestedCollectionRest.PLURAL_NAME)
 public class HarvestedCollectionRestRepository extends AbstractDSpaceRestRepository {
 
     @Autowired

@@ -73,8 +73,8 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Kim Shepherd
  */
 @RestController
-@RequestMapping("/api/" + IdentifierRestRepository.CATEGORY)
-@Component(IdentifierRestRepository.CATEGORY + "." + IdentifierRestRepository.NAME)
+@RequestMapping("/api/" + IdentifierRest.CATEGORY)
+@Component(IdentifierRest.CATEGORY + "." + IdentifierRest.PLURAL_NAME)
 public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRest, String> implements InitializingBean {
     @Autowired
     private DiscoverableEndpointsService discoverableEndpointsService;
@@ -86,10 +86,6 @@ public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRes
     private HandleService handleService;
     @Autowired
     private ItemService itemService;
-
-    // Set category and name for routing
-    public static final String CATEGORY = "pid";
-    public static final String NAME = IdentifierRest.NAME;
 
     /**
      * Register /api/pid/find?id=... as a discoverable endpoint service
@@ -104,7 +100,7 @@ public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRes
                                                 new TemplateVariables(
                                                         new TemplateVariable("id",
                                                                 TemplateVariable.VariableType.REQUEST_PARAM))),
-                                        CATEGORY)));
+                                        IdentifierRest.CATEGORY)));
     }
 
     /**
@@ -163,7 +159,7 @@ public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRes
                 results.add(new IdentifierRest(handleUrl, "handle", null));
             }
         } catch (SQLException | IdentifierException e) {
-            throw new LinkNotFoundException(IdentifierRestRepository.CATEGORY, IdentifierRest.NAME, uuid);
+            throw new LinkNotFoundException(IdentifierRest.CATEGORY, IdentifierRest.NAME, uuid);
         }
         // Return list of identifiers for this DSpaceObject
         return new PageImpl<>(results, pageable, results.size());

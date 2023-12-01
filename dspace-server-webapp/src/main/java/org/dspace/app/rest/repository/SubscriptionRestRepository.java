@@ -61,7 +61,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  */
-@Component(SubscriptionRest.CATEGORY + "." + SubscriptionRest.NAME)
+@Component(SubscriptionRest.CATEGORY + "." + SubscriptionRest.PLURAL_NAME)
 public class SubscriptionRestRepository extends DSpaceRestRepository<SubscriptionRest, Integer>
                                          implements InitializingBean {
 

@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
  * It only supports a search method
  */
 
-@Component(SubmissionCCLicenseUrlRest.CATEGORY + "." + SubmissionCCLicenseUrlRest.NAME)
+@Component(SubmissionCCLicenseUrlRest.CATEGORY + "." + SubmissionCCLicenseUrlRest.PLURAL_NAME)
 public class SubmissionCCLicenseUrlRepository extends DSpaceRestRepository<SubmissionCCLicenseUrlRest, String>
                                               implements InitializingBean {
 

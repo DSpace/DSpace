@@ -45,7 +45,7 @@ import org.springframework.stereotype.Component;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-@Component(ResearcherProfileRest.CATEGORY + "." + ResearcherProfileRest.NAME)
+@Component(ResearcherProfileRest.CATEGORY + "." + ResearcherProfileRest.PLURAL_NAME)
 @ConditionalOnProperty(value = "researcher-profile.entity-type")
 public class ResearcherProfileRestRepository extends DSpaceRestRepository<ResearcherProfileRest, UUID> {
 
