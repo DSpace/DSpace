@@ -51,7 +51,7 @@ public class CommunityParentCommunityLinkRepository extends AbstractDSpaceRestRe
             Context context = obtainContext();
             Community community = communityService.find(context, communityId);
             if (community == null) {
-                throw new ResourceNotFoundException("No such community: " + community);
+                throw new ResourceNotFoundException("No such community: " + communityId);
             }
             Community parentCommunity = (Community) communityService.getParentObject(context, community);
             if (parentCommunity == null) {
