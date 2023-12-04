@@ -44,6 +44,9 @@
                <entry value-ref="PIDMetadataAction">
                   <key><util:constant static-field="org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_PID"/></key>
                </entry>
+               <entry value-ref="AddLinkMetadataAction">
+                  <key><util:constant static-field="org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MORE_LINK"/></key>
+               </entry>
             </map>   
         </property>
      </bean>
@@ -73,6 +76,10 @@
      </bean>
      <bean id="AddReviewMetadataAction" class="org.dspace.qaevent.action.QANotifySimpleMetadataAction">
         <property name="metadata" value="datacite.relation.isReviewedBy" />
+     </bean>
+     <bean id="AddLinkMetadataAction" class="org.dspace.qaevent.action.QANotifyFormattedMetadataAction">
+        <property name="metadata" value="datacite.relation.isSupplementedBy" />
+        <property name="format" value="Relation type: [0] - Subject: [1]" />
      </bean>
      <bean id="AddEndorsedMetadataAction" class="org.dspace.qaevent.action.QANotifySimpleMetadataAction">
         <property name="metadata" value="notify.relation.endorsedBy"/>

@@ -204,6 +204,44 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
 
     }
 
+    @Test
+    public void ldnInboxAnnounceReleaseTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).withName("community").build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+        InputStream announceRelationshipStream = getClass().getResourceAsStream("ldn_announce_release.json");
+        String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
+        NotifyServiceEntity notifyServiceEntity = NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("https://review-service.com/inbox/about/")
+                                .withLdnUrl("https://review-service.com/inbox/")
+                                .withScore(BigDecimal.valueOf(0.6d))
+                                .build();
+        String announceRelationship = IOUtils.toString(announceRelationshipStream, Charset.defaultCharset());
+        announceRelationshipStream.close();
+        String message = announceRelationship.replaceAll("<<object>>", object);
+        message = message.replaceAll("<<object_handle>>", object);
+
+        ObjectMapper mapper = new ObjectMapper();
+        Notification notification = mapper.readValue(message, Notification.class);
+        getClient()
+            .perform(post("/ldn/inbox")
+                .contentType("application/ld+json")
+                .content(message))
+            .andExpect(status().isAccepted());
+
+        ldnMessageService.extractAndProcessMessageFromQueue(context);
+
+        assertThat(qaEventService.findAllSources(context, 0, 20),
+            hasItem(QASourceMatcher.with(COAR_NOTIFY_SOURCE, 1L)));
+
+        assertThat(qaEventService.findAllTopicsBySource(context, COAR_NOTIFY_SOURCE, 0, 20), hasItem(
+            QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MORE_LINK, 1L)));
+
+    }
+
     private void checkStoredLDNMessage(Notification notification, LDNMessageEntity ldnMessage, String object)
         throws Exception {
 
