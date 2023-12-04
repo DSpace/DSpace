@@ -1204,22 +1204,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     }
 
     @Override
-    public void optimizeSOLR() {
-        try {
-            long start = System.currentTimeMillis();
-            System.out.println("SOLR Optimize -- Process Started:" + start);
-            solr.optimize();
-            long finish = System.currentTimeMillis();
-            System.out.println("SOLR Optimize -- Process Finished:" + finish);
-            System.out.println("SOLR Optimize -- Total time taken:" + (finish - start) + " (ms).");
-        } catch (SolrServerException sse) {
-            System.err.println(sse.getMessage());
-        } catch (IOException ioe) {
-            System.err.println(ioe.getMessage());
-        }
-    }
-
-    @Override
     public void shardSolrIndex() throws IOException, SolrServerException {
         if (!(solr instanceof HttpSolrClient)) {
             return;
@@ -1691,11 +1675,14 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 statisticYearCores
                     .add(baseSolrUrl.replace("http://", "").replace("https://", "") + statCoreName);
             }
-            //Also add the core containing the current year !
-            statisticYearCores.add(((HttpSolrClient) solr)
+            var baseCore = ((HttpSolrClient) solr)
                     .getBaseURL()
                     .replace("http://", "")
-                    .replace("https://", ""));
+                    .replace("https://", "");
+            if (!statisticYearCores.contains(baseCore)) {
+                //Also add the core containing the current year, if it hasn't been added already
+                statisticYearCores.add(baseCore);
+            }
         } catch (IOException | SolrServerException e) {
             log.error(e.getMessage(), e);
         }

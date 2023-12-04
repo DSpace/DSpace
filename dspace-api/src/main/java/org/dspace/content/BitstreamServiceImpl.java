@@ -276,6 +276,11 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         //Remove our bitstream from all our bundles
         final List<Bundle> bundles = bitstream.getBundles();
         for (Bundle bundle : bundles) {
+            authorizeService.authorizeAction(context, bundle, Constants.REMOVE);
+            //We also need to remove the bitstream id when it's set as bundle's primary bitstream
+            if (bitstream.equals(bundle.getPrimaryBitstream())) {
+                bundle.unsetPrimaryBitstreamID();
+            }
             bundle.removeBitstream(bitstream);
         }
 
@@ -403,7 +408,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
     @Override
     public Bitstream getThumbnail(Context context, Bitstream bitstream) throws SQLException {
-        Pattern pattern = Pattern.compile("^" + bitstream.getName() + ".([^.]+)$");
+        Pattern pattern = getBitstreamNamePattern(bitstream);
 
         for (Bundle bundle : bitstream.getBundles()) {
             for (Item item : bundle.getItems()) {
@@ -418,6 +423,13 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         }
 
         return null;
+    }
+
+    protected Pattern getBitstreamNamePattern(Bitstream bitstream) {
+        if (bitstream.getName() != null) {
+            return Pattern.compile("^" + Pattern.quote(bitstream.getName()) + ".([^.]+)$");
+        }
+        return Pattern.compile("^" + bitstream.getName() + ".([^.]+)$");
     }
 
     @Override
