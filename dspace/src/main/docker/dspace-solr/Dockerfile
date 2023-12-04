@@ -26,10 +26,10 @@ RUN mkdir -p $AUTHORITY_CONFIGSET_PATH && \
     mkdir -p $SEARCH_CONFIGSET_PATH && \
     mkdir -p $STATISTICS_CONFIGSET_PATH
 
-COPY dspace/solr/authority/conf/* $AUTHORITY_CONFIGSET_PATH/
-COPY dspace/solr/oai/conf/* $OAI_CONFIGSET_PATH/
-COPY dspace/solr/search/conf/* $SEARCH_CONFIGSET_PATH/
-COPY dspace/solr/statistics/conf/* $STATISTICS_CONFIGSET_PATH/
+COPY api/dspace/solr/authority/conf/* $AUTHORITY_CONFIGSET_PATH/ 
+COPY api/dspace/solr/oai/conf/* $OAI_CONFIGSET_PATH/
+COPY api/dspace/solr/search/conf/* $SEARCH_CONFIGSET_PATH/
+COPY api/dspace/solr/statistics/conf/* $STATISTICS_CONFIGSET_PATH/
 
 RUN chown -R solr:solr /opt/solr/server/solr/configsets
 
