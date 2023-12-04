@@ -12,6 +12,7 @@ import java.util.List;
 
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.access.status.factory.AccessStatusServiceFactory;
 import org.dspace.access.status.service.AccessStatusService;
 import org.dspace.content.Item;
@@ -31,6 +32,13 @@ import org.dspace.xoai.util.ItemUtils;
  *          <field name="value">open.access</field>
  *       </element>
  *   </element>
+ *   OR
+ *   <element name="others">
+ *       <element name="access-status">
+ *          <field name="value">embargo</field>
+ *          <field name="embargo">2024-10-10</field>
+ *       </element>
+ *   </element>
  * }
  * </pre>
  * Returning Values are based on:
@@ -46,8 +54,14 @@ public class AccessStatusElementItemCompilePlugin implements XOAIExtensionItemCo
             String accessStatusType;
             accessStatusType = accessStatusService.getAccessStatus(context, item);
 
+            String embargoFromItem = accessStatusService.getEmbargoFromItem(context, item);
+
             Element accessStatus = ItemUtils.create("access-status");
             accessStatus.getField().add(ItemUtils.createValue("value", accessStatusType));
+
+            if (StringUtils.isNotEmpty(embargoFromItem)) {
+                accessStatus.getField().add(ItemUtils.createValue("embargo", embargoFromItem));
+            }
 
             Element others;
             List<Element> elements = metadata.getElement();

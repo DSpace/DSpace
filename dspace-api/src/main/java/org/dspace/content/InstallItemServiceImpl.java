@@ -93,7 +93,7 @@ public class InstallItemServiceImpl implements InstallItemService {
         // As this is a BRAND NEW item, as a final step we need to remove the
         // submitter item policies created during deposit and replace them with
         // the default policies from the collection.
-        itemService.inheritCollectionDefaultPolicies(c, item, collection);
+        itemService.inheritCollectionDefaultPolicies(c, item, collection, false);
 
         return item;
     }
@@ -270,5 +270,29 @@ public class InstallItemServiceImpl implements InstallItemService {
         }
 
         return myMessage.toString();
+    }
+
+    @Override
+    public String getSubmittedByProvenanceMessage(Context context, Item item) throws SQLException {
+        // get date
+        DCDate now = DCDate.getCurrent();
+
+        // Create provenance description
+        StringBuffer provmessage = new StringBuffer();
+
+        if (item.getSubmitter() != null) {
+            provmessage.append("Submitted by ").append(item.getSubmitter().getFullName())
+                .append(" (").append(item.getSubmitter().getEmail()).append(") on ")
+                .append(now.toString());
+        } else {
+            // else, null submitter
+            provmessage.append("Submitted by unknown (probably automated) on")
+                .append(now.toString());
+        }
+        provmessage.append("\n");
+
+        // add sizes and checksums of bitstreams
+        provmessage.append(getBitstreamProvenanceMessage(context, item));
+        return provmessage.toString();
     }
 }

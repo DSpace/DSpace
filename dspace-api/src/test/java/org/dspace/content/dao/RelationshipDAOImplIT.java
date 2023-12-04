@@ -35,9 +35,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class RelationshipTypeDAOImplTest extends AbstractIntegrationTest {
+/**
+ * Created by: Andrew Wood
+ * Date: 20 Sep 2019
+ */
+public class RelationshipDAOImplIT extends AbstractIntegrationTest {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(RelationshipTypeDAOImplTest.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(RelationshipDAOImplIT.class);
 
     private Relationship relationship;
 
@@ -51,7 +55,7 @@ public class RelationshipTypeDAOImplTest extends AbstractIntegrationTest {
 
     private RelationshipType relationshipType;
 
-    private List<RelationshipType> relationshipTypeList = new ArrayList<>();
+    private List<Relationship> relationshipsList = new ArrayList<>();
 
     private EntityType entityTypeOne;
 
@@ -75,6 +79,7 @@ public class RelationshipTypeDAOImplTest extends AbstractIntegrationTest {
     public void init() {
         super.init();
         try {
+            // Create objects for testing
             context.turnOffAuthorisationSystem();
             owningCommunity = communityService.create(null, context);
             collection = collectionService.create(context, owningCommunity);
@@ -92,7 +97,7 @@ public class RelationshipTypeDAOImplTest extends AbstractIntegrationTest {
                     "isAuthorOfPublication", "isPublicationOfAuthor",0,10,0,10);
             relationship = relationshipService.create(context, itemOne, itemTwo, relationshipType, 0, 0);
             relationshipService.update(context, relationship);
-            relationshipTypeList.add(relationshipType);
+            relationshipsList.add(relationship);
             context.restoreAuthSystemState();
         } catch (Exception e) {
             log.error(e);
@@ -107,7 +112,6 @@ public class RelationshipTypeDAOImplTest extends AbstractIntegrationTest {
     @Override
     public void destroy() {
         try {
-            // Cleanup newly created objects
             context.turnOffAuthorisationSystem();
             relationshipService.delete(context, relationship);
             relationshipTypeService.delete(context, relationshipType);
@@ -124,38 +128,38 @@ public class RelationshipTypeDAOImplTest extends AbstractIntegrationTest {
     }
 
     /**
-     * Test findbyTypesAndLabels should return our defined RelationshipType given our test Entities entityTypeTwo and
-     * entityTypeOne with the affiliated labels isAuthorOfPublication and isPublicationOfAuthor
+     * Test findItem should return our defined relationshipsList given our test Item itemOne.
      *
      * @throws Exception
      */
     @Test
-    public void testFindByTypesAndLabels() throws Exception {
-        assertEquals("TestFindbyTypesAndLabels 0", relationshipType, relationshipTypeService
-                .findbyTypesAndTypeName(context, entityTypeTwo, entityTypeOne, "isAuthorOfPublication",
-                        "isPublicationOfAuthor"));
+    public void testFindByItem() throws Exception {
+        assertEquals("TestFindByItem 0", relationshipsList, relationshipService.findByItem(context, itemOne,
+                -1, -1, false));
     }
 
     /**
-     * Test findByLeftOrRightLabel should return our defined relationshipTypeList given one of our affiliated labels
+     * Test findByRelationshipType should return our defined relationshipsList given our test RelationshipType
+     * relationshipType
      *
      * @throws Exception
      */
     @Test
-    public void testFindByLeftOrRightLabel() throws Exception {
-        assertEquals("TestFindByLeftOrRightLabel 0", relationshipTypeList, relationshipTypeService.
-                findByLeftwardOrRightwardTypeName(context, "isAuthorOfPublication", -1, -1));
+    public void testFindByRelationshipType() throws Exception {
+        assertEquals("TestByRelationshipType 0", relationshipsList, relationshipService.findByRelationshipType(context,
+                relationshipType));
     }
 
     /**
-     * Test findByEntityType should return our defined relationshipsList given one our defined EntityTypes
-     * entityTypeOne
+     * Test countTotal should return our defined relationshipsList's size given our test Context
+     * context
      *
      * @throws Exception
      */
     @Test
-    public void testFindByEntityType() throws Exception {
-        assertEquals("TestFindByEntityType 0", relationshipTypeList, relationshipTypeService.findByEntityType(context,
-                entityTypeOne));
+    public void testCountRows() throws Exception {
+        assertEquals("TestByRelationshipType 0", relationshipsList.size(), relationshipService.countTotal(context));
     }
+
+
 }

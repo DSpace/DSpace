@@ -27,6 +27,7 @@ arks
 ^Array$
 asterias
 atomz
+axios\/\d
 BDFetch
 Betsie
 baidu
@@ -45,6 +46,7 @@ BUbiNG
 bwh3_user_agent
 CakePHP
 celestial
+centuryb
 cfnetwork
 checklink
 checkprivacy
@@ -89,6 +91,7 @@ Embedly
 EThOS\+\(British\+Library\)
 facebookexternalhit\/
 favorg
+Faveeo\/\d
 FDM(\s|\+)\d
 Feedbin
 feedburner
@@ -113,6 +116,7 @@ GLMSLinkAnalysis
 Goldfire(\s|\+)Server
 google
 Grammarly
+GroupHigh\/\d
 grub
 gulliver
 gvfs\/
@@ -121,16 +125,19 @@ heritrix
 holmes
 htdig
 htmlparser
+HeadlessChrome
 HttpComponents\/1.1
 HTTPFetcher
 http.?client
 httpget
+httpx
 httrack
 ia_archiver
 ichiro
 iktomi
 ilse
 Indy Library
+insomnia
 ^integrity\/\d
 internetseer
 intute
@@ -140,6 +147,7 @@ iskanie
 jeeves
 Jersey\/\d
 jobo
+Koha
 kyluka
 larbin
 libcurl
@@ -161,10 +169,12 @@ LongURL.API
 ltx71
 lwp
 lycos[_+]
+MaCoCu
 mail\.ru
 MarcEdit
 mediapartners-google
 megite
+MetaInspector
 MetaURI[\+\s]API\/\d\.\d
 Microsoft(\s|\+)URL(\s|\+)Control
 Microsoft Office Existence Discovery
@@ -190,6 +200,7 @@ nagios
 ^NetAnts\/\d
 netcraft
 netluchs
+nettle
 newspaper\/\d
 ng\/2\.
 ^Ning\/\d
@@ -225,6 +236,7 @@ rambler
 ReactorNetty\/\d
 Readpaper
 redalert
+RestSharp
 Riddler
 robozilla
 rss
@@ -252,7 +264,7 @@ T\-H\-U\-N\-D\-E\-R\-S\-T\-O\-N\-E
 tailrank
 Teleport(\s|\+)Pro
 Teoma
-The\+Knowledge\+AI
+The[\+\s]Knowledge[\+\s]AI
 titan
 ^Traackr\.com$
 Trello
@@ -302,6 +314,8 @@ yacy
 yahoo
 yandex
 Yeti\/\d
+Zabbix
+ZoteroTranslationServer
 zeus
 zyborg
 7siters
