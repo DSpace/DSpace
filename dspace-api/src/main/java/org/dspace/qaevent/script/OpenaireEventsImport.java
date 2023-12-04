@@ -32,6 +32,7 @@ import org.dspace.content.QAEvent;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.handle.HandleServiceImpl;
 import org.dspace.handle.service.HandleService;
 import org.dspace.qaevent.service.BrokerClientFactory;
 import org.dspace.qaevent.service.QAEventService;
@@ -105,7 +106,7 @@ public class OpenaireEventsImport
         jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         DSpace dspace = new DSpace();
-        handleService = dspace.getSingletonService(HandleService.class);
+        handleService = dspace.getSingletonService(HandleServiceImpl.class);
         qaEventService = dspace.getSingletonService(QAEventService.class);
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         brokerClient = BrokerClientFactory.getInstance().getBrokerClient();
