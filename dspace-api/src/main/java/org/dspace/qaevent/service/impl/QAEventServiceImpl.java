@@ -440,7 +440,9 @@ public class QAEventServiceImpl implements QAEventService {
     public List<QASource> findAllSources(Context context, long offset, int pageSize) {
         return Arrays.stream(getSupportedSources())
                      .map((sourceName) -> findSource(context, sourceName))
-                     .sorted(comparing(QASource::getTotalEvents).reversed())
+                     .filter(Objects::nonNull)
+                     .sorted(comparing(QASource::getTotalEvents)
+                     .reversed())
                      .skip(offset)
                      .limit(pageSize)
                      .collect(Collectors.toList());
