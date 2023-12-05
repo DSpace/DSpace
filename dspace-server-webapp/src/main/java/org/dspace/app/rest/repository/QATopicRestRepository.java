@@ -43,11 +43,15 @@ public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, Str
     @Override
     @PreAuthorize("hasPermission(#id, 'QUALITYASSURANCETOPIC', 'READ')")
     public QATopicRest findOne(Context context, String id) {
-        QATopic topic = qaEventService.findTopicByTopicId(id);
-        if (topic == null) {
+        String[] topicIdSplitted = id.split(":", 3);
+        if (topicIdSplitted.length < 2) {
             return null;
         }
-        return converter.toRest(topic, utils.obtainProjection());
+        String sourceName = topicIdSplitted[0];
+        String topicName = topicIdSplitted[1].replaceAll("!", "/");
+        UUID target = topicIdSplitted.length == 3 ? UUID.fromString(topicIdSplitted[2]) : null;
+        QATopic topic = qaEventService.findTopicBySourceAndNameAndTarget(context, sourceName, topicName, target);
+        return (topic != null) ? converter.toRest(topic, utils.obtainProjection()) : null;
     }
 
     @SearchRestMethod(name = "bySource")
