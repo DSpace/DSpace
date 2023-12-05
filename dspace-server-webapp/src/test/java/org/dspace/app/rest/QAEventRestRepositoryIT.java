@@ -50,6 +50,7 @@ import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
 import org.dspace.content.QAEventProcessed;
+import org.dspace.qaevent.QANotifyPatterns;
 import org.dspace.qaevent.dao.QAEventsDao;
 import org.dspace.qaevent.service.dto.CorrectionTypeMessageDTO;
 import org.hamcrest.Matchers;
@@ -405,20 +406,28 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
         EntityType publication = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
         EntityType project = EntityTypeBuilder.createEntityTypeBuilder(context, "Project").build();
-        RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publication, project, "isProjectOfPublication",
-                "isPublicationOfProject", 0, null, 0,
-                null).withCopyToRight(true).build();
+
+        RelationshipTypeBuilder.createRelationshipTypeBuilder(context, publication, project,
+                                "isProjectOfPublication", "isPublicationOfProject", 0, null, 0, null)
+                               .withCopyToRight(true)
+                               .build();
+
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
-            .withEntityType("Publication")
-            .withName("Collection 1").build();
+                                           .withEntityType("Publication")
+                                           .withName("Collection 1")
+                                           .build();
         Collection colFunding = CollectionBuilder.createCollection(context, parentCommunity)
-            .withName("Collection Fundings")
-            .withEntityType("Project").build();
-        Item funding = ItemBuilder.createItem(context, colFunding).withTitle("Tracking Papyrus and Parchment Paths")
-                .build();
+                                                 .withName("Collection Fundings")
+                                                 .withEntityType("Project")
+                                                 .build();
+
+        Item funding = ItemBuilder.createItem(context, colFunding)
+                                  .withTitle("Tracking Papyrus and Parchment Paths")
+                                  .build();
+
         QAEvent eventProjectBound = QAEventBuilder.createTarget(context, col1, "Science and Freedom with project")
-                .withTopic("ENRICH/MISSING/PROJECT")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PROJECT)
                 .withMessage(
                         "{\"projects[0].acronym\":\"PAThs\","
                         + "\"projects[0].code\":\"687567\","
@@ -434,7 +443,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .build();
         QAEvent eventProjectNoBound = QAEventBuilder
                 .createTarget(context, col1, "Science and Freedom with unrelated project")
-                .withTopic("ENRICH/MISSING/PROJECT")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PROJECT)
                 .withMessage(
                         "{\"projects[0].acronym\":\"NEW\","
                         + "\"projects[0].code\":\"123456\","
@@ -445,35 +454,45 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                         + "\"projects[0].title\":\"A new project\"}")
                 .build();
         QAEvent eventMissingPID1 = QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-                .withTopic("ENRICH/MISSING/PID")
-                .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
+                .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}")
+                .build();
         QAEvent eventMissingPID2 = QAEventBuilder.createTarget(context, col1, "Science and Freedom 2")
-                .withTopic("ENRICH/MISSING/PID")
-                .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
+                .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}")
+                .build();
         QAEvent eventMissingUnknownPID = QAEventBuilder.createTarget(context, col1, "Science and Freedom URN PID")
-                .withTopic("ENRICH/MISSING/PID")
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
                 .withMessage(
                         "{\"pids[0].type\":\"urn\",\"pids[0].value\":\"http://thesis2.sba.units.it/store/handle/item/12937\"}")
                 .build();
         QAEvent eventMorePID = QAEventBuilder.createTarget(context, col1, "Science and Freedom 3")
-                .withTopic("ENRICH/MORE/PID")
-                .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"2144302\"}").build();
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MORE_PID)
+                .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"2144302\"}")
+                .build();
         QAEvent eventAbstract = QAEventBuilder.createTarget(context, col1, "Science and Freedom 4")
-                .withTopic("ENRICH/MISSING/ABSTRACT")
-                .withMessage("{\"abstracts[0]\": \"An abstract to add...\"}").build();
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT)
+                .withMessage("{\"abstracts[0]\": \"An abstract to add...\"}")
+                .build();
         QAEvent eventAbstractToDiscard = QAEventBuilder.createTarget(context, col1, "Science and Freedom 7")
-                .withTopic("ENRICH/MISSING/ABSTRACT")
-                .withMessage("{\"abstracts[0]\": \"Abstract to discard...\"}").build();
+                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT)
+                .withMessage("{\"abstracts[0]\": \"Abstract to discard...\"}")
+                .build();
         context.restoreAuthSystemState();
+
         // prepare the different patches for our decisions
         List<Operation> acceptOp = new ArrayList<Operation>();
         acceptOp.add(new ReplaceOperation("/status", QAEvent.ACCEPTED));
+
         List<Operation> acceptOpUppercase = new ArrayList<Operation>();
         acceptOpUppercase.add(new ReplaceOperation("/status", QAEvent.ACCEPTED));
+
         List<Operation> discardOp = new ArrayList<Operation>();
         discardOp.add(new ReplaceOperation("/status", QAEvent.DISCARDED));
+
         List<Operation> rejectOp = new ArrayList<Operation>();
         rejectOp.add(new ReplaceOperation("/status", QAEvent.REJECTED));
+
         String patchAccept = getPatchContent(acceptOp);
         String patchAcceptUppercase = getPatchContent(acceptOpUppercase);
         String patchDiscard = getPatchContent(discardOp);
@@ -490,82 +509,95 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         eventAbstract.setStatus(QAEvent.ACCEPTED);
 
         getClient(authToken).perform(patch("/api/integration/qualityassuranceevents/" + eventMissingPID1.getEventId())
-                .content(patchAccept)
-                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", QAEventMatcher.matchQAEventEntry(eventMissingPID1)));
+                            .content(patchAccept)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$", QAEventMatcher.matchQAEventEntry(eventMissingPID1)));
+
         getClient(authToken).perform(patch("/api/integration/qualityassuranceevents/" + eventMorePID.getEventId())
-                .content(patchAcceptUppercase)
-                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", QAEventMatcher.matchQAEventEntry(eventMorePID)));
+                            .content(patchAcceptUppercase)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$", QAEventMatcher.matchQAEventEntry(eventMorePID)));
+
         getClient(authToken)
             .perform(patch("/api/integration/qualityassuranceevents/" + eventMissingUnknownPID.getEventId())
                 .content(patchAccept)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", QAEventMatcher.matchQAEventEntry(eventMissingUnknownPID)));
+
         getClient(authToken).perform(patch("/api/integration/qualityassuranceevents/" + eventProjectBound.getEventId())
-                .content(patchAccept)
-                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", QAEventMatcher.matchQAEventEntry(eventProjectBound)));
+                            .content(patchAccept)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$", QAEventMatcher.matchQAEventEntry(eventProjectBound)));
+
         getClient(authToken)
             .perform(patch("/api/integration/qualityassuranceevents/" + eventProjectNoBound.getEventId())
                 .content(patchAccept)
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", QAEventMatcher.matchQAEventEntry(eventProjectNoBound)));
+
         getClient(authToken).perform(patch("/api/integration/qualityassuranceevents/" + eventAbstract.getEventId())
-                .content(patchAccept)
-                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", QAEventMatcher.matchQAEventEntry(eventAbstract)));
+                            .content(patchAccept)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$", QAEventMatcher.matchQAEventEntry(eventAbstract)));
+
         // check if the item has been updated
         getClient(authToken).perform(get("/api/core/items/" + eventMissingPID1.getTarget())
-                    .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                .andExpect(status().isOk())
-                .andExpect(
-                        jsonPath("$",
-                                hasJsonPath("$.metadata['dc.identifier.other'][0].value", is("10.2307/2144300"))));
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",hasJsonPath("$.metadata['dc.identifier.other'][0].value",
+                                                    is("10.2307/2144300"))));
+
         getClient(authToken).perform(get("/api/core/items/" + eventMorePID.getTarget())
-                    .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasJsonPath("$.metadata['dc.identifier.other'][0].value", is("2144302"))));
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$", hasJsonPath("$.metadata['dc.identifier.other'][0].value",
+                                                     is("2144302"))));
+
         getClient(authToken).perform(get("/api/core/items/" + eventMissingUnknownPID.getTarget())
-                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasJsonPath("$.metadata['dc.identifier.other'][0].value",
-                        is("http://thesis2.sba.units.it/store/handle/item/12937"))));
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$", hasJsonPath("$.metadata['dc.identifier.other'][0].value",
+                                                     is("http://thesis2.sba.units.it/store/handle/item/12937"))));
+
         getClient(authToken).perform(get("/api/core/items/" + eventProjectBound.getTarget())
-                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$",
-                        hasJsonPath("$.metadata['relation.isProjectOfPublication'][0].value",
-                                is(funding.getID().toString()))));
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",
+                                    hasJsonPath("$.metadata['relation.isProjectOfPublication'][0].value",
+                                             is(funding.getID().toString()))));
+
         getClient(authToken).perform(get("/api/core/items/" + eventProjectNoBound.getTarget())
-                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$",
-                    hasJsonPath("$.metadata['relation.isProjectOfPublication'][0].value",
-                            is(not(empty())))));
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$",
+                                    hasJsonPath("$.metadata['relation.isProjectOfPublication'][0].value",
+                                             is(not(empty())))));
+
         getClient(authToken).perform(get("/api/core/items/" + eventAbstract.getTarget())
-                    .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$",
-                        hasJsonPath("$.metadata['dc.description.abstract'][0].value", is("An abstract to add..."))));
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$", hasJsonPath("$.metadata['dc.description.abstract'][0].value",
+                                                              is("An abstract to add..."))));
+
         // reject pid2
         eventMissingPID2.setStatus(QAEvent.REJECTED);
         getClient(authToken).perform(patch("/api/integration/qualityassuranceevents/" + eventMissingPID2.getEventId())
-                .content(patchReject)
-                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", QAEventMatcher.matchQAEventEntry(eventMissingPID2)));
+                            .content(patchReject)
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$", QAEventMatcher.matchQAEventEntry(eventMissingPID2)));
+
         getClient(authToken).perform(get("/api/core/items/" + eventMissingPID2.getTarget())
-                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$",
-                    hasNoJsonPath("$.metadata['dc.identifier.other']")));
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$", hasNoJsonPath("$.metadata['dc.identifier.other']")));
+
         // discard abstractToDiscard
         eventAbstractToDiscard.setStatus(QAEvent.DISCARDED);
         getClient(authToken)
@@ -574,17 +606,18 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", QAEventMatcher.matchQAEventEntry(eventAbstractToDiscard)));
+
         getClient(authToken).perform(get("/api/core/items/" + eventMissingPID2.getTarget())
-                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$",
-                    hasNoJsonPath("$.metadata['dc.description.abstract']")));
+                            .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$", hasNoJsonPath("$.metadata['dc.description.abstract']")));
+
         // no pending qa events should be longer available
-        getClient(authToken).perform(get("/api/integration/qualityassurancetopics")).andExpect(status().isOk())
-            .andExpect(content().contentType(contentType))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(0)));
-        // we should have stored the decision into the database as well
+        getClient(authToken).perform(get("/api/integration/qualityassurancesources/" + QAEvent.OPENAIRE_SOURCE))
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(contentType))
+                            .andExpect(status().isOk())
+                            .andExpect(jsonPath("$.totalEvents", is(0)));
     }
 
     @Test
