@@ -98,7 +98,11 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport {
     }
 
     /**
-     * Return EPerson members of a Group
+     * Return EPerson members of a Group.
+     * <P>
+     * WARNING: This method may have bad performance for Groups with large numbers of EPerson members.
+     * Therefore, only use this when you need to access every EPerson member. Instead, consider using
+     * EPersonService.findByGroups() for a paginated list of EPersons.
      *
      * @return list of EPersons
      */
@@ -143,9 +147,13 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport {
     }
 
     /**
-     * Return Group members of a Group.
+     * Return Group members (i.e. direct subgroups) of a Group.
+     * <P>
+     * WARNING: This method may have bad performance for Groups with large numbers of Subgroups.
+     * Therefore, only use this when you need to access every Subgroup. Instead, consider using
+     * GroupService.findByParent() for a paginated list of Subgroups.
      *
-     * @return list of groups
+     * @return list of subgroups
      */
     public List<Group> getMemberGroups() {
         return groups;
