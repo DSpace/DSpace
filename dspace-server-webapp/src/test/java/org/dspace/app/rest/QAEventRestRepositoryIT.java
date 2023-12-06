@@ -897,7 +897,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                              .andExpect(jsonPath("$.source", is(DSPACE_USERS_SOURCE)))
                              .andExpect(jsonPath("$.title", is(publication.getName())))
                              .andExpect(jsonPath("$.topic", is("REQUEST/WITHDRAWN")))
-                             // .andExpect(jsonPath("$.trust", is("1,000")))
+                             .andExpect(jsonPath("$.trust", is("1.000")))
                              .andExpect(jsonPath("$.status", is("PENDING")));
 
         getClient(adminToken).perform(get("/api/core/items/" + publication.getID()))
@@ -963,7 +963,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                              .andExpect(jsonPath("$.source", is(DSPACE_USERS_SOURCE)))
                              .andExpect(jsonPath("$.title", is(publication.getName())))
                              .andExpect(jsonPath("$.topic", is("REQUEST/REINSTATE")))
-                             // .andExpect(jsonPath("$.trust", is("1,000")))
+                             .andExpect(jsonPath("$.trust", is("1.000")))
                              .andExpect(jsonPath("$.status", is("PENDING")));
 
         getClient(adminToken).perform(get("/api/core/items/" + publication.getID()))
