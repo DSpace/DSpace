@@ -446,15 +446,18 @@ public class ClarinShibbolethLoginFilterIT extends AbstractControllerIntegration
     }
 
     @Test
-    public void testUTF8ShibHeaders() throws Exception {
+    public void testISOShibHeaders() throws Exception {
+        String testMail = "test@email.edu";
+        String testIdp = IDP_TEST_EPERSON + "test";
+        String testNetId = NET_ID_TEST_EPERSON + "000";
         // NOTE: The initial call to /shibboleth comes *from* an external Shibboleth site. So, it is always
         // unauthenticated, but it must include some expected SHIB attributes.
         // SHIB-MAIL attribute is the default email header sent from Shibboleth after a successful login.
         // In this test we are simply mocking that behavior by setting it to an existing EPerson.
         String token = getClient().perform(get("/api/authn/shibboleth")
-                        .header("SHIB-MAIL", clarinEperson.getEmail())
-                        .header("Shib-Identity-Provider", IDP_TEST_EPERSON)
-                        .header("SHIB-NETID", NET_ID_TEST_EPERSON)
+                        .header("SHIB-MAIL", testMail)
+                        .header("Shib-Identity-Provider", testIdp)
+                        .header("SHIB-NETID", testNetId)
                         .header("SHIB-GIVENNAME", "knihovna KÅ¯Å\u0088 test Å½luÅ¥ouÄ\u008DkÃ½"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("http://localhost:4000"))
@@ -465,6 +468,56 @@ public class ClarinShibbolethLoginFilterIT extends AbstractControllerIntegration
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.authenticated", is(true)))
                 .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")));
+
+        // Check if was created a user with such email and netid.
+        EPerson ePerson = ePersonService.findByNetid(context, Util.formatNetId(testNetId, testIdp));
+        assertTrue(Objects.nonNull(ePerson));
+        assertEquals(ePerson.getEmail(), testMail);
+        assertEquals(ePerson.getFirstName(), "knihovna Kůň test Žluťoučký");
+
+        EPersonBuilder.deleteEPerson(ePerson.getID());
+
+        getClient(token).perform(
+                        get("/api/authz/authorizations/search/object")
+                                .param("embed", "feature")
+                                .param("feature", feature)
+                                .param("uri", utils.linkToSingleResource(ePersonRest, "self").getHref()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.totalElements", is(0)))
+                .andExpect(jsonPath("$._embedded").doesNotExist());
+    }
+
+    @Test
+    public void testUTF8ShibHeaders() throws Exception {
+        String testMail = "test@email.edu";
+        String testIdp = IDP_TEST_EPERSON + "test";
+        String testNetId = NET_ID_TEST_EPERSON + "000";
+        // NOTE: The initial call to /shibboleth comes *from* an external Shibboleth site. So, it is always
+        // unauthenticated, but it must include some expected SHIB attributes.
+        // SHIB-MAIL attribute is the default email header sent from Shibboleth after a successful login.
+        // In this test we are simply mocking that behavior by setting it to an existing EPerson.
+        String token = getClient().perform(get("/api/authn/shibboleth")
+                        .header("SHIB-MAIL", testMail)
+                        .header("Shib-Identity-Provider", testIdp)
+                        .header("SHIB-NETID", testNetId)
+                        .header("SHIB-GIVENNAME", "knihovna Kůň test Žluťoučký"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("http://localhost:4000"))
+                .andReturn().getResponse().getHeader("Authorization");
+
+
+        getClient(token).perform(get("/api/authn/status"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.authenticated", is(true)))
+                .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")));
+
+        // Check if was created a user with such email and netid.
+        EPerson ePerson = ePersonService.findByNetid(context, Util.formatNetId(testNetId, testIdp));
+        assertTrue(Objects.nonNull(ePerson));
+        assertEquals(ePerson.getEmail(), testMail);
+        assertEquals(ePerson.getFirstName(), "knihovna Kůň test Žluťoučký");
+
+        EPersonBuilder.deleteEPerson(ePerson.getID());
 
         getClient(token).perform(
                         get("/api/authz/authorizations/search/object")

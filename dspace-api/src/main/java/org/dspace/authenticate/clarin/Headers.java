@@ -9,6 +9,7 @@
 package org.dspace.authenticate.clarin;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -16,8 +17,11 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.services.ConfigurationService;
+import org.dspace.utils.DSpace;
 
 /**
  * Helper class for request headers.
@@ -29,9 +33,11 @@ public class Headers {
     private static final Logger log = LogManager.getLogger(org.dspace.authenticate.clarin.Headers.class);
     // variables
     //
+    private static ConfigurationService configurationService = new DSpace().getConfigurationService();
 
     private HashMap<String, List<String>> headers_ = new HashMap<String, List<String>>();
     private String header_separator_ = null;
+    private static String EMPTY_STRING = "";
 
 
     // ctors
@@ -157,17 +163,53 @@ public class Headers {
 
 
     /**
-     * Convert ISO header value to UTF-8
-     * @param value ISO header value String
-     * @return
+     * Convert ISO header value to UTF-8 or return UTF-8 value if it is not ISO.
+     * @param value ISO/UTF-8 header value String
+     * @return Converted ISO value to UTF-8 or UTF-8 value from input
      */
-    private String updateValueByCharset(String value) {
-        try {
-            return new String(value.getBytes("ISO-8859-1"), "UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            log.warn("Failed to reconvert shibboleth attribute with value ("
-                    + value + ").", ex);
+    public static String updateValueByCharset(String value) {
+        String inputEncoding = configurationService.getProperty("shibboleth.name.conversion.inputEncoding",
+                "ISO-8859-1");
+        String outputEncoding = configurationService.getProperty("shibboleth.name.conversion.outputEncoding",
+                "UTF-8");
+
+        if (StringUtils.isBlank(value)) {
+            value = EMPTY_STRING;
         }
-        return value;
+
+        // If the value is not ISO-8859-1, then it is already UTF-8
+        if (!isISOType(value)) {
+            return value;
+        }
+
+        try {
+            // Encode the string to UTF-8
+            return new String(value.getBytes(inputEncoding), outputEncoding);
+        } catch (UnsupportedEncodingException ex) {
+            log.warn("Cannot convert the value: " + value + " from " + inputEncoding + " to " + outputEncoding +
+                    " because of: " + ex.getMessage());
+            return value;
+        }
+    }
+
+    /**
+     * Check if the value is ISO-8859-1 encoded.
+     * @param value String to check
+     * @return true if the value is ISO-8859-1 encoded, false otherwise
+     */
+    private static boolean isISOType(String value) {
+        try {
+            // Encode the string to ISO-8859-1
+            byte[] iso8859Bytes = value.getBytes(StandardCharsets.ISO_8859_1);
+
+            // Decode the bytes back to a string using ISO-8859-1
+            String decodedString = new String(iso8859Bytes, StandardCharsets.ISO_8859_1);
+
+            // Compare the original string with the decoded string
+            return StringUtils.equals(value, decodedString);
+        } catch (Exception e) {
+            // An exception occurred, so the input is not ISO-8859-1
+            return false;
+        }
     }
 }

@@ -695,8 +695,8 @@ public class ClarinShibAuthentication implements AuthenticationMethod {
         // Header values
         String netid = Util.formatNetId(findSingleAttribute(request, netidHeader), org);
         String email = findSingleAttribute(request, emailHeader);
-        String fname = findSingleAttribute(request, fnameHeader);
-        String lname = findSingleAttribute(request, lnameHeader);
+        String fname = Headers.updateValueByCharset(findSingleAttribute(request, fnameHeader));
+        String lname = Headers.updateValueByCharset(findSingleAttribute(request, lnameHeader));
 
         // If the values are not in the request headers try to retrieve it from `shibheaders`.
         if (StringUtils.isEmpty(netid)) {
@@ -817,8 +817,8 @@ public class ClarinShibAuthentication implements AuthenticationMethod {
 
         String netid = Util.formatNetId(findSingleAttribute(request, netidHeader), shibheaders.get_idp());
         String email = findSingleAttribute(request, emailHeader);
-        String fname = findSingleAttribute(request, fnameHeader);
-        String lname = findSingleAttribute(request, lnameHeader);
+        String fname = Headers.updateValueByCharset(findSingleAttribute(request, fnameHeader));
+        String lname = Headers.updateValueByCharset(findSingleAttribute(request, lnameHeader));
 
         // If the values are not in the request headers try to retrieve it from `shibheaders`.
         if (StringUtils.isEmpty(netid)) {
