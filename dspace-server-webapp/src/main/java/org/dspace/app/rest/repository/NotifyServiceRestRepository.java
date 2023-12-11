@@ -106,6 +106,11 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
             }
         }
 
+        if (notifyService.findByLdnUrl(context,notifyServiceRest.getLdnUrl()) != null) {
+            throw new UnprocessableEntityException(format("LDN url already in use %s",
+                notifyServiceRest.getLdnUrl()));
+        }
+
         NotifyServiceEntity notifyServiceEntity = notifyService.create(context);
         notifyServiceEntity.setName(notifyServiceRest.getName());
         notifyServiceEntity.setDescription(notifyServiceRest.getDescription());
