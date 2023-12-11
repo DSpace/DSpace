@@ -84,6 +84,18 @@ public interface ItemService
     public Item createTemplateItem(Context context, Collection collection) throws SQLException, AuthorizeException;
 
     /**
+     * Populate the given item with all template item specified metadata.
+     *
+     * @param context    DSpace context object
+     * @param collection Collection (parent)
+     * @param template   if <code>true</code>, the item inherits all collection's template item metadata
+     * @param item    item to populate with template item specified metadata
+     * @throws SQLException       if database error
+     */
+    public void populateWithTemplateItemMetadata (Context context, Collection collection, boolean template, Item item)
+        throws SQLException;
+
+    /**
      * Get all the items in the archive. Only items with the "in archive" flag
      * set are included. The order of the list is indeterminate.
      *
