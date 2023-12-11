@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.repository.patch.operation.ldn;
 
+import static java.lang.String.format;
+
 import java.sql.SQLException;
 
 import org.dspace.app.ldn.NotifyServiceEntity;
@@ -48,6 +50,11 @@ public class NotifyServiceLdnUrlReplaceOperation extends PatchOperation<NotifySe
         Object ldnUrl = operation.getValue();
         if (ldnUrl == null | !(ldnUrl instanceof String)) {
             throw new UnprocessableEntityException("The /ldnurl value must be a string");
+        }
+
+        if (notifyService.findByLdnUrl(context,(String) ldnUrl) != null) {
+            throw new UnprocessableEntityException(format("LDN url already in use %s",
+                (String) ldnUrl));
         }
 
         checkModelForExistingValue(notifyServiceEntity);
