@@ -10,7 +10,7 @@ package org.dspace.qaevent;
 import java.util.Date;
 
 /**
- * This model class represent the source/provider of the QA events (as OpenAIRE).
+ * This model class represent the source/provider of the QA events (as Openaire).
  * 
  * @author Luca Giamminonni (luca.giamminonni at 4Science)
  *

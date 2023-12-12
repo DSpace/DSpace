@@ -42,7 +42,9 @@ import org.dspace.utils.DSpace;
 /**
  * Implementation of {@link DSpaceRunnable} to perfom a QAEvents import from a
  * json file. The JSON file contains an array of JSON Events, where each event
- * has the following structure
+ * has the following structure. The message attribute follows the structure
+ * documented at
+ * @see <a href="https://graph.openaire.eu/docs/category/entities" target="_blank"> see </a>
  * 
  * <code> <br/>
  * { <br/>

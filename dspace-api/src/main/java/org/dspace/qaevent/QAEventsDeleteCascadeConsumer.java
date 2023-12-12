@@ -16,7 +16,7 @@ import org.dspace.qaevent.service.QAEventService;
 import org.dspace.utils.DSpace;
 
 /**
- * Consumer to delete qaevents once the target item is deleted
+ * Consumer to delete qaevents from solr due to the target item deletion
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *

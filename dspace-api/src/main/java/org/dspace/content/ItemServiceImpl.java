@@ -77,7 +77,7 @@ import org.dspace.orcid.service.OrcidQueueService;
 import org.dspace.orcid.service.OrcidSynchronizationService;
 import org.dspace.orcid.service.OrcidTokenService;
 import org.dspace.profile.service.ResearcherProfileService;
-import org.dspace.qaevent.dao.QAEventsDao;
+import org.dspace.qaevent.dao.QAEventsDAO;
 import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.service.VersioningService;
 import org.dspace.workflow.WorkflowItemService;
@@ -172,7 +172,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     protected SubscribeService subscribeService;
 
     @Autowired
-    private QAEventsDao qaEventsDao;
+    private QAEventsDAO qaEventsDao;
 
     protected ItemServiceImpl() {
         super();
