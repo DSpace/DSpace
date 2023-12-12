@@ -21,6 +21,7 @@ import org.dspace.app.iiif.model.generator.ExternalLinksGenerator;
 import org.dspace.app.iiif.model.generator.ImageContentGenerator;
 import org.dspace.app.iiif.model.generator.ManifestGenerator;
 import org.dspace.app.iiif.model.generator.RangeGenerator;
+import org.dspace.app.iiif.model.reader.ManifestReader;
 import org.dspace.app.iiif.service.utils.IIIFUtils;
 import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.authorize.AuthorizeException;
@@ -86,6 +87,9 @@ public class ManifestService extends AbstractResourceService {
     @Autowired
     MetadataExposureService metadataExposureService;
 
+    @Autowired
+    ManifestReader manifestReader;
+
     protected String[] METADATA_FIELDS;
 
     /**
@@ -116,13 +120,13 @@ public class ManifestService extends AbstractResourceService {
      * @throws SQLException
      */
     public String getManifest(Item item, Context context) throws AuthorizeException, IOException, SQLException {
-        String manifestFromBundle = utils.getManifestBitstream(item, context);
+        String manifest = manifestReader.getManifestAsString(item, context);
 
-        if (manifestFromBundle == null) {
+        if (manifest == null) {
             return createManifest(item, context);
         }
 
-        return manifestFromBundle;
+        return manifest;
     }
 
     /**

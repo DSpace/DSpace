@@ -107,7 +107,7 @@ public class IIIFServiceFacade {
         if (item == null) {
             throw new ResourceNotFoundException("IIIF canvas for  id " + id + " not found");
         }
-        return canvasLookupService.generateCanvas(context, item, canvasId);
+        return canvasLookupService.getCanvas(context, item, canvasId);
     }
 
     /**

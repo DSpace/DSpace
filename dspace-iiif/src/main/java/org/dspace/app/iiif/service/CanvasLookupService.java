@@ -7,10 +7,15 @@
  */
 package org.dspace.app.iiif.service;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
+import de.digitalcollections.iiif.model.sharedcanvas.Canvas;
+import de.digitalcollections.iiif.model.sharedcanvas.Manifest;
 import org.dspace.app.iiif.model.generator.CanvasGenerator;
+import org.dspace.app.iiif.model.reader.ManifestReader;
 import org.dspace.app.iiif.service.utils.IIIFUtils;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -38,11 +43,30 @@ public class CanvasLookupService extends AbstractResourceService {
     @Autowired
     CanvasService canvasService;
 
+    @Autowired
+    ManifestReader reader;
+
     public CanvasLookupService(ConfigurationService configurationService) {
         setConfiguration(configurationService);
     }
 
-    public String generateCanvas(Context context, Item item, String canvasId) {
+    public String getCanvas(Context context, Item item, String canvasId) {
+        Manifest manifest;
+        try {
+            manifest = reader.getManifestResource(item, context);
+        } catch (SQLException | IOException | AuthorizeException e) {
+            throw new RuntimeException(e);
+        }
+
+        Canvas canvas = this.getFromManifest(manifest, canvasId);
+        if (canvas != null) {
+            return utils.asJson(canvas);
+        }
+
+        return generateCanvas(context, item, canvasId);
+    }
+
+    private String generateCanvas(Context context, Item item, String canvasId) {
         int canvasPosition = utils.getCanvasId(canvasId);
         Bitstream bitstream = utils.getBitstreamForCanvas(context, item, canvasPosition);
         if (bitstream == null) {
@@ -57,6 +81,16 @@ public class CanvasLookupService extends AbstractResourceService {
             throw new RuntimeException(e);
         }
         return utils.asJson(canvasGenerator.generateResource());
+    }
+
+    private Canvas getFromManifest(Manifest manifest, String canvasId) {
+        if (manifest == null) {
+            return null;
+        }
+        return manifest.getDefaultSequence().getCanvases().stream()
+            .filter(c -> c.getIdentifier().toString().equals(canvasId))
+            .findFirst()
+            .orElse(null);
     }
 
 }
