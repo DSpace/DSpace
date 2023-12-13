@@ -10,13 +10,16 @@ package org.dspace.app.rest;
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -24,17 +27,22 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.VersionBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.eperson.EPerson;
 import org.dspace.license.service.CreativeCommonsService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
 import org.dspace.xmlworkflow.storedcomponents.service.CollectionRoleService;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -64,6 +72,8 @@ public class ClarinWorkflowItemRestRepositoryIT extends AbstractControllerIntegr
 
     @Autowired
     private CreativeCommonsService creativeCommonsService;
+    @Autowired
+    private XmlWorkflowItemService xmlWorkflowItemService;
 
     @Autowired
     private ItemService itemService;
@@ -249,5 +259,65 @@ public class ClarinWorkflowItemRestRepositoryIT extends AbstractControllerIntegr
             ItemBuilder.deleteItem(UUID.fromString(idNewItemRef.get()));
             WorkspaceItemBuilder.deleteWorkspaceItem(idWorkspaceItemRef.get());
         }
+    }
+
+
+    @Test
+    public void shouldCreateProvenanceMessageOnItemSubmit() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community with one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        //2. create a normal user to use as submitter
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("submitter@example.com")
+                .withPassword("dspace")
+                .build();
+
+        // Submitter group - allow deposit a new item without workflow
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection 2")
+                .withSubmitterGroup(submitter)
+                .build();
+        context.setCurrentUser(submitter);
+
+        //3. a workspace item
+        WorkspaceItem wsitem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .withTitle("Submission Item")
+                .withIssueDate("2017-10-17")
+                .grantLicense()
+                .build();
+
+        context.restoreAuthSystemState();
+
+        // get the submitter auth token
+        String authToken = getAuthToken(submitter.getEmail(), "dspace");
+
+        // submit the workspaceitem to start the workflow
+        getClient(authToken)
+                .perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
+                        .content("/api/submission/workspaceitems/" + wsitem.getID())
+                        .contentType(textUriContentType))
+                .andExpect(status().isCreated());
+
+        // Load deposited item and check the provenance metadata
+        Item depositedItem = itemService.find(context, wsitem.getItem().getID());
+        List<MetadataValue> mvList = itemService.getMetadata(depositedItem, "dc", "description",
+                "provenance", Item.ANY);
+        assertFalse(mvList.isEmpty());
+
+        // Check if the provenance contains the submitter info
+        boolean containsSubmitterProvenance = false;
+        for (MetadataValue mv: mvList) {
+            if (mv.getValue().contains("Submitted by " + submitter.getEmail())) {
+                containsSubmitterProvenance = true;
+                break;
+            }
+        }
+        assertThat(containsSubmitterProvenance, is(true));
     }
 }
