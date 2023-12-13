@@ -3,24 +3,29 @@
 # Parameters: {0} is expanded to filename
 #             {1} to a download URL 
 #             {2} to license url
+#             {3} helpdesk email
+#             {4} helpdesk phone number
+#             {5} DSpace name short
+#             {6} DSpace name
+#             {7} DSpace UI url
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: ${lr.dspace.name.short}: Download instructions for {0}
+Subject: ${params[5]}: Download instructions for ${params[0]}
 To download the file you have requested, please click the link below:
- {1}
+ ${params[1]}
   
 Remember, the file is distributed under specific license:
- {2}
+ ${params[2]}
 
 If you have trouble downloading the file or if you did not request this download please contact
-${lr.help.mail} or call us at ${lr.help.phone}
+${params[3]} or call us at ${params[4]}
 
 
-${lr.dspace.name.short} Team
+${params[5]} Team
 
 _____________________________________
-${dspace.name},
-WWW: ${dspace.url}
-Email: ${lr.help.mail}
-Tel.: ${lr.help.phone}
+${params[6]},
+WWW: ${params[7]}
+Email: ${params[3]}
+Tel.: ${params[4]}

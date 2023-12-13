@@ -173,9 +173,18 @@ public class ClarinUserMetadataRestController {
             throw new BadRequestException("Cannot find the clarin license for the bitstream with ID: " + bitstreamUUID);
         }
 
+        // Fetch DSpace main cfg info and send it in the email
+        String uiUrl = configurationService.getProperty("dspace.ui.url", "");
+        String helpDeskEmail = configurationService.getProperty("lr.help.mail", "");
+        String helpDeskPhoneNum = configurationService.getProperty("lr.help.phone", "");
+        String dspaceName = configurationService.getProperty("dspace.name", "");
+        String dspaceNameShort = configurationService.getProperty("dspace.name.short", "");
+
+        if (StringUtils.isEmpty(uiUrl)) {
+            log.error("Cannot load the `dspace.ui.url` property from the cfg.");
+            throw new RuntimeException("Cannot load the `dspace.ui.url` property from the cfg.");
+        }
         // Compose download link
-        // Get UI url
-        String uiUrl = configurationService.getProperty("dspace.ui.url");
         String downloadLink = uiUrl + "/" + BitstreamRest.PLURAL_NAME + "/" + bitstream.getID() + "/download?dtoken=" +
                 downloadToken;
 
@@ -185,6 +194,11 @@ public class ClarinUserMetadataRestController {
             bean.addArgument(bitstream.getName());
             bean.addArgument(downloadLink);
             bean.addArgument(clarinLicense.getDefinition());
+            bean.addArgument(helpDeskEmail);
+            bean.addArgument(helpDeskPhoneNum);
+            bean.addArgument(dspaceNameShort);
+            bean.addArgument(dspaceName);
+            bean.addArgument(uiUrl);
             bean.addRecipient(email);
             bean.send();
         } catch (MessagingException e) {

@@ -84,12 +84,17 @@ public class ClarinAutoRegistrationController {
             return null;
         }
 
+        // Fetch DSpace main cfg info and send it in the email
         String uiUrl = configurationService.getProperty("dspace.ui.url");
+        String helpDeskEmail = configurationService.getProperty("lr.help.mail", "");
+        String helpDeskPhoneNum = configurationService.getProperty("lr.help.phone", "");
+        String dspaceName = configurationService.getProperty("dspace.name", "");
+        String dspaceNameShort = configurationService.getProperty("dspace.name.short", "");
+
         if (StringUtils.isEmpty(uiUrl)) {
             log.error("Cannot load the `dspace.ui.url` property from the cfg.");
             throw new RuntimeException("Cannot load the `dspace.ui.url` property from the cfg.");
         }
-
         // Generate token and create ClarinVerificationToken record with the token and user email.
         String verificationToken = Utils.generateHexKey();
         clarinVerificationToken.setEmail(email);
@@ -103,6 +108,11 @@ public class ClarinAutoRegistrationController {
             Locale locale = context.getCurrentLocale();
             Email bean = Email.getEmail(I18nUtil.getEmailFilename(locale, "clarin_autoregistration"));
             bean.addArgument(autoregistrationURL);
+            bean.addArgument(helpDeskEmail);
+            bean.addArgument(helpDeskPhoneNum);
+            bean.addArgument(dspaceNameShort);
+            bean.addArgument(dspaceName);
+            bean.addArgument(uiUrl);
             bean.addRecipient(email);
             bean.send();
         } catch (Exception e) {
