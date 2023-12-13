@@ -16,7 +16,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import de.digitalcollections.iiif.model.sharedcanvas.Manifest;
 import org.dspace.app.iiif.model.ObjectMapperFactory;
-import org.dspace.app.iiif.service.utils.IIIFUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
@@ -32,22 +31,8 @@ public class ManifestReader {
     @Autowired
     protected BitstreamService bitstreamService;
 
-    @Autowired
-    private IIIFUtils utils;
-
     protected ObjectMapper objectMapper = ObjectMapperFactory.getIiifObjectMapper();
     protected SimpleModule iiifModule = ObjectMapperFactory.getIiifModule();
-
-    public String getManifestAsString(Item item, Context context)
-            throws SQLException, IOException, AuthorizeException {
-        Manifest manifest = this.getManifestResource(item, context);
-
-        if (manifest != null) {
-            return utils.asJson(manifest);
-        }
-
-        return null;
-    }
 
     /**
      * Get a Manifest object for an item. If the item does not have a dedicated manifest

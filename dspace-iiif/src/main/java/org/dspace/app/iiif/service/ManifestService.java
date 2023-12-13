@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import de.digitalcollections.iiif.model.sharedcanvas.Manifest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.iiif.model.generator.CanvasGenerator;
@@ -120,13 +121,13 @@ public class ManifestService extends AbstractResourceService {
      * @throws SQLException
      */
     public String getManifest(Item item, Context context) throws AuthorizeException, IOException, SQLException {
-        String manifest = manifestReader.getManifestAsString(item, context);
+        Manifest manifest = manifestReader.getManifestResource(item, context);
 
         if (manifest == null) {
             return createManifest(item, context);
         }
 
-        return manifest;
+        return utils.asJson(manifest);
     }
 
     /**
