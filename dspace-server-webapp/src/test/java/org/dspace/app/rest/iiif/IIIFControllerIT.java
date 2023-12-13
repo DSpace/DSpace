@@ -37,6 +37,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -1465,6 +1466,42 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.metadata.length()", is(4)))
                 .andExpect(jsonPath("$.metadata[3].label", is("Moo")))
                 .andExpect(jsonPath("$.metadata[3].value", is("Moo!")));
+    }
+
+    @Test
+    @Ignore
+    public void readCanvasFromCustomManifest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                                           .build();
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                      .enableIIIF()
+                                      .build();
+        Bundle targetBundle = BundleBuilder.createBundle(context, publicItem1)
+                                           .withName("IIIF_MANIFEST")
+                                           .build();
+
+        try (InputStream is = getClass().getResourceAsStream("manifest.json")) {
+                Bitstream bitstream1 = BitstreamBuilder
+                        .createBitstream(context, targetBundle, is)
+                        .withName("manifest.json")
+                        .withMimeType("application/json")
+                        .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/canvas/c1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.type", is("sc:Canvas")))
+                .andExpect(jsonPath("$.label", is("Test label")));
     }
 
 }

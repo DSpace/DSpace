@@ -61,6 +61,42 @@
           ],
           "width": 2200,
           "height": 1600
+        },
+        {
+          "@id": "http://localhost:8080/server/iiif/5029580c-8c21-491e-88fc-ceb0e2270831/canvas/c1",
+          "@type": "sc:Canvas",
+          "label": "Test label",
+          "metadata": [],
+          "thumbnail": {
+            "@id": "http://localhost:8182/iiif/2/2e6e8ec5-86a0-4ca4-8744-5ad3ca84e218/full/90,/0/default.jpg",
+            "service": {
+              "@context": "http://iiif.io/api/image/2/context.json",
+              "@id": "http://localhost:8182/iiif/2/2e6e8ec5-86a0-4ca4-8744-5ad3ca84e218",
+              "profile": "http://iiif.io/api/image/2/level0.json",
+              "protocol": "http://iiif.io/api/image"
+            },
+            "format": "image/jpeg"
+          },
+          "images": [
+            {
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "http://localhost:8182/iiif/2/2e6e8ec5-86a0-4ca4-8744-5ad3ca84e218/full/full/0/default.jpg",
+                "@type": "dctypes:Image",
+                "service": {
+                  "@context": "http://iiif.io/api/image/2/context.json",
+                  "@id": "http://localhost:8182/iiif/2/2e6e8ec5-86a0-4ca4-8744-5ad3ca84e218",
+                  "profile": "http://iiif.io/api/image/2/level1.json",
+                  "protocol": "http://iiif.io/api/image"
+                },
+                "format": "image/jpeg"
+              },
+              "on": "http://localhost:8080/server/iiif/5029580c-8c21-491e-88fc-ceb0e2270831/canvas/c1"
+            }
+          ],
+          "width": 2200,
+          "height": 1600
         }
       ]
     }
