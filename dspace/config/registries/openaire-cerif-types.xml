@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>OpenAIRE Types</title>
+    </dspace-header>
+
+    <dc-schema>
+        <name>oairecerif</name>
+        <namespace>https://www.openaire.eu/cerif-profile/1.1/</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>identifier</element>
+        <qualifier>url</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>oairecerif</schema>
+        <element>acronym</element>
+        <scope_note></scope_note>
+    </dc-type>
+
+</dspace-dc-types>
