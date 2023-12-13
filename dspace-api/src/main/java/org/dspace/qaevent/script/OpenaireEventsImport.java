@@ -32,7 +32,7 @@ import org.dspace.content.QAEvent;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.qaevent.service.BrokerClientFactory;
+import org.dspace.qaevent.service.OpenaireClientFactory;
 import org.dspace.qaevent.service.QAEventService;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.services.ConfigurationService;
@@ -105,7 +105,7 @@ public class OpenaireEventsImport
 
         qaEventService = new DSpace().getSingletonService(QAEventService.class);
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-        brokerClient = BrokerClientFactory.getInstance().getBrokerClient();
+        brokerClient = OpenaireClientFactory.getInstance().getBrokerClient();
 
         topicsToImport = configurationService.getArrayProperty("qaevents.openaire.import.topic");
         openaireBrokerURL = getOpenaireBrokerUri();

@@ -45,9 +45,9 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.matcher.QASourceMatcher;
 import org.dspace.matcher.QATopicMatcher;
-import org.dspace.qaevent.service.BrokerClientFactory;
+import org.dspace.qaevent.service.OpenaireClientFactory;
 import org.dspace.qaevent.service.QAEventService;
-import org.dspace.qaevent.service.impl.BrokerClientFactoryImpl;
+import org.dspace.qaevent.service.impl.OpenaireClientFactoryImpl;
 import org.dspace.utils.DSpace;
 import org.junit.After;
 import org.junit.Before;
@@ -67,7 +67,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
     private Collection collection;
 
-    private BrokerClient brokerClient = BrokerClientFactory.getInstance().getBrokerClient();
+    private BrokerClient brokerClient = OpenaireClientFactory.getInstance().getBrokerClient();
 
     private BrokerClient mockBrokerClient = mock(BrokerClient.class);
 
@@ -86,12 +86,12 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         context.restoreAuthSystemState();
 
-        ((BrokerClientFactoryImpl) BrokerClientFactory.getInstance()).setBrokerClient(mockBrokerClient);
+        ((OpenaireClientFactoryImpl) OpenaireClientFactory.getInstance()).setBrokerClient(mockBrokerClient);
     }
 
     @After
     public void after() {
-        ((BrokerClientFactoryImpl) BrokerClientFactory.getInstance()).setBrokerClient(brokerClient);
+        ((OpenaireClientFactoryImpl) OpenaireClientFactory.getInstance()).setBrokerClient(brokerClient);
     }
 
     @Test
