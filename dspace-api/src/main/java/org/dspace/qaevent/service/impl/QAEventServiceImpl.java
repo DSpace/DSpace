@@ -36,6 +36,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.FacetParams;
 import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
 import org.dspace.content.service.ItemService;
@@ -188,12 +189,13 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public List<QATopic> findAllTopics(long offset, long count) {
-        return findAllTopicsBySource(null, offset, count);
+    public List<QATopic> findAllTopics(long offset, long count, String orderField, boolean ascending) {
+        return findAllTopicsBySource(null, offset, count, orderField, ascending);
     }
 
     @Override
-    public List<QATopic> findAllTopicsBySource(String source, long offset, long count) {
+    public List<QATopic> findAllTopicsBySource(String source, long offset, long count,
+        String orderField, boolean ascending) {
 
         if (source != null && isNotSupportedSource(source)) {
             return null;
@@ -201,6 +203,8 @@ public class QAEventServiceImpl implements QAEventService {
 
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
+        solrQuery.setSort(orderField, ascending ? ORDER.asc : ORDER.desc);
+        solrQuery.setFacetSort(FacetParams.FACET_SORT_INDEX);
         solrQuery.setQuery("*:*");
         solrQuery.setFacet(true);
         solrQuery.setFacetMinCount(1);

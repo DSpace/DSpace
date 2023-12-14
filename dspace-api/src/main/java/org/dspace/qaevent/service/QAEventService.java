@@ -27,11 +27,9 @@ public interface QAEventService {
      * Find all the event's topics.
      *
      * @param  offset   the offset to apply
-     * @param  pageSize the page size
      * @return          the topics list
      */
-    public List<QATopic> findAllTopics(long offset, long pageSize);
-
+    public List<QATopic> findAllTopics(long offset, long count, String orderField, boolean ascending);
     /**
      * Find all the event's topics related to the given source.
      *
@@ -40,7 +38,8 @@ public interface QAEventService {
      * @param  count  the page size
      * @return        the topics list
      */
-    public List<QATopic> findAllTopicsBySource(String source, long offset, long count);
+    public List<QATopic> findAllTopicsBySource(String source, long offset, long count,
+        String orderField, boolean ascending);
 
     /**
      * Count all the event's topics.
