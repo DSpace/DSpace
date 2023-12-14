@@ -984,6 +984,7 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         SearchFilterMatcher.authorFilter(),
                         SearchFilterMatcher.subjectFilter(),
 //                       SearchFilterMatcher.dateIssuedFilter(),
+                        SearchFilterMatcher.publisherFilter(),
                         SearchFilterMatcher.hasContentInOriginalBundleFilter(),
                         SearchFilterMatcher.hasFileNameInOriginalBundleFilter(),
                         SearchFilterMatcher.hasFileDescriptionInOriginalBundleFilter(),

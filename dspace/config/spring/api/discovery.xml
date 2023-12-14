@@ -200,6 +200,7 @@
                 <ref bean="searchFilterLanguage" />
                 <ref bean="searchFilterItemsCommunity"/>
                 <ref bean="searchFilterType"/>
+                <ref bean="searchFilterPublisher"/>
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -2527,6 +2528,17 @@
         <property name="metadataFields">
             <list>
                 <value>dc.type</value>
+            </list>
+        </property>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+    </bean>
+
+    <bean id="searchFilterPublisher" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="publisher"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.publisher</value>
             </list>
         </property>
         <property name="sortOrderSidebar" value="COUNT"/>
