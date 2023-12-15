@@ -11,9 +11,9 @@ import static org.dspace.eperson.service.CaptchaService.REGISTER_ACTION;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import javax.mail.MessagingException;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.mail.MessagingException;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;

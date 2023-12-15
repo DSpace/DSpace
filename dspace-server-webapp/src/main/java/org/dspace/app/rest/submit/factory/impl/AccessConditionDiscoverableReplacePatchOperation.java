@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 import java.util.Objects;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.dspace.app.rest.exception.UnprocessableEntityException;

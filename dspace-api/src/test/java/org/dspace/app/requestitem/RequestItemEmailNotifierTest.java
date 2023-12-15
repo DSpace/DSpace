@@ -12,11 +12,11 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 
-import javax.mail.Address;
-import javax.mail.Message;
-import javax.mail.Provider;
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
+import jakarta.mail.Address;
+import jakarta.mail.Message;
+import jakarta.mail.Provider;
+import jakarta.mail.Session;
+import jakarta.mail.internet.InternetAddress;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.app.requestitem.factory.RequestItemServiceFactory;

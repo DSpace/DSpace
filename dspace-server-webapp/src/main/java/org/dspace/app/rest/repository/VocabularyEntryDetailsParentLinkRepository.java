@@ -8,7 +8,7 @@
 package org.dspace.app.rest.repository;
 
 import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import javax.ws.rs.NotFoundException;
 
 import org.apache.commons.lang3.StringUtils;

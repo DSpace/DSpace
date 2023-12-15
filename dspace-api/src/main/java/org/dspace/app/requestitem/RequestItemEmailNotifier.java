@@ -14,7 +14,7 @@ import java.util.List;
 import javax.annotation.ManagedBean;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

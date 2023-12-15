@@ -10,7 +10,7 @@ package org.dspace.service.impl;
 import static org.apache.commons.lang3.StringUtils.ordinalIndexOf;
 
 import java.net.Inet4Address;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import com.google.common.net.InetAddresses;
 import org.apache.commons.lang3.ArrayUtils;

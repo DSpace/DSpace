@@ -19,20 +19,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import javax.servlet.AsyncContext;
-import javax.servlet.DispatcherType;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpUpgradeHandler;
-import javax.servlet.http.Part;
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpUpgradeHandler;
+import jakarta.servlet.http.Part;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.dspace.core.Utils;
@@ -64,7 +64,7 @@ public class DummyHttpServletRequest implements HttpServletRequest {
     }
 
     /* (non-Javadoc)
-     * @see javax.servlet.http.HttpServletRequest#changeSessionId
+     * @see jakarta.servlet.http.HttpServletRequest#changeSessionId
      */
     @Override
     public String changeSessionId() {
@@ -73,7 +73,7 @@ public class DummyHttpServletRequest implements HttpServletRequest {
     }
 
     /* (non-Javadoc)
-     * @see javax.servlet.http.HttpServletRequest#getAuthType()
+     * @see jakarta.servlet.http.HttpServletRequest#getAuthType()
      */
     @Override
     public String getAuthType() {
@@ -82,7 +82,7 @@ public class DummyHttpServletRequest implements HttpServletRequest {
     }
 
     /* (non-Javadoc)
-     * @see javax.servlet.http.HttpServletRequest#getContextPath()
+     * @see jakarta.servlet.http.HttpServletRequest#getContextPath()
      */
     @Override
     public String getContextPath() {
@@ -91,7 +91,7 @@ public class DummyHttpServletRequest implements HttpServletRequest {
     }
 
     /* (non-Javadoc)
-     * @see javax.servlet.http.HttpServletRequest#getCookies()
+     * @see jakarta.servlet.http.HttpServletRequest#getCookies()
      */
     @Override
     public Cookie[] getCookies() {
@@ -100,7 +100,7 @@ public class DummyHttpServletRequest implements HttpServletRequest {
     }
 
     /* (non-Javadoc)
-     * @see javax.servlet.http.HttpServletRequest#getDateHeader(java.lang.String)
+     * @see jakarta.servlet.http.HttpServletRequest#getDateHeader(java.lang.String)
      */
     @Override
     public long getDateHeader(String arg0) {
@@ -118,7 +118,7 @@ public class DummyHttpServletRequest implements HttpServletRequest {
         values.add(headerValue);
     }
     /* (non-Javadoc)
-     * @see javax.servlet.http.HttpServletRequest#getDispatcherType()
+     * @see jakarta.servlet.http.HttpServletRequest#getDispatcherType()
      */
     @Override
     public DispatcherType getDispatcherType() {
@@ -127,7 +127,7 @@ public class DummyHttpServletRequest implements HttpServletRequest {
     }
 
     /* (non-Javadoc)
-     * @see javax.servlet.http.HttpServletRequest#getHeader(java.lang.String)
+     * @see jakarta.servlet.http.HttpServletRequest#getHeader(java.lang.String)
      */
     @Override
     public String getHeader(String key) {
@@ -139,7 +139,7 @@ public class DummyHttpServletRequest implements HttpServletRequest {
     }
 
     /* (non-Javadoc)
-     * @see javax.servlet.http.HttpServletRequest#getHeaderNames()
+     * @see jakarta.servlet.http.HttpServletRequest#getHeaderNames()
      */
     @Override
     public Enumeration getHeaderNames() {

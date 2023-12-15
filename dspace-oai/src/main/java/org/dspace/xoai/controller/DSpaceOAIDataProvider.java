@@ -8,7 +8,7 @@
 package org.dspace.xoai.controller;
 
 import static java.util.Arrays.asList;
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.apache.logging.log4j.LogManager.getLogger;
 
 import java.io.IOException;
@@ -17,9 +17,9 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import javax.xml.stream.XMLStreamException;
 
 import com.lyncode.xoai.dataprovider.OAIDataProvider;

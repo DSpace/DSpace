@@ -28,7 +28,6 @@ import org.jdom2.Text;
 import org.jdom2.filter.Filters;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Custom MetadataContributor to manage Epo ID.
@@ -95,7 +94,7 @@ public class EpoIdMetadataContributor implements MetadataContributor<Element> {
     protected Map<String, String> prefixToNamespaceMapping;
 
     /**
-     * Initialize EpoIdMetadataContributor with a query, prefixToNamespaceMapping and MetadataFieldConfig
+     * Initialize EpoIdMetadataContributor with all required fields: a query, prefixToNamespaceMapping and MetadataFieldConfig
      *
      * @param query                    query string
      * @param prefixToNamespaceMapping metadata prefix to namespace mapping
@@ -107,13 +106,6 @@ public class EpoIdMetadataContributor implements MetadataContributor<Element> {
         this.query = query;
         this.prefixToNamespaceMapping = prefixToNamespaceMapping;
         this.field = field;
-    }
-
-    /**
-     * Empty constructor for EpoIdMetadataContributor
-     */
-    public EpoIdMetadataContributor() {
-
     }
 
     protected String query;
@@ -128,27 +120,12 @@ public class EpoIdMetadataContributor implements MetadataContributor<Element> {
     }
 
     /**
-     * Setting the MetadataFieldConfig
-     *
-     * @param field MetadataFieldConfig used while retrieving MetadatumDTO
-     */
-    @Required
-    public void setField(MetadataFieldConfig field) {
-        this.field = field;
-    }
-
-    /**
      * Return query used to create an xpathExpression on, this query is used to
      *
      * @return the query this instance is based on
      */
     public String getQuery() {
         return query;
-    }
-
-    @Required
-    public void setQuery(String query) {
-        this.query = query;
     }
 
     /**

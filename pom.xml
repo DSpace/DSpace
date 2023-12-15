@@ -18,10 +18,10 @@
 
     <properties>
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
-        <java.version>11</java.version>
-        <spring.version>5.3.32</spring.version>
-        <spring-boot.version>2.7.18</spring-boot.version>
-        <spring-security.version>5.7.11</spring-security.version> <!-- sync with version used by spring-boot-->
+        <java.version>17</java.version>
+        <spring.version>6.1.1</spring.version>
+        <spring-boot.version>3.2.0</spring-boot.version>
+        <spring-security.version>6.1.5</spring-security.version> <!-- sync with version used by spring-boot-->
         <hibernate.version>5.6.15.Final</hibernate.version>
         <hibernate-validator.version>6.2.5.Final</hibernate-validator.version>
         <postgresql.driver.version>42.7.2</postgresql.driver.version>
@@ -33,8 +33,8 @@
         <jackson.version>2.16.0</jackson.version>
         <jackson-databind.version>2.16.0</jackson-databind.version>
         <javax-annotation.version>1.3.2</javax-annotation.version>
-        <jaxb-api.version>2.3.1</jaxb-api.version>
-        <jaxb-runtime.version>2.3.9</jaxb-runtime.version>
+        <jaxb-api.version>4.0.0</jaxb-api.version>
+        <jaxb-runtime.version>4.0.1</jaxb-runtime.version>
         <jcache-version>1.1.1</jcache-version>
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
         <jetty.version>9.4.54.v20240208</jetty.version>
@@ -57,8 +57,8 @@
         <!-- PIN Jena to 2.x until both RDF and SWORDv2 can be updated to Jena 3. Requires package renaming, see
              https://jena.apache.org/documentation/migrate_jena2_jena3.html -->
         <jena.version>2.13.0</jena.version>
-        <!-- Jersey is used to integrate with external sources/services -->
-        <jersey.version>2.39.1</jersey.version>
+        <!-- Used by (now obsolete) 'dspace-rest' WAR -->
+        <jersey.version>3.1.5</jersey.version>
 
         <!--=== MAVEN SETTINGS ===-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -395,7 +395,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.5</version>
+                    <version>0.8.11</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -1493,13 +1493,13 @@
             </dependency>
             <dependency>
                 <groupId>com.sun.mail</groupId>
-                <artifactId>javax.mail</artifactId>
-                <version>1.6.2</version>
+                <artifactId>jakarta.mail</artifactId>
+                <version>2.0.1</version>
             </dependency>
             <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>javax.servlet-api</artifactId>
-                <version>3.1.0</version>
+                <groupId>jakarta.servlet</groupId>
+                <artifactId>jakarta.servlet-api</artifactId>
+                <version>6.0.0</version>
             </dependency>
 
             <!-- Jaxen is needed by xoai and sword2-server, but they disagree on the versions -->
@@ -1765,8 +1765,8 @@
 
             <!-- JAXB API and implementation (no longer bundled as of Java 11) -->
             <dependency>
-                <groupId>javax.xml.bind</groupId>
-                <artifactId>jaxb-api</artifactId>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jakarta.xml.bind-api</artifactId>
                 <version>${jaxb-api.version}</version>
             </dependency>
             <dependency>

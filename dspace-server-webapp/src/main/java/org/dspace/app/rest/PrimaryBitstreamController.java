@@ -12,7 +12,7 @@ import static org.dspace.core.Constants.BITSTREAM;
 
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.UnprocessableEntityException;

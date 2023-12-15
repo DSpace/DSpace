@@ -8,10 +8,10 @@
 package org.dspace.app.rest.security;
 
 import java.util.UUID;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.HttpHeaders;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.core.HttpHeaders;
 
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.web.csrf.CsrfToken;

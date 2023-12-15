@@ -9,10 +9,10 @@ package org.dspace.xmlworkflow;
 
 import static org.junit.Assert.assertTrue;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;

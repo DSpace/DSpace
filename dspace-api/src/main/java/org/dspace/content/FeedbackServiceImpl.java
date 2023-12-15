@@ -9,8 +9,8 @@ package org.dspace.content;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Objects;
-import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.dspace.content.service.FeedbackService;

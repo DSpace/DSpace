@@ -226,16 +226,11 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
 
         if (applicationContext != null) {
             try {
+                // This both closes the context and destroys all beans related to it
                 applicationContext.close();
             } catch (Exception e) {
                 // keep going anyway
                 log.warn("Exception closing ApplicationContext:  {}", e.getMessage(), e);
-            }
-            try {
-                applicationContext.destroy();
-            } catch (Exception e) {
-                // keep going anyway
-                log.warn("Exception destroying ApplicationContext:  {}", e.getMessage(), e);
             }
             applicationContext = null;
         }

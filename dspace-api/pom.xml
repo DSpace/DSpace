@@ -60,8 +60,8 @@
                         </path>
                         <!-- Enable JAXB -->
                         <path>
-                            <groupId>javax.xml.bind</groupId>
-                            <artifactId>jaxb-api</artifactId>
+                            <groupId>jakarta.xml.bind</groupId>
+                            <artifactId>jakarta.xml.bind-api</artifactId>
                             <version>${jaxb-api.version}</version>
                         </path>
                         <!-- Enable Commons Annotations -->
@@ -486,11 +486,11 @@
         </dependency>
         <dependency>
             <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
+            <artifactId>jakarta.mail</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -714,15 +714,15 @@
 
         <!-- JAXB API and implementation (no longer bundled as of Java 11) -->
         <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
         </dependency>
 
-        <!-- Jersey / JAX-RS client (javax.ws.rs.*) dependencies needed to integrate with external sources/services -->
+        <!-- Jersey / JAX-RS client (jakarta.ws.rs.*) dependencies needed to integrate with external sources/services -->
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-client</artifactId>
@@ -844,7 +844,17 @@
             	</exclusion>
                 <exclusion>
                     <groupId>com.fasterxml.jackson.datatype</groupId>
-            		<artifactId>jackson-datatype-jsr310</artifactId>
+                    <artifactId>jackson-datatype-jsr310</artifactId>
+                </exclusion>
+                <!-- Resolve dependency conflicts with Hibernate -->
+                <exclusion>
+                    <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
+                </exclusion>
+                <!-- Resolve dependency conflicts with Solr -->
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>javax.servlet-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -865,7 +875,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
-    
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.0.0</version>
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>
@@ -918,11 +933,6 @@
             <groupId>com.github.java-json-tools</groupId>
             <artifactId>json-schema-validator</artifactId>
             <version>2.2.14</version>
-          </dependency>
-          <dependency>
-            <groupId>jakarta.xml.bind</groupId>
-            <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>2.3.3</version>
           </dependency>
           <dependency>
             <groupId>javax.validation</groupId>

@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.exception;
 
-import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+import static jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static org.springframework.web.servlet.DispatcherServlet.EXCEPTION_ATTRIBUTE;
 
 import java.io.IOException;
@@ -16,8 +16,8 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

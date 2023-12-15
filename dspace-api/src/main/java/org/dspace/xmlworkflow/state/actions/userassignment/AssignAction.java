@@ -10,7 +10,7 @@ package org.dspace.xmlworkflow.state.actions.userassignment;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.dspace.core.Context;
 import org.dspace.xmlworkflow.RoleMembers;

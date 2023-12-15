@@ -10,7 +10,7 @@ package org.dspace.eperson;
 import java.io.IOException;
 import java.util.Date;
 import java.util.UUID;
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
