@@ -32,7 +32,7 @@ public class QAAuthorizationFeature implements AuthorizationFeature {
 
     @Override
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException {
-        return configurationService.getBooleanProperty("qaevent.enabled", false);
+        return configurationService.getBooleanProperty("qaevents.enabled", false);
     }
 
     @Override
