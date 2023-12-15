@@ -12,9 +12,10 @@ import java.sql.SQLException;
 import org.dspace.app.rest.authorization.AuthorizationFeature;
 import org.dspace.app.rest.authorization.AuthorizationFeatureDocumentation;
 import org.dspace.app.rest.model.BaseObjectRest;
-import org.dspace.app.rest.model.QAEventRest;
+import org.dspace.app.rest.model.SiteRest;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Component;
 public class QAAuthorizationFeature implements AuthorizationFeature {
     public final static String NAME = "canSeeQA";
 
+    @Autowired
     private ConfigurationService configurationService;
 
     @Override
@@ -38,7 +40,7 @@ public class QAAuthorizationFeature implements AuthorizationFeature {
     @Override
     public String[] getSupportedTypes() {
         return new String[]{
-            QAEventRest.CATEGORY + "." + QAEventRest.NAME,
+            SiteRest.CATEGORY + "." + SiteRest.NAME
         };
     }
 }

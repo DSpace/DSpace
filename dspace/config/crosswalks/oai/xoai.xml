@@ -526,7 +526,7 @@
         </Set>
         <Set id="openaireSet">
             <Spec>openaire</Spec>
-            <Name>Openaire</Name>
+            <Name>OpenAIRE</Name>
             <!-- Just an alias -->
         </Set>
     </Sets>

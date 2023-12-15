@@ -103,7 +103,7 @@ public class OpenaireRestConnector {
 
         if (StringUtils.isBlank(tokenServiceUrl) || StringUtils.isBlank(clientId)
                 || StringUtils.isBlank(clientSecret)) {
-            throw new IOException("Cannot grab Openaire token with nulls service url, client id or secret");
+            throw new IOException("Cannot grab OpenAIRE token with nulls service url, client id or secret");
         }
 
         String auth = clientId + ":" + clientSecret;
