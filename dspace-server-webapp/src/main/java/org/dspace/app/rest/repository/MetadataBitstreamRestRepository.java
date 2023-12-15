@@ -55,6 +55,7 @@ import org.dspace.content.service.clarin.ClarinLicenseResourceMappingService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.dspace.util.FileInfo;
 import org.dspace.util.FileTreeViewGenerator;
@@ -97,6 +98,9 @@ public class MetadataBitstreamRestRepository extends DSpaceRestRepository<Metada
 
     @Autowired
     AuthorizationBitstreamUtils authorizationBitstreamUtils;
+
+    @Autowired
+    ConfigurationService configurationService;
 
     @SearchRestMethod(name = "byHandle")
     public Page<MetadataBitstreamWrapperRest> findByHandle(@Parameter(value = "handle", required = true) String handle,
@@ -398,6 +402,13 @@ public class MetadataBitstreamRestRepository extends DSpaceRestRepository<Metada
      */
     private boolean findOutCanPreview(Context context, Bitstream bitstream) throws SQLException, AuthorizeException {
         try {
+            // Check it is allowed by configuration
+            boolean isAllowedByCfg = configurationService.getBooleanProperty("file.preview.enabled", true);
+            if (!isAllowedByCfg) {
+                return false;
+            }
+
+            // Check it is allowed by license
             authorizeService.authorizeAction(context, bitstream, Constants.READ);
             return true;
         } catch (MissingLicenseAgreementException e) {

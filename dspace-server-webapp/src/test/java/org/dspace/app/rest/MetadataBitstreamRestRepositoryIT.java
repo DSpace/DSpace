@@ -33,6 +33,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.service.clarin.ClarinLicenseResourceMappingService;
 import org.dspace.core.Constants;
+import org.dspace.services.ConfigurationService;
 import org.dspace.util.FileTreeViewGenerator;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -56,6 +57,9 @@ public class MetadataBitstreamRestRepositoryIT extends AbstractControllerIntegra
 
     @Autowired
     AuthorizeService authorizeService;
+
+    @Autowired
+    ConfigurationService configurationService;
 
     @Before
     public void setup() throws Exception {
@@ -123,6 +127,40 @@ public class MetadataBitstreamRestRepositoryIT extends AbstractControllerIntegra
                         .value(Matchers.containsInAnyOrder(Matchers.containsString(url))));
 
 
+    }
+
+    @Test
+    public void previewingIsDisabledByCfg() throws Exception {
+        boolean canPreview = configurationService.getBooleanProperty("file.preview.enabled", true);
+        // Disable previewing
+        configurationService.setProperty("file.preview.enabled", false);
+        // There is no restriction, so the user could preview the file
+        getClient().perform(get(METADATABITSTREAM_SEARCH_BY_HANDLE_ENDPOINT)
+                        .param("handle", publicItem.getHandle())
+                        .param("fileGrpType", FILE_GRP_TYPE))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.metadatabitstreams").exists())
+                .andExpect(jsonPath("$._embedded.metadatabitstreams").isArray())
+                .andExpect(jsonPath("$._embedded.metadatabitstreams[*].name")
+                        .value(Matchers.containsInAnyOrder(Matchers.containsString("Bitstream"))))
+                .andExpect(jsonPath("$._embedded.metadatabitstreams[*].description")
+                        .value(Matchers.containsInAnyOrder(Matchers.containsString(bts.getFormatDescription(context)))))
+                .andExpect(jsonPath("$._embedded.metadatabitstreams[*].format")
+                        .value(Matchers.containsInAnyOrder(Matchers.containsString(
+                                bts.getFormat(context).getMIMEType()))))
+                .andExpect(jsonPath("$._embedded.metadatabitstreams[*].fileSize")
+                        .value(Matchers.containsInAnyOrder(Matchers.containsString(
+                                FileTreeViewGenerator.humanReadableFileSize(bts.getSizeBytes())))))
+                .andExpect(jsonPath("$._embedded.metadatabitstreams[*].canPreview")
+                        .value(Matchers.containsInAnyOrder(Matchers.is(false))))
+                .andExpect(jsonPath("$._embedded.metadatabitstreams[*].fileInfo").exists())
+                .andExpect(jsonPath("$._embedded.metadatabitstreams[*].checksum")
+                        .value(Matchers.containsInAnyOrder(Matchers.containsString(bts.getChecksum()))))
+                .andExpect(jsonPath("$._embedded.metadatabitstreams[*].href")
+                        .value(Matchers.containsInAnyOrder(Matchers.containsString(url))));
+
+        configurationService.setProperty("file.preview.enabled", canPreview);
     }
 
     @Test
