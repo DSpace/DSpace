@@ -32,7 +32,13 @@ public class WorkspaceItemConverter
     public WorkspaceItemRest convert(org.dspace.content.WorkspaceItem obj, Projection projection) {
         WorkspaceItemRest witem = new WorkspaceItemRest();
         witem.setProjection(projection);
-        fillFromModel(obj, witem, projection);
+        fillFromModel(obj, witem, projection,null);
+        return witem;
+    }
+      public WorkspaceItemRest convertbyCollection(org.dspace.content.WorkspaceItem obj, Projection projection,Boolean isRequire) {
+        WorkspaceItemRest witem = new WorkspaceItemRest();
+        witem.setProjection(projection);
+        fillFromModel(obj, witem, projection,isRequire);
         return witem;
     }
 

@@ -33,7 +33,7 @@ public class WorkflowItemConverter
     public WorkflowItemRest convert(XmlWorkflowItem obj, Projection projection) {
         WorkflowItemRest witem = new WorkflowItemRest();
         witem.setProjection(projection);
-        fillFromModel(obj, witem, projection);
+        fillFromModel(obj, witem, projection,null);
         return witem;
     }
 

@@ -59,11 +59,14 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
     @Autowired
     SubmissionService submissionService;
 
+    @Autowired
+    protected ConfigurationService configurationService;
+
     public AInprogressItemConverter() throws SubmissionConfigReaderException {
         submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
     }
 
-    protected void fillFromModel(T obj, R witem, Projection projection) {
+    protected void fillFromModel(T obj, R witem, Projection projection, Boolean isUploadRequiredFromCollection) {
         Collection collection = obj.getCollection();
         Item item = obj.getItem();
         EPerson submitter = null;
@@ -99,9 +102,21 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
                 Class stepClass;
                 try {
                     stepClass = loader.loadClass(stepConfig.getProcessingClassName());
-
                     Object stepInstance = stepClass.newInstance();
-
+                     //Define upload of files mandatory or optional per collection
+                    String CheckWebuiSubmitUploadRequired = configurationService.getProperty("webui.submit.upload.required");
+                    if (isUploadRequiredFromCollection == null && CheckWebuiSubmitUploadRequired == null) {
+                        configurationService.setProperty("webui.submit.upload.required", true);
+                    } else if (isUploadRequiredFromCollection != null && CheckWebuiSubmitUploadRequired == null) {
+                        configurationService.setProperty("webui.submit.upload.required", isUploadRequiredFromCollection);
+                    } else if (isUploadRequiredFromCollection == null && CheckWebuiSubmitUploadRequired != null) {
+                        configurationService.setProperty("webui.submit.upload.required", CheckWebuiSubmitUploadRequired);
+                    } else if (CheckWebuiSubmitUploadRequired != null && CheckWebuiSubmitUploadRequired.equalsIgnoreCase("false") && isUploadRequiredFromCollection != null && isUploadRequiredFromCollection == true) {
+                        configurationService.setProperty("webui.submit.upload.required", true);
+                    } else if (CheckWebuiSubmitUploadRequired != null && CheckWebuiSubmitUploadRequired.equalsIgnoreCase("true") && isUploadRequiredFromCollection != null && isUploadRequiredFromCollection == false) {
+                        configurationService.setProperty("webui.submit.upload.required", false);
+                    }
+                    //Define upload of files mandatory or optional per collection
                     if (stepInstance instanceof DataProcessingStep) {
                         // load the interface for this step
                         DataProcessingStep stepProcessing =

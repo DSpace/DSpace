@@ -117,7 +117,11 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     @Autowired
     private UriListHandlerService uriListHandlerService;
 
+    @Autowired
+    ConfigurationService configurationService;
+
     private SubmissionConfigService submissionConfigService;
+    
 
     public WorkspaceItemRestRepository() throws SubmissionConfigReaderException {
         submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
@@ -135,7 +139,25 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         if (witem == null) {
             return null;
         }
-        return converter.toRest(witem, utils.obtainProjection());
+         //Define upload of files mandatory or optional per collection
+        Boolean IsRequired = null;
+        try {
+            Collection c = witem.getCollection();
+            Optional<String> isUploadRequiredFromCollection = c.getMetadata().stream().filter(d -> d.getMetadataField().getElement().equalsIgnoreCase("upload")).map(dd -> dd.getValue()).findFirst();
+            if (isUploadRequiredFromCollection != null && isUploadRequiredFromCollection.isPresent()) {
+                if (isUploadRequiredFromCollection.get().equalsIgnoreCase("true")) {
+                    IsRequired = true;
+                } else {
+                    IsRequired = false;
+                }
+            } else {
+                IsRequired = null;
+            }
+        }catch (Exception e){
+            System.out.println("errr"+e.getMessage());
+            IsRequired = null;
+        }
+        return workspaceItemConverter.convertbyCollection(witem, utils.obtainProjection(),isRequire);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
