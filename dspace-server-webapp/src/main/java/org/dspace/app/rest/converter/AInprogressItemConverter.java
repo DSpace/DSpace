@@ -67,7 +67,7 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
         submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
     }
 
-    protected void fillFromModel(T obj, R witem, Projection projection, Boolean isUploadRequiredFromCollection) {
+    protected void fillFromModel(T obj, R witem, Projection projection, Boolean isRequired) {
         Collection collection = obj.getCollection();
         Item item = obj.getItem();
         EPerson submitter = null;
@@ -105,16 +105,22 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
                     stepClass = loader.loadClass(stepConfig.getProcessingClassName());
                     Object stepInstance = stepClass.newInstance();
                     //Define upload of files mandatory or optional per collection
-                    String checkWebuiSubmitUploadRequired = configurationService.getProperty("webui.submit.upload.required");
-                    if (isUploadRequiredFromCollection == null && checkWebuiSubmitUploadRequired == null) {
+                    String isPropertyRequired = configurationService.getProperty("webui.submit.upload.required");
+                    if (isRequired == null && isPropertyRequired == null) {
                         configurationService.setProperty("webui.submit.upload.required", true);
-                    } else if (isUploadRequiredFromCollection != null && checkWebuiSubmitUploadRequired == null) {
-                        configurationService.setProperty("webui.submit.upload.required", isUploadRequiredFromCollection);
-                    } else if (isUploadRequiredFromCollection == null && checkWebuiSubmitUploadRequired != null) {
-                        configurationService.setProperty("webui.submit.upload.required", checkWebuiSubmitUploadRequired);
-                    } else if (checkWebuiSubmitUploadRequired != null && checkWebuiSubmitUploadRequired.equalsIgnoreCase("false") && isUploadRequiredFromCollection != null && isUploadRequiredFromCollection == true) {
+                    } else if (isRequired != null && isPropertyRequired == null) {
+                        configurationService.setProperty("webui.submit.upload.required", isRequired);
+                    } else if (isRequired == null && isPropertyRequired != null) {
+                        configurationService.setProperty("webui.submit.upload.required",
+                                isPropertyRequired);
+                    } else if (isPropertyRequired != null &&
+                            isPropertyRequired.equalsIgnoreCase("false") &&
+                            isRequired != null && isRequired == true) {
                         configurationService.setProperty("webui.submit.upload.required", true);
-                    } else if (checkWebuiSubmitUploadRequired != null && checkWebuiSubmitUploadRequired.equalsIgnoreCase("true") && isUploadRequiredFromCollection != null && isUploadRequiredFromCollection == false) {
+                    } else if (isPropertyRequired != null &&
+                            isPropertyRequired.equalsIgnoreCase("true")
+                            && isRequired != null &&
+                            isRequired == false) {
                         configurationService.setProperty("webui.submit.upload.required", false);
                     }
                     //Define upload of files mandatory or optional per collection

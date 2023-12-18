@@ -76,7 +76,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Component(WorkspaceItemRest.CATEGORY + "." + WorkspaceItemRest.NAME)
 public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceItemRest, Integer>
-    implements ReloadableEntityObjectRepository<WorkspaceItem, Integer> {
+        implements ReloadableEntityObjectRepository<WorkspaceItem, Integer> {
 
     public static final String OPERATION_PATH_SECTIONS = "sections";
 
@@ -139,7 +139,9 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         Boolean isRequire = null;
         try {
             Collection c = witem.getCollection();
-            Optional<String> optional = c.getMetadata().stream().filter(d -> d.getMetadataField().getElement().equalsIgnoreCase("upload")).map(dd -> dd.getValue()).findFirst();
+            Optional<String> optional = c.getMetadata().stream()
+                    .filter(d -> d.getMetadataField().getElement().equalsIgnoreCase("upload"))
+                    .map(dd -> dd.getValue()).findFirst();
             if (optional != null && optional.isPresent()) {
                 if (optional.get().equalsIgnoreCase("true")) {
                     isRequire = true;
@@ -149,11 +151,10 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             } else {
                 isRequire = null;
             }
-        }catch (Exception e){
-            System.out.println("errr"+e.getMessage());
+        }catch(Exception e) {
             isRequire = null;
         }
-        return workspaceItemConverter.convertbyCollection(witem, utils.obtainProjection(),isRequire);
+        return workspaceItemConverter.convert(witem, utils.obtainProjection(), isRequire);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -172,7 +173,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     @PreAuthorize("hasPermission(#submitterID, 'EPERSON', 'READ')")
     @SearchRestMethod(name = "findBySubmitter")
     public Page<WorkspaceItemRest> findBySubmitter(@Parameter(value = "uuid", required = true) UUID submitterID,
-            Pageable pageable) {
+                                                   Pageable pageable) {
         try {
             Context context = obtainContext();
             EPerson ep = epersonService.find(context, submitterID);
@@ -231,7 +232,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                 submissionService.evaluatePatchToInprogressSubmission(context, request, source, wsi, section, op);
             } else {
                 throw new DSpaceBadRequestException(
-                    "Patch path operation need to starts with '" + OPERATION_PATH_SECTIONS + "'");
+                        "Patch path operation need to starts with '" + OPERATION_PATH_SECTIONS + "'");
             }
         }
         wis.update(context, source);
@@ -245,7 +246,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             witem = wis.find(context, id);
             wis.deleteAll(context, witem);
             context.addEvent(new Event(Event.DELETE, Constants.ITEM, witem.getItem().getID(), null,
-                itemService.getIdentifiers(context, witem.getItem())));
+                    itemService.getIdentifiers(context, witem.getItem())));
         } catch (SQLException | IOException e) {
             log.error(e.getMessage(), e);
         }
@@ -253,8 +254,8 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
     @Override
     public Iterable<WorkspaceItemRest> upload(Context context, HttpServletRequest request,
-            List<MultipartFile> uploadfiles)
-        throws SQLException, FileNotFoundException, IOException, AuthorizeException {
+                                              List<MultipartFile> uploadfiles)
+            throws SQLException, FileNotFoundException, IOException, AuthorizeException {
         List<WorkspaceItemRest> results = new ArrayList<>();
 
         String uuid = request.getParameter("owningCollection");
@@ -269,7 +270,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         }
 
         SubmissionConfig submissionConfig =
-            submissionConfigService.getSubmissionConfigByCollection(collection.getHandle());
+                submissionConfigService.getSubmissionConfigByCollection(collection.getHandle());
         List<WorkspaceItem> result = null;
         List<ImportRecord> records = new ArrayList<>();
         try {
@@ -294,7 +295,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             log.error("Error importing metadata", e);
         }
         WorkspaceItem source = submissionService.
-            createWorkspaceItem(context, getRequestService().getCurrentRequest());
+                createWorkspaceItem(context, getRequestService().getCurrentRequest());
         merge(context, records, source);
         result = new ArrayList<>();
         result.add(source);
@@ -318,7 +319,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                                 UploadableStep uploadableStep = (UploadableStep) stepInstance;
                                 for (MultipartFile mpFile : uploadfiles) {
                                     ErrorRest err = uploadableStep.upload(context,
-                                        submissionService, stepConfig, wi, mpFile);
+                                            submissionService, stepConfig, wi, mpFile);
                                     if (err != null) {
                                         errors.add(err);
                                     }
@@ -343,7 +344,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
     @Override
     protected WorkspaceItemRest createAndReturn(Context context, List<String> stringList)
-        throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
+            throws AuthorizeException, SQLException, RepositoryMethodNotImplementedException {
 
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
         WorkspaceItem workspaceItem = uriListHandlerService.handle(context, req, stringList, WorkspaceItem.class);
@@ -357,7 +358,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
      * It'll return a 204 if nothing was found
      * @param itemUuid  The UUID for the Item to be used
      * @param pageable  The pageable if present
-     * @return          The resulting WorkspaceItem object
+     * @return The resulting WorkspaceItem object
      */
     @SearchRestMethod(name = "item")
     public WorkspaceItemRest findByItemUuid(@Parameter(value = "uuid", required = true) UUID itemUuid,
@@ -390,19 +391,19 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
     private void merge(Context context, List<ImportRecord> records, WorkspaceItem item) throws SQLException {
         for (MetadataValue metadataValue : itemService.getMetadata(
-            item.getItem(), Item.ANY, Item.ANY, Item.ANY, Item.ANY)) {
+                item.getItem(), Item.ANY, Item.ANY, Item.ANY, Item.ANY)) {
             itemService.clearMetadata(context, item.getItem(),
-                metadataValue.getMetadataField().getMetadataSchema().getNamespace(),
-                metadataValue.getMetadataField().getElement(),
-                metadataValue.getMetadataField().getQualifier(),
-                metadataValue.getLanguage());
+                    metadataValue.getMetadataField().getMetadataSchema().getNamespace(),
+                    metadataValue.getMetadataField().getElement(),
+                    metadataValue.getMetadataField().getQualifier(),
+                    metadataValue.getLanguage());
         }
         for (ImportRecord record : records) {
             if (record != null && record.getValueList() != null) {
                 for (MetadatumDTO metadataValue : record.getValueList()) {
                     itemService.addMetadata(context, item.getItem(), metadataValue.getSchema(),
-                        metadataValue.getElement(), metadataValue.getQualifier(), null,
-                        metadataValue.getValue());
+                            metadataValue.getElement(), metadataValue.getQualifier(), null,
+                            metadataValue.getValue());
                 }
             }
         }
