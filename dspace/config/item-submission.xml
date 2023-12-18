@@ -247,6 +247,13 @@
             <type>coarnotify</type>
         </step-definition>
 
+        <!-- Detect duplicates step -->
+        <step-definition id="duplicates">
+            <heading>submit.progressbar.duplicates</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DuplicateDetectionStep</processing-class>
+            <type>duplicates</type>
+        </step-definition>
+
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
