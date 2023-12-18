@@ -111,7 +111,7 @@ public class RequestItemRepository
         ObjectMapper mapper = new ObjectMapper();
         String captchaToken = req.getHeader("X-Recaptcha-Token");
         boolean verificationEnabled = configurationService.getBooleanProperty("requestcopy.verification.enabled");
-        if (verificationEnabled){
+        if (verificationEnabled) {
             try {
                 captchaService.processResponse(captchaToken, REGISTER_ACTION);
             } catch (InvalidReCaptchaException e) {
@@ -124,7 +124,6 @@ public class RequestItemRepository
         } catch (IOException ex) {
             throw new UnprocessableEntityException("error parsing the body", ex);
         }
-
         // Check request.item.type:
         // "all" = anyone can request.
         // "logged" = only authenticated user can request.
