@@ -8,13 +8,13 @@
 package org.dspace.external;
 
 /**
- * OpenAIRE rest API token to be used when grabbing an accessToken.<br/>
+ * Openaire rest API token to be used when grabbing an accessToken.<br/>
  * Based on https://develop.openaire.eu/basic.html
  * 
  * @author paulo-graca
  *
  */
-public class OpenAIRERestToken {
+public class OpenaireRestToken {
 
     /**
      * Stored access token
@@ -32,7 +32,7 @@ public class OpenAIRERestToken {
      * @param accessToken
      * @param expiresIn
      */
-    public OpenAIRERestToken(String accessToken, Long expiresIn) {
+    public OpenaireRestToken(String accessToken, Long expiresIn) {
         this.accessToken = accessToken;
         this.setExpirationDate(expiresIn);
     }

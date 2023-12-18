@@ -31,7 +31,7 @@ import eu.openaire.oaf.model.base.Project;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.dto.MetadataValueDTO;
-import org.dspace.external.OpenAIRERestConnector;
+import org.dspace.external.OpenaireRestConnector;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.AbstractExternalDataProvider;
 import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
@@ -39,13 +39,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This class is the implementation of the ExternalDataProvider interface that
- * will deal with the OpenAIRE External Data lookup
+ * will deal with the Openaire External Data lookup
  * 
  * @author paulo-graca
  */
-public class OpenAIREFundingDataProvider extends AbstractExternalDataProvider {
+public class OpenaireFundingDataProvider extends AbstractExternalDataProvider {
 
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(OpenAIREFundingDataProvider.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(OpenaireFundingDataProvider.class);
 
     /**
      * GrantAgreement prefix
@@ -75,7 +75,7 @@ public class OpenAIREFundingDataProvider extends AbstractExternalDataProvider {
     /**
      * Connector to handle token and requests
      */
-    protected OpenAIRERestConnector connector;
+    protected OpenaireRestConnector connector;
 
     protected Map<String, MetadataFieldConfig> metadataFields;
 
@@ -93,7 +93,7 @@ public class OpenAIREFundingDataProvider extends AbstractExternalDataProvider {
         // characters that must be escaped for the <:entry-id>
         String decodedId = new String(Base64.getDecoder().decode(id));
         if (!isValidProjectURI(decodedId)) {
-            log.error("Invalid ID for OpenAIREFunding - " + id);
+            log.error("Invalid ID for OpenaireFunding - " + id);
             return Optional.empty();
         }
         Response response = searchByProjectURI(decodedId);
@@ -101,7 +101,7 @@ public class OpenAIREFundingDataProvider extends AbstractExternalDataProvider {
         try {
             if (response.getHeader() != null && Integer.parseInt(response.getHeader().getTotal()) > 0) {
                 Project project = response.getResults().getResult().get(0).getMetadata().getEntity().getProject();
-                ExternalDataObject externalDataObject = new OpenAIREFundingDataProvider
+                ExternalDataObject externalDataObject = new OpenaireFundingDataProvider
                         .ExternalDataObjectBuilder(project)
                         .setId(generateProjectURI(project))
                         .setSource(sourceIdentifier)
@@ -123,7 +123,7 @@ public class OpenAIREFundingDataProvider extends AbstractExternalDataProvider {
             limit = LIMIT_DEFAULT;
         }
 
-        // OpenAIRE uses pages and first page starts with 1
+        // Openaire uses pages and first page starts with 1
         int page = (start / limit) + 1;
 
         // escaping query
@@ -148,7 +148,7 @@ public class OpenAIREFundingDataProvider extends AbstractExternalDataProvider {
 
         if (projects.size() > 0) {
             return projects.stream()
-                    .map(project -> new OpenAIREFundingDataProvider
+                    .map(project -> new OpenaireFundingDataProvider
                             .ExternalDataObjectBuilder(project)
                             .setId(generateProjectURI(project))
                             .setSource(sourceIdentifier)
@@ -176,24 +176,24 @@ public class OpenAIREFundingDataProvider extends AbstractExternalDataProvider {
      * Generic setter for the sourceIdentifier
      * 
      * @param sourceIdentifier The sourceIdentifier to be set on this
-     *                         OpenAIREFunderDataProvider
+     *                         OpenaireFunderDataProvider
      */
     @Autowired(required = true)
     public void setSourceIdentifier(String sourceIdentifier) {
         this.sourceIdentifier = sourceIdentifier;
     }
 
-    public OpenAIRERestConnector getConnector() {
+    public OpenaireRestConnector getConnector() {
         return connector;
     }
 
     /**
-     * Generic setter for OpenAIRERestConnector
+     * Generic setter for OpenaireRestConnector
      * 
      * @param connector
      */
     @Autowired(required = true)
-    public void setConnector(OpenAIRERestConnector connector) {
+    public void setConnector(OpenaireRestConnector connector) {
         this.connector = connector;
     }
 
@@ -219,7 +219,7 @@ public class OpenAIREFundingDataProvider extends AbstractExternalDataProvider {
     }
 
     /**
-     * This method returns an URI based on OpenAIRE 3.0 guidelines
+     * This method returns an URI based on Openaire 3.0 guidelines
      * https://guidelines.openaire.eu/en/latest/literature/field_projectid.html that
      * can be used as an ID if is there any missing part, that part it will be
      * replaced by the character '+'
@@ -281,7 +281,7 @@ public class OpenAIREFundingDataProvider extends AbstractExternalDataProvider {
     }
 
     /**
-     * OpenAIRE Funding External Data Builder Class
+     * Openaire Funding External Data Builder Class
      * 
      * @author pgraca
      */
