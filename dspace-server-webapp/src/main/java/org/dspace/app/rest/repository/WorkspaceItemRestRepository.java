@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
@@ -93,7 +94,6 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     @Autowired
     BitstreamFormatService bitstreamFormatService;
 
-    @Autowired
     ConfigurationService configurationService;
 
     @Autowired
@@ -117,11 +117,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     @Autowired
     private UriListHandlerService uriListHandlerService;
 
-    @Autowired
-    ConfigurationService configurationService;
-
     private SubmissionConfigService submissionConfigService;
-    
 
     public WorkspaceItemRestRepository() throws SubmissionConfigReaderException {
         submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
@@ -139,23 +135,23 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         if (witem == null) {
             return null;
         }
-         //Define upload of files mandatory or optional per collection
-        Boolean IsRequired = null;
+        //Define upload of files mandatory or optional per collection
+        Boolean isRequire = null;
         try {
             Collection c = witem.getCollection();
-            Optional<String> isUploadRequiredFromCollection = c.getMetadata().stream().filter(d -> d.getMetadataField().getElement().equalsIgnoreCase("upload")).map(dd -> dd.getValue()).findFirst();
-            if (isUploadRequiredFromCollection != null && isUploadRequiredFromCollection.isPresent()) {
-                if (isUploadRequiredFromCollection.get().equalsIgnoreCase("true")) {
-                    IsRequired = true;
+            Optional<String> optional = c.getMetadata().stream().filter(d -> d.getMetadataField().getElement().equalsIgnoreCase("upload")).map(dd -> dd.getValue()).findFirst();
+            if (optional != null && optional.isPresent()) {
+                if (optional.get().equalsIgnoreCase("true")) {
+                    isRequire = true;
                 } else {
-                    IsRequired = false;
+                    isRequire = false;
                 }
             } else {
-                IsRequired = null;
+                isRequire = null;
             }
         }catch (Exception e){
             System.out.println("errr"+e.getMessage());
-            IsRequired = null;
+            isRequire = null;
         }
         return workspaceItemConverter.convertbyCollection(witem, utils.obtainProjection(),isRequire);
     }

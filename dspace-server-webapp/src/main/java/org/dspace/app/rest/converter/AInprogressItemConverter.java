@@ -25,6 +25,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
 import org.dspace.submit.factory.SubmissionServiceFactory;
 import org.dspace.submit.service.SubmissionConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ import org.springframework.context.annotation.Lazy;
 
 /**
  * Abstract implementation providing the common functionalities for all the inprogressSubmission Converter
- * 
+ *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  * @param <T>
@@ -41,7 +42,7 @@ import org.springframework.context.annotation.Lazy;
  *            the DSpace REST inprogressSubmission representation
  */
 public abstract class AInprogressItemConverter<T extends InProgressSubmission,
-                            R extends AInprogressSubmissionRest>
+        R extends AInprogressSubmissionRest>
         implements IndexableObjectConverter<T, R> {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AInprogressItemConverter.class);
@@ -103,34 +104,35 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
                 try {
                     stepClass = loader.loadClass(stepConfig.getProcessingClassName());
                     Object stepInstance = stepClass.newInstance();
-                     //Define upload of files mandatory or optional per collection
-                    String CheckWebuiSubmitUploadRequired = configurationService.getProperty("webui.submit.upload.required");
-                    if (isUploadRequiredFromCollection == null && CheckWebuiSubmitUploadRequired == null) {
+                    //Define upload of files mandatory or optional per collection
+                    String checkWebuiSubmitUploadRequired = configurationService.getProperty("webui.submit.upload.required");
+                    if (isUploadRequiredFromCollection == null && checkWebuiSubmitUploadRequired == null) {
                         configurationService.setProperty("webui.submit.upload.required", true);
-                    } else if (isUploadRequiredFromCollection != null && CheckWebuiSubmitUploadRequired == null) {
+                    } else if (isUploadRequiredFromCollection != null && checkWebuiSubmitUploadRequired == null) {
                         configurationService.setProperty("webui.submit.upload.required", isUploadRequiredFromCollection);
-                    } else if (isUploadRequiredFromCollection == null && CheckWebuiSubmitUploadRequired != null) {
-                        configurationService.setProperty("webui.submit.upload.required", CheckWebuiSubmitUploadRequired);
-                    } else if (CheckWebuiSubmitUploadRequired != null && CheckWebuiSubmitUploadRequired.equalsIgnoreCase("false") && isUploadRequiredFromCollection != null && isUploadRequiredFromCollection == true) {
+                    } else if (isUploadRequiredFromCollection == null && checkWebuiSubmitUploadRequired != null) {
+                        configurationService.setProperty("webui.submit.upload.required", checkWebuiSubmitUploadRequired);
+                    } else if (checkWebuiSubmitUploadRequired != null && checkWebuiSubmitUploadRequired.equalsIgnoreCase("false") && isUploadRequiredFromCollection != null && isUploadRequiredFromCollection == true) {
                         configurationService.setProperty("webui.submit.upload.required", true);
-                    } else if (CheckWebuiSubmitUploadRequired != null && CheckWebuiSubmitUploadRequired.equalsIgnoreCase("true") && isUploadRequiredFromCollection != null && isUploadRequiredFromCollection == false) {
+                    } else if (checkWebuiSubmitUploadRequired != null && checkWebuiSubmitUploadRequired.equalsIgnoreCase("true") && isUploadRequiredFromCollection != null && isUploadRequiredFromCollection == false) {
                         configurationService.setProperty("webui.submit.upload.required", false);
                     }
                     //Define upload of files mandatory or optional per collection
+
                     if (stepInstance instanceof DataProcessingStep) {
                         // load the interface for this step
                         DataProcessingStep stepProcessing =
-                            (DataProcessingStep) stepClass.newInstance();
+                                (DataProcessingStep) stepClass.newInstance();
                         for (ErrorRest error : stepProcessing.validate(submissionService, obj, stepConfig)) {
                             addError(witem.getErrors(), error);
                         }
                         witem.getSections()
-                            .put(sections.getId(), stepProcessing.getData(submissionService, obj, stepConfig));
+                                .put(sections.getId(), stepProcessing.getData(submissionService, obj, stepConfig));
                     } else if (!(stepInstance instanceof RestProcessingStep)) {
                         log.warn("The submission step class specified by '" + stepConfig.getProcessingClassName() +
-                                 "' does not implement the interface org.dspace.app.rest.submit.RestProcessingStep!" +
-                                 " Therefore it cannot be used by the Configurable Submission as the " +
-                                 "<processing-class>!");
+                                "' does not implement the interface org.dspace.app.rest.submit.RestProcessingStep!" +
+                                " Therefore it cannot be used by the Configurable Submission as the " +
+                                "<processing-class>!");
                     }
 
                 } catch (Exception e) {
