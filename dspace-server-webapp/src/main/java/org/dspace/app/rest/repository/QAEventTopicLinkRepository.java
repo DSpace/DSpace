@@ -8,7 +8,7 @@
 package org.dspace.app.rest.repository;
 
 import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.model.QAEventRest;
 import org.dspace.app.rest.model.QATopicRest;

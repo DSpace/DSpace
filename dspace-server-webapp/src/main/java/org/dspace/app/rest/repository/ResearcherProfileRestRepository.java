@@ -11,7 +11,7 @@ import java.net.URI;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;

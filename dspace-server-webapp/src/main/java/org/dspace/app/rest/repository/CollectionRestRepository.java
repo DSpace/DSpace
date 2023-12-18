@@ -15,7 +15,7 @@ import java.util.Objects;
 import java.util.SortedMap;
 import java.util.UUID;
 import jakarta.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
