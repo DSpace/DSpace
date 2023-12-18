@@ -40,20 +40,20 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * based on OrcidRestConnector it's a rest connector for OpenAIRE API providing
+ * based on OrcidRestConnector it's a rest connector for Openaire API providing
  * ways to perform searches and token grabbing
  * 
  * @author paulo-graca
  *
  */
-public class OpenAIRERestConnector {
+public class OpenaireRestConnector {
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(OpenAIRERestConnector.class);
+    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(OpenaireRestConnector.class);
 
     /**
-     * OpenAIRE API Url
+     * Openaire API Url
      *  and can be configured with: openaire.api.url
      */
     private String url = "https://api.openaire.eu";
@@ -65,30 +65,30 @@ public class OpenAIRERestConnector {
     boolean tokenEnabled = false;
 
     /**
-     * OpenAIRE Authorization and Authentication Token Service URL
+     * Openaire Authorization and Authentication Token Service URL
      *  and can be configured with: openaire.token.url
      */
     private String tokenServiceUrl;
 
     /**
-     * OpenAIRE clientId
+     * Openaire clientId
      *  and can be configured with: openaire.token.clientId
      */
     private String clientId;
 
     /**
-     * OpenAIRERest access token
+     * OpenaireRest access token
      */
-    private OpenAIRERestToken accessToken;
+    private OpenaireRestToken accessToken;
 
     /**
-     * OpenAIRE clientSecret
+     * Openaire clientSecret
      *  and can be configured with: openaire.token.clientSecret
      */
     private String clientSecret;
 
 
-    public OpenAIRERestConnector(String url) {
+    public OpenaireRestConnector(String url) {
         this.url = url;
     }
 
@@ -99,7 +99,7 @@ public class OpenAIRERestConnector {
      * 
      * @throws IOException
      */
-    public OpenAIRERestToken grabNewAccessToken() throws IOException {
+    public OpenaireRestToken grabNewAccessToken() throws IOException {
 
         if (StringUtils.isBlank(tokenServiceUrl) || StringUtils.isBlank(clientId)
                 || StringUtils.isBlank(clientSecret)) {
@@ -145,13 +145,13 @@ public class OpenAIRERestConnector {
             throw new IOException("Unable to grab the access token using provided service url, client id and secret");
         }
 
-        return new OpenAIRERestToken(responseObject.get("access_token").toString(),
+        return new OpenaireRestToken(responseObject.get("access_token").toString(),
                 Long.valueOf(responseObject.get("expires_in").toString()));
 
     }
 
     /**
-     * Perform a GET request to the OpenAIRE API
+     * Perform a GET request to the Openaire API
      * 
      * @param file
      * @param accessToken
@@ -218,12 +218,12 @@ public class OpenAIRERestConnector {
     }
 
     /**
-     * Perform an OpenAIRE Project Search By Keywords
+     * Perform an Openaire Project Search By Keywords
      * 
      * @param page
      * @param size
      * @param keywords
-     * @return OpenAIRE Response
+     * @return Openaire Response
      */
     public Response searchProjectByKeywords(int page, int size, String... keywords) {
         String path = "search/projects?keywords=" + String.join("+", keywords);
@@ -231,13 +231,13 @@ public class OpenAIRERestConnector {
     }
 
     /**
-     * Perform an OpenAIRE Project Search By ID and by Funder
+     * Perform an Openaire Project Search By ID and by Funder
      * 
      * @param projectID
      * @param projectFunder
      * @param page
      * @param size
-     * @return OpenAIRE Response
+     * @return Openaire Response
      */
     public Response searchProjectByIDAndFunder(String projectID, String projectFunder, int page, int size) {
         String path = "search/projects?grantID=" + projectID + "&funder=" + projectFunder;
@@ -245,12 +245,12 @@ public class OpenAIRERestConnector {
     }
 
     /**
-     * Perform an OpenAIRE Search request
+     * Perform an Openaire Search request
      * 
      * @param path
      * @param page
      * @param size
-     * @return OpenAIRE Response
+     * @return Openaire Response
      */
     public Response search(String path, int page, int size) {
         String[] queryStringPagination = { "page=" + page, "size=" + size };

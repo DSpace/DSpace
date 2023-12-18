@@ -42,10 +42,10 @@
         </scope_note>
     </dc-type>
     
-    <!-- OpenAIRE4 Guidelines -->
+    <!-- Openaire4 Guidelines -->
     <!-- 2.2.2.1. Attribute nameType (R) -->
     <!-- and 3.2.6. Subproperty nameIdentifier (R) -->
-    <!-- specific type required by OpenAIRE4 Guidelines -->  
+    <!-- specific type required by Openaire4 Guidelines -->  
     
     <dc-type>
         <schema>organization</schema>

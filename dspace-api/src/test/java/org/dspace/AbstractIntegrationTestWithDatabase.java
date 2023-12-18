@@ -32,6 +32,8 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.kernel.ServiceManager;
+import org.dspace.qaevent.MockQAEventService;
+import org.dspace.qaevent.service.QAEventService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.MockSolrLoggerServiceImpl;
 import org.dspace.statistics.MockSolrStatisticsCore;
@@ -206,6 +208,10 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             MockAuthoritySolrServiceImpl authorityService = serviceManager
                     .getServiceByName(AuthoritySearchService.class.getName(), MockAuthoritySolrServiceImpl.class);
             authorityService.reset();
+
+            MockQAEventService qaEventService = serviceManager
+                .getServiceByName(QAEventService.class.getName(), MockQAEventService.class);
+            qaEventService.reset();
 
             // Reload our ConfigurationService (to reset configs to defaults again)
             DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
