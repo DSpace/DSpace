@@ -151,7 +151,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
             } else {
                 isRequire = null;
             }
-        }catch(Exception e) {
+        } catch (Exception e) {
             isRequire = null;
         }
         return workspaceItemConverter.convert(witem, utils.obtainProjection(), isRequire);
