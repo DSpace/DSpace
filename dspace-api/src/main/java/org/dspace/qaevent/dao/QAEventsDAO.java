@@ -22,7 +22,7 @@ import org.dspace.eperson.EPerson;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public interface QAEventsDao extends GenericDAO<QAEventProcessed> {
+public interface QAEventsDAO extends GenericDAO<QAEventProcessed> {
 
     /**
      * Returns all the stored QAEventProcessed entities.

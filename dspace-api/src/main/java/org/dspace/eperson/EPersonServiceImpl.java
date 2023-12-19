@@ -48,7 +48,7 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
 import org.dspace.orcid.service.OrcidTokenService;
-import org.dspace.qaevent.dao.QAEventsDao;
+import org.dspace.qaevent.dao.QAEventsDAO;
 import org.dspace.services.ConfigurationService;
 import org.dspace.util.UUIDUtils;
 import org.dspace.versioning.Version;
@@ -109,7 +109,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     @Autowired
     protected OrcidTokenService orcidTokenService;
     @Autowired
-    protected QAEventsDao qaEventsDao;
+    protected QAEventsDAO qaEventsDao;
 
     protected EPersonServiceImpl() {
         super();

@@ -66,7 +66,7 @@
     </bean>
     
     <bean id="import-openaire-events" class="org.dspace.qaevent.script.OpenaireEventsImportCliScriptConfiguration" primary="true">
-        <property name="description" value="Import new openAIRE quality assurance broker events"/>
+        <property name="description" value="Import new openaire quality assurance broker events"/>
         <property name="dspaceRunnableClass" value="org.dspace.qaevent.script.OpenaireEventsImportCli"/>
     </bean>
 

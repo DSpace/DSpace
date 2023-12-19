@@ -17,16 +17,16 @@ import org.dspace.content.QAEventProcessed;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.qaevent.dao.QAEventsDao;
+import org.dspace.qaevent.dao.QAEventsDAO;
 
 /**
- * Implementation of {@link QAEventsDao} that store processed events using an
+ * Implementation of {@link QAEventsDAO} that store processed events using an
  * SQL DBMS.
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public class QAEventsDaoImpl extends AbstractHibernateDAO<QAEventProcessed> implements QAEventsDao {
+public class QAEventsDAOImpl extends AbstractHibernateDAO<QAEventProcessed> implements QAEventsDAO {
 
     @Override
     public List<QAEventProcessed> findAll(Context context) throws SQLException {
@@ -60,7 +60,7 @@ public class QAEventsDaoImpl extends AbstractHibernateDAO<QAEventProcessed> impl
     public List<QAEventProcessed> searchByEventId(Context context, String eventId, Integer start, Integer size)
             throws SQLException {
         Query query = createQuery(context,
-                "SELECT * " + "FROM QAEventProcessed qaevent WHERE qaevent.qaevent_id = :event_id ");
+                "SELECT * FROM QAEventProcessed qaevent WHERE qaevent.qaevent_id = :event_id ");
         query.setFirstResult(start);
         query.setMaxResults(size);
         query.setParameter("event_id", eventId);

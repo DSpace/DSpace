@@ -45,9 +45,9 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.matcher.QASourceMatcher;
 import org.dspace.matcher.QATopicMatcher;
-import org.dspace.qaevent.service.BrokerClientFactory;
+import org.dspace.qaevent.service.OpenaireClientFactory;
 import org.dspace.qaevent.service.QAEventService;
-import org.dspace.qaevent.service.impl.BrokerClientFactoryImpl;
+import org.dspace.qaevent.service.impl.OpenaireClientFactoryImpl;
 import org.dspace.utils.DSpace;
 import org.junit.After;
 import org.junit.Before;
@@ -63,11 +63,13 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
     private static final String BASE_JSON_DIR_PATH = "org/dspace/app/openaire-events/";
 
+    private static final String ORDER_FIELD = "topic";
+
     private QAEventService qaEventService = new DSpace().getSingletonService(QAEventService.class);
 
     private Collection collection;
 
-    private BrokerClient brokerClient = BrokerClientFactory.getInstance().getBrokerClient();
+    private BrokerClient brokerClient = OpenaireClientFactory.getInstance().getBrokerClient();
 
     private BrokerClient mockBrokerClient = mock(BrokerClient.class);
 
@@ -86,12 +88,12 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         context.restoreAuthSystemState();
 
-        ((BrokerClientFactoryImpl) BrokerClientFactory.getInstance()).setBrokerClient(mockBrokerClient);
+        ((OpenaireClientFactoryImpl) OpenaireClientFactory.getInstance()).setBrokerClient(mockBrokerClient);
     }
 
     @After
     public void after() {
-        ((BrokerClientFactoryImpl) BrokerClientFactory.getInstance()).setBrokerClient(brokerClient);
+        ((OpenaireClientFactoryImpl) OpenaireClientFactory.getInstance()).setBrokerClient(brokerClient);
     }
 
     @Test
@@ -157,7 +159,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 5L)));
 
-        assertThat(qaEventService.findAllTopics(0, 20), containsInAnyOrder(
+        assertThat(qaEventService.findAllTopics(0, 20, ORDER_FIELD, false), containsInAnyOrder(
             QATopicMatcher.with("ENRICH/MORE/PROJECT", 1L),
             QATopicMatcher.with("ENRICH/MORE/PID", 1L),
             QATopicMatcher.with("ENRICH/MISSING/PID", 1L),
@@ -213,7 +215,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 3L)));
 
-        assertThat(qaEventService.findAllTopics(0, 20), containsInAnyOrder(
+        assertThat(qaEventService.findAllTopics(0, 20, ORDER_FIELD, false), containsInAnyOrder(
             QATopicMatcher.with("ENRICH/MISSING/ABSTRACT", 1L),
             QATopicMatcher.with("ENRICH/MISSING/PROJECT", 1L),
             QATopicMatcher.with("ENRICH/MORE/PID", 1L)
@@ -253,7 +255,8 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 1L)));
 
-        assertThat(qaEventService.findAllTopics(0, 20), contains(QATopicMatcher.with("ENRICH/MISSING/ABSTRACT", 1L)));
+        assertThat(qaEventService.findAllTopics(0, 20, ORDER_FIELD, false),
+            contains(QATopicMatcher.with("ENRICH/MISSING/ABSTRACT", 1L)));
 
         String abstractMessage = "{\"abstracts[0]\":\"Missing Abstract\"}";
 
@@ -280,7 +283,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 0L)));
 
-        assertThat(qaEventService.findAllTopics(0, 20), empty());
+        assertThat(qaEventService.findAllTopics(0, 20, ORDER_FIELD, false), empty());
 
         verifyNoInteractions(mockBrokerClient);
     }
@@ -327,7 +330,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 6L)));
 
-        assertThat(qaEventService.findAllTopics(0, 20), containsInAnyOrder(
+        assertThat(qaEventService.findAllTopics(0, 20, ORDER_FIELD, false), containsInAnyOrder(
             QATopicMatcher.with("ENRICH/MORE/PROJECT", 1L),
             QATopicMatcher.with("ENRICH/MORE/PID", 1L),
             QATopicMatcher.with("ENRICH/MISSING/PID", 1L),
@@ -381,7 +384,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 0L)));
 
-        assertThat(qaEventService.findAllTopics(0, 20), empty());
+        assertThat(qaEventService.findAllTopics(0, 20, ORDER_FIELD, false), empty());
 
         verify(mockBrokerClient).listSubscriptions(openaireURL, "user@test.com");
 
@@ -432,7 +435,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         assertThat(qaEventService.findAllSources(0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 6L)));
 
-        assertThat(qaEventService.findAllTopics(0, 20), containsInAnyOrder(
+        assertThat(qaEventService.findAllTopics(0, 20, ORDER_FIELD, false), containsInAnyOrder(
             QATopicMatcher.with("ENRICH/MORE/PROJECT", 1L),
             QATopicMatcher.with("ENRICH/MISSING/PID", 1L),
             QATopicMatcher.with("ENRICH/MORE/PID", 1L),
