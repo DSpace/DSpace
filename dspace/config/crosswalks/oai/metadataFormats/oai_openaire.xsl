@@ -457,6 +457,13 @@
         </oaire:funderIdentifier>
     </xsl:template>
 
+    <!-- This template creates the sub-element <oaire:funderIdentifier> from a Funded Project built entity -->
+    <xsl:template match="doc:field[starts-with(@name,'project.funder.rorIdentifier')]" mode="entity_funding">
+        <oaire:funderIdentifier funderIdentifierType="ROR" schemeURI="http://ror.org/">
+            <xsl:value-of select="./text()"/>
+        </oaire:funderIdentifier>
+    </xsl:template>
+
     <!-- This template creates the sub-element <oaire:fundingStream> from a Funded Project built entity -->
     <xsl:template match="doc:field[starts-with(@name,'oaire.fundingStream')]" mode="entity_funding">
         <oaire:fundingStream>
