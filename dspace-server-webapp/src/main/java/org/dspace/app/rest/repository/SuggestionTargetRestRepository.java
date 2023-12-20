@@ -71,6 +71,9 @@ public class SuggestionTargetRestRepository extends DSpaceRestRepository<Suggest
         List<SuggestionTarget> suggestionTargets = suggestionService.findAllTargets(context, source,
                 pageable.getPageSize(), pageable.getOffset());
         long tot = suggestionService.countAll(context, source);
+        if (suggestionTargets == null) {
+            return null;
+        }
         return converter.toRestPage(suggestionTargets, pageable, tot, utils.obtainProjection());
     }
 
@@ -82,6 +85,9 @@ public class SuggestionTargetRestRepository extends DSpaceRestRepository<Suggest
         List<SuggestionTarget> suggestionTargets = suggestionService.findByTarget(context, target,
                 pageable.getPageSize(), pageable.getOffset());
         long tot = suggestionService.countAllByTarget(context, target);
+        if (suggestionTargets == null) {
+        	return null;
+        }
         return converter.toRestPage(suggestionTargets, pageable, tot, utils.obtainProjection());
     }
 
