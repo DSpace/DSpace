@@ -86,7 +86,7 @@ public class SuggestionTargetRestRepository extends DSpaceRestRepository<Suggest
                 pageable.getPageSize(), pageable.getOffset());
         long tot = suggestionService.countAllByTarget(context, target);
         if (suggestionTargets == null) {
-        	return null;
+            return null;
         }
         return converter.toRestPage(suggestionTargets, pageable, tot, utils.obtainProjection());
     }
