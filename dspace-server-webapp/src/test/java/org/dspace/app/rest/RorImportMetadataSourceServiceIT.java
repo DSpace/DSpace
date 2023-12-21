@@ -54,13 +54,16 @@ public class RorImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
 
             context.restoreAuthSystemState();
             Collection<ImportRecord> recordsImported = rorServiceImpl.getRecords("test query", 0, 2);
-            assertThat(recordsImported, hasSize(10));
+            assertThat(recordsImported, hasSize(20));
 
             ImportRecord record = recordsImported.iterator().next();
 
             assertThat(record.getValueList(), hasSize(11));
 
-            assertThat(record.getSingleValue("dc.title"), is("The University of Texas"));
+            assertThat(
+                record.getSingleValue("organization.legalName"),
+                is("The University of Texas")
+            );
             assertThat(record.getSingleValue("organization.identifier.ror"), is("https://ror.org/02f6dcw23"));
             assertThat(record.getSingleValue("oairecerif.acronym"), is("UTHSCSA"));
             assertThat(record.getSingleValue("oairecerif.identifier.url"), is("http://www.uthscsa.edu/"));
@@ -115,7 +118,10 @@ public class RorImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
             context.restoreAuthSystemState();
             ImportRecord record = rorServiceImpl.getRecord("https://ror.org/01sps7q28");
             assertThat(record.getValueList(), hasSize(9));
-            assertThat(record.getSingleValue("dc.title"), is("The University of Texas Health Science Center at Tyler"));
+            assertThat(
+                record.getSingleValue("organization.legalName"),
+                is("The University of Texas Health Science Center at Tyler")
+            );
             assertThat(record.getSingleValue("organization.identifier.ror"), is("https://ror.org/01sps7q28"));
             assertThat(record.getSingleValue("oairecerif.acronym"), is("UTHSCT"));
             assertThat(record.getSingleValue("oairecerif.identifier.url"),
