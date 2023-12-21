@@ -29,6 +29,7 @@ import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 
@@ -57,6 +58,9 @@ public class RequestItemEmailNotifier {
 
     @Inject
     protected RequestItemService requestItemService;
+
+    @Inject
+    protected EPersonService ePersonService;
 
     protected final RequestItemAuthorExtractor requestItemAuthorExtractor;
 
@@ -190,13 +194,13 @@ public class RequestItemEmailNotifier {
             if (ri.isAccept_request()) {
                 if (ri.isAllfiles()) {
                     Item item = ri.getItem();
+                    EPerson ePerson = ePersonService.findByEmail(context, ri.getReqEmail());
                     List<Bundle> bundles = item.getBundles("ORIGINAL");
                     for (Bundle bundle : bundles) {
                         List<Bitstream> bitstreams = bundle.getBitstreams();
                         for (Bitstream bitstream : bitstreams) {
                             if (!bitstream.getFormat(context).isInternal() &&
-                                    requestItemService.isRestricted(context,
-                                    bitstream)) {
+                                    requestItemService.isRestricted(context, bitstream, ePerson)) {
                                 // #8636 Anyone receiving the email can respond to the
                                 // request without authenticating into DSpace
                                 context.turnOffAuthorisationSystem();
