@@ -88,6 +88,33 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
             SubmissionDefinitionRest def = converter.toRest(
                     submissionConfigService.getSubmissionConfigByCollection(collection.getHandle()), projection);
             witem.setSubmissionDefinition(def);
+            //Define upload of files mandatory or optional per collection
+            String isPropertyRequired =
+                    configurationService.getProperty("webui.submit.upload.required");
+            if (isRequired == null && isPropertyRequired == null) {
+                configurationService.setProperty("webui.submit.upload.required", true);
+            } else if (isRequired != null && isPropertyRequired == null) {
+                configurationService.setProperty("webui.submit.upload.required", isRequired);
+            } else if (isRequired == null && isPropertyRequired != null) {
+                configurationService.setProperty("webui.submit.upload.required",
+                        isPropertyRequired);
+            } else if (isPropertyRequired != null &&
+                    isPropertyRequired.equalsIgnoreCase("false") &&
+                    isRequired != null && isRequired == true) {
+                configurationService.setProperty("webui.submit.upload.required", true);
+            } else if (isPropertyRequired != null &&
+                    isPropertyRequired.equalsIgnoreCase("true")
+                    && isRequired != null &&
+                    isRequired == false) {
+                configurationService.setProperty("webui.submit.upload.required", false);
+            } else if (isPropertyRequired != null &&
+                    isPropertyRequired.equalsIgnoreCase("false")
+                    && isRequired != null &&
+                    isRequired == false) {
+                configurationService.setProperty("webui.submit.upload.required", false);
+            }
+            //Define upload of files mandatory or optional per collection
+
             for (SubmissionSectionRest sections : def.getPanels()) {
                 SubmissionStepConfig stepConfig = submissionSectionConverter.toModel(sections);
 
@@ -104,32 +131,13 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
                 try {
                     stepClass = loader.loadClass(stepConfig.getProcessingClassName());
                     Object stepInstance = stepClass.newInstance();
-                    //Define upload of files mandatory or optional per collection
-                    String isPropertyRequired = configurationService.getProperty("webui.submit.upload.required");
-                    if (isRequired == null && isPropertyRequired == null) {
-                        configurationService.setProperty("webui.submit.upload.required", true);
-                    } else if (isRequired != null && isPropertyRequired == null) {
-                        configurationService.setProperty("webui.submit.upload.required", isRequired);
-                    } else if (isRequired == null && isPropertyRequired != null) {
-                        configurationService.setProperty("webui.submit.upload.required",
-                                isPropertyRequired);
-                    } else if (isPropertyRequired != null &&
-                            isPropertyRequired.equalsIgnoreCase("false") &&
-                            isRequired != null && isRequired == true) {
-                        configurationService.setProperty("webui.submit.upload.required", true);
-                    } else if (isPropertyRequired != null &&
-                            isPropertyRequired.equalsIgnoreCase("true")
-                            && isRequired != null &&
-                            isRequired == false) {
-                        configurationService.setProperty("webui.submit.upload.required", false);
-                    }
-                    //Define upload of files mandatory or optional per collection
 
                     if (stepInstance instanceof DataProcessingStep) {
                         // load the interface for this step
                         DataProcessingStep stepProcessing =
                                 (DataProcessingStep) stepClass.newInstance();
                         for (ErrorRest error : stepProcessing.validate(submissionService, obj, stepConfig)) {
+                            System.out.println("error " + error.getMessage());
                             addError(witem.getErrors(), error);
                         }
                         witem.getSections()
