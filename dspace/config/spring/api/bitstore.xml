@@ -3,7 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" default-lazy-init="true">
 
-    <bean name="org.dspace.storage.bitstore.BitstreamStorageService" class="org.dspace.storage.bitstore.BitstreamStorageServiceImpl">
+    <bean name="org.dspace.storage.bitstore.BitstreamStorageService" class="org.dspace.storage.bitstore.SyncBitstreamStorageServiceImpl">
         <property name="incoming" value="${assetstore.index.primary}"/>
         <property name="stores">
             <map>
@@ -17,7 +17,7 @@
         <property name="baseDir" value="${assetstore.dir}"/>
     </bean>
 
-    <bean name="s3Store" class="org.dspace.storage.bitstore.S3BitStoreService" scope="singleton" lazy-init="true">
+    <bean name="s3Store" class="org.dspace.storage.bitstore.SyncS3BitStoreService" scope="singleton" lazy-init="true">
         <property name="enabled" value="${assetstore.s3.enabled}"/>
         <!-- AWS Security credentials, with policies for specified bucket -->
         <property name="awsAccessKey" value="${assetstore.s3.awsAccessKey}"/>

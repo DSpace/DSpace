@@ -46,6 +46,8 @@ public class BitstreamRest extends DSpaceObjectRest {
     @JsonProperty(access = Access.READ_ONLY)
     private Integer sequenceId;
 
+    private int storeNumber;
+
     public String getBundleName() {
         return bundleName;
     }
@@ -76,6 +78,14 @@ public class BitstreamRest extends DSpaceObjectRest {
 
     public void setSequenceId(Integer sequenceId) {
         this.sequenceId = sequenceId;
+    }
+
+    public int getStoreNumber() {
+        return storeNumber;
+    }
+
+    public void setStoreNumber(int storeNumber) {
+        this.storeNumber = storeNumber;
     }
 
     @Override

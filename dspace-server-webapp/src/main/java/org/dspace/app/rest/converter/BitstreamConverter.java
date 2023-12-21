@@ -45,6 +45,7 @@ public class BitstreamConverter extends DSpaceObjectConverter<Bitstream, Bitstre
         checksum.setValue(obj.getChecksum());
         b.setCheckSum(checksum);
         b.setSizeBytes(obj.getSizeBytes());
+        b.setStoreNumber(obj.getStoreNumber());
         return b;
     }
 
