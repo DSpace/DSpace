@@ -1,14 +1,14 @@
-# E-mail sent to confirm authenticity of the user's e-mail.
-#
-# Parameters: {0} confirmation e-mail
-#             {1} helpdesk email
-#             {2} helpdesk phone number
-#             {3} DSpace name short
-#             {4} DSpace name
-#             {5} DSpace UI url
-#
-# See org.dspace.core.Email for information on the format of this file.
-#
+## E-mail sent to confirm authenticity of the user's e-mail.
+##
+## Parameters: {0} confirmation e-mail
+##             {1} helpdesk email
+##             {2} helpdesk phone number
+##             {3} DSpace name short
+##             {4} DSpace name
+##             {5} DSpace UI url
+##
+## See org.dspace.core.Email for information on the format of this file.
+##
 Subject: ${params[3]}: Account Registration
 To complete registration for a ${params[3]} repository account at {params[5]}, please click the link below:
 
