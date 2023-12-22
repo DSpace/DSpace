@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.LogManager;
@@ -48,7 +47,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-
+import org.springframework.web.util.HtmlUtils;
 /**
  * Component to expose item requests.
  *
@@ -173,11 +172,11 @@ public class RequestItemRepository
             username = user.getFullName();
         } else { // An anonymous session may provide a name.
             // Escape username to evade nasty XSS attempts
-            username = StringEscapeUtils.escapeHtml4(rir.getRequestName());
+            username = HtmlUtils.htmlEscape(rir.getRequestName(),"UTF-8");
         }
 
         // Requester's message text, escaped to evade nasty XSS attempts
-        String message = StringEscapeUtils.escapeHtml4(rir.getRequestMessage());
+        String message = HtmlUtils.htmlEscape(rir.getRequestMessage(),"UTF-8");
 
         // Create the request.
         String token;
@@ -243,7 +242,10 @@ public class RequestItemRepository
         }
 
         JsonNode responseMessageNode = requestBody.findValue("responseMessage");
-        String message = responseMessageNode.asText();
+        String message = null;
+        if (responseMessageNode != null && !responseMessageNode.isNull()) {
+            message = responseMessageNode.asText();
+        }
 
         ri.setDecision_date(new Date());
         requestItemService.update(context, ri);

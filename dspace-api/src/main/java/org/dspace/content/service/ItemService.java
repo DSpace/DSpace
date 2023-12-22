@@ -473,7 +473,7 @@ public interface ItemService
     public void removeGroupPolicies(Context context, Item item, Group group) throws SQLException, AuthorizeException;
 
     /**
-     * remove all policies on an item and its contents, and replace them with
+     * Remove all policies on an item and its contents, and replace them with
      * the DEFAULT_ITEM_READ and DEFAULT_BITSTREAM_READ policies belonging to
      * the collection.
      *
@@ -486,6 +486,26 @@ public interface ItemService
      * @throws AuthorizeException if authorization error
      */
     public void inheritCollectionDefaultPolicies(Context context, Item item, Collection collection)
+        throws java.sql.SQLException, AuthorizeException;
+
+    /**
+     * Remove all submission and workflow policies on an item and its contents, and add
+     * default collection policies which are not yet already in place.
+     * If overrideItemReadPolicies is true, then all read policies on the item are replaced (but only if the
+     * collection has a default read policy).
+     *
+     * @param context                   DSpace context object
+     * @param item                      item to reset policies on
+     * @param collection                Collection
+     * @param overrideItemReadPolicies  if true, all read policies on the item are replaced (but only if the
+     *                                  collection has a default read policy)
+     * @throws SQLException       if database error
+     *                            if an SQL error or if no default policies found. It's a bit
+     *                            draconian, but default policies must be enforced.
+     * @throws AuthorizeException if authorization error
+     */
+    public void inheritCollectionDefaultPolicies(Context context, Item item, Collection collection,
+                                                 boolean overrideItemReadPolicies)
         throws java.sql.SQLException, AuthorizeException;
 
     /**
@@ -508,6 +528,28 @@ public interface ItemService
         throws SQLException, AuthorizeException;
 
     /**
+     * Adjust the Bundle and Bitstream policies to reflect what have been defined
+     * during the submission/workflow. The temporary SUBMISSION and WORKFLOW
+     * policies are removed and the policies defined at the item and collection
+     * level are copied and inherited as appropriate. Custom selected Item policies
+     * are copied to the bundle/bitstream only if no explicit custom policies were
+     * already applied to the bundle/bitstream. Collection's policies are inherited
+     * if there are no other policies defined or if the append mode is defined by
+     * the configuration via the core.authorization.installitem.inheritance-read.append-mode property
+     *
+     * @param context                        DSpace context object
+     * @param item                           Item to adjust policies on
+     * @param collection                     Collection
+     * @param replaceReadRPWithCollectionRP  if true, all read policies on the item are replaced (but only if the
+     *                                       collection has a default read policy)
+     * @throws SQLException       If database error
+     * @throws AuthorizeException If authorization error
+     */
+    public void adjustBundleBitstreamPolicies(Context context, Item item, Collection collection,
+                                              boolean replaceReadRPWithCollectionRP)
+        throws SQLException, AuthorizeException;
+
+    /**
      * Adjust the Bitstream policies to reflect what have been defined
      * during the submission/workflow. The temporary SUBMISSION and WORKFLOW
      * policies are removed and the policies defined at the item and collection
@@ -527,6 +569,29 @@ public interface ItemService
     public void adjustBitstreamPolicies(Context context, Item item, Collection collection, Bitstream bitstream)
         throws SQLException, AuthorizeException;
 
+    /**
+     * Adjust the Bitstream policies to reflect what have been defined
+     * during the submission/workflow. The temporary SUBMISSION and WORKFLOW
+     * policies are removed and the policies defined at the item and collection
+     * level are copied and inherited as appropriate. Custom selected Item policies
+     * are copied to the bitstream only if no explicit custom policies were
+     * already applied to the bitstream. Collection's policies are inherited
+     * if there are no other policies defined or if the append mode is defined by
+     * the configuration via the core.authorization.installitem.inheritance-read.append-mode property
+     *
+     * @param context             DSpace context object
+     * @param item                Item to adjust policies on
+     * @param collection          Collection
+     * @param bitstream           Bitstream to adjust policies on
+     * @param replaceReadRPWithCollectionRP  If true, all read policies on the bitstream are replaced (but only if the
+     *                                       collection has a default read policy)
+     * @throws SQLException       If database error
+     * @throws AuthorizeException If authorization error
+     */
+    public void adjustBitstreamPolicies(Context context, Item item, Collection collection, Bitstream bitstream,
+                                        boolean replaceReadRPWithCollectionRP)
+        throws SQLException, AuthorizeException;
+
 
     /**
      * Adjust the Item's policies to reflect what have been defined during the
@@ -543,6 +608,26 @@ public interface ItemService
      * @throws AuthorizeException  If authorization error
      */
     public void adjustItemPolicies(Context context, Item item, Collection collection)
+        throws SQLException, AuthorizeException;
+
+    /**
+     * Adjust the Item's policies to reflect what have been defined during the
+     * submission/workflow. The temporary SUBMISSION and WORKFLOW policies are
+     * removed and the default policies defined at the collection level are
+     * inherited as appropriate. Collection's policies are inherited if there are no
+     * other policies defined or if the append mode is defined by the configuration
+     * via the core.authorization.installitem.inheritance-read.append-mode property
+     *
+     * @param context                        DSpace context object
+     * @param item                           Item to adjust policies on
+     * @param collection                     Collection
+     * @param replaceReadRPWithCollectionRP  If true, all read policies on the item are replaced (but only if the
+     *                                       collection has a default read policy)
+     * @throws SQLException        If database error
+     * @throws AuthorizeException  If authorization error
+     */
+    public void adjustItemPolicies(Context context, Item item, Collection collection,
+                                   boolean replaceReadRPWithCollectionRP)
         throws SQLException, AuthorizeException;
 
     /**
@@ -790,24 +875,24 @@ public interface ItemService
     int countWithdrawnItems(Context context) throws SQLException;
 
     /**
-     * finds all items for which the current user has editing rights
-     * @param context DSpace context object
-     * @param offset page offset
-     * @param limit  page size limit
-     * @return list of items for which the current user has editing rights
-     * @throws SQLException
-     * @throws SearchServiceException
-     */
+      * finds all items for which the current user has editing rights
+      * @param context DSpace context object
+      * @param offset page offset
+      * @param limit  page size limit
+      * @return list of items for which the current user has editing rights
+      * @throws SQLException
+      * @throws SearchServiceException
+      */
     public List<Item> findItemsWithEdit(Context context, int offset, int limit)
         throws SQLException, SearchServiceException;
 
     /**
-     * counts all items for which the current user has editing rights
-     * @param context DSpace context object
-     * @return list of items for which the current user has editing rights
-     * @throws SQLException
-     * @throws SearchServiceException
-     */
+    * counts all items for which the current user has editing rights
+    * @param context DSpace context object
+    * @return list of items for which the current user has editing rights
+    * @throws SQLException
+    * @throws SearchServiceException
+    */
     public int countItemsWithEdit(Context context) throws SQLException, SearchServiceException;
 
     /**

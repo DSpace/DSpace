@@ -27,7 +27,6 @@ import org.dspace.app.rest.model.WorkflowItemRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.submit.SubmissionService;
-import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -40,6 +39,8 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPersonServiceImpl;
 import org.dspace.services.ConfigurationService;
+import org.dspace.submit.factory.SubmissionServiceFactory;
+import org.dspace.submit.service.SubmissionConfigService;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
@@ -109,10 +110,10 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     @Autowired
     protected XmlWorkflowFactory workflowFactory;
 
-    private final SubmissionConfigReader submissionConfigReader;
+    private SubmissionConfigService submissionConfigService;
 
     public WorkflowItemRestRepository() throws SubmissionConfigReaderException {
-        submissionConfigReader = new SubmissionConfigReader();
+        submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
     }
 
     @Override
