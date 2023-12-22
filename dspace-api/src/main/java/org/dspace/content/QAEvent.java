@@ -36,9 +36,17 @@ public class QAEvent {
     private String source;
 
     private String eventId;
-
+    /**
+     * contains the targeted dspace object,
+     * ie: oai:www.openstarts.units.it:123456789/1120 contains the handle
+     * of the DSpace pbject in its final part 123456789/1120
+     * */
     private String originalId;
 
+    /**
+     * evaluated with the targeted dspace object id
+     * 
+     * */
     private String target;
 
     private String related;

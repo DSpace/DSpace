@@ -29,7 +29,6 @@ public interface QAEventService {
      *
      * @param  context  the DSpace context
      * @param  offset   the offset to apply
-     * @param  pageSize the page size
      * @return          the topics list
      */
     public List<QATopic> findAllTopics(Context context, long offset, long pageSize);

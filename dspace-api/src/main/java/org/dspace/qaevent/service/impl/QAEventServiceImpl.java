@@ -44,8 +44,8 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.qaevent.QASource;
 import org.dspace.qaevent.QATopic;
-import org.dspace.qaevent.dao.QAEventsDao;
-import org.dspace.qaevent.dao.impl.QAEventsDaoImpl;
+import org.dspace.qaevent.dao.QAEventsDAO;
+import org.dspace.qaevent.dao.impl.QAEventsDAOImpl;
 import org.dspace.qaevent.service.QAEventSecurityService;
 import org.dspace.qaevent.service.QAEventService;
 import org.dspace.services.ConfigurationService;
@@ -56,7 +56,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Implementation of {@link QAEventService} that use Solr to store events. When
  * the user performs an action on the event (such as accepting the suggestion or
  * rejecting it) then the event is removed from solr and saved in the database
- * (see {@link QAEventsDao}) so that it is no longer proposed.
+ * (see {@link QAEventsDAO}) so that it is no longer proposed.
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
@@ -73,7 +73,7 @@ public class QAEventServiceImpl implements QAEventService {
     protected ItemService itemService;
 
     @Autowired
-    private QAEventsDaoImpl qaEventsDao;
+    private QAEventsDAOImpl qaEventsDao;
 
     private ObjectMapper jsonMapper;
 

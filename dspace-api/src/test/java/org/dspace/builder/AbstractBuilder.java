@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.alerts.service.SystemWideAlertService;
 import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
 import org.dspace.app.requestitem.service.RequestItemService;
+import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -52,6 +53,8 @@ import org.dspace.qaevent.service.QAEventService;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.submit.factory.SubmissionServiceFactory;
+import org.dspace.submit.service.SubmissionConfigService;
 import org.dspace.supervision.factory.SupervisionOrderServiceFactory;
 import org.dspace.supervision.service.SupervisionOrderService;
 import org.dspace.utils.DSpace;
@@ -109,6 +112,7 @@ public abstract class AbstractBuilder<T, S> {
     static OrcidQueueService orcidQueueService;
     static OrcidTokenService orcidTokenService;
     static SystemWideAlertService systemWideAlertService;
+    static SubmissionConfigService submissionConfigService;
     static SubscribeService subscribeService;
     static SupervisionOrderService supervisionOrderService;
     static QAEventService qaEventService;
@@ -173,6 +177,11 @@ public abstract class AbstractBuilder<T, S> {
         orcidTokenService = OrcidServiceFactory.getInstance().getOrcidTokenService();
         systemWideAlertService = DSpaceServicesFactory.getInstance().getServiceManager()
                                                       .getServicesByType(SystemWideAlertService.class).get(0);
+        try {
+            submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
+        } catch (SubmissionConfigReaderException e) {
+            log.error(e.getMessage(), e);
+        }
         subscribeService = ContentServiceFactory.getInstance().getSubscribeService();
         supervisionOrderService = SupervisionOrderServiceFactory.getInstance().getSupervisionOrderService();
         qaEventService = new DSpace().getSingletonService(QAEventService.class);
@@ -210,6 +219,7 @@ public abstract class AbstractBuilder<T, S> {
         versioningService = null;
         orcidTokenService = null;
         systemWideAlertService = null;
+        submissionConfigService = null;
         subscribeService = null;
         supervisionOrderService = null;
         qaEventService = null;

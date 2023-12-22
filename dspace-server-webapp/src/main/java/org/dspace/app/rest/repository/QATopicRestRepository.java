@@ -20,6 +20,7 @@ import org.dspace.qaevent.service.QAEventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +32,8 @@ import org.springframework.stereotype.Component;
  */
 @Component(QATopicRest.CATEGORY + "." + QATopicRest.NAME)
 public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, String> {
+
+    final static String ORDER_FIELD = "topic";
 
     @Autowired
     private QAEventService qaEventService;

@@ -83,13 +83,14 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
         if (CollectionUtils.isNotEmpty(metadataFields) || StringUtils.isNotBlank(additionalWhere)) {
             //Add the where query on metadata
             query.append(" WHERE ");
+            // Group the 'OR' clauses below in outer parentheses, e.g. "WHERE (clause1 OR clause2 OR clause3)".
+            // Grouping these 'OR' clauses allows for later code to append 'AND' clauses without unexpected behaviors
+            query.append("(");
             for (int i = 0; i < metadataFields.size(); i++) {
                 MetadataField metadataField = metadataFields.get(i);
                 if (StringUtils.isNotBlank(operator)) {
-                    query.append(" (");
                     query.append("lower(STR(" + metadataField.toString()).append(".value)) ").append(operator)
                          .append(" lower(:queryParam)");
-                    query.append(")");
                     if (i < metadataFields.size() - 1) {
                         query.append(" OR ");
                     }
@@ -102,6 +103,7 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
                 }
                 query.append(additionalWhere);
             }
+            query.append(")");
 
         }
     }

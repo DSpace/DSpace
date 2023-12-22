@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.UUID;
 
 /**
- * This model class represent the source/provider of the QA events (as OpenAIRE).
+ * This model class represent the source/provider of the QA events (as Openaire).
  * 
  * @author Luca Giamminonni (luca.giamminonni at 4Science)
  *

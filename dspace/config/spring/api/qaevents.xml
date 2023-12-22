@@ -9,11 +9,11 @@
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
-    <bean id="qaEventsDao" class="org.dspace.qaevent.dao.impl.QAEventsDaoImpl" />
+    <bean id="qaEventsDao" class="org.dspace.qaevent.dao.impl.QAEventsDAOImpl" />
     
     <bean id="openaireBrokerClient" class="eu.dnetlib.broker.BrokerClient" />
     
-    <bean id="brokerClientFactory" class="org.dspace.qaevent.service.impl.BrokerClientFactoryImpl" />
+    <bean id="openaireClientFactory" class="org.dspace.qaevent.service.impl.OpenaireClientFactoryImpl" />
  
      <bean id="org.dspace.qaevent.service.QAEventActionService" class="org.dspace.qaevent.service.impl.QAEventActionServiceImpl">
         <property name="topicsToActions">

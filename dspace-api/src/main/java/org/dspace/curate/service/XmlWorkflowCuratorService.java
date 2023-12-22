@@ -42,9 +42,9 @@ public interface XmlWorkflowCuratorService {
      *
      * @param c the context
      * @param wfi the workflow item
-     * @return true if curation was completed or not required,
+     * @return true if curation was completed or not required;
      *         false if tasks were queued for later completion,
-     *         or item was rejected
+     *         or item was rejected.
      * @throws AuthorizeException if authorization error
      * @throws IOException if IO error
      * @throws SQLException if database error
@@ -58,7 +58,9 @@ public interface XmlWorkflowCuratorService {
      * @param curator the curation context
      * @param c the user context
      * @param wfId the workflow item's ID
-     * @return true if curation failed.
+     * @return true if curation curation was completed or not required;
+     *         false if tasks were queued for later completion,
+     *         or item was rejected.
      * @throws AuthorizeException if authorization error
      * @throws IOException if IO error
      * @throws SQLException if database error
@@ -72,7 +74,9 @@ public interface XmlWorkflowCuratorService {
      * @param curator the curation context
      * @param c the user context
      * @param wfi the workflow item
-     * @return true if curation failed.
+     * @return true if workflow curation was completed or not required;
+     *         false if tasks were queued for later completion,
+     *         or item was rejected.
      * @throws AuthorizeException if authorization error
      * @throws IOException if IO error
      * @throws SQLException if database error

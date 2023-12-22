@@ -25,9 +25,21 @@ public class QAEventBuilder extends AbstractBuilder<QAEvent, QAEventService> {
     private Item item;
     private QAEvent target;
     private String source = QAEvent.OPENAIRE_SOURCE;
+    /**
+     * the title of the DSpace object
+     * */
     private String title;
+    /**
+     * the name of the Quality Assurance Event Topic
+     * */
     private String topic;
+    /**
+     * thr original QA Event imported
+     * */
     private String message;
+    /**
+     * uuid of the targeted DSpace object
+     * */
     private String relatedItem;
     private double trust = 0.5;
     private Date lastUpdate = new Date();
