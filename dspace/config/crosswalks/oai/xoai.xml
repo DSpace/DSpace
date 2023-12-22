@@ -47,7 +47,7 @@
         </Context>
 
         <!--
-            OpenAIRE Guidelines 3.0:
+            Openaire Guidelines 3.0:
 
             - https://guidelines.openaire.eu/
 
@@ -55,10 +55,10 @@
 
             - Predefined DSpace fields don't allow to set this up with a default.
          -->
-        <Context baseurl="openaire" name="OpenAIRE Context">
+        <Context baseurl="openaire" name="Openaire Context">
             <!-- Date format, field prefixes, etc are ensured by the transformer -->
             <Transformer ref="openaireTransformer"/>
-            <!-- OpenAIRE filter -->
+            <!-- Openaire filter -->
             <Filter ref="openAireFilter"/>
             <!-- Just an alias, in fact it returns all items within the driver context -->
             <Set ref="openaireSet"/>
@@ -66,12 +66,12 @@
             <Format ref="oaidc"/>
             <Format ref="mets"/>
             <Description>
-                This contexts complies with OpenAIRE Guidelines for Literature Repositories v3.0.
+                This contexts complies with Openaire Guidelines for Literature Repositories v3.0.
             </Description>
         </Context>
 
         <!--
-            OpenAIRE Guidelines 4.0:
+            Openaire Guidelines 4.0:
 
             - https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/
 
@@ -79,15 +79,15 @@
 
             - Predefined DSpace fields don't allow to set this up with a default.
          -->
-        <Context baseurl="openaire4" name="OpenAIRE 4 Context">
+        <Context baseurl="openaire4" name="Openaire 4 Context">
             <!-- Date format, field prefixes, etc are ensured by the transformer -->
             <Transformer ref="openaire4Transformer"/>
-            <!-- OpenAIRE filter -->
-            <Filter ref="openAIRE4Filter"/>
+            <!-- Openaire filter -->
+            <Filter ref="openaire4Filter"/>
             <!-- Metadata Formats -->
             <Format ref="oaiopenaire"/>
             <Description>
-                This contexts complies with OpenAIRE Guidelines for Literature Repositories v4.0.
+                This contexts complies with Openaire Guidelines for Literature Repositories v4.0.
             </Description>
         </Context>
 
@@ -176,7 +176,7 @@
             <Namespace>http://irdb.nii.ac.jp/oai</Namespace>
             <SchemaLocation>http://irdb.nii.ac.jp/oai/junii2-3-1.xsd</SchemaLocation>
         </Format>
-        <!-- Metadata format based on the OpenAIRE 4.0 guidelines
+        <!-- Metadata format based on the Openaire 4.0 guidelines
              https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/use_of_oai_pmh.html
         -->
         <Format id="oaiopenaire">
@@ -250,13 +250,13 @@
             </Definition>
         </Filter>
 
-        <!-- OpenAIRE filter for records returned by OAI-PMH.
+        <!-- Openaire filter for records returned by OAI-PMH.
              By default, return an Item record:
                * If a Title & Author field both exist
                * AND a valid DRIVER Document Type exists
                * AND Item is either publicly accessible OR Withdrawn (for tombstones)
-               * AND the OpenAIRE "dc.relation" is specified
-             This filter is only used in the OpenAIRE context ([oai]/openaire).
+               * AND the Openaire "dc.relation" is specified
+             This filter is only used in the Openaire context ([oai]/openaire).
         -->
         <Filter id="openAireFilter">
             <Definition>
@@ -319,7 +319,7 @@
             </Definition>
         </Filter>
 
-        <!-- OpenAIRE4 filter for records returned by OAI-PMH.
+        <!-- Openaire4 filter for records returned by OAI-PMH.
              By default, return an Item record:
                 * If it is publicly accessible
                 * * OR it has been withdrawn (in order to display a tombstone record).
@@ -328,7 +328,7 @@
                 * limiting the results only to Publications as expected
              This filter is used by the default context ([oai]/request).
         -->
-        <Filter id="openAIRE4Filter">
+        <Filter id="openaire4Filter">
             <Definition>
                 <And>
                     <LeftCondition>
@@ -457,7 +457,7 @@
 
         <!-- This condition determines if an Item has a "dc.rights" field
              specifying "open access", which is required for DRIVER
-             OR "openAccess", which is required by OpenAIRE. -->
+             OR "openAccess", which is required by Openaire. -->
         <CustomCondition id="driverAccessCondition">
             <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>
@@ -483,7 +483,7 @@
         </CustomCondition>
 
         <!-- This condition determines if an Item has a "dc.relation" field
-             which specifies the openAIRE project ID. -->
+             which specifies the openaire project ID. -->
         <CustomCondition id="openaireRelationCondition">
             <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>

@@ -77,6 +77,7 @@ import org.dspace.orcid.service.OrcidQueueService;
 import org.dspace.orcid.service.OrcidSynchronizationService;
 import org.dspace.orcid.service.OrcidTokenService;
 import org.dspace.profile.service.ResearcherProfileService;
+import org.dspace.qaevent.dao.QAEventsDAO;
 import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.service.VersioningService;
 import org.dspace.workflow.WorkflowItemService;
@@ -169,6 +170,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Autowired(required = true)
     protected SubscribeService subscribeService;
+
+    @Autowired
+    private QAEventsDAO qaEventsDao;
 
     protected ItemServiceImpl() {
         super();
@@ -817,6 +821,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         OrcidToken orcidToken = orcidTokenService.findByProfileItem(context, item);
         if (orcidToken != null) {
             orcidToken.setProfileItem(null);
+        }
+
+        List<QAEventProcessed> qaEvents = qaEventsDao.findByItem(context, item);
+        for (QAEventProcessed qaEvent : qaEvents) {
+            qaEventsDao.delete(context, qaEvent);
         }
 
         //Only clear collections after we have removed everything else from the item

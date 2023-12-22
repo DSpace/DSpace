@@ -1,0 +1,20 @@
+[
+
+	{
+		"originalId": "oai:www.openstarts.units.it:123456789/99998",
+		"title": "Egypt, crossroad of translations and literary interweavings (3rd-6th centuries). A reconsideration of earlier Coptic literature",
+		"topic": "ENRICH/MORE/UNKNOWN",
+		"trust": 1.0
+	},
+	
+	{
+		"originalId": "oai:www.openstarts.units.it:123456789/999991",
+		"title": "Test Publication 2",
+		"topic": "ENRICH/MISSING/ABSTRACT",
+		"trust": 1.0,
+		"message": {
+			"abstracts[0]": "Missing Abstract"
+		}
+	}
+	
+]

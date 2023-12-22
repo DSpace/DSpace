@@ -14,7 +14,7 @@ import javax.xml.bind.JAXBException;
 
 import eu.openaire.jaxb.helper.OpenAIREHandler;
 import eu.openaire.jaxb.model.Response;
-import org.dspace.external.OpenAIRERestConnector;
+import org.dspace.external.OpenaireRestConnector;
 import org.mockito.AdditionalMatchers;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
@@ -22,14 +22,14 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 /**
- * Mock the OpenAIRE external source using a mock rest connector so that query
+ * Mock the Openaire external source using a mock rest connector so that query
  * will be resolved against static test files
  * 
  */
-public class MockOpenAIREFundingDataProvider extends OpenAIREFundingDataProvider {
+public class MockOpenaireFundingDataProvider extends OpenaireFundingDataProvider {
     @Override
     public void init() throws IOException {
-        OpenAIRERestConnector restConnector = Mockito.mock(OpenAIRERestConnector.class);
+        OpenaireRestConnector restConnector = Mockito.mock(OpenaireRestConnector.class);
 
         when(restConnector.searchProjectByKeywords(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt(),
                 ArgumentMatchers.startsWith("mushroom"))).thenAnswer(new Answer<Response>() {
