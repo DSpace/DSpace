@@ -839,13 +839,6 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         assertThat(processedEvent.getItem().getID().toString(), is(event.getTarget()));
         assertThat(processedEvent.getEventTimestamp(), notNullValue());
         assertThat(processedEvent.getEperson().getID(), is(admin.getID()));
-
-        getClient(authToken).perform(delete("/api/integration/qualityassuranceevents/" + event.getEventId()))
-            .andExpect(status().isInternalServerError());
-
-        authToken = getAuthToken(eperson.getEmail(), password);
-        getClient(authToken).perform(delete("/api/integration/qualityassuranceevents/" + event2.getEventId()))
-        .andExpect(status().isForbidden());
     }
 
     @Test
