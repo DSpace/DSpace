@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class WorkflowItemConverter
-    extends AInprogressItemConverter<XmlWorkflowItem, org.dspace.app.rest.model.WorkflowItemRest> {
+        extends AInprogressItemConverter<XmlWorkflowItem, org.dspace.app.rest.model.WorkflowItemRest> {
 
     public WorkflowItemConverter() throws SubmissionConfigReaderException {
         super();
@@ -33,7 +33,7 @@ public class WorkflowItemConverter
     public WorkflowItemRest convert(XmlWorkflowItem obj, Projection projection) {
         WorkflowItemRest witem = new WorkflowItemRest();
         witem.setProjection(projection);
-        fillFromModel(obj, witem, projection,null);
+        fillFromModel(obj, witem, projection);
         return witem;
     }
 

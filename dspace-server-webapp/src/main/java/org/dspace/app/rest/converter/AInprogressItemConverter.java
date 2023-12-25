@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -24,6 +25,8 @@ import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Collection;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.service.CollectionService;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.dspace.submit.factory.SubmissionServiceFactory;
@@ -61,16 +64,20 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
     SubmissionService submissionService;
 
     @Autowired
+    protected CollectionService collectionService;
+    @Autowired
     protected ConfigurationService configurationService;
+
 
     public AInprogressItemConverter() throws SubmissionConfigReaderException {
         submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
     }
 
-    protected void fillFromModel(T obj, R witem, Projection projection, Boolean isRequired) {
+    protected void fillFromModel(T obj, R witem, Projection projection) {
         Collection collection = obj.getCollection();
         Item item = obj.getItem();
         EPerson submitter = null;
+        String isPropertyRequired = configurationService.getProperty("webui.submit.upload.required");
         submitter = obj.getSubmitter();
 
         witem.setId(obj.getID());
@@ -83,38 +90,27 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
         // 1. retrieve the submission definition
         // 2. iterate over the submission section to allow to plugin additional
         // info
-
+        //Define upload of files mandatory or optional per collection
+        Boolean isRequired = null;
+        try {
+            List<MetadataValue> list = collectionService.getMetadata(obj.getCollection()
+                    , "dspace", "upload", "required", null);
+            if (list != null) {
+                Optional<String> optional = list.stream()
+                        .filter(d -> d.getValue() != null)
+                        .map(dd -> dd.getValue()).findFirst();
+                if (optional.isPresent()) {
+                    isRequired = Boolean.parseBoolean(optional.get());
+                }
+            }
+        } catch (Exception e) {
+            isRequired = null;
+            System.out.println("Error" + e.getMessage());
+        }
         if (collection != null) {
             SubmissionDefinitionRest def = converter.toRest(
                     submissionConfigService.getSubmissionConfigByCollection(collection.getHandle()), projection);
             witem.setSubmissionDefinition(def);
-            //Define upload of files mandatory or optional per collection
-            String isPropertyRequired =
-                    configurationService.getProperty("webui.submit.upload.required");
-            if (isRequired == null && isPropertyRequired == null) {
-                configurationService.setProperty("webui.submit.upload.required", true);
-            } else if (isRequired != null && isPropertyRequired == null) {
-                configurationService.setProperty("webui.submit.upload.required", isRequired);
-            } else if (isRequired == null && isPropertyRequired != null) {
-                configurationService.setProperty("webui.submit.upload.required",
-                        isPropertyRequired);
-            } else if (isPropertyRequired != null &&
-                    isPropertyRequired.equalsIgnoreCase("false") &&
-                    isRequired != null && isRequired == true) {
-                configurationService.setProperty("webui.submit.upload.required", true);
-            } else if (isPropertyRequired != null &&
-                    isPropertyRequired.equalsIgnoreCase("true")
-                    && isRequired != null &&
-                    isRequired == false) {
-                configurationService.setProperty("webui.submit.upload.required", false);
-            } else if (isPropertyRequired != null &&
-                    isPropertyRequired.equalsIgnoreCase("false")
-                    && isRequired != null &&
-                    isRequired == false) {
-                configurationService.setProperty("webui.submit.upload.required", false);
-            }
-            //Define upload of files mandatory or optional per collection
-
             for (SubmissionSectionRest sections : def.getPanels()) {
                 SubmissionStepConfig stepConfig = submissionSectionConverter.toModel(sections);
 
@@ -130,14 +126,16 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
                 Class stepClass;
                 try {
                     stepClass = loader.loadClass(stepConfig.getProcessingClassName());
-                    Object stepInstance = stepClass.newInstance();
 
+                    Object stepInstance = stepClass.newInstance();
+                    if (isRequired != null) {
+                        configurationService.setProperty("webui.submit.upload.required", isRequired);
+                    }
                     if (stepInstance instanceof DataProcessingStep) {
                         // load the interface for this step
                         DataProcessingStep stepProcessing =
                                 (DataProcessingStep) stepClass.newInstance();
                         for (ErrorRest error : stepProcessing.validate(submissionService, obj, stepConfig)) {
-                            System.out.println("error " + error.getMessage());
                             addError(witem.getErrors(), error);
                         }
                         witem.getSections()
@@ -156,6 +154,7 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
 
             }
         }
+        configurationService.setProperty("webui.submit.upload.required", isPropertyRequired);
     }
 
     private void addError(List<ErrorRest> errors, ErrorRest toAdd) {

@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
@@ -94,6 +93,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     @Autowired
     BitstreamFormatService bitstreamFormatService;
 
+    @Autowired
     ConfigurationService configurationService;
 
     @Autowired
@@ -135,26 +135,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         if (witem == null) {
             return null;
         }
-        //Define upload of files mandatory or optional per collection
-        Boolean isRequire = null;
-        try {
-            Collection c = witem.getCollection();
-            Optional<String> optional = c.getMetadata().stream()
-                    .filter(d -> d.getMetadataField().getElement().equalsIgnoreCase("upload"))
-                    .map(dd -> dd.getValue()).findFirst();
-            if (optional != null && optional.isPresent()) {
-                if (optional.get().equalsIgnoreCase("true")) {
-                    isRequire = true;
-                } else {
-                    isRequire = false;
-                }
-            } else {
-                isRequire = null;
-            }
-        } catch (Exception e) {
-            isRequire = null;
-        }
-        return workspaceItemConverter.convert(witem, utils.obtainProjection(), isRequire);
+        return converter.toRest(witem, utils.obtainProjection());
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -358,7 +339,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
      * It'll return a 204 if nothing was found
      * @param itemUuid  The UUID for the Item to be used
      * @param pageable  The pageable if present
-     * @return The resulting WorkspaceItem object
+     * @return          The resulting WorkspaceItem object
      */
     @SearchRestMethod(name = "item")
     public WorkspaceItemRest findByItemUuid(@Parameter(value = "uuid", required = true) UUID itemUuid,
