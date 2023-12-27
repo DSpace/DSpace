@@ -10,10 +10,8 @@ package org.dspace.discovery.indexobject;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.apache.solr.common.SolrInputDocument;
@@ -26,7 +24,8 @@ import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Factory implementation implementation for the {@link IndexableLDNNotification}
+ * Factory implementation implementation for the
+ * {@link IndexableLDNNotification}
  *
  * @author Stefano Maffei at 4science.com
  */
@@ -36,21 +35,6 @@ public class LDNMessageEntityIndexFactoryImpl extends IndexFactoryImpl<Indexable
     private LDNMessageService ldnMessageService;
     @Autowired(required = true)
     private ItemService itemService;
-
-    private static final String INCOMING = "Incoming";
-    private static final String OUTGOING = "Outgoing";
-
-    private static final Map<Integer, String> queueStatusMap;
-
-    static {
-        queueStatusMap = new HashMap<>();
-        queueStatusMap.put(LDNMessageEntity.QUEUE_STATUS_QUEUED, "Queued");
-        queueStatusMap.put(LDNMessageEntity.QUEUE_STATUS_PROCESSING, "Processing");
-        queueStatusMap.put(LDNMessageEntity.QUEUE_STATUS_PROCESSED, "Processed");
-        queueStatusMap.put(LDNMessageEntity.QUEUE_STATUS_FAILED, "Failure");
-        queueStatusMap.put(LDNMessageEntity.QUEUE_STATUS_UNTRUSTED, "Untrusted");
-        queueStatusMap.put(LDNMessageEntity.QUEUE_STATUS_UNMAPPED_ACTION, "Failure");
-    }
 
     @Override
     public Iterator<IndexableLDNNotification> findAll(Context context) throws SQLException {
@@ -99,7 +83,7 @@ public class LDNMessageEntityIndexFactoryImpl extends IndexFactoryImpl<Indexable
         // add schema, element, qualifier and full fieldName
         doc.addField("notification_id", ldnMessage.getID());
         doc.addField("queue_status_i", ldnMessage.getQueueStatus());
-        doc.addField("queue_status_s", queueStatusMap.get(ldnMessage.getQueueStatus()));
+        doc.addField("queue_status_s", LDNMessageEntity.getQueueStatus(ldnMessage));
         doc.addField("notification_id", ldnMessage.getID());
         Item item = (Item) ldnMessage.getObject();
         if (item != null) {
@@ -111,11 +95,13 @@ public class LDNMessageEntityIndexFactoryImpl extends IndexFactoryImpl<Indexable
         }
         NotifyServiceEntity origin = ldnMessage.getOrigin();
         if (origin != null) {
-            addFacetIndex(doc, "origin", String.valueOf(origin.getID()), getServiceNameForNotifyServ(origin));
+            addFacetIndex(doc, "origin", String.valueOf(origin.getID()),
+                LDNMessageEntity.getServiceNameForNotifyServ(origin));
         }
         NotifyServiceEntity target = ldnMessage.getOrigin();
         if (target != null) {
-            addFacetIndex(doc, "target", String.valueOf(target.getID()), getServiceNameForNotifyServ(target));
+            addFacetIndex(doc, "target", String.valueOf(target.getID()),
+                LDNMessageEntity.getServiceNameForNotifyServ(target));
         }
         if (ldnMessage.getInReplyTo() != null) {
             doc.addField("in_reply_to", ldnMessage.getInReplyTo().getID());
@@ -127,23 +113,9 @@ public class LDNMessageEntityIndexFactoryImpl extends IndexFactoryImpl<Indexable
         doc.addField("queue_attempts", ldnMessage.getQueueAttempts());
         doc.addField("queue_last_start_time", ldnMessage.getQueueLastStartTime());
         doc.addField("queue_timeout", ldnMessage.getQueueTimeout());
-        doc.addField("notification_type", getNotificationType(ldnMessage));
+        doc.addField("notification_type", LDNMessageEntity.getNotificationType(ldnMessage));
 
         return doc;
-    }
-
-    private String getNotificationType(LDNMessageEntity ldnMessage) {
-        if (ldnMessage.getInReplyTo() != null || ldnMessage.getOrigin() != null) {
-            return INCOMING;
-        }
-        return OUTGOING;
-    }
-
-    private String getServiceNameForNotifyServ(NotifyServiceEntity serviceEntity) {
-        if (serviceEntity != null) {
-            return serviceEntity.getName();
-        }
-        return "self";
     }
 
 }

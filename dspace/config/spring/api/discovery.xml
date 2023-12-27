@@ -113,6 +113,9 @@
                 <!-- OpenAIRE4 guidelines - search for an OrgUnit that have a specific dc.type=FundingOrganization -->
                 <entry key="openAIREFundingAgency" value-ref="openAIREFundingAgency"/>
                 <entry key="eperson_claims" value-ref="eperson_claims"/>
+                <!-- COAR NOTIFY LDN MESSAGES configuration -->
+                <entry key="NOTIFY.incoming" value-ref="NOTIFY.incoming"/>
+                <entry key="NOTIFY.outgoing" value-ref="NOTIFY.outgoing"/>
             </map>
         </property>
         <property name="toIgnoreMetadataFields">
@@ -2120,6 +2123,42 @@
     </bean>
 
 
+    <bean id="ldnMessageEntityBaseConfig"
+        class="org.dspace.discovery.configuration.DiscoveryConfiguration"
+        scope="prototype">
+        <property name="id" value="ldnMessages" />
+        <!--Which sidebar facets are to be displayed -->
+        <property name="sidebarFacets">
+            <list>
+            </list>
+        </property>
+        <!--The search filters which can be used on the discovery search page -->
+        <property name="searchFilters">
+            <list>
+            </list>
+        </property>
+        <!--The sort filters for the discovery search-->
+        <property name="searchSortConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="sortFields">
+                    <list>
+                    	<ref bean="sortLastModified"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <!--Any default filter queries, these filter queries will be used for all
+            queries done by discovery for this configuration -->
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find LDNMessageEntity -->
+                <value>search.resourcetype:LDNMessageEntity</value>
+            </list>
+        </property>
+        <!--Default result per page  -->
+        <property name="defaultRpp" value="10" />
+    </bean>
+
      <!--TagCloud configuration bean for default discovery configuration-->
     <bean id="defaultTagCloudFacetConfiguration" class="org.dspace.discovery.configuration.TagCloudFacetConfiguration">
         <!-- Actual configuration of the tagcloud (colors, sorting, etc.) -->
@@ -2128,6 +2167,28 @@
         <property name="tagCloudFacets">
             <list>
                 <ref bean="searchFilterSubject" />
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="NOTIFY.incoming" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="ldnMessageEntityBaseConfig">
+        <property name="id" value="NOTIFY.incoming"/>
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find LDNMessageEntity -->
+                <value>search.resourcetype:LDNMessageEntity</value>
+                <value>notification_type:Incoming</value>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="NOTIFY.outgoing" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="ldnMessageEntityBaseConfig">
+        <property name="id" value="NOTIFY.incoming"/>
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find LDNMessageEntity -->
+                <value>search.resourcetype:LDNMessageEntity</value>
+                <value>notification_type:Outgoing</value>
             </list>
         </property>
     </bean>
