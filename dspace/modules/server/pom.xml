@@ -12,6 +12,7 @@
     </parent>
 
     <properties>
+        <dspace.version>7.6-SNAPSHOT</dspace.version>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/../../..</root.basedir>
     </properties>
@@ -64,6 +65,31 @@
                 <executions>
                     <execution>
                         <phase>prepare-package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.dspace</groupId>
+                                    <artifactId>dspace-server-webapp</artifactId>
+                                    <version>${dspace.version}</version>
+                                    <type>jar</type>
+                                    <includes>**/static/**,**/*.properties</includes>
+                                    <outputDirectory>${project.build.directory}/additions</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
