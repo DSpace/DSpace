@@ -76,19 +76,14 @@
                         <id>unpack</id>
                         <phase>prepare-package</phase>
                         <goals>
-                            <goal>unpack</goal>
+                            <goal>unpack-dependencies</goal>
                         </goals>
                         <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.dspace</groupId>
-                                    <artifactId>dspace-server-webapp</artifactId>
-                                    <version>${dspace.version}</version>
-                                    <type>jar</type>
-                                    <includes>**/static/**,**/*.properties</includes>
-                                    <outputDirectory>${project.build.directory}/additions</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
+                            <includeScope>runtime</includeScope>
+                            <includeGroupIds>org.dspace</includeGroupIds>
+                            <includeArtifactIds>dspace-server-webapp</includeArtifactIds>
+                            <includes>**/static/**,**/*.properties</includes>
+                            <outputDirectory>${project.build.directory}/additions</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
