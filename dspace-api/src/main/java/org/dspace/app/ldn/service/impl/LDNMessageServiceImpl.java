@@ -238,9 +238,11 @@ public class LDNMessageServiceImpl implements LDNMessageService {
                     } catch (JsonSyntaxException jse) {
                         result = -1;
                         log.error("Unable to read JSON notification from LdnMessage " + msg, jse);
+                        msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_FAILED);
                     } catch (Exception e) {
                         result = -1;
                         log.error(e);
+                        msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_FAILED);
                     } finally {
                         msg.setQueueAttempts(msg.getQueueAttempts() + 1);
                         update(context, msg);
