@@ -148,12 +148,15 @@ public class WebApplication {
                 // Get allowed origins for api and iiif endpoints.
                 // The actuator endpoints are configured using management.endpoints.web.cors.* properties
                 String[] corsAllowedOrigins = configuration
-                    .getCorsAllowedOrigins(configuration.getCorsAllowedOriginsConfig());
+                        .getCorsAllowedOrigins(configuration.getCorsAllowedOriginsConfig());
                 String[] iiifAllowedOrigins = configuration
-                    .getCorsAllowedOrigins(configuration.getIiifAllowedOriginsConfig());
+                        .getCorsAllowedOrigins(configuration.getIiifAllowedOriginsConfig());
+                String[] signpostingAllowedOrigins = configuration
+                        .getCorsAllowedOrigins(configuration.getSignpostingAllowedOriginsConfig());
 
                 boolean corsAllowCredentials = configuration.getCorsAllowCredentials();
                 boolean iiifAllowCredentials = configuration.getIiifAllowCredentials();
+                boolean signpostingAllowCredentials = configuration.getSignpostingAllowCredentials();
                 if (corsAllowedOrigins != null) {
                     registry.addMapping("/api/**").allowedMethods(CorsConfiguration.ALL)
                             // Set Access-Control-Allow-Credentials to "true" and specify which origins are valid
@@ -176,6 +179,18 @@ public class WebApplication {
                             .allowedHeaders("Accept", "Authorization", "Content-Type", "Origin", "X-On-Behalf-Of",
                                 "X-Requested-With", "X-XSRF-TOKEN", "X-CORRELATION-ID", "X-REFERRER",
                                 "x-recaptcha-token")
+                            // Allow list of response headers allowed to be sent by us (the server) to the client
+                            .exposedHeaders("Authorization", "DSPACE-XSRF-TOKEN", "Location", "WWW-Authenticate");
+                }
+                if (signpostingAllowedOrigins != null) {
+                    registry.addMapping("/signposting/**").allowedMethods(CorsConfiguration.ALL)
+                            // Set Access-Control-Allow-Credentials to "true" and specify which origins are valid
+                            // for our Access-Control-Allow-Origin header
+                            .allowCredentials(signpostingAllowCredentials).allowedOrigins(signpostingAllowedOrigins)
+                            // Allow list of request preflight headers allowed to be sent to us from the client
+                            .allowedHeaders("Accept", "Authorization", "Content-Type", "Origin", "X-On-Behalf-Of",
+                                    "X-Requested-With", "X-XSRF-TOKEN", "X-CORRELATION-ID", "X-REFERRER",
+                                    "x-recaptcha-token", "access-control-allow-headers")
                             // Allow list of response headers allowed to be sent by us (the server) to the client
                             .exposedHeaders("Authorization", "DSPACE-XSRF-TOKEN", "Location", "WWW-Authenticate");
                 }

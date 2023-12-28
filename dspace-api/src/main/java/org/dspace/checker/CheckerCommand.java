@@ -245,7 +245,7 @@ public final class CheckerCommand {
         info.setProcessStartDate(new Date());
 
         try {
-            Map checksumMap = bitstreamStorageService.computeChecksum(context, info.getBitstream());
+            Map<String, Object> checksumMap = bitstreamStorageService.computeChecksum(context, info.getBitstream());
             if (MapUtils.isNotEmpty(checksumMap)) {
                 info.setBitstreamFound(true);
                 if (checksumMap.containsKey("checksum")) {
@@ -255,10 +255,16 @@ public final class CheckerCommand {
                 if (checksumMap.containsKey("checksum_algorithm")) {
                     info.setChecksumAlgorithm(checksumMap.get("checksum_algorithm").toString());
                 }
+
+                // compare new checksum to previous checksum
+                info.setChecksumResult(compareChecksums(info.getExpectedChecksum(), info.getCurrentChecksum()));
+
+            } else {
+                info.setCurrentChecksum("");
+                info.setChecksumResult(getChecksumResultByCode(ChecksumResultCode.BITSTREAM_NOT_FOUND));
+                info.setToBeProcessed(false);
             }
 
-            // compare new checksum to previous checksum
-            info.setChecksumResult(compareChecksums(info.getExpectedChecksum(), info.getCurrentChecksum()));
         } catch (IOException e) {
             // bitstream located, but file missing from asset store
             info.setChecksumResult(getChecksumResultByCode(ChecksumResultCode.BITSTREAM_NOT_FOUND));

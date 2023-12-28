@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
+import static org.dspace.app.rest.model.BrowseIndexRest.BROWSE_TYPE_VALUE_LIST;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
@@ -19,6 +20,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.Period;
 
 import org.dspace.app.rest.matcher.BrowseEntryResourceMatcher;
 import org.dspace.app.rest.matcher.BrowseIndexMatcher;
@@ -63,22 +66,23 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
 
-                   //Our default Discovery config has 4 browse indexes so we expect this to be reflected in the page
+                   //Our default Discovery config has 5 browse indexes, so we expect this to be reflected in the page
                    // object
                    .andExpect(jsonPath("$.page.size", is(20)))
-                   .andExpect(jsonPath("$.page.totalElements", is(4)))
+                   .andExpect(jsonPath("$.page.totalElements", is(5)))
                    .andExpect(jsonPath("$.page.totalPages", is(1)))
                    .andExpect(jsonPath("$.page.number", is(0)))
 
-                   //The array of browse index should have a size 4
-                   .andExpect(jsonPath("$._embedded.browses", hasSize(4)))
+                   //The array of browse index should have a size 5
+                   .andExpect(jsonPath("$._embedded.browses", hasSize(5)))
 
                    //Check that all (and only) the default browse indexes are present
                    .andExpect(jsonPath("$._embedded.browses", containsInAnyOrder(
                        BrowseIndexMatcher.dateIssuedBrowseIndex("asc"),
                        BrowseIndexMatcher.contributorBrowseIndex("asc"),
                        BrowseIndexMatcher.titleBrowseIndex("asc"),
-                       BrowseIndexMatcher.subjectBrowseIndex("asc")
+                       BrowseIndexMatcher.subjectBrowseIndex("asc"),
+                       BrowseIndexMatcher.hierarchicalBrowseIndex("srsc")
                    )))
         ;
     }
@@ -122,6 +126,21 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
 
                    //Check that the JSON root matches the expected browse index
                    .andExpect(jsonPath("$", BrowseIndexMatcher.contributorBrowseIndex("asc")))
+        ;
+    }
+
+    @Test
+    public void findBrowseByVocabulary() throws Exception {
+        //Use srsc as this vocabulary is included by default
+        //When we call the root endpoint
+        getClient().perform(get("/api/discover/browses/srsc"))
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   //We expect the content type to be "application/hal+json;charset=UTF-8"
+                   .andExpect(content().contentType(contentType))
+
+                   //Check that the JSON root matches the expected browse index
+                   .andExpect(jsonPath("$", BrowseIndexMatcher.hierarchicalBrowseIndex("srsc")))
         ;
     }
 
@@ -759,7 +778,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                         .withIssueDate("2017-08-10")
                                         .withAuthor("Mouse, Mickey")
                                         .withSubject("Cartoons").withSubject("Mice")
-                                        .withEmbargoPeriod("12 months")
+                                        .withEmbargoPeriod(Period.ofMonths(12))
                                         .build();
 
         //5. An item that is only readable for an internal groups
@@ -892,7 +911,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                         .withIssueDate("2017-08-10")
                                         .withAuthor("Mouse, Mickey")
                                         .withSubject("Cartoons").withSubject("Mice")
-                                        .withEmbargoPeriod("12 months")
+                                        .withEmbargoPeriod(Period.ofMonths(12))
                                         .build();
 
         //5. An item that is only readable for an internal groups
@@ -2142,7 +2161,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 // The browse definition ID should be "author"
                 .andExpect(jsonPath("$.id", is("author")))
                 // It should be configured as a metadata browse
-                .andExpect(jsonPath("$.metadataBrowse", is(true)))
+                .andExpect(jsonPath("$.browseType", is(BROWSE_TYPE_VALUE_LIST)))
         ;
     }
 
@@ -2159,7 +2178,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 // The browse definition ID should be "author"
                 .andExpect(jsonPath("$.id", is("author")))
                 // It should be configured as a metadata browse
-                .andExpect(jsonPath("$.metadataBrowse", is(true)));
+                .andExpect(jsonPath("$.browseType", is(BROWSE_TYPE_VALUE_LIST)));
     }
 
     @Test

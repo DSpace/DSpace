@@ -30,6 +30,7 @@ import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,7 +40,8 @@ import org.springframework.stereotype.Component;
  * @author Ben Bosman (ben at atmire dot com)
  */
 @Component
-public class VersionedHandleIdentifierProviderWithCanonicalHandles extends IdentifierProvider {
+public class VersionedHandleIdentifierProviderWithCanonicalHandles extends IdentifierProvider
+    implements InitializingBean {
     /**
      * log4j category
      */
@@ -65,6 +67,19 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
     @Autowired(required = true)
     private ItemService itemService;
 
+    /**
+     * After all the properties are set check that the versioning is enabled
+     *
+     * @throws Exception throws an exception if this isn't the case
+     */
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if (!configurationService.getBooleanProperty("versioning.enabled", true)) {
+            throw new RuntimeException("the " + VersionedHandleIdentifierProviderWithCanonicalHandles.class.getName() +
+                    " is enabled, but the versioning is disabled.");
+        }
+    }
+
     @Override
     public boolean supports(Class<? extends Identifier> identifier) {
         return Handle.class.isAssignableFrom(identifier);
@@ -80,11 +95,11 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
         String id = mint(context, dso);
 
         // move canonical to point the latest version
-        if (dso != null && dso.getType() == Constants.ITEM) {
+        if (dso.getType() == Constants.ITEM && dso instanceof Item) {
             Item item = (Item) dso;
-            VersionHistory history = null;
+            VersionHistory history;
             try {
-                history = versionHistoryService.findByItem(context, (Item) dso);
+                history = versionHistoryService.findByItem(context, item);
             } catch (SQLException ex) {
                 throw new RuntimeException("A problem with the database connection occured.", ex);
             }
@@ -165,45 +180,46 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
     @Override
     public void register(Context context, DSpaceObject dso, String identifier) {
         try {
+            if (dso instanceof Item) {
+                Item item = (Item) dso;
+                // if this identifier is already present in the Handle table and the corresponding item
+                // has a history, then someone is trying to restore the latest version for the item. When
+                // trying to restore the latest version, the identifier in input doesn't have the
+                // 1234/123.latestVersion. Instead, it is the canonical 1234/123
+                VersionHistory itemHistory = getHistory(context, identifier);
+                if (!identifier.matches(".*/.*\\.\\d+") && itemHistory != null) {
 
-            Item item = (Item) dso;
+                    int newVersionNumber = versionHistoryService.getLatestVersion(context, itemHistory)
+                                                                .getVersionNumber() + 1;
+                    String canonical = identifier;
+                    identifier = identifier.concat(".").concat("" + newVersionNumber);
+                    restoreItAsVersion(context, dso, identifier, item, canonical, itemHistory);
+                } else if (identifier.matches(".*/.*\\.\\d+")) {
+                    // if identifier == 1234.5/100.4 reinstate the version 4 in the version table if absent
 
-            // if for this identifier is already present a record in the Handle table and the corresponding item
-            // has an history someone is trying to restore the latest version for the item. When
-            // trying to restore the latest version the identifier in input doesn't have the for 1234/123.latestVersion
-            // it is the canonical 1234/123
-            VersionHistory itemHistory = getHistory(context, identifier);
-            if (!identifier.matches(".*/.*\\.\\d+") && itemHistory != null) {
-
-                int newVersionNumber = versionHistoryService.getLatestVersion(context, itemHistory)
-                                                            .getVersionNumber() + 1;
-                String canonical = identifier;
-                identifier = identifier.concat(".").concat("" + newVersionNumber);
-                restoreItAsVersion(context, dso, identifier, item, canonical, itemHistory);
-            } else if (identifier.matches(".*/.*\\.\\d+")) {
-                // if identifier == 1234.5/100.4 reinstate the version 4 in the version table if absent
-
-                // if it is a version of an item is needed to put back the record
-                // in the versionitem table
-                String canonical = getCanonical(identifier);
-                DSpaceObject canonicalItem = this.resolve(context, canonical);
-                if (canonicalItem == null) {
-                    restoreItAsCanonical(context, dso, identifier, item, canonical);
-                } else {
-                    VersionHistory history = versionHistoryService.findByItem(context, (Item) canonicalItem);
-                    if (history == null) {
+                    // if it is a version of an item is needed to put back the record
+                    // in the versionitem table
+                    String canonical = getCanonical(identifier);
+                    DSpaceObject canonicalItem = this.resolve(context, canonical);
+                    if (canonicalItem == null) {
                         restoreItAsCanonical(context, dso, identifier, item, canonical);
                     } else {
-                        restoreItAsVersion(context, dso, identifier, item, canonical, history);
+                        VersionHistory history = versionHistoryService.findByItem(context, (Item) canonicalItem);
+                        if (history == null) {
+                            restoreItAsCanonical(context, dso, identifier, item, canonical);
+                        } else {
+                            restoreItAsVersion(context, dso, identifier, item, canonical, history);
 
+                        }
                     }
-                }
-            } else {
-                //A regular handle
-                createNewIdentifier(context, dso, identifier);
-                if (dso instanceof Item) {
+                } else {
+                    // A regular handle to create for an Item
+                    createNewIdentifier(context, dso, identifier);
                     modifyHandleMetadata(context, item, getCanonical(identifier));
                 }
+            } else {
+                // Handle being registered for a different type of object (e.g. Collection or Community)
+                createNewIdentifier(context, dso, identifier);
             }
         } catch (IOException | SQLException | AuthorizeException e) {
             log.error(LogHelper.getHeader(context,
@@ -306,6 +322,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
     public DSpaceObject resolve(Context context, String identifier, String... attributes) {
         // We can do nothing with this, return null
         try {
+            identifier = handleService.parseHandle(identifier);
             return handleService.resolveToObject(context, identifier);
         } catch (IllegalStateException | SQLException e) {
             log.error(LogHelper.getHeader(context, "Error while resolving handle to item", "handle: " + identifier),
@@ -424,6 +441,19 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
             if (handleService.resolveToObject(context, identifierPreviousItem) == null) {
                 handleService.createHandle(context, previous.getItem(), identifierPreviousItem, true);
             }
+        }
+
+        DSpaceObject itemWithCanonicalHandle = handleService.resolveToObject(context, canonical);
+        if (itemWithCanonicalHandle != null) {
+            if (itemWithCanonicalHandle.getID() != previous.getItem().getID()) {
+                log.warn("The previous version's item (" + previous.getItem().getID() +
+                        ") does not match with the item containing handle " + canonical +
+                        " (" + itemWithCanonicalHandle.getID() + ")");
+            }
+            // Move the original handle from whatever item it's on to the newest version
+            handleService.modifyHandleDSpaceObject(context, canonical, dso);
+        } else {
+            handleService.createHandle(context, dso, canonical);
         }
 
         // add a new Identifier for this item: 12345/100.x

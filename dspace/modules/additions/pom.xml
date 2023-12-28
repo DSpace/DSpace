@@ -17,7 +17,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>7.6-SNAPSHOT</version>
+      <version>8.0-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -61,22 +61,6 @@
    </build>
 
    <profiles>
-      <profile>
-         <id>oracle-support</id>
-         <activation>
-            <property>
-               <name>db.name</name>
-               <value>oracle</value>
-            </property>
-         </activation>
-         <dependencies>
-            <dependency>
-               <groupId>com.oracle</groupId>
-               <artifactId>ojdbc6</artifactId>
-            </dependency>
-         </dependencies>
-      </profile>
-
       <!-- Setup the Unit Test Environment (when -DskipUnitTests=false) -->
       <profile>
          <id>unit-test-environment</id>

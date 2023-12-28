@@ -28,7 +28,8 @@ services:
       # proxies.trusted.ipranges: This setting is required for a REST API running in Docker to trust requests
       # from the host machine. This IP range MUST correspond to the 'dspacenet' subnet defined above.
       proxies__P__trusted__P__ipranges: '172.23.0'
-    image: "${DOCKER_OWNER:-dspace}/dspace:${DSPACE_VER:-dspace-7_x-test}"
+      LOGGING_CONFIG: /dspace/config/log4j2-container.xml
+    image: "${DOCKER_OWNER:-dspace}/dspace:${DSPACE_VER:-latest-test}"
     build:
       context: .
       dockerfile: Dockerfile.test
@@ -62,13 +63,17 @@ services:
       while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
       /dspace/bin/dspace database migrate
       catalina.sh run
-  # DSpace database container
+  # DSpace PostgreSQL database container
   dspacedb:
     container_name: dspacedb
+    # Uses a custom Postgres image with pgcrypto installed
+    image: "${DOCKER_OWNER:-dspace}/dspace-postgres-pgcrypto:${DSPACE_VER:-latest}"
+    build:
+      # Must build out of subdirectory to have access to install script for pgcrypto
+      context: ./dspace/src/main/docker/dspace-postgres-pgcrypto/
     environment:
       PGDATA: /pgdata
-    # Uses a custom Postgres image with pgcrypto installed
-    image: dspace/dspace-postgres-pgcrypto
+      POSTGRES_PASSWORD: dspace
     networks:
       dspacenet:
     ports:
@@ -77,11 +82,12 @@ services:
     stdin_open: true
     tty: true
     volumes:
+    # Keep Postgres data directory between reboots
     - pgdata:/pgdata
   # DSpace Solr container
   dspacesolr:
     container_name: dspacesolr
-    image: "${DOCKER_OWNER:-dspace}/dspace-solr:${DSPACE_VER:-dspace-7_x}"
+    image: "${DOCKER_OWNER:-dspace}/dspace-solr:${DSPACE_VER:-latest}"
     build:
       context: .
       dockerfile: ./dspace/src/main/docker/dspace-solr/Dockerfile
@@ -115,6 +121,8 @@ services:
       cp -r /opt/solr/server/solr/configsets/search/* search
       precreate-core statistics /opt/solr/server/solr/configsets/statistics
       cp -r /opt/solr/server/solr/configsets/statistics/* statistics
+      precreate-core qaevent /opt/solr/server/solr/configsets/qaevent
+      cp -r /opt/solr/server/solr/configsets/qaevent/* qaevent
       exec solr -f
 volumes:
   assetstore:

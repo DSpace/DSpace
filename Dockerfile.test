@@ -1,16 +1,17 @@
 # This image will be published as dspace/dspace
 # See https://github.com/DSpace/DSpace/tree/main/dspace/src/main/docker for usage details
 #
-# - note: default tag for branch: dspace/dspace: dspace/dspace:dspace-7_x-test
+# - note: default tag for branch: dspace/dspace: dspace/dspace:latest-test
 #
 # This image is meant for TESTING/DEVELOPMENT ONLY as it deploys the old v6 REST API under HTTP (not HTTPS)
 
 # This Dockerfile uses JDK11 by default, but has also been tested with JDK17.
 # To build with JDK17, use "--build-arg JDK_VERSION=17"
 ARG JDK_VERSION=11
+ARG DSPACE_VERSION=latest
 
 # Step 1 - Run Maven Build
-FROM dspace/dspace-dependencies:dspace-7_x as build
+FROM dspace/dspace-dependencies:${DSPACE_VERSION} as build
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 # The dspace-installer directory will be written to /install
