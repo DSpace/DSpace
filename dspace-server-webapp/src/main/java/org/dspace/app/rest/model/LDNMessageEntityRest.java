@@ -18,6 +18,7 @@ import org.dspace.app.rest.RestResourceController;
 public class LDNMessageEntityRest extends BaseObjectRest<String> {
 
     public static final String NAME = "message";
+    public static final String NAME_PLURALS = "messages";
     public static final String CATEGORY = RestAddressableModel.LDN;
 
     private String notificationId;

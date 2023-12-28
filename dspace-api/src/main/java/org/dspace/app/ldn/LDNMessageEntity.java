@@ -38,8 +38,8 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
     /*
      * Notification Type constants
      */
-    private static final String TYPE_INCOMING = "Incoming";
-    private static final String TYPE_OUTGOING = "Outgoing";
+    public static final String TYPE_INCOMING = "Incoming";
+    public static final String TYPE_OUTGOING = "Outgoing";
    /**
     * Message queued, it has to be elaborated.
     */

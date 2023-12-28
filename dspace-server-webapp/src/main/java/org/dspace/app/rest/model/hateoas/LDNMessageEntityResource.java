@@ -9,6 +9,7 @@ package org.dspace.app.rest.model.hateoas;
 
 import org.dspace.app.rest.model.LDNMessageEntityRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
+import org.dspace.app.rest.utils.Utils;
 
 /**
  * Browse Entry Rest HAL Resource. The HAL Resource wraps the REST Resource
@@ -17,10 +18,10 @@ import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
  * @author Stefano Maffei (stefano.maffei at 4science.com)
  */
 @RelNameDSpaceResource(LDNMessageEntityRest.NAME)
-public class LDNMessageEntityResource extends HALResource<LDNMessageEntityRest> {
+public class LDNMessageEntityResource extends DSpaceResource<LDNMessageEntityRest> {
 
-    public LDNMessageEntityResource(LDNMessageEntityRest content) {
-        super(content);
+    public LDNMessageEntityResource(LDNMessageEntityRest data, Utils utils) {
+        super(data, utils);
     }
 
 }

@@ -2187,7 +2187,7 @@
             <list>
                 <!--Only find LDNMessageEntity -->
                 <value>search.resourcetype:LDNMessageEntity</value>
-                <value>notification_type:Incoming</value>
+                <value>notification_type:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_INCOMING}</value>
             </list>
         </property>
     </bean>
@@ -2198,7 +2198,7 @@
             <list>
                 <!--Only find LDNMessageEntity -->
                 <value>search.resourcetype:LDNMessageEntity</value>
-                <value>notification_type:Incoming</value>
+                <value>notification_type:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_INCOMING}</value>
                 <value>in_reply_to:*</value>
                 <value>activity_stream_type:Accept</value>
                 <value>queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_PROCESSED}</value>
@@ -2212,7 +2212,7 @@
             <list>
                 <!--Only find LDNMessageEntity -->
                 <value>search.resourcetype:LDNMessageEntity</value>
-                <value>notification_type:Incoming</value>
+                <value>notification_type:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_INCOMING}</value>
                 <value>queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_PROCESSED}</value>
             </list>
         </property>
@@ -2224,7 +2224,7 @@
             <list>
                 <!--Only find LDNMessageEntity -->
                 <value>search.resourcetype:LDNMessageEntity</value>
-                <value>notification_type:Incoming</value>
+                <value>notification_type:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_INCOMING}</value>
                 <value>queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_FAILED} OR queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_UNMAPPED_ACTION}</value>
             </list>
         </property>
@@ -2236,7 +2236,7 @@
             <list>
                 <!--Only find LDNMessageEntity -->
                 <value>search.resourcetype:LDNMessageEntity</value>
-                <value>notification_type:Incoming</value>
+                <value>notification_type:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_INCOMING}</value>
                 <value>queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_UNTRUSTED}</value>
             </list>
         </property>
@@ -2248,7 +2248,7 @@
             <list>
                 <!--Only find LDNMessageEntity -->
                 <value>search.resourcetype:LDNMessageEntity</value>
-                <value>notification_type:Outgoing</value>
+                <value>notification_type:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_OUTGOING}</value>
             </list>
         </property>
     </bean>
@@ -2259,7 +2259,7 @@
             <list>
                 <!--Only find LDNMessageEntity -->
                 <value>search.resourcetype:LDNMessageEntity</value>
-                <value>notification_type:Outgoing</value>
+                <value>notification_type:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_OUTGOING}</value>
                 <value>queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_PROCESSED}</value>
             </list>
         </property>
@@ -2271,7 +2271,7 @@
             <list>
                 <!--Only find LDNMessageEntity -->
                 <value>search.resourcetype:LDNMessageEntity</value>
-                <value>notification_type:Outgoing</value>
+                <value>notification_type:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_OUTGOING}</value>
                 <value>queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_QUEUED}</value>
             </list>
         </property>
@@ -2283,7 +2283,7 @@
             <list>
                 <!--Only find LDNMessageEntity -->
                 <value>search.resourcetype:LDNMessageEntity</value>
-                <value>notification_type:Outgoing</value>
+                <value>notification_type:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_OUTGOING}</value>
                 <value>queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_QUEUED_FOR_RETRY}</value>
             </list>
         </property>
@@ -2295,7 +2295,7 @@
             <list>
                 <!--Only find LDNMessageEntity -->
                 <value>search.resourcetype:LDNMessageEntity</value>
-                <value>notification_type:Outgoing</value>
+                <value>notification_type:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_OUTGOING}</value>
                 <value>queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_FAILED} OR queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_UNMAPPED_ACTION}</value>
             </list>
         </property>
