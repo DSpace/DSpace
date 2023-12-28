@@ -12,7 +12,7 @@
     </parent>
 
     <properties>
-        <dspace.version>7.6-SNAPSHOT</dspace.version>
+        <dspace.version>8.0-SNAPSHOT</dspace.version>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/../../..</root.basedir>
     </properties>
