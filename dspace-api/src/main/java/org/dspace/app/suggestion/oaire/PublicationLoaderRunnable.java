@@ -5,14 +5,13 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.suggestion;
+package org.dspace.app.suggestion.oaire;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
-import org.dspace.app.suggestion.oaire.OAIREPublicationLoader;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
@@ -32,12 +31,12 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Alessandro Martelli (alessandro.martelli at 4science.it)
  */
-public class OAIREPublicationLoaderRunnable
-    extends DSpaceRunnable<OAIREPublicationLoaderScriptConfiguration<OAIREPublicationLoaderRunnable>> {
+public class PublicationLoaderRunnable
+    extends DSpaceRunnable<PublicationLoaderScriptConfiguration<PublicationLoaderRunnable>> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OAIREPublicationLoaderRunnable.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PublicationLoaderRunnable.class);
 
-    private OAIREPublicationLoader oairePublicationLoader = null;
+    private PublicationLoader oairePublicationLoader = null;
 
     protected Context context;
 
@@ -45,9 +44,9 @@ public class OAIREPublicationLoaderRunnable
 
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public OAIREPublicationLoaderScriptConfiguration<OAIREPublicationLoaderRunnable> getScriptConfiguration() {
-        OAIREPublicationLoaderScriptConfiguration configuration = new DSpace().getServiceManager()
-                .getServiceByName("import-oaire-suggestions", OAIREPublicationLoaderScriptConfiguration.class);
+    public PublicationLoaderScriptConfiguration<PublicationLoaderRunnable> getScriptConfiguration() {
+        PublicationLoaderScriptConfiguration configuration = new DSpace().getServiceManager()
+                .getServiceByName("import-oaire-suggestions", PublicationLoaderScriptConfiguration.class);
         return configuration;
     }
 
@@ -55,7 +54,7 @@ public class OAIREPublicationLoaderRunnable
     public void setup() throws ParseException {
 
         oairePublicationLoader = new DSpace().getServiceManager().getServiceByName(
-                "OAIREPublicationLoader", OAIREPublicationLoader.class);
+                "OpenairePublicationLoader", PublicationLoader.class);
 
         profile = commandLine.getOptionValue("s");
         if (profile == null) {

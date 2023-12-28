@@ -97,9 +97,9 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkaccesscontrol.BulkAccessControlCli"/>
     </bean>
 
-    <bean id="import-oaire-suggestions" class="org.dspace.app.suggestion.OAIREPublicationLoaderCliScriptConfiguration">
+    <bean id="import-oaire-suggestions" class="org.dspace.app.suggestion.oaire.PublicationLoaderCliScriptConfiguration">
        <property name="description" value="Import and store locally metadata from OpenAIRE"/>
-       <property name="dspaceRunnableClass" value="org.dspace.app.suggestion.OAIREPublicationLoaderRunnableCli"/>
+       <property name="dspaceRunnableClass" value="org.dspace.app.suggestion.oaire.PublicationLoaderRunnableCli"/>
     </bean>
 
 </beans>

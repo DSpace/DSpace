@@ -18,11 +18,11 @@
  
 	 <util:map id="suggestionProviders" map-class="java.util.HashMap" 
 	          key-type="java.lang.String" value-type="org.dspace.app.suggestion.SuggestionProvider">
-	    <entry key="oaire" value-ref="OAIREPublicationLoader" />
+	    <entry key="openaire" value-ref="OpenairePublicationLoader" />
 	</util:map>
 
-    <bean id="OAIREPublicationLoader" class="org.dspace.app.suggestion.oaire.OAIREPublicationLoader">
-        <property name="sourceName" value="oaire" />
+    <bean id="OpenairePublicationLoader" class="org.dspace.app.suggestion.oaire.PublicationLoader">
+        <property name="sourceName" value="openaire" />
         <property name="primaryProvider" ref="openaireLiveImportDataProviderByAuthor" />
         <property name="otherProviders">
             <list>

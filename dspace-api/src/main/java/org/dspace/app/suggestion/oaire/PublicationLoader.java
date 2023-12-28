@@ -33,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
  *
  */
-public class OAIREPublicationLoader extends SolrSuggestionProvider {
+public class PublicationLoader extends SolrSuggestionProvider {
 
     private List<String> names;
 

@@ -5,19 +5,19 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.suggestion;
+package org.dspace.app.suggestion.oaire;
 
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.ParseException;
 import org.dspace.utils.DSpace;
 
-public class OAIREPublicationLoaderRunnableCli extends OAIREPublicationLoaderRunnable {
+public class PublicationLoaderRunnableCli extends PublicationLoaderRunnable {
 
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public OAIREPublicationLoaderCliScriptConfiguration getScriptConfiguration() {
-        OAIREPublicationLoaderCliScriptConfiguration configuration = new DSpace().getServiceManager()
-                .getServiceByName("import-oaire-suggestions", OAIREPublicationLoaderCliScriptConfiguration.class);
+    public PublicationLoaderCliScriptConfiguration getScriptConfiguration() {
+        PublicationLoaderCliScriptConfiguration configuration = new DSpace().getServiceManager()
+                .getServiceByName("import-oaire-suggestions", PublicationLoaderCliScriptConfiguration.class);
         return configuration;
     }
 

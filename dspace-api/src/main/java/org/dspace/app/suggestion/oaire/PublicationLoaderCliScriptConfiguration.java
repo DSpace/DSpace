@@ -5,17 +5,17 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.suggestion;
+package org.dspace.app.suggestion.oaire;
 
 import org.apache.commons.cli.Options;
 
 /**
- * Extension of {@link OAIREPublicationLoaderScriptConfiguration} for CLI.
+ * Extension of {@link PublicationLoaderScriptConfiguration} for CLI.
  *
  * @author Alessandro Martelli (alessandro.martelli at 4science.it)
  */
-public class OAIREPublicationLoaderCliScriptConfiguration<T extends OAIREPublicationLoaderRunnable>
-    extends OAIREPublicationLoaderScriptConfiguration<T> {
+public class PublicationLoaderCliScriptConfiguration<T extends PublicationLoaderRunnable>
+    extends PublicationLoaderScriptConfiguration<T> {
 
     @Override
     public Options getOptions() {

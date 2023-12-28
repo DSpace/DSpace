@@ -12,7 +12,7 @@ import org.dspace.content.Item;
 import org.dspace.external.model.ExternalDataObject;
 
 /**
- * Interface used in {@see org.dspace.app.suggestion.oaire.OAIREPublicationApproverServiceImpl}
+ * Interface used in {@see org.dspace.app.suggestion.oaire.PublicationApproverServiceImpl}
  * to construct filtering pipeline.
  * 
  * For each EvidenceScorer, the service call computeEvidence method.
