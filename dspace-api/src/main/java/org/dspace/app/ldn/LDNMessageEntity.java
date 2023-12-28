@@ -46,6 +46,11 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
     public static final Integer QUEUE_STATUS_QUEUED = 1;
 
     /**
+     * Message queued for retry, it has to be elaborated.
+     */
+    public static final Integer QUEUE_STATUS_QUEUED_FOR_RETRY = 7;
+
+    /**
      * Message has been taken from the queue and it's elaboration is in progress.
      */
     public static final Integer QUEUE_STATUS_PROCESSING = 2;

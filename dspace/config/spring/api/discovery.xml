@@ -116,6 +116,16 @@
                 <!-- COAR NOTIFY LDN MESSAGES configuration -->
                 <entry key="NOTIFY.incoming" value-ref="NOTIFY.incoming"/>
                 <entry key="NOTIFY.outgoing" value-ref="NOTIFY.outgoing"/>
+                <!-- COAR NOTIFY LDN MESSAGES incoming configuration -->
+                <entry key="NOTIFY.incoming.accepted" value-ref="NOTIFY.incoming.accepted"/>
+                <entry key="NOTIFY.incoming.processed" value-ref="NOTIFY.incoming.processed"/>
+                <entry key="NOTIFY.incoming.failure" value-ref="NOTIFY.incoming.failure"/>
+                <entry key="NOTIFY.incoming.untrusted" value-ref="NOTIFY.incoming.untrusted"/>
+                <!-- COAR NOTIFY LDN MESSAGES outgoing configuration -->
+                <entry key="NOTIFY.outgoing.delivered" value-ref="NOTIFY.outgoing.delivered"/>
+                <entry key="NOTIFY.outgoing.queued" value-ref="NOTIFY.outgoing.queued"/>
+                <entry key="NOTIFY.outgoing.queued_for_retry" value-ref="NOTIFY.outgoing.queued_for_retry"/>
+                <entry key="NOTIFY.outgoing.failure" value-ref="NOTIFY.outgoing.failure"/>
             </map>
         </property>
         <property name="toIgnoreMetadataFields">
@@ -2182,13 +2192,111 @@
         </property>
     </bean>
     
+    <bean id="NOTIFY.incoming.accepted" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="ldnMessageEntityBaseConfig">
+        <property name="id" value="NOTIFY.incoming.accepted"/>
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find LDNMessageEntity -->
+                <value>search.resourcetype:LDNMessageEntity</value>
+                <value>notification_type:Incoming</value>
+                <value>in_reply_to:*</value>
+                <value>activity_stream_type:Accept</value>
+                <value>queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_PROCESSED}</value>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="NOTIFY.incoming.processed" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="ldnMessageEntityBaseConfig">
+        <property name="id" value="NOTIFY.incoming.processed"/>
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find LDNMessageEntity -->
+                <value>search.resourcetype:LDNMessageEntity</value>
+                <value>notification_type:Incoming</value>
+                <value>queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_PROCESSED}</value>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="NOTIFY.incoming.failure" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="ldnMessageEntityBaseConfig">
+        <property name="id" value="NOTIFY.incoming.failure"/>
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find LDNMessageEntity -->
+                <value>search.resourcetype:LDNMessageEntity</value>
+                <value>notification_type:Incoming</value>
+                <value>queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_FAILED} OR queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_UNMAPPED_ACTION}</value>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="NOTIFY.incoming.untrusted" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="ldnMessageEntityBaseConfig">
+        <property name="id" value="NOTIFY.incoming.untrusted"/>
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find LDNMessageEntity -->
+                <value>search.resourcetype:LDNMessageEntity</value>
+                <value>notification_type:Incoming</value>
+                <value>queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_UNTRUSTED}</value>
+            </list>
+        </property>
+    </bean>
+    
     <bean id="NOTIFY.outgoing" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="ldnMessageEntityBaseConfig">
-        <property name="id" value="NOTIFY.incoming"/>
+        <property name="id" value="NOTIFY.outgoing"/>
         <property name="defaultFilterQueries">
             <list>
                 <!--Only find LDNMessageEntity -->
                 <value>search.resourcetype:LDNMessageEntity</value>
                 <value>notification_type:Outgoing</value>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="NOTIFY.outgoing.delivered" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="ldnMessageEntityBaseConfig">
+        <property name="id" value="NOTIFY.outgoing.delivered"/>
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find LDNMessageEntity -->
+                <value>search.resourcetype:LDNMessageEntity</value>
+                <value>notification_type:Outgoing</value>
+                <value>queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_PROCESSED}</value>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="NOTIFY.outgoing.queued" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="ldnMessageEntityBaseConfig">
+        <property name="id" value="NOTIFY.outgoing.queued"/>
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find LDNMessageEntity -->
+                <value>search.resourcetype:LDNMessageEntity</value>
+                <value>notification_type:Outgoing</value>
+                <value>queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_QUEUED}</value>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="NOTIFY.outgoing.queued_for_retry" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="ldnMessageEntityBaseConfig">
+        <property name="id" value="NOTIFY.outgoing.queued_for_retry"/>
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find LDNMessageEntity -->
+                <value>search.resourcetype:LDNMessageEntity</value>
+                <value>notification_type:Outgoing</value>
+                <value>queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_QUEUED_FOR_RETRY}</value>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="NOTIFY.outgoing.failure" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="ldnMessageEntityBaseConfig">
+        <property name="id" value="NOTIFY.outgoing.failure"/>
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find LDNMessageEntity -->
+                <value>search.resourcetype:LDNMessageEntity</value>
+                <value>notification_type:Outgoing</value>
+                <value>queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_FAILED} OR queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_UNMAPPED_ACTION}</value>
             </list>
         </property>
     </bean>
