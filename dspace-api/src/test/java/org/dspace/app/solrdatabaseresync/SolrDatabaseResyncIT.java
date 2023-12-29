@@ -65,6 +65,7 @@ public class SolrDatabaseResyncIT extends AbstractIntegrationTestWithDatabase {
     public void setUp() throws Exception {
         super.setUp();
         configurationService.setProperty("solr-database-resync.time-until-reindex", 1);
+        configurationService.setProperty("script.solr-database-resync.batch-size", 5);
 
         ServiceManager serviceManager = DSpaceServicesFactory.getInstance().getServiceManager();
         searchService = serviceManager.getServiceByName(null, MockSolrSearchCore.class);
