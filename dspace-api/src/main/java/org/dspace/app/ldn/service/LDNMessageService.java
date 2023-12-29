@@ -135,4 +135,12 @@ public interface LDNMessageService {
      * @throws SQLException if something goes wrong
      */
     public void delete(Context context, LDNMessageEntity ldnMessage) throws SQLException;
+
+    /**
+     * find the ldn messages to be reprocessed
+     *
+     * @param context the context
+     * @throws SQLException if something goes wrong
+     */
+    public List<LDNMessageEntity> findMessagesToBeReprocessed(Context context) throws SQLException;
 }

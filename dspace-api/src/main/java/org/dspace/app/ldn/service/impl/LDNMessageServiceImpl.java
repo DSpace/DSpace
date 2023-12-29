@@ -37,7 +37,10 @@ import org.dspace.app.ldn.utility.LDNUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.discovery.indexobject.IndexableLDNNotification;
+import org.dspace.event.Event;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +67,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
     private LDNRouter ldnRouter;
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(LDNMessageServiceImpl.class);
+    private static final String LDN_ID_PREFIX = "urn:uuid:";
 
     protected LDNMessageServiceImpl() {
 
@@ -71,6 +75,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
 
     @Override
     public LDNMessageEntity find(Context context, String id) throws SQLException {
+        id = id.startsWith(LDN_ID_PREFIX) ? id : LDN_ID_PREFIX + id;
         return ldnMessageDao.findByID(context, LDNMessageEntity.class, id);
     }
 
@@ -131,13 +136,20 @@ public class LDNMessageServiceImpl implements LDNMessageService {
 
     @Override
     public void update(Context context, LDNMessageEntity ldnMessage) throws SQLException {
-        //CST-12126 then LDNMessageService.update() when the origin is set != null,
-        //move the queue_status from UNTRUSTED to QUEUED
+        // CST-12126 then LDNMessageService.update() when the origin is set != null,
+        // move the queue_status from UNTRUSTED to QUEUED
         if (ldnMessage.getOrigin() != null &&
             LDNMessageEntity.QUEUE_STATUS_UNTRUSTED.compareTo(ldnMessage.getQueueStatus()) == 0) {
             ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_QUEUED);
         }
         ldnMessageDao.save(context, ldnMessage);
+        UUID notificationUUID = UUID.fromString(ldnMessage.getID().replace(LDN_ID_PREFIX, ""));
+        ArrayList<String> identifiersList = new ArrayList<String>();
+        identifiersList.add(ldnMessage.getID());
+        context.addEvent(
+            new Event(Event.MODIFY, Constants.LDN_MESSAGE,
+                notificationUUID,
+                IndexableLDNNotification.TYPE, identifiersList));
     }
 
     private DSpaceObject findDspaceObjectByUrl(Context context, String url) throws SQLException {
@@ -173,6 +185,13 @@ public class LDNMessageServiceImpl implements LDNMessageService {
     }
 
     @Override
+    public List<LDNMessageEntity> findMessagesToBeReprocessed(Context context) throws SQLException {
+        List<LDNMessageEntity> result = null;
+        result = ldnMessageDao.findMessagesToBeReprocessed(context);
+        return result;
+    }
+
+    @Override
     public List<LDNMessageEntity> findProcessingTimedoutMessages(Context context) throws SQLException {
         List<LDNMessageEntity> result = null;
         int max_attempts = configurationService.getIntProperty("ldn.processor.max.attempts");
@@ -187,9 +206,10 @@ public class LDNMessageServiceImpl implements LDNMessageService {
         if (timeoutInMinutes == 0) {
             timeoutInMinutes = 60;
         }
-        List<LDNMessageEntity> msgs = null;
+        List<LDNMessageEntity> msgs = new ArrayList<LDNMessageEntity>();
         try {
-            msgs = findOldestMessagesToProcess(context);
+            msgs.addAll(findOldestMessagesToProcess(context));
+            msgs.addAll(findMessagesToBeReprocessed(context));
             if (msgs != null && msgs.size() > 0) {
                 LDNMessageEntity msg = null;
                 LDNProcessor processor = null;
@@ -218,9 +238,11 @@ public class LDNMessageServiceImpl implements LDNMessageService {
                     } catch (JsonSyntaxException jse) {
                         result = -1;
                         log.error("Unable to read JSON notification from LdnMessage " + msg, jse);
+                        msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_FAILED);
                     } catch (Exception e) {
                         result = -1;
                         log.error(e);
+                        msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_FAILED);
                     } finally {
                         msg.setQueueAttempts(msg.getQueueAttempts() + 1);
                         update(context, msg);
