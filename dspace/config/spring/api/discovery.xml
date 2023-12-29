@@ -2208,7 +2208,7 @@
             <list>
                 <!--Only find LDNMessageEntity -->
                 <value>search.resourcetype:LDNMessageEntity</value>
-                <value>notification_type:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_INCOMING}</value>
+                <value>notification_type_keyword:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_INCOMING}</value>
             </list>
         </property>
     </bean>
@@ -2219,10 +2219,10 @@
             <list>
                 <!--Only find LDNMessageEntity -->
                 <value>search.resourcetype:LDNMessageEntity</value>
-                <value>notification_type:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_INCOMING}</value>
+                <value>notification_type_keyword:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_INCOMING}</value>
                 <value>in_reply_to:*</value>
-                <value>activity_stream_type:Accept</value>
-                <value>queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_PROCESSED}</value>
+                <value>activity_stream_type_keyword:Accept</value>
+                <value>queue_status_authority:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_PROCESSED}</value>
             </list>
         </property>
     </bean>
@@ -2233,8 +2233,8 @@
             <list>
                 <!--Only find LDNMessageEntity -->
                 <value>search.resourcetype:LDNMessageEntity</value>
-                <value>notification_type:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_INCOMING}</value>
-                <value>queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_PROCESSED}</value>
+                <value>notification_type_keyword:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_INCOMING}</value>
+                <value>queue_status_authority:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_PROCESSED}</value>
             </list>
         </property>
     </bean>
@@ -2245,8 +2245,8 @@
             <list>
                 <!--Only find LDNMessageEntity -->
                 <value>search.resourcetype:LDNMessageEntity</value>
-                <value>notification_type:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_INCOMING}</value>
-                <value>queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_FAILED} OR queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_UNMAPPED_ACTION}</value>
+                <value>notification_type_keyword:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_INCOMING}</value>
+                <value>queue_status_authority:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_FAILED} OR queue_status_authority:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_UNMAPPED_ACTION}</value>
             </list>
         </property>
     </bean>
@@ -2257,8 +2257,8 @@
             <list>
                 <!--Only find LDNMessageEntity -->
                 <value>search.resourcetype:LDNMessageEntity</value>
-                <value>notification_type:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_INCOMING}</value>
-                <value>queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_UNTRUSTED}</value>
+                <value>notification_type_keyword:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_INCOMING}</value>
+                <value>queue_status_authority:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_UNTRUSTED}</value>
             </list>
         </property>
     </bean>
@@ -2269,7 +2269,7 @@
             <list>
                 <!--Only find LDNMessageEntity -->
                 <value>search.resourcetype:Item</value>
-                <value>{!join from=relateditem_authority to=search.resourceid fromIndex=${solr.multicorePrefix}search}notification_type:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_INCOMING}</value>
+                <value>{!join from=relateditem_authority to=search.resourceid fromIndex=${solr.multicorePrefix}search}notification_type_keyword:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_INCOMING}</value>
                 <value>-withdrawn:true AND -discoverable:false</value>
             </list>
         </property>
@@ -2281,7 +2281,7 @@
             <list>
                 <!--Only find LDNMessageEntity -->
                 <value>search.resourcetype:LDNMessageEntity</value>
-                <value>notification_type:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_OUTGOING}</value>
+                <value>notification_type_keyword:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_OUTGOING}</value>
             </list>
         </property>
     </bean>
@@ -2292,8 +2292,8 @@
             <list>
                 <!--Only find LDNMessageEntity -->
                 <value>search.resourcetype:LDNMessageEntity</value>
-                <value>notification_type:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_OUTGOING}</value>
-                <value>queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_PROCESSED}</value>
+                <value>notification_type_keyword:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_OUTGOING}</value>
+                <value>queue_status_authority:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_PROCESSED}</value>
             </list>
         </property>
     </bean>
@@ -2304,8 +2304,8 @@
             <list>
                 <!--Only find LDNMessageEntity -->
                 <value>search.resourcetype:LDNMessageEntity</value>
-                <value>notification_type:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_OUTGOING}</value>
-                <value>queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_QUEUED}</value>
+                <value>notification_type_keyword:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_OUTGOING}</value>
+                <value>queue_status_authority:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_QUEUED}</value>
             </list>
         </property>
     </bean>
@@ -2316,8 +2316,8 @@
             <list>
                 <!--Only find LDNMessageEntity -->
                 <value>search.resourcetype:LDNMessageEntity</value>
-                <value>notification_type:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_OUTGOING}</value>
-                <value>queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_QUEUED_FOR_RETRY}</value>
+                <value>notification_type_keyword:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_OUTGOING}</value>
+                <value>queue_status_authority:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_QUEUED_FOR_RETRY}</value>
             </list>
         </property>
     </bean>
@@ -2328,8 +2328,8 @@
             <list>
                 <!--Only find LDNMessageEntity -->
                 <value>search.resourcetype:LDNMessageEntity</value>
-                <value>notification_type:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_OUTGOING}</value>
-                <value>queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_FAILED} OR queue_status_i:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_UNMAPPED_ACTION}</value>
+                <value>notification_type_keyword:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_OUTGOING}</value>
+                <value>queue_status_authority:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_FAILED} OR queue_status_authority:#{T(org.dspace.app.ldn.LDNMessageEntity).QUEUE_STATUS_UNMAPPED_ACTION}</value>
             </list>
         </property>
     </bean>
@@ -2340,7 +2340,7 @@
             <list>
                 <!--Only find LDNMessageEntity -->
                 <value>search.resourcetype:Item</value>
-                <value>{!join from=relateditem_authority to=search.resourceid fromIndex=${solr.multicorePrefix}search}notification_type:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_OUTGOING}</value>
+                <value>{!join from=relateditem_authority to=search.resourceid fromIndex=${solr.multicorePrefix}search}notification_type_keyword:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_OUTGOING}</value>
                 <value>-withdrawn:true AND -discoverable:false</value>
             </list>
         </property>
@@ -3066,7 +3066,6 @@
         <property name="indexFieldName" value="relateditem"/>
         <property name="metadataFields">
             <list>
-                <value>relateditem</value>
             </list>
         </property>
         <property name="facetLimit" value="5"/>
@@ -3081,7 +3080,6 @@
         <property name="indexFieldName" value="origin"/>
         <property name="metadataFields">
             <list>
-                <value>origin</value>
             </list>
         </property>
         <property name="facetLimit" value="5"/>
@@ -3096,7 +3094,6 @@
         <property name="indexFieldName" value="target"/>
         <property name="metadataFields">
             <list>
-                <value>target</value>
             </list>
         </property>
         <property name="facetLimit" value="5"/>
@@ -3108,10 +3105,9 @@
     </bean>
 
     <bean id="searchFilterNotifyQueueStatus" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
-        <property name="indexFieldName" value="queue_status_s"/>
+        <property name="indexFieldName" value="queue_status"/>
         <property name="metadataFields">
             <list>
-                <value>queue_status_s</value>
             </list>
         </property>
         <property name="facetLimit" value="5"/>
@@ -3126,7 +3122,6 @@
         <property name="indexFieldName" value="activity_stream_type"/>
         <property name="metadataFields">
             <list>
-                <value>activity_stream_type</value>
             </list>
         </property>
         <property name="facetLimit" value="5"/>
@@ -3141,7 +3136,6 @@
         <property name="indexFieldName" value="coar_notify_type"/>
         <property name="metadataFields">
             <list>
-                <value>coar_notify_type</value>
             </list>
         </property>
         <property name="facetLimit" value="5"/>
@@ -3156,7 +3150,6 @@
         <property name="indexFieldName" value="notification_type"/>
         <property name="metadataFields">
             <list>
-                <value>notification_type</value>
             </list>
         </property>
         <property name="facetLimit" value="5"/>

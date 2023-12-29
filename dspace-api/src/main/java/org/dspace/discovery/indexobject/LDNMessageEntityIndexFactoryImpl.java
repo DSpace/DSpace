@@ -84,6 +84,8 @@ public class LDNMessageEntityIndexFactoryImpl extends IndexFactoryImpl<Indexable
         doc.addField("notification_id", ldnMessage.getID());
         doc.addField("queue_status_i", ldnMessage.getQueueStatus());
         doc.addField("queue_status_s", LDNMessageEntity.getQueueStatus(ldnMessage));
+        addFacetIndex(doc, "queue_status", String.valueOf(ldnMessage.getQueueStatus()),
+            LDNMessageEntity.getQueueStatus(ldnMessage));
         Item item = (Item) ldnMessage.getObject();
         if (item != null) {
             addFacetIndex(doc, "object", item.getID().toString(), itemService.getMetadata(item, "dc.title"));
@@ -109,12 +111,14 @@ public class LDNMessageEntityIndexFactoryImpl extends IndexFactoryImpl<Indexable
         }
         doc.addField("message", ldnMessage.getMessage());
         doc.addField("type", ldnMessage.getType());
-        doc.addField("activity_stream_type", ldnMessage.getActivityStreamType());
-        doc.addField("coar_notify_type", ldnMessage.getCoarNotifyType());
+        addFacetIndex(doc, "activity_stream_type", ldnMessage.getActivityStreamType(),
+            ldnMessage.getActivityStreamType());
+        addFacetIndex(doc, "coar_notify_type", ldnMessage.getCoarNotifyType(), ldnMessage.getCoarNotifyType());
         doc.addField("queue_attempts", ldnMessage.getQueueAttempts());
         doc.addField("queue_last_start_time", ldnMessage.getQueueLastStartTime());
         doc.addField("queue_timeout", ldnMessage.getQueueTimeout());
-        doc.addField("notification_type", LDNMessageEntity.getNotificationType(ldnMessage));
+        String notificationType = LDNMessageEntity.getNotificationType(ldnMessage);
+        addFacetIndex(doc, "notification_type", notificationType, notificationType);
 
         return doc;
     }
