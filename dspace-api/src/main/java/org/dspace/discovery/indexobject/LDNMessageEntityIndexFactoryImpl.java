@@ -84,14 +84,15 @@ public class LDNMessageEntityIndexFactoryImpl extends IndexFactoryImpl<Indexable
         doc.addField("notification_id", ldnMessage.getID());
         doc.addField("queue_status_i", ldnMessage.getQueueStatus());
         doc.addField("queue_status_s", LDNMessageEntity.getQueueStatus(ldnMessage));
-        doc.addField("notification_id", ldnMessage.getID());
         Item item = (Item) ldnMessage.getObject();
         if (item != null) {
             addFacetIndex(doc, "object", item.getID().toString(), itemService.getMetadata(item, "dc.title"));
+            addFacetIndex(doc, "relateditem", item.getID().toString(), itemService.getMetadata(item, "dc.title"));
         }
         item = (Item) ldnMessage.getContext();
         if (item != null) {
             addFacetIndex(doc, "context", item.getID().toString(), itemService.getMetadata(item, "dc.title"));
+            addFacetIndex(doc, "relateditem", item.getID().toString(), itemService.getMetadata(item, "dc.title"));
         }
         NotifyServiceEntity origin = ldnMessage.getOrigin();
         if (origin != null) {
