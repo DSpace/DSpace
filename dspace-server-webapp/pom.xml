@@ -61,7 +61,6 @@
                             <resources>
                                 <resource>
                                     <directory>${basedir}/src/test/resources</directory>
-                                    <filtering>true</filtering>
                                 </resource>
                             </resources>
                         </configuration>
@@ -78,10 +77,15 @@
                                     <directory>${basedir}/src/main/resources</directory>
                                     <includes>
                                         <include>**/*.properties</include>
+                                    </includes>
+                                    <filtering>true</filtering>
+                                </resource>
+                                <resource>
+                                    <directory>${basedir}/src/main/resources</directory>
+                                    <includes>
                                         <include>**/static/**</include>
                                         <include>**/spring/**</include>
                                     </includes>
-                                    <filtering>true</filtering>
                                 </resource>
                             </resources>
                         </configuration>
