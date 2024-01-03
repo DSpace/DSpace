@@ -21,6 +21,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
@@ -42,7 +43,9 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
     static final String DEFAULT_PATTERN = "Generated Thumbnail";
     protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected static final ConfigurationService configurationService
-            = DSpaceServicesFactory.getInstance().getConfigurationService();
+        = DSpaceServicesFactory.getInstance().getConfigurationService();
+    protected static final BitstreamService bitstreamService
+        = ContentServiceFactory.getInstance().getBitstreamService();
 
     protected static final String PRE = ImageMagickThumbnailFilter.class.getName();
 
@@ -202,7 +205,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
                         }
                     }
                 }
-                String description = bit.getDescription();
+                String description = bitstreamService.getDescription(bit);
                 // If anything other than a generated thumbnail
                 // is found, halt processing
                 Pattern replaceRegex;

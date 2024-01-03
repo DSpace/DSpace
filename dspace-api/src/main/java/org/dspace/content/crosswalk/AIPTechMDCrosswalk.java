@@ -28,6 +28,7 @@ import org.dspace.content.packager.DSpaceAIPIngester;
 import org.dspace.content.packager.METSManifest;
 import org.dspace.content.packager.PackageUtils;
 import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.SiteService;
@@ -80,6 +81,8 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
      * log4j category
      */
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(AIPTechMDCrosswalk.class);
+    protected final BitstreamService bitstreamService = ContentServiceFactory.getInstance()
+                                                                             .getBitstreamService();
     protected final BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance()
                                                                                          .getBitstreamFormatService();
     protected final SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
@@ -235,19 +238,19 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
             if (bsName != null) {
                 dc.add(makeDC("title", null, bsName));
             }
-            String bsSource = bitstream.getSource();
+            String bsSource = bitstreamService.getSource(bitstream);
             if (bsSource != null) {
                 dc.add(makeDC("title", "alternative", bsSource));
             }
-            String bsDesc = bitstream.getDescription();
+            String bsDesc = bitstreamService.getDescription(bitstream);
             if (bsDesc != null) {
                 dc.add(makeDC("description", null, bsDesc));
             }
-            String bsUfmt = bitstream.getUserFormatDescription();
+            String bsUfmt = bitstreamService.getUserFormatDescription(bitstream);
             if (bsUfmt != null) {
                 dc.add(makeDC("format", null, bsUfmt));
             }
-            BitstreamFormat bsf = bitstream.getFormat(context);
+            BitstreamFormat bsf = bitstreamService.getFormat(context, bitstream);
             dc.add(makeDC("format", "medium", bsf.getShortDescription()));
             dc.add(makeDC("format", "mimetype", bsf.getMIMEType()));
             dc.add(makeDC("format", "supportlevel", bitstreamFormatService.getSupportLevelText(bsf)));
@@ -285,7 +288,7 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
 
             //FIXME: adding two URIs for now (site handle and URL), in case site isn't using handles
             dc.add(makeDC("identifier", "uri", "hdl:" + site.getHandle()));
-            dc.add(makeDC("identifier", "uri", site.getURL()));
+            dc.add(makeDC("identifier", "uri", siteService.getURL(site)));
         }
 
         return XSLTDisseminationCrosswalk.createDIM(dso, dc);
@@ -361,13 +364,13 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
                     if (type == Constants.BITSTREAM) {
                         Bitstream bitstream = (Bitstream) dso;
                         if (dcField.equals("title")) {
-                            bitstream.setName(context, value);
+                            bitstreamService.setName(context, bitstream, value);
                         } else if (dcField.equals("title.alternative")) {
-                            bitstream.setSource(context, value);
+                            bitstreamService.setSource(context, bitstream, value);
                         } else if (dcField.equals("description")) {
-                            bitstream.setDescription(context, value);
+                            bitstreamService.setDescription(context, bitstream, value);
                         } else if (dcField.equals("format")) {
-                            bitstream.setUserFormatDescription(context, value);
+                            bitstreamService.setUserFormatDescription(context, bitstream, value);
                         } else if (dcField.equals("format.medium")) {
                             bsfShortName = value;
                         } else if (dcField.equals("format.mimetype")) {
@@ -495,7 +498,7 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
                                                                bsfInternal);
             }
             if (bsf != null) {
-                ((Bitstream) dso).setFormat(context, bsf);
+                bitstreamService.setFormat(context, (Bitstream) dso, bsf);
             } else {
                 log.warn("Failed to find or create bitstream format named \"" + bsfShortName + "\"");
             }

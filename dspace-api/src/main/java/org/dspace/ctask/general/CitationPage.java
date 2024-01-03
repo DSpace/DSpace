@@ -22,6 +22,7 @@ import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -253,13 +254,16 @@ public class CitationPage extends AbstractCurationTask {
 
         //Setup a good name for our bitstream and make
         //it the same format as the source document.
-        citedBitstream.setName(context, bitstream.getName());
-        bitstreamService.setFormat(context, citedBitstream, bitstream.getFormat(Curator.curationContext()));
-        citedBitstream.setDescription(context, bitstream.getDescription());
+        BitstreamFormat format = bitstreamService.getFormat(Curator.curationContext(), bitstream);
+        String description = bitstreamService.getDescription(bitstream);
+
+        bitstreamService.setName(context, citedBitstream, bitstream.getName());
+        bitstreamService.setFormat(context, citedBitstream, format);
+        bitstreamService.setDescription(context, citedBitstream, description);
         displayMap.put(bitstream.getName(), citedBitstream);
         clonePolicies(context, bitstream, citedBitstream);
         this.resBuilder.append(" Added ")
-                .append(citedBitstream.getName())
+                .append(bitstream.getName())
                 .append(" to the ")
                 .append(CitationPage.DISPLAY_BUNDLE_NAME)
                 .append(" bundle.\n");

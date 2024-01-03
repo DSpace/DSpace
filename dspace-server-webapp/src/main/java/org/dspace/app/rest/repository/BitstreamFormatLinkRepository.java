@@ -45,10 +45,10 @@ public class BitstreamFormatLinkRepository extends AbstractDSpaceRestRepository
             if (bitstream == null) {
                 throw new ResourceNotFoundException("No such bitstream: " + bitstreamId);
             }
-            if (bitstream.getFormat(context) == null) {
+            if (bitstreamService.getFormat(context, bitstream) == null) {
                 return null;
             }
-            return converter.toRest(bitstream.getFormat(context), projection);
+            return converter.toRest(bitstreamService.getFormat(context, bitstream), projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

@@ -181,14 +181,14 @@ public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, Bun
             }
             String name = bitstreamRest.getName();
             if (StringUtils.isNotBlank(name)) {
-                bitstream.setName(context, name);
+                bitstreamService.setName(context, bitstream, name);
             } else {
-                bitstream.setName(context, originalFilename);
+                bitstreamService.setName(context, bitstream, originalFilename);
             }
 
         } else {
             bitstream = bitstreamService.create(context, bundle, fileInputStream);
-            bitstream.setName(context, originalFilename);
+            bitstreamService.setName(context, bitstream, originalFilename);
 
         }
         BitstreamFormat bitstreamFormat = bitstreamFormatService.guessFormat(context, bitstream);

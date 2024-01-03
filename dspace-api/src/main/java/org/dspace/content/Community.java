@@ -22,11 +22,8 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.content.comparator.NameAscendingComparator;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.HibernateProxyHelper;
@@ -73,9 +70,6 @@ public class Community extends CacheableDSpaceObject implements DSpaceObjectLega
     @OneToOne
     @JoinColumn(name = "logo_bitstream_id")
     private Bitstream logo = null;
-
-    @Transient
-    protected transient CommunityService communityService;
 
     /**
      * Protected constructor, create object using:
@@ -247,20 +241,12 @@ public class Community extends CacheableDSpaceObject implements DSpaceObjectLega
 
     @Override
     public String getName() {
-        String value = getCommunityService()
-            .getMetadataFirstValue(this, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
+        String value = getMetadataFirstValue(MetadataSchemaEnum.DC.getName(), "title", null);
         return value == null ? "" : value;
     }
 
     @Override
     public Integer getLegacyId() {
         return legacyId;
-    }
-
-    private CommunityService getCommunityService() {
-        if (communityService == null) {
-            communityService = ContentServiceFactory.getInstance().getCommunityService();
-        }
-        return communityService;
     }
 }

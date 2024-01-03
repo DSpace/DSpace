@@ -636,7 +636,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withWorkflowGroup(1, admin, reviewer1)
                 .build();
 
-        final Group workflowGroup = col1.getWorkflowStep1(context);
+        final Group workflowGroup = collectionService.getWorkflowGroup(context, col1, 1);
         final String name = workflowGroup.getName();
 
         context.restoreAuthSystemState();
@@ -1412,7 +1412,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withName("Collection 1")
                 .withWorkflowGroup(1, admin, reviewer1)
                 .build();
-        Group workflowGroup = col1.getWorkflowStep1(context);
+        Group workflowGroup = collectionService.getWorkflowGroup(context, col1, 1);
 
         context.restoreAuthSystemState();
 
@@ -1517,7 +1517,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withSubmitterGroup(admin)
                 .build();
         Group adminGroup = collection.getAdministrators();
-        Group worfklowGroup = collection.getWorkflowStep1(context);
+        Group worfklowGroup = collectionService.getWorkflowGroup(context, collection, 1);
         Group submitterGroup = collection.getSubmitters();
         context.restoreAuthSystemState();
 
@@ -2281,8 +2281,8 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                                            .withWorkflowGroup(2, eperson)
                                            .build();
 
-        Group workflowGroupStep1 = col1.getWorkflowStep1(context);
-        Group workflowGroupStep2 = col1.getWorkflowStep2(context);
+        Group workflowGroupStep1 = collectionService.getWorkflowGroup(context, col1, 1);
+        Group workflowGroupStep2 = collectionService.getWorkflowGroup(context, col1, 2);
 
         context.restoreAuthSystemState();
 

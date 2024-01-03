@@ -715,6 +715,52 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
     @Override
     public String getName(EPerson dso) {
-        return dso.getName();
+        return dso.getEmail();
+    }
+
+    @Override
+    public String getFullName(EPerson eperson) {
+        String f = getFirstName(eperson);
+        String l = getLastName(eperson);
+
+        if ((l == null) && (f == null)) {
+            return eperson.getEmail();
+        } else if (f == null) {
+            return l;
+        } else {
+            return (f + " " + l);
+        }
+    }
+
+    @Override
+    public String getFirstName(EPerson eperson) {
+        return getMetadataFirstValue(eperson, "eperson", "firstname", null, Item.ANY);
+    }
+
+    @Override
+    public void setFirstName(Context context, EPerson eperson, String firstname) throws SQLException {
+        setMetadataSingleValue(context, eperson, "eperson", "firstname", null, null, firstname);
+        eperson.setModified();
+    }
+
+    @Override
+    public String getLastName(EPerson eperson) {
+        return getMetadataFirstValue(eperson, "eperson", "lastname", null, Item.ANY);
+    }
+
+    @Override
+    public void setLastName(Context context, EPerson eperson, String lastname) throws SQLException {
+        setMetadataSingleValue(context, eperson, "eperson", "lastname", null, null, lastname);
+        eperson.setModified();
+    }
+
+    @Override
+    public String getLanguage(EPerson eperson) {
+        return getMetadataFirstValue(eperson, "eperson", "language", null, Item.ANY);
+    }
+
+    @Override
+    public void setLanguage(Context context, EPerson eperson, String language) throws SQLException {
+        setMetadataSingleValue(context, eperson, "eperson", "language", null, null, language);
     }
 }

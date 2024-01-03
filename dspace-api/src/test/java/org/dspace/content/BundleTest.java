@@ -216,7 +216,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
     @Test
     public void testSetName() throws SQLException {
         String name = "new name";
-        b.setName(context, name);
+        bundleService.setName(context, b, name);
         assertThat("testSetName 0", b.getName(), notNullValue());
         assertThat("testSetName 1", b.getName(), not(equalTo("")));
         assertThat("testSetName 2", b.getName(), equalTo(name));
@@ -304,7 +304,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
         context.turnOffAuthorisationSystem();
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
-        bs.setName(context, name);
+        bitstreamService.setName(context, bs, name);
         bundleService.addBitstream(context, b, bs);
         bundleService.update(context, b);
         context.restoreAuthSystemState();
@@ -334,7 +334,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
         String name = "name";
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
-        bs.setName(context, name);
+        bitstreamService.setName(context, bs, name);
         bundleService.addBitstream(context, b, bs);
         context.restoreAuthSystemState();
 
@@ -383,7 +383,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
         String name = "name";
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream bs = bitstreamService.create(context, b, new FileInputStream(f));
-        bs.setName(context, name);
+        bitstreamService.setName(context, bs, name);
         assertThat("testCreateBitstreamAuth 0", bundleService.getBitstreamByName(b, name), notNullValue());
         assertThat("testCreateBitstreamAuth 1", bundleService.getBitstreamByName(b, name), equalTo(bs));
         assertThat("testCreateBitstreamAuth 2", bundleService.getBitstreamByName(b, name).getName(), equalTo(name));
@@ -420,7 +420,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
         String name = "name bitstream";
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream bs = bitstreamService.register(context, b, assetstore, f.getName());
-        bs.setName(context, name);
+        bitstreamService.setName(context, bs, name);
         assertThat("testRegisterBitstream 0", bundleService.getBitstreamByName(b, name), notNullValue());
         assertThat("testRegisterBitstream 1", bundleService.getBitstreamByName(b, name), equalTo(bs));
         assertThat("testRegisterBitstream 2", bundleService.getBitstreamByName(b, name).getName(), equalTo(name));
@@ -437,7 +437,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
         // create a new Bitstream to add to Bundle
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
-        bs.setName(context, "name");
+        bitstreamService.setName(context, bs, "name");
         bundleService.addBitstream(context, b, bs);
         fail("Exception should have been thrown");
     }
@@ -457,7 +457,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
 
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
-        bs.setName(context, "name");
+        bitstreamService.setName(context, bs, "name");
         bundleService.addBitstream(context, b, bs);
         assertThat("testAddBitstreamAuth 0", bundleService.getBitstreamByName(b, bs.getName()), notNullValue());
         assertThat("testAddBitstreamAuth 1", bundleService.getBitstreamByName(b, bs.getName()), equalTo(bs));
@@ -476,7 +476,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
         File f = new File(testProps.get("test.bitstream").toString());
         context.turnOffAuthorisationSystem();
         Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
-        bs.setName(context, "name");
+        bitstreamService.setName(context, bs, "name");
         context.restoreAuthSystemState();
 
         bundleService.removeBitstream(context, b, bs);
@@ -695,13 +695,13 @@ public class BundleTest extends AbstractDSpaceObjectTest {
         context.turnOffAuthorisationSystem();
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
-        bs.setName(context, "bitstream1");
+        bitstreamService.setName(context, bs, "bitstream1");
         bundleService.addBitstream(context, b, bs);
         Bitstream bs2 = bitstreamService.create(context, new FileInputStream(f));
-        bs2.setName(context, "bitstream2");
+        bitstreamService.setName(context, bs2, "bitstream2");
         bundleService.addBitstream(context, b, bs2);
         Bitstream bs3 = bitstreamService.create(context, new FileInputStream(f));
-        bs3.setName(context, "bitstream3");
+        bitstreamService.setName(context, bs3, "bitstream3");
         bundleService.addBitstream(context, b, bs3);
         context.restoreAuthSystemState();
 

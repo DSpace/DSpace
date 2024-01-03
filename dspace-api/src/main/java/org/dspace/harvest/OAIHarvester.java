@@ -638,7 +638,7 @@ public class OAIHarvester {
             }
 
             OREBitstream = bitstreamService.create(ourContext, OREBundle, OREStream);
-            OREBitstream.setName(ourContext, "ORE.xml");
+            bitstreamService.setName(ourContext, OREBitstream, "ORE.xml");
 
             BitstreamFormat bf = bitstreamFormatService.guessFormat(ourContext, OREBitstream);
             bitstreamService.setFormat(ourContext, OREBitstream, bf);

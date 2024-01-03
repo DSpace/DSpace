@@ -242,7 +242,9 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             List<String> fmts = filterFormats.get(filterClass.getClass().getName() +
                                                       (pluginName != null ? FILTER_PLUGIN_SEPARATOR + pluginName : ""));
 
-            if (fmts.contains(myBitstream.getFormat(context).getShortDescription())) {
+            BitstreamFormat format = bitstreamService.getFormat(context, myBitstream);
+
+            if (fmts.contains(format.getShortDescription())) {
                 try {
                     // only update item if bitstream not skipped
                     if (processBitstream(context, myItem, myBitstream, filterClass)) {
@@ -265,7 +267,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                 String[] mimeTypes = srif.getInputMIMETypes();
                 if (mimeTypes != null) {
                     for (String mimeType : mimeTypes) {
-                        if (mimeType.equalsIgnoreCase(myBitstream.getFormat(context).getMIMEType())) {
+                        if (mimeType.equalsIgnoreCase(format.getMIMEType())) {
                             applyFilter = true;
                         }
                     }
@@ -276,7 +278,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                     String[] descriptions = srif.getInputDescriptions();
                     if (descriptions != null) {
                         for (String desc : descriptions) {
-                            if (desc.equalsIgnoreCase(myBitstream.getFormat(context).getShortDescription())) {
+                            if (desc.equalsIgnoreCase(format.getShortDescription())) {
                                 applyFilter = true;
                             }
                         }
@@ -288,7 +290,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                     String[] extensions = srif.getInputExtensions();
                     if (extensions != null) {
                         for (String ext : extensions) {
-                            List<String> formatExtensions = myBitstream.getFormat(context).getExtensions();
+                            List<String> formatExtensions = format.getExtensions();
                             if (formatExtensions != null && formatExtensions.contains(ext)) {
                                 applyFilter = true;
                             }
@@ -393,10 +395,10 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             // create bitstream to store the filter result
             Bitstream b = bitstreamService.create(context, targetBundle, destStream);
             // set the name, source and description of the bitstream
-            b.setName(context, newName);
-            b.setSource(context, "Written by FormatFilter " + formatFilter.getClass().getName() +
+            bitstreamService.setName(context, b, newName);
+            bitstreamService.setSource(context, b, "Written by FormatFilter " + formatFilter.getClass().getName() +
                     " on " + DCDate.getCurrent() + " (GMT).");
-            b.setDescription(context, formatFilter.getDescription());
+            bitstreamService.setDescription(context, b, formatFilter.getDescription());
             // Set the format of the bitstream
             BitstreamFormat bf = bitstreamFormatService.findByShortDescription(context,
                     formatFilter.getFormatString());

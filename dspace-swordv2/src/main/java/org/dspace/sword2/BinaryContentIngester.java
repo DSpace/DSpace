@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -63,8 +64,8 @@ public class BinaryContentIngester extends AbstractSwordContentIngester {
                 context, deposit.getInputStream(), item);
             BitstreamFormat format = this.getFormat(
                 context, deposit.getFilename());
-            bs.setName(context, deposit.getFilename());
-            bs.setFormat(context, format);
+            bitstreamService.setName(context, bs, deposit.getFilename());
+            bitstreamService.setFormat(context, bs, format);
             bitstreamService.update(context, bs);
 
             // now we have an item in the workspace, and we need to consider adding some metadata to it,
@@ -122,7 +123,7 @@ public class BinaryContentIngester extends AbstractSwordContentIngester {
             List<Bundle> originals = item.getBundles();
             Bundle original = null;
             for (Bundle bundle : originals) {
-                if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName())) {
+                if (StringUtils.equals(Constants.CONTENT_BUNDLE_NAME, bundle.getName())) {
                     original = bundle;
                 }
             }
@@ -135,8 +136,8 @@ public class BinaryContentIngester extends AbstractSwordContentIngester {
                 .create(context, original, deposit.getInputStream());
             BitstreamFormat format = this
                 .getFormat(context, deposit.getFilename());
-            bs.setFormat(context, format);
-            bs.setName(context, deposit.getFilename());
+            bitstreamService.setName(context, bs, deposit.getFilename());
+            bitstreamService.setFormat(context, bs, format);
             bitstreamService.update(context, bs);
 
             // update the item metadata to include the current time as

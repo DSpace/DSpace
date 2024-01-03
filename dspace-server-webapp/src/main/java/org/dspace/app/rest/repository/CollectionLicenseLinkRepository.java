@@ -53,7 +53,7 @@ public class CollectionLicenseLinkRepository extends AbstractDSpaceRestRepositor
                 throw new ResourceNotFoundException("No such collection: " + collectionId);
             }
             LicenseRest licenseRest = new LicenseRest();
-            String text = collection.getLicenseCollection();
+            String text = collectionService.getLicense(collection);
             if (StringUtils.isNotBlank(text)) {
                 licenseRest.setCustom(true);
                 licenseRest.setText(text);

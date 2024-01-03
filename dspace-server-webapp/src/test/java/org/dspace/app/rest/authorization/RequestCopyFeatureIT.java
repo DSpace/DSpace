@@ -40,6 +40,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
@@ -66,6 +67,9 @@ public class RequestCopyFeatureIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private ItemService itemService;
 
 
     @Autowired
@@ -118,7 +122,8 @@ public class RequestCopyFeatureIT extends AbstractControllerIntegrationTest {
                                                               .withFulltext("Test", "source", is)
                                                               .build();
             itemInWorkSpace = workspaceItem.getItem();
-            bitstreamFromWorkSpaceItem = itemInWorkSpace.getBundles("ORIGINAL").get(0).getBitstreams().get(0);
+            bitstreamFromWorkSpaceItem = itemService.getBundles(itemInWorkSpace, "ORIGINAL")
+                                                    .get(0).getBitstreams().get(0);
         }
         resourcePolicyService.removePolicies(context, bitstreamB, Constants.READ);
 

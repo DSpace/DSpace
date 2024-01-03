@@ -173,7 +173,7 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
             try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(f));) {
                 bs = bitstreamService.create(context, targetBundle, bis);
             }
-            bs.setName(context, ce.filename);
+            bitstreamService.setName(context, bs, ce.filename);
 
             // Identify the format
             // FIXME - guessing format guesses license.txt incorrectly as a text file format!
@@ -181,7 +181,7 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
             bitstreamService.setFormat(context, bs, fmt);
 
             if (ce.description != null) {
-                bs.setDescription(context, ce.description);
+                bitstreamService.setDescription(context, bs, ce.description);
             }
 
             if ((ce.permissionsActionId != -1) && (ce.permissionsGroupName != null)) {

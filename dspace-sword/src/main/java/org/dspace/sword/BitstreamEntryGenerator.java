@@ -16,6 +16,9 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.core.Constants;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -36,6 +39,9 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry {
      * logger
      */
     private static final Logger log = LogManager.getLogger(BitstreamEntryGenerator.class);
+
+    private final BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+    private final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
     /**
      * Create a new ATOM Entry generator which can provide a SWORD Entry for
@@ -75,7 +81,7 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry {
             String bsurl = urlManager.getBitstreamUrl(this.bitstream);
             BitstreamFormat bf = null;
             try {
-                bf = this.bitstream.getFormat(swordService.getContext());
+                bf = bitstreamService.getFormat(swordService.getContext(), bitstream);
             } catch (SQLException e) {
                 log.error("Exception caught: ", e);
                 throw new DSpaceSWORDException(e);
@@ -148,7 +154,7 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry {
         String bsurl = urlManager.getBitstreamUrl(this.bitstream);
         BitstreamFormat bf;
         try {
-            bf = this.bitstream.getFormat(swordService.getContext());
+            bf = bitstreamService.getFormat(swordService.getContext(), bitstream);
         } catch (SQLException e) {
             log.error("Exception caught: ", e);
             throw new DSpaceSWORDException(e);
@@ -239,7 +245,7 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry {
     @Override
     protected void addTitle() {
         Title title = new Title();
-        title.setContent(this.bitstream.getName());
+        title.setContent(bitstream.getName());
         title.setType(ContentType.TEXT);
         entry.setTitle(title);
         log.debug("Added title to entry");

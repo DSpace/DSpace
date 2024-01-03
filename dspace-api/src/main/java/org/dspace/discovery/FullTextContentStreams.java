@@ -163,7 +163,7 @@ public class FullTextContentStreams extends ContentStreamBase {
         }
 
         public String getContentType(final Context context) throws SQLException {
-            BitstreamFormat format = bitstream != null ? bitstream.getFormat(context) : null;
+            BitstreamFormat format = bitstream != null ? bitstreamService.getFormat(context, bitstream) : null;
             return format == null ? null : StringUtils.trimToEmpty(format.getMIMEType());
         }
 

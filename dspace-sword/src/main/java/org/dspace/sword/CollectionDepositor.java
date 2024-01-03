@@ -180,8 +180,8 @@ public class CollectionDepositor extends Depositor {
                     }
                 }
 
-                bitstream.setName(context, fn);
-                bitstream.setDescription(context, "SWORD deposit package");
+                bitstreamService.setName(context, bitstream, fn);
+                bitstreamService.setDescription(context, bitstream, "SWORD deposit package");
 
                 BitstreamFormat bf = bitstreamFormatService.findByMIMEType(
                     context, deposit.getContentType());

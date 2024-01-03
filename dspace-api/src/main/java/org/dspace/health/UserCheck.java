@@ -63,7 +63,7 @@ public class UserCheck extends Check {
                 if (e.getLastName() != null && e.getLastName().length() > 0) {
                     info.put("Have 2nd name", info.get("Have 2nd name") + 1);
                 }
-                if (e.getLanguage() != null && e.getLanguage().length() > 0) {
+                if (ePersonService.getLanguage(e) != null && ePersonService.getLanguage(e).length() > 0) {
                     info.put("Have lang", info.get("Have lang") + 1);
                 }
                 if (e.getNetid() != null && e.getNetid().length() > 0) {

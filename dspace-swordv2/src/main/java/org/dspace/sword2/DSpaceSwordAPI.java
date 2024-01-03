@@ -286,14 +286,13 @@ public class DSpaceSwordAPI {
                         context, swordBundle, bais);
 
                     String fn = this.createEntryFilename(context, deposit, true);
-                    entryBitstream.setName(context, fn);
-                    entryBitstream.setDescription(context,
-                                                  "Original SWORD entry document");
+                    bitstreamService.setName(context, entryBitstream, fn);
+                    bitstreamService.setDescription(context, entryBitstream, "Original SWORD entry document");
 
                     BitstreamFormat bf = bitstreamFormatService
                         .findByMIMEType(context, "application/xml");
                     if (bf != null) {
-                        entryBitstream.setFormat(context, bf);
+                        bitstreamService.setFormat(context, entryBitstream, bf);
                     }
 
                     bitstreamService.update(context, entryBitstream);
@@ -321,14 +320,13 @@ public class DSpaceSwordAPI {
                         }
                     }
 
-                    bitstream.setName(context, fn);
-                    bitstream.setDescription(context,
-                                             "Original SWORD deposit file");
+                    bitstreamService.setName(context, bitstream, fn);
+                    bitstreamService.setDescription(context, bitstream, "Original SWORD deposit file");
 
                     BitstreamFormat bf = bitstreamFormatService
                         .findByMIMEType(context, deposit.getMimeType());
                     if (bf != null) {
-                        bitstream.setFormat(context, bf);
+                        bitstreamService.setFormat(context, bitstream, bf);
                     }
 
                     bitstreamService.update(context, bitstream);

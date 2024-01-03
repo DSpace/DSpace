@@ -75,24 +75,30 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
         if (item == null) {
             return UNKNOWN;
         }
+
+        return calculateAccessStatusForDso(context, getPrimaryOrFirstBitstream(item), threshold);
+    }
+
+    private Bitstream getPrimaryOrFirstBitstream(Item item) {
         // Consider only the original bundles.
-        List<Bundle> bundles = item.getBundles(Constants.DEFAULT_BUNDLE_NAME);
+        List<Bundle> bundles = itemService.getBundles(item, Constants.DEFAULT_BUNDLE_NAME);
         // Check for primary bitstreams first.
         Bitstream bitstream = bundles.stream()
-            .map(bundle -> bundle.getPrimaryBitstream())
-            .filter(Objects::nonNull)
-            .findFirst()
-            .orElse(null);
+                                     .map(Bundle::getPrimaryBitstream)
+                                     .filter(Objects::nonNull)
+                                     .findFirst()
+                                     .orElse(null);
         if (bitstream == null) {
             // If there is no primary bitstream,
             // take the first bitstream in the bundles.
             bitstream = bundles.stream()
-                .map(bundle -> bundle.getBitstreams())
-                .flatMap(List::stream)
-                .findFirst()
-                .orElse(null);
+                               .map(Bundle::getBitstreams)
+                               .flatMap(List::stream)
+                               .findFirst()
+                               .orElse(null);
         }
-        return calculateAccessStatusForDso(context, bitstream, threshold);
+
+        return bitstream;
     }
 
     /**
@@ -173,8 +179,7 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
      * @return an access status value
      */
     @Override
-    public String getEmbargoFromItem(Context context, Item item, Date threshold)
-            throws SQLException {
+    public String getEmbargoFromItem(Context context, Item item, Date threshold) throws SQLException {
         Date embargoDate;
 
         // If Item status is not "embargo" then return a null embargo date.
@@ -183,23 +188,8 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
         if (item == null || !accessStatus.equals(EMBARGO)) {
             return null;
         }
-        // Consider only the original bundles.
-        List<Bundle> bundles = item.getBundles(Constants.DEFAULT_BUNDLE_NAME);
-        // Check for primary bitstreams first.
-        Bitstream bitstream = bundles.stream()
-                .map(bundle -> bundle.getPrimaryBitstream())
-                .filter(Objects::nonNull)
-                .findFirst()
-                .orElse(null);
-        if (bitstream == null) {
-            // If there is no primary bitstream,
-            // take the first bitstream in the bundles.
-            bitstream = bundles.stream()
-                    .map(bundle -> bundle.getBitstreams())
-                    .flatMap(List::stream)
-                    .findFirst()
-                    .orElse(null);
-        }
+
+        Bitstream bitstream = getPrimaryOrFirstBitstream(item);
 
         if (bitstream == null) {
             return null;

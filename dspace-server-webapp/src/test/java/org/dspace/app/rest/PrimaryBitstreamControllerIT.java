@@ -34,6 +34,7 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
+import org.dspace.content.service.ItemService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,6 +49,8 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
     BundleService bundleService;
     @Autowired
     BitstreamService bitstreamService;
+    @Autowired
+    ItemService itemService;
 
     Item item;
     Bitstream bitstream;
@@ -73,7 +76,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                                          .withMimeType("text/plain")
                                          .build();
         }
-        bundle = item.getBundles("ORIGINAL").get(0);
+        bundle = itemService.getBundles(item, "ORIGINAL").get(0);
         context.restoreAuthSystemState();
     }
 

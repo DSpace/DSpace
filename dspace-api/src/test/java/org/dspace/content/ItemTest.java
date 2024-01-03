@@ -954,7 +954,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
         String name = "bundle";
         Bundle created = bundleService.create(context, it, name);
-        created.setName(context, name);
+        bundleService.setName(context, created, name);
         itemService.addBundle(context, it, created);
 
         assertThat("testAddBundleAuth 0", itemService.getBundles(it, name), notNullValue());
@@ -969,7 +969,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     public void testAddBundleNoAuth() throws Exception {
         String name = "bundle";
         Bundle created = bundleService.create(context, it, name);
-        created.setName(context, name);
+        bundleService.setName(context, created, name);
         itemService.addBundle(context, it, created);
         fail("Exception expected");
     }
@@ -983,7 +983,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         context.turnOffAuthorisationSystem();
         String name = "bundle";
         Bundle created = bundleService.create(context, it, name);
-        created.setName(context, name);
+        bundleService.setName(context, created, name);
         itemService.addBundle(context, it, created);
         context.restoreAuthSystemState();
 
@@ -1006,7 +1006,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         context.turnOffAuthorisationSystem();
         String name = "bundle";
         Bundle created = bundleService.create(context, it, name);
-        created.setName(context, name);
+        bundleService.setName(context, created, name);
         itemService.addBundle(context, it, created);
         context.restoreAuthSystemState();
 
@@ -1095,7 +1095,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         context.turnOffAuthorisationSystem();
         String name = "LICENSE";
         Bundle created = bundleService.create(context, it, name);
-        created.setName(context, name);
+        bundleService.setName(context, created, name);
         context.restoreAuthSystemState();
 
         // Allow Item REMOVE perms
@@ -1117,7 +1117,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         context.turnOffAuthorisationSystem();
         String name = "LICENSE";
         Bundle created = bundleService.create(context, it, name);
-        created.setName(context, name);
+        bundleService.setName(context, created, name);
         context.restoreAuthSystemState();
 
         itemService.removeDSpaceLicense(context, it);
@@ -1133,7 +1133,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         context.turnOffAuthorisationSystem();
         String name = "LICENSE";
         Bundle created = bundleService.create(context, it, name);
-        created.setName(context, name);
+        bundleService.setName(context, created, name);
 
         String bsname = "License";
         File f = new File(testProps.get("test.bitstream").toString());
@@ -1167,7 +1167,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         context.turnOffAuthorisationSystem();
         String name = "LICENSE";
         Bundle created = bundleService.create(context, it, name);
-        created.setName(context, name);
+        bundleService.setName(context, created, name);
 
         String bsname = "License";
         File f = new File(testProps.get("test.bitstream").toString());
@@ -1376,7 +1376,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         //we add some bundles for the test
         String name = "LICENSE";
         Bundle created = bundleService.create(context, it, name);
-        created.setName(context, name);
+        bundleService.setName(context, created, name);
 
         String bsname = "License";
         File f = new File(testProps.get("test.bitstream").toString());
@@ -1451,7 +1451,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         //we add some bundles for the test
         String name = "LICENSE";
         Bundle created = bundleService.create(context, it, name);
-        created.setName(context, name);
+        bundleService.setName(context, created, name);
 
         String bsname = "License";
         File f = new File(testProps.get("test.bitstream").toString());
@@ -1551,7 +1551,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         // Verify ORIGINAL Bundle inherits DEFAULT_ITEM_READ group from Collection
         // Bundles should inherit from DEFAULT_ITEM_READ so that if the item is readable, the files
         // can be listed (even if files are access restricted or embargoed)
-        List<Bundle> bundles = item.getBundles(Constants.DEFAULT_BUNDLE_NAME);
+        List<Bundle> bundles = itemService.getBundles(item, Constants.DEFAULT_BUNDLE_NAME);
         Bundle originalBundle = bundles.get(0);
         List<ResourcePolicy> bundleReadPolicies = authorizeService.getPoliciesActionFilter(context, originalBundle,
                                                                                            Constants.READ);

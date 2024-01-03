@@ -21,9 +21,12 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 import org.dspace.content.Bitstream;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.hamcrest.Matcher;
 
 public class BitstreamMatcher {
+    private static final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
     private BitstreamMatcher() { }
 
@@ -121,6 +124,8 @@ public class BitstreamMatcher {
 
     public static Matcher<? super Object> matchProperties(Bitstream bitstream) {
         try {
+            String description = bitstreamService.getDescription(bitstream);
+
             return allOf(
                     hasJsonPath("$.uuid", is(bitstream.getID().toString())),
                     hasJsonPath("$.name", is(bitstream.getName())),
@@ -128,8 +133,8 @@ public class BitstreamMatcher {
                     hasJsonPath("$.metadata", allOf(
                             matchMetadata("dc.title", bitstream.getName())
                     )),
-                    bitstream.getDescription() != null ?
-                            hasJsonPath("$.metadata", matchMetadata("dc.description", bitstream.getDescription())) :
+                    description != null ?
+                            hasJsonPath("$.metadata", matchMetadata("dc.description", description)) :
                             hasJsonPath("$.metadata", matchMetadataDoesNotExist("dc.description")),
                     hasJsonPath("$.sizeBytes", is((int) bitstream.getSizeBytes())),
                     hasJsonPath("$.checkSum", matchChecksum())

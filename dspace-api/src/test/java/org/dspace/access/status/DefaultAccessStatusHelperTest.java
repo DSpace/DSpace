@@ -242,7 +242,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         Bundle bundle = bundleService.create(context, itemWithBitstream, Constants.CONTENT_BUNDLE_NAME);
         Bitstream bitstream = bitstreamService.create(context, bundle,
                 new ByteArrayInputStream("1".getBytes(StandardCharsets.UTF_8)));
-        bitstream.setName(context, "primary");
+        bitstreamService.setName(context, bitstream, "primary");
         bundle.setPrimaryBitstreamID(bitstream);
         context.restoreAuthSystemState();
         String status = helper.getAccessStatusFromItem(context, itemWithBitstream, threshold);
@@ -259,7 +259,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         Bundle bundle = bundleService.create(context, itemWithEmbargo, Constants.CONTENT_BUNDLE_NAME);
         Bitstream bitstream = bitstreamService.create(context, bundle,
                 new ByteArrayInputStream("1".getBytes(StandardCharsets.UTF_8)));
-        bitstream.setName(context, "primary");
+        bitstreamService.setName(context, bitstream, "primary");
         bundle.setPrimaryBitstreamID(bitstream);
         List<ResourcePolicy> policies = new ArrayList<>();
         Group group = groupService.findByName(context, Group.ANONYMOUS);
@@ -287,7 +287,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         Bundle bundle = bundleService.create(context, itemWithDateRestriction, Constants.CONTENT_BUNDLE_NAME);
         Bitstream bitstream = bitstreamService.create(context, bundle,
                 new ByteArrayInputStream("1".getBytes(StandardCharsets.UTF_8)));
-        bitstream.setName(context, "primary");
+        bitstreamService.setName(context, bitstream, "primary");
         bundle.setPrimaryBitstreamID(bitstream);
         List<ResourcePolicy> policies = new ArrayList<>();
         Group group = groupService.findByName(context, Group.ANONYMOUS);
@@ -313,7 +313,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         Bundle bundle = bundleService.create(context, itemWithGroupRestriction, Constants.CONTENT_BUNDLE_NAME);
         Bitstream bitstream = bitstreamService.create(context, bundle,
                 new ByteArrayInputStream("1".getBytes(StandardCharsets.UTF_8)));
-        bitstream.setName(context, "primary");
+        bitstreamService.setName(context, bitstream, "primary");
         bundle.setPrimaryBitstreamID(bitstream);
         List<ResourcePolicy> policies = new ArrayList<>();
         Group group = groupService.findByName(context, Group.ADMIN);
@@ -338,7 +338,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         Bundle bundle = bundleService.create(context, itemWithoutPolicy, Constants.CONTENT_BUNDLE_NAME);
         Bitstream bitstream = bitstreamService.create(context, bundle,
                 new ByteArrayInputStream("1".getBytes(StandardCharsets.UTF_8)));
-        bitstream.setName(context, "primary");
+        bitstreamService.setName(context, bitstream, "primary");
         bundle.setPrimaryBitstreamID(bitstream);
         authorizeService.removeAllPolicies(context, bitstream);
         context.restoreAuthSystemState();
@@ -356,7 +356,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         Bundle bundle = bundleService.create(context, itemWithoutPrimaryBitstream, Constants.CONTENT_BUNDLE_NAME);
         Bitstream bitstream = bitstreamService.create(context, bundle,
                 new ByteArrayInputStream("1".getBytes(StandardCharsets.UTF_8)));
-        bitstream.setName(context, "first");
+        bitstreamService.setName(context, bitstream, "first");
         context.restoreAuthSystemState();
         String status = helper.getAccessStatusFromItem(context, itemWithoutPrimaryBitstream, threshold);
         assertThat("testWithoutPrimaryBitstream 0", status, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));

@@ -21,6 +21,8 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -48,6 +50,9 @@ public class ReceiptGenerator {
 
     protected ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
     protected DepositReceipt createFileReceipt(Context context,
                                                DepositResult result, SwordConfigurationDSpace config)
@@ -123,7 +128,8 @@ public class ReceiptGenerator {
                 // note here that we don't provide an actionable url
                 receipt.setOriginalDeposit(
                     urlManager.getActionableBitstreamUrl(od),
-                    od.getFormat(context).getMIMEType());
+                    bitstreamService.getFormat(context, od).getMIMEType()
+                );
             }
 
             Map<String, String> derived = new HashMap<>();
@@ -132,7 +138,7 @@ public class ReceiptGenerator {
                 for (Bitstream bs : result.getDerivedResources()) {
                     // here we provide actionable urls for the parts of the resource
                     derived.put(urlManager.getActionableBitstreamUrl(bs),
-                                bs.getFormat(context).getMIMEType());
+                                bitstreamService.getFormat(context, bs).getMIMEType());
                 }
             }
             receipt.setDerivedResources(derived);

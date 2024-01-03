@@ -723,7 +723,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
     protected String getItemTitle(XmlWorkflowItem wi) throws SQLException {
         Item myitem = wi.getItem();
-        String title = myitem.getName();
+        String title = itemService.getName(myitem);
 
         // only return the first element, or "Untitled"
         if (StringUtils.isNotBlank(title)) {

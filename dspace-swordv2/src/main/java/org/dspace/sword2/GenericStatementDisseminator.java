@@ -21,6 +21,7 @@ import org.dspace.content.DCDate;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -34,6 +35,9 @@ public abstract class GenericStatementDisseminator
 
     protected ItemService itemService = ContentServiceFactory.getInstance()
                                                              .getItemService();
+
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance()
+                                                                       .getBitstreamService();
 
     protected void populateStatement(Context context, Item item,
                                      Statement statement)
@@ -83,8 +87,7 @@ public abstract class GenericStatementDisseminator
                         OriginalDeposit deposit = new OriginalDeposit(
                             this.urlManager.getBitstreamUrl(
                                 bitstream));
-                        deposit.setMediaType(bitstream
-                                                 .getFormat(context).getMIMEType());
+                        deposit.setMediaType(bitstreamService.getFormat(context, bitstream).getMIMEType());
                         deposit.setDepositedOn(this.getDateOfDeposit(item));
                         originalDeposits.add(deposit);
                     }
@@ -139,8 +142,7 @@ public abstract class GenericStatementDisseminator
                             ResourcePart part = new ResourcePart(this.urlManager
                                                                      .getActionableBitstreamUrl(
                                                                          bitstream));
-                            part.setMediaType(bitstream
-                                                  .getFormat(context).getMIMEType());
+                            part.setMediaType(bitstreamService.getFormat(context, bitstream).getMIMEType());
                             resources.add(part);
                         }
                     }

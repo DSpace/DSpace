@@ -17,6 +17,8 @@ import java.util.UUID;
 
 import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.app.util.service.DSpaceObjectUtils;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataDSpaceCsvExportService;
 import org.dspace.core.Constants;
@@ -29,6 +31,12 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Implementation of {@link MetadataDSpaceCsvExportService}
  */
 public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExportService {
+
+    @Autowired
+    private CommunityService communityService;
+
+    @Autowired
+    private CollectionService collectionService;
 
     @Autowired
     private ItemService itemService;

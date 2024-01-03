@@ -142,8 +142,8 @@ public class SimpleZipContentIngester extends AbstractSwordContentIngester {
                 Bitstream bs = bitstreamService.create(context, target, stream);
                 BitstreamFormat format = this
                     .getFormat(context, entry.getName());
-                bs.setFormat(context, format);
-                bs.setName(context, entry.getName());
+                bitstreamService.setFormat(context, bs, format);
+                bitstreamService.setName(context, bs, entry.getName());
                 bitstreamService.update(context, bs);
                 derivedResources.add(bs);
             }

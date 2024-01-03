@@ -804,7 +804,7 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
         Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, InputStream.nullInputStream())
             .build();
 
-        Bundle bundle = item.getBundles("ORIGINAL").get(0);
+        Bundle bundle = itemService.getBundles(item, "ORIGINAL").get(0);
 
         // Verify that the item, bundle and bitstream each have exactly one READ policy, for the anonymous group.
         assertEquals(
@@ -877,7 +877,7 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
         Bitstream bitstream = BitstreamBuilder.createBitstream(context, item, InputStream.nullInputStream())
             .build();
 
-        Bundle bundle = item.getBundles("ORIGINAL").get(0);
+        Bundle bundle = itemService.getBundles(item, "ORIGINAL").get(0);
 
         // Verify that the item, bundle and bitstream each have exactly one READ policy, for the anonymous group.
         assertEquals(

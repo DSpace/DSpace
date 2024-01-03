@@ -150,12 +150,12 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
     }
 
     public BitstreamBuilder withName(String name) throws SQLException {
-        bitstream.setName(context, name);
+        bitstreamService.setName(context, bitstream, name);
         return this;
     }
 
     public BitstreamBuilder withDescription(String description) throws SQLException {
-        bitstream.setDescription(context, description);
+        bitstreamService.setDescription(context, bitstream, description);
         return this;
     }
 
@@ -163,7 +163,7 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
         BitstreamFormat bf = bitstreamFormatService.findByMIMEType(context, mimeType);
 
         if (bf != null) {
-            bitstream.setFormat(context, bf);
+            bitstreamService.setFormat(context, bitstream, bf);
         }
 
         return this;
@@ -178,7 +178,7 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
      * @throws SQLException
      */
     public BitstreamBuilder guessFormat() throws SQLException {
-        bitstream.setFormat(context, bitstreamFormatService.guessFormat(context, bitstream));
+        bitstreamService.setFormat(context, bitstream, bitstreamFormatService.guessFormat(context, bitstream));
         return this;
     }
 

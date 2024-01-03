@@ -19,6 +19,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 import org.dspace.curate.Distributive;
@@ -33,6 +34,8 @@ import org.dspace.curate.Distributive;
 public class ProfileFormats extends AbstractCurationTask {
     // map of formats to occurrences
     protected Map<String, Integer> fmtTable = new HashMap<String, Integer>();
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance()
+                                                                       .getBitstreamService();
     protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance()
                                                                                    .getBitstreamFormatService();
 
@@ -54,7 +57,7 @@ public class ProfileFormats extends AbstractCurationTask {
     protected void performItem(Item item) throws SQLException, IOException {
         for (Bundle bundle : item.getBundles()) {
             for (Bitstream bs : bundle.getBitstreams()) {
-                String fmt = bs.getFormat(Curator.curationContext()).getShortDescription();
+                String fmt = bitstreamService.getFormat(Curator.curationContext(), bs).getShortDescription();
                 Integer count = fmtTable.get(fmt);
                 if (count == null) {
                     count = 1;

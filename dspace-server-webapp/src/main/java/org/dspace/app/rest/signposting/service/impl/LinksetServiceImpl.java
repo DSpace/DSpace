@@ -143,11 +143,7 @@ public class LinksetServiceImpl implements LinksetService {
     }
 
     private Iterator<Bitstream> getItemBitstreams(Context context, Item item) {
-        try {
-            List<Bundle> bundles = itemService.getBundles(item, Constants.DEFAULT_BUNDLE_NAME);
-            return bundles.stream().flatMap(bundle -> bundle.getBitstreams().stream()).iterator();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        List<Bundle> bundles = itemService.getBundles(item, Constants.DEFAULT_BUNDLE_NAME);
+        return bundles.stream().flatMap(bundle -> bundle.getBitstreams().stream()).iterator();
     }
 }

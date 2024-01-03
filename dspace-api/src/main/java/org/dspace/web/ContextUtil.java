@@ -18,6 +18,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.dspace.utils.DSpace;
@@ -34,6 +36,8 @@ public class ContextUtil {
      * The log4j logger
      */
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ContextUtil.class);
+
+    private static final EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
     /**
      * Where the context is stored on an HTTP Request object
@@ -125,7 +129,7 @@ public class ContextUtil {
             }
         }
         if (userLocale == null && context.getCurrentUser() != null) {
-            String userLanguage = context.getCurrentUser().getLanguage();
+            String userLanguage = epersonService.getLanguage(context.getCurrentUser());
             if (userLanguage != null) {
                 userLocale = new Locale(userLanguage);
             }

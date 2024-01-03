@@ -937,7 +937,7 @@ public abstract class AbstractMETSDisseminator
                         }
                     }
                     file.setGROUPID(groupID);
-                    file.setMIMETYPE(bitstream.getFormat(context).getMIMEType());
+                    file.setMIMETYPE(bitstreamService.getFormat(context, bitstream).getMIMEType());
                     file.setSIZE(auth ? bitstream.getSizeBytes() : 0);
 
                     // Translate checksum and type to METS
@@ -1093,7 +1093,7 @@ public abstract class AbstractMETSDisseminator
         edu.harvard.hul.ois.mets.File file = new edu.harvard.hul.ois.mets.File();
         String fileID = gensym("logo");
         file.setID(fileID);
-        file.setMIMETYPE(logoBs.getFormat(context).getMIMEType());
+        file.setMIMETYPE(bitstreamService.getFormat(context, logoBs).getMIMEType());
         file.setSIZE(logoBs.getSizeBytes());
 
         // Translate checksum and type to METS
@@ -1427,7 +1427,7 @@ public abstract class AbstractMETSDisseminator
             return bitstream.getName();
         } else {
             String base = "bitstream_" + String.valueOf(bitstream.getID());
-            List<String> ext = bitstream.getFormat(context).getExtensions();
+            List<String> ext = bitstreamService.getFormat(context, bitstream).getExtensions();
             return (ext.size() > 0) ? base + "." + ext.get(0) : base;
         }
     }

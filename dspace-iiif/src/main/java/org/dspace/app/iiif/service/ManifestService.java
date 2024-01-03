@@ -26,6 +26,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
@@ -53,6 +54,9 @@ public class ManifestService extends AbstractResourceService {
 
     @Autowired
     protected ItemService itemService;
+
+    @Autowired
+    protected BitstreamService bitstreamService;
 
     @Autowired
     CanvasService canvasService;
@@ -126,7 +130,7 @@ public class ManifestService extends AbstractResourceService {
     private void populateManifest(Item item, Context context) {
         String manifestId = getManifestId(item.getID());
         manifestGenerator.setIdentifier(manifestId);
-        manifestGenerator.setLabel(item.getName());
+        manifestGenerator.setLabel(itemService.getName(item));
         setLogoContainer();
         addRelated(item);
         addSearchService(item);
@@ -197,7 +201,7 @@ public class ManifestService extends AbstractResourceService {
             if (eq.length > 2) {
                 qualifier = eq[2];
             }
-            List<MetadataValue> metadata = item.getItemService().getMetadata(item, schema, element, qualifier,
+            List<MetadataValue> metadata = itemService.getMetadata(item, schema, element, qualifier,
                     Item.ANY);
             List<String> values = new ArrayList<String>();
             for (MetadataValue meta : metadata) {
@@ -223,12 +227,12 @@ public class ManifestService extends AbstractResourceService {
                 }
             }
         }
-        String descrValue = item.getItemService().getMetadataFirstValue(item, "dc", "description", null, Item.ANY);
+        String descrValue = itemService.getMetadataFirstValue(item, "dc", "description", null, Item.ANY);
         if (StringUtils.isNotBlank(descrValue)) {
             manifestGenerator.addDescription(descrValue);
         }
 
-        String licenseUriValue = item.getItemService().getMetadataFirstValue(item, "dc", "rights", "uri", Item.ANY);
+        String licenseUriValue = itemService.getMetadataFirstValue(item, "dc", "rights", "uri", Item.ANY);
         if (StringUtils.isNotBlank(licenseUriValue)) {
             manifestGenerator.addLicense(licenseUriValue);
         }
@@ -318,7 +322,7 @@ public class ManifestService extends AbstractResourceService {
             for (Bitstream bitstream : bitstreams) {
                 String mimeType = null;
                 try {
-                    mimeType = bitstream.getFormat(context).getMIMEType();
+                    mimeType = bitstreamService.getFormat(context, bitstream).getMIMEType();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }

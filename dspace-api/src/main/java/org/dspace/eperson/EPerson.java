@@ -7,7 +7,6 @@
  */
 package org.dspace.eperson;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,11 +23,9 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.CacheableDSpaceObject;
 import org.dspace.content.DSpaceObjectLegacySupport;
-import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.HibernateProxyHelper;
-import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 
 /**
@@ -102,9 +99,6 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
     public static final int LANGUAGE = 5;
 
     @Transient
-    protected transient EPersonService ePersonService;
-
-    @Transient
     private Date previousActive;
 
     /**
@@ -163,28 +157,6 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
     }
 
     /**
-     * Get the e-person's language
-     *
-     * @return language code (or null if the column is an SQL NULL)
-     */
-    public String getLanguage() {
-        return getePersonService().getMetadataFirstValue(this, "eperson", "language", null, Item.ANY);
-    }
-
-    /**
-     * Set the EPerson's language.  Value is expected to be a Unix/POSIX
-     * Locale specification of the form {language} or {language}_{territory},
-     * e.g. "en", "en_US", "pt_BR" (the latter is Brazilian Portuguese).
-     *
-     * @param context  The relevant DSpace Context.
-     * @param language language code
-     * @throws SQLException An exception that provides information on a database access error or other errors.
-     */
-    public void setLanguage(Context context, String language) throws SQLException {
-        getePersonService().setMetadataSingleValue(context, this, "eperson", "language", null, null, language);
-    }
-
-    /**
      * Get the e-person's email address
      *
      * @return their email address (or null if the column is an SQL NULL)
@@ -226,6 +198,8 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
      * Get the e-person's full name, combining first and last name in a
      * displayable string.
      *
+     * @deprecated  This method is required to keep {@link #equals} and {@link #hashCode} working.
+     *              Please {@link EPersonService#getFullName} instead.
      * @return their full name (first + last name; if both are NULL, returns email)
      */
     public String getFullName() {
@@ -244,43 +218,23 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
     /**
      * Get the eperson's first name.
      *
+     * @deprecated  This method is required to keep {@link #equals} and {@link #hashCode} working.
+     *              Please {@link EPersonService#getFirstName} instead.
      * @return their first name (or null if the column is an SQL NULL)
      */
     public String getFirstName() {
-        return getePersonService().getMetadataFirstValue(this, "eperson", "firstname", null, Item.ANY);
-    }
-
-    /**
-     * Set the eperson's first name
-     *
-     * @param context   The relevant DSpace Context.
-     * @param firstname the person's first name
-     * @throws SQLException An exception that provides information on a database access error or other errors.
-     */
-    public void setFirstName(Context context, String firstname) throws SQLException {
-        getePersonService().setMetadataSingleValue(context, this, "eperson", "firstname", null, null, firstname);
-        setModified();
+        return getMetadataFirstValue("eperson", "firstname", null);
     }
 
     /**
      * Get the eperson's last name.
      *
+     * @deprecated  This method is required to keep {@link #equals} and {@link #hashCode} working.
+     *              Please {@link EPersonService#getLastName} instead.
      * @return their last name (or null if the column is an SQL NULL)
      */
     public String getLastName() {
-        return getePersonService().getMetadataFirstValue(this, "eperson", "lastname", null, Item.ANY);
-    }
-
-    /**
-     * Set the eperson's last name
-     *
-     * @param context  The relevant DSpace Context.
-     * @param lastname the person's last name
-     * @throws SQLException An exception that provides information on a database access error or other errors.
-     */
-    public void setLastName(Context context, String lastname) throws SQLException {
-        getePersonService().setMetadataSingleValue(context, this, "eperson", "lastname", null, null, lastname);
-        setModified();
+        return getMetadataFirstValue("eperson", "lastname", null);
     }
 
     /**
@@ -360,7 +314,7 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
     }
 
     /**
-     * @return type found in Constants, see {@link org.dspace.core.Constants#Constants Constants}
+     * @return type found in {@link org.dspace.core.Constants Constants}
      */
     @Override
     public int getType() {
@@ -378,8 +332,7 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
 
     /**
      * Store the digest algorithm used to hash the password.  You should also
-     * set the {@link setPassword password hash} and the
-     * {@link setDigestAlgorithm digest algorithm}.
+     * set the {@link #setPassword password hash} and the {@link #setDigestAlgorithm digest algorithm}.
      *
      * @param digestAlgorithm
      */
@@ -393,8 +346,7 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
 
     /**
      * Store the salt used when hashing the password.  You should also set the
-     * {@link setPassword password hash} and the {@link setDigestAlgorithm
-     * digest algorithm}.
+     * {@link #setPassword password hash} and the {@link #setDigestAlgorithm digest algorithm}.
      *
      * @param salt
      */
@@ -408,7 +360,7 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
 
     /**
      * Store the <strong>hash of a</strong> password.  You should also set the
-     * {@link setSalt salt} and the {@link setDigestAlgorithm digest algorithm}.
+     * {@link #setSalt salt} and the {@link #setDigestAlgorithm digest algorithm}.
      *
      * @param password
      */
@@ -418,13 +370,6 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
 
     public List<Group> getGroups() {
         return groups;
-    }
-
-    private EPersonService getePersonService() {
-        if (ePersonService == null) {
-            ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-        }
-        return ePersonService;
     }
 
     public String getSessionSalt() {
@@ -446,4 +391,8 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
         return StringUtils.isNotBlank(getPassword());
     }
 
+    @Override
+    public void setModified() {
+        super.setModified();
+    }
 }

@@ -72,6 +72,7 @@ import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -98,6 +99,9 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private GroupService groupService;
+
+    @Autowired
+    private CollectionService collectionService;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -1145,7 +1149,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
             .createCollection(context, community)
             .withWorkflowGroup(1, ePerson)
             .build();
-        Group workflowGroup = collection.getWorkflowStep1(context);
+        Group workflowGroup = collectionService.getWorkflowGroup(context, collection, 1);
         context.restoreAuthSystemState();
 
         // enable Polish locale

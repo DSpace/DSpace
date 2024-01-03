@@ -7,7 +7,6 @@
  */
 package org.dspace.content;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,9 +19,6 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.BundleService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.HibernateProxyHelper;
@@ -65,9 +61,6 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport {
     )
     private final List<Item> items = new ArrayList<>();
 
-    @Transient
-    protected transient BundleService bundleService;
-
     /**
      * Protected constructor, create object using:
      * {@link org.dspace.content.service.BundleService#create(Context, Item, String)}
@@ -87,20 +80,7 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport {
      */
     @Override
     public String getName() {
-        return getBundleService().getMetadataFirstValue(this, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
-    }
-
-    /**
-     * Set the name of the bundle
-     *
-     * @param context context
-     * @param name    string name of the bundle (ORIGINAL, TEXT, THUMBNAIL) are the
-     *                values currently used
-     * @throws SQLException if database error
-     */
-    public void setName(Context context, String name) throws SQLException {
-        getBundleService().setMetadataSingleValue(context, this, MetadataSchemaEnum.DC.getName(),
-                                                  "title", null, null, name);
+        return getMetadataFirstValue(MetadataSchemaEnum.DC.getName(), "title", null);
     }
 
     /**
@@ -221,12 +201,5 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport {
     @Override
     public int getType() {
         return Constants.BUNDLE;
-    }
-
-    private BundleService getBundleService() {
-        if (bundleService == null) {
-            bundleService = ContentServiceFactory.getInstance().getBundleService();
-        }
-        return bundleService;
     }
 }

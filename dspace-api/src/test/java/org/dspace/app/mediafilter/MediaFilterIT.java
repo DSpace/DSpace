@@ -187,14 +187,14 @@ public class MediaFilterIT extends AbstractIntegrationTestWithDatabase {
     }
 
     private void checkItemHasBeenNotProcessed(Item item) throws IOException, SQLException, AuthorizeException {
-        List<Bundle> textBundles = item.getBundles("TEXT");
+        List<Bundle> textBundles = itemService.getBundles(item, "TEXT");
         assertTrue("The item " + item.getName() + " should NOT have the TEXT bundle", textBundles.size() == 0);
     }
 
     private void checkItemHasBeenProcessed(Item item) throws IOException, SQLException, AuthorizeException {
         String expectedFileName = StringUtils.endsWith(item.getName(), "_a") ? "test.csv.txt" : "test.txt.txt";
         String expectedContent = StringUtils.endsWith(item.getName(), "_a") ? "data3,3" : "quick brown fox";
-        List<Bundle> textBundles = item.getBundles("TEXT");
+        List<Bundle> textBundles = itemService.getBundles(item, "TEXT");
         assertTrue("The item " + item.getName() + " has NOT the TEXT bundle", textBundles.size() == 1);
         List<Bitstream> bitstreams = textBundles.get(0).getBitstreams();
         assertTrue("The item " + item.getName() + " has NOT exactly 1 bitstream in the TEXT bundle",

@@ -206,7 +206,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
             // For our primary test item, create a Bitstream in the ORIGINAL bundle
             File f = new File(testProps.get("test.bitstream").toString());
             Bitstream b = itemService.createSingleBitstream(context, new FileInputStream(f), item);
-            b.setName(context, "Test Bitstream");
+            bitstreamService.setName(context, b, "Test Bitstream");
             bitstreamService.update(context, b);
             itemService.update(context, item);
             testItemHandle = item.getHandle();
@@ -814,7 +814,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
         // Create a test Bitstream in the ORIGINAL bundle
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream b = itemService.createSingleBitstream(context, new FileInputStream(f), item);
-        b.setName(context, "Test Bitstream");
+        bitstreamService.setName(context, b, "Test Bitstream");
         bitstreamService.update(context, b);
         itemService.update(context, item);
 
@@ -884,7 +884,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
         // Create a test Bitstream in the ORIGINAL bundle
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream b = itemService.createSingleBitstream(context, new FileInputStream(f), item);
-        b.setName(context, "Test Bitstream");
+        bitstreamService.setName(context, b, "Test Bitstream");
         bitstreamService.update(context, b);
         itemService.update(context, item);
 

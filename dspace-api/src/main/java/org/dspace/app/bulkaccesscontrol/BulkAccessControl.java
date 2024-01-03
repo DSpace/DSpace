@@ -477,7 +477,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
      * @param item the item contains bitstreams
      * @param accessControl the access control input
      */
-    private void updateBitstreamsPolicies(Item item, BulkAccessControlInput accessControl) {
+    private void updateBitstreamsPolicies(Item item, BulkAccessControlInput accessControl) throws SQLException {
         AccessConditionBitstream.Constraint constraints = accessControl.getBitstream().getConstraints();
 
         // look over all the bundles and force initialization of bitstreams collection
@@ -488,7 +488,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
                              bundle.getBitstreams().stream())
                          .count();
 
-        item.getBundles(CONTENT_BUNDLE_NAME).stream()
+        itemService.getBundles(item, CONTENT_BUNDLE_NAME).stream()
             .flatMap(bundle -> bundle.getBitstreams().stream())
             .filter(bitstream -> constraints == null ||
                 constraints.getUuid() == null ||

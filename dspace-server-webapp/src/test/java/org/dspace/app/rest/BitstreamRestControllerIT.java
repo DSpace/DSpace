@@ -169,7 +169,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                 .withSupportLevel(SUPPORTED)
                 .build();
 
-        bitstream.setFormat(context, supportedFormat);
+        bitstreamService.setFormat(context, bitstream, supportedFormat);
 
         context.restoreAuthSystemState();
     }
@@ -1116,7 +1116,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
         bitstream = context.reloadEntity(bitstream);
 
-        assertThat(knownFormat, equalTo(bitstream.getFormat(context)));
+        assertThat(knownFormat, equalTo(bitstreamService.getFormat(context, bitstream)));
         assertTrue(isEmpty(
                 bitstreamService.getMetadataByMetadataString(bitstream, "dc.format")
         ));
@@ -1139,7 +1139,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
         bitstream = context.reloadEntity(bitstream);
 
-        assertThat(unknownFormat, equalTo(bitstream.getFormat(context)));
+        assertThat(unknownFormat, equalTo(bitstreamService.getFormat(context, bitstream)));
         assertTrue(isEmpty(
                 bitstreamService.getMetadataByMetadataString(bitstream, "dc.format")
         ));

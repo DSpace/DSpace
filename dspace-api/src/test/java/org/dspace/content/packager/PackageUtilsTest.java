@@ -157,12 +157,12 @@ public class PackageUtilsTest extends AbstractUnitTest {
     @Test
     public void testCrosswalkGroupNameWithoutUnderscore() throws Exception {
         Collection testCollection = (Collection) handleService.resolveToObject(context, testCollectionHandle);
-        Group originalFirstStepWorkflowGroup = testCollection.getWorkflowStep1(context);
+        Group originalFirstStepWorkflowGroup = collectionService.getWorkflowGroup(context, testCollection, 1);
 
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
         Group testGroup = groupService.create(context);
         groupService.setName(testGroup, "TESTGROUP");
-        testCollection.setWorkflowGroup(context, 1, testGroup);
+       collectionService.setWorkflowGroup(context, testCollection, 1, testGroup);
 
         String exportName = PackageUtils.translateGroupNameForExport(context,
                                                                      testGroup.getName());
@@ -173,18 +173,18 @@ public class PackageUtilsTest extends AbstractUnitTest {
         assertEquals("Exported Group name without underscore unchanged by translation for import", exportName,
                      importName);
 
-        testCollection.setWorkflowGroup(context, 1, originalFirstStepWorkflowGroup);
+       collectionService.setWorkflowGroup(context, testCollection, 1, originalFirstStepWorkflowGroup);
     }
 
     @Test
     public void testCrosswalkGroupNameUnderscoresNoDSO() throws Exception {
         Collection testCollection = (Collection) handleService.resolveToObject(context, testCollectionHandle);
-        Group originalFirstStepWorkflowGroup = testCollection.getWorkflowStep1(context);
+        Group originalFirstStepWorkflowGroup = collectionService.getWorkflowGroup(context, testCollection, 1);
 
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
         Group testGroup = groupService.create(context);
         groupService.setName(testGroup, "TESTGROUP_ABC_TEST");
-        testCollection.setWorkflowGroup(context, 1, testGroup);
+       collectionService.setWorkflowGroup(context, testCollection, 1, testGroup);
 
         String exportName = PackageUtils.translateGroupNameForExport(context,
                                                                      testGroup.getName());
@@ -195,13 +195,13 @@ public class PackageUtilsTest extends AbstractUnitTest {
         assertEquals("Exported Group name with underscores but no DSO unchanged by translation for import", exportName,
                      importName);
 
-        testCollection.setWorkflowGroup(context, 1, originalFirstStepWorkflowGroup);
+       collectionService.setWorkflowGroup(context, testCollection, 1, originalFirstStepWorkflowGroup);
     }
 
     @Test
     public void testCrosswalkGroupNameUnderscoresAndDSO() throws Exception {
         Collection testCollection = (Collection) handleService.resolveToObject(context, testCollectionHandle);
-        Group originalFirstStepWorkflowGroup = testCollection.getWorkflowStep1(context);
+        Group originalFirstStepWorkflowGroup = collectionService.getWorkflowGroup(context, testCollection, 1);
 
         Group group = collectionService.createWorkflowGroup(context, testCollection, 1);
 
@@ -214,7 +214,7 @@ public class PackageUtilsTest extends AbstractUnitTest {
         assertEquals("Exported Group name with dso unchanged by roundtrip translation for export/import",
                      group.getName(), importName);
 
-        testCollection.setWorkflowGroup(context, 1, originalFirstStepWorkflowGroup);
+       collectionService.setWorkflowGroup(context, testCollection, 1, originalFirstStepWorkflowGroup);
     }
 
     @After

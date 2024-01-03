@@ -120,8 +120,8 @@ public class LicenseUtilsTest extends AbstractUnitTest {
         String defaultLicense = licenseService.getDefaultSubmissionLicense();
         context.turnOffAuthorisationSystem();
         person = ePersonService.create(context);
-        person.setFirstName(context, "first name");
-        person.setLastName(context, "last name");
+        ePersonService.setFirstName(context, person, "first name");
+        ePersonService.setLastName(context, person, "last name");
         person.setEmail("testGetLicenseText_5args@email.com");
 
         //TODO: the tested method doesn't verify the input, will throw NPE if any parameter is null
@@ -157,7 +157,7 @@ public class LicenseUtilsTest extends AbstractUnitTest {
         //test collection template
         locale = Locale.ENGLISH;
         collection = collectionService.create(context, owningCommunity);
-        collection.setLicense(context, template);
+        collectionService.setLicense(context, collection, template);
         item = installItemService.installItem(context, workspaceItemService.create(context, collection, false));
         additionalInfo = null;
         assertThat("testGetLicenseText_5args 3",
@@ -166,7 +166,7 @@ public class LicenseUtilsTest extends AbstractUnitTest {
 
         locale = Locale.GERMAN;
         collection = collectionService.create(context, owningCommunity);
-        collection.setLicense(context, template);
+        collectionService.setLicense(context, collection, template);
         item = installItemService.installItem(context, workspaceItemService.create(context, collection, false));
         additionalInfo = null;
         assertThat("testGetLicenseText_5args 4",
@@ -175,7 +175,7 @@ public class LicenseUtilsTest extends AbstractUnitTest {
 
         locale = Locale.ENGLISH;
         collection = collectionService.create(context, owningCommunity);
-        collection.setLicense(context, templateLong);
+        collectionService.setLicense(context, collection, templateLong);
         item = installItemService.installItem(context, workspaceItemService.create(context, collection, false));
         additionalInfo = new LinkedHashMap<>();
         additionalInfo.put("arg1", "arg1");
@@ -204,8 +204,8 @@ public class LicenseUtilsTest extends AbstractUnitTest {
         String templateResult = "Template license: first name last name testgetlicensetext_4args@email.com  ";
         context.turnOffAuthorisationSystem();
         person = ePersonService.create(context);
-        person.setFirstName(context, "first name");
-        person.setLastName(context, "last name");
+        ePersonService.setFirstName(context, person, "first name");
+        ePersonService.setLastName(context, person, "last name");
         person.setEmail("testGetLicenseText_4args@email.com");
         ePersonService.update(context, person);
 
@@ -230,14 +230,14 @@ public class LicenseUtilsTest extends AbstractUnitTest {
         //test collection template
         locale = Locale.ENGLISH;
         collection = collectionService.create(context, owningCommunity);
-        collection.setLicense(context, template);
+        collectionService.setLicense(context, collection, template);
         item = installItemService.installItem(context, workspaceItemService.create(context, collection, false));
         assertThat("testGetLicenseText_5args 3", LicenseUtils.getLicenseText(locale, collection, item, person),
                    equalTo(templateResult));
 
         locale = Locale.GERMAN;
         collection = collectionService.create(context, owningCommunity);
-        collection.setLicense(context, template);
+        collectionService.setLicense(context, collection, template);
         item = installItemService.installItem(context, workspaceItemService.create(context, collection, false));
         assertThat("testGetLicenseText_5args 4", LicenseUtils.getLicenseText(locale, collection, item, person),
                    equalTo(templateResult));

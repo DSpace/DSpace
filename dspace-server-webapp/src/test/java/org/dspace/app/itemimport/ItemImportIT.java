@@ -192,8 +192,8 @@ public class ItemImportIT extends AbstractEntityIntegrationTest {
      * @throws Exception
      */
     private void checkBitstream() throws Exception {
-        Bitstream bitstream = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next()
-                .getBundles("ORIGINAL").get(0).getBitstreams().get(0);
+        Item item = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next();
+        Bitstream bitstream = itemService.getBundles(item, "ORIGINAL").get(0).getBitstreams().get(0);
         getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.metadata", allOf(

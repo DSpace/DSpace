@@ -29,6 +29,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.Site;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.SiteService;
@@ -60,6 +61,8 @@ public class SimpleDSORelationsConverterPlugin
     private static final Logger log =
             org.apache.logging.log4j.LogManager.getLogger(SimpleDSORelationsConverterPlugin.class);
 
+    @Autowired(required = true)
+    protected BundleService bundleService;
     @Autowired(required = true)
     protected BitstreamService bitstreamService;
     @Autowired(required = true)
