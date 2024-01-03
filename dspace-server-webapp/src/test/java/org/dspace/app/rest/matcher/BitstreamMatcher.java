@@ -102,7 +102,8 @@ public class BitstreamMatcher {
         return matchEmbeds(
                 "bundle",
                 "format",
-                "thumbnail"
+                "thumbnail",
+                "checksum"
         );
     }
 
@@ -115,7 +116,8 @@ public class BitstreamMatcher {
                 "content",
                 "format",
                 "self",
-                "thumbnail"
+                "thumbnail",
+                "checksum"
         );
     }
 

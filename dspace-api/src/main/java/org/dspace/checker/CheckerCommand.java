@@ -7,10 +7,13 @@
  */
 package org.dspace.checker;
 
+import static org.dspace.storage.bitstore.SyncBitstreamStorageServiceImpl.SYNCHRONIZED_STORES_NUMBER;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.collections4.MapUtils;
 import org.apache.logging.log4j.Logger;
@@ -20,8 +23,8 @@ import org.dspace.checker.service.ChecksumResultService;
 import org.dspace.checker.service.MostRecentChecksumService;
 import org.dspace.content.Bitstream;
 import org.dspace.core.Context;
+import org.dspace.storage.bitstore.SyncBitstreamStorageServiceImpl;
 import org.dspace.storage.bitstore.factory.StorageServiceFactory;
-import org.dspace.storage.bitstore.service.BitstreamStorageService;
 
 /**
  * <p>
@@ -55,7 +58,7 @@ public final class CheckerCommand {
      * Checksum history Data access object
      */
     private ChecksumHistoryService checksumHistoryService = null;
-    private BitstreamStorageService bitstreamStorageService = null;
+    private SyncBitstreamStorageServiceImpl bitstreamStorageService = null;
     private ChecksumResultService checksumResultService = null;
 
     /**
@@ -86,7 +89,7 @@ public final class CheckerCommand {
     public CheckerCommand(Context context) {
         checksumService = CheckerServiceFactory.getInstance().getMostRecentChecksumService();
         checksumHistoryService = CheckerServiceFactory.getInstance().getChecksumHistoryService();
-        bitstreamStorageService = StorageServiceFactory.getInstance().getBitstreamStorageService();
+        bitstreamStorageService = StorageServiceFactory.getInstance().getSyncBitstreamStorageService();
         checksumResultService = CheckerServiceFactory.getInstance().getChecksumResultService();
         this.context = context;
     }
@@ -245,7 +248,9 @@ public final class CheckerCommand {
         info.setProcessStartDate(new Date());
 
         try {
-            Map<String, Object> checksumMap = bitstreamStorageService.computeChecksum(context, info.getBitstream());
+            // 1. DB - Store not match
+            Bitstream bitstream = info.getBitstream();
+            Map<String, Object> checksumMap = bitstreamStorageService.computeChecksum(context, bitstream);
             if (MapUtils.isNotEmpty(checksumMap)) {
                 info.setBitstreamFound(true);
                 if (checksumMap.containsKey("checksum")) {
@@ -263,6 +268,32 @@ public final class CheckerCommand {
                 info.setCurrentChecksum("");
                 info.setChecksumResult(getChecksumResultByCode(ChecksumResultCode.BITSTREAM_NOT_FOUND));
                 info.setToBeProcessed(false);
+            }
+
+            // 2. Store1 - Synchronized store 2 not match
+            // Check checksum of synchronized store
+            if (bitstream.getStoreNumber() != SYNCHRONIZED_STORES_NUMBER) {
+                return;
+            }
+            if (Objects.equals(ChecksumResultCode.CHECKSUM_NO_MATCH, info.getChecksumResult().getResultCode())) {
+                return;
+            }
+
+            Map<String, Object> syncStoreChecksumMap =
+                    bitstreamStorageService.computeChecksumSpecStore(context, bitstream,
+                            bitstreamStorageService.getSynchronizedStoreNumber(bitstream));
+            if (MapUtils.isNotEmpty(syncStoreChecksumMap)) {
+                String syncStoreChecksum = "";
+                if (checksumMap.containsKey("checksum")) {
+                    syncStoreChecksum = syncStoreChecksumMap.get("checksum").toString();
+                }
+                // compare new checksum to previous checksum
+                ChecksumResult checksumResult = compareChecksums(info.getCurrentChecksum(), syncStoreChecksum);
+                // Do not override result with synchronization info if the checksums are not matching between
+                // DB and store
+                if (!Objects.equals(checksumResult.getResultCode(), ChecksumResultCode.CHECKSUM_NO_MATCH)) {
+                    info.setChecksumResult(getChecksumResultByCode(ChecksumResultCode.CHECKSUM_SYNC_NO_MATCH));
+                }
             }
 
         } catch (IOException e) {

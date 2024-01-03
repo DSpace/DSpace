@@ -7,6 +7,7 @@
  */
 package org.dspace.storage.bitstore.factory;
 
+import org.dspace.storage.bitstore.SyncBitstreamStorageServiceImpl;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,9 +21,17 @@ public class StorageServiceFactoryImpl extends StorageServiceFactory {
 
     @Autowired(required = true)
     private BitstreamStorageService bitstreamStorageService;
+    @Autowired(required = true)
+    private SyncBitstreamStorageServiceImpl syncBitstreamStorageService;
+
 
     @Override
     public BitstreamStorageService getBitstreamStorageService() {
         return bitstreamStorageService;
+    }
+
+    @Override
+    public SyncBitstreamStorageServiceImpl getSyncBitstreamStorageService() {
+        return syncBitstreamStorageService;
     }
 }

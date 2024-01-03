@@ -23,6 +23,7 @@ import static org.dspace.core.Constants.WRITE;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -1234,6 +1235,52 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
         Mockito.verify(bitstreamStorageServiceSpy, times(1)).retrieve(any(), eq(bitstream));
         Mockito.verify(inputStreamSpy, times(1)).close();
+    }
+
+    @Test
+    public void testChecksumLinkRepository() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community and one collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        //2. A public item with a bitstream
+        String bitstreamContent = "0123456789";
+
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+
+            Item publicItem1 = ItemBuilder.createItem(context, col1)
+                    .withTitle("Public item 1")
+                    .withIssueDate("2017-10-17")
+                    .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                    .build();
+
+            bitstream = BitstreamBuilder
+                    .createBitstream(context, publicItem1, is)
+                    .withName("Test bitstream")
+                    .withDescription("This is a bitstream to test range requests")
+                    .withMimeType("text/plain")
+                    .build();
+        }
+        context.restoreAuthSystemState();
+
+        getClient()
+                .perform(get("/api/core/bitstreams/" + bitstream.getID() + "/checksum"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.activeStore.value", is(bitstream.getChecksum())))
+                .andExpect(jsonPath("$.activeStore.checkSumAlgorithm", is(bitstream.getChecksumAlgorithm())))
+                .andExpect(jsonPath("$.databaseChecksum.value", is(bitstream.getChecksum())))
+                .andExpect(jsonPath("$.databaseChecksum.checkSumAlgorithm",
+                        is(bitstream.getChecksumAlgorithm())))
+                .andExpect(jsonPath("$.synchronizedStore.value", nullValue()))
+                .andExpect(jsonPath("$.synchronizedStore.checkSumAlgorithm", nullValue()));
+
+
     }
 
 }

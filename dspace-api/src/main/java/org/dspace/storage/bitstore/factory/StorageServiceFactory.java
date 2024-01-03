@@ -8,6 +8,7 @@
 package org.dspace.storage.bitstore.factory;
 
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.storage.bitstore.SyncBitstreamStorageServiceImpl;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
 
 /**
@@ -19,6 +20,8 @@ import org.dspace.storage.bitstore.service.BitstreamStorageService;
 public abstract class StorageServiceFactory {
 
     public abstract BitstreamStorageService getBitstreamStorageService();
+
+    public abstract SyncBitstreamStorageServiceImpl getSyncBitstreamStorageService();
 
     public static StorageServiceFactory getInstance() {
         return DSpaceServicesFactory.getInstance().getServiceManager()

@@ -27,6 +27,10 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
         @LinkRest(
                 name = BitstreamRest.THUMBNAIL,
                 method = "getThumbnail"
+        ),
+        @LinkRest(
+                name = BitstreamRest.CHECKSUM,
+                method = "getChecksum"
         )
 })
 public class BitstreamRest extends DSpaceObjectRest {
@@ -37,6 +41,7 @@ public class BitstreamRest extends DSpaceObjectRest {
     public static final String BUNDLE = "bundle";
     public static final String FORMAT = "format";
     public static final String THUMBNAIL = "thumbnail";
+    public static final String CHECKSUM = "checksum";
 
     private String bundleName;
 

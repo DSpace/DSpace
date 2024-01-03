@@ -19,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Supplier;
 import javax.validation.constraints.NotNull;
 
@@ -30,12 +31,11 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.transfer.Download;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.amazonaws.services.s3.transfer.Upload;
@@ -45,7 +45,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
@@ -81,7 +81,7 @@ public class S3BitStoreService extends BaseBitStoreService {
     /**
      * Checksum algorithm
      */
-    protected static final String CSA = "MD5";
+    static final String CSA = "MD5";
 
     // These settings control the way an identifier is hashed into
     // directory and file names
@@ -168,13 +168,11 @@ public class S3BitStoreService extends BaseBitStoreService {
 
     /**
      * This constructor is used for test purpose.
-     * In this way is possible to use a mocked instance of AmazonS3
      *
-     * @param s3Service mocked AmazonS3 service
+     * @param s3Service AmazonS3 service
      */
-    protected S3BitStoreService(AmazonS3 s3Service, TransferManager tm) {
+    protected S3BitStoreService(AmazonS3 s3Service) {
         this.s3Service = s3Service;
-        this.tm = tm;
     }
 
     @Override
@@ -322,19 +320,22 @@ public class S3BitStoreService extends BaseBitStoreService {
         String key = getFullKey(bitstream.getInternalId());
         //Copy istream to temp file, and send the file, with some metadata
         File scratchFile = File.createTempFile(bitstream.getInternalId(), "s3bs");
-        try {
-            FileUtils.copyInputStreamToFile(in, scratchFile);
-            long contentLength = scratchFile.length();
-            // The ETag may or may not be and MD5 digest of the object data.
-            // Therefore, we precalculate before uploading
-            String localChecksum = org.dspace.curate.Utils.checksum(scratchFile, CSA);
+        try (
+                FileOutputStream fos = new FileOutputStream(scratchFile);
+                // Read through a digest input stream that will work out the MD5
+                DigestInputStream dis = new DigestInputStream(in, MessageDigest.getInstance(CSA));
+        ) {
+            Utils.bufferedCopy(dis, fos);
+            in.close();
 
             Upload upload = tm.upload(bucketName, key, scratchFile);
 
             upload.waitForUploadResult();
 
-            bitstream.setSizeBytes(contentLength);
-            bitstream.setChecksum(localChecksum);
+            bitstream.setSizeBytes(scratchFile.length());
+            // we cannot use the S3 ETAG here as it could be not a MD5 in case of multipart upload (large files) or if
+            // the bucket is encrypted
+            bitstream.setChecksum(Utils.toHex(dis.getMessageDigest().digest()));
             bitstream.setChecksumAlgorithm(CSA);
 
         } catch (AmazonClientException | IOException | InterruptedException e) {
@@ -371,10 +372,30 @@ public class S3BitStoreService extends BaseBitStoreService {
         if (isRegisteredBitstream(key)) {
             key = key.substring(REGISTERED_FLAG.length());
         }
+
+        Map<String, Object> metadata = new HashMap<>();
+
         try {
+
             ObjectMetadata objectMetadata = s3Service.getObjectMetadata(bucketName, key);
             if (objectMetadata != null) {
-                return this.about(objectMetadata, attrs);
+                putValueIfExistsKey(attrs, metadata, "size_bytes", objectMetadata.getContentLength());
+                putValueIfExistsKey(attrs, metadata, "modified", valueOf(objectMetadata.getLastModified().getTime()));
+            }
+
+            putValueIfExistsKey(attrs, metadata, "checksum_algorithm", CSA);
+
+            if (attrs.contains("checksum")) {
+                try (InputStream in = get(bitstream);
+                     DigestInputStream dis = new DigestInputStream(in, MessageDigest.getInstance(CSA))
+                ) {
+                    Utils.copy(dis, NullOutputStream.NULL_OUTPUT_STREAM);
+                    byte[] md5Digest = dis.getMessageDigest().digest();
+                    metadata.put("checksum", Utils.toHex(md5Digest));
+                } catch (NoSuchAlgorithmException nsae) {
+                    // Should never happen
+                    log.warn("Caught NoSuchAlgorithmException", nsae);
+                }
             }
 
             return metadata;
@@ -387,34 +408,6 @@ public class S3BitStoreService extends BaseBitStoreService {
             throw new IOException(e);
         }
         return metadata;
-    }
-
-    /**
-     * Populates map values by checking key existence
-     * <br>
-     * Adds technical metadata about an asset in the asset store, like:
-     * <ul>
-     *  <li>size_bytes</li>
-     *  <li>checksum</li>
-     *  <li>checksum_algorithm</li>
-     *  <li>modified</li>
-     * </ul>
-     *
-     * @param objectMetadata containing technical data
-     * @param attrs map with keys populated
-     * @return Map of enriched attrs with values
-     */
-    public Map about(ObjectMetadata objectMetadata, Map attrs) {
-        if (objectMetadata != null) {
-            this.putValueIfExistsKey(attrs, SIZE_BYTES, objectMetadata.getContentLength());
-
-            // put CHECKSUM_ALGORITHM if exists CHECKSUM
-            this.putValueIfExistsKey(attrs, CHECKSUM, objectMetadata.getETag());
-            this.putEntryIfExistsKey(attrs, CHECKSUM, Map.entry(CHECKSUM_ALGORITHM, CSA));
-
-            this.putValueIfExistsKey(attrs, MODIFIED, String.valueOf(objectMetadata.getLastModified().getTime()));
-        }
-        return attrs;
     }
 
     /**
@@ -499,22 +492,6 @@ public class S3BitStoreService extends BaseBitStoreService {
         this.awsAccessKey = awsAccessKey;
     }
 
-    @Autowired(required = true)
-    public void setPathStyleAccessEnabled(boolean pathStyleAccessEnabled) {
-        this.pathStyleAccessEnabled = pathStyleAccessEnabled;
-    }
-
-    public boolean getPathStyleAccessEnabled() {
-        return this.pathStyleAccessEnabled;
-    }
-    public void setEndpoint(String endpoint) {
-        this.endpoint = endpoint;
-    }
-
-    public String getEndpoint() {
-        return this.endpoint;
-    }
-
     public String getAwsSecretKey() {
         return awsSecretKey;
     }
@@ -557,6 +534,22 @@ public class S3BitStoreService extends BaseBitStoreService {
         this.useRelativePath = useRelativePath;
     }
 
+    public String getEndpoint() {
+        return endpoint;
+    }
+
+    public void setEndpoint(String endpoint) {
+        this.endpoint = endpoint;
+    }
+
+    public boolean getPathStyleAccessEnabled() {
+        return pathStyleAccessEnabled;
+    }
+
+    public void setPathStyleAccessEnabled(boolean pathStyleAccessEnabled) {
+        this.pathStyleAccessEnabled = pathStyleAccessEnabled;
+    }
+
     /**
      * Contains a command-line testing tool. Expects arguments:
      * -a accessKey -s secretKey -f assetFileName
@@ -594,7 +587,6 @@ public class S3BitStoreService extends BaseBitStoreService {
 
         String accessKey = command.getOptionValue("a");
         String secretKey = command.getOptionValue("s");
-        String assetFile = command.getOptionValue("f");
 
         S3BitStoreService store = new S3BitStoreService();
 

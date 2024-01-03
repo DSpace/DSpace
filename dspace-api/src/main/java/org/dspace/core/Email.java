@@ -377,6 +377,20 @@ public class Email {
         vctx.put("config", new UnmodifiableConfigurationService(config));
         vctx.put("params", Collections.unmodifiableList(arguments));
 
+        if (null == template) {
+            if (StringUtils.isBlank(content)) {
+                // No template and no content -- PANIC!!!
+                throw new MessagingException("Email has no body");
+            }
+            // No template, so use a String of content.
+            StringResourceRepository repo = (StringResourceRepository)
+                    templateEngine.getApplicationAttribute(RESOURCE_REPOSITORY_NAME);
+            repo.putStringResource(contentName, content);
+            // Turn content into a template.
+            template = templateEngine.getTemplate(contentName);
+            templateHeaders = new String[] {};
+        }
+
         StringWriter writer = new StringWriter();
         try {
             template.merge(vctx, writer);

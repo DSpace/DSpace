@@ -9,7 +9,7 @@ package org.dspace.content;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -25,7 +25,7 @@ import org.dspace.content.service.clarin.ClarinBitstreamService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.event.Event;
-import org.dspace.storage.bitstore.DSBitStoreService;
+import org.dspace.storage.bitstore.SyncBitstreamStorageServiceImpl;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -48,7 +48,7 @@ public class ClarinBitstreamServiceImpl implements ClarinBitstreamService {
     private static final String CSA = "MD5";
 
     @Autowired
-    private DSBitStoreService storeService;
+    private SyncBitstreamStorageServiceImpl syncBitstreamStorageService;
     @Autowired
     protected BitstreamDAO bitstreamDAO;
     @Autowired
@@ -99,13 +99,12 @@ public class ClarinBitstreamServiceImpl implements ClarinBitstreamService {
         }
         //get file from assetstore based on internal_id
         //recalculate check fields
-        Map wantedMetadata = new HashMap();
-        wantedMetadata.put("size_bytes", null);
-        wantedMetadata.put("checksum", null);
-        wantedMetadata.put("checksum_algorithm", null);
-        Map checksumMap = storeService.about(bitstream, wantedMetadata);
+        List<String> wantedMetadata = List.of("size_bytes", "checksum", "checksum_algorithm");
+        Map<String, Object> receivedMetadata = syncBitstreamStorageService
+                .getStore(syncBitstreamStorageService.whichStoreNumber(bitstream))
+                .about(bitstream, wantedMetadata);
         //check that new calculated values match the expected values
-        if (MapUtils.isEmpty(checksumMap) || !valid(bitstream, checksumMap)) {
+        if (MapUtils.isEmpty(receivedMetadata) || !valid(bitstream, receivedMetadata)) {
             //an error occurred - expected and calculated values do not match
             //delete all created data
             bitstreamService.delete(context, bitstream);
@@ -126,7 +125,7 @@ public class ClarinBitstreamServiceImpl implements ClarinBitstreamService {
      * @param checksumMap calculated values
      * @return bitstream values match with expected values
      */
-    private boolean valid(Bitstream bitstream, Map checksumMap) {
+    private boolean valid(Bitstream bitstream, Map<String, Object> checksumMap) {
         if (!checksumMap.containsKey("checksum") || !checksumMap.containsKey("checksum_algorithm") ||
                 !checksumMap.containsKey("size_bytes")) {
             log.error("Cannot validate of bitstream with id: " + bitstream.getID() +
