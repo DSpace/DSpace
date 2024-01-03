@@ -431,7 +431,7 @@ public class StatisticsDataVisits extends StatisticsData {
                             Bundle bundle = item.getBundles().get(j);
                             for (int k = 0; k < bundle.getBitstreams().size(); k++) {
                                 Bitstream bitstream = bundle.getBitstreams().get(k);
-                                if (!bitstream.getFormat(context).isInternal()) {
+                                if (!bitstreamService.getFormat(context, bitstream).isInternal()) {
                                     // Add a separate query for each bitstream
                                     query.setDso(bitstream, bitstream.getType(), dsoLength);
                                 }

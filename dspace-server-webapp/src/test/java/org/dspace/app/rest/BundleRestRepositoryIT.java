@@ -610,7 +610,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                     .build();
         }
 
-        bundle1 = item.getBundles("ORIGINAL").get(0);
+        bundle1 = itemService.getBundles(item, "ORIGINAL").get(0);
 
         context.restoreAuthSystemState();
 

@@ -98,8 +98,8 @@ public class EPersonTest extends AbstractUnitTest {
         try {
             EPerson eperson = ePersonService.create(context);
             eperson.setEmail(EMAIL);
-            eperson.setFirstName(context, FIRSTNAME);
-            eperson.setLastName(context, LASTNAME);
+            ePersonService.setFirstName(context, eperson, FIRSTNAME);
+            ePersonService.setLastName(context, eperson, LASTNAME);
             eperson.setNetid(NETID);
             eperson.setPassword(PASSWORD);
             ePersonService.update(context, eperson);
@@ -1297,8 +1297,8 @@ public class EPersonTest extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
         EPerson ePerson = ePersonService.create(context);
         ePerson.setEmail(email);
-        ePerson.setFirstName(context, firstname);
-        ePerson.setLastName(context, lastname);
+        ePersonService.setFirstName(context, eperson, firstname);
+        ePersonService.setLastName(context, eperson, lastname);
         ePersonService.update(context, ePerson);
         context.restoreAuthSystemState();
         return ePerson;

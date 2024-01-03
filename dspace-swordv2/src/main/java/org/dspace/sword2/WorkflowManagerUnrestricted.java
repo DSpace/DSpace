@@ -14,6 +14,8 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BundleService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.swordapp.server.Deposit;
@@ -25,6 +27,8 @@ import org.swordapp.server.UriRegistry;
  * on items in any state (in workflow, in archive, or withdrawn).
  */
 public class WorkflowManagerUnrestricted implements WorkflowManager {
+    private final BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+
     public void retrieveServiceDoc(Context context) throws SwordError {
         // do nothing - operation allowed
     }

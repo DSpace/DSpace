@@ -9,9 +9,6 @@ package org.dspace.content;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
@@ -25,15 +22,11 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 @Table(name = "site")
 public class Site extends CacheableDSpaceObject {
 
-    @Transient
-    private transient SiteService siteService;
-
     /**
      * Protected constructor, create object using:
      * {@link org.dspace.content.service.SiteService#createSite(Context)}
      */
     protected Site() {
-
     }
 
     /**
@@ -46,22 +39,12 @@ public class Site extends CacheableDSpaceObject {
         return Constants.SITE;
     }
 
-    @Override
+    /**
+     * @deprecated use {@link org.dspace.content.service.SiteService#getName} instead.
+     */
     public String getName() {
-        return getSiteService().getName(this);
-    }
-
-    public String getURL() {
         ConfigurationService configurationService
-                = DSpaceServicesFactory.getInstance().getConfigurationService();
-        return configurationService.getProperty("dspace.ui.url");
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
+        return configurationService.getProperty("dspace.name");
     }
-
-    private SiteService getSiteService() {
-        if (siteService == null) {
-            siteService = ContentServiceFactory.getInstance().getSiteService();
-        }
-        return siteService;
-    }
-
 }

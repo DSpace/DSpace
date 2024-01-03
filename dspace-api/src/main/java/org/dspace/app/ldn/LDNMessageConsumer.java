@@ -199,7 +199,8 @@ public class LDNMessageConsumer implements Consumer {
     }
 
     private Optional<Bitstream> findPrimaryBitstream(Item item) {
-        List<Bundle> bundles = item.getBundles(Constants.CONTENT_BUNDLE_NAME);
+        List<Bundle> bundles = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
+
         return bundles.stream()
                       .findFirst()
                       .map(Bundle::getPrimaryBitstream)
@@ -214,7 +215,7 @@ public class LDNMessageConsumer implements Consumer {
         return bitstream.map(bs -> {
             try {
                 Context context = ContextUtil.obtainCurrentRequestContext();
-                BitstreamFormat bitstreamFormat = bs.getFormat(context);
+                BitstreamFormat bitstreamFormat = bitstreamService.getFormat(context, bs);
                 if (bitstreamFormat.getShortDescription().equals("Unknown")) {
                     return getUserFormatMimeType(bs);
                 }

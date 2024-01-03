@@ -25,6 +25,8 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.swordapp.server.SwordError;
@@ -32,6 +34,10 @@ import org.swordapp.server.SwordServerException;
 
 public class FeedContentDisseminator extends AbstractSimpleDC
     implements SwordContentDisseminator {
+
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance()
+                                                                       .getBitstreamService();
+
     @Override
     public InputStream disseminate(Context context, Item item)
         throws DSpaceSwordException, SwordError, SwordServerException {
@@ -92,7 +98,7 @@ public class FeedContentDisseminator extends AbstractSimpleDC
         throws DSpaceSwordException {
         BitstreamFormat format = null;
         try {
-            format = bitstream.getFormat(context);
+            format = bitstreamService.getFormat(context, bitstream);
         } catch (SQLException e) {
             throw new DSpaceSwordException(e);
         }
@@ -107,7 +113,7 @@ public class FeedContentDisseminator extends AbstractSimpleDC
 
         entry.setId(bsUrl);
         entry.setTitle(bitstream.getName());
-        String desc = bitstream.getDescription();
+        String desc = bitstreamService.getDescription(bitstream);
         if ("".equals(desc) || desc == null) {
             desc = bitstream.getName();
         }

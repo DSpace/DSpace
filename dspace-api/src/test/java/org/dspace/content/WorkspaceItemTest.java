@@ -311,8 +311,8 @@ public class WorkspaceItemTest extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
         EPerson eperson = ePersonService.create(context);
         eperson.setEmail("jane@smith.org");
-        eperson.setFirstName(context, "Jane");
-        eperson.setLastName(context, "Smith");
+        ePersonService.setFirstName(context, eperson, "Jane");
+        ePersonService.setLastName(context, eperson, "Smith");
         ePersonService.update(context, eperson);
 
         // Update our session to be logged in as new users

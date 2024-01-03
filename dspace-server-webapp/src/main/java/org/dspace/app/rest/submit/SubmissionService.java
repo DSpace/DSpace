@@ -49,6 +49,7 @@ import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.DuplicateDetectionService;
 import org.dspace.content.service.ItemService;
@@ -92,6 +93,8 @@ public class SubmissionService {
     protected CollectionService collectionService;
     @Autowired
     protected ItemService itemService;
+    @Autowired
+    protected BitstreamService bitstreamService;
     @Autowired
     protected WorkspaceItemService workspaceItemService;
     @Autowired
@@ -211,7 +214,9 @@ public class SubmissionService {
         }
         Projection projection = utils.obtainProjection();
         HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
-        data.setFormat(converter.toRest(source.getFormat(ContextUtil.obtainContext(request)), projection));
+        data.setFormat(converter.toRest(
+            bitstreamService.getFormat(ContextUtil.obtainContext(request), source), projection
+        ));
 
         for (ResourcePolicy rp : source.getResourcePolicies()) {
             if (ResourcePolicy.TYPE_CUSTOM.equals(rp.getRpType())) {

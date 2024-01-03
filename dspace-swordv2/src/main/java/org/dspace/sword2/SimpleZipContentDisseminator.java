@@ -24,6 +24,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
@@ -36,6 +37,9 @@ import org.swordapp.server.UriRegistry;
 public class SimpleZipContentDisseminator implements SwordContentDisseminator {
     protected BitstreamService bitstreamService = ContentServiceFactory
         .getInstance().getBitstreamService();
+
+    protected BundleService bundleService = ContentServiceFactory
+        .getInstance().getBundleService();
 
     protected ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();

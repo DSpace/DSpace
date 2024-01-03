@@ -13,16 +13,19 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
 import org.dspace.content.Site;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.SiteService;
 import org.hamcrest.Matcher;
 
 public class SiteMatcher {
+    private static final SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
 
     private SiteMatcher() { }
 
     public static Matcher<? super Object> matchEntry(Site site) {
         return allOf(
             hasJsonPath("$.uuid", is(site.getID().toString())),
-            hasJsonPath("$.name", is(site.getName())),
+            hasJsonPath("$.name", is(siteService.getName(site))),
             hasJsonPath("$.type", is("site")),
             hasJsonPath("$._links.self.href", containsString("/api/core/sites/" + site.getID()))
 

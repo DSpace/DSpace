@@ -750,7 +750,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
 
             // Create the bitstream in the bundle & initialize its name
             Bitstream bitstream = bitstreamService.create(context, bundle, fileStream);
-            bitstream.setName(context, path);
+            bitstreamService.setName(context, bitstream, path);
 
             // Set bitstream sequence id, if known
             String seqID = mfile.getAttributeValue("SEQ");
@@ -778,7 +778,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
             // set it:
             // 1. attempt to guess from MIME type
             // 2. if that fails, guess from "name" extension.
-            if (bitstream.getFormat(context).equals(unknownFormat)) {
+            if (bitstreamService.getFormat(context, bitstream).equals(unknownFormat)) {
                 if (log.isDebugEnabled()) {
                     log.debug("Guessing format of Bitstream left un-set: "
                                   + bitstream.toString());
@@ -850,8 +850,8 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
         // Create a Bitstream from the METS Manifest's content
         Bitstream manifestBitstream = bitstreamService.create(context, mdBundle, manifest
             .getMetsAsStream());
-        manifestBitstream.setName(context, METSManifest.MANIFEST_FILE);
-        manifestBitstream.setSource(context, METSManifest.MANIFEST_FILE);
+        bitstreamService.setName(context, manifestBitstream, METSManifest.MANIFEST_FILE);
+        bitstreamService.setSource(context, manifestBitstream, METSManifest.MANIFEST_FILE);
         bitstreamService.update(context, manifestBitstream);
 
         // Get magic bitstream format to identify manifest.
@@ -864,7 +864,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
         BitstreamFormat manifestFormat = PackageUtils
             .findOrCreateBitstreamFormat(context, fmtName,
                                          "application/xml", fmtName + " package manifest");
-        manifestBitstream.setFormat(context, manifestFormat);
+        bitstreamService.setFormat(context, manifestBitstream, manifestFormat);
         bitstreamService.update(context, manifestBitstream);
     }
 

@@ -19,6 +19,8 @@ import org.dspace.content.Bundle;
 import org.dspace.content.DCDate;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.handle.factory.HandleServiceFactory;
@@ -49,6 +51,10 @@ public class ItemEntryGenerator extends DSpaceATOMEntry {
 
     protected ItemService itemService = ContentServiceFactory.getInstance()
                                                              .getItemService();
+    protected BundleService bundleService  = ContentServiceFactory.getInstance()
+                                                                  .getBundleService();
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance()
+                                                                       .getBitstreamService();
     private final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
@@ -107,9 +113,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry {
                                 List<Bitstream> bss = bundle
                                     .getBitstreams();
                                 for (Bitstream bs : bss) {
-                                    BitstreamFormat bf = bs
-                                        .getFormat(
-                                            swordService.getContext());
+                                    BitstreamFormat bf = bitstreamService.getFormat(swordService.getContext(), bs);
                                     String format = "application/octet-stream";
                                     if (bf != null) {
                                         format = bf.getMIMEType();
@@ -204,8 +208,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry {
                         link.setHref(url);
                         link.setRel("part");
 
-                        BitstreamFormat bsf = bs
-                            .getFormat(swordService.getContext());
+                        BitstreamFormat bsf = bitstreamService.getFormat(swordService.getContext(), bs);
                         if (bsf != null) {
                             link.setType(bsf.getMIMEType());
                         }
