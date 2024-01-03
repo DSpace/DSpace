@@ -75,6 +75,11 @@ public class LDNMessageServiceImpl implements LDNMessageService {
 
     @Override
     public LDNMessageEntity find(Context context, String id) throws SQLException {
+
+        if (id == null) {
+            return null;
+        }
+
         id = id.startsWith(LDN_ID_PREFIX) ? id : LDN_ID_PREFIX + id;
         return ldnMessageDao.findByID(context, LDNMessageEntity.class, id);
     }
