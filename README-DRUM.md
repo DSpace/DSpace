@@ -118,6 +118,32 @@ Confluence for information about setting up a MacBook to use the Kubernetes
   Information about customizing DSpace for DRUM.
 * [docs](dspace/docs) - additional documentation
 
+## Customization Markings
+
+UMD customizations to stock DSpace code should be marked, if possible, with
+a starting comment "UMD Customization" and an ending comment of
+"End UMD Customization", for example, in a Java file:
+
+```java
+// UMD Customization
+... New or modified code ...
+// End UMD Customization
+```
+
+The following customizations *do not* need to be commented:
+
+* Updates to the "\<version>" identifier in "pom.xml" files
+* "Branding" changes in email templates such as "dspace/config/emails/" or
+  the default DSpace license in "dspace/config/default.license", as these files
+  do not have a convenient "comment" mechanism
+* Files that do not have a "comment" mechanism, such as JSON files
+* Extremely trivial whitespace changes unrelated to UMD customizations, such as
+  tabs in the modified DSpace file being automatically converted to spaces by
+  VS Code, or an end-of-file line.
+
+The main goal is to make it immediately when performing DSpace version upgrades
+whether a change in a file is due to an explicit UMD customization.
+
 ## License
 
 See the [DRUM-LICENSE](DRUM-LICENSE.md) file for license rights and limitations
