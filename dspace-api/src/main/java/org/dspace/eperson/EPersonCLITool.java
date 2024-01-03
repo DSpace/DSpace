@@ -199,9 +199,9 @@ public class EPersonCLITool {
         eperson.setSelfRegistered(false);
 
         eperson.setEmail(command.getOptionValue(OPT_EMAIL.getOpt()));
-        eperson.setFirstName(context, command.getOptionValue(OPT_GIVENNAME.getOpt()));
-        eperson.setLastName(context, command.getOptionValue(OPT_SURNAME.getOpt()));
-        eperson.setLanguage(context, command.getOptionValue(OPT_LANGUAGE.getOpt(),
+        ePersonService.setFirstName(context, eperson, command.getOptionValue(OPT_GIVENNAME.getOpt()));
+        ePersonService.setLastName(context, eperson, command.getOptionValue(OPT_SURNAME.getOpt()));
+        ePersonService.setLanguage(context, eperson, command.getOptionValue(OPT_LANGUAGE.getOpt(),
                                                             Locale.getDefault().getLanguage()));
         ePersonService.setMetadataSingleValue(context, eperson, MD_PHONE,
                 command.getOptionValue(OPT_PHONE.getOpt()), null);
@@ -398,11 +398,11 @@ public class EPersonCLITool {
                 }
             }
             if (command.hasOption(OPT_GIVENNAME.getOpt())) {
-                eperson.setFirstName(context, command.getOptionValue(OPT_GIVENNAME.getOpt()));
+                ePersonService.setFirstName(context, eperson, command.getOptionValue(OPT_GIVENNAME.getOpt()));
                 modified = true;
             }
             if (command.hasOption(OPT_SURNAME.getOpt())) {
-                eperson.setLastName(context, command.getOptionValue(OPT_SURNAME.getOpt()));
+                ePersonService.setLastName(context, eperson, command.getOptionValue(OPT_SURNAME.getOpt()));
                 modified = true;
             }
             if (command.hasOption(OPT_PHONE.getOpt())) {
@@ -411,7 +411,7 @@ public class EPersonCLITool {
                 modified = true;
             }
             if (command.hasOption(OPT_LANGUAGE.getOpt())) {
-                eperson.setLanguage(context, command.getOptionValue(OPT_LANGUAGE.getOpt()));
+                ePersonService.setLanguage(context, eperson, command.getOptionValue(OPT_LANGUAGE.getOpt()));
                 modified = true;
             }
             if (command.hasOption(OPT_REQUIRE_CERTIFICATE.getOpt())) {

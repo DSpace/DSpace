@@ -146,9 +146,8 @@ public class ItemDepositor extends Depositor {
                         fis.close();
                     }
                 }
-                bitstream.setName(context, fn);
-                bitstream.setDescription(context,
-                                         "Original file deposited via SWORD");
+                bitstreamService.setName(context, bitstream, fn);
+                bitstreamService.setDescription(context, bitstream, "Original file deposited via SWORD");
 
                 BitstreamFormat bf = bitstreamFormatService
                     .findByMIMEType(context, deposit.getContentType());

@@ -100,7 +100,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
 
         // Create a table row
         Bundle bundle = bundleDAO.create(context, new Bundle());
-        bundle.setName(context, name);
+        setName(context, bundle, name);
         itemService.addBundle(context, item, bundle);
         if (!bundle.getItems().contains(item)) {
             bundle.addItem(item);

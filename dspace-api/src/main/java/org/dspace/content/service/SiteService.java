@@ -24,4 +24,6 @@ public interface SiteService extends DSpaceObjectService<Site> {
     public Site createSite(Context context) throws SQLException;
 
     public Site findSite(Context context) throws SQLException;
+
+    String getURL(Site site);
 }

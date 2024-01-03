@@ -21,7 +21,9 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DCDate;
 import org.dspace.content.Item;
+import org.dspace.content.LicenseUtils;
 import org.dspace.core.Context;
 
 /**
@@ -235,4 +237,66 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
      */
     @Nullable
     Long getLastModified(Bitstream bitstream) throws IOException;
+
+    /**
+     * Set the name of the bitstream
+     *
+     * @param context   context
+     * @param name      the new name of the bitstream
+     * @throws SQLException if database error
+     */
+    void setName(Context context, Bitstream bitstream, String name) throws SQLException;
+
+    /**
+     * Get the source of this bitstream - typically the filename with path
+     * information (if originally provided) or the name of the tool that
+     * generated this bitstream
+     *
+     * @return the source of the bitstream
+     */
+    String getSource(Bitstream bitstream);
+
+    /**
+     * Set the source of the bitstream
+     *
+     * @param context   context
+     * @param source    the new source of the bitstream
+     * @throws SQLException if database error
+     */
+    void setSource(Context context, Bitstream bitstream, String source) throws SQLException;
+
+    /**
+     * Get the description of this bitstream - optional free text, typically
+     * provided by a user at submission time
+     *
+     * @return the description of the bitstream
+     */
+    String getDescription(Bitstream bitstream);
+
+    /**
+     * Set the description of the bitstream
+     *
+     * @param context   context
+     * @param desc      the new description of the bitstream
+     * @throws SQLException if database error
+     */
+    void setDescription(Context context, Bitstream bitstream, String desc) throws SQLException;
+
+    /**
+     * Get the user's format description. Returns null if the format is known by
+     * the system.
+     *
+     * @return the user's format description.
+     */
+    String getUserFormatDescription(Bitstream bitstream);
+
+    /**
+     * Add date for bitstream granted (used into the use case for license grant the
+     * {@link LicenseUtils#grantLicense(Context, Item, String, String)}
+     *
+     * @param context        the dspace context
+     * @param acceptanceDate the granted date
+     * @throws SQLException
+     */
+    void setAcceptanceDate(Context context, Bitstream bitstream, DCDate acceptanceDate) throws SQLException;
 }

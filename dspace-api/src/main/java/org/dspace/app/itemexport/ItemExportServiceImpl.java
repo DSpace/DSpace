@@ -409,7 +409,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                     String myName = bitstream.getName();
                     String oldName = myName;
 
-                    String description = bitstream.getDescription();
+                    String description = bitstreamService.getDescription(bitstream);
                     if (!StringUtils.isEmpty(description)) {
                         description = "\tdescription:" + description;
                     } else {

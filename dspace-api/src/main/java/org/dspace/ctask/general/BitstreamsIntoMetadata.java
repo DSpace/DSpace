@@ -16,6 +16,8 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 
@@ -34,6 +36,8 @@ public class BitstreamsIntoMetadata extends AbstractCurationTask {
 
     // The log4j logger for this class
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BitstreamsIntoMetadata.class);
+
+    private final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
 
     /**
@@ -114,14 +118,14 @@ public class BitstreamsIntoMetadata extends AbstractCurationTask {
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     protected void addMetadata(Item item, Bitstream bitstream, String type) throws SQLException {
-        String value = bitstream.getFormat(Curator.curationContext()).getMIMEType() + "##";
+        String value = bitstreamService.getFormat(Curator.curationContext(), bitstream).getMIMEType() + "##";
         value += bitstream.getName() + "##";
         value += bitstream.getSizeBytes() + "##";
         value += item.getHandle() + "##";
         value += bitstream.getSequenceID() + "##";
         value += bitstream.getChecksum() + "##";
-        if (bitstream.getDescription() != null) {
-            value += bitstream.getDescription();
+        if (bitstreamService.getDescription(bitstream) != null) {
+            value += bitstreamService.getDescription(bitstream);
         }
         itemService.addMetadata(Curator.curationContext(), item, "dc", "format", type, "en", value);
     }

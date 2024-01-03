@@ -78,6 +78,10 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         return value == null ? "" : value;
     }
 
+    public void setName(Context context, T dso, String name) throws SQLException {
+        setMetadataSingleValue(context, dso, MetadataSchemaEnum.DC.getName(), "title", null, null, name);
+    }
+
     @Override
     public ArrayList<String> getIdentifiers(Context context, T dso) {
         ArrayList<String> identifiers = new ArrayList<>();

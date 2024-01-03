@@ -130,11 +130,11 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
                 // This EPerson creation should only happen once (i.e. for first test run)
                 log.info("Creating initial EPerson (email=test@email.com) for Unit Tests");
                 eperson = ePersonService.create(context);
-                eperson.setFirstName(context, "first");
-                eperson.setLastName(context, "last");
+                ePersonService.setFirstName(context, eperson, "first");
+                ePersonService.setLastName(context, eperson, "last");
                 eperson.setEmail("test@email.com");
                 eperson.setCanLogIn(true);
-                eperson.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
+                ePersonService.setLanguage(context, eperson, I18nUtil.getDefaultLocale().getLanguage());
                 ePersonService.setPassword(eperson, password);
                 // actually save the eperson to unit testing DB
                 ePersonService.update(context, eperson);
@@ -151,11 +151,11 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
                 // This EPerson creation should only happen once (i.e. for first test run)
                 log.info("Creating initial EPerson (email=admin@email.com) for Unit Tests");
                 admin = ePersonService.create(context);
-                admin.setFirstName(context, "first (admin)");
-                admin.setLastName(context, "last (admin)");
+                ePersonService.setFirstName(context, admin, "first (admin)");
+                ePersonService.setLastName(context, admin, "last (admin)");
                 admin.setEmail("admin@email.com");
                 admin.setCanLogIn(true);
-                admin.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
+                ePersonService.setLanguage(context, admin, I18nUtil.getDefaultLocale().getLanguage());
                 ePersonService.setPassword(admin, password);
                 // actually save the eperson to unit testing DB
                 ePersonService.update(context, admin);

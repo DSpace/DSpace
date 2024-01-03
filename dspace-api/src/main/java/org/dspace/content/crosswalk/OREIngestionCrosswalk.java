@@ -190,7 +190,7 @@ public class OREIngestionCrosswalk
                 Bitstream newBitstream = bitstreamService.create(context, targetBundle, in);
 
                 String bsName = resource.getAttributeValue("title");
-                newBitstream.setName(context, bsName);
+                bitstreamService.setName(context, newBitstream, bsName);
 
                 // Identify the format
                 String mimeString = resource.getAttributeValue("type");
@@ -198,7 +198,7 @@ public class OREIngestionCrosswalk
                 if (bsFormat == null) {
                     bsFormat = bitstreamFormatService.guessFormat(context, newBitstream);
                 }
-                newBitstream.setFormat(context, bsFormat);
+                bitstreamService.setFormat(context, newBitstream, bsFormat);
                 bitstreamService.update(context, newBitstream);
 
                 bundleService.addBitstream(context, targetBundle, newBitstream);

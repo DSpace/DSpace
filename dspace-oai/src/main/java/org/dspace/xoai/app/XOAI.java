@@ -57,6 +57,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -99,6 +100,7 @@ public class XOAI {
 
     private final AuthorizeService authorizeService;
     private final ItemService itemService;
+    private final BitstreamService bitstreamService;
 
     private final static ConfigurationService configurationService = DSpaceServicesFactory.getInstance()
             .getConfigurationService();
@@ -110,8 +112,8 @@ public class XOAI {
         try {
             for (Bundle b : itemService.getBundles(item, "ORIGINAL")) {
                 for (Bitstream bs : b.getBitstreams()) {
-                    if (!formats.contains(bs.getFormat(context).getMIMEType())) {
-                        formats.add(bs.getFormat(context).getMIMEType());
+                    if (!formats.contains(bitstreamService.getFormat(context, bs).getMIMEType())) {
+                        formats.add(bitstreamService.getFormat(context, bs).getMIMEType());
                     }
                 }
             }
@@ -129,6 +131,7 @@ public class XOAI {
         // Load necessary DSpace services
         this.authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         this.itemService = ContentServiceFactory.getInstance().getItemService();
+        this.bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
         this.extensionPlugins = new DSpace().getServiceManager()
                 .getServicesByType(XOAIExtensionItemCompilePlugin.class);
     }
@@ -140,6 +143,7 @@ public class XOAI {
         // Load necessary DSpace services
         this.authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         this.itemService = ContentServiceFactory.getInstance().getItemService();
+        this.bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
         this.extensionPlugins = new DSpace().getServiceManager()
                 .getServicesByType(XOAIExtensionItemCompilePlugin.class);
     }
@@ -452,8 +456,8 @@ public class XOAI {
 
         boolean hasBitstream = false;
 
-        for (Bundle b : item.getBundles("ORIGINAL")) {
-            if (b.getBitstreams().size() > 0) {
+        for (Bundle b : itemService.getBundles(item, "ORIGINAL")) {
+            if (!b.getBitstreams().isEmpty()) {
                 hasBitstream = true;
             }
         }

@@ -61,6 +61,7 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
@@ -176,6 +177,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Autowired
     private QAEventsDAO qaEventsDao;
 
+    @Autowired
+    private EPersonService epersonService;
+
     protected ItemServiceImpl() {
     }
 
@@ -188,7 +192,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             primaryBitstream = originalBundles.get(0).getPrimaryBitstream();
         }
         if (primaryBitstream != null) {
-            if (primaryBitstream.getFormat(context).getMIMEType().equals("text/html")) {
+            if (bitstreamService.getFormat(context, primaryBitstream).getMIMEType().equals("text/html")) {
                 return null;
             }
 
@@ -445,7 +449,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public List<Bundle> getBundles(Item item, String name) throws SQLException {
+    public List<Bundle> getBundles(Item item, String name) {
         List<Bundle> matchingBundles = new ArrayList<>();
         // now only keep bundles with matching names
         List<Bundle> bunds = item.getBundles();
@@ -530,7 +534,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             List<Bitstream> bitstreams = bund.getBitstreams();
 
             for (Bitstream bitstream : bitstreams) {
-                if (!bitstream.getFormat(context).isInternal()) {
+                if (!bitstreamService.getFormat(context, bitstream).isInternal()) {
                     // Bitstream is not of an internal format
                     bitstreamList.add(bitstream);
                 }
@@ -612,7 +616,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             List<Bitstream> bits = bund.getBitstreams();
 
             for (Bitstream bit : bits) {
-                BitstreamFormat bft = bit.getFormat(context);
+                BitstreamFormat bft = bitstreamService.getFormat(context, bit);
 
                 if (bft.getID() == licensetype) {
                     removethisbundle = true;
@@ -760,12 +764,20 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // bitstream checksums
         EPerson e = context.getCurrentUser();
         StringBuilder prov = new StringBuilder();
-        prov.append("Item reinstated by ").append(e.getFullName()).append(" (")
-            .append(e.getEmail()).append(") on ").append(timestamp).append("\n")
+        prov.append("Item reinstated by ")
+            .append(epersonService.getFullName(e))
+            .append(" (")
+            .append(e.getEmail())
+            .append(") on ")
+            .append(timestamp)
+            .append("\n")
             .append("Item was in collections:\n");
 
         for (Collection coll : colls) {
-            prov.append(coll.getName()).append(" (ID: ").append(coll.getID()).append(")\n");
+            prov.append(coll.getName())
+                .append(" (ID: ")
+                .append(coll.getID())
+                .append(")\n");
         }
 
         // Clear withdrawn flag
@@ -1353,8 +1365,8 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     /**
-     * Check whether or not there is already an RP on the given dso, which has actionId={@link Constants.READ} and
-     * resourceTypeId={@link ResourcePolicy.TYPE_CUSTOM}
+     * Check whether or not there is already an RP on the given dso, which has actionId={@link Constants#READ} and
+     * resourceTypeId={@link ResourcePolicy#TYPE_CUSTOM}
      *
      * @param context DSpace context
      * @param dso     DSpace object to check for custom read RP

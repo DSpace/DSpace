@@ -297,7 +297,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService {
             StringBuilder buf = new StringBuilder(1000);
             buf.append("------------------------------------------------ \n");
             buf.append(msg("format-id")).append(" =  ").append(
-                info.getFormat(context).getID()).append("\n");
+                bitstreamService.getFormat(context, info).getID()).append("\n");
             buf.append(msg("deleted")).append(" = ").append(info.isDeleted())
                .append("\n");
             buf.append(msg("bitstream-id")).append(" = ").append(
@@ -310,14 +310,14 @@ public class SimpleReporterServiceImpl implements SimpleReporterService {
                .append("\n");
             buf.append(msg("size")).append(" = ").append(info.getSizeBytes())
                .append("\n");
-            buf.append(msg("source")).append(" = ").append(info.getSource())
+            buf.append(msg("source")).append(" = ").append(bitstreamService.getSource(info))
                .append("\n");
             buf.append(msg("checksum")).append(" = ").append(
                 info.getChecksum()).append("\n");
             buf.append(msg("store-number")).append(" = ").append(
                 info.getStoreNumber()).append("\n");
             buf.append(msg("description")).append(" = ").append(
-                info.getUserFormatDescription()).append("\n");
+                bitstreamService.getUserFormatDescription(info)).append("\n");
             buf.append("----------------------------------------------- \n\n");
             osw.write(buf.toString());
         }

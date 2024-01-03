@@ -103,11 +103,11 @@ public class AbstractUnitTest extends AbstractDSpaceTest {
                 // This EPerson creation should only happen once (i.e. for first test run)
                 log.info("Creating initial EPerson (email=test@email.com) for Unit Tests");
                 eperson = ePersonService.create(context);
-                eperson.setFirstName(context, "first");
-                eperson.setLastName(context, "last");
+                ePersonService.setFirstName(context, eperson, "first");
+                ePersonService.setLastName(context, eperson, "last");
                 eperson.setEmail("test@email.com");
                 eperson.setCanLogIn(true);
-                eperson.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
+                ePersonService.setLanguage(context, eperson, I18nUtil.getDefaultLocale().getLanguage());
                 // actually save the eperson to unit testing DB
                 ePersonService.update(context, eperson);
             }

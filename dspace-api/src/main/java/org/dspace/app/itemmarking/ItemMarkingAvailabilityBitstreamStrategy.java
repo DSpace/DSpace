@@ -17,6 +17,7 @@ import org.dspace.app.util.Util;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -35,6 +36,9 @@ public class ItemMarkingAvailabilityBitstreamStrategy implements ItemMarkingExtr
 
     @Autowired(required = true)
     protected ItemService itemService;
+
+    @Autowired(required = true)
+    protected BitstreamService bitstreamService;
 
     private static final Logger LOG = LogManager.getLogger();
 

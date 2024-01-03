@@ -156,7 +156,7 @@ public class PREMISCrosswalk
 
                 // Apply new bitstream name if we found it.
                 if (bsName != null) {
-                    bitstream.setName(context, bsName);
+                    bitstreamService.setName(context, bitstream, bsName);
                     log.debug(
                         "Changing bitstream id=" + String.valueOf(bitstream.getID()) + "name and source to: " + bsName);
                 }
@@ -171,7 +171,7 @@ public class PREMISCrosswalk
                 }
 
                 if (bf != null) {
-                    bitstream.setFormat(context, bf);
+                    bitstreamService.setFormat(context, bitstream, bf);
                 }
             } else {
                 log.debug("Skipping element: " + me.toString());
@@ -236,7 +236,7 @@ public class PREMISCrosswalk
         // get or make up name for bitstream:
         String bsName = bitstream.getName();
         if (bsName == null) {
-            List<String> ext = bitstream.getFormat(context).getExtensions();
+            List<String> ext = bitstreamService.getFormat(context, bitstream).getExtensions();
             bsName = "bitstream_" + sid + (ext.size() > 0 ? ext.get(0) : "");
         }
         if (handle != null && baseUrl != null) {
@@ -289,7 +289,7 @@ public class PREMISCrosswalk
         Element format = new Element("format", PREMIS_NS);
         Element formatDes = new Element("formatDesignation", PREMIS_NS);
         Element formatName = new Element("formatName", PREMIS_NS);
-        formatName.setText(bitstream.getFormat(context).getMIMEType());
+        formatName.setText(bitstreamService.getFormat(context, bitstream).getMIMEType());
         formatDes.addContent(formatName);
         format.addContent(formatDes);
         ochar.addContent(format);
@@ -297,7 +297,7 @@ public class PREMISCrosswalk
         // originalName <- name (or source if none)
         String oname = bitstream.getName();
         if (oname == null) {
-            oname = bitstream.getSource();
+            oname = bitstreamService.getSource(bitstream);
         }
         if (oname != null) {
             Element on = new Element("originalName", PREMIS_NS);

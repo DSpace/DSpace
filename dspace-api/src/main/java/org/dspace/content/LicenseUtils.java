@@ -141,14 +141,14 @@ public class LicenseUtils {
         Bitstream b = itemService.createSingleBitstream(context, bais, item, "LICENSE");
 
         // Now set the format and name of the bitstream
-        b.setName(context, "license.txt");
-        b.setSource(context, "Written by org.dspace.content.LicenseUtils");
+        bitstreamService.setName(context, b, "license.txt");
+        bitstreamService.setSource(context, b, "Written by org.dspace.content.LicenseUtils");
 
         DCDate acceptanceDCDate = DCDate.getCurrent();
         if (acceptanceDate != null) {
             acceptanceDCDate = new DCDate(acceptanceDate);
         }
-        b.setAcceptanceDate(context, acceptanceDCDate);
+        bitstreamService.setAcceptanceDate(context, b, acceptanceDCDate);
         // Find the License format
         BitstreamFormat bf = bitstreamFormat.findByShortDescription(context,
                                                                     "License");
