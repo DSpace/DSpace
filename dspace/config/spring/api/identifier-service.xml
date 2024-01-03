@@ -103,14 +103,14 @@
     </bean>
     <!-- End UMD Customization -->
 
-
     <!-- Provider to mint and register DOIs using EZID as the registrar.
     -->
     <!--
          Set generateDataciteXML to true to send metadata in DataCite xml schema for EZID DOI mint requests.
          When generateDataciteXML is enabled, EZIDIdentifierProvider uses
          dspace.cfg:crosswalk.dissemination.DataCite.stylesheet XSL configuration for metadata mapping
-    
+    -->
+    <!-- Uncomment to enable DOI using EZID
     <bean id="org.dspace.identifier.EZIDIdentifierProvider"
           class="org.dspace.identifier.EZIDIdentifierProvider"
           scope='singleton'>
@@ -126,22 +126,24 @@
         </property>
         <property name='crosswalk'>
             <map>
-                <entry key='_target' value='dc.identifier.uri'/>
+                <entry key='datacite.creator' value='dc.contributor.author'/>
+                <entry key='datacite.title' value='dc.title'/>
+                <entry key='datacite.publisher' value='dc.publisher'/>
+                <entry key='datacite.publicationyear' value='dc.date.issued'/>
             </map>
         </property>
         <property name='crosswalkTransform'>
             <description>How to compute the crosswalked value from the original.  Default is plain copy.</description>
             <map>
-                <entry key='_target'>
-                    <bean class='org.dspace.identifier.ezid.HandleToTarget'>
-                        <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
-                    </bean>
+                <entry key='datacite.publicationyear'>
+                    <bean class='org.dspace.identifier.ezid.DateToYear'/>
                 </entry>
             </map>
         </property>
-        <property name='generateDataciteXML' value='true'/>
-        <property name='disseminationCrosswalkName' value='UmdDataCite'/>
+        <property name='generateDataciteXML' value='false'/>
+        <property name='disseminationCrosswalkName' value='DataCite'/>
 
     </bean>
     -->
+
 </beans>
