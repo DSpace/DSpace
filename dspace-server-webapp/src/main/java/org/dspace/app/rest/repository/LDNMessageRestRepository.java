@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.ldn.LDNMessageEntity;
 import org.dspace.app.ldn.service.LDNMessageService;
+import org.dspace.app.rest.exception.MethodNotAllowedException;
 import org.dspace.app.rest.model.LDNMessageEntityRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.authorize.AuthorizeException;
@@ -62,20 +63,20 @@ public class LDNMessageRestRepository extends DSpaceRestRepository<LDNMessageEnt
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     protected LDNMessageEntityRest createAndReturn(Context context) throws AuthorizeException, SQLException {
-        throw new UnsupportedOperationException("Creation of LDN Message is not supported via Endpoint");
+        throw new MethodNotAllowedException("Creation of LDN Message is not supported via Endpoint");
     }
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, String id,
         Patch patch) throws AuthorizeException, SQLException {
-        throw new UnsupportedOperationException("Patch of LDN Message is not supported via Endpoint");
+        throw new MethodNotAllowedException("Patch of LDN Message is not supported via Endpoint");
     }
 
     @Override
     @PreAuthorize("hasAuthority('ADMIN')")
     protected void delete(Context context, String id) throws AuthorizeException {
-        throw new UnsupportedOperationException("Deletion of LDN Message is not supported via Endpoint");
+        throw new MethodNotAllowedException("Deletion of LDN Message is not supported via Endpoint");
     }
 
     @Override

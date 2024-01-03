@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -216,21 +217,25 @@ public class LDNMessageRestRepositoryIT extends AbstractControllerIntegrationTes
             .perform(post("/api/ldn/messages")
                 .content(mapper.writeValueAsBytes(data))
                 .contentType(contentType))
-            .andExpect(status().isInternalServerError());
+            .andExpect(status().isMethodNotAllowed());
     }
 
     @Test
     public void deleteLDNMessageTest() throws Exception {
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(delete("/api/ldn/messages"))
-                            .andExpect(status().isMethodNotAllowed());
+        getClient(authToken)
+            .perform(delete("/api/ldn/messages/urn:uuid:668f26e0-2c8d-4117-a0d2-ee713523bcb4"))
+            .andExpect(status().isMethodNotAllowed());
     }
 
     @Test
     public void patchLDNMessageTest() throws Exception {
         String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(patch("/api/ldn/messages"))
-                            .andExpect(status().isMethodNotAllowed());
+        getClient(authToken)
+            .perform(patch("/api/ldn/messages/urn:uuid:668f26e0-2c8d-4117-a0d2-ee713523bcb4")
+                .content(getPatchContent(List.of()))
+                .contentType(APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isMethodNotAllowed());
     }
 
     @Override
