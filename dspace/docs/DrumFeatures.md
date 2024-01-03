@@ -34,9 +34,9 @@ information.
 ## Electronic Theses and Dissertations (ETD)
 
 * LIBDRUM-671 - "ETD Department" CRUD functionality
-* LIBDRUM-680 - Loader for loading Proquest ETDs into DRUM
-  * transform Proquest metadata to dublin core
-  * transform Proquest metadata to marc and transfer to TSD
+* LIBDRUM-680 - Loader for loading ProQuest ETDs into DRUM
+  * transform ProQuest metadata to dublin core
+  * transform ProQuest metadata to marc and transfer to TSD
   * map into department etd collection
   * email notification
 

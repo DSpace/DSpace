@@ -20,7 +20,7 @@ sequentially. This requires that there be only one source doing the DOI minting,
 as having two minting sources would potentially generate overlapping numbers.
 
 In DRUM, DOIs are minted as a random 8 character code in the format "XXXX-XXXX"
-(4 alphanumeric characters, a hypen, then 4 more alphanumeric characters). This
+(4 alphanumeric characters, a hyphen, then 4 more alphanumeric characters). This
 eliminates the requirement to have a single minting source.
 
 The generation of random DOIs is controlled by the "identifier.doi.mintRandom"

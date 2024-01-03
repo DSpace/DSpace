@@ -174,9 +174,9 @@ development:
 ## Debugging
 
 The `JAVA_TOOL_OPTIONS` configuration included in the Docker compose starts the
-jpda debugger for Tomcat. The [.vscode/launch.json](/.vscode/launch.json)
+JPDA debugger for Tomcat. The [.vscode/launch.json](/.vscode/launch.json)
 file contains the VS Code debug configuration needed to attach to Tomcat. See
-the "Visual Studio Code IDE Setup" section for the extensions neeeded for
+the "Visual Studio Code IDE Setup" section for the extensions needed for
 debugging.
 
 To start debugging,
@@ -204,7 +204,7 @@ $ docker compose -p d7 restart dspace
 $ docker exec -it dspace bash
 ```
 
-## Create an adminstrator user
+## Create an administrator user
 
 ```zsh
 $ docker compose -p d7 -f docker-compose-cli.yml run dspace-cli create-administrator

@@ -23,7 +23,7 @@ Access to the submitted forms is through the Wufoo website.
 
 ## Wufoo Form Configuration
 
-Implementing the Wufoo form functionlity requires the following properties in
+Implementing the Wufoo form functionality requires the following properties in
 the "local.cfg" file:
 
 * wufoo.feedback.formUrl - The "base" URL for the Wufoo form, typically `https://libumd.wufoo.com/forms/`

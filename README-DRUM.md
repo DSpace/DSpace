@@ -4,7 +4,7 @@ Home: <https://drum.lib.umd.edu/>
 
 ## Documentation
 
-The original Dspace documentation is in the "README.md" file.
+The original DSpace documentation is in the "README.md" file.
 
 ## Development Environment
 
@@ -147,5 +147,5 @@ whether a change in a file is due to an explicit UMD customization.
 ## License
 
 See the [DRUM-LICENSE](DRUM-LICENSE.md) file for license rights and limitations
-(Apache 2.0). This lincense only governs the part of code base developed at UMD.
+(Apache 2.0). This license only governs the part of code base developed at UMD.
 The DSpace license can be found at <https://github.com/DSpace/DSpace>

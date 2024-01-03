@@ -9,13 +9,13 @@ DSpace provides a sample "crontab" file  at
 All of the sample tasks are performed, although sometimes on a different
 schedule, except for the following:
 
-* index-authority - We do not use an "authority" Solr core, so thistask is not
+* index-authority - We do not use an "authority" Solr core, so this task is not
   needed.
 
 In addition, the following tasks are performed:
 
 * generate-sitemaps - Generates sitemaps for use by search engines
-* load-etd-nightly - Custom UMD task to load Proquest ETD files
+* load-etd-nightly - Custom UMD task to load ProQuest ETD files
 * curate - Run any Curation Tasks queued from the Admin UI
 
 ## Cron Container
@@ -135,9 +135,9 @@ The script has completed
 
 ----
 
-### load-etd-nightly (Proquest)
+### load-etd-nightly (ProQuest)
 
-Custom UMD functionality to load Proquest ETD files.
+Custom UMD functionality to load ProQuest ETD files.
 
 **Note:** The following steps should *not* be run in production, as it involves
 the addition of an item.
@@ -313,7 +313,7 @@ database:
 
     d) Find the collection you want to subscribe to, and note the collection ID
        of the collection from the URL. For example, for the
-       "Aerospace Engineering Theses and Disserations" collection,
+       "Aerospace Engineering Theses and Dissertations" collection,
        <https://drum.sandbox.lib.umd.edu/collections/8976365e-2edf-4fb5-a706-dec3e5c01983>,
        the collection ID is "8976365e-2edf-4fb5-a706-dec3e5c01983"
 
@@ -343,7 +343,7 @@ database:
 
     where \<SUBSCRIPTION_ID> is the id number from the previous step,
     \<EPERSON_ID> is your eperson ID, and \<COLLECTION_ID> is the collection ID.
-    For example, if the next subscribtion id is 605, your eperson ID is
+    For example, if the next subscription id is 605, your eperson ID is
     "c9d13f20-0c95-4844-b8a6-254d128c4f14", and the collection ID is
     "8976365e-2edf-4fb5-a706-dec3e5c01983", the command would be:
 
@@ -365,7 +365,7 @@ Extracts full text from documents and creates thumbnail images.
 
 To verify in production:
 
-1) Find an item thas was added on the previous day and verify that a
+1) Find an item that was added on the previous day and verify that a
    thumbnail image has been created.
 
 To verify in sandbox/test/qa:

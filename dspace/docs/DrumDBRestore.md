@@ -4,7 +4,7 @@
 with DRUM running DSpace 7. See [dspace/docs/DrumDBRestoreFromDSpace6.md](DrumDBRestoreFromDSpace6.md)
 for information about restoring a database snapshot from a DRUM using DSpace 6.
 
-1) Switch the appropiate Kubernetes namespace from which the database snapshot
+1) Switch the appropriate Kubernetes namespace from which the database snapshot
    should be retrieved (the following example uses the Kubernetes "test"
    namespace):
 

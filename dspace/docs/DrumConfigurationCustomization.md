@@ -120,7 +120,7 @@ ALTER TABLE etdunit ADD PRIMARY KEY (uuid);
 ```
 
 In H2, this is not possible, as H2 thinks a second primary key is being created.
-Moveover, if you attempt to drop the primary key before changing it, i.e.:
+Moreover, if you attempt to drop the primary key before changing it, i.e.:
 
 ```sql
 ALTER TABLE etdunit DROP PRIMARY KEY;
@@ -151,7 +151,7 @@ ALTER TABLE etdunit ADD PRIMARY KEY (uuid);
 
 The "CASCADE" option deletes the primary key associated with the constraint.
 
-The implicit contraint names are believed to be stable, so while kludgy, this
+The implicit constraint names are believed to be stable, so while kludgy, this
 should work consistently.
 
 ### Renaming Columns
