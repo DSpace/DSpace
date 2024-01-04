@@ -56,7 +56,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
 import org.dspace.qaevent.QANotifyPatterns;
 import org.dspace.qaevent.action.ASimpleMetadataAction;
-import org.dspace.qaevent.dao.QAEventsDao;
+import org.dspace.qaevent.dao.QAEventsDAO;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +70,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
-    private QAEventsDao qaEventsDao;
+    private QAEventsDAO qaEventsDao;
 
     @Autowired
     private ItemService itemService;
@@ -1002,6 +1002,11 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
             .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}")
             .build();
 
+        QAEvent event2 = QAEventBuilder.createTarget(context, col1, "Science and Freedom")
+            .withTopic("ENRICH/MISSING/PID")
+            .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}")
+            .build();
+
         context.restoreAuthSystemState();
 
         String authToken = getAuthToken(admin.getEmail(), password);
@@ -1029,6 +1034,12 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
         assertThat(processedEvent.getEventTimestamp(), notNullValue());
         assertThat(processedEvent.getEperson().getID(), is(admin.getID()));
 
+        getClient(authToken).perform(delete("/api/integration/qualityassuranceevents/" + event.getEventId()))
+            .andExpect(status().isInternalServerError());
+
+        authToken = getAuthToken(eperson.getEmail(), password);
+        getClient(authToken).perform(delete("/api/integration/qualityassuranceevents/" + event2.getEventId()))
+        .andExpect(status().isForbidden());
     }
 
     @Test

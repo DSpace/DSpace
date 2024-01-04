@@ -40,6 +40,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.FacetParams;
 import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
 import org.dspace.content.service.ItemService;
@@ -50,8 +51,8 @@ import org.dspace.qaevent.AutomaticProcessingAction;
 import org.dspace.qaevent.QAEventAutomaticProcessingEvaluation;
 import org.dspace.qaevent.QASource;
 import org.dspace.qaevent.QATopic;
-import org.dspace.qaevent.dao.QAEventsDao;
-import org.dspace.qaevent.dao.impl.QAEventsDaoImpl;
+import org.dspace.qaevent.dao.QAEventsDAO;
+import org.dspace.qaevent.dao.impl.QAEventsDAOImpl;
 import org.dspace.qaevent.service.QAEventActionService;
 import org.dspace.qaevent.service.QAEventSecurityService;
 import org.dspace.qaevent.service.QAEventService;
@@ -60,11 +61,12 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+
 /**
  * Implementation of {@link QAEventService} that use Solr to store events. When
  * the user performs an action on the event (such as accepting the suggestion or
  * rejecting it) then the event is removed from solr and saved in the database
- * (see {@link QAEventsDao}) so that it is no longer proposed.
+ * (see {@link QAEventsDAO}) so that it is no longer proposed.
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
@@ -86,7 +88,7 @@ public class QAEventServiceImpl implements QAEventService {
     private HandleService handleService;
 
     @Autowired
-    private QAEventsDaoImpl qaEventsDao;
+    private QAEventsDAOImpl qaEventsDao;
 
     @Autowired(required = false)
     @Qualifier("qaAutomaticProcessingMap")
@@ -240,19 +242,29 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public List<QATopic> findAllTopicsBySource(Context context, String source, long offset, int count) {
-        return findAllTopicsBySourceAndTarget(context, source, null, offset, count);
+    public List<QATopic> findAllTopics(Context context, long offset, long count, String orderField, boolean ascending) {
+        return findAllTopicsBySource(context, null, offset, count, orderField, ascending);
+    }
+
+    @Override
+    public List<QATopic> findAllTopicsBySource(Context context, String source, long offset,
+        long count, String orderField, boolean ascending) {
+        return findAllTopicsBySourceAndTarget(context, source, null, offset, count, orderField, ascending);
     }
 
     @Override
     public List<QATopic> findAllTopicsBySourceAndTarget(Context context, String source, UUID target, long offset,
-            int count) {
+            long count, String orderField, boolean ascending) {
         if (isNotSupportedSource(source)
                 || !qaSecurityService.canSeeSource(context, context.getCurrentUser(), source)) {
             return List.of();
         }
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
+        if (orderField != null) {
+            solrQuery.setSort(orderField, ascending ? ORDER.asc : ORDER.desc);
+            solrQuery.setFacetSort(FacetParams.FACET_SORT_INDEX);
+        }
         Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context,
                 context.getCurrentUser(), source);
         solrQuery.setQuery(securityQuery.orElse("*:*"));

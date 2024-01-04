@@ -143,7 +143,7 @@ public class QAEventMatcher {
                 hrefPrefix = "https://arxiv.org/abs/";
                 break;
             case "handle":
-                hrefPrefix = "https://arxiv.org/abs/";
+                hrefPrefix = "https://hdl.handle.net/";
                 break;
             case "urn":
                 hrefPrefix = "";

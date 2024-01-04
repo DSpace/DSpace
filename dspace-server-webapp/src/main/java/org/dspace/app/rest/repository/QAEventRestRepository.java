@@ -24,7 +24,7 @@ import org.dspace.content.QAEvent;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.qaevent.dao.QAEventsDao;
+import org.dspace.qaevent.dao.QAEventsDAO;
 import org.dspace.qaevent.service.QAEventService;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +48,7 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
     private QAEventService qaEventService;
 
     @Autowired
-    private QAEventsDao qaEventDao;
+    private QAEventsDAO qaEventDao;
 
     @Autowired
     private ItemService itemService;

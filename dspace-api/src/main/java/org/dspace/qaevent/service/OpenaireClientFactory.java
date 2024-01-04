@@ -16,7 +16,7 @@ import org.dspace.utils.DSpace;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public interface BrokerClientFactory {
+public interface OpenaireClientFactory {
 
     /**
      * Returns an instance of the {@link BrokerClient}.
@@ -25,7 +25,7 @@ public interface BrokerClientFactory {
      */
     public BrokerClient getBrokerClient();
 
-    public static BrokerClientFactory getInstance() {
-        return new DSpace().getServiceManager().getServiceByName("brokerClientFactory", BrokerClientFactory.class);
+    public static OpenaireClientFactory getInstance() {
+        return new DSpace().getServiceManager().getServiceByName("openaireClientFactory", OpenaireClientFactory.class);
     }
 }

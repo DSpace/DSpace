@@ -8,17 +8,17 @@
 package org.dspace.qaevent.service.impl;
 
 import eu.dnetlib.broker.BrokerClient;
-import org.dspace.qaevent.service.BrokerClientFactory;
+import org.dspace.qaevent.service.OpenaireClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Implementation of {@link BrokerClientFactory} that returns the instance of
+ * Implementation of {@link OpenaireClientFactory} that returns the instance of
  * {@link BrokerClient} managed by the Spring context.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-public class BrokerClientFactoryImpl implements BrokerClientFactory {
+public class OpenaireClientFactoryImpl implements OpenaireClientFactory {
 
     @Autowired
     private BrokerClient brokerClient;
