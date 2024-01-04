@@ -1,0 +1,14 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="1" author="Doroshenko Danil">
+        <insert tableName="speciality">
+            <column name="code" value="052"/>
+            <column name="name" value="Політологія"/>
+            <column name="chair_id" value="97"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

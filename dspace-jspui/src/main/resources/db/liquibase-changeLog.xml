@@ -9,6 +9,7 @@
     <include file="changelog/03-metadata-field.xml" relativeToChangelogFile="true"/>
     <include file="changelog/04-add-law-speciality.xml" relativeToChangelogFile="true"/>
     <include file="changelog/05-add-applied-math-speciality.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/06-add-politology-speciality.xml" relativeToChangelogFile="true"/>
 
     <changeSet id="6" author="Igor Marchenko">
         <addColumn tableName="faculty">
@@ -189,5 +190,8 @@
             insert into dspaceobject(uuid) select uuid from chair where chair_id = 103;
         </sql>
     </changeSet>
+
+
+
 
 </databaseChangeLog>
