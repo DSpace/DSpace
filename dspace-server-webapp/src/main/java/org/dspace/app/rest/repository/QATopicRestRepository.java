@@ -75,7 +75,7 @@ public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, Str
             ascending = pageable.getSort()
                 .getOrderFor(ORDER_FIELD).getDirection() == Direction.ASC;
         }
-        List<QATopic> topics = qaEventService.findAllTopics(context, pageable.getOffset(), pageable.getPageSize(),
+        List<QATopic> topics = qaEventService.findAllTopicsBySource(context, source, pageable.getOffset(), pageable.getPageSize(),
             ORDER_FIELD, ascending);
         if (topics == null) {
             return null;

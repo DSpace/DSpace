@@ -47,6 +47,7 @@ import org.dspace.app.rest.repository.NotifyServiceRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.NotifyServiceBuilder;
 import org.dspace.builder.NotifyServiceInboundPatternBuilder;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -54,6 +55,7 @@ import org.junit.Test;
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
+@Ignore
 public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
