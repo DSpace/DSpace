@@ -1,8 +1,18 @@
-FROM tomcat:8-jre8 as ant_build
+# This Docker image is based on Step 2 in "Dockerfile", with some steps removed
+# as they will be performed in the Dockerfiles that use this image
+# (Dockerfile.dev, Dockerfile.dev-additions)
+ARG JDK_VERSION=11
 
+FROM openjdk:${JDK_VERSION}-slim as ant_build
 # Create the initial install deployment using ANT
-ENV ANT_VERSION 1.10.7
+ENV ANT_VERSION 1.10.13
 ENV ANT_HOME /tmp/ant-$ANT_VERSION
 ENV PATH $ANT_HOME/bin:$PATH
+# Need wget to install ant
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends wget \
+    && apt-get purge -y --auto-remove \
+    && rm -rf /var/lib/apt/lists/*
+# Download and install 'ant'
 RUN mkdir $ANT_HOME && \
-    curl --silent "https://archive.apache.org/dist/ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz" | tar -zx --strip-components=1 -C $ANT_HOME
+    wget -qO- "https://archive.apache.org/dist/ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz" | tar -zx --strip-components=1 -C $ANT_HOME
