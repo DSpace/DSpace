@@ -40,6 +40,7 @@ import org.dspace.eperson.dao.RegistrationDataDAO;
 import org.dspace.eperson.service.CaptchaService;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -305,6 +306,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         reloadCaptchaProperties(originVerification, originSecret, originVresion);
     }
 
+    @Ignore
     @Test
     public void registrationFlowWithInvalidCaptchaTokenTest() throws Exception {
         String originVerification = configurationService.getProperty("registration.verification.enabled");

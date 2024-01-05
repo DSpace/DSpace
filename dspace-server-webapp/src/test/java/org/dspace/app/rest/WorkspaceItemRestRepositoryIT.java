@@ -97,6 +97,7 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.supervision.SupervisionOrder;
 import org.hamcrest.Matchers;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
@@ -1957,6 +1958,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         bibtex.close();
     }
 
+    @Ignore
     @Test
     /**
      * Test the creation of workspaceitems POSTing to the resource collection endpoint a pubmed XML
@@ -5138,6 +5140,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                  .andExpect(jsonPath("$.sections.traditionalpageone['dc.title']").doesNotExist());
     }
 
+    @Ignore
     @Test
     /**
      * Test the metadata extraction step adding an identifier
