@@ -58,12 +58,11 @@ public class CanvasLookupService extends AbstractResourceService {
             throw new RuntimeException(e);
         }
 
-        Canvas canvas = this.getFromManifest(manifest, canvasId);
-        if (canvas != null) {
-            return utils.asJson(canvas);
+        if (manifest == null) {
+            return generateCanvas(context, item, canvasId);
         }
-
-        return generateCanvas(context, item, canvasId);
+        Canvas canvas = this.getFromManifest(manifest, canvasId);
+        return utils.asJson(canvas);
     }
 
     private String generateCanvas(Context context, Item item, String canvasId) {
@@ -85,12 +84,18 @@ public class CanvasLookupService extends AbstractResourceService {
 
     private Canvas getFromManifest(Manifest manifest, String canvasId) {
         if (manifest == null) {
-            return null;
+            throw new ResourceNotFoundException("No manifest found");
         }
+        // Not a good way to look for the canvasId. The author will need to make sure each
+        // simple identifier is unique. Since it'll be scoped to the manifest, maybe it's
+        // not a big deal, but ideally we'd have the full ID and do a simple equality check
         return manifest.getDefaultSequence().getCanvases().stream()
-            .filter(c -> c.getIdentifier().toString().equals(canvasId))
+            // .filter(c -> c.getIdentifier().toString().equals(canvasId))
+            .filter(c -> c.getIdentifier().toString().endsWith(canvasId))
             .findFirst()
-            .orElse(null);
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "Canvas not found in manifest " + manifest.getIdentifier() + " -/- " + canvasId
+            ));
     }
 
 }

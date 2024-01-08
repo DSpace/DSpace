@@ -40,7 +40,7 @@ public class ManifestReader {
      *
      * @param item DSpace item
      * @param context DSpace context
-     * @return
+     * @return NULL if no manifest bitstream was found
      * @throws SQLException
      * @throws IOException
      * @throws AuthorizeException

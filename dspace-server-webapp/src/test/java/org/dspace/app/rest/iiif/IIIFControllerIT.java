@@ -37,7 +37,6 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -1469,7 +1468,6 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    @Ignore
     public void readCanvasFromCustomManifest() throws Exception {
         context.turnOffAuthorisationSystem();
 
@@ -1500,7 +1498,7 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
 
         getClient().perform(get("/iiif/" + publicItem1.getID() + "/canvas/c1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.type", is("sc:Canvas")))
+                .andExpect(jsonPath("$.@type", is("sc:Canvas")))
                 .andExpect(jsonPath("$.label", is("Test label")));
     }
 
