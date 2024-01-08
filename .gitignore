@@ -6,6 +6,10 @@ scripts/patches
 # Ignore HTTPS certificates
 dspace/src/main/docker/nginx/certs/*
 !dspace/src/main/docker/nginx/certs/.keep
+
+# Ignore database dump directory to be used with docker-compose for initializing
+postgres-init/*
+!postgres-init/README.md
 ## End UMD Customization
 
 ## Ignore the MVN compiled output directories from version tracking
@@ -41,15 +45,11 @@ nb-configuration.xml
 ## KEPT FOR BACKWARDS COMPATIBILITY WITH 5.x (build.properties is now replaced with local.cfg)
 /*.properties
 !/build.properties
-!/local.properties
 
 # Ignore a local.cfg file in root folder, if it exists
 /local.cfg
 # Also ignore it under dspace/config
 /dspace/config/local.cfg
-# Ignore database dump directory to be used with docker-compose for initializing
-postgres-init/*
-!postgres-init/README.md
 
 ##Mac noise
 .DS_Store

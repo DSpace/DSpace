@@ -343,11 +343,6 @@ identifier.doi.namespaceseparator =
 crosswalk.dissemination.DataCite.publisher = Digital Repository at the University of Maryland
 crosswalk.dissemination.DataCite.stylesheet = crosswalks/DIM2UmdDataCite.xsl
 
-####################
-# GOOGLE ANALYTICS #
-####################
-xmlui.google.analytics.key=
-
 #####################
 # LOGLEVEL SETTINGS #
 #####################

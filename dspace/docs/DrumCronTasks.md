@@ -9,13 +9,13 @@ DSpace provides a sample "crontab" file  at
 All of the sample tasks are performed, although sometimes on a different
 schedule, except for the following:
 
-* index-authority - We do not use an "authority" Solr core, so thistask is not
+* index-authority - We do not use an "authority" Solr core, so this task is not
   needed.
 
 In addition, the following tasks are performed:
 
 * generate-sitemaps - Generates sitemaps for use by search engines
-* load-etd-nightly - Custom UMD task to load Proquest ETD files
+* load-etd-nightly - Custom UMD task to load ProQuest ETD files
 * curate - Run any Curation Tasks queued from the Admin UI
 
 ## Cron Container
@@ -87,8 +87,9 @@ Updates the "oai" Solr core with new/modified documents for OAI-PMH harvesting.
 
     Execute the query, and verify that a single entry is found.
 
-**Note:** There is a known DSpace issue (see DSpace pull request 2856) that
-deleted items are *not* removed from the "oai" Solr index.
+**Note:** There is a known DSpace issue (see DSpace
+<https://github.com/DSpace/DSpace/pull/2856>) that deleted items are *not*
+removed from the "oai" Solr index.
 
 ----
 
@@ -135,9 +136,9 @@ The script has completed
 
 ----
 
-### load-etd-nightly (Proquest)
+### load-etd-nightly (ProQuest)
 
-Custom UMD functionality to load Proquest ETD files.
+Custom UMD functionality to load ProQuest ETD files.
 
 **Note:** The following steps should *not* be run in production, as it involves
 the addition of an item.
@@ -283,76 +284,29 @@ To verify in sandbox/test/qa:
 
 ----
 
-### dspace sub-daily
+### dspace subscription-send
 
 Sends an email to any users who have "subscribed" to a Collection, notifying
 them of newly added content.
 
-**Note:** In DSpace 7.4, there is no way for a user to subscribe/unsubscribe to
-a collection via the GUI (this functionality is implemented in DSpace 7.5).
-Existing subscriptions should still work.
-
-Also, in DSpace 7.5, this task is changed to "subscription-send"
+Separate cron entries send emails for daily, weekly, and monthly subscriptions.
 
 **Note:** The following steps should *not* be run in production, as it involves
 the addition of an item.
 
-Since the GUI functionality for adding a subscription is not available in
-DSpace 7.4, the following procedure adds a subscription directly to the Postgres
-database:
-
-1) Add a subscription to the "subscription" table in Postgres
+1) Add a daily subscription to a collection via the DRUM GUI:
 
     a) Login in to DRUM as an "administrator" user.
 
-    b) Select "Access Control | People" from the administrative sidebar. The
-       "EPeople" page will be displayed.
+    b) Find the collection you want to subscribe to, such as the
+       "Aerospace Engineering Theses and Dissertations" collection,
+       <https://drum-test.lib.umd.edu/collections/8976365e-2edf-4fb5-a706-dec3e5c01983>
 
-    c) On the "EPeople" page, look up your username and note the value in the
-       "ID" field
+    c) Left-click the "bell" icon next to the collection title, and select
+       "Daily" in the "Subscriptions" popup dialog. Left-click the "Submit"
+       button.
 
-    d) Find the collection you want to subscribe to, and note the collection ID
-       of the collection from the URL. For example, for the
-       "Aerospace Engineering Theses and Disserations" collection,
-       <https://drum.sandbox.lib.umd.edu/collections/8976365e-2edf-4fb5-a706-dec3e5c01983>,
-       the collection ID is "8976365e-2edf-4fb5-a706-dec3e5c01983"
-
-    e) Access the "drum-db-0" container running Postgres:
-
-    ```bash
-    $ kubectl exec -it drum-db-0 -- /bin/bash
-    ```
-
-    f) Run the following command in the "drum-db-0" container to access the "psql" client
-
-    ```bash
-    drum-db-0$ psql --username=drum --dbname=drum
-    ```
-
-    g) Run the following command to determine the next valid subscription id:
-
-    ```bash
-    psql$ select MAX(subscription_id)+1 from subscription;
-    ```
-
-    h) To add a subscription, the psql command will have the form:
-
-    ```text
-    INSERT INTO subscription (subscription_id, eperson_id, collection_id) VALUES (<SUBSCRIPTION_ID>,'<EPERSON_ID>', '<COLLECTION_ID>');
-    ```
-
-    where \<SUBSCRIPTION_ID> is the id number from the previous step,
-    \<EPERSON_ID> is your eperson ID, and \<COLLECTION_ID> is the collection ID.
-    For example, if the next subscribtion id is 605, your eperson ID is
-    "c9d13f20-0c95-4844-b8a6-254d128c4f14", and the collection ID is
-    "8976365e-2edf-4fb5-a706-dec3e5c01983", the command would be:
-
-    ```bash
-    psql$ INSERT INTO subscription (subscription_id, eperson_id, collection_id) VALUES (605, 'c9d13f20-0c95-4844-b8a6-254d128c4f14', '8976365e-2edf-4fb5-a706-dec3e5c01983');
-    ```
-
-2) Log in to DRUM as an administrator, and add a new item to the collection
-   that has been subscribed to.
+2) A new item to the collection that has been subscribed to.
 
 3) After the cron task has run, verify that you receive an email indicating that
    the new item has been added to the collection
@@ -365,7 +319,7 @@ Extracts full text from documents and creates thumbnail images.
 
 To verify in production:
 
-1) Find an item thas was added on the previous day and verify that a
+1) Find an item that was added on the previous day and verify that a
    thumbnail image has been created.
 
 To verify in sandbox/test/qa:
@@ -409,28 +363,20 @@ queue (in DSpace 6 there was a "Queue" button along with a "Start" button on the
 Therefore, does not appear to be a way to test this issue, as there are no
 curation tasks to run via the queue.
 
-## Broken Cron Tasks
+----
 
-The following cron tasks are "broken" as of DSpace 7.4, with the expectation
-that they will be fixed in subsequent DSpace releases:
-
-### checker/checker-emailer
+### checker and checker-emailer
 
 Verifies the checksums of all files stored in DSpace, and notify the system
 administrator whether any checksums were found to be different.
 
-There are two open DSpace issues related checksum checker, indicating that it
-does not work:
+In production, daily emails should be sent out indicating whether any of the
+file checksums checked were different.
 
-* <https://github.com/DSpace/DSpace/issues/8570>
-* <https://github.com/DSpace/DSpace/pull/8500>
+## Broken Cron Tasks
 
-These may possibly be fixed in DSpace 7.6.
-
-Also, the current implementation has "checker-emailer -All", and it is seems
-unlikely that "-All" is valid flag (it should probably be "--All").
-
-----
+The following cron tasks are "broken" as of DSpace 7.4, with the expectation
+that they will be fixed in subsequent DSpace releases:
 
 ### cleanup
 

@@ -30,7 +30,7 @@ it is simply an emergent result based on the resource policies of the bitstream,
 the user, and the current date.
 
 The resource policy for an embargo typically consists of setting an
-"Anonymous READ" policy (a policg for the "Anonymous" group with "READ"
+"Anonymous READ" policy (a policy for the "Anonymous" group with "READ"
 permission) that has a "Start Date" in the future. Once the date in the
 "Start Date" is reached, anyone can download the bitstream. For bitstreams that
 are permanently embargoed, an "Anonymous READ" policy is simply not created.
@@ -130,7 +130,7 @@ based on:
 * Whether the user is logged in - this can happen, for example, if a bitstream
   has been restricted to on-campus IP addresses through a "Campus" group
   resource policy.
-* For anoynmous users, whether the embargo has a lift date
+* For anonymous users, whether the embargo has a lift date
 
 This functionality relies on the stock DSpace resource policies to determine
 if a user has "READ" permission to the bitstream. The "ETD Embargo" resource

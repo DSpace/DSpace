@@ -70,7 +70,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
-public class VersioningWithRelationshipsTest extends AbstractIntegrationTestWithDatabase {
+public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDatabase {
 
     private final RelationshipService relationshipService =
         ContentServiceFactory.getInstance().getRelationshipService();

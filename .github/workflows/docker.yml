@@ -15,30 +15,36 @@ on:
 permissions:
   contents: read  #  to fetch code (actions/checkout)
 
+# Define shared environment variables for all jobs below
+env:
+  # Define tags to use for Docker images based on Git tags/branches (for docker/metadata-action)
+  # For a new commit on default branch (main), use the literal tag 'latest' on Docker image.
+  # For a new commit on other branches, use the branch name as the tag for Docker image.
+  # For a new tag, copy that tag name as the tag for Docker image.
+  IMAGE_TAGS: |
+    type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
+    type=ref,event=branch,enable=${{ !endsWith(github.ref, github.event.repository.default_branch) }}
+    type=ref,event=tag
+  # Define default tag "flavor" for docker/metadata-action per
+  # https://github.com/docker/metadata-action#flavor-input
+  # We manage the 'latest' tag ourselves to the 'main' branch (see settings above)
+  TAGS_FLAVOR: |
+    latest=false
+  # Architectures / Platforms for which we will build Docker images
+  # If this is a PR, we ONLY build for AMD64. For PRs we only do a sanity check test to ensure Docker builds work.
+  # If this is NOT a PR (e.g. a tag or merge commit), also build for ARM64. NOTE: The ARM64 build takes MUCH
+  # longer (around 45mins or so) which is why we only run it when pushing a new Docker image.
+  PLATFORMS: linux/amd64${{ github.event_name != 'pull_request' && ', linux/arm64' || '' }}
+
 jobs:
-  docker:
+  ####################################################
+  # Build/Push the 'dspace/dspace-dependencies' image.
+  # This image is used by all other jobs.
+  ####################################################
+  dspace-dependencies:
     # Ensure this job never runs on forked repos. It's only executed for 'dspace/dspace'
     if: github.repository == 'dspace/dspace'
     runs-on: ubuntu-latest
-    env:
-      # Define tags to use for Docker images based on Git tags/branches (for docker/metadata-action)
-      # For a new commit on default branch (main), use the literal tag 'dspace-7_x' on Docker image.
-      # For a new commit on other branches, use the branch name as the tag for Docker image.
-      # For a new tag, copy that tag name as the tag for Docker image.
-      IMAGE_TAGS: |
-        type=raw,value=dspace-7_x,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
-        type=ref,event=branch,enable=${{ !endsWith(github.ref, github.event.repository.default_branch) }}
-        type=ref,event=tag
-      # Define default tag "flavor" for docker/metadata-action per
-      # https://github.com/docker/metadata-action#flavor-input
-      # We turn off 'latest' tag by default.
-      TAGS_FLAVOR: |
-        latest=false
-      # Architectures / Platforms for which we will build Docker images
-      # If this is a PR, we ONLY build for AMD64. For PRs we only do a sanity check test to ensure Docker builds work.
-      # If this is NOT a PR (e.g. a tag or merge commit), also build for ARM64. NOTE: The ARM64 build takes MUCH
-      # longer (around 45mins or so) which is why we only run it when pushing a new Docker image.
-      PLATFORMS: linux/amd64${{ github.event_name != 'pull_request' && ', linux/arm64' || '' }}
 
     steps:
       # https://github.com/actions/checkout
@@ -62,9 +68,6 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
 
-      ####################################################
-      # Build/Push the 'dspace/dspace-dependencies' image
-      ####################################################
       # https://github.com/docker/metadata-action
       # Get Metadata for docker_build_deps step below
       - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-dependencies' image
@@ -78,7 +81,7 @@ jobs:
       # https://github.com/docker/build-push-action
       - name: Build and push 'dspace-dependencies' image
         id: docker_build_deps
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: ./Dockerfile.dependencies
@@ -90,9 +93,38 @@ jobs:
           tags: ${{ steps.meta_build_deps.outputs.tags }}
           labels: ${{ steps.meta_build_deps.outputs.labels }}
 
-      #######################################
-      # Build/Push the 'dspace/dspace' image
-      #######################################
+  #######################################
+  # Build/Push the 'dspace/dspace' image
+  #######################################
+  dspace:
+    # Ensure this job never runs on forked repos. It's only executed for 'dspace/dspace'
+    if: github.repository == 'dspace/dspace'
+    # Must run after 'dspace-dependencies' job above
+    needs: dspace-dependencies
+    runs-on: ubuntu-latest
+
+    steps:
+      # https://github.com/actions/checkout
+      - name: Checkout codebase
+        uses: actions/checkout@v3
+
+      # https://github.com/docker/setup-buildx-action
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # https://github.com/docker/setup-qemu-action
+      - name: Set up QEMU emulation to build for multiple architectures
+        uses: docker/setup-qemu-action@v2
+
+      # https://github.com/docker/login-action
+      - name: Login to DockerHub
+        # Only login if not a PR, as PRs only trigger a Docker build and not a push
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+
       # Get Metadata for docker_build step below
       - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace' image
         id: meta_build
@@ -104,7 +136,7 @@ jobs:
 
       - name: Build and push 'dspace' image
         id: docker_build
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: ./Dockerfile
@@ -116,9 +148,38 @@ jobs:
           tags: ${{ steps.meta_build.outputs.tags }}
           labels: ${{ steps.meta_build.outputs.labels }}
 
-      #####################################################
-      # Build/Push the 'dspace/dspace' image ('-test' tag)
-      #####################################################
+  #############################################################
+  # Build/Push the 'dspace/dspace' image ('-test' tag)
+  #############################################################
+  dspace-test:
+    # Ensure this job never runs on forked repos. It's only executed for 'dspace/dspace'
+    if: github.repository == 'dspace/dspace'
+    # Must run after 'dspace-dependencies' job above
+    needs: dspace-dependencies
+    runs-on: ubuntu-latest
+
+    steps:
+      # https://github.com/actions/checkout
+      - name: Checkout codebase
+        uses: actions/checkout@v3
+
+      # https://github.com/docker/setup-buildx-action
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # https://github.com/docker/setup-qemu-action
+      - name: Set up QEMU emulation to build for multiple architectures
+        uses: docker/setup-qemu-action@v2
+
+      # https://github.com/docker/login-action
+      - name: Login to DockerHub
+        # Only login if not a PR, as PRs only trigger a Docker build and not a push
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+
       # Get Metadata for docker_build_test step below
       - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-test' image
         id: meta_build_test
@@ -133,7 +194,7 @@ jobs:
 
       - name: Build and push 'dspace-test' image
         id: docker_build_test
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: ./Dockerfile.test
@@ -145,9 +206,38 @@ jobs:
           tags: ${{ steps.meta_build_test.outputs.tags }}
           labels: ${{ steps.meta_build_test.outputs.labels }}
 
-      ###########################################
-      # Build/Push the 'dspace/dspace-cli' image
-      ###########################################
+  ###########################################
+  # Build/Push the 'dspace/dspace-cli' image
+  ###########################################
+  dspace-cli:
+    # Ensure this job never runs on forked repos. It's only executed for 'dspace/dspace'
+    if: github.repository == 'dspace/dspace'
+    # Must run after 'dspace-dependencies' job above
+    needs: dspace-dependencies
+    runs-on: ubuntu-latest
+
+    steps:
+      # https://github.com/actions/checkout
+      - name: Checkout codebase
+        uses: actions/checkout@v3
+
+      # https://github.com/docker/setup-buildx-action
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # https://github.com/docker/setup-qemu-action
+      - name: Set up QEMU emulation to build for multiple architectures
+        uses: docker/setup-qemu-action@v2
+
+      # https://github.com/docker/login-action
+      - name: Login to DockerHub
+        # Only login if not a PR, as PRs only trigger a Docker build and not a push
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+
       # Get Metadata for docker_build_test step below
       - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-cli' image
         id: meta_build_cli
@@ -159,7 +249,7 @@ jobs:
 
       - name: Build and push 'dspace-cli' image
         id: docker_build_cli
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: ./Dockerfile.cli
@@ -171,9 +261,36 @@ jobs:
           tags: ${{ steps.meta_build_cli.outputs.tags }}
           labels: ${{ steps.meta_build_cli.outputs.labels }}
 
-      ###########################################
-      # Build/Push the 'dspace/dspace-solr' image
-      ###########################################
+  ###########################################
+  # Build/Push the 'dspace/dspace-solr' image
+  ###########################################
+  dspace-solr:
+    # Ensure this job never runs on forked repos. It's only executed for 'dspace/dspace'
+    if: github.repository == 'dspace/dspace'
+    runs-on: ubuntu-latest
+
+    steps:
+      # https://github.com/actions/checkout
+      - name: Checkout codebase
+        uses: actions/checkout@v3
+
+      # https://github.com/docker/setup-buildx-action
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # https://github.com/docker/setup-qemu-action
+      - name: Set up QEMU emulation to build for multiple architectures
+        uses: docker/setup-qemu-action@v2
+
+      # https://github.com/docker/login-action
+      - name: Login to DockerHub
+        # Only login if not a PR, as PRs only trigger a Docker build and not a push
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+
       # Get Metadata for docker_build_solr step below
       - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-solr' image
         id: meta_build_solr
@@ -185,7 +302,7 @@ jobs:
 
       - name: Build and push 'dspace-solr' image
         id: docker_build_solr
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: ./dspace/src/main/docker/dspace-solr/Dockerfile
@@ -197,9 +314,36 @@ jobs:
           tags: ${{ steps.meta_build_solr.outputs.tags }}
           labels: ${{ steps.meta_build_solr.outputs.labels }}
 
-      ###########################################################
-      # Build/Push the 'dspace/dspace-postgres-pgcrypto' image
-      ###########################################################
+  ###########################################################
+  # Build/Push the 'dspace/dspace-postgres-pgcrypto' image
+  ###########################################################
+  dspace-postgres-pgcrypto:
+    # Ensure this job never runs on forked repos. It's only executed for 'dspace/dspace'
+    if: github.repository == 'dspace/dspace'
+    runs-on: ubuntu-latest
+
+    steps:
+      # https://github.com/actions/checkout
+      - name: Checkout codebase
+        uses: actions/checkout@v3
+
+      # https://github.com/docker/setup-buildx-action
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # https://github.com/docker/setup-qemu-action
+      - name: Set up QEMU emulation to build for multiple architectures
+        uses: docker/setup-qemu-action@v2
+
+      # https://github.com/docker/login-action
+      - name: Login to DockerHub
+        # Only login if not a PR, as PRs only trigger a Docker build and not a push
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+
       # Get Metadata for docker_build_postgres step below
       - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-postgres-pgcrypto' image
         id: meta_build_postgres
@@ -211,7 +355,7 @@ jobs:
 
       - name: Build and push 'dspace-postgres-pgcrypto' image
         id: docker_build_postgres
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           # Must build out of subdirectory to have access to install script for pgcrypto
           context: ./dspace/src/main/docker/dspace-postgres-pgcrypto/
@@ -224,9 +368,36 @@ jobs:
           tags: ${{ steps.meta_build_postgres.outputs.tags }}
           labels: ${{ steps.meta_build_postgres.outputs.labels }}
 
-      ###########################################################
-      # Build/Push the 'dspace/dspace-postgres-pgcrypto' image ('-loadsql' tag)
-      ###########################################################
+  ########################################################################
+  # Build/Push the 'dspace/dspace-postgres-pgcrypto' image (-loadsql tag)
+  ########################################################################
+  dspace-postgres-pgcrypto-loadsql:
+    # Ensure this job never runs on forked repos. It's only executed for 'dspace/dspace'
+    if: github.repository == 'dspace/dspace'
+    runs-on: ubuntu-latest
+
+    steps:
+      # https://github.com/actions/checkout
+      - name: Checkout codebase
+        uses: actions/checkout@v3
+
+      # https://github.com/docker/setup-buildx-action
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # https://github.com/docker/setup-qemu-action
+      - name: Set up QEMU emulation to build for multiple architectures
+        uses: docker/setup-qemu-action@v2
+
+      # https://github.com/docker/login-action
+      - name: Login to DockerHub
+        # Only login if not a PR, as PRs only trigger a Docker build and not a push
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+
       # Get Metadata for docker_build_postgres_loadsql step below
       - name: Sync metadata (tags, labels) from GitHub to Docker for 'dspace-postgres-pgcrypto-loadsql' image
         id: meta_build_postgres_loadsql
@@ -241,7 +412,7 @@ jobs:
 
       - name: Build and push 'dspace-postgres-pgcrypto-loadsql' image
         id: docker_build_postgres_loadsql
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           # Must build out of subdirectory to have access to install script for pgcrypto
           context: ./dspace/src/main/docker/dspace-postgres-pgcrypto-curl/

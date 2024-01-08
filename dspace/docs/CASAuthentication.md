@@ -9,7 +9,7 @@ a new EPerson for a user, if they are not already known by DRUM).
 
 ## Configuration
 
-**Note** In the configuraton files, commas in values are treated as separators,
+**Note** In the configuration files, commas in values are treated as separators,
 and so must be escaped if part of the value. For example, if the value for the
 LDAP bind auth property ("drum.ldap.bind.auth") is is
 
@@ -117,7 +117,7 @@ module.
 DSpace 7 enables administrators to impersonate users by adding an
 "X-On-Behalf-Of" header to the HTTP request. This header is handled by the
 "org.dspace.app.rest.security.StatelessAuthenticationFilter" class in the
-authetication filter chain (see the
+authentication filter chain (see the
 "org.dspace.app.rest.security.WebSecurityConfiguration" class). The
 "StatelessAuthenticationFilter" class calls the "switchContextUser" method on
 the "org.dspace.core.Context" class, which sets the current user and clears the
