@@ -97,11 +97,11 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
 
     @Override
     @PreAuthorize("hasPermission(#id, 'QUALITYASSURANCEEVENT', 'DELETE')")
-    protected void delete(Context context, String eventId) throws AuthorizeException {
-        Item item = findTargetItem(context, eventId);
+    protected void delete(Context context, String id) throws AuthorizeException {
+        Item item = findTargetItem(context, id);
         EPerson eperson = context.getCurrentUser();
-        qaEventService.deleteEventByEventId(eventId);
-        qaEventDao.storeEvent(context, eventId, eperson, item);
+        qaEventService.deleteEventByEventId(id);
+        qaEventDao.storeEvent(context, id, eperson, item);
     }
 
     @Override

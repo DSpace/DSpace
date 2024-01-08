@@ -28,14 +28,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.dspace.app.ldn.NotifyServiceEntity;
+import org.dspace.app.ldn.service.NotifyService;
 import org.dspace.app.rest.model.NotifyServiceInboundPatternRest;
 import org.dspace.app.rest.model.NotifyServiceOutboundPatternRest;
 import org.dspace.app.rest.model.NotifyServiceRest;
@@ -47,16 +50,21 @@ import org.dspace.app.rest.repository.NotifyServiceRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.NotifyServiceBuilder;
 import org.dspace.builder.NotifyServiceInboundPatternBuilder;
+import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
 
 /**
  * Integration test class for {@link NotifyServiceRestRepository}.
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
-@Ignore
 public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    private NotifyService notifyService;
 
     @Test
     public void findAllUnAuthorizedTest() throws Exception {
@@ -713,6 +721,11 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
+    @Ignore
+    /*
+     * frabacche senseless because it's a mandatory+unique
+     * entity field and also table column!
+     */
     public void notifyServiceLdnUrlRemoveOperationTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -3473,5 +3486,20 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ;
     }
 
+    @Override
+    @After
+    public void destroy() throws Exception {
+        List<NotifyServiceEntity> notifyServiceEntities = notifyService.findAll(context);
+        if (CollectionUtils.isNotEmpty(notifyServiceEntities)) {
+            notifyServiceEntities.forEach(notifyServiceEntity -> {
+                try {
+                    notifyService.delete(context, notifyServiceEntity);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
 
+        super.destroy();
+    }
 }

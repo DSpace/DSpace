@@ -65,7 +65,7 @@ public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, Str
     }
 
     @SearchRestMethod(name = "bySource")
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @PreAuthorize("hasPermission(#source, 'QUALITYASSURANCETOPIC', 'READ')")
     public Page<QATopicRest> findBySource(@Parameter(value = "source", required = true) String source,
             Pageable pageable) {
         Context context = obtainContext();
@@ -84,7 +84,7 @@ public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, Str
     }
 
     @SearchRestMethod(name = "byTarget")
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @PreAuthorize("hasPermission(#target, 'QUALITYASSURANCETOPIC', 'READ')")
     public Page<QATopicRest> findByTarget(@Parameter(value = "target", required = true) UUID target,
         @Parameter(value = "source", required = true) String source,
         Pageable pageable) {

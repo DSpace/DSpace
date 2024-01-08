@@ -40,6 +40,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+
 /**
  * This is the repository responsible to manage NotifyService Rest object
  *
@@ -228,5 +229,4 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
     public Class<NotifyServiceRest> getDomainClass() {
         return NotifyServiceRest.class;
     }
-
 }

@@ -28,7 +28,6 @@ import org.dspace.content.QAEvent;
 import org.dspace.qaevent.QANotifyPatterns;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -322,7 +321,6 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(status().isUnauthorized());
     }
 
-    @Ignore
     @Test
     public void findBySourceForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -435,7 +433,6 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(status().isUnauthorized());
     }
 
-    @Ignore
     @Test
     public void findByTargetForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
