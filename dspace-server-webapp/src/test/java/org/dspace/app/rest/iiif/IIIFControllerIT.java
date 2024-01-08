@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -1502,4 +1503,71 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.label", is("Test label")));
     }
 
+    @Test
+    public void getSeeAlsoFromCustomManifest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                                           .build();
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                      .enableIIIF()
+                                      .build();
+        Bundle targetBundle = BundleBuilder.createBundle(context, publicItem1)
+                                           .withName("IIIF_MANIFEST")
+                                           .build();
+
+        try (InputStream is = getClass().getResourceAsStream("manifest2.json")) {
+                Bitstream bitstream1 = BitstreamBuilder
+                        .createBitstream(context, targetBundle, is)
+                        .withName("manifest2.json")
+                        .withMimeType("application/json")
+                        .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest/seeAlso"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.label", is("More descriptions of this resource")));
+    }
+
+    @Test
+    public void getSeeAlsoFromCustomManifestWithNoSeeAlso() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                                           .build();
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                                      .withTitle("Public item 1")
+                                      .withIssueDate("2017-10-17")
+                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                                      .enableIIIF()
+                                      .build();
+        Bundle targetBundle = BundleBuilder.createBundle(context, publicItem1)
+                                           .withName("IIIF_MANIFEST")
+                                           .build();
+
+        try (InputStream is = getClass().getResourceAsStream("manifest.json")) {
+                Bitstream bitstream1 = BitstreamBuilder
+                        .createBitstream(context, targetBundle, is)
+                        .withName("manifest.json")
+                        .withMimeType("application/json")
+                        .build();
+        }
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest/seeAlso"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(""));
+    }
 }
