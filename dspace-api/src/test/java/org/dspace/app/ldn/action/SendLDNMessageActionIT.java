@@ -11,15 +11,14 @@ import static org.dspace.app.ldn.action.ActionStatus.ABORT;
 import static org.dspace.app.ldn.action.ActionStatus.CONTINUE;
 import static org.hamcrest.Matchers.any;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
-import java.net.URI;
 import java.sql.SQLException;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.ldn.LDNMessageEntity;
@@ -41,13 +40,11 @@ import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
