@@ -38,7 +38,6 @@ public class NotifyServiceEntityMatcher extends TypeSafeMatcher<NotifyServiceEnt
             actualEntity.getUrl().equals(expectedEntity.getUrl()) &&
             actualEntity.getLdnUrl().equals(expectedEntity.getLdnUrl()) &&
             actualEntity.getInboundPatterns() == expectedEntity.getInboundPatterns() &&
-            actualEntity.getOutboundPatterns() == expectedEntity.getOutboundPatterns() &&
             actualEntity.isEnabled() == expectedEntity.isEnabled() &&
             actualEntity.getScore() == expectedEntity.getScore();
     }
@@ -51,7 +50,6 @@ public class NotifyServiceEntityMatcher extends TypeSafeMatcher<NotifyServiceEnt
                    .appendText(", URL ").appendValue(expectedEntity.getUrl())
                    .appendText(", LDN URL ").appendValue(expectedEntity.getLdnUrl())
                    .appendText(", inbound patterns ").appendValue(expectedEntity.getInboundPatterns())
-                   .appendText(", outbound patterns ").appendValue(expectedEntity.getOutboundPatterns())
                    .appendText(", enabled ").appendValue(expectedEntity.isEnabled())
                    .appendText(", score ").appendValue(expectedEntity.getScore());
     }

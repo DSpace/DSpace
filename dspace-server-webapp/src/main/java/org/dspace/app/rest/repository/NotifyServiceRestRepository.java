@@ -19,15 +19,12 @@ import javax.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.NotifyServiceInboundPattern;
-import org.dspace.app.ldn.NotifyServiceOutboundPattern;
 import org.dspace.app.ldn.service.NotifyService;
 import org.dspace.app.ldn.service.NotifyServiceInboundPatternService;
-import org.dspace.app.ldn.service.NotifyServiceOutboundPatternService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.NotifyServiceInboundPatternRest;
-import org.dspace.app.rest.model.NotifyServiceOutboundPatternRest;
 import org.dspace.app.rest.model.NotifyServiceRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.ResourcePatch;
@@ -55,9 +52,6 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
 
     @Autowired
     private NotifyServiceInboundPatternService inboundPatternService;
-
-    @Autowired
-    private NotifyServiceOutboundPatternService outboundPatternService;
 
     @Autowired
     ResourcePatch<NotifyServiceEntity> resourcePatch;
@@ -124,10 +118,6 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
                 notifyServiceRest.getNotifyServiceInboundPatterns());
         }
 
-        if (notifyServiceRest.getNotifyServiceOutboundPatterns() != null) {
-            appendNotifyServiceOutboundPatterns(context, notifyServiceEntity,
-                notifyServiceRest.getNotifyServiceOutboundPatterns());
-        }
         notifyServiceEntity.setScore(notifyServiceRest.getScore());
 
         notifyService.update(context, notifyServiceEntity);
@@ -150,22 +140,6 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
         }
 
         notifyServiceEntity.setInboundPatterns(inboundPatterns);
-    }
-
-    private void appendNotifyServiceOutboundPatterns(Context context, NotifyServiceEntity notifyServiceEntity,
-        List<NotifyServiceOutboundPatternRest> outboundPatternRests) throws SQLException {
-
-        List<NotifyServiceOutboundPattern> outboundPatterns = new ArrayList<>();
-
-        for (NotifyServiceOutboundPatternRest outboundPatternRest : outboundPatternRests) {
-            NotifyServiceOutboundPattern outboundPattern = outboundPatternService.create(context, notifyServiceEntity);
-            outboundPattern.setPattern(outboundPatternRest.getPattern());
-            outboundPattern.setConstraint(outboundPatternRest.getConstraint());
-
-            outboundPatterns.add(outboundPattern);
-        }
-
-        notifyServiceEntity.setOutboundPatterns(outboundPatterns);
     }
 
     @Override
