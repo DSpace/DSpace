@@ -102,7 +102,7 @@ public class LDNMessageConsumer implements Consumer {
         List<NotifyServiceInboundPattern> inboundPatterns = inboundPatternService.findAutomaticPatterns(context);
 
         for (NotifyServiceInboundPattern inboundPattern : inboundPatterns) {
-            if (inboundPattern.getConstraint() == null ||
+            if (StringUtils.isEmpty(inboundPattern.getConstraint()) ||
                 evaluateFilter(context, item, inboundPattern.getConstraint())) {
                 createLDNMessage(context, item, inboundPattern.getNotifyService(), inboundPattern.getPattern());
             }
