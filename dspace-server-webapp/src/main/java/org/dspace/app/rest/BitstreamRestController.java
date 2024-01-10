@@ -138,6 +138,7 @@ public class BitstreamRestController {
                 .withBufferSize(BUFFER_SIZE)
                 .withFileName(name)
                 .withChecksum(bit.getChecksum())
+                .withLength(bit.getSizeBytes())
                 .withMimetype(mimetype)
                 .with(request)
                 .with(response);
