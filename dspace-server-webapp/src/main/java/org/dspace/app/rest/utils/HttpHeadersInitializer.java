@@ -14,6 +14,7 @@ import static javax.mail.internet.MimeUtility.encodeText;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -142,6 +143,9 @@ public class HttpHeadersInitializer {
         httpHeaders.put(ACCEPT_RANGES, Collections.singletonList(BYTES));
         if (checksum != null) {
             httpHeaders.put(ETAG, Collections.singletonList(checksum));
+        }
+        if (Objects.nonNull((Long.valueOf(this.length)))) {
+            httpHeaders.put(HttpHeaders.CONTENT_LENGTH, Collections.singletonList(String.valueOf(this.length)));
         }
         httpHeaders.put(LAST_MODIFIED, Collections.singletonList(FastHttpDateFormat.formatDate(lastModified)));
         httpHeaders.put(EXPIRES, Collections.singletonList(FastHttpDateFormat.formatDate(
