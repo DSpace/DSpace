@@ -1909,8 +1909,11 @@
     <repositories>
         <!-- Check Maven Central first (before other repos below) -->
         <repository>
-            <id>maven-central</id>
+            <id>central</id>
             <url>https://repo.maven.apache.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
         <!-- Enable access to artifacts in Sonatype's snapshot repo for Snapshots ONLY -->
         <repository>
@@ -1928,6 +1931,9 @@
         <repository>
             <id>handle.net</id>
             <url>https://handle.net/maven</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
     </repositories>
 </project>
