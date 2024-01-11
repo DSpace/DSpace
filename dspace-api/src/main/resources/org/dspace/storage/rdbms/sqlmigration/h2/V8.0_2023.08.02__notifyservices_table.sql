@@ -36,19 +36,3 @@ CREATE TABLE notifyservice_inbound_pattern (
 );
 
 CREATE INDEX notifyservice_inbound_idx ON notifyservice_inbound_pattern (service_id);
-
------------------------------------------------------------------------------------
--- CREATE notifyservice_outbound_patterns table
------------------------------------------------------------------------------------
-
-CREATE SEQUENCE if NOT EXISTS notifyservice_outbound_pattern_id_seq;
-
-CREATE TABLE notifyservice_outbound_pattern (
-    id INTEGER PRIMARY KEY,
-    service_id INTEGER REFERENCES notifyservice(id) ON DELETE CASCADE,
-    pattern VARCHAR(255),
-    constraint_name VARCHAR(255)
-);
-
-CREATE INDEX notifyservice_outbound_idx ON notifyservice_outbound_pattern (service_id);
-
