@@ -55,11 +55,17 @@ public class ExternalDataServiceImpl implements ExternalDataService {
 
     @Override
     public List<ExternalDataObject> searchExternalDataObjects(String source, String query, int start, int limit) {
+        return searchExternalDataObjects(source, query, null, start, limit);
+    }
+
+    @Override
+    public List<ExternalDataObject> searchExternalDataObjects(String source, String query, String hint,
+                                                              int start, int limit) {
         ExternalDataProvider provider = getExternalDataProvider(source);
         if (provider == null) {
             throw new IllegalArgumentException("Provider for: " + source + " couldn't be found");
         }
-        return provider.searchExternalDataObjects(query, start, limit);
+        return provider.searchExternalDataObjects(query, hint, start, limit);
     }
 
 
