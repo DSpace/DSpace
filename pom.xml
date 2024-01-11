@@ -21,7 +21,7 @@
         <java.version>17</java.version>
         <spring.version>6.1.1</spring.version>
         <spring-boot.version>3.2.0</spring-boot.version>
-        <spring-security.version>6.1.5</spring-security.version> <!-- sync with version used by spring-boot-->
+        <spring-security.version>6.2.0</spring-security.version> <!-- sync with version used by spring-boot-->
         <hibernate.version>5.6.15.Final</hibernate.version>
         <hibernate-validator.version>6.2.5.Final</hibernate-validator.version>
         <postgresql.driver.version>42.7.2</postgresql.driver.version>
@@ -45,7 +45,8 @@
         <tika.version>2.5.0</tika.version>
         <!-- Sync with whatever version Tika uses -->
         <bouncycastle.version>1.70</bouncycastle.version>
-
+        <!-- Jersey is used to integrate with external sources/services -->
+        <jersey.version>3.1.5</jersey.version>
         <!--=== SERVER WEBAPP DEPENDENCIES ===-->
         <!-- Library for reading JSON documents: https://github.com/json-path/JsonPath (used by Server webapp) -->
         <json-path.version>2.9.0</json-path.version>
@@ -54,11 +55,8 @@
         <nimbus-jose-jwt.version>7.9</nimbus-jose-jwt.version>
 
         <!--=== OTHER MODULE-SPECIFIC DEPENDENCIES ===-->
-        <!-- PIN Jena to 2.x until both RDF and SWORDv2 can be updated to Jena 3. Requires package renaming, see
-             https://jena.apache.org/documentation/migrate_jena2_jena3.html -->
-        <jena.version>2.13.0</jena.version>
-        <!-- Used by (now obsolete) 'dspace-rest' WAR -->
-        <jersey.version>3.1.5</jersey.version>
+        <!-- Jena is used by both RDF and SWORDv2 -->
+        <jena.version>4.9.0</jena.version>
 
         <!--=== MAVEN SETTINGS ===-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -1279,6 +1277,21 @@
                 <version>8.0.1</version>
             </dependency>
 
+            <!-- Solr-core and Postgres disagree on versions of Checker Qual -->
+            <dependency>
+                <groupId>org.checkerframework</groupId>
+                <artifactId>checker-qual</artifactId>
+                <version>3.31.0</version>
+            </dependency>
+
+            <!-- Several dependencies disagree on version of GSON including Jena, Google-OAuth-Client
+                 and OpenAIRE Broker-Client -->
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>2.10.1</version>
+            </dependency>
+
             <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analyzers-icu below,
              otherwise ICUFoldingFilterFactory may throw errors in tests.  -->
             <dependency>
@@ -1311,29 +1324,11 @@
                 <artifactId>apache-jena-libs</artifactId>
                 <type>pom</type>
                 <version>${jena.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                    <!-- Newer version brought in by Tika -->
-                    <exclusion>
-                        <groupId>org.apache.commons</groupId>
-                        <artifactId>commons-csv</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>net.handle</groupId>
                 <artifactId>handle</artifactId>
                 <version>9.3.1</version>
-		<exclusions>
-                    <!-- A later version is brought in by google-oauth-client -->
-                    <exclusion>
-                        <groupId>com.google.code.gson</groupId>
-                        <artifactId>gson</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <!-- Required to run Handle Server -->
             <dependency>
@@ -1459,12 +1454,22 @@
                 <artifactId>commons-lang3</artifactId>
                 <version>3.14.0</version>
             </dependency>
-            <!-- NOTE: We don't use commons-logging directly, but many dependencies rely on it.
-                 So, we specify the version to use to avoid dependency convergence issues. -->
+            <!-- NOTE: We don't use commons-logging, commons-compress or commons-csv directly,
+                 but many dependencies rely on them. Only here specified to avoid dependency convergence issues. -->
             <dependency>
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging</artifactId>
                 <version>1.3.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>1.23.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-csv</artifactId>
+                <version>1.10.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
