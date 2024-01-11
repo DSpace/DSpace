@@ -117,14 +117,29 @@ public class SHERPAv2JournalISSNDataProvider extends AbstractExternalDataProvide
     }
 
     /**
+     * To comply with new interface and abstract, the 'hint' is now implemented if not actually
+     * supported in this provider.
+     *
+     * @param query The query for the search
+     * @param start The start of the search
+     * @param limit The max amount of records to be returned by the search
+     * @return
+     */
+    @Override
+    public List<ExternalDataObject> searchExternalDataObjects(String query, int start, int limit) {
+        return searchExternalDataObjects(query, null, start, limit);
+    }
+
+    /**
      * Search SHERPA v2 API for journal results based on a 'contains word' query
      * @param query The term to query for the search
+     * @param hint A hint string to help with parameters or additional filters / logic
      * @param start The start of the search
      * @param limit The max amount of records to be returned by the search
      * @return a list of external data objects
      */
     @Override
-    public List<ExternalDataObject> searchExternalDataObjects(String query, int start, int limit) {
+    public List<ExternalDataObject> searchExternalDataObjects(String query, String hint, int start, int limit) {
 
         // Get SHERPA response from the API for all objects matching this ISSN
         SHERPAResponse sherpaResponse = sherpaService.performRequest(

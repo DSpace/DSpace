@@ -8,6 +8,7 @@
 package org.dspace.external.provider.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,8 +42,23 @@ public class MockDataProvider extends AbstractExternalDataProvider {
         }
     }
 
+    /**
+     * To comply with new interface and abstract, the 'hint' is now implemented if not actually
+     * supported in this provider.
+     *
+     * @param query The query for the search
+     * @param start The start of the search
+     * @param limit The max amount of records to be returned by the search
+     * @return
+     */
+    @Override
     public List<ExternalDataObject> searchExternalDataObjects(String query, int start, int limit) {
-        List<ExternalDataObject> listToReturn = new LinkedList<>();
+        return searchExternalDataObjects(query, null, start, limit);
+    }
+
+    @Override
+    public List<ExternalDataObject> searchExternalDataObjects(String query, String hint, int start, int limit) {
+        List<ExternalDataObject> listToReturn = new ArrayList<>();
         for (Map.Entry<String, ExternalDataObject> entry : mockLookupMap.entrySet()) {
             if (StringUtils.containsIgnoreCase(entry.getKey(), query)) {
                 listToReturn.add(entry.getValue());
