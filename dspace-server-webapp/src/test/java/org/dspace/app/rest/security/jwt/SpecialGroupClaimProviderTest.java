@@ -14,7 +14,7 @@ import static org.mockito.ArgumentMatchers.any;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import com.nimbusds.jwt.JWTClaimsSet;
 import org.dspace.core.Context;

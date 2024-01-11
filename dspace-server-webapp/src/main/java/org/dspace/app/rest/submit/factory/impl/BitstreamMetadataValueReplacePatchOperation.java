@@ -67,7 +67,7 @@ public class BitstreamMetadataValueReplacePatchOperation extends MetadataValueRe
         throws SQLException, IllegalArgumentException, IllegalAccessException {
         String mdString = split[3];
         List<MetadataValue> metadataByMetadataString = bitstreamService.getMetadataByMetadataString(b, mdString);
-        Assert.notEmpty(metadataByMetadataString);
+        Assert.notEmpty(metadataByMetadataString, "No metadata fields match ".concat(mdString));
 
         int index = Integer.parseInt(split[4]);
         // if split size is one so we have a call to initialize or replace

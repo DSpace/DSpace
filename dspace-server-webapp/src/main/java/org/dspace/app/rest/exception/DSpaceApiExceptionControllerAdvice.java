@@ -33,6 +33,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.repository.support.QueryMethodParameterConversionException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.csrf.InvalidCsrfTokenException;
@@ -216,7 +217,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
 
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
-                                                                          HttpHeaders headers, HttpStatus status,
+                                                                          HttpHeaders headers, HttpStatusCode status,
                                                                           WebRequest request) {
         // we want the 400 status for missing parameters, see https://jira.lyrasis.org/browse/DS-4428
         return super.handleMissingServletRequestParameter(ex, headers, HttpStatus.BAD_REQUEST, request);
@@ -224,7 +225,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
 
     @Override
     protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers,
-                                                        HttpStatus status, WebRequest request) {
+                                                        HttpStatusCode status, WebRequest request) {
         // we want the 400 status for missing parameters, see https://jira.lyrasis.org/browse/DS-4428
         return super.handleTypeMismatch(ex, headers, HttpStatus.BAD_REQUEST, request);
     }

@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import org.dspace.app.rest.matcher.WorkflowItemMatcher;
 import org.dspace.app.rest.matcher.WorkspaceItemMatcher;

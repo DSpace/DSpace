@@ -1229,7 +1229,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
 
         getClient(token).perform(patch("/api/submission/workspaceitems/" + publicationWorkspaceItem.getID())
                                          .content(patchBody)
-                                         .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+                                         .contentType(jakarta.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
                         .andExpect(status().isOk());
 
         String authorField = "dc.contributor.author";
@@ -1296,7 +1296,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
 
         getClient(token).perform(patch("/api/submission/workspaceitems/" + publicationWorkspaceItem.getID())
                                          .content(patchBody)
-                                         .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+                                         .contentType(jakarta.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
                         .andExpect(status().isUnprocessableEntity());
 
     }
@@ -1456,7 +1456,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
 
         getClient(token).perform(patch("/api/core/items/" + publicationItem.getID())
                                      .content(patchBody)
-                                     .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+                                     .contentType(jakarta.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
                         .andExpect(status().isOk());
 
         String authorField = "dc.contributor.author";
@@ -1517,7 +1517,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
             .perform(
                 patch("/api/submission/workspaceitems/" + publicationWorkspaceItem.getID())
                 .content(patchBody)
-                .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON)
+                .contentType(jakarta.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON)
             )
             .andExpect(status().isOk());
 
@@ -1561,7 +1561,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
 
         getClient(token).perform(patch("/api/submission/workspaceitems/" + publicationWorkspaceItem.getID())
                                          .content(patchBody)
-                                         .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+                                         .contentType(jakarta.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
                         .andExpect(status().isOk());
 
         String authorField = "dc.contributor.author";
@@ -1595,7 +1595,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
 
         getClient(token).perform(patch("/api/submission/workspaceitems/" + publicationWorkspaceItem.getID())
                                          .content(patchBody)
-                                         .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+                                         .contentType(jakarta.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
                         .andExpect(status().isOk());
 
         String authorField = "dc.contributor.author";
@@ -1638,7 +1638,7 @@ public class PatchMetadataIT extends AbstractEntityIntegrationTest {
 
         getClient(token).perform(patch("/api/submission/workspaceitems/" + publicationWorkspaceItem.getID())
                                          .content(patchBody)
-                                         .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+                                         .contentType(jakarta.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
                         .andExpect(status().isOk());
 
         final String authorField = "dc.contributor.author";

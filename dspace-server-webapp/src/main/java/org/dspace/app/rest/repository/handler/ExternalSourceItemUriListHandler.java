@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.authorize.AuthorizeException;

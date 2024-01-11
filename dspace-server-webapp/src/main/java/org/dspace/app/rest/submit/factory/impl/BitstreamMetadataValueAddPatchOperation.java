@@ -67,10 +67,11 @@ public class BitstreamMetadataValueAddPatchOperation extends MetadataValueAddPat
                         // call with "-" or "index-based" we should receive only single
                         // object member
                         MetadataValueRest object = evaluateSingleObject((LateObjectEvaluator) value);
+                        String mdString = split[3];
                         // check if is not empty
                         List<MetadataValue> metadataByMetadataString =
-                            bitstreamService.getMetadataByMetadataString(b,split[3]);
-                        Assert.notEmpty(metadataByMetadataString);
+                            bitstreamService.getMetadataByMetadataString(b,mdString);
+                        Assert.notEmpty(metadataByMetadataString, "No metadata fields match ".concat(mdString));
                         if (split.length > 4) {
                             String controlChar = split[4];
                             switch (controlChar) {

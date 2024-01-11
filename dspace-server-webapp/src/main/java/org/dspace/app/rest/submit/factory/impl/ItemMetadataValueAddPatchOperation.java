@@ -103,10 +103,11 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
             // call with "-" or "index-based" we should receive only single
             // object member
             MetadataValueRest object = evaluateSingleObject((LateObjectEvaluator) value);
+            String mdString = split[0];
             // check if is not empty
             List<MetadataValue> metadataByMetadataString = itemService.getMetadataByMetadataString(source.getItem(),
-                                                                                                   split[0]);
-            Assert.notEmpty(metadataByMetadataString);
+                                                                                                   mdString);
+            Assert.notEmpty(metadataByMetadataString, "No metadata fields match ".concat(mdString));
             if (split.length > 1) {
                 String controlChar = split[1];
                 switch (controlChar) {

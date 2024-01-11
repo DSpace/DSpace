@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.UUID;
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 
 import com.jayway.jsonpath.JsonPath;
 import com.nimbusds.jose.JOSEException;

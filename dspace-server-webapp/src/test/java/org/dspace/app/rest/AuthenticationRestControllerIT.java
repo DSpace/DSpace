@@ -36,7 +36,7 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.util.Base64;
 import java.util.Map;
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jwt.JWTClaimsSet;

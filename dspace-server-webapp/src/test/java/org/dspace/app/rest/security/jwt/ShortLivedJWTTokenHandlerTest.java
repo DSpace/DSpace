@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 import java.text.ParseException;
 import java.util.Base64;
 import java.util.Date;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;

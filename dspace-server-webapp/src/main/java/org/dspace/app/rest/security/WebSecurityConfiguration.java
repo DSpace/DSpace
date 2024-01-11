@@ -19,12 +19,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
@@ -40,7 +43,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 @Configuration
 @EnableConfigurationProperties(SecurityProperties.class)
-public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfiguration {
 
     public static final String ADMIN_GRANT = "ADMIN";
     public static final String AUTHENTICATED_GRANT = "AUTHENTICATED";
@@ -67,58 +70,79 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${management.endpoints.web.base-path:/actuator}")
     private String actuatorBasePath;
 
-    @Override
-    public void configure(WebSecurity webSecurity) throws Exception {
-        // Define URL patterns which Spring Security will ignore entirely.
-        webSecurity
-            .ignoring()
-                // These /login request types are purposefully unsecured, as they all throw errors.
-                .antMatchers(HttpMethod.GET, "/api/authn/login")
-                .antMatchers(HttpMethod.PUT, "/api/authn/login")
-                .antMatchers(HttpMethod.PATCH, "/api/authn/login")
-                .antMatchers(HttpMethod.DELETE, "/api/authn/login");
+    /**
+     * Bean to customize WebSecurity to ignore specific URL paths entirely
+     */
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (webSecurity) ->
+            webSecurity.ignoring()
+                       // These /login request types are purposefully unsecured, as they all throw errors.
+                       .requestMatchers(HttpMethod.GET, "/api/authn/login")
+                       .requestMatchers(HttpMethod.PUT, "/api/authn/login")
+                       .requestMatchers(HttpMethod.PATCH, "/api/authn/login")
+                       .requestMatchers(HttpMethod.DELETE, "/api/authn/login");
     }
 
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    /**
+     * Create a Spring Security AuthenticationManager with our custom AuthenticationProvider
+     * @param http HttpSecurity
+     * @return AuthenticationManager
+     */
+    @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity http)
+        throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder =
+            http.getSharedObject(AuthenticationManagerBuilder.class);
+        authenticationManagerBuilder.authenticationProvider(ePersonRestAuthenticationProvider);
+        return authenticationManagerBuilder.build();
+    }
+
+    /**
+     * Bean to customize security on specific endpoints
+     * @param http HttpSecurity
+     */
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        // Get the current AuthenticationManager to use to apply filters below
+        AuthenticationManager authenticationManager =
+            authenticationManager(http);
+
         // Configure authentication requirements for ${dspace.server.url}/api/ URL only
         // NOTE: REST API is hardcoded to respond on /api/. Other modules (OAI, SWORD, IIIF, etc) use other root paths.
-        http.requestMatchers()
-            .antMatchers("/api/**", "/iiif/**", actuatorBasePath + "/**", "/signposting/**")
-            .and()
+        http.securityMatcher("/api/**", "/iiif/**", actuatorBasePath + "/**", "/signposting/**")
             // Enable Spring Security authorization on these paths
-            .authorizeRequests()
+            .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
                 // Allow POST by anyone on the login endpoint
-                .antMatchers(HttpMethod.POST,"/api/authn/login").permitAll()
+                .requestMatchers(HttpMethod.POST,"/api/authn/login").permitAll()
                 // Everyone can call GET on the status endpoint (used to check your authentication status)
-                .antMatchers(HttpMethod.GET, "/api/authn/status").permitAll()
-                .antMatchers(HttpMethod.GET, actuatorBasePath + "/info").hasAnyAuthority(ADMIN_GRANT)
-            .and()
+                .requestMatchers(HttpMethod.GET, "/api/authn/status").permitAll()
+                .requestMatchers(HttpMethod.GET, actuatorBasePath + "/info").hasAnyAuthority(ADMIN_GRANT)
+            )
             // Tell Spring to not create Sessions
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+            .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             // Anonymous requests should have the "ANONYMOUS" security grant
-            .anonymous().authorities(ANONYMOUS_GRANT).and()
+            .anonymous((anonymous) -> anonymous.authorities(ANONYMOUS_GRANT))
             // Wire up the HttpServletRequest with the current SecurityContext values
-            .servletApi().and()
+            .servletApi(Customizer.withDefaults())
             // Enable CORS for Spring Security (see CORS settings in Application and ApplicationConfig)
-            .cors().and()
+            .cors(Customizer.withDefaults())
             // Enable CSRF protection with custom csrfTokenRepository and custom sessionAuthenticationStrategy
             // (both are defined below as methods).
             // While we primarily use JWT in headers, CSRF protection is needed because we also support JWT via Cookies
-            .csrf()
+            .csrf((csrf) -> csrf
                 .csrfTokenRepository(this.csrfTokenRepository())
                 .sessionAuthenticationStrategy(this.sessionAuthenticationStrategy())
-            .and()
-            .exceptionHandling()
+            )
+            .exceptionHandling((exceptionHandling) -> exceptionHandling
                 // Return 401 on authorization failures with a correct WWWW-Authenticate header
                 .authenticationEntryPoint(new DSpace401AuthenticationEntryPoint(restAuthenticationService))
                 // Custom handler for AccessDeniedExceptions, including CSRF exceptions
                 .accessDeniedHandler(accessDeniedHandler)
-            .and()
-
+            )
             // Logout configuration
-            .logout()
+            .logout((logout) -> logout
                 // On logout, clear the "session" salt
                 .addLogoutHandler(customLogoutHandler)
                 // Configure the logout entry point & require POST
@@ -127,41 +151,36 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
                 // Everyone can call this endpoint
                 .permitAll()
-            .and()
-
+            )
             // Add a filter before any request to handle DSpace IP-based authorization/authentication
             // (e.g. anonymous users may be added to special DSpace groups if they are in a given IP range)
-            .addFilterBefore(new AnonymousAdditionalAuthorizationFilter(authenticationManager(), authenticationService),
+            .addFilterBefore(new AnonymousAdditionalAuthorizationFilter(authenticationManager, authenticationService),
                              StatelessAuthenticationFilter.class)
             // Add a filter before our login endpoints to do the authentication based on the data in the HTTP request
-            .addFilterBefore(new StatelessLoginFilter("/api/authn/login", authenticationManager(),
+            .addFilterBefore(new StatelessLoginFilter("/api/authn/login", authenticationManager,
                                                       restAuthenticationService),
                              LogoutFilter.class)
             // Add a filter before our shibboleth endpoints to do the authentication based on the data in the
             // HTTP request
-            .addFilterBefore(new ShibbolethLoginFilter("/api/authn/shibboleth", authenticationManager(),
+            .addFilterBefore(new ShibbolethLoginFilter("/api/authn/shibboleth", authenticationManager,
                                                        restAuthenticationService),
                              LogoutFilter.class)
             //Add a filter before our ORCID endpoints to do the authentication based on the data in the
             // HTTP request
-            .addFilterBefore(new OrcidLoginFilter("/api/authn/orcid", authenticationManager(),
-                                                       restAuthenticationService),
+            .addFilterBefore(new OrcidLoginFilter("/api/authn/orcid", authenticationManager,
+                                                  restAuthenticationService),
                              LogoutFilter.class)
             //Add a filter before our OIDC endpoints to do the authentication based on the data in the
             // HTTP request
-            .addFilterBefore(new OidcLoginFilter("/api/authn/oidc", authenticationManager(),
-                                                      restAuthenticationService),
+            .addFilterBefore(new OidcLoginFilter("/api/authn/oidc", authenticationManager,
+                                                 restAuthenticationService),
                              LogoutFilter.class)
             // Add a custom Token based authentication filter based on the token previously given to the client
             // before each URL
-            .addFilterBefore(new StatelessAuthenticationFilter(authenticationManager(), restAuthenticationService,
+            .addFilterBefore(new StatelessAuthenticationFilter(authenticationManager, restAuthenticationService,
                                                                ePersonRestAuthenticationProvider, requestService),
                              StatelessLoginFilter.class);
-    }
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(ePersonRestAuthenticationProvider);
+        return http.build();
     }
 
     /**

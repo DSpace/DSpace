@@ -2632,7 +2632,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
             getClient(token).perform(patch("/api/core/items/" + publication1.getID())
                                          .content(getPatchContent(ops))
-                                         .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON));
+                                         .contentType(jakarta.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON));
 
             // Add another relationship
             mvcResult = getClient(token)

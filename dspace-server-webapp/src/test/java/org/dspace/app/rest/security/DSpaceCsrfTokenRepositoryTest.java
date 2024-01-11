@@ -10,8 +10,8 @@ package org.dspace.app.rest.security;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import javax.servlet.http.Cookie;
-import javax.ws.rs.core.HttpHeaders;
+import jakarta.servlet.http.Cookie;
+import jakarta.ws.rs.core.HttpHeaders;
 
 import org.junit.Before;
 import org.junit.Test;
