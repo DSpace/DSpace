@@ -7,7 +7,6 @@
  */
 package org.dspace.importer.external.scielo.service;
 
-import jakarta.ws.rs.BadRequestException;
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.net.URLEncoder;
@@ -23,6 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.el.MethodNotFoundException;
 
+import jakarta.ws.rs.BadRequestException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.dspace.content.Item;

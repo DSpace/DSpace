@@ -10,11 +10,11 @@ package org.dspace.content.dao.impl;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Root;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Order;
+import jakarta.persistence.criteria.Root;
 import org.dspace.content.EntityType;
 import org.dspace.content.EntityType_;
 import org.dspace.content.dao.EntityTypeDAO;

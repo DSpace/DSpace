@@ -10,8 +10,8 @@ package org.dspace.eperson;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Locale;
-import jakarta.mail.MessagingException;
 
+import jakarta.mail.MessagingException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.service.AuthenticationService;

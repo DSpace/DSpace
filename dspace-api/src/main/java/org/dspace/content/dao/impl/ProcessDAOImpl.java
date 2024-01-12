@@ -14,11 +14,11 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.ProcessStatus;
 import org.dspace.content.dao.ProcessDAO;
@@ -178,7 +178,7 @@ public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements Pro
         criteriaQuery.select(processRoot);
         criteriaQuery.where(criteriaBuilder.equal(processRoot.get(Process_.E_PERSON), user));
 
-        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
+        List<jakarta.persistence.criteria.Order> orderList = new LinkedList<>();
         orderList.add(criteriaBuilder.desc(processRoot.get(Process_.PROCESS_ID)));
         criteriaQuery.orderBy(orderList);
 

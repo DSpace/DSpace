@@ -11,11 +11,11 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.dspace.content.Collection;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
@@ -46,7 +46,7 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
         Root<HarvestedCollection> harvestedCollectionRoot = criteriaQuery.from(HarvestedCollection.class);
         criteriaQuery.select(harvestedCollectionRoot);
 
-        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
+        List<jakarta.persistence.criteria.Order> orderList = new LinkedList<>();
         orderList.add(criteriaBuilder.desc(harvestedCollectionRoot.get(HarvestedCollection_.lastHarvested)));
         criteriaQuery.orderBy(orderList);
 
@@ -61,7 +61,7 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
         Root<HarvestedCollection> harvestedCollectionRoot = criteriaQuery.from(HarvestedCollection.class);
         criteriaQuery.select(harvestedCollectionRoot);
 
-        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
+        List<jakarta.persistence.criteria.Order> orderList = new LinkedList<>();
         orderList.add(criteriaBuilder.asc(harvestedCollectionRoot.get(HarvestedCollection_.lastHarvested)));
         criteriaQuery.orderBy(orderList);
 
@@ -138,7 +138,7 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
                             )
         );
 
-        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
+        List<jakarta.persistence.criteria.Order> orderList = new LinkedList<>();
         orderList.add(criteriaBuilder.asc(harvestedCollectionRoot.get(HarvestedCollection_.lastHarvested)));
         criteriaQuery.orderBy(orderList);
 

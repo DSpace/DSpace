@@ -8,8 +8,8 @@
 package org.dspace.usage;
 
 import java.util.List;
-import jakarta.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 

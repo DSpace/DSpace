@@ -13,8 +13,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import javax.annotation.Resource;
 
+import jakarta.annotation.Resource;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
@@ -94,7 +94,8 @@ public class EpoIdMetadataContributor implements MetadataContributor<Element> {
     protected Map<String, String> prefixToNamespaceMapping;
 
     /**
-     * Initialize EpoIdMetadataContributor with all required fields: a query, prefixToNamespaceMapping and MetadataFieldConfig
+     * Initialize EpoIdMetadataContributor with all required fields: a query, prefixToNamespaceMapping
+     * and MetadataFieldConfig
      *
      * @param query                    query string
      * @param prefixToNamespaceMapping metadata prefix to namespace mapping

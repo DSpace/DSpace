@@ -22,8 +22,8 @@
         <spring.version>6.1.1</spring.version>
         <spring-boot.version>3.2.0</spring-boot.version>
         <spring-security.version>6.2.0</spring-security.version> <!-- sync with version used by spring-boot-->
-        <hibernate.version>5.6.15.Final</hibernate.version>
-        <hibernate-validator.version>6.2.5.Final</hibernate-validator.version>
+        <hibernate.version>6.4.1.Final</hibernate.version>
+        <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
         <postgresql.driver.version>42.7.2</postgresql.driver.version>
         <solr.client.version>8.11.3</solr.client.version>
 
@@ -32,7 +32,7 @@
         <!-- NOTE: when updating jackson.version, also sync jackson-databind.version below -->
         <jackson.version>2.16.0</jackson.version>
         <jackson-databind.version>2.16.0</jackson-databind.version>
-        <javax-annotation.version>1.3.2</javax-annotation.version>
+        <jakarta-annotation.version>2.1.1</jakarta-annotation.version>
         <jaxb-api.version>4.0.0</jaxb-api.version>
         <jaxb-runtime.version>4.0.1</jaxb-runtime.version>
         <jcache-version>1.1.1</jcache-version>
@@ -138,9 +138,9 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.1</version>
+                    <version>3.12.1</version>
                     <configuration>
-                        <release>11</release>
+                        <release>${java.version}</release>
                         <!-- Turn on http://errorprone.info (requires fork=true & below compilerArgs)-->
                         <fork>true</fork>
                         <compilerArgs>
@@ -1071,19 +1071,26 @@
             </dependency>
 
             <dependency>
-                <groupId>org.hibernate</groupId>
+                <groupId>org.hibernate.orm</groupId>
                 <artifactId>hibernate-core</artifactId>
                 <version>${hibernate.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.hibernate</groupId>
+                <groupId>org.hibernate.orm</groupId>
                 <artifactId>hibernate-jpamodelgen</artifactId>
                 <version>${hibernate.version}</version>
+                <exclusions>
+                    <!-- Later version provided by Hibernate Core -->
+                    <exclusion>
+                        <groupId>org.antlr</groupId>
+                        <artifactId>antlr4-runtime</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
-                <groupId>org.hibernate</groupId>
+                <groupId>org.hibernate.orm</groupId>
                 <artifactId>hibernate-jcache</artifactId>
                 <version>${hibernate.version}</version>
             </dependency>
@@ -1095,7 +1102,7 @@
             </dependency>
 
             <dependency>
-                <groupId>org.hibernate</groupId>
+                <groupId>org.hibernate.validator</groupId>
                 <artifactId>hibernate-validator</artifactId>
                 <!-- This artifact doesn't track the main Hibernate version. -->
                 <version>${hibernate-validator.version}</version>
@@ -1443,6 +1450,13 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-dbcp2</artifactId>
                 <version>2.11.0</version>
+                <exclusions>
+                    <!-- Newer version is pulled in by Hibernate -->
+                    <exclusion>
+                        <groupId>jakarta.transaction</groupId>
+                        <artifactId>jakarta.transaction-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
@@ -1776,9 +1790,9 @@
                 <scope>runtime</scope>
             </dependency>
             <dependency>
-                <groupId>javax.annotation</groupId>
-                <artifactId>javax.annotation-api</artifactId>
-                <version>${javax-annotation.version}</version>
+                <groupId>jakarta.annotation</groupId>
+                <artifactId>jakarta.annotation-api</artifactId>
+                <version>${jakarta-annotation.version}</version>
             </dependency>
             <!-- mockito-inline and hibernate-ehcache pull in different versions of byte-buddy. Specify which we want. -->
             <!-- TODO: We might be able to remove this after hibernate-ehcache is replaced by hibernate-jcache -->

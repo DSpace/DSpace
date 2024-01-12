@@ -9,11 +9,11 @@ package org.dspace.app.requestitem.dao.impl;
 
 import java.sql.SQLException;
 import java.util.Iterator;
-import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 
+import jakarta.persistence.Query;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.RequestItem_;
 import org.dspace.app.requestitem.dao.RequestItemDAO;

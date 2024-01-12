@@ -7,10 +7,9 @@
  */
 package org.dspace.app.iiif.model.generator;
 
-import javax.validation.constraints.NotNull;
-
 import de.digitalcollections.iiif.model.ImageContent;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * This service generator wraps the image content model.

@@ -17,7 +17,6 @@ import jakarta.mail.Message;
 import jakarta.mail.Provider;
 import jakarta.mail.Session;
 import jakarta.mail.internet.InternetAddress;
-
 import org.dspace.AbstractUnitTest;
 import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
 import org.dspace.app.requestitem.service.RequestItemService;

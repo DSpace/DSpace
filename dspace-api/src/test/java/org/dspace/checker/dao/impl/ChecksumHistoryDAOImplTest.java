@@ -15,8 +15,8 @@ import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import javax.persistence.Query;
 
+import jakarta.persistence.Query;
 import org.dspace.AbstractUnitTest;
 import org.dspace.checker.ChecksumResultCode;
 import org.dspace.content.Bitstream;

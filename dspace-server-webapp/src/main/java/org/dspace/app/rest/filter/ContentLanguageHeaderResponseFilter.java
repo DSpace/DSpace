@@ -9,6 +9,7 @@ package org.dspace.app.rest.filter;
 
 import java.io.IOException;
 import java.util.Locale;
+
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -16,7 +17,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.dspace.core.I18nUtil;
 import org.springframework.stereotype.Component;
 

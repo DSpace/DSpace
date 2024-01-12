@@ -9,10 +9,10 @@ package org.purl.sword.server;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.purl.sword.base.AtomDocumentRequest;
 import org.purl.sword.base.AtomDocumentResponse;
 import org.purl.sword.base.SWORDAuthenticationException;

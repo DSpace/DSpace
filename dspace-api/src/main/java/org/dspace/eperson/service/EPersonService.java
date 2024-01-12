@@ -13,8 +13,8 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-import javax.validation.constraints.NotNull;
 
+import jakarta.validation.constraints.NotNull;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataFieldName;

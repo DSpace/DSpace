@@ -8,9 +8,9 @@
 package org.dspace.app.rest.security;
 
 import java.io.IOException;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.dspace.app.rest.model.wrapper.AuthenticationToken;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;

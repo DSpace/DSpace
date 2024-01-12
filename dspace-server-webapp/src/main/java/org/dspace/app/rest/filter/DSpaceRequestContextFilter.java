@@ -8,13 +8,13 @@
 package org.dspace.app.rest.filter;
 
 import java.io.IOException;
+
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
-
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.core.Context;
 

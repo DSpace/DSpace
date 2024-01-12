@@ -11,11 +11,11 @@ package org.dspace.rdf.providing;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.logging.log4j.Logger;

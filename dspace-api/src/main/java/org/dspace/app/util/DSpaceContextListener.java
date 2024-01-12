@@ -13,9 +13,9 @@ import java.net.URLConnection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.util.Enumeration;
+
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
-
 import org.apache.logging.log4j.Logger;
 
 /**

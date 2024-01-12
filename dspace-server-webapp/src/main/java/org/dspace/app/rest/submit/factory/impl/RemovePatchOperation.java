@@ -8,7 +8,6 @@
 package org.dspace.app.rest.submit.factory.impl;
 
 import jakarta.servlet.http.HttpServletRequest;
-
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.core.Context;

@@ -13,11 +13,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
-import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 
+import jakarta.persistence.Query;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
@@ -137,7 +137,7 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
 
                 // Find the next value in our sequence (based on DB dialect)
                 try (PreparedStatement preparedStatement = connection
-                    .prepareStatement(dialect.getSequenceNextValString(HANDLE_SEQUENCE))) {
+                    .prepareStatement("SELECT nextval('" + HANDLE_SEQUENCE + "')")) {
                     // Execute query and return results
                     try (ResultSet resultSet = preparedStatement.executeQuery()) {
                         if (resultSet.next()) {
