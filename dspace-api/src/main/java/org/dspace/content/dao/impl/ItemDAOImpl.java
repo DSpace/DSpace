@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -24,20 +23,10 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.Item_;
 import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataValue;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Property;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.criterion.Subqueries;
-import org.hibernate.type.StandardBasicTypes;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Item object.
@@ -172,120 +161,6 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
             query.setParameter("text_value", value);
         }
         return iterate(query);
-    }
-
-    enum OP {
-        equals {
-            public Criterion buildPredicate(String val, String regexClause) {
-                return Property.forName("mv.value").eq(val);
-            }
-        },
-        not_equals {
-            public Criterion buildPredicate(String val, String regexClause) {
-                return OP.equals.buildPredicate(val, regexClause);
-            }
-        },
-        like {
-            public Criterion buildPredicate(String val, String regexClause) {
-                return Property.forName("mv.value").like(val);
-            }
-        },
-        not_like {
-            public Criterion buildPredicate(String val, String regexClause) {
-                return OP.like.buildPredicate(val, regexClause);
-            }
-        },
-        contains {
-            public Criterion buildPredicate(String val, String regexClause) {
-                return Property.forName("mv.value").like("%" + val + "%");
-            }
-        },
-        doesnt_contain {
-            public Criterion buildPredicate(String val, String regexClause) {
-                return OP.contains.buildPredicate(val, regexClause);
-            }
-        },
-        exists {
-            public Criterion buildPredicate(String val, String regexClause) {
-                return Property.forName("mv.value").isNotNull();
-            }
-        },
-        doesnt_exist {
-            public Criterion buildPredicate(String val, String regexClause) {
-                return OP.exists.buildPredicate(val, regexClause);
-            }
-        },
-        matches {
-            public Criterion buildPredicate(String val, String regexClause) {
-                return Restrictions.sqlRestriction(regexClause, val, StandardBasicTypes.STRING);
-            }
-        },
-        doesnt_match {
-            public Criterion buildPredicate(String val, String regexClause) {
-                return OP.matches.buildPredicate(val, regexClause);
-            }
-
-        };
-        public abstract Criterion buildPredicate(String val, String regexClause);
-    }
-
-    @Override
-    @Deprecated
-    public Iterator<Item> findByMetadataQuery(Context context, List<List<MetadataField>> listFieldList,
-                                              List<String> query_op, List<String> query_val, List<UUID> collectionUuids,
-                                              String regexClause, int offset, int limit) throws SQLException {
-
-        Criteria criteria = getHibernateSession(context).createCriteria(Item.class, "item");
-        criteria.setFirstResult(offset);
-        criteria.setMaxResults(limit);
-
-        if (!collectionUuids.isEmpty()) {
-            DetachedCriteria dcollCriteria = DetachedCriteria.forClass(Collection.class, "coll");
-            dcollCriteria.setProjection(Projections.property("coll.id"));
-            dcollCriteria.add(Restrictions.eqProperty("coll.id", "item.owningCollection"));
-            dcollCriteria.add(Restrictions.in("coll.id", collectionUuids));
-            criteria.add(Subqueries.exists(dcollCriteria));
-        }
-
-        int index = Math.min(listFieldList.size(), Math.min(query_op.size(), query_val.size()));
-        StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i < index; i++) {
-            OP op = OP.valueOf(query_op.get(i));
-            if (op == null) {
-                log.warn("Skipping Invalid Operator: " + query_op.get(i));
-                continue;
-            }
-
-            if (op == OP.matches || op == OP.doesnt_match) {
-                if (regexClause.isEmpty()) {
-                    log.warn("Skipping Unsupported Regex Operator: " + query_op.get(i));
-                    continue;
-                }
-            }
-
-            DetachedCriteria subcriteria = DetachedCriteria.forClass(MetadataValue.class, "mv");
-            subcriteria.add(Property.forName("mv.dSpaceObject").eqProperty("item.id"));
-            subcriteria.setProjection(Projections.property("mv.dSpaceObject"));
-
-            if (!listFieldList.get(i).isEmpty()) {
-                subcriteria.add(Restrictions.in("metadataField", listFieldList.get(i)));
-            }
-
-            subcriteria.add(op.buildPredicate(query_val.get(i), regexClause));
-
-            if (op == OP.exists || op == OP.equals || op == OP.like || op == OP.contains || op == OP.matches) {
-                criteria.add(Subqueries.exists(subcriteria));
-            } else {
-                criteria.add(Subqueries.notExists(subcriteria));
-            }
-        }
-        criteria.addOrder(Order.asc("item.id"));
-
-        log.debug(String.format("Running custom query with %d filters", index));
-
-        return ((List<Item>) criteria.list()).iterator();
-
     }
 
     @Override
