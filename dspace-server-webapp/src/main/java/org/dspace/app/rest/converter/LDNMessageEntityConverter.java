@@ -39,6 +39,7 @@ public class LDNMessageEntityConverter implements IndexableObjectConverter<LDNMe
         ldnRest.setQueueAttempts(obj.getQueueAttempts());
         ldnRest.setQueueLastStartTime(obj.getQueueLastStartTime());
         ldnRest.setQueueTimeout(obj.getQueueTimeout());
+        ldnRest.setMessage(obj.getMessage());
         ldnRest.setNotificationType(LDNMessageEntity.getNotificationType(obj));
         return ldnRest;
     }

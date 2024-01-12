@@ -49,6 +49,8 @@ public class LDNMessageEntityRest extends BaseObjectRest<String> {
 
     private String notificationType;
 
+    private String message;
+
     public LDNMessageEntityRest() {
         super();
     }
@@ -178,6 +180,14 @@ public class LDNMessageEntityRest extends BaseObjectRest<String> {
 
     public void setInReplyTo(String inReplyTo) {
         this.inReplyTo = inReplyTo;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
 }
