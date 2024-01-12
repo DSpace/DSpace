@@ -103,7 +103,7 @@ public class LDNMessageEntityIndexFactoryImpl extends IndexFactoryImpl<Indexable
             addFacetIndex(doc, "ldn_service", String.valueOf(origin.getID()),
                 LDNMessageEntity.getServiceNameForNotifyServ(origin));
         }
-        NotifyServiceEntity target = ldnMessage.getOrigin();
+        NotifyServiceEntity target = ldnMessage.getTarget();
         if (target != null) {
             addFacetIndex(doc, "target", String.valueOf(target.getID()),
                 LDNMessageEntity.getServiceNameForNotifyServ(target));
