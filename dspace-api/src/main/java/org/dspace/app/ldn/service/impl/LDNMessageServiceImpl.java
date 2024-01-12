@@ -7,6 +7,8 @@
  */
 package org.dspace.app.ldn.service.impl;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -85,7 +87,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
     }
 
     @Override
-    public LDNMessageEntity create(Context context, Notification notification) throws SQLException {
+    public LDNMessageEntity create(Context context, Notification notification, String sourceIp) throws SQLException {
         LDNMessageEntity ldnMessage = create(context, notification.getId());
         ldnMessage.setObject(findDspaceObjectByUrl(context, notification.getObject().getId()));
         if (null != notification.getContext()) {
@@ -124,9 +126,53 @@ public class LDNMessageServiceImpl implements LDNMessageService {
             ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_UNTRUSTED);
         }
         ldnMessage.setQueueTimeout(new Date());
+        ldnMessage.setSourceIp(sourceIp);
+
+        if (!isValidIp(ldnMessage)) {
+            ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_UNTRUSTED_IP);
+        }
 
         update(context, ldnMessage);
         return ldnMessage;
+    }
+
+    private boolean isValidIp(LDNMessageEntity message) {
+
+        boolean enabled = configurationService.getBooleanProperty("coar-notify.ip-range.enabled", true);
+
+        if (!enabled) {
+            return true;
+        }
+
+        NotifyServiceEntity notifyService =
+            message.getOrigin() == null ? message.getTarget() : message.getOrigin();
+
+        String lowerIp = notifyService.getLowerIp();
+        String upperIp = notifyService.getUpperIp();
+
+        try {
+            InetAddress ip = InetAddress.getByName(message.getSourceIp());
+            InetAddress lowerBoundAddress = InetAddress.getByName(lowerIp);
+            InetAddress upperBoundAddress = InetAddress.getByName(upperIp);
+
+            long ipLong = ipToLong(ip);
+            long lowerBoundLong = ipToLong(lowerBoundAddress);
+            long upperBoundLong = ipToLong(upperBoundAddress);
+
+            return ipLong >= lowerBoundLong && ipLong <= upperBoundLong;
+        } catch (UnknownHostException e) {
+            return false;
+        }
+    }
+
+    private long ipToLong(InetAddress ip) {
+        byte[] octets = ip.getAddress();
+        long result = 0;
+        for (byte octet : octets) {
+            result <<= 8;
+            result |= octet & 0xff;
+        }
+        return result;
     }
 
     @Override
