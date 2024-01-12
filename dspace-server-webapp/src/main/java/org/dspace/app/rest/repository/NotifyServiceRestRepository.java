@@ -112,6 +112,8 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
         notifyServiceEntity.setUrl(notifyServiceRest.getUrl());
         notifyServiceEntity.setLdnUrl(notifyServiceRest.getLdnUrl());
         notifyServiceEntity.setEnabled(notifyServiceRest.isEnabled());
+        notifyServiceEntity.setLowerIp(notifyServiceRest.getLowerIp());
+        notifyServiceEntity.setUpperIp(notifyServiceRest.getUpperIp());
 
         if (notifyServiceRest.getNotifyServiceInboundPatterns() != null) {
             appendNotifyServiceInboundPatterns(context, notifyServiceEntity,

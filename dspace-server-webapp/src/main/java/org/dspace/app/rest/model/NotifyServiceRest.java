@@ -29,6 +29,8 @@ public class NotifyServiceRest extends BaseObjectRest<Integer> {
     private String ldnUrl;
     private boolean enabled;
     private BigDecimal score;
+    private String lowerIp;
+    private String upperIp;
 
     private List<NotifyServiceInboundPatternRest> notifyServiceInboundPatterns;
 
@@ -101,6 +103,22 @@ public class NotifyServiceRest extends BaseObjectRest<Integer> {
 
     public void setScore(BigDecimal score) {
         this.score = score;
+    }
+
+    public String getLowerIp() {
+        return lowerIp;
+    }
+
+    public void setLowerIp(String lowerIp) {
+        this.lowerIp = lowerIp;
+    }
+
+    public String getUpperIp() {
+        return upperIp;
+    }
+
+    public void setUpperIp(String upperIp) {
+        this.upperIp = upperIp;
     }
 
 }

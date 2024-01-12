@@ -136,4 +136,14 @@ public class NotifyServiceBuilder extends AbstractBuilder<NotifyServiceEntity, N
         return this;
     }
 
+    public NotifyServiceBuilder withLowerIp(String lowerIp) {
+        notifyServiceEntity.setLowerIp(lowerIp);
+        return this;
+    }
+
+    public NotifyServiceBuilder withUpperIp(String upperIp) {
+        notifyServiceEntity.setUpperIp(upperIp);
+        return this;
+    }
+
 }
