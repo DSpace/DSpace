@@ -28,7 +28,6 @@ import org.dspace.content.QAEvent;
 import org.dspace.qaevent.QANotifyPatterns;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -178,22 +177,26 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void findBySourceTest() throws Exception {
         context.turnOffAuthorisationSystem();
         configurationService.setProperty("qaevent.sources",
-            new String[] { "openaire", "test-source", "test-source-2" });
+            new String[] { QAEvent.OPENAIRE_SOURCE, "test-source", "test-source-2" });
         parentCommunity = CommunityBuilder.createCommunity(context)
             .withName("Parent Community")
             .build();
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom")
             .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
+            .withSource(QAEvent.OPENAIRE_SOURCE)
             .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 2")
             .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
+            .withSource(QAEvent.OPENAIRE_SOURCE)
             .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 3")
             .withTopic(QANotifyPatterns.TOPIC_ENRICH_MORE_PID)
+            .withSource(QAEvent.OPENAIRE_SOURCE)
             .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"10.2307/2144302\"}").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 4")
             .withTopic(org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT)
+            .withSource(QAEvent.OPENAIRE_SOURCE)
             .withMessage(
                 "{\"abstracts[0]\": \"Descrizione delle caratteristiche...\"}")
             .build();
@@ -249,15 +252,19 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom")
             .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
+            .withSource(QAEvent.OPENAIRE_SOURCE)
             .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 2")
             .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
+            .withSource(QAEvent.OPENAIRE_SOURCE)
             .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 3")
             .withTopic(QANotifyPatterns.TOPIC_ENRICH_MORE_PID)
+            .withSource(QAEvent.OPENAIRE_SOURCE)
             .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"10.2307/2144302\"}").build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 4")
             .withTopic(org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT)
+            .withSource(QAEvent.OPENAIRE_SOURCE)
             .withMessage(
                 "{\"abstracts[0]\": \"Descrizione delle caratteristiche...\"}")
             .build();
@@ -314,7 +321,6 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(status().isUnauthorized());
     }
 
-    @Ignore
     @Test
     public void findBySourceForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -427,7 +433,6 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(status().isUnauthorized());
     }
 
-    @Ignore
     @Test
     public void findByTargetForbiddenTest() throws Exception {
         context.turnOffAuthorisationSystem();

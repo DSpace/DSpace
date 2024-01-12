@@ -130,7 +130,7 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         assertThat(qaEventService.findAllSources(context, 0, 20),
             hasItem(QASourceMatcher.with(COAR_NOTIFY_SOURCE, 1L)));
 
-        assertThat(qaEventService.findAllTopicsBySource(context, COAR_NOTIFY_SOURCE, 0, 20), hasItem(
+        assertThat(qaEventService.findAllTopicsBySource(context, COAR_NOTIFY_SOURCE, 0, 20, "topic", true), hasItem(
             QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MORE_REVIEW, 1L)));
 
     }
@@ -237,7 +237,7 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         assertThat(qaEventService.findAllSources(context, 0, 20),
             hasItem(QASourceMatcher.with(COAR_NOTIFY_SOURCE, 1L)));
 
-        assertThat(qaEventService.findAllTopicsBySource(context, COAR_NOTIFY_SOURCE, 0, 20), hasItem(
+        assertThat(qaEventService.findAllTopicsBySource(context, COAR_NOTIFY_SOURCE, 0, 20, "topic", true), hasItem(
             QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MORE_LINK, 1L)));
 
     }

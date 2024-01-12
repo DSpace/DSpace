@@ -51,9 +51,6 @@ public class NotifyServiceEntity implements ReloadableEntity<Integer> {
     @OneToMany(mappedBy = "notifyService")
     private List<NotifyServiceInboundPattern> inboundPatterns;
 
-    @OneToMany(mappedBy = "notifyService")
-    private List<NotifyServiceOutboundPattern> outboundPatterns;
-
     @Column(name = "enabled")
     private boolean enabled = false;
 
@@ -111,14 +108,6 @@ public class NotifyServiceEntity implements ReloadableEntity<Integer> {
 
     public void setInboundPatterns(List<NotifyServiceInboundPattern> inboundPatterns) {
         this.inboundPatterns = inboundPatterns;
-    }
-
-    public List<NotifyServiceOutboundPattern> getOutboundPatterns() {
-        return outboundPatterns;
-    }
-
-    public void setOutboundPatterns(List<NotifyServiceOutboundPattern> outboundPatterns) {
-        this.outboundPatterns = outboundPatterns;
     }
 
     @Override

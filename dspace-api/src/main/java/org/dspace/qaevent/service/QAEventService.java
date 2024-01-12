@@ -25,6 +25,14 @@ import org.dspace.qaevent.QATopic;
 public interface QAEventService {
 
     /**
+     * Find all the event's topics.
+     *
+     * @param  offset   the offset to apply
+     * @return          the topics list
+     */
+    public List<QATopic> findAllTopics(Context context, long offset, long count, String orderField, boolean ascending);
+
+    /**
      * Find all the event's topics related to the given source.
      *
      * @param  context the DSpace context
@@ -33,7 +41,8 @@ public interface QAEventService {
      * @param  count  the page size
      * @return        the topics list
      */
-    public List<QATopic> findAllTopicsBySource(Context context, String source, long offset, int count);
+    public List<QATopic> findAllTopicsBySource(Context context, String source, long offset, long count,
+        String orderField, boolean ascending);
 
     /**
      * Find a specific topic by its name, source and optionally a target.
@@ -186,11 +195,13 @@ public interface QAEventService {
      * @param  source (not null) the source to search for
      * @param  target the item referring to
      * @param  offset the offset to apply
-     * @param  pageSize  the page size
+     * @param  count  result count
+     * @param  orderField field name for sorting
+     * @param  ascending activate ascending sort
      * @return        the topics list
      */
     public List<QATopic> findAllTopicsBySourceAndTarget(Context context, String source, UUID target, long offset,
-            int pageSize);
+        long count, String orderField, boolean ascending);
 
     /**
      * Count all the event's topics related to the given source referring to a specific item

@@ -2,13 +2,13 @@
 <!DOCTYPE dspace-dc-types SYSTEM "dspace-dc-types.dtd">
 
 <!--
-  This document was based on the OpenAIRE4 Guidelines for Literature Repositories
+  This document was based on the Openaire4 Guidelines for Literature Repositories
   https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/index.html
   -->
   
 <dspace-dc-types>
     <dspace-header>
-        <title>OpenAIRE4 fields definition</title>
+        <title>Openaire4 fields definition</title>
     </dspace-header>
 
     <dc-schema>

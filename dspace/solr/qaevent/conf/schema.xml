@@ -160,29 +160,6 @@
         <filter class="solr.TrimFilterFactory" />
       </analyzer>
     </fieldType>
-    
-    <!-- This field is used for store metadatavalue (with authority, prefered label, variants and 
-    	 language) to use in projection  -->
-    <fieldType name="dspaceMetadataProjection" class="solr.TextField" sortMissingLast="true" omitNorms="true">
-        <analyzer>
-            <!--Treats the entire field as a single token, regardless of its content-->
-            <tokenizer class="solr.KeywordTokenizerFactory"/>
-        </analyzer>
-    </fieldType>
-    
-    <!--This field is used for auto complete features in the discovery search-->
-    <fieldType name="dspaceAutoComplete" class="solr.TextField" sortMissingLast="true" omitNorms="true">
-        <analyzer>
-            <tokenizer class="solr.KeywordTokenizerFactory"/>
-
-            <!--Lower cases our values-->
-            <filter class="solr.LowerCaseFilterFactory" />
-            <!--Discards common words.-->
-            <filter class="solr.StopFilterFactory" />
-            <!-- The TrimFilter removes any leading or trailing whitespace -->
-            <filter class="solr.TrimFilterFactory" />
-        </analyzer>
-    </fieldType>
 
     <fieldType name="keywordFilter" class="solr.TextField" sortMissingLast="true" omitNorms="true">
         <analyzer>

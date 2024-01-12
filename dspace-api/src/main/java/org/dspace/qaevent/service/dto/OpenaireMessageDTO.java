@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Implementation of {@link QAMessageDTO} that model message coming from OPENAIRE.
- *
+ * @see <a href="https://graph.openaire.eu/docs/category/entities" target="_blank"> see </a>
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */

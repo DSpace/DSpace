@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.ldn.NotifyServiceInboundPattern;
-import org.dspace.app.ldn.NotifyServiceOutboundPattern;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.patch.JsonValueEvaluator;
 import org.dspace.app.rest.model.patch.Operation;
@@ -29,7 +28,6 @@ import org.springframework.stereotype.Component;
 @Component
 public final class NotifyServicePatchUtils {
 
-    public static final String NOTIFY_SERVICE_OUTBOUND_PATTERNS = "notifyServiceOutboundPatterns";
     public static final String NOTIFY_SERVICE_INBOUND_PATTERNS = "notifyServiceInboundPatterns";
 
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -67,35 +65,6 @@ public final class NotifyServicePatchUtils {
     }
 
     /**
-     * Extract NotifyServiceOutboundPattern from Operation by parsing the json
-     * and mapping it to a NotifyServiceOutboundPattern
-     *
-     * @param operation     Operation whose value is being parsed
-     * @return NotifyServiceOutboundPattern extracted from json in operation value
-     */
-    protected NotifyServiceOutboundPattern extractNotifyServiceOutboundPatternFromOperation(Operation operation) {
-        NotifyServiceOutboundPattern outboundPattern = null;
-        try {
-            if (operation.getValue() != null) {
-                if (operation.getValue() instanceof JsonValueEvaluator) {
-                    outboundPattern = objectMapper.readValue(((JsonValueEvaluator) operation.getValue())
-                            .getValueNode().toString(), NotifyServiceOutboundPattern.class);
-                } else if (operation.getValue() instanceof String) {
-                    outboundPattern = objectMapper.readValue((String) operation.getValue(),
-                        NotifyServiceOutboundPattern.class);
-                }
-            }
-        } catch (IOException e) {
-            throw new DSpaceBadRequestException("IOException: trying to map json from operation.value" +
-                " to NotifyServiceOutboundPattern class.", e);
-        }
-        if (outboundPattern == null) {
-            throw new DSpaceBadRequestException("Could not extract NotifyServiceOutboundPattern Object from Operation");
-        }
-        return outboundPattern;
-    }
-
-    /**
      * Extract list of NotifyServiceInboundPattern from Operation by parsing the json
      * and mapping it to a list of NotifyServiceInboundPattern
      *
@@ -121,35 +90,6 @@ public final class NotifyServicePatchUtils {
                 "Objects from Operation");
         }
         return inboundPatterns;
-    }
-
-    /**
-     * Extract list of NotifyServiceInboundPattern from Operation by parsing the json
-     * and mapping it to a list of NotifyServiceInboundPattern
-     *
-     * @param operation     Operation whose value is being parsed
-     * @return list of NotifyServiceInboundPattern extracted from json in operation value
-     */
-    protected List<NotifyServiceOutboundPattern> extractNotifyServiceOutboundPatternsFromOperation(
-        Operation operation) {
-        List<NotifyServiceOutboundPattern> outboundPatterns = null;
-        try {
-            if (operation.getValue() != null) {
-                if (operation.getValue() instanceof String) {
-                    outboundPatterns = objectMapper.readValue((String) operation.getValue(),
-                        objectMapper.getTypeFactory().constructCollectionType(ArrayList.class,
-                            NotifyServiceOutboundPattern.class));
-                }
-            }
-        } catch (IOException e) {
-            throw new DSpaceBadRequestException("IOException: trying to map json from operation.value" +
-                " to List of NotifyServiceOutboundPattern class.", e);
-        }
-        if (outboundPatterns == null) {
-            throw new DSpaceBadRequestException("Could not extract list of NotifyServiceOutboundPattern " +
-                "Objects from Operation");
-        }
-        return outboundPatterns;
     }
 
     protected int extractIndexFromOperation(Operation operation) {

@@ -31,7 +31,6 @@ public class NotifyServiceRest extends BaseObjectRest<Integer> {
     private BigDecimal score;
 
     private List<NotifyServiceInboundPatternRest> notifyServiceInboundPatterns;
-    private List<NotifyServiceOutboundPatternRest> notifyServiceOutboundPatterns;
 
     @Override
     public String getCategory() {
@@ -94,15 +93,6 @@ public class NotifyServiceRest extends BaseObjectRest<Integer> {
     public void setNotifyServiceInboundPatterns(
         List<NotifyServiceInboundPatternRest> notifyServiceInboundPatterns) {
         this.notifyServiceInboundPatterns = notifyServiceInboundPatterns;
-    }
-
-    public List<NotifyServiceOutboundPatternRest> getNotifyServiceOutboundPatterns() {
-        return notifyServiceOutboundPatterns;
-    }
-
-    public void setNotifyServiceOutboundPatterns(
-        List<NotifyServiceOutboundPatternRest> notifyServiceOutboundPatterns) {
-        this.notifyServiceOutboundPatterns = notifyServiceOutboundPatterns;
     }
 
     public BigDecimal getScore() {

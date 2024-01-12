@@ -12,9 +12,7 @@ import java.util.List;
 
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.NotifyServiceInboundPattern;
-import org.dspace.app.ldn.NotifyServiceOutboundPattern;
 import org.dspace.app.rest.model.NotifyServiceInboundPatternRest;
-import org.dspace.app.rest.model.NotifyServiceOutboundPatternRest;
 import org.dspace.app.rest.model.NotifyServiceRest;
 import org.dspace.app.rest.projection.Projection;
 import org.springframework.stereotype.Component;
@@ -45,11 +43,6 @@ public class NotifyServiceConverter implements DSpaceConverter<NotifyServiceEnti
                 convertInboundPatternToRest(obj.getInboundPatterns()));
         }
 
-        if (obj.getOutboundPatterns() != null) {
-            notifyServiceRest.setNotifyServiceOutboundPatterns(
-                convertOutboundPatternToRest(obj.getOutboundPatterns()));
-        }
-
         return notifyServiceRest;
     }
 
@@ -64,18 +57,6 @@ public class NotifyServiceConverter implements DSpaceConverter<NotifyServiceEnti
             inboundPatternRests.add(inboundPatternRest);
         }
         return inboundPatternRests;
-    }
-
-    private List<NotifyServiceOutboundPatternRest> convertOutboundPatternToRest(
-        List<NotifyServiceOutboundPattern> outboundPatterns) {
-        List<NotifyServiceOutboundPatternRest> outboundPatternRests = new ArrayList<>();
-        for (NotifyServiceOutboundPattern outboundPattern : outboundPatterns) {
-            NotifyServiceOutboundPatternRest outboundPatternRest = new NotifyServiceOutboundPatternRest();
-            outboundPatternRest.setPattern(outboundPattern.getPattern());
-            outboundPatternRest.setConstraint(outboundPattern.getConstraint());
-            outboundPatternRests.add(outboundPatternRest);
-        }
-        return outboundPatternRests;
     }
 
     @Override
