@@ -2143,8 +2143,7 @@
         <property name="sidebarFacets">
             <list>
             	<ref bean="searchFilterNotifyRelatedItem" />
-            	<ref bean="searchFilterNotifyOrigin" />
-            	<ref bean="searchFilterNotifyTarget" />
+            	<ref bean="searchFilterNotifyLdnService" />
             	<ref bean="searchFilterNotifyQueueStatus" />
             	<ref bean="searchFilterNotifyActivityStreamType" />
             	<ref bean="searchFilterNotifyCoarNotifyType" />
@@ -2157,6 +2156,7 @@
             	<ref bean="searchFilterNotifyRelatedItem" />
             	<ref bean="searchFilterNotifyOrigin" />
             	<ref bean="searchFilterNotifyTarget" />
+            	<ref bean="searchFilterNotifyLdnService" />
             	<ref bean="searchFilterNotifyQueueStatus" />
             	<ref bean="searchFilterNotifyActivityStreamType" />
             	<ref bean="searchFilterNotifyCoarNotifyType" />
@@ -3064,6 +3064,20 @@
 
     <bean id="searchFilterNotifyRelatedItem" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
         <property name="indexFieldName" value="relateditem"/>
+        <property name="metadataFields">
+            <list>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+        <property name="isOpenByDefault" value="true"/>
+        <property name="pageSize" value="10"/>
+        <property name="exposeMinAndMaxValue" value="true"/>
+    </bean>
+
+    <bean id="searchFilterNotifyLdnService" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="ldn_service"/>
         <property name="metadataFields">
             <list>
             </list>
