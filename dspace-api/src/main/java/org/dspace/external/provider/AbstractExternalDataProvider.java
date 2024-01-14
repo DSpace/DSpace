@@ -80,8 +80,8 @@ public abstract class AbstractExternalDataProvider implements ExternalDataProvid
     public abstract List<ExternalDataObject> searchExternalDataObjects(String query, String hint, int start, int limit);
 
     /**
-     *
-     * @return
+     * Get metadata maps by 'type', if present. See spring configuration for examples.
+     * @return map of metadata types
      */
     @Override
     public Map<String, Map<String, MetadataFieldConfig>> getMetadataMapsByType() {
