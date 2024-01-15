@@ -9,10 +9,12 @@ package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 
 import java.util.List;
 
+import org.dspace.coarnotify.LDNPattern;
 import org.hamcrest.Matcher;
 
 /**
@@ -26,11 +28,18 @@ public class SubmissionCOARNotifyMatcher {
     private SubmissionCOARNotifyMatcher() {
     }
 
-    public static Matcher<? super Object> matchCOARNotifyEntry(String id, List<String> patterns) {
+    public static Matcher<? super Object> matchCOARNotifyEntry(String id, List<LDNPattern> patterns) {
         return allOf(
             hasJsonPath("$.id", is(id)),
-            hasJsonPath("$.patterns", is(patterns))
-        );
+            hasJsonPath(
+                "$.patterns", contains(
+                patterns.stream()
+                        .map(ldnPattern ->
+                            allOf(
+                                hasJsonPath("pattern", is(ldnPattern.getPattern())),
+                                hasJsonPath("multipleRequest", is(ldnPattern.isMultipleRequest()))
+                            ))
+                        .toArray(Matcher[]::new))));
     }
 
 }

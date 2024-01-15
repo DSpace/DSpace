@@ -25,6 +25,7 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.step.DataCOARNotify;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.coarnotify.COARNotifyConfigurationService;
+import org.dspace.coarnotify.LDNPattern;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,12 +107,13 @@ public class COARNotifySubmissionService {
     }
 
     private boolean isContainPattern(String config, String pattern) {
-        List<String> patterns = coarNotifyConfigurationService.getPatterns().get(config);
+        List<LDNPattern> patterns = coarNotifyConfigurationService.getPatterns().get(config);
         if (CollectionUtils.isEmpty(patterns)) {
             return false;
         }
 
         return patterns.stream()
+                       .map(LDNPattern::getPattern)
                        .anyMatch(v ->
                            v.equals(pattern));
     }

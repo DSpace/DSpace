@@ -10,13 +10,28 @@
             <map>
                 <entry key="coarnotify">
                     <list>
-                        <value>request-review</value>
-                        <value>request-endorsement</value>
-                        <value>request-ingest</value>
+                        <ref bean="requestReview"/>
+                        <ref bean="requestEndorsement"/>
+                        <ref bean="requestIngest" />
                     </list>
                 </entry>
             </map>
         </property>
+    </bean>
+
+    <bean id="requestReview" class="org.dspace.coarnotify.LDNPattern">
+        <property name="pattern" value="request-review"/>
+        <property name="multipleRequest" value="true"/>
+    </bean>
+
+    <bean id="requestEndorsement" class="org.dspace.coarnotify.LDNPattern">
+        <property name="pattern" value="request-endorsement"/>
+        <property name="multipleRequest" value="true"/>
+    </bean>
+
+    <bean id="requestIngest" class="org.dspace.coarnotify.LDNPattern">
+        <property name="pattern" value="request-ingest"/>
+        <property name="multipleRequest" value="false"/>
     </bean>
 
 </beans>
