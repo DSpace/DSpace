@@ -895,7 +895,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                 return true;
             }
         } catch (SearchServiceException e) {
-            log.error("Failed getting getting community/collection admin status for "
+            log.error("Failed getting community/collection admin status for "
                 + context.getCurrentUser().getEmail() + " The search error is: " + e.getMessage()
                 + " The search resourceType filter was: " + query);
         }
