@@ -600,6 +600,7 @@
     <!--The configuration settings for discovery of withdrawn and undiscoverable items (admin only) and regular items-->
     <bean id="administrativeView" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
         <property name="id" value="administrativeView"/>
+        <property name="indexAlways" value="true"/>
         <property name="sidebarFacets">
             <list>
                 <ref bean="searchFilterDiscoverable" />
@@ -609,6 +610,9 @@
                 <ref bean="searchFilterIssued" />
                 <ref bean="searchFilterContentInOriginalBundle"/>
                 <ref bean="searchFilterEntityType"/>
+                <ref bean="searchFilterNotifyRelation" />
+                <ref bean="searchFilterNotifyEndorsement" />
+                <ref bean="searchFilterNotifyReview" />
             </list>
         </property>
         <!-- Set TagCloud configuration per discovery configuration -->
@@ -631,6 +635,9 @@
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
                 <ref bean="searchFilterIsPublicationOfJournalIssueRelation"/>
                 <ref bean="searchFilterIsJournalOfPublicationRelation"/>
+                <ref bean="searchFilterNotifyRelation" />
+                <ref bean="searchFilterNotifyEndorsement" />
+                <ref bean="searchFilterNotifyReview" />
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -2263,7 +2270,7 @@
         </property>
     </bean>
     
-    <bean id="NOTIFY.incoming.involvedItems" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="NOTIFY.incoming">
+    <bean id="NOTIFY.incoming.involvedItems" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="administrativeView">
         <property name="id" value="NOTIFY.incoming.involvedItems"/>
         <property name="defaultFilterQueries">
             <list>
@@ -2334,7 +2341,7 @@
         </property>
     </bean>
     
-    <bean id="NOTIFY.outgoing.involvedItems" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="NOTIFY.outgoing">
+    <bean id="NOTIFY.outgoing.involvedItems" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="administrativeView">
         <property name="id" value="NOTIFY.outgoing.involvedItems"/>
         <property name="defaultFilterQueries">
             <list>
@@ -3172,6 +3179,49 @@
         <property name="isOpenByDefault" value="true"/>
         <property name="pageSize" value="10"/>
         <property name="exposeMinAndMaxValue" value="true"/>
+    </bean>
+
+    <bean id="searchFilterNotifyRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="notifyRelation"/>
+        <property name="metadataFields">
+            <list>
+                <value>datacite.relation.isReferencedBy</value>
+                <value>datacite.relation.isSupplementedBy</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+        <property name="isOpenByDefault" value="true"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterNotifyEndorsement" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="notifyEndorsement"/>
+        <property name="metadataFields">
+            <list>
+                <value>notify.relation.endorsedBy</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+        <property name="isOpenByDefault" value="true"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
+    <bean id="searchFilterNotifyReview" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="notifyReview"/>
+        <property name="metadataFields">
+            <list>
+                <value>datacite.relation.isReviewedBy</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+        <property name="isOpenByDefault" value="true"/>
+        <property name="pageSize" value="10"/>
     </bean>
 
     <!--Sort properties-->
