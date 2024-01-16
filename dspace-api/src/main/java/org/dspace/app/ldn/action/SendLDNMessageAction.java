@@ -56,6 +56,9 @@ public class SendLDNMessageAction implements LDNAction {
         log.info("Announcing notification {}", request);
 
         try {
+            //Server-side request forgery Critical check gitHub failure is a false positive,
+            //because the LDN Service URL is configured by the user from DSpace
+            //frontend configuration at /admin/ldn/services
             ResponseEntity<String> response = restTemplate.postForEntity(
                 notification.getTarget().getInbox(),
                 request,

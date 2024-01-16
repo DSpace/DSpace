@@ -43,7 +43,6 @@ public class NotifyServiceDescriptionReplaceOperation extends PatchOperation<Not
     @Override
     public NotifyServiceEntity perform(Context context, NotifyServiceEntity notifyServiceEntity, Operation operation)
         throws SQLException {
-        checkOperationValue(operation.getValue());
 
         Object description = operation.getValue();
         if (description == null | !(description instanceof String)) {
