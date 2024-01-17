@@ -2154,7 +2154,6 @@
             	<ref bean="searchFilterNotifyQueueStatus" />
             	<ref bean="searchFilterNotifyActivityStreamType" />
             	<ref bean="searchFilterNotifyCoarNotifyType" />
-            	<ref bean="searchFilterNotifyNotificationType" />
             </list>
         </property>
         <!--The search filters which can be used on the discovery search page -->
@@ -2167,7 +2166,6 @@
             	<ref bean="searchFilterNotifyQueueStatus" />
             	<ref bean="searchFilterNotifyActivityStreamType" />
             	<ref bean="searchFilterNotifyCoarNotifyType" />
-            	<ref bean="searchFilterNotifyNotificationType" />
             </list>
         </property>
         <!--The sort filters for the discovery search-->
