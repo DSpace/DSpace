@@ -34,7 +34,12 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
      * LDN messages interact with a fictitious queue. Scheduled tasks manage the queue.
      */
 
-   /**
+    /**
+     * Message must not be processed.
+     */
+    public static final Integer QUEUE_STATUS_UNTRUSTED_IP = 0;
+
+    /**
     * Message queued, it has to be elaborated.
     */
     public static final Integer QUEUE_STATUS_QUEUED = 1;
@@ -112,6 +117,9 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
 
     @Column(name = "coar_notify_type")
     private String coarNotifyType;
+
+    @Column(name = "source_ip")
+    private String sourceIp;
 
     protected LDNMessageEntity() {
 
@@ -253,6 +261,14 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
 
     public void setQueueTimeout(Date queueTimeout) {
         this.queueTimeout = queueTimeout;
+    }
+
+    public String getSourceIp() {
+        return sourceIp;
+    }
+
+    public void setSourceIp(String sourceIp) {
+        this.sourceIp = sourceIp;
     }
 
     @Override

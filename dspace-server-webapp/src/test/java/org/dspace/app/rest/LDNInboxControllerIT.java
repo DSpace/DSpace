@@ -76,6 +76,8 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
                                 .withDescription("service description")
                                 .withUrl("service url")
                                 .withLdnUrl("https://overlay-journal.com/inbox/")
+                                .withLowerIp("127.0.0.1")
+                                .withUpperIp("127.0.0.3")
                                 .build();
         context.restoreAuthSystemState();
 
@@ -111,6 +113,8 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
                                 .withUrl("https://review-service.com/inbox/about/")
                                 .withLdnUrl("https://review-service.com/inbox/")
                                 .withScore(BigDecimal.valueOf(0.6d))
+                                .withLowerIp("127.0.0.1")
+                                .withUpperIp("127.0.0.3")
                                 .build();
         String announceReview = IOUtils.toString(announceReviewStream, Charset.defaultCharset());
         announceReviewStream.close();
@@ -163,6 +167,8 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
                                 .withUrl("https://review-service.com/inbox/about/")
                                 .withLdnUrl("https://review-service.com/inbox/")
                                 .withScore(BigDecimal.valueOf(0.6d))
+                                .withLowerIp("127.0.0.1")
+                                .withUpperIp("127.0.0.3")
                                 .build();
         InputStream offerReviewStream = getClass().getResourceAsStream("ldn_offer_review.json");
         String announceReview = IOUtils.toString(offerReviewStream, Charset.defaultCharset());
@@ -218,6 +224,8 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
                                 .withUrl("https://review-service.com/inbox/about/")
                                 .withLdnUrl("https://review-service.com/inbox/")
                                 .withScore(BigDecimal.valueOf(0.6d))
+                                .withLowerIp("127.0.0.1")
+                                .withUpperIp("127.0.0.3")
                                 .build();
         String announceRelationship = IOUtils.toString(announceRelationshipStream, Charset.defaultCharset());
         announceRelationshipStream.close();
@@ -263,6 +271,46 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         assertEquals(notification.getTarget().getInbox(), storedMessage.getTarget().getInbox());
         assertEquals(notification.getObject().getId(), storedMessage.getObject().getId());
         assertEquals(notification.getType(), storedMessage.getType());
+    }
+
+    @Test
+    public void ldnInboxAnnounceEndorsementInvalidIpTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).withName("community").build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+        String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("https://overlay-journal.com/inbox/")
+                                .withLowerIp("127.0.0.2")
+                                .withUpperIp("127.0.0.5")
+                                .build();
+        context.restoreAuthSystemState();
+
+        InputStream announceEndorsementStream = getClass().getResourceAsStream("ldn_announce_endorsement.json");
+        String announceEndorsement = IOUtils.toString(announceEndorsementStream, Charset.defaultCharset());
+        announceEndorsementStream.close();
+        String message = announceEndorsement.replaceAll("<<object>>", object);
+        message = message.replaceAll("<<object_handle>>", object);
+
+        ObjectMapper mapper = new ObjectMapper();
+        Notification notification = mapper.readValue(message, Notification.class);
+        getClient()
+            .perform(post("/ldn/inbox")
+                .contentType("application/ld+json")
+                .content(message))
+            .andExpect(status().isAccepted());
+
+        int processed = ldnMessageService.extractAndProcessMessageFromQueue(context);
+        assertEquals(processed, 0);
+
+        LDNMessageEntity ldnMessage = ldnMessageService.find(context, notification.getId());
+        checkStoredLDNMessage(notification, ldnMessage, object);
+        assertEquals(ldnMessage.getQueueStatus(), LDNMessageEntity.QUEUE_STATUS_UNTRUSTED_IP);
     }
 
     @Override

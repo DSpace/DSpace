@@ -59,10 +59,11 @@ public interface LDNMessageService {
      *
      * @param context The DSpace context
      * @param notification the requested notification
+     * @param sourceIp the source ip
      * @return the created LDN Message
      * @throws SQLException If something goes wrong in the database
      */
-    public LDNMessageEntity create(Context context, Notification notification) throws SQLException;
+    public LDNMessageEntity create(Context context, Notification notification, String sourceIp) throws SQLException;
 
     /**
      * Update the provided LDNMessage

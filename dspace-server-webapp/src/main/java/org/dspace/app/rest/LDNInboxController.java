@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import java.util.regex.Pattern;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.logging.log4j.Logger;
@@ -51,12 +52,14 @@ public class LDNInboxController {
      * @throws Exception
      */
     @PostMapping(value = "/inbox", consumes = "application/ld+json")
-    public ResponseEntity<Object> inbox(@RequestBody Notification notification) throws Exception {
+    public ResponseEntity<Object> inbox(HttpServletRequest request, @RequestBody Notification notification)
+        throws Exception {
+
         Context context = ContextUtil.obtainCurrentRequestContext();
         validate(notification);
         log.info("stored notification {} {}", notification.getId(), notification.getType());
 
-        LDNMessageEntity ldnMsgEntity = ldnMessageService.create(context, notification);
+        LDNMessageEntity ldnMsgEntity = ldnMessageService.create(context, notification, request.getRemoteAddr());
         log.info("stored ldn message {}", ldnMsgEntity);
         context.commit();
 
