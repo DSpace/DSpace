@@ -11,7 +11,7 @@ import org.dspace.qaevent.service.dto.NotifyMessageDTO;
 import org.dspace.qaevent.service.dto.QAMessageDTO;
 
 /**
- * Openaire Implementation {@link AMetadataMapAction}
+ * Notify Implementation {@link AMetadataMapAction}
  * 
  * @author Francesco Bacchelli (francesco.bacchelli at 4science.it)
  *
