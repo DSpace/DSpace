@@ -21,6 +21,7 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.service.DuplicateDetectionService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataValueService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.content.virtual.PotentialDuplicate;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -38,6 +39,8 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.workflow.WorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -60,6 +63,10 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
     MetadataFieldService metadataFieldService;
     @Autowired
     MetadataValueService metadataValueService;
+    @Autowired
+    XmlWorkflowItemService workflowItemService;
+    @Autowired
+    WorkspaceItemService workspaceItemService;
 
     /**
      * Get a list of PotentialDuplicate objects (wrappers with some metadata included for previewing) that
@@ -137,6 +144,7 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
         // what submission / archived state it is in
         if (indexableObject instanceof IndexableWorkspaceItem) {
             workspaceItem = ((IndexableWorkspaceItem) indexableObject).getIndexedObject();
+            log.info("ITS A WORKSPACE ITEM ITS A WORKSPACE ITEM " + workspaceItem.getItem().getName());
             // Only process workspace items that belong to the submitter
             if (workspaceItem != null && workspaceItem.getSubmitter() != null
                     && workspaceItem.getSubmitter().equals(context.getCurrentUser())) {
@@ -144,14 +152,18 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
             }
         }
         if (indexableObject instanceof IndexableWorkflowItem) {
-            log.info("ITS A WORKFLOW ITEM ITS A WORKFLOW ITEM");
             workflowItem = ((IndexableWorkflowItem) indexableObject).getIndexedObject();
+            log.info("ITS A WORKFLOW ITEM ITS A WORKFLOW ITEM " + workflowItem.getItem().getName());
             if (workflowItem != null) {
                 resultItem = workflowItem.getItem();
             }
         }
         if (indexableObject instanceof IndexableItem) {
             resultItem = ((IndexableItem) indexableObject).getIndexedObject();
+            log.info("NORMAL ITEM FOUND " + resultItem.getName());
+            // Attempt resolution of workflow or workspace items, tested later
+            workflowItem = workflowItemService.findByItem(context, resultItem);
+            workspaceItem = workspaceItemService.findByItem(context, resultItem);
         }
 
         // Result item must not be null, a template item, or actually identical to the original
@@ -224,6 +236,8 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
         } else if (authorizeService.isAdmin(context, resultItem)) {
             // Admins can always read, return immediately
             return Optional.of(potentialDuplicate);
+        } else {
+            log.error("No valid permission to return this item");
         }
 
             // By default, return an empty result

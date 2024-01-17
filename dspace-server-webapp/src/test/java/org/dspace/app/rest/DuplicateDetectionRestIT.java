@@ -13,34 +13,40 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.I18nUtil;
 import org.dspace.discovery.IndexingService;
-import org.dspace.discovery.indexobject.IndexableWorkflowItem;
+import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.service.HandleService;
+import org.dspace.identifier.service.IdentifierService;
 import org.dspace.services.ConfigurationService;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.hamcrest.Matchers;
-import org.junit.After;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static java.lang.Thread.sleep;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -65,11 +71,19 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
     CollectionService collectionService;
     @Autowired
     HandleService handleService;
+    @Autowired
+    WorkspaceItemService workspaceItemService;
+    @Autowired
+    XmlWorkflowItemService workflowItemService;
+    @Autowired
+    IdentifierService identifierService;
+    @Autowired
+    AuthorizeService authorizeService;
+    @Autowired
+    XmlWorkflowService workflowService;
 
     private Collection col;
-    private Item item1;
-    private Item item2;
-    private Item item3;
+    private Collection simpleCol;
     private final String item1IssueDate = "2011-10-17";
     private final String item1Subject = "ExtraEntry 1";
     private final String item1Title = "Public item I";
@@ -77,6 +91,8 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
     private final String item2Subject = "ExtraEntry 2";
     private final String item2IssueDate = "2012-10-17";
     private EPerson anotherEPerson;
+
+    private static Logger log = LogManager.getLogger();
 
     @Override
     public void setUp() throws Exception {
@@ -93,14 +109,16 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
 
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
-        DSpaceObject dso = handleService.resolveToObject(context, "123456789/test-duplicate-detection");
-        if (dso == null) {
-            col = CollectionBuilder.createCollection(context, parentCommunity, "123456789/test-duplicate-detection")
-                    .withWorkflowGroup("reviewer", admin)
-                    .withName("Collection").build();
-        } else {
-            col = (Collection) dso;
-        }
+
+        col = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Test Collection")
+                .withWorkflowGroup(1, admin)
+                .build();
+        simpleCol = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Test Collection without Workflow")
+                .build();
+        eperson.setFirstName(context, "first");
+        eperson.setLastName(context, "last");
         EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
         anotherEPerson = ePersonService.findByEmail(context, "test-another-user@email.com");
         if (anotherEPerson == null) {
@@ -114,39 +132,26 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
             // actually save the eperson to unit testing DB
             ePersonService.update(context, anotherEPerson);
         }
-
-        // Ingest three example items with slightly different titles
-        // item2 is 1 edit distance from item1 and item3
-        // item1 and item3 are 2 edit distance from each other
-        item1 = ItemBuilder.createItem(context, col)
-                .withTitle(item1Title) // Public item I
-                .withIssueDate(item1IssueDate)
-                .withAuthor(item1Author)
-                .withSubject(item1Subject)
-                .build();
-        item2 = ItemBuilder.createItem(context, col)
-                .withTitle("Public item II")
-                .withIssueDate(item2IssueDate)
-                .withAuthor("Smith, Donald X.")
-                .withSubject(item2Subject)
-                .build();
-        item3 = ItemBuilder.createItem(context, col)
-                .withTitle("Public item III")
-                .withIssueDate("2013-10-17")
-                .withAuthor("Smith, Donald Y.")
-                .withSubject("ExtraEntry 3")
-                .build();
-
-
-        context.dispatchEvents();
-        context.restoreAuthSystemState();
         //context.setDispatcher("noindex");
-
+        context.restoreAuthSystemState();
     }
 
     @Test
     public void itemsContainDuplicatesLinkTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
+        log.error("EPERSON FULL NAME IS " + eperson.getFullName());
+
+        context.turnOffAuthorisationSystem();
+        WorkspaceItem workspaceItem1 = WorkspaceItemBuilder.createWorkspaceItem(context, simpleCol)
+                .withTitle(item1Title)
+                .withSubject(item1Subject)
+                .withIssueDate(item1IssueDate)
+                .withAuthor(item1Author)
+                .withSubmitter(eperson)
+                .build();
+        XmlWorkflowItem wfi1 = workflowService.start(context, workspaceItem1);
+        Item item1 = wfi1.getItem();
+        context.restoreAuthSystemState();
 
         getClient(token).perform(get("/api/core/items/" + item1.getID()))
                 .andExpect(status().isOk())
@@ -157,6 +162,41 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
     @Test
     public void searchDuplicatesByLinkTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
+
+        context.turnOffAuthorisationSystem();
+
+        // Ingest three example items with slightly different titles
+        // item2 is 1 edit distance from item1 and item3
+        // item1 and item3 are 2 edit distance from each other
+        WorkspaceItem workspaceItem1 = WorkspaceItemBuilder.createWorkspaceItem(context, simpleCol)
+                .withTitle(item1Title)
+                .withSubject(item1Subject)
+                .withIssueDate(item1IssueDate)
+                .withAuthor(item1Author)
+                .withSubmitter(eperson)
+                .build();
+        WorkspaceItem workspaceItem2 = WorkspaceItemBuilder.createWorkspaceItem(context, simpleCol)
+                .withTitle("Public item II")
+                .withIssueDate(item2IssueDate)
+                .withAuthor("Smith, Donald X.")
+                .withSubject(item2Subject)
+                .withSubmitter(eperson)
+                .build();
+        WorkspaceItem workspaceItem3 = WorkspaceItemBuilder.createWorkspaceItem(context, simpleCol)
+                .withTitle(item1Title)
+                .withTitle("Public item III")
+                .withIssueDate("2013-10-17")
+                .withAuthor("Smith, Donald Y.")
+                .withSubject("ExtraEntry 3")
+                .withSubmitter(eperson)
+                .build();
+        log.error("EPERSON FULL NAME IS " + eperson.getFullName());
+        XmlWorkflowItem wfi1 = workflowService.start(context, workspaceItem1);
+        XmlWorkflowItem wfi2 = workflowService.start(context, workspaceItem2);
+        Item item1 = wfi1.getItem();
+        Item item2 = wfi2.getItem();
+
+        context.restoreAuthSystemState();
 
         getClient(token).perform(get("/api/core/items/" + item1.getID() + "/duplicates"))
                 .andExpect(status().isOk())
@@ -184,9 +224,35 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
     public void submissionSectionDataTest() throws Exception {
         // Test publication
         context.turnOffAuthorisationSystem();
+
+        Collection workspaceCollection =
+                CollectionBuilder.createCollection(context, parentCommunity, "123456789/test-duplicate-detection")
+                        .withName("Test Collection Workspace").build();
+
+        // Ingest three example items with slightly different titles
+        // item2 is 1 edit distance from item1 and item3
+        // item1 and item3 are 2 edit distance from each other
+        Item item1 = ItemBuilder.createItem(context, col)
+                .withTitle(item1Title) // Public item I
+                .withIssueDate(item1IssueDate)
+                .withAuthor(item1Author)
+                .withSubject(item1Subject)
+                .build();
+        Item item2 = ItemBuilder.createItem(context, col)
+                .withTitle("Public item II")
+                .withIssueDate(item2IssueDate)
+                .withAuthor("Smith, Donald X.")
+                .withSubject(item2Subject)
+                .build();
+        Item item3 = ItemBuilder.createItem(context, col)
+                .withTitle("Public item III")
+                .withIssueDate("2013-10-17")
+                .withAuthor("Smith, Donald Y.")
+                .withSubject("ExtraEntry 3")
+                .build();
         // Create a new workspace item with a similar title to Item 1 (1 edit distance). Reuse other items
         // metadata for the rest, as it is not relevant.
-        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col)
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, workspaceCollection)
                 .withTitle("Public item X")
                 .withSubject(item2Subject)
                 .withIssueDate(item2IssueDate)
@@ -267,6 +333,11 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
     public void submissionSectionWorkspaceItemVisibilityTest() throws Exception {
         // Test publication
         context.turnOffAuthorisationSystem();
+        // Create a new collection with handle that maps to teh test-duplicate-detection submission config
+        col = CollectionBuilder.createCollection(context, parentCommunity, "123456789/test-duplicate-detection")
+                .withName("Test Collection with Duplicate Detection")
+                .withWorkflowGroup(1, admin)
+                .build();
         // Create a new workspace item with a similar title to Item 1 (1 edit distance). Reuse other items
         // metadata for the rest, as it is not relevant.
         WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col)
@@ -316,44 +387,49 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
      */
     @Test
     public void submissionSectionWorkflowItemVisibilityTest() throws Exception {
-        String reviewerToken = getAuthToken(admin.getEmail(), password);
+
         context.turnOffAuthorisationSystem();
-
-        Item testItem = ItemBuilder.createItem(context, col)
-                .withTitle("Totally unique?") // Public item I
-                .withIssueDate(item1IssueDate)
-                .withAuthor(item1Author)
-                .withSubject(item1Subject)
-                .build();
-        // Create a new workspace item with a similar title to Item 1 (1 edit distance). Reuse other items
-        // metadata for the rest, as it is not relevant.
-        XmlWorkflowItem workflowItem1 = WorkflowItemBuilder.createWorkflowItem(context, col)
-                .withTitle("Totally unique!")
-                .withIssueDate("2017-10-17")
+        // Create a new collection with handle that maps to teh test-duplicate-detection submission config
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+        Collection workflowCol = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Test Collection with Duplicate Detection")
+                .withWorkflowGroup("reviewer", admin)
                 .build();
 
-        //indexingService.indexContent(context, new IndexableWorkflowItem(workflowItem1));
-
-        context.dispatchEvents();
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, workflowCol)
+                .withTitle("Unique title")
+                .withSubmitter(eperson)
+                .build();
+        WorkspaceItem workspaceItem2 = WorkspaceItemBuilder.createWorkspaceItem(context, workflowCol)
+                .withTitle("Unique title")
+                .withSubmitter(eperson)
+                .build();
+        XmlWorkflowItem workflowItem1 = workflowService.start(context, workspaceItem);
+        XmlWorkflowItem workflowItem2 = workflowService.start(context, workspaceItem2);
+        indexingService.reIndexContent(context, new IndexableItem(workflowItem1.getItem()));
+        indexingService.reIndexContent(context, new IndexableItem(workflowItem2.getItem()));
         context.restoreAuthSystemState();
-        context.setCurrentUser(admin);
+        sleep(3600);
 
+        context.setCurrentUser(admin);
+        String reviewerToken = getAuthToken(admin.getEmail(), password);
 
         // The reviewer should be able to see the workflow item as a potential duplicate of the test item
-        getClient(reviewerToken).perform(get("/api/core/items/" + testItem.getID() + "/duplicates"))
+        getClient(reviewerToken).perform(get("/api/core/items/" + workflowItem1.getItem().getID() + "/duplicates"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 // Valid duplicates array
                 .andExpect(jsonPath("$._embedded.duplicates", Matchers.hasSize(1)))
                 // UUID of only array member matches the new workflow item ID
-                .andExpect(jsonPath("$._embedded.duplicates[0].uuid").value(workflowItem1.getItem().getID().toString()));
+                .andExpect(jsonPath("$._embedded.duplicates[0].uuid").value(workflowItem2.getItem().getID().toString()));
 
         // Another random user will NOT see this
         getClient(getAuthToken(anotherEPerson.getEmail(), password))
-                .perform(get("/api/core/items/" + testItem.getID() + "/duplicates"))
+                .perform(get("/api/core/items/" + workflowItem1.getItem().getID() + "/duplicates"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 // Valid duplicates array
                 .andExpect(jsonPath("$._embedded.duplicates", Matchers.hasSize(0)));
     }
+
 }
