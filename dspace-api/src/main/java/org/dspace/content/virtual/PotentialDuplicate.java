@@ -17,6 +17,8 @@ import org.dspace.content.MetadataValue;
 /**
  * Model of potential duplicate item. Provides as little data as possible, but enough to be useful
  * about the context / state of the duplicate, and metadata for preview purposes.
+ * This class lives in the virtual package because it is not stored, addressable data, it's a stub / preview
+ * based on an items' search result and metadata.
  *
  * @author Kim Shepherd
  */

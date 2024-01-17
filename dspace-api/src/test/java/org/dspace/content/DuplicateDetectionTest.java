@@ -1,0 +1,194 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+package org.dspace.content;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+
+import org.apache.commons.lang.StringUtils;
+import org.dspace.AbstractIntegrationTestWithDatabase;
+import org.dspace.builder.CollectionBuilder;
+import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.ItemBuilder;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DuplicateDetectionService;
+import org.dspace.content.virtual.PotentialDuplicate;
+import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SearchUtils;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.junit.Before;
+import org.junit.Test;
+import scala.concurrent.impl.FutureConvertersImpl;
+
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNull;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+/**
+ *
+ * Integration tests for the duplicate detection service
+ *
+ * @author Kim Shepherd
+ */
+public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase {
+
+    private GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+    private SearchService searchService = SearchUtils.getSearchService();
+    private DuplicateDetectionService duplicateDetectionService = ContentServiceFactory.getInstance().getDuplicateDetectionService();
+    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private Collection col;
+    private Item item1;
+    private Item item2;
+    private Item item3;
+    private final String item1IssueDate = "2011-10-17";
+    private final String item1Subject = "ExtraEntry 1";
+    private final String item1Title = "Public item I";
+    private final String item1Author = "Smith, Donald";
+
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+        // Temporarily enable duplicate detection and set signature distance to 1
+        configurationService.setProperty("duplicate.enable", true);
+        configurationService.setProperty("duplicate.signature.distance", 1);
+        configurationService.setProperty("duplicate.signature.normalise.lowercase", true);
+        configurationService.setProperty("duplicate.signature.normalise.whitespace", true);
+        configurationService.setProperty("duplicate.signature.field", "item_signature");
+        configurationService.setProperty("duplicate.preview.metadata.field",
+                new String[]{"dc.date.issued", "dc.subject"});
+
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
+        col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection").build();
+
+        // Ingest three example items with slightly different titles
+        // item2 is 1 edit distance from item1 and item3
+        // item1 and item3 are 2 edit distance from each other
+        item1 = ItemBuilder.createItem(context, col)
+                .withTitle(item1Title) // Public item I
+                .withIssueDate(item1IssueDate)
+                .withAuthor(item1Author)
+                .withSubject(item1Subject)
+                .build();
+        item2 = ItemBuilder.createItem(context, col)
+                .withTitle("Public item II")
+                .withIssueDate("2012-10-17")
+                .withAuthor("Smith, Donald X.")
+                .withSubject("ExtraEntry 2")
+                .build();
+        item3 = ItemBuilder.createItem(context, col)
+                .withTitle("Public item III")
+                .withIssueDate("2013-10-17")
+                .withAuthor("Smith, Donald Y.")
+                .withSubject("ExtraEntry 3")
+                .build();
+
+        context.setDispatcher("noindex");
+    }
+
+    /**
+     * Test instantiation of simple potential duplicate object
+     */
+    @Test
+    public void testPotentialDuplicateInstantatation() {
+        PotentialDuplicate potentialDuplicate = new PotentialDuplicate();
+        // The constructor should instantiate a new list for metadata
+        assertEquals("Metadata value list size should be 0",
+                0, potentialDuplicate.getMetadataValueList().size());
+        // Other properties should not be set
+        assertNull("Title should be null", potentialDuplicate.getTitle());
+        //StringUtils.getLevenshteinDistance()
+    }
+
+    /**
+     * Test instantiation of simple potential duplicate object given an item as a constructor argument
+     */
+    @Test
+    public void testPotentialDuplicateInstantiationWithItem() {
+        PotentialDuplicate potentialDuplicate = new PotentialDuplicate(item1);
+        // We should have title, uuid, owning collection name set and metadata value list instantiated to empty
+        assertEquals("UUID should match item1 uuid", item1.getID(), potentialDuplicate.getUuid());
+        assertEquals("Title should match item1 title", item1Title, potentialDuplicate.getTitle());
+        assertEquals("Owning collection should match item1 owning collection",
+                item1.getOwningCollection().getName(), potentialDuplicate.getOwningCollectionName());
+        assertEquals("Metadata value list size should be 0",
+                0, potentialDuplicate.getMetadataValueList().size());
+    }
+
+    /**
+     * Test that a search for getPotentialDuplicates returns the expected results, populated with the expected
+     * preview values and metadata. This is the core method used by the duplicate item link repository and
+     * detect duplicates submission step.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testSearchDuplicates() throws Exception {
+
+        // Get potential duplicates of item 1:
+        // Expected: Public item II should appear as it has the configured levenshtein distance of 1
+        List<PotentialDuplicate> potentialDuplicates = duplicateDetectionService.getPotentialDuplicates(context, item1);
+
+        // Make sure result list is size 1
+        int size = 1;
+        assertEquals("Potential duplicates of item1 should have size " + size,
+                size, potentialDuplicates.size());
+
+        // The only member should be Public item II (one distance from public item I)
+        assertEquals("Item II should be be the detected duplicate",
+                item2.getID(), potentialDuplicates.get(0).getUuid());
+
+        // Get potential duplicates of item2:
+        // Expected: BOTH other items should appear as they are both 1 distance away from "Public item II"
+        potentialDuplicates = duplicateDetectionService.getPotentialDuplicates(context, item2);
+
+        // Sort by title
+        potentialDuplicates.sort(Comparator.comparing(PotentialDuplicate::getTitle));
+
+        // Make sure result list is size 1
+        size = 2;
+        assertEquals("Potential duplicates of item2 should have size " + size,
+                size, potentialDuplicates.size());
+
+        // The result list should contain both item1 and item3 in the expected order
+        assertEquals("item1 should be the first detected duplicate",
+                item1.getID(), potentialDuplicates.get(0).getUuid());
+        assertEquals("item3 should be be the second detected duplicate",
+                item3.getID(), potentialDuplicates.get(1).getUuid());
+
+        // Check metadata is populated as per configuration, using item1 (first in results)
+        // Check for date
+        Optional<String> foundDate = potentialDuplicates.get(0).getMetadataValueList().stream()
+                .filter(metadataValue -> metadataValue.getMetadataField().toString('.').equals("dc.date.issued"))
+                .map(MetadataValue::getValue).findFirst();
+        assertThat("There should be an issue date found", foundDate.isPresent());
+        assertEquals("item1 issue date should match the duplicate obj metadata issue date",
+                item1IssueDate, foundDate.get());
+        // Check for subject
+        Optional<String> foundSubject = potentialDuplicates.get(0).getMetadataValueList().stream()
+                .filter(metadataValue -> metadataValue.getMetadataField().toString('.').equals("dc.subject"))
+                .map(MetadataValue::getValue).findFirst();
+        assertThat("There should be a subject found", foundSubject.isPresent());
+        assertEquals("item1 subject should match the duplicate obj metadata subject",
+                item1Subject, foundSubject.get());
+
+        // Check for author, which was NOT configured to be copied
+        Optional<String> foundAuthor = potentialDuplicates.get(0).getMetadataValueList().stream()
+                .filter(metadataValue -> metadataValue.getMetadataField().toString('.')
+                        .equals("dc.contributor.author"))
+                .map(MetadataValue::getValue).findFirst();
+        assertThat("There should NOT be an author found", foundAuthor.isEmpty());
+
+    }
+
+}

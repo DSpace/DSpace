@@ -27,6 +27,7 @@
         <name-map community-handle="123456789/topcommunity-test" submission-name="topcommunitytest"/>
         <name-map community-handle="123456789/subcommunity-test" submission-name="subcommunitytest"/>
         <name-map collection-handle="123456789/collection-test" submission-name="collectiontest"/>
+        <name-map collection-handle="123456789/test-duplicate-detection" submission-name="test-duplicate-detection"/>
     </submission-map>
 
 
@@ -180,6 +181,13 @@
             <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
         </step-definition>
 
+        <!-- Detect duplicates step -->
+        <step-definition id="duplicates">
+            <heading>submit.progressbar.duplicates</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DuplicateDetectionStep</processing-class>
+            <type>duplicates</type>
+        </step-definition>
+
         <step-definition id="coarnotify">
             <heading>submit.progressbar.coarnotify</heading>
             <processing-class>org.dspace.app.rest.submit.step.NotifyStep</processing-class>
@@ -279,6 +287,12 @@
 
         <submission-process name="collectiontest">
             <step id="collection"/>
+        </submission-process>
+
+        <submission-process name="test-duplicate-detection">
+            <step id="collection"/>
+            <step id="duplicates"/>
+            <step id="traditionalpageone"/>
         </submission-process>
 
     </submission-definitions>

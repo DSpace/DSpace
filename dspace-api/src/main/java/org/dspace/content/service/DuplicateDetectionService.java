@@ -14,6 +14,7 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.DuplicateDetectionServiceImpl;
 import org.dspace.content.Item;
 import org.dspace.content.virtual.PotentialDuplicate;
 import org.dspace.core.Context;
@@ -23,7 +24,7 @@ import org.dspace.discovery.SearchServiceException;
 
 /**
  * Duplicate Detection Service handles get, search and validation operations for duplicate detection.
- * @see org.dspace.content.DuplicateDetectionServiceImpl for implementation details
+ * @see DuplicateDetectionServiceImpl for implementation details
  *
  * @author Kim Shepherd
  */
@@ -58,7 +59,7 @@ public interface DuplicateDetectionService {
      * @throws SQLException
      * @throws AuthorizeException
      */
-    public Optional<PotentialDuplicate> validateDuplicateResult(Context context, IndexableObject indexableObject,
+    Optional<PotentialDuplicate> validateDuplicateResult(Context context, IndexableObject indexableObject,
                                                                 Item original) throws SQLException, AuthorizeException;
 
     /**
