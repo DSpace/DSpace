@@ -79,7 +79,7 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
     private Collection collection;
 
     private File s3Directory;
-    
+
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
 
