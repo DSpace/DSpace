@@ -395,6 +395,20 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     @Test
+    public void findByMetadataAndCollectionWithMetadataWithoutVocabularyTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+            .withName("Test collection")
+            .build();
+        context.restoreAuthSystemState();
+        String token = getAuthToken(admin.getEmail(), password);
+        getClient(token).perform(get("/api/submission/vocabularies/search/byMetadataAndCollection")
+                .param("metadata", "dc.title")
+                .param("collection", collection.getID().toString()))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
     public void findByMetadataAndCollectionUnprocessableEntityTest() throws Exception {
         context.turnOffAuthorisationSystem();
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
