@@ -142,12 +142,15 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
                     && workspaceItem.getSubmitter().equals(context.getCurrentUser())) {
                 resultItem = workspaceItem.getItem();
             }
-        } else if (indexableObject instanceof IndexableWorkflowItem) {
+        }
+        if (indexableObject instanceof IndexableWorkflowItem) {
+            log.info("ITS A WORKFLOW ITEM ITS A WORKFLOW ITEM");
             workflowItem = ((IndexableWorkflowItem) indexableObject).getIndexedObject();
             if (workflowItem != null) {
                 resultItem = workflowItem.getItem();
             }
-        } else if (indexableObject instanceof IndexableItem) {
+        }
+        if (indexableObject instanceof IndexableItem) {
             resultItem = ((IndexableItem) indexableObject).getIndexedObject();
         }
 
@@ -201,16 +204,14 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
         }
 
         // More authorisation checks
-        if (authorizeService.isAdmin(context, resultItem)) {
-            // Admins can always read, return immediately
-            return Optional.of(potentialDuplicate);
-        }
-        else if (workflowItem != null) {
+        if (workflowItem != null) {
             Collection c = workflowItem.getCollection();
+            log.info("INSPECITG WORKFLOW ITEM " + workflowItem.getItem().getName() + " WITH EPERSON " + context.getCurrentUser().getName());
             if (groupService.isMember(context, context.getCurrentUser(), c.getWorkflowStep1(context)) ||
                     groupService.isMember(context, context.getCurrentUser(), c.getWorkflowStep2(context)) ||
                     groupService.isMember(context, context.getCurrentUser(), c.getWorkflowStep3(context))) {
                 // Current user is a member of one of the workflow role groups
+                log.info("WORKFLOW REVIEWER CAN SEE " + workflowItem.getID());
                 potentialDuplicate.setWorkflowItemId(workflowItem.getID());
                 return Optional.of(potentialDuplicate);
             }
@@ -220,9 +221,12 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
             if (authorizeService.authorizeActionBoolean(context, resultItem, Constants.READ)) {
                 return Optional.of(potentialDuplicate);
             }
+        } else if (authorizeService.isAdmin(context, resultItem)) {
+            // Admins can always read, return immediately
+            return Optional.of(potentialDuplicate);
         }
 
-        // By default, return an empty result
+            // By default, return an empty result
         return Optional.empty();
     }
 
