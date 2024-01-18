@@ -221,6 +221,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                 //Get our next step, if none is found, archive our item
                 firstStep = wf.getNextStep(context, wfi, firstStep, ActionResult.OUTCOME_COMPLETE);
                 if (firstStep == null) {
+                    // record the submitted provenance message
+                    recordStart(context, wfi.getItem(),null);
                     archive(context, wfi);
                 } else {
                     activateFirstStep(context, wf, firstStep, wfi);
@@ -1187,25 +1189,30 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         DCDate now = DCDate.getCurrent();
 
         // Create provenance description
-        String provmessage = "";
+        StringBuffer provmessage = new StringBuffer();
 
         if (myitem.getSubmitter() != null) {
-            provmessage = "Submitted by " + myitem.getSubmitter().getFullName()
-                + " (" + myitem.getSubmitter().getEmail() + ") on "
-                + now.toString() + " workflow start=" + action.getProvenanceStartId() + "\n";
+            provmessage.append("Submitted by ").append(myitem.getSubmitter().getFullName())
+                .append(" (").append(myitem.getSubmitter().getEmail()).append(") on ")
+                .append(now.toString());
         } else {
             // else, null submitter
-            provmessage = "Submitted by unknown (probably automated) on"
-                + now.toString() + " workflow start=" + action.getProvenanceStartId() + "\n";
+            provmessage.append("Submitted by unknown (probably automated) on")
+                .append(now.toString());
+        }
+        if (action != null) {
+            provmessage.append(" workflow start=").append(action.getProvenanceStartId()).append("\n");
+        } else {
+            provmessage.append("\n");
         }
 
         // add sizes and checksums of bitstreams
-        provmessage += installItemService.getBitstreamProvenanceMessage(context, myitem);
+        provmessage.append(installItemService.getBitstreamProvenanceMessage(context, myitem));
 
         // Add message to the DC
         itemService
             .addMetadata(context, myitem, MetadataSchemaEnum.DC.getName(),
-                         "description", "provenance", "en", provmessage);
+                         "description", "provenance", "en", provmessage.toString());
         itemService.update(context, myitem);
     }
 
