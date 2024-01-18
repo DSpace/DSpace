@@ -210,6 +210,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         notifyServiceRest.setLdnUrl("https://service.ldn.org/inbox");
         notifyServiceRest.setNotifyServiceInboundPatterns(List.of(inboundPatternRestOne, inboundPatternRestTwo));
         notifyServiceRest.setEnabled(false);
+        notifyServiceRest.setLowerIp("192.168.0.1");
+        notifyServiceRest.setUpperIp("192.168.0.5");
 
         AtomicReference<Integer> idRef = new AtomicReference<Integer>();
         String authToken = getAuthToken(admin.getEmail(), password);
@@ -218,7 +220,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                                 .contentType(contentType))
                             .andExpect(status().isCreated())
                             .andExpect(jsonPath("$", matchNotifyService("service name", "service description",
-                                "https://service.ldn.org/about", "https://service.ldn.org/inbox", false)))
+                                "https://service.ldn.org/about", "https://service.ldn.org/inbox", false,
+                                "192.168.0.1", "192.168.0.5")))
                             .andDo(result ->
                                 idRef.set((read(result.getResponse().getContentAsString(), "$.id"))));
 
@@ -228,7 +231,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.notifyServiceInboundPatterns", hasSize(2)))
             .andExpect(jsonPath("$", allOf(
                 matchNotifyService(idRef.get(), "service name", "service description",
-                        "https://service.ldn.org/about", "https://service.ldn.org/inbox", false),
+                    "https://service.ldn.org/about", "https://service.ldn.org/inbox", false,
+                    "192.168.0.1", "192.168.0.5"),
                 hasJsonPath("$.notifyServiceInboundPatterns", containsInAnyOrder(
                     matchNotifyServicePattern("patternA", "itemFilterA", true),
                     matchNotifyServicePattern("patternB", null, false)
@@ -2304,4 +2308,185 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         super.destroy();
     }
+
+    @Test
+    public void notifyServiceLowerIpReplaceOperationBadRequestTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withUrl("https://service.ldn.org/about")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation operation = new ReplaceOperation("/lowerIp", "192.168.0.1");
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void notifyServiceLowerIpReplaceOperationTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
+                                .withLowerIp("192.168.0.1")
+                                .withUpperIp("192.168.0.5")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation operation = new ReplaceOperation("/lowerIp", "192.168.0.2");
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
+                "service description", "https://service.ldn.org/about", "https://service.ldn.org/inbox",
+                false, "192.168.0.2", "192.168.0.5"))
+            );
+    }
+
+    @Test
+    public void notifyServiceLowerIpRemoveOperationTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
+                                .withLowerIp("192.168.0.1")
+                                .withUpperIp("192.168.0.5")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        RemoveOperation operation = new RemoveOperation("/lowerIp");
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void notifyServiceUpperIpReplaceOperationBadRequestTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withUrl("https://service.ldn.org/about")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation operation = new ReplaceOperation("/lowerIp", "192.168.0.8");
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void notifyServiceUpperIpReplaceOperationTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
+                                .withLowerIp("192.168.0.1")
+                                .withUpperIp("192.168.0.5")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        ReplaceOperation operation = new ReplaceOperation("/upperIp", "192.168.0.8");
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", matchNotifyService(notifyServiceEntity.getID(), "service name",
+                "service description", "https://service.ldn.org/about", "https://service.ldn.org/inbox",
+                false, "192.168.0.1", "192.168.0.8"))
+            );
+    }
+
+    @Test
+    public void notifyServiceUpperIpRemoveOperationTest() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("https://service.ldn.org/about")
+                                .withLdnUrl("https://service.ldn.org/inbox")
+                                .withLowerIp("192.168.0.1")
+                                .withUpperIp("192.168.0.5")
+                                .build();
+        context.restoreAuthSystemState();
+
+        List<Operation> ops = new ArrayList<Operation>();
+        RemoveOperation operation = new RemoveOperation("/upperIp");
+        ops.add(operation);
+
+        String patchBody = getPatchContent(ops);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken)
+            .perform(patch("/api/ldn/ldnservices/" + notifyServiceEntity.getID())
+                .content(patchBody)
+                .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
 }

@@ -57,6 +57,12 @@ public class NotifyServiceEntity implements ReloadableEntity<Integer> {
     @Column(name = "score")
     private BigDecimal score;
 
+    @Column(name = "lower_ip")
+    private String lowerIp;
+
+    @Column(name = "upper_ip")
+    private String upperIp;
+
     public void setId(Integer id) {
         this.id = id;
     }
@@ -130,4 +136,21 @@ public class NotifyServiceEntity implements ReloadableEntity<Integer> {
     public void setScore(BigDecimal score) {
         this.score = score;
     }
+
+    public String getLowerIp() {
+        return lowerIp;
+    }
+
+    public void setLowerIp(String lowerIp) {
+        this.lowerIp = lowerIp;
+    }
+
+    public String getUpperIp() {
+        return upperIp;
+    }
+
+    public void setUpperIp(String upperIp) {
+        this.upperIp = upperIp;
+    }
+
 }

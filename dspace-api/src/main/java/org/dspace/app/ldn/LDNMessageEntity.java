@@ -7,7 +7,6 @@
  */
 package org.dspace.app.ldn;
 
-import java.lang.reflect.Field;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -35,20 +34,15 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
      * LDN messages interact with a fictitious queue. Scheduled tasks manage the queue.
      */
 
-    /*
-     * Notification Type constants
+    /**
+     * Message must not be processed.
      */
-    public static final String TYPE_INCOMING = "Incoming";
-    public static final String TYPE_OUTGOING = "Outgoing";
-   /**
+    public static final Integer QUEUE_STATUS_UNTRUSTED_IP = 0;
+
+    /**
     * Message queued, it has to be elaborated.
     */
     public static final Integer QUEUE_STATUS_QUEUED = 1;
-
-    /**
-     * Message queued for retry, it has to be elaborated.
-     */
-    public static final Integer QUEUE_STATUS_QUEUED_FOR_RETRY = 7;
 
     /**
      * Message has been taken from the queue and it's elaboration is in progress.
@@ -123,6 +117,9 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
 
     @Column(name = "coar_notify_type")
     private String coarNotifyType;
+
+    @Column(name = "source_ip")
+    private String sourceIp;
 
     protected LDNMessageEntity() {
 
@@ -266,37 +263,16 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
         this.queueTimeout = queueTimeout;
     }
 
+    public String getSourceIp() {
+        return sourceIp;
+    }
+
+    public void setSourceIp(String sourceIp) {
+        this.sourceIp = sourceIp;
+    }
+
     @Override
     public String toString() {
         return "LDNMessage id:" + this.getID() + " typed:" + this.getType();
-    }
-
-    public static String getNotificationType(LDNMessageEntity ldnMessage) {
-        if (ldnMessage.getInReplyTo() != null || ldnMessage.getOrigin() != null) {
-            return TYPE_INCOMING;
-        }
-        return TYPE_OUTGOING;
-    }
-
-    public static String getServiceNameForNotifyServ(NotifyServiceEntity serviceEntity) {
-        if (serviceEntity != null) {
-            return serviceEntity.getName();
-        }
-        return "self";
-    }
-
-    public static String getQueueStatus(LDNMessageEntity ldnMessage) {
-        Class<LDNMessageEntity> cl = LDNMessageEntity.class;
-        try {
-            for (Field f : cl.getDeclaredFields()) {
-                String fieldName = f.getName();
-                if (fieldName.startsWith("QUEUE_") && (f.get(null) == ldnMessage.getQueueStatus())) {
-                    return fieldName;
-                }
-            }
-        } catch (IllegalArgumentException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-        return null;
     }
 }
