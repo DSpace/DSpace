@@ -10,6 +10,7 @@ package org.dspace.scripts.configuration;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
@@ -104,6 +105,19 @@ public abstract class ScriptConfiguration<T extends DSpaceRunnable> implements B
      * @return the options value of this ScriptConfiguration
      */
     public abstract Options getOptions();
+
+    /**
+     * The getter for the options of the Script (help informations)
+     *
+     * @return the options value of this ScriptConfiguration for help
+     */
+    public Options getHelpOptions() {
+        Options options = new Options();
+
+        options.addOption(Option.builder("h").longOpt("help").desc("help").hasArg(false).required(false).build());
+
+        return options;
+    }
 
     @Override
     public void setBeanName(String beanName) {

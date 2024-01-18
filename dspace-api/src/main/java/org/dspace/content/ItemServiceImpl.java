@@ -920,8 +920,16 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Override
     public void inheritCollectionDefaultPolicies(Context context, Item item, Collection collection)
         throws SQLException, AuthorizeException {
-        adjustItemPolicies(context, item, collection);
-        adjustBundleBitstreamPolicies(context, item, collection);
+        inheritCollectionDefaultPolicies(context, item, collection, true);
+    }
+
+    @Override
+    public void inheritCollectionDefaultPolicies(Context context, Item item, Collection collection,
+                                                 boolean replaceReadRPWithCollectionRP)
+        throws SQLException, AuthorizeException {
+
+        adjustItemPolicies(context, item, collection, replaceReadRPWithCollectionRP);
+        adjustBundleBitstreamPolicies(context, item, collection, replaceReadRPWithCollectionRP);
 
         log.debug(LogHelper.getHeader(context, "item_inheritCollectionDefaultPolicies",
                                        "item_id=" + item.getID()));
@@ -929,6 +937,13 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Override
     public void adjustBundleBitstreamPolicies(Context context, Item item, Collection collection)
+        throws SQLException, AuthorizeException {
+        adjustBundleBitstreamPolicies(context, item, collection, true);
+    }
+
+    @Override
+    public void adjustBundleBitstreamPolicies(Context context, Item item, Collection collection,
+                                              boolean replaceReadRPWithCollectionRP)
         throws SQLException, AuthorizeException {
         // Bundles should inherit from DEFAULT_ITEM_READ so that if the item is readable, the files
         // can be listed (even if they are themselves not readable as per DEFAULT_BITSTREAM_READ or other
@@ -948,10 +963,19 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         }
         // TODO: should we also throw an exception if no DEFAULT_ITEM_READ?
 
+        boolean removeCurrentReadRPBitstream =
+            replaceReadRPWithCollectionRP && defaultCollectionBitstreamPolicies.size() > 0;
+        boolean removeCurrentReadRPBundle =
+            replaceReadRPWithCollectionRP && defaultCollectionBundlePolicies.size() > 0;
+
         // remove all policies from bundles, add new ones
         // Remove bundles
         List<Bundle> bunds = item.getBundles();
         for (Bundle mybundle : bunds) {
+            // If collection has default READ policies, remove the bundle's READ policies.
+            if (removeCurrentReadRPBundle) {
+                authorizeService.removePoliciesActionFilter(context, mybundle, Constants.READ);
+            }
 
             // if come from InstallItem: remove all submission/workflow policies
             authorizeService.removeAllPoliciesByDSOAndType(context, mybundle, ResourcePolicy.TYPE_SUBMISSION);
@@ -960,6 +984,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             addDefaultPoliciesNotInPlace(context, mybundle, defaultCollectionBundlePolicies);
 
             for (Bitstream bitstream : mybundle.getBitstreams()) {
+                // If collection has default READ policies, remove the bundle's READ policies.
+                if (removeCurrentReadRPBitstream) {
+                    authorizeService.removePoliciesActionFilter(context, bitstream, Constants.READ);
+                }
+
                 // if come from InstallItem: remove all submission/workflow policies
                 removeAllPoliciesAndAddDefault(context, bitstream, defaultItemPolicies,
                                                defaultCollectionBitstreamPolicies);
@@ -968,7 +997,14 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
-    public void adjustBitstreamPolicies(Context context, Item item, Collection collection , Bitstream bitstream)
+    public void adjustBitstreamPolicies(Context context, Item item, Collection collection, Bitstream bitstream)
+        throws SQLException, AuthorizeException {
+        adjustBitstreamPolicies(context, item, collection, bitstream, true);
+    }
+
+    @Override
+    public void adjustBitstreamPolicies(Context context, Item item, Collection collection , Bitstream bitstream,
+                                        boolean replaceReadRPWithCollectionRP)
         throws SQLException, AuthorizeException {
         List<ResourcePolicy> defaultCollectionPolicies = authorizeService
             .getPoliciesActionFilter(context, collection, Constants.DEFAULT_BITSTREAM_READ);
@@ -998,9 +1034,21 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Override
     public void adjustItemPolicies(Context context, Item item, Collection collection)
         throws SQLException, AuthorizeException {
+        adjustItemPolicies(context, item, collection, true);
+    }
+
+    @Override
+    public void adjustItemPolicies(Context context, Item item, Collection collection,
+                                   boolean replaceReadRPWithCollectionRP)
+        throws SQLException, AuthorizeException {
         // read collection's default READ policies
         List<ResourcePolicy> defaultCollectionPolicies = authorizeService
             .getPoliciesActionFilter(context, collection, Constants.DEFAULT_ITEM_READ);
+
+        // If collection has defaultREAD policies, remove the item's READ policies.
+        if (replaceReadRPWithCollectionRP && defaultCollectionPolicies.size() > 0) {
+            authorizeService.removePoliciesActionFilter(context, item, Constants.READ);
+        }
 
         // MUST have default policies
         if (defaultCollectionPolicies.size() < 1) {
