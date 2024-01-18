@@ -115,7 +115,7 @@ public class LDNMessageBuilder extends AbstractBuilder<LDNMessageEntity, LDNMess
         try {
 
             this.context = context;
-            this.ldnMessageEntity = ldnMessageService.create(context, notification);
+            this.ldnMessageEntity = ldnMessageService.create(context, notification, "127.0.0.1");
 
         } catch (SQLException e) {
             log.warn("Failed to create the NotifyService", e);
