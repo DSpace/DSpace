@@ -6986,7 +6986,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                                 .withName("service name")
                                 .withDescription("service description")
                                 .withUrl("service url")
-                                .withLdnUrl("https://overlay-journal.com/inbox/")
+                                .withLdnUrl("https://generic-service.com/system/inbox/")
                                 .build();
 
         InputStream announceReviewStream = getClass().getResourceAsStream("ldn_announce_review.json");
