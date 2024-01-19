@@ -43,6 +43,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import io.findify.s3mock.S3Mock;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.matcher.LambdaMatcher;
 import org.dspace.authorize.AuthorizeException;
@@ -61,6 +62,7 @@ import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 
 
 /**
@@ -86,6 +88,7 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
     @Before
     public void setup() throws Exception {
 
+        configurationService.setProperty("assetstore.s3.enabled", "true");
         s3Directory = new File(System.getProperty("java.io.tmpdir"), "s3");
 
         s3Mock = S3Mock.create(8001, s3Directory.getAbsolutePath());
@@ -94,7 +97,8 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
         amazonS3Client = createAmazonS3Client();
 
         s3BitStoreService = new S3BitStoreService(amazonS3Client);
-
+        s3BitStoreService.setEnabled(BooleanUtils.toBoolean(
+                configurationService.getProperty("assetstore.s3.enabled")));
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
@@ -391,7 +395,7 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void testDoNotInitializeConfigured() throws Exception {
         String assetstores3enabledOldValue = configurationService.getProperty("assetstore.s3.enabled");
-        configurationService.setProperty("assetstore.s3.enabled", false);
+        configurationService.setProperty("assetstore.s3.enabled", "false");
         s3BitStoreService = new S3BitStoreService(amazonS3Client);
         s3BitStoreService.init();
         assertFalse(s3BitStoreService.isInitialized());
