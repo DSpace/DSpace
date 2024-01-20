@@ -171,6 +171,8 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             }
             // clear item objects from context cache and internal cache
             c.uncacheEntity(currentItem);
+            // commit after each item to release DB resources
+            c.commit();
             currentItem = null;
         }
     }
