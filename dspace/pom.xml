@@ -188,7 +188,6 @@
             </build>
             <dependencies>
                 <!-- Add all modules that should be taken into account for the coverage reports -->
-                <!-- (Excludes dspace-rest which is deprecated and doesn't build by default) -->
                 <dependency>
                     <groupId>org.dspace</groupId>
                     <artifactId>dspace-api</artifactId>

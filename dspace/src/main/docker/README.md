@@ -31,9 +31,8 @@ docker push dspace/dspace-dependencies:latest
 ## Dockerfile.test (in root folder)
 
 This Dockerfile builds a DSpace 7 backend image (for testing/development).
-This image deploys two DSpace webapps to Tomcat running in Docker:
+This image deploys one webapp to Tomcat running in Docker:
 1. The DSpace 7 REST API (at `http://localhost:8080/server`)
-2. The legacy (v6) REST API (at `http://localhost:8080/rest`), deployed without requiring HTTPS access.
 This image also sets up debugging in Tomcat for development.
 
 ```
