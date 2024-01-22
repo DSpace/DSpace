@@ -14,10 +14,8 @@ import java.util.Date;
 
 import com.google.gson.Gson;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.qaevent.service.QAEventService;
 import org.dspace.qaevent.service.dto.CorrectionTypeMessageDTO;
@@ -39,14 +37,14 @@ public class ReinstateCorrectionType implements CorrectionType, InitializingBean
 
     @Autowired
     private QAEventService qaEventService;
-    @Autowired
-    private AuthorizeService authorizeService;
 
     @Override
-    public boolean isAllowed(Context context, Item targetItem) throws SQLException, AuthorizeException {
-        authorizeService.authorizeAction(context, targetItem, Constants.READ);
+    public boolean isAllowed(Context context, Item targetItem) throws SQLException {
+        if (!targetItem.isWithdrawn()) {
+            return false;
+        }
         long tot = qaEventService.countSourcesByTarget(context, targetItem.getID());
-        return tot == 0 && targetItem.isWithdrawn();
+        return tot == 0;
     }
 
     @Override
