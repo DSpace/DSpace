@@ -7,6 +7,11 @@
  */
 package org.dspace.content;
 
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNull;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -29,11 +34,6 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNull;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
-
 /**
  *
  * Integration tests for the duplicate detection service
@@ -41,7 +41,8 @@ import static org.junit.Assert.fail;
  * @author Kim Shepherd
  */
 public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase {
-    private DuplicateDetectionService duplicateDetectionService = ContentServiceFactory.getInstance().getDuplicateDetectionService();
+    private DuplicateDetectionService duplicateDetectionService = ContentServiceFactory.getInstance()
+            .getDuplicateDetectionService();
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     private Collection col;
     private Collection workflowCol;
@@ -224,7 +225,8 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
         try {
             potentialDuplicates = duplicateDetectionService.getPotentialDuplicates(context, item4);
         } catch (SearchServiceException e) {
-            fail("Duplicate search with special characters should NOT result in search exception (" + e.getMessage() + ")");
+            fail("Duplicate search with special characters should NOT result in search exception (" +
+                    e.getMessage() + ")");
         }
 
         // Make sure result list is size 1
@@ -256,7 +258,8 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
         //indexingService.commit();
         context.restoreAuthSystemState();
         context.setCurrentUser(admin);
-        List<PotentialDuplicate> potentialDuplicates = duplicateDetectionService.getPotentialDuplicates(context, workflowItem1.getItem());
+        List<PotentialDuplicate> potentialDuplicates =
+                duplicateDetectionService.getPotentialDuplicates(context, workflowItem1.getItem());
 
         // Make sure result list is size 1
         int size = 1;

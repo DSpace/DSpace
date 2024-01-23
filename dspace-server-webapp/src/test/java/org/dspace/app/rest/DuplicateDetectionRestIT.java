@@ -7,11 +7,17 @@
  */
 package org.dspace.app.rest;
 
-import javax.ws.rs.core.MediaType;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,12 +50,6 @@ import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Test item link and section data REST endpoints for duplicate detection.
@@ -408,13 +408,15 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
         String reviewerToken = getAuthToken(admin.getEmail(), password);
 
         // The reviewer should be able to see the workflow item as a potential duplicate of the test item
-        getClient(reviewerToken).perform(get("/api/core/items/" + workflowItem1.getItem().getID() + "/duplicates"))
+        getClient(reviewerToken).perform(get("/api/core/items/" + workflowItem1.getItem().getID()
+                        + "/duplicates"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 // Valid duplicates array
                 .andExpect(jsonPath("$._embedded.duplicates", Matchers.hasSize(1)))
                 // UUID of only array member matches the new workflow item ID
-                .andExpect(jsonPath("$._embedded.duplicates[0].uuid").value(workflowItem2.getItem().getID().toString()));
+                .andExpect(jsonPath("$._embedded.duplicates[0].uuid")
+                        .value(workflowItem2.getItem().getID().toString()));
 
         // Another random user will NOT see this
         getClient(getAuthToken(anotherEPerson.getEmail(), password))
