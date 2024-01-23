@@ -3,7 +3,7 @@
     <groupId>org.dspace.modules</groupId>
     <artifactId>server</artifactId>
     <packaging>war</packaging>
-    <name>DSpace Server Webapp:: Local Customizations</name>
+    <name>DSpace Server Webapp:: Tomcat deployable WAR</name>
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>

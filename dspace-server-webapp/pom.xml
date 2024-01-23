@@ -76,9 +76,20 @@
                                 <resource>
                                     <directory>${basedir}/src/main/resources</directory>
                                     <includes>
-                                        <include>**/*.properties</include>
+                                        <include>**/*application*.properties</include>
+                                        <include>**/*dspace*.properties</include>
                                     </includes>
                                     <filtering>true</filtering>
+                                </resource>
+                                <resource>
+                                    <directory>${basedir}/src/main/resources</directory>
+                                    <excludes>
+                                        <exclude>**/*application*.properties</exclude>
+                                        <exclude>**/*dspace*.properties</exclude>
+                                    </excludes>
+                                    <includes>
+                                        <include>**/*.properties</include>
+                                    </includes>
                                 </resource>
                                 <resource>
                                     <directory>${basedir}/src/main/resources</directory>

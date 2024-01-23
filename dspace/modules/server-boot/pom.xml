@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace</groupId>
     <artifactId>server-boot</artifactId>
-    <name>DSpace Server Webapp:: Boot</name>
+    <name>DSpace Server Webapp:: Executable JAR</name>
 
     <!--
       A Parent POM that Maven inherits DSpace Default
