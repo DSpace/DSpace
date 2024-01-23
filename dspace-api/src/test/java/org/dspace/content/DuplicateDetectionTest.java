@@ -7,6 +7,7 @@
  */
 package org.dspace.content;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +22,7 @@ import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DuplicateDetectionService;
 import org.dspace.content.virtual.PotentialDuplicate;
+import org.dspace.discovery.SearchServiceException;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
@@ -30,6 +32,7 @@ import org.junit.Test;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNull;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  *
@@ -191,6 +194,47 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
                         .equals("dc.contributor.author"))
                 .map(MetadataValue::getValue).findFirst();
         assertThat("There should NOT be an author found", foundAuthor.isEmpty());
+
+    }
+
+    /**
+     * Test that a search for getPotentialDuplicates properly escapes Solr reserved characters
+     * e.g. +  -  &&  | |  !  ( )  { }  [ ]  ^  "  ~  *  ?  :  \
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testSearchDuplicatesWithReservedSolrCharacters() throws Exception {
+
+        Item item4 = ItemBuilder.createItem(context, col)
+                .withTitle("Testing: An Important Development Step")
+                .withIssueDate(item1IssueDate)
+                .withAuthor(item1Author)
+                .withSubject(item1Subject)
+                .build();
+        Item item5 = ItemBuilder.createItem(context, col)
+                .withTitle("Testing an important development step")
+                .withIssueDate("2012-10-17")
+                .withAuthor("Smith, Donald X.")
+                .withSubject("ExtraEntry 2")
+                .build();
+
+        // Get potential duplicates of item 4 and make sure no exceptions are thrown
+        List<PotentialDuplicate> potentialDuplicates = new ArrayList<>();
+        try {
+            potentialDuplicates = duplicateDetectionService.getPotentialDuplicates(context, item4);
+        } catch (SearchServiceException e) {
+            fail("Duplicate search with special characters should NOT result in search exception (" + e.getMessage() + ")");
+        }
+
+        // Make sure result list is size 1
+        int size = 1;
+        assertEquals("Potential duplicates of item1 should have size " + size,
+                size, potentialDuplicates.size());
+
+        // The only member should be item 5
+        assertEquals("Item 5 should be be the detected duplicate",
+                item5.getID(), potentialDuplicates.get(0).getUuid());
 
     }
 

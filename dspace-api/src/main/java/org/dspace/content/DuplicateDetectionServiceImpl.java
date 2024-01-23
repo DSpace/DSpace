@@ -272,6 +272,9 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
             // Get search service
             SearchService searchService = SearchUtils.getSearchService();
 
+            // Escape reserved solr characters
+            signature = searchService.escapeQueryChars(signature);
+
             // Construct discovery query based on signature
             DiscoverQuery discoverQuery = new DiscoverQuery();
             discoverQuery.setQuery("(" + configurationService.getProperty("duplicate.signature.field",
