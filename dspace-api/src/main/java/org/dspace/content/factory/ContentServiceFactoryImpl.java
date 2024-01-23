@@ -10,7 +10,6 @@ package org.dspace.content.factory;
 import java.util.List;
 
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.DuplicateDetectionServiceImpl;
 import org.dspace.content.RelationshipMetadataService;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;

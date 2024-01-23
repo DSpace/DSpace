@@ -11,36 +11,22 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
-import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DuplicateDetectionService;
 import org.dspace.content.virtual.PotentialDuplicate;
-import org.dspace.discovery.IndexingService;
-import org.dspace.discovery.SearchService;
-import org.dspace.discovery.SearchUtils;
-import org.dspace.discovery.indexobject.IndexableItem;
-import org.dspace.discovery.indexobject.IndexableWorkflowItem;
-import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.workflow.factory.WorkflowServiceFactory;
-import org.dspace.xmlworkflow.factory.XmlWorkflowFactory;
-import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
-import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import scala.concurrent.impl.FutureConvertersImpl;
 
-import static java.lang.Thread.sleep;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNull;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -52,13 +38,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * @author Kim Shepherd
  */
 public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase {
-
-    private GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-    private SearchService searchService = SearchUtils.getSearchService();
     private DuplicateDetectionService duplicateDetectionService = ContentServiceFactory.getInstance().getDuplicateDetectionService();
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-    private XmlWorkflowService workflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
-    private IndexingService indexingService = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("org.dspace.discovery.IndexingService", org.dspace.discovery.IndexingService.class);
     private Collection col;
     private Collection workflowCol;
     private Item item1;
@@ -69,6 +50,7 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
     private final String item1Title = "Public item I";
     private final String item1Author = "Smith, Donald";
 
+    private static final Logger log = LogManager.getLogger();
 
     @Before
     public void setUp() throws Exception {
@@ -83,11 +65,14 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
                 new String[]{"dc.date.issued", "dc.subject"});
 
         context.turnOffAuthorisationSystem();
+        context.setDispatcher("default");
 
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
         col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection").build();
-        workflowCol = CollectionBuilder.createCollection(context, parentCommunity).withName("Workflow Collection")
-                .withWorkflowGroup("reviewer", admin).build();
+        workflowCol = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Workflow Collection")
+                .withWorkflowGroup("reviewer", admin)
+                .build();
 
         // Ingest three example items with slightly different titles
         // item2 is 1 edit distance from item1 and item3
@@ -111,7 +96,7 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
                 .withSubject("ExtraEntry 3")
                 .build();
 
-        //context.setDispatcher("noindex");
+
     }
 
     /**
@@ -214,25 +199,18 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
         // Get potential duplicates of item 1:
         // Expected: Public item II should appear as it has the configured levenshtein distance of 1
         context.turnOffAuthorisationSystem();
-        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, workflowCol)
+        //context.setDispatcher("default");
+        XmlWorkflowItem workflowItem1 = WorkflowItemBuilder.createWorkflowItem(context, workflowCol)
                 .withTitle("Unique title")
                 .withSubmitter(eperson)
                 .build();
-        WorkspaceItem workspaceItem2 = WorkspaceItemBuilder.createWorkspaceItem(context, workflowCol)
+        XmlWorkflowItem workflowItem2 = WorkflowItemBuilder.createWorkflowItem(context, workflowCol)
                 .withTitle("Unique title")
                 .withSubmitter(eperson)
                 .build();
-        XmlWorkflowItem workflowItem1 = workflowService.start(context, workspaceItem);
-        XmlWorkflowItem workflowItem2 = workflowService.start(context, workspaceItem2);
 
-        // Force reindex of these workflow items, as test framework appears not to do this by default?
-        indexingService.reIndexContent(context, new IndexableItem(workflowItem1.getItem()));
-        indexingService.reIndexContent(context, new IndexableItem(workflowItem2.getItem()));
-
+        //indexingService.commit();
         context.restoreAuthSystemState();
-
-        sleep(3600);
-
         context.setCurrentUser(admin);
         List<PotentialDuplicate> potentialDuplicates = duplicateDetectionService.getPotentialDuplicates(context, workflowItem1.getItem());
 

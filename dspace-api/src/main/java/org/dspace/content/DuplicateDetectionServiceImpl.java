@@ -39,7 +39,6 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.workflow.WorkflowItem;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -131,7 +130,8 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
      * @throws AuthorizeException
      */
     @Override
-    public Optional<PotentialDuplicate> validateDuplicateResult(Context context, IndexableObject indexableObject, Item original)
+    public Optional<PotentialDuplicate> validateDuplicateResult(Context context, IndexableObject indexableObject,
+                                                                Item original)
             throws SQLException,
             AuthorizeException {
 
@@ -144,7 +144,6 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
         // what submission / archived state it is in
         if (indexableObject instanceof IndexableWorkspaceItem) {
             workspaceItem = ((IndexableWorkspaceItem) indexableObject).getIndexedObject();
-            log.info("ITS A WORKSPACE ITEM ITS A WORKSPACE ITEM " + workspaceItem.getItem().getName());
             // Only process workspace items that belong to the submitter
             if (workspaceItem != null && workspaceItem.getSubmitter() != null
                     && workspaceItem.getSubmitter().equals(context.getCurrentUser())) {
@@ -153,14 +152,12 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
         }
         if (indexableObject instanceof IndexableWorkflowItem) {
             workflowItem = ((IndexableWorkflowItem) indexableObject).getIndexedObject();
-            log.info("ITS A WORKFLOW ITEM ITS A WORKFLOW ITEM " + workflowItem.getItem().getName());
             if (workflowItem != null) {
                 resultItem = workflowItem.getItem();
             }
         }
         if (indexableObject instanceof IndexableItem) {
             resultItem = ((IndexableItem) indexableObject).getIndexedObject();
-            log.info("NORMAL ITEM FOUND " + resultItem.getName());
             // Attempt resolution of workflow or workspace items, tested later
             workflowItem = workflowItemService.findByItem(context, resultItem);
             workspaceItem = workspaceItemService.findByItem(context, resultItem);
@@ -184,8 +181,7 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
         VersionHistory candiateVersionHistory = versionHistoryService.findByItem(context, resultItem);
         // if the versionHistory is null, either versioning is switched off or the item doesn't have
         // multiple versions
-        if (versionHistory != null && versionHistory.equals(candiateVersionHistory))
-        {
+        if (versionHistory != null && versionHistory.equals(candiateVersionHistory)) {
             log.warn("skipping item that is just another version of this item");
             return Optional.empty();
         }
@@ -218,12 +214,10 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
         // More authorisation checks
         if (workflowItem != null) {
             Collection c = workflowItem.getCollection();
-            log.info("INSPECITG WORKFLOW ITEM " + workflowItem.getItem().getName() + " WITH EPERSON " + context.getCurrentUser().getName());
             if (groupService.isMember(context, context.getCurrentUser(), c.getWorkflowStep1(context)) ||
                     groupService.isMember(context, context.getCurrentUser(), c.getWorkflowStep2(context)) ||
                     groupService.isMember(context, context.getCurrentUser(), c.getWorkflowStep3(context))) {
                 // Current user is a member of one of the workflow role groups
-                log.info("WORKFLOW REVIEWER CAN SEE " + workflowItem.getID());
                 potentialDuplicate.setWorkflowItemId(workflowItem.getID());
                 return Optional.of(potentialDuplicate);
             }
@@ -286,7 +280,7 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
             // Add filter queries for the resource type
             discoverQuery.addFilterQueries("(search.resourcetype:Item OR " +
                     "search.resourcetype:WorkspaceItem OR " +
-                    "search.resourcetype:WorkflowItem)");
+                    "search.resourcetype:XmlWorkflowItem OR search.resourcetype:WorkflowItem)");
             // Skip this item itself so it isn't a false positive
             discoverQuery.addFilterQueries("-search.resourceid:" + item.getID());
 

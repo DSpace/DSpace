@@ -7,13 +7,12 @@
  */
 package org.dspace.app.rest.repository;
 
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
-
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.Nullable;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
