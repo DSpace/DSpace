@@ -32,7 +32,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.I18nUtil;
 import org.dspace.discovery.IndexingService;
-import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
@@ -46,7 +45,6 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static java.lang.Thread.sleep;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -396,20 +394,15 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
                 .withWorkflowGroup("reviewer", admin)
                 .build();
 
-        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, workflowCol)
+        XmlWorkflowItem workflowItem1 = WorkflowItemBuilder.createWorkflowItem(context, workflowCol)
+                .withTitle("Unique title")
+                .withSubmitter(anotherEPerson)
+                .build();
+        XmlWorkflowItem workflowItem2 = WorkflowItemBuilder.createWorkflowItem(context, workflowCol)
                 .withTitle("Unique title")
                 .withSubmitter(eperson)
                 .build();
-        WorkspaceItem workspaceItem2 = WorkspaceItemBuilder.createWorkspaceItem(context, workflowCol)
-                .withTitle("Unique title")
-                .withSubmitter(eperson)
-                .build();
-        XmlWorkflowItem workflowItem1 = workflowService.start(context, workspaceItem);
-        XmlWorkflowItem workflowItem2 = workflowService.start(context, workspaceItem2);
-        indexingService.reIndexContent(context, new IndexableItem(workflowItem1.getItem()));
-        indexingService.reIndexContent(context, new IndexableItem(workflowItem2.getItem()));
         context.restoreAuthSystemState();
-        sleep(3600);
 
         context.setCurrentUser(admin);
         String reviewerToken = getAuthToken(admin.getEmail(), password);
