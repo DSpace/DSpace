@@ -123,7 +123,7 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
         checkItemsPresentInFile(filename, itemsSubject1);
 
 
-        result = runDSpaceScript("metadata-export-search", "-q", "subject: " + subject2, "-n", filename);
+        result = runDSpaceScript("metadata-export-search", "-q", "subject:" + subject2, "-n", filename);
 
         assertEquals(0, result);
         checkItemsPresentInFile(filename, itemsSubject2);

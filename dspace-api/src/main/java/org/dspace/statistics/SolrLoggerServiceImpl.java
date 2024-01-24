@@ -1194,7 +1194,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                     first = false;
                 }
 
-                query.append(" NOT(ip: ").append(ip).append(")");
+                query.append(" NOT(ip:").append(ip).append(")");
             }
             filterQuery = query.toString();
         }
