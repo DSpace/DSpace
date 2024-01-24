@@ -8,18 +8,26 @@
 package org.dspace.correctiontype;
 
 import static org.dspace.content.QAEvent.DSPACE_USERS_SOURCE;
+import static org.dspace.correctiontype.WithdrawnCorrectionType.WITHDRAWAL_REINSTATE_GROUP;
 
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.Objects;
+import java.util.UUID;
 
 import com.google.gson.Gson;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
 import org.dspace.core.Context;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.qaevent.service.QAEventService;
 import org.dspace.qaevent.service.dto.CorrectionTypeMessageDTO;
 import org.dspace.qaevent.service.dto.QAMessageDTO;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -36,15 +44,34 @@ public class ReinstateCorrectionType implements CorrectionType, InitializingBean
     private String creationForm;
 
     @Autowired
+    private GroupService groupService;
+    @Autowired
     private QAEventService qaEventService;
+    @Autowired
+    private AuthorizeService authorizeService;
+    @Autowired
+    private ConfigurationService configurationService;
 
     @Override
     public boolean isAllowed(Context context, Item targetItem) throws SQLException {
         if (!targetItem.isWithdrawn()) {
             return false;
         }
+        boolean isAdmin = authorizeService.isAdmin(context);
+        if (!currentUserIsMemberOfwithdrawalReinstateGroup(context) && !isAdmin) {
+            return false;
+        }
         long tot = qaEventService.countSourcesByTarget(context, targetItem.getID());
         return tot == 0;
+    }
+
+    private boolean currentUserIsMemberOfwithdrawalReinstateGroup(Context context) throws SQLException {
+        String withdrawalReinstateGroupUUID = configurationService.getProperty(WITHDRAWAL_REINSTATE_GROUP);
+        if (StringUtils.isBlank(withdrawalReinstateGroupUUID)) {
+            return false;
+        }
+        Group withdrawalReinstateGroup = groupService.find(context, UUID.fromString(withdrawalReinstateGroupUUID));
+        return Objects.nonNull(withdrawalReinstateGroup) && groupService.isMember(context, withdrawalReinstateGroup);
     }
 
     @Override

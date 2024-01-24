@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,6 +42,8 @@ import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.QAEvent;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.qaevent.QASource;
 import org.dspace.qaevent.QATopic;
@@ -50,6 +53,8 @@ import org.dspace.qaevent.service.QAEventSecurityService;
 import org.dspace.qaevent.service.QAEventService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -62,6 +67,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  */
 public class QAEventServiceImpl implements QAEventService {
+
+    private static final Logger log = LoggerFactory.getLogger(QAEventServiceImpl.class);
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;
@@ -306,9 +313,24 @@ public class QAEventServiceImpl implements QAEventService {
                 updateRequest.process(getSolr());
 
                 getSolr().commit();
+                sentEmailToAdminAboutNewRequest(dto);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public void sentEmailToAdminAboutNewRequest(QAEvent qaEvent) {
+        try {
+            Email email = Email.getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), "qaevent_admin_notification"));
+            email.addRecipient(configurationService.getProperty("mail.admin"));
+            email.addArgument(qaEvent.getTopic());
+            email.addArgument(qaEvent.getTarget());
+            email.addArgument(qaEvent.getMessage());
+            email.send();
+        } catch (Exception e) {
+            log.warn("Error during sending email of Withdrawn/Reinstate request for item with uuid:"
+                     + qaEvent.getTarget(), e);
         }
     }
 
