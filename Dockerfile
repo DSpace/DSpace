@@ -19,7 +19,7 @@ RUN mkdir /install \
 USER dspace
 # Copy the DSpace source code (from local machine) into the workdir (excluding .dockerignore contents)
 ADD --chown=dspace . /app/
-# Build DSpace (note: this build doesn't include the optional, deprecated "dspace-rest" webapp)
+# Build DSpace
 # Copy the dspace-installer directory to /install.  Clean up the build to keep the docker image small
 # Maven flags here ensure that we skip building test environment and skip all code verification checks.
 # These flags speed up this compilation as much as reasonably possible.
