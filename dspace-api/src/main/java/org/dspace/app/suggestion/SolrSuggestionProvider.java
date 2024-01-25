@@ -129,7 +129,7 @@ public abstract class SolrSuggestionProvider implements SuggestionProvider {
     }
 
     /**
-     *
+     * check if the externalDataObject may have suggestion
      * @param context
      * @param externalDataObject
      * @return true if the externalDataObject could be suggested by this provider

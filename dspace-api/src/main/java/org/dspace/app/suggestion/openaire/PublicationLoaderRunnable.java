@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.suggestion.oaire;
+package org.dspace.app.suggestion.openaire;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +46,7 @@ public class PublicationLoaderRunnable
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public PublicationLoaderScriptConfiguration<PublicationLoaderRunnable> getScriptConfiguration() {
         PublicationLoaderScriptConfiguration configuration = new DSpace().getServiceManager()
-                .getServiceByName("import-oaire-suggestions", PublicationLoaderScriptConfiguration.class);
+                .getServiceByName("import-openaire-suggestions", PublicationLoaderScriptConfiguration.class);
         return configuration;
     }
 
@@ -69,8 +69,12 @@ public class PublicationLoaderRunnable
 
         context = new Context();
 
-        List<Item> researchers = getResearchers(profile);
-
+        List<Item> researchers = new ArrayList<Item>();
+        if (profile != null) {
+            researchers = getResearcher(profile);
+        } else {
+            researchers = getResearchers();
+        }
         for (Item researcher : researchers) {
 
             oairePublicationLoader.importAuthorRecords(context, researcher);
@@ -89,17 +93,27 @@ public class PublicationLoaderRunnable
      * @return             the researcher with specified UUID or all researchers
      */
     @SuppressWarnings("rawtypes")
-    private List<Item> getResearchers(String profileUUID) {
+    private List<Item> getResearcher(String profileUUID) {
         final UUID uuid = profileUUID != null ? UUID.fromString(profileUUID) : null;
         SearchService searchService = new DSpace().getSingletonService(SearchService.class);
-        List<IndexableObject> objects = null;
-        if (uuid != null) {
-            objects = searchService.search(context, "search.resourceid:" + uuid.toString(),
-                "lastModified", false, 0, 1000, "search.resourcetype:Item", "dspace.entity.type:Person");
-        } else {
-            objects = searchService.search(context, "*:*", "lastModified", false, 0, 1000, "search.resourcetype:Item",
-                    "dspace.entity.type:Person");
+        List<IndexableObject> objects = searchService.search(context, "search.resourceid:" + uuid.toString(),
+                "lastModified", false, 0, 1, "search.resourcetype:Item", "dspace.entity.type:Person");
+        List<Item> items = new ArrayList<Item>();
+        if (objects != null) {
+            for (IndexableObject o : objects) {
+                items.add((Item) o.getIndexedObject());
+            }
         }
+        LOGGER.info("Found " + items.size() + " researcher(s)");
+        return items;
+    }
+
+    @SuppressWarnings("rawtypes")
+    private List<Item> getResearchers() {
+        List<IndexableObject> objects = null;
+        SearchService searchService = new DSpace().getSingletonService(SearchService.class);
+        objects = searchService.search(context, "*:*", "lastModified", false, 0,
+            Integer.MAX_VALUE, "search.resourcetype:Item", "dspace.entity.type:Person");
         List<Item> items = new ArrayList<Item>();
         if (objects != null) {
             for (IndexableObject o : objects) {

@@ -5,18 +5,15 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.suggestion.oaire;
+package org.dspace.app.suggestion.openaire;
 
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 import org.dspace.app.suggestion.SuggestionEvidence;
 import org.dspace.app.suggestion.SuggestionUtils;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.util.MultiFormatDateParser;
@@ -33,7 +30,7 @@ public class DateScorer implements EvidenceScorer {
 
     private String birthDateMetadata;
 
-    private String educationDateMetadata;
+    //private String educationDateMetadata;
 
     private String minDateMetadata;
 
@@ -61,7 +58,7 @@ public class DateScorer implements EvidenceScorer {
     public String getBirthDateMetadata() {
         return birthDateMetadata;
     }
-
+    /*
     public void setEducationDateMetadata(String educationDate) {
         this.educationDateMetadata = educationDate;
     }
@@ -69,6 +66,7 @@ public class DateScorer implements EvidenceScorer {
     public String getEducationDateMetadata() {
         return educationDateMetadata;
     }
+    */
 
     public void setBirthDateDelta(int birthDateDelta) {
         this.birthDateDelta = birthDateDelta;
@@ -139,6 +137,12 @@ public class DateScorer implements EvidenceScorer {
         }
     }
 
+    /**
+     * returns min and max year interval in between it's probably that the researcher
+     * actually contributed to the suggested item
+     * @param researcher
+     * @return
+     */
     private Integer[] calculateRange(Item researcher) {
         String minDateStr = getSingleValue(researcher, minDateMetadata);
         int minYear = getYear(minDateStr);
@@ -149,11 +153,14 @@ public class DateScorer implements EvidenceScorer {
         } else {
             String birthDateStr = getSingleValue(researcher, birthDateMetadata);
             int birthDateYear = getYear(birthDateStr);
-            int educationDateYear = getListMetadataValues(researcher, educationDateMetadata)
-                      .stream()
-                      .mapToInt(x -> getYear(x.getValue()))
-                      .filter(d -> d > 0)
-                      .min().orElse(-1);
+            int educationDateYear = -1;
+            /*
+            getListMetadataValues(researcher, educationDateMetadata)
+              .stream()
+              .mapToInt(x -> getYear(x.getValue()))
+              .filter(d -> d > 0)
+              .min().orElse(-1);
+            */
             if (educationDateYear > 0) {
                 return new Integer[] {
                     minYear > 0 ? minYear : educationDateYear + educationDateDelta,
@@ -170,6 +177,7 @@ public class DateScorer implements EvidenceScorer {
         }
     }
 
+    /*
     private List<MetadataValue> getListMetadataValues(Item researcher, String metadataKey) {
         if (metadataKey != null) {
             return itemService.getMetadataByMetadataString(researcher, metadataKey);
@@ -177,6 +185,7 @@ public class DateScorer implements EvidenceScorer {
             return Collections.EMPTY_LIST;
         }
     }
+    */
 
     private String getSingleValue(Item researcher, String metadataKey) {
         if (metadataKey != null) {

@@ -30,8 +30,9 @@ import org.springframework.stereotype.Component;
 
 /**
  *
- * An authenticated user is allowed to view a suggestion for the data that his
- * own. This {@link RestPermissionEvaluatorPlugin} implements that requirement.
+ * An authenticated user is allowed to view a suggestion
+ * related to a Target object that he owns (as defined by "dspace.object.owner" metadata field)
+ * See {@link RestPermissionEvaluatorPlugin} for the inherited contract.
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *

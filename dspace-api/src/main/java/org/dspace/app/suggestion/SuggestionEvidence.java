@@ -14,10 +14,13 @@ package org.dspace.app.suggestion;
  */
 public class SuggestionEvidence {
 
+    /** name of the evidence */
     private String name;
 
+    /** score of the evidence */
     private double score;
 
+    /** additional notes */
     private String notes;
 
     public SuggestionEvidence() {

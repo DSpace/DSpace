@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.suggestion.oaire;
+package org.dspace.app.suggestion.openaire;
 
 import static org.dspace.app.suggestion.SuggestionUtils.getAllEntriesByMetadatum;
 import static org.dspace.app.suggestion.SuggestionUtils.getFirstEntryByMetadatum;
@@ -66,7 +66,7 @@ public class PublicationLoader extends SolrSuggestionProvider {
      * This method filter a list of ImportRecords using a pipeline of AuthorNamesApprover
      * and return a filtered list of ImportRecords.
      * 
-     * @see org.dspace.app.suggestion.oaire.AuthorNamesScorer
+     * @see org.dspace.app.suggestion.openaire.AuthorNamesScorer
      * @param researcher the researcher Item
      * @param importRecords List of import record
      * @return a list of filtered import records

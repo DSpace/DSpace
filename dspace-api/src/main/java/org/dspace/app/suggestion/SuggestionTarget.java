@@ -16,10 +16,13 @@ import org.dspace.content.Item;
  */
 public class SuggestionTarget {
 
+    /** the item targeted */
     private Item target;
 
+    /** source name of the suggestion */
     private String source;
 
+    /** total count of suggestions for same target and source */
     private int total;
 
     public SuggestionTarget() {

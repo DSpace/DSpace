@@ -14,8 +14,10 @@ package org.dspace.app.suggestion;
  */
 public class SuggestionSource {
 
+    /** source name of the suggestion */
     private String name;
 
+    /** number of targeted items */
     private int total;
 
     public SuggestionSource() {

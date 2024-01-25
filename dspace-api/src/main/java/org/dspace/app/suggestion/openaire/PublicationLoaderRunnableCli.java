@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.suggestion.oaire;
+package org.dspace.app.suggestion.openaire;
 
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.ParseException;
@@ -17,7 +17,7 @@ public class PublicationLoaderRunnableCli extends PublicationLoaderRunnable {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public PublicationLoaderCliScriptConfiguration getScriptConfiguration() {
         PublicationLoaderCliScriptConfiguration configuration = new DSpace().getServiceManager()
-                .getServiceByName("import-oaire-suggestions", PublicationLoaderCliScriptConfiguration.class);
+                .getServiceByName("import-openaire-suggestions", PublicationLoaderCliScriptConfiguration.class);
         return configuration;
     }
 
@@ -28,7 +28,7 @@ public class PublicationLoaderRunnableCli extends PublicationLoaderRunnable {
         // in case of CLI we show the help prompt
         if (commandLine.hasOption('h')) {
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("Import Readearchers Suggestions", getScriptConfiguration().getOptions());
+            formatter.printHelp("Import Researchers Suggestions", getScriptConfiguration().getOptions());
             System.exit(0);
         }
     }

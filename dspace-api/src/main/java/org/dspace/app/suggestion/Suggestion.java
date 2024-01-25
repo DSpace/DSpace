@@ -14,26 +14,36 @@ import org.dspace.content.Item;
 import org.dspace.content.dto.MetadataValueDTO;
 
 /**
- * 
+ * This entity contains metadatas that should be added to the targeted Item
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class Suggestion {
 
+    /** id of the suggestion */
     private String id;
 
+    /** the dc.title of the item */
     private String display;
 
+    /** the external source name the suggestion comes from */
     private String source;
 
+    /** external uri of the item */
     private String externalSourceUri;
 
+    /** item targeted by this suggestion */
     private Item target;
 
     private List<SuggestionEvidence> evidences = new LinkedList<SuggestionEvidence>();
 
     private List<MetadataValueDTO> metadata = new LinkedList<MetadataValueDTO>();
 
+    /** suggestion creation
+     * @param source name of the external source
+     * @param target the targeted item in repository
+     * @param idPart external item id, used mainly for suggestion @see #id creation
+     * */
     public Suggestion(String source, Item target, String idPart) {
         this.source = source;
         this.target = target;

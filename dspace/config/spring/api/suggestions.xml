@@ -21,7 +21,7 @@
 	    <entry key="openaire" value-ref="OpenairePublicationLoader" />
 	</util:map>
 
-    <bean id="OpenairePublicationLoader" class="org.dspace.app.suggestion.oaire.PublicationLoader">
+    <bean id="OpenairePublicationLoader" class="org.dspace.app.suggestion.openaire.PublicationLoader">
         <property name="sourceName" value="openaire" />
         <property name="primaryProvider" ref="openaireLiveImportDataProviderByAuthor" />
         <property name="otherProviders">
@@ -37,7 +37,7 @@
         <property name="pipeline">
             <list>
                 <bean
-                    class="org.dspace.app.suggestion.oaire.AuthorNamesScorer">
+                    class="org.dspace.app.suggestion.openaire.AuthorNamesScorer">
                     <property name="contributorMetadata">
                         <list>
                             <value>dc.contributor.author</value>
@@ -50,9 +50,9 @@
                     </property>
                 </bean>
                 <bean
-                    class="org.dspace.app.suggestion.oaire.DateScorer">
+                    class="org.dspace.app.suggestion.openaire.DateScorer">
                     <property name="birthDateMetadata" value="person.birthDate" />
-                    <property name="educationDateMetadata" value="crisrp.education.end" />
+                    <!-- <property name="educationDateMetadata" value="crisrp.education.end" /> -->
                     <property name="publicationDateMetadata" value="dc.date.issued" />
                 </bean>    
             </list>
