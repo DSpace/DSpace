@@ -8,15 +8,20 @@
 package org.dspace.app.suggestion.openaire;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.dspace.discovery.IndexableObject;
+import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SearchServiceException;
+import org.dspace.discovery.SearchUtils;
+import org.dspace.discovery.utils.DiscoverQueryBuilder;
+import org.dspace.discovery.utils.parameter.QueryBuilderSearchFilter;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.sort.SortOption;
 import org.dspace.utils.DSpace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,14 +74,9 @@ public class PublicationLoaderRunnable
 
         context = new Context();
 
-        List<Item> researchers = new ArrayList<Item>();
-        if (profile != null) {
-            researchers = getResearcher(profile);
-        } else {
-            researchers = getResearchers();
-        }
-        for (Item researcher : researchers) {
-
+        Iterator<Item> researchers = getResearchers(profile);
+        while (researchers.hasNext()) {
+            Item researcher = researchers.next();
             oairePublicationLoader.importAuthorRecords(context, researcher);
         }
 
@@ -93,34 +93,24 @@ public class PublicationLoaderRunnable
      * @return             the researcher with specified UUID or all researchers
      */
     @SuppressWarnings("rawtypes")
-    private List<Item> getResearcher(String profileUUID) {
-        final UUID uuid = profileUUID != null ? UUID.fromString(profileUUID) : null;
+    private Iterator<Item> getResearchers(String profileUUID) {
         SearchService searchService = new DSpace().getSingletonService(SearchService.class);
-        List<IndexableObject> objects = searchService.search(context, "search.resourceid:" + uuid.toString(),
-                "lastModified", false, 0, 1, "search.resourcetype:Item", "dspace.entity.type:Person");
-        List<Item> items = new ArrayList<Item>();
-        if (objects != null) {
-            for (IndexableObject o : objects) {
-                items.add((Item) o.getIndexedObject());
-            }
+        DiscoverQueryBuilder queryBuilder = SearchUtils.getQueryBuilder();
+        List<QueryBuilderSearchFilter> filters = new ArrayList<QueryBuilderSearchFilter>();
+        if (profileUUID != null) {
+            QueryBuilderSearchFilter queryBuilderSearchFilter =
+                new QueryBuilderSearchFilter("search.resourceid", "equals", profileUUID.toString());
+            filters.add(queryBuilderSearchFilter);
         }
-        LOGGER.info("Found " + items.size() + " researcher(s)");
-        return items;
-    }
-
-    @SuppressWarnings("rawtypes")
-    private List<Item> getResearchers() {
-        List<IndexableObject> objects = null;
-        SearchService searchService = new DSpace().getSingletonService(SearchService.class);
-        objects = searchService.search(context, "*:*", "lastModified", false, 0,
-            Integer.MAX_VALUE, "search.resourcetype:Item", "dspace.entity.type:Person");
-        List<Item> items = new ArrayList<Item>();
-        if (objects != null) {
-            for (IndexableObject o : objects) {
-                items.add((Item) o.getIndexedObject());
-            }
+        try {
+            DiscoverQuery discoverQuery = queryBuilder.buildQuery(context, null,
+                SearchUtils.getDiscoveryConfigurationByName("person"),
+                "*:*", filters,
+                "Item", 10, Long.getLong("0"), null, SortOption.DESCENDING);
+            return searchService.iteratorSearch(context, null, discoverQuery);
+        } catch (SearchServiceException e) {
+            LOGGER.error("Unable to read researcher on solr", e);
         }
-        LOGGER.info("Found " + items.size() + " researcher(s)");
-        return items;
+        return null;
     }
 }
