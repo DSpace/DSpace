@@ -2,7 +2,6 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-server-webapp</artifactId>
-    <packaging>war</packaging>
     <name>DSpace Server Webapp</name>
     <description>
         DSpace Server Webapp (Spring Boot)
@@ -25,23 +24,82 @@
 
         <!-- Default resource delimiter for Spring Boot, so it doesn't clash with Spring ${} placeholders-->
         <resource.delimiter>@</resource.delimiter>
-        <!-- Define our starting class for our Spring Boot Application -->
-        <start-class>org.dspace.app.rest.Application</start-class>
     </properties>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <configuration>
-                    <attachClasses>true</attachClasses>
-                    <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
-                    <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
-                </configuration>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.1.0</version>
                 <executions>
                     <execution>
-                        <phase>prepare-package</phase>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>${root.basedir}/dspace/config/dspace.cfg</file>
+                                <file>${root.basedir}/dspace/config/local.cfg</file>
+                            </files>
+                            <quiet>true</quiet>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>testEnvironment</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>testResources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/test/resources</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>webappFiltering</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/main/resources</directory>
+                                    <includes>
+                                        <include>**/*application*.properties</include>
+                                        <include>**/*dspace*.properties</include>
+                                    </includes>
+                                    <filtering>true</filtering>
+                                </resource>
+                                <resource>
+                                    <directory>${basedir}/src/main/resources</directory>
+                                    <excludes>
+                                        <exclude>**/*application*.properties</exclude>
+                                        <exclude>**/*dspace*.properties</exclude>
+                                    </excludes>
+                                    <includes>
+                                        <include>**/*.properties</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>${basedir}/src/main/resources</directory>
+                                    <includes>
+                                        <include>**/static/**</include>
+                                        <include>**/spring/**</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -66,11 +124,11 @@
                         <exclude>**/src/test/resources/**</exclude>
                         <exclude>**/src/test/data/**</exclude>
                         <!--Skip license check of third party files included/customized from HAL Browser -->
-                        <exclude>src/main/webapp/index.html</exclude>
-                        <exclude>src/main/webapp/login.html</exclude>
-                        <exclude>src/main/webapp/styles.css</exclude>
-                        <exclude>src/main/webapp/js/hal/**</exclude>
-                        <exclude>src/main/webapp/js/vendor/**</exclude>
+                        <exclude>src/main/resources/static/index.html</exclude>
+                        <exclude>src/main/resources/static/login.html</exclude>
+                        <exclude>src/main/resources/static/styles.css</exclude>
+                        <exclude>src/main/resources/static/js/hal/**</exclude>
+                        <exclude>src/main/resources/static/js/vendor/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -252,12 +310,6 @@
                     <artifactId>hibernate-validator</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-            <scope>provided</scope>
-            <version>${spring-boot.version}</version>
         </dependency>
 
         <dependency>
@@ -484,12 +536,10 @@
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path-assert</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

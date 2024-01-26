@@ -20,6 +20,8 @@ import org.dspace.services.model.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +31,7 @@ import org.springframework.stereotype.Component;
  * the authenticated EPerson is allowed to perform the requested action.
  */
 @Component
+@Order(value = Ordered.HIGHEST_PRECEDENCE)
 public class AdminRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
     private static final Logger log = LoggerFactory.getLogger(RestObjectPermissionEvaluatorPlugin.class);
