@@ -81,7 +81,7 @@ public class FeedbackRestRepository extends DSpaceRestRepository<FeedbackRest, I
 
         String pageUrl = feedbackRest.getPage();
         String urlPrefix = configurationService.getProperty("dspace.ui.url");
-        if (! StringUtils.startsWith(pageUrl, urlPrefix)) {
+        if (StringUtils.isNotBlank(pageUrl) && ! StringUtils.startsWith(pageUrl, urlPrefix)) {
             throw new DSpaceBadRequestException("unexpected page url was submitted");
         }
 
