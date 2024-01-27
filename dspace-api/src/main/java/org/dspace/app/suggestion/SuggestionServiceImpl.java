@@ -76,6 +76,7 @@ public class SuggestionServiceImpl implements SuggestionService {
     public List<SuggestionTarget> findByTarget(Context context, UUID target, int pageSize, long offset) {
         List<SuggestionTarget> fullSourceTargets = new ArrayList<SuggestionTarget>();
         for (String source : providersMap.keySet()) {
+            // all the suggestion target will be related to the same target (i.e. the same researcher - person item)
             SuggestionTarget sTarget = providersMap.get(source).findTarget(context, target);
             if (sTarget != null && sTarget.getTotal() > 0) {
                 fullSourceTargets.add(sTarget);
@@ -88,6 +89,8 @@ public class SuggestionServiceImpl implements SuggestionService {
             }
         }
         );
+        // this list will be as large as the number of sources available in the repository so it is unlikely that
+        // real pagination will occur
         return fullSourceTargets.stream().skip(offset).limit(pageSize).collect(Collectors.toList());
     }
 
