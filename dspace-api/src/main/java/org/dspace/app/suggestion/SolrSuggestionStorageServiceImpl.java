@@ -38,6 +38,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.FacetParams;
 import org.dspace.content.Item;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.content.service.ItemService;
@@ -250,16 +251,13 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
         solrQuery.setFacet(true);
         solrQuery.setFacetMinCount(1);
         solrQuery.addFacetField(TARGET_ID);
-        solrQuery.setFacetLimit((int) (pageSize + offset));
+        solrQuery.setParam(FacetParams.FACET_OFFSET, String.valueOf(offset));
+        solrQuery.setFacetLimit((int) (pageSize));
         QueryResponse response = getSolr().query(solrQuery);
         FacetField facetField = response.getFacetField(TARGET_ID);
         List<SuggestionTarget> suggestionTargets = new ArrayList<SuggestionTarget>();
         int idx = 0;
         for (Count c : facetField.getValues()) {
-            if (idx < offset) {
-                idx++;
-                continue;
-            }
             SuggestionTarget target = new SuggestionTarget();
             target.setSource(source);
             target.setTotal((int) c.getCount());
