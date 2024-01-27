@@ -70,6 +70,7 @@ public class FacetValueMatcher {
         );
     }
 
+
     public static Matcher<? super Object> entrySubjectWithAuthority(String label, String authority, int count) {
         return allOf(
             hasJsonPath("$.authorityKey", is(authority)),

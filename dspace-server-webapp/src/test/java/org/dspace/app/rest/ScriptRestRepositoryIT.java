@@ -45,6 +45,7 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.ProcessBuilder;
@@ -54,6 +55,7 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.ProcessStatus;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.scripts.DSpaceCommandLineParameter;
 import org.dspace.scripts.Process;
@@ -364,9 +366,39 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
      */
     @Test
     public void postProcessNonAdminAuthorizeException() throws Exception {
-        String token = getAuthToken(eperson.getEmail(), password);
+        context.turnOffAuthorisationSystem();
+        EPerson comAdmin = EPersonBuilder.createEPerson(context)
+                .withEmail("comAdmin@example.com")
+                .withPassword(password).build();
+        EPerson colAdmin = EPersonBuilder.createEPerson(context)
+                .withEmail("colAdmin@example.com")
+                .withPassword(password).build();
+        EPerson itemAdmin = EPersonBuilder.createEPerson(context)
+                .withEmail("itemAdmin@example.com")
+                .withPassword(password).build();
+        Community community = CommunityBuilder.createCommunity(context)
+                                          .withName("Community")
+                                          .withAdminGroup(comAdmin)
+                                          .build();
+        Collection collection = CollectionBuilder.createCollection(context, community)
+                                                .withName("Collection")
+                                                .withAdminGroup(colAdmin)
+                                                .build();
+        Item item = ItemBuilder.createItem(context, collection).withAdminUser(itemAdmin)
+                                .withTitle("Test item to curate").build();
+        context.restoreAuthSystemState();
 
+        String token = getAuthToken(eperson.getEmail(), password);
+        String comAdmin_token = getAuthToken(eperson.getEmail(), password);
+        String colAdmin_token = getAuthToken(eperson.getEmail(), password);
+        String itemAdmin_token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(multipart("/api/system/scripts/mock-script/processes"))
+                        .andExpect(status().isForbidden());
+        getClient(comAdmin_token).perform(multipart("/api/system/scripts/mock-script/processes"))
+                        .andExpect(status().isForbidden());
+        getClient(colAdmin_token).perform(multipart("/api/system/scripts/mock-script/processes"))
+                        .andExpect(status().isForbidden());
+        getClient(itemAdmin_token).perform(multipart("/api/system/scripts/mock-script/processes"))
                         .andExpect(status().isForbidden());
     }
 
@@ -436,7 +468,7 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
         String token = getAuthToken(admin.getEmail(), password);
 
         getClient(token).perform(multipart("/api/system/scripts/mock-script-invalid/processes"))
-                        .andExpect(status().isBadRequest());
+                        .andExpect(status().isNotFound());
     }
 
     @Test
@@ -721,7 +753,6 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
             ProcessBuilder.deleteProcess(idRef.get());
         }
     }
-
 
     @After
     public void destroy() throws Exception {

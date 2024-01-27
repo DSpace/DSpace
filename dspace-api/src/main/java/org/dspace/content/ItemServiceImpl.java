@@ -295,9 +295,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         return itemDAO.findAll(context, true, true);
     }
 
+    @Override
     public Iterator<Item> findAllRegularItems(Context context) throws SQLException {
         return itemDAO.findAllRegularItems(context);
-    };
+    }
 
     @Override
     public Iterator<Item> findAllRegularItems(Context context) throws SQLException {

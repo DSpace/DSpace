@@ -321,11 +321,12 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         try {
             metadataFieldRest = new ObjectMapper().readValue(jsonNode.toString(), MetadataFieldRest.class);
         } catch (JsonProcessingException e) {
-            throw new UnprocessableEntityException("Cannot parse JSON in request body", e);
+            throw new DSpaceBadRequestException("Cannot parse JSON in request body", e);
         }
 
-        if (metadataFieldRest == null || isBlank(metadataFieldRest.getElement())) {
-            throw new UnprocessableEntityException("metadata element (in request body) cannot be blank");
+        MetadataField metadataField = metadataFieldService.find(context, id);
+        if (metadataField == null) {
+            throw new UnprocessableEntityException("metadata field with id: " + id + " not found");
         }
 
         if (!Objects.equals(metadataFieldRest.getElement(), metadataField.getElement())) {

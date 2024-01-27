@@ -6,7 +6,6 @@
 
     <bean id="iiifCanvasDimensionServiceFactory" class="org.dspace.iiif.canvasdimension.factory.IIIFCanvasDimensionServiceFactoryImpl"/>
     <bean class="org.dspace.iiif.canvasdimension.IIIFCanvasDimensionServiceImpl" scope="prototype"/>
-    <bean class="org.dspace.iiif.MockIIIFApiQueryServiceImpl" id="org.dspace.iiif.IIIFApiQueryServiceImpl"
+    <bean class="org.dspace.iiif.MockIIIFApiQueryServiceImpl" id="org.dspace.iiif.IIIFApiQueryService"
           autowire-candidate="true"/>
-
 </beans>

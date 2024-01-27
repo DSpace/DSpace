@@ -140,6 +140,9 @@ public class CMDIFileBundleMaintainerTest extends AbstractDSpaceObjectTest {
         // Allow Bitstream DELETE perms
         doNothing().when(authorizeServiceSpy)
                 .authorizeAction(any(Context.class), any(Bitstream.class), eq(Constants.DELETE));
+        // Allow to the user authorization to remove Bundle - it is necessary for the removing the bitstream
+        doNothing().when(authorizeServiceSpy)
+                .authorizeAction(any(Context.class), any(Bundle.class), eq(Constants.REMOVE));
 
 
         // Upload CMDI file

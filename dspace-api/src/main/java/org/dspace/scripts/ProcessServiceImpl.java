@@ -316,6 +316,11 @@ public class ProcessServiceImpl implements ProcessService {
         return this.processDAO.findByStatusAndCreationTimeOlderThan(context, statuses, date);
     }
 
+    @Override
+    public int countByUser(Context context, EPerson user) throws SQLException {
+        return processDAO.countByUser(context, user);
+    }
+
     private String formatLogLine(int processId, String scriptName, String output, ProcessLogLevel processLogLevel) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         StringBuilder sb = new StringBuilder();

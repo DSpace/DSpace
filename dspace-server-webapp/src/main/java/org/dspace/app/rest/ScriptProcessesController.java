@@ -67,8 +67,8 @@ public class ScriptProcessesController {
      * @return              The ProcessResource object for the created process
      * @throws Exception    If something goes wrong
      */
-    @RequestMapping(method = RequestMethod.POST)
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public ResponseEntity<RepresentationModel<?>> startProcess(
         @PathVariable(name = "name") String scriptName,
         @RequestParam(name = "file", required = false) List<MultipartFile> files)

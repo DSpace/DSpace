@@ -876,24 +876,24 @@ public interface ItemService
     int countWithdrawnItems(Context context) throws SQLException;
 
     /**
-     * finds all items for which the current user has editing rights
-     * @param context DSpace context object
-     * @param offset page offset
-     * @param limit  page size limit
-     * @return list of items for which the current user has editing rights
-     * @throws SQLException
-     * @throws SearchServiceException
-     */
+      * finds all items for which the current user has editing rights
+      * @param context DSpace context object
+      * @param offset page offset
+      * @param limit  page size limit
+      * @return list of items for which the current user has editing rights
+      * @throws SQLException
+      * @throws SearchServiceException
+      */
     public List<Item> findItemsWithEdit(Context context, int offset, int limit)
         throws SQLException, SearchServiceException;
 
     /**
-     * counts all items for which the current user has editing rights
-     * @param context DSpace context object
-     * @return list of items for which the current user has editing rights
-     * @throws SQLException
-     * @throws SearchServiceException
-     */
+    * counts all items for which the current user has editing rights
+    * @param context DSpace context object
+    * @return list of items for which the current user has editing rights
+    * @throws SQLException
+    * @throws SearchServiceException
+    */
     public int countItemsWithEdit(Context context) throws SQLException, SearchServiceException;
 
     /**

@@ -1319,5 +1319,10 @@ public class ClarinShibAuthentication implements AuthenticationMethod {
     public boolean canChangePassword(Context context, EPerson ePerson, String currentPassword) {
         return false;
     }
+
+    @Override
+    public boolean areSpecialGroupsApplicable(Context context, HttpServletRequest request) {
+        return true;
+    }
 }
 

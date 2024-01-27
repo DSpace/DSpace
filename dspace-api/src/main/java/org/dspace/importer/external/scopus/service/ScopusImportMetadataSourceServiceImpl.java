@@ -202,6 +202,8 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
                 String response = liveImportClient.executeHttpGetRequest(timeout, url, params);
 
                 SAXBuilder saxBuilder = new SAXBuilder();
+                // disallow DTD parsing to ensure no XXE attacks can occur
+                saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
                 Document document = saxBuilder.build(new StringReader(response));
                 Element root = document.getRootElement();
 
@@ -377,6 +379,8 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
     private List<Element> splitToRecords(String recordsSrc) {
         try {
             SAXBuilder saxBuilder = new SAXBuilder();
+            // disallow DTD parsing to ensure no XXE attacks can occur
+            saxBuilder.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
             Document document = saxBuilder.build(new StringReader(recordsSrc));
             Element root = document.getRootElement();
             List<Element> records = root.getChildren("entry",Namespace.getNamespace("http://www.w3.org/2005/Atom"));

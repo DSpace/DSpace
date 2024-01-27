@@ -292,7 +292,14 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             int countAttempt = 0;
             while (StringUtils.isBlank(response) && countAttempt <= attempt) {
                 countAttempt++;
+
+                long time = System.currentTimeMillis() - lastRequest;
+                if ((time) < interRequestTime) {
+                    Thread.sleep(interRequestTime - time);
+                }
+
                 response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
+                lastRequest = System.currentTimeMillis();
             }
 
             if (StringUtils.isBlank(response)) {
@@ -316,7 +323,13 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             countAttempt = 0;
             while (StringUtils.isBlank(response2) && countAttempt <= attempt) {
                 countAttempt++;
+                long time = System.currentTimeMillis() - lastRequest;
+                if ((time) < interRequestTime) {
+                    Thread.sleep(interRequestTime - time);
+                }
                 response2 = liveImportClient.executeHttpGetRequest(1000, uriBuilder2.toString(), params2);
+
+                lastRequest = System.currentTimeMillis();
             }
 
             if (StringUtils.isBlank(response2)) {
@@ -338,6 +351,11 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
     private List<Element> splitToRecords(String recordsSrc) {
         try {
             SAXBuilder saxBuilder = new SAXBuilder();
+            // Disallow external entities & entity expansion to protect against XXE attacks
+            // (NOTE: We receive errors if we disable all DTDs for PubMed, so this is the best we can do)
+            saxBuilder.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            saxBuilder.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            saxBuilder.setExpandEntities(false);
             Document document = saxBuilder.build(new StringReader(recordsSrc));
             Element root = document.getRootElement();
 
@@ -418,7 +436,13 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             int countAttempt = 0;
             while (StringUtils.isBlank(response) && countAttempt <= attempt) {
                 countAttempt++;
+                long time = System.currentTimeMillis() - lastRequest;
+                if ((time) < interRequestTime) {
+                    Thread.sleep(interRequestTime - time);
+                }
+
                 response = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
+                lastRequest = System.currentTimeMillis();
             }
 
             if (StringUtils.isBlank(response)) {
@@ -441,7 +465,12 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             countAttempt = 0;
             while (StringUtils.isBlank(response2) && countAttempt <= attempt) {
                 countAttempt++;
+                long time = System.currentTimeMillis() - lastRequest;
+                if ((time) < interRequestTime) {
+                    Thread.sleep(interRequestTime - time);
+                }
                 response2 = liveImportClient.executeHttpGetRequest(1000, uriBuilder2.toString(), params2);
+                lastRequest = System.currentTimeMillis();
             }
 
             if (StringUtils.isBlank(response2)) {

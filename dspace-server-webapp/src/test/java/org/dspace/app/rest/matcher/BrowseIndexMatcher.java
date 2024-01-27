@@ -84,6 +84,24 @@ public class BrowseIndexMatcher {
         );
     }
 
+    public static Matcher<? super Object> hierarchicalBrowseIndex(final String vocabulary) {
+        return allOf(
+            hasJsonPath("$.metadata", contains("dc.subject")),
+            hasJsonPath("$.browseType", equalToIgnoringCase(BROWSE_TYPE_HIERARCHICAL)),
+            hasJsonPath("$.type", equalToIgnoringCase("browse")),
+            hasJsonPath("$.facetType", equalToIgnoringCase("subject")),
+            hasJsonPath("$.vocabulary", equalToIgnoringCase(vocabulary)),
+            hasJsonPath("$._links.vocabulary.href",
+                        is(REST_SERVER_URL + String.format("submission/vocabularies/%s/", vocabulary))),
+            hasJsonPath("$._links.items.href",
+                        is(REST_SERVER_URL + String.format("discover/browses/%s/items", vocabulary))),
+            hasJsonPath("$._links.entries.href",
+                        is(REST_SERVER_URL + String.format("discover/browses/%s/entries", vocabulary))),
+            hasJsonPath("$._links.self.href",
+                        is(REST_SERVER_URL + String.format("discover/browses/%s", vocabulary)))
+        );
+    }
+
     public static Matcher<? super Object> publisherBrowseIndex(final String order) {
         return allOf(
                 hasJsonPath("$.metadata", contains("dc.publisher")),

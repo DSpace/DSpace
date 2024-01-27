@@ -86,6 +86,9 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     private GroupService groupService;
 
     @Autowired
+    private GroupService groupService;
+
+    @Autowired
     ClarinUserRegistrationService clarinUserRegistrationService;
 
     private final EPersonService es;

@@ -480,6 +480,11 @@ public class HandleServiceImpl implements HandleService {
         return null;
     }
 
+    @Override
+    public String[] getAdditionalPrefixes() {
+        return configurationService.getArrayProperty("handle.additional.prefixes");
+    }
+
     /**
      *
      * @param context DSpace context
@@ -520,10 +525,5 @@ public class HandleServiceImpl implements HandleService {
             }
         }
         return null;
-    }
-
-    @Override
-    public String[] getAdditionalPrefixes() {
-        return configurationService.getArrayProperty("handle.additional.prefixes");
     }
 }

@@ -97,6 +97,7 @@ public class S3BitStoreService extends BaseBitStoreService {
     protected static final int directoryLevels = 3;
 
     private boolean enabled = false;
+
     private String awsAccessKey;
     private String awsSecretKey;
     private String awsRegionName;
@@ -130,7 +131,7 @@ public class S3BitStoreService extends BaseBitStoreService {
             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
-     * Utility method for generate AmazonS3 builder with specific region
+     * Utility method for generate AmazonS3 builder
      *
      * @param regions wanted regions in client
      * @param awsCredentials credentials of the client

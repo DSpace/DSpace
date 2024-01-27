@@ -163,7 +163,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
             op.define("pdf:use-cropbox=true");
         }
 
-        String s = "[" + page + "]";
+        String s = "[0]";
         op.addImage(f.getAbsolutePath() + s);
         if (configurationService.getBooleanProperty(PRE + ".flatten", true)) {
             op.flatten();

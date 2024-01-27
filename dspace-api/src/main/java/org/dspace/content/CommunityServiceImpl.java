@@ -78,6 +78,7 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     protected IdentifierService identifierService;
     @Autowired(required = true)
     protected SubscribeService subscribeService;
+
     protected CommunityServiceImpl() {
         super();
     }

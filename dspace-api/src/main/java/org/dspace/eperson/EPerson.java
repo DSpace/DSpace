@@ -452,6 +452,10 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport {
         return previousActive;
     }
 
+    public boolean hasPasswordSet() {
+        return StringUtils.isNotBlank(getPassword());
+    }
+
     public String getWelcomeInfo() {
         return welcomeInfo;
     }
@@ -463,9 +467,6 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport {
     }
     public void setCanEditSubmissionMetadata(Boolean canEditSubmissionMetadata) {
         this.canEditSubmissionMetadata = canEditSubmissionMetadata;
-    }
-    public boolean hasPasswordSet() {
-        return StringUtils.isNotBlank(getPassword());
     }
 
 }

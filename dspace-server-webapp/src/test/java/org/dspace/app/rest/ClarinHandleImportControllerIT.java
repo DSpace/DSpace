@@ -12,7 +12,6 @@ import static org.junit.Assert.assertNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -59,12 +58,9 @@ public class ClarinHandleImportControllerIT extends AbstractControllerIntegratio
         assertEquals(handle.getResourceTypeId(), (Integer)2);
         assertNull(handle.getUrl());
         assertNull(handle.getDSpaceObject());
-        //clean all
+        //remove imported handle
         context.turnOffAuthorisationSystem();
-        List<Handle> handles = handleService.findAll(context);
-        for (Handle h: handles) {
-            handleService.delete(context, h);
-        }
+        handleService.delete(context, handle);
         context.restoreAuthSystemState();
     }
 }

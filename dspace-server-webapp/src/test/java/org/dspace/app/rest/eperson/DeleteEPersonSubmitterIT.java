@@ -149,8 +149,8 @@ public class DeleteEPersonSubmitterIT extends AbstractControllerIntegrationTest 
         Item item = itemService.find(context, installItem.getID());
         List<RequestItemAuthor> requestItemAuthor = requestItemAuthorExtractor.getRequestItemAuthor(context, item);
 
-        assertEquals("Help Desk", requestItemAuthor.get(0).getFullName());
-        assertEquals("dspace-help@myu.edu", requestItemAuthor.get(0).getEmail());
+        assertEquals(HELPDESK_NAME, requestItemAuthor.get(0).getFullName());
+        assertEquals(HELPDESK_EMAIL, requestItemAuthor.get(0).getEmail());
     }
 
     /**

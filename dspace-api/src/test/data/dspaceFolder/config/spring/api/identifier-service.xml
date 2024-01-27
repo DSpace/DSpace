@@ -28,7 +28,7 @@
         </property>
     </bean>
 
-    <bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.VersionedHandleIdentifierProvider" scope="singleton">
+    <bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.ClarinVersionedHandleIdentifierProvider" scope="singleton">
         <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
     </bean>
 

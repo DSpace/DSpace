@@ -23,7 +23,7 @@ import java.util.List;
 import com.google.common.io.Files;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.Logger;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
@@ -39,6 +39,7 @@ import org.dspace.discovery.SearchUtils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase {
@@ -51,7 +52,7 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
     private Item[] itemsSubject2 = new Item[numberItemsSubject2];
     private String filename;
     private Collection collection;
-    private Logger logger = org.apache.logging.log4j.LogManager.getLogger(MetadataExportSearchIT.class);
+    private Logger logger = Logger.getLogger(MetadataExportSearchIT.class);
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     private SearchService searchService;
 
@@ -169,17 +170,17 @@ public class MetadataExportSearchIT extends AbstractIntegrationTestWithDatabase 
         checkItemsPresentInFile(filename, itemsSubject1);
     }
 
-    // CLARIN - CLARIN-DSpace doesn't use DateIssues search filter (commented in the discovery.xml), so this test
-    // is failing
-//    @Test
-//    public void exportMetadataSearchFilterDate() throws Exception {
-//        int result = runDSpaceScript(
-//            "metadata-export-search", "-f", "dateIssued,equals=[2000 TO 2020]", "-n", filename
-//        );
-//
-//        assertEquals(0, result);
-//        checkItemsPresentInFile(filename, itemsSubject1);
-//    }
+    // CLARIN UPDATE - the date filter is not supported
+    @Ignore
+    @Test
+    public void exportMetadataSearchFilterDate() throws Exception {
+        int result = runDSpaceScript(
+            "metadata-export-search", "-f", "dateIssued,equals=[2000 TO 2020]", "-n", filename
+        );
+
+        assertEquals(0, result);
+        checkItemsPresentInFile(filename, itemsSubject1);
+    }
 
     @Test
     public void exportMetadataSearchMultipleFilters() throws Exception {

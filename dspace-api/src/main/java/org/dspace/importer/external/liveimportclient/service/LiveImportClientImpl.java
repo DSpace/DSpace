@@ -60,7 +60,8 @@ public class LiveImportClientImpl implements LiveImportClient {
             requestConfigBuilder.setConnectionRequestTimeout(timeout);
             RequestConfig defaultRequestConfig = requestConfigBuilder.build();
 
-            method = new HttpGet(buildUrl(URL, params.get(URI_PARAMETERS)));
+            String uri = buildUrl(URL, params.get(URI_PARAMETERS));
+            method = new HttpGet(uri);
             method.setConfig(defaultRequestConfig);
 
             Map<String, String> headerParams = params.get(HEADER_PARAMETERS);
@@ -71,7 +72,9 @@ public class LiveImportClientImpl implements LiveImportClient {
             }
 
             configureProxy(method, defaultRequestConfig);
-
+            if (log.isDebugEnabled()) {
+                log.debug("Performing GET request to \"" + uri + "\"...");
+            }
             HttpResponse httpResponse = httpClient.execute(method);
             if (isNotSuccessfull(httpResponse)) {
                 throw new RuntimeException("The request failed with: " + getStatusCode(httpResponse) + " code, reason= "
@@ -98,7 +101,8 @@ public class LiveImportClientImpl implements LiveImportClient {
             Builder requestConfigBuilder = RequestConfig.custom();
             RequestConfig defaultRequestConfig = requestConfigBuilder.build();
 
-            method = new HttpPost(buildUrl(URL, params.get(URI_PARAMETERS)));
+            String uri = buildUrl(URL, params.get(URI_PARAMETERS));
+            method = new HttpPost(uri);
             method.setConfig(defaultRequestConfig);
             if (StringUtils.isNotBlank(entry)) {
                 method.setEntity(new StringEntity(entry));
@@ -106,7 +110,9 @@ public class LiveImportClientImpl implements LiveImportClient {
             setHeaderParams(method, params);
 
             configureProxy(method, defaultRequestConfig);
-
+            if (log.isDebugEnabled()) {
+                log.debug("Performing POST request to \"" + uri + "\"..." );
+            }
             HttpResponse httpResponse = httpClient.execute(method);
             if (isNotSuccessfull(httpResponse)) {
                 throw new RuntimeException();

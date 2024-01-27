@@ -616,6 +616,10 @@ public class HandleRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
         List<Handle> handles = handleClarinService.findAll(context);
         for (Handle handle: handles) {
+            // Do not remove Site handle because it is missing in other tests e.g. CurationScriptIT
+            if (handle.getHandle().endsWith("/0")) {
+                continue;
+            }
             handleClarinService.delete(context, handle);
         }
         context.restoreAuthSystemState();

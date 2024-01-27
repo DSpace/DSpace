@@ -171,12 +171,6 @@ public class XOAI {
             }
             solrServerResolver.getServer().commit();
 
-            if (optimize) {
-                println("Optimizing Index");
-                solrServerResolver.getServer().optimize();
-                println("Index optimized");
-            }
-
             // Set last compilation date
             xoaiLastCompilationCacheService.put(new Date());
             return result;
@@ -430,12 +424,9 @@ public class XOAI {
          * deletion policy. Do not set the flag for still invisible embargoed items,
          * because this will override the item.public flag.
          */
-        boolean deleted = false;
-        if (!item.isHidden()) {
-            deleted = (item.isWithdrawn() || !item.isDiscoverable() || (isEmbargoed ? isPublic : false));
-        }
-        doc.addField("item.deleted", deleted);
 
+        doc.addField("item.deleted",
+                (item.isWithdrawn() || !item.isDiscoverable() || (isEmbargoed ? isPublic : false)));
 
         /*
          * An item that is embargoed will potentially not be harvested by incremental
@@ -587,7 +578,6 @@ public class XOAI {
             CommandLineParser parser = new DefaultParser();
             Options options = new Options();
             options.addOption("c", "clear", false, "Clear index before indexing");
-            options.addOption("o", "optimize", false, "Optimize index at the end");
             options.addOption("v", "verbose", false, "Verbose output");
             options.addOption("h", "help", false, "Shows some help");
             options.addOption("n", "number", true, "FOR DEVELOPMENT MUST DELETE");
@@ -621,7 +611,7 @@ public class XOAI {
 
                 if (COMMAND_IMPORT.equals(command)) {
                     ctx = new Context(Context.Mode.READ_ONLY);
-                    XOAI indexer = new XOAI(ctx, line.hasOption('o'), line.hasOption('c'), line.hasOption('v'));
+                    XOAI indexer = new XOAI(ctx, line.hasOption('c'), line.hasOption('v'));
 
                     applicationContext.getAutowireCapableBeanFactory().autowireBean(indexer);
 

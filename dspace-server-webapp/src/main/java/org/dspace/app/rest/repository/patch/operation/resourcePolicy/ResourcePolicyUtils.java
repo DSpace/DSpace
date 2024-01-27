@@ -130,13 +130,12 @@ public class ResourcePolicyUtils {
      */
     public void checkResourcePolicyForConsistentEndDateValue(ResourcePolicy resource, Operation operation) {
         String dateS = (String) operation.getValue();
-        try {
-            Date date = simpleDateFormat.parse(dateS);
-            if (resource.getStartDate() != null && resource.getStartDate().after(date)) {
-                throw new DSpaceBadRequestException("Attempting to set an invalid endDate smaller than the startDate.");
-            }
-        } catch (ParseException e) {
-            throw new DSpaceBadRequestException("Invalid endDate value", e);
+        Date date = MultiFormatDateParser.parse(dateS);
+        if (date == null) {
+            throw new DSpaceBadRequestException("Invalid endDate value " + dateS);
+        }
+        if (resource.getStartDate() != null && resource.getStartDate().after(date)) {
+            throw new DSpaceBadRequestException("Attempting to set an invalid endDate smaller than the startDate.");
         }
     }
 }

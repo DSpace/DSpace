@@ -17,7 +17,6 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.UUID;
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,7 +26,6 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.RequestItem;
-import org.dspace.app.requestitem.RequestItemAuthorExtractor;
 import org.dspace.app.requestitem.RequestItemEmailNotifier;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.rest.converter.RequestItemConverter;
@@ -72,8 +70,8 @@ public class RequestItemRepository
     @Autowired(required = true)
     protected RequestItemConverter requestItemConverter;
 
-    @Resource(name = "requestItemAuthorExtractor")
-    protected RequestItemAuthorExtractor requestItemAuthorExtractor;
+    @Autowired(required = true)
+    protected RequestItemEmailNotifier requestItemEmailNotifier;
 
     @Autowired(required = true)
     protected RequestItemEmailNotifier requestItemEmailNotifier;

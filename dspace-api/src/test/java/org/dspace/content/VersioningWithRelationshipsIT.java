@@ -2162,7 +2162,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
                     .build();
 
                 // metadata - person 3 & project 2
-                itemService.addMetadata(context, pe3_1, "dc", "relation", null, null, "project 2 (mdv)");
+                itemService.addMetadata(context, pe3_1, "dc", "relation", null, null, "project 2 (mdv)", "20000", 300);
 
                 // relationship - person 1 & project 3
                 RelationshipBuilder.createRelationshipBuilder(context, pe1_1, pr3_1, isProjectOfPerson)
@@ -2193,14 +2193,14 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
                     .build();
 
                 // metadata - person 3 & project 4
-                itemService.addMetadata(context, pe3_1, "dc", "relation", null, null, "project 4 (mdv)");
+                itemService.addMetadata(context, pe3_1, "dc", "relation", null, null, "project 4 (mdv)" , "20000", 300);
 
                 // relationship - person 3 & project 5
                 RelationshipBuilder.createRelationshipBuilder(context, pe3_1, pr5_1, isProjectOfPerson)
                     .build();
 
                 // metadata - person 3 & project 6
-                itemService.addMetadata(context, pe3_1, "dc", "relation", null, null, "project 6 (mdv)");
+                itemService.addMetadata(context, pe3_1, "dc", "relation", null, null, "project 6 (mdv)" , "20000", 300);
 
                 // SUMMARY
                 //

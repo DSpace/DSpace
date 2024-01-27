@@ -47,6 +47,7 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
 import org.dspace.orcid.service.OrcidTokenService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.util.UUIDUtils;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
@@ -101,6 +102,8 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     protected VersionDAO versionDAO;
     @Autowired(required = true)
     protected ClaimedTaskService claimedTaskService;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
     @Autowired
     protected OrcidTokenService orcidTokenService;
 

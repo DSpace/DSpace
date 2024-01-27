@@ -22,9 +22,21 @@ public interface AccessStatusHelper {
      *
      * @param context the DSpace context
      * @param item    the item
+     * @param threshold the embargo threshold date
      * @return an access status value
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     public String getAccessStatusFromItem(Context context, Item item, Date threshold)
         throws SQLException;
+
+    /**
+     * Retrieve embargo information for the item
+     *
+     * @param context the DSpace context
+     * @param item the item to check for embargo information
+     * @param threshold the embargo threshold date
+     * @return an embargo date
+     * @throws SQLException An exception that provides information on a database access error or other errors.
+     */
+    public String getEmbargoFromItem(Context context, Item item, Date threshold) throws SQLException;
 }

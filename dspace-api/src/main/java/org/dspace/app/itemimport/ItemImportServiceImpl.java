@@ -579,7 +579,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
     /**
      * Resolve an item identifier.
-     * 
+     *
      * @param c Context
      * @param itemIdentifier The identifier string found in the import file (handle or UUID)
      * @return Item if found, or null.

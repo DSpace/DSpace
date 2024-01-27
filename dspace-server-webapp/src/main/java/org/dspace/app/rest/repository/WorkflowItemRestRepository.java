@@ -28,7 +28,6 @@ import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.utils.SolrOAIReindexer;
-import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -115,7 +114,7 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
     @Autowired
     private SolrOAIReindexer solrOAIReindexer;
 
-    private final SubmissionConfigReader submissionConfigReader;
+    private SubmissionConfigService submissionConfigService;
 
     public WorkflowItemRestRepository() throws SubmissionConfigReaderException {
         submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
@@ -187,8 +186,6 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         if (source.getItem().isArchived()) {
             return null;
         }
-
-
         return converter.toRest(source, utils.obtainProjection());
     }
 

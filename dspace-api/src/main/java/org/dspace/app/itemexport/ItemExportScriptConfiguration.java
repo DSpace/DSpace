@@ -7,12 +7,9 @@
  */
 package org.dspace.app.itemexport;
 
-import java.sql.SQLException;
-
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.core.Context;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -36,15 +33,6 @@ public class ItemExportScriptConfiguration<T extends ItemExport> extends ScriptC
     @Override
     public void setDspaceRunnableClass(Class<T> dspaceRunnableClass) {
         this.dspaceRunnableClass = dspaceRunnableClass;
-    }
-
-    @Override
-    public boolean isAllowedToExecute(final Context context) {
-        try {
-            return authorizeService.isAdmin(context);
-        } catch (SQLException e) {
-            throw new RuntimeException("SQLException occurred when checking if the current user is an admin", e);
-        }
     }
 
     @Override

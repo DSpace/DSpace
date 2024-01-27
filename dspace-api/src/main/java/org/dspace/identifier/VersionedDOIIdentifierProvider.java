@@ -56,6 +56,14 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider implem
      * @throws Exception throws an exception if this isn't the case
      */
     @Override
+    public void afterPropertiesSet() throws Exception {
+        if (!configurationService.getBooleanProperty("versioning.enabled", true)) {
+            throw new RuntimeException("the " + VersionedDOIIdentifierProvider.class.getName() +
+                    " is enabled, but the versioning is disabled.");
+        }
+    }
+
+    @Override
     public String mint(Context context, DSpaceObject dso) throws IdentifierException {
         return mint(context, dso, this.filter);
     }
@@ -172,11 +180,6 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider implem
         register(context, dso, doi, filter);
 
         return doi;
-    }
-
-    @Override
-    public void register(Context context, DSpaceObject dso, String identifier) throws IdentifierException {
-        register(context, dso, identifier, this.filter);
     }
 
     @Override

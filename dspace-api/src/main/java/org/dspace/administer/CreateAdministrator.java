@@ -14,6 +14,7 @@ import java.util.Locale;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.lang3.StringUtils;
@@ -97,11 +98,21 @@ public final class CreateAdministrator {
         }
 
         if (line.hasOption("e") && line.hasOption("f") && line.hasOption("l") &&
-            line.hasOption("c") && line.hasOption("p") && line.hasOption("o")) {
+                line.hasOption("c") && line.hasOption("p") && line.hasOption("o")) {
             ca.createAdministrator(line.getOptionValue("e"),
-                                   line.getOptionValue("f"), line.getOptionValue("l"),
-                                   line.getOptionValue("c"), line.getOptionValue("p"),
-                                   line.getOptionValue("o"));
+                    line.getOptionValue("f"), line.getOptionValue("l"),
+                    line.getOptionValue("c"), line.getOptionValue("p"),
+                    line.getOptionValue("o"));
+        } else if (line.hasOption("h")) {
+            String header = "\nA command-line tool for creating an initial administrator for setting up a" +
+                    " DSpace site. Unless all the required parameters are passed it will" +
+                    " prompt for an e-mail address, last name, first name and password from" +
+                    " standard input.. An administrator group is then created and the data passed" +
+                    "  in used to create an e-person in that group.\n\n";
+            String footer = "\n";
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("dspace create-administrator", header, options, footer, true);
+            return;
         } else {
             ca.negotiateAdministratorDetails(line);
         }
@@ -147,6 +158,7 @@ public final class CreateAdministrator {
         String firstName = line.getOptionValue('f');
         String lastName = line.getOptionValue('l');
         String language = I18nUtil.getDefaultLocale().getLanguage();
+        String org = line.getOptionValue('o');
         ConfigurationService cfg = DSpaceServicesFactory.getInstance().getConfigurationService();
         boolean flag = line.hasOption('p');
         char[] password = null;
@@ -217,8 +229,7 @@ public final class CreateAdministrator {
             password = line.getOptionValue("p").toCharArray();
         }
         // if we make it to here, we are ready to create an administrator
-        createAdministrator(email, firstName, lastName, language, String.valueOf(password));
-
+        createAdministrator(email, firstName, lastName, language, String.valueOf(password), org);
     }
 
     private char[] getPassword(Console console) {
@@ -233,8 +244,7 @@ public final class CreateAdministrator {
         System.out.print("Again to confirm: ");
         System.out.flush();
 
-        // if we make it to here, we are ready to create an administrator
-        createAdministrator(email, firstName, lastName, language, String.valueOf(password1), "");
+        password2 = console.readPassword();
 
         // TODO real password validation
         if (password1.length > 1 && Arrays.equals(password1, password2)) {

@@ -87,6 +87,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+
 /**
  * This is the repository responsible to manage WorkspaceItem Rest object
  *
@@ -143,7 +144,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
     @Autowired
     ClarinLicenseResourceMappingService clarinLicenseResourceMappingService;
 
-    private SubmissionConfigReader submissionConfigReader;
+    private SubmissionConfigService submissionConfigService;
 
     public WorkspaceItemRestRepository() throws SubmissionConfigReaderException {
         submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
@@ -232,6 +233,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         WorkspaceItemRest wsi = findOne(context, id);
         WorkspaceItem source = wis.find(context, id);
         for (Operation op : operations) {
+            //the value in the position 0 is a null value
             String[] path = op.getPath().substring(1).split("/", 3);
             if (OPERATION_PATH_LICENSE_RESOURCE.equals(path[0])) {
                 this.maintainLicensesForItem(context, source, op);

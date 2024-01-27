@@ -488,10 +488,3 @@ ALTER COLUMN element TYPE character varying(128);
 ALTER TABLE eperson ADD welcome_info varchar(30);
 
 ALTER TABLE eperson ADD can_edit_submission_metadata BOOL;
-
-insert into checksum_results
-values
-(
-    'CHECKSUM_SYNC_NO_MATCH',
-    'The checksum value from S3 is not matching the checksum value from the local file system'
-);
