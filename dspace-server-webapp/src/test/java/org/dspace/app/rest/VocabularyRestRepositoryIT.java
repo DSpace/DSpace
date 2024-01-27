@@ -92,6 +92,11 @@ public class VocabularyRestRepositoryIT extends AbstractControllerIntegrationTes
         // the properties that we're altering above and this is only used within the tests
         DCInputAuthority.reset();
         pluginService.clearNamedPluginClasses();
+
+        // The following line is needed to call init() method in the ChoiceAuthorityServiceImpl class, without it
+        // the `submissionConfigService` will be null what will cause a NPE in the clearCache() method
+        // https://github.com/DSpace/DSpace/issues/9292
+        cas.getChoiceAuthoritiesNames();
         cas.clearCache();
 
         context.turnOffAuthorisationSystem();
