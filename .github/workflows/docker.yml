@@ -111,11 +111,28 @@ jobs:
           # Use tags / labels provided by 'docker/metadata-action' above
           tags: ${{ steps.meta_build_deps.outputs.tags }}
           labels: ${{ steps.meta_build_deps.outputs.labels }}
+          
+  ####################################################
+  # Build/Push the 'dataquest/dspace-dependencies' image
+  ####################################################
+  dspace-dependencies:
+    # Ensure this job never runs on forked repos. It's only executed for 'dataquest/dspace'
+    if: github.repository == 'dataquest-dev/dspace'
+    uses: ./.github/workflows/reusable-docker-build.yml
+    with:
+      build_id: dspace-dependencies
+      image_name: dataquest/dspace-dependencies
+      dockerfile_path: ./Dockerfile.dependencies
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
 
   #######################################
   # Build/Push the 'dataquest/dspace' image
   #######################################
   dspace:
+    # Ensure this job never runs on forked repos. It's only executed for 'dataquest/dspace'
+    if: github.repository == 'dataquest-dev/dspace'
     # Must run after 'dspace-dependencies' job above
     needs: dspace-dependencies
     runs-on: ubuntu-latest
@@ -169,6 +186,8 @@ jobs:
   # Build/Push the 'dataquest/dspace' image ('-test' tag)
   #############################################################
   dspace-test:
+    # Ensure this job never runs on forked repos. It's only executed for 'dataquest/dspace'
+    if: github.repository == 'dataquest-dev/dspace'
     # Must run after 'dspace-dependencies' job above
     needs: dspace-dependencies
     runs-on: ubuntu-latest
@@ -225,7 +244,7 @@ jobs:
   # Build/Push the 'dataquest/dspace-cli' image
   ###########################################
   dspace-cli:
-    # Ensure this job never runs on forked repos. It's only executed for 'dspace/dspace'
+    # Ensure this job never runs on forked repos. It's only executed for 'dataquest/dspace'
     if: github.repository == 'dspace/dspace'
     # Must run after 'dspace-dependencies' job above
     needs: dspace-dependencies
@@ -288,10 +307,10 @@ jobs:
 
 
   ###########################################
-  # Build/Push the 'dspace/dspace-solr' image
+  # Build/Push the 'dataquest/dspace-solr' image
   ###########################################
   dspace-solr:
-    # Ensure this job never runs on forked repos. It's only executed for 'dspace/dspace'
+    # Ensure this job never runs on forked repos. It's only executed for 'dataquest/dspace'
     if: github.repository == 'dspace/dspace'
     runs-on: ubuntu-latest
 
@@ -341,10 +360,10 @@ jobs:
           labels: ${{ steps.meta_build_solr.outputs.labels }}
 
   ###########################################################
-  # Build/Push the 'dspace/dspace-postgres-pgcrypto' image
+  # Build/Push the 'dataquest/dspace-postgres-pgcrypto' image
   ###########################################################
   dspace-postgres-pgcrypto:
-    # Ensure this job never runs on forked repos. It's only executed for 'dspace/dspace'
+    # Ensure this job never runs on forked repos. It's only executed for 'dataquest/dspace'
     if: github.repository == 'dspace/dspace'
     runs-on: ubuntu-latest
 
@@ -395,10 +414,10 @@ jobs:
           labels: ${{ steps.meta_build_postgres.outputs.labels }}
 
   ########################################################################
-  # Build/Push the 'dspace/dspace-postgres-pgcrypto' image (-loadsql tag)
+  # Build/Push the 'dataquest/dspace-postgres-pgcrypto' image (-loadsql tag)
   ########################################################################
   dspace-postgres-pgcrypto-loadsql:
-    # Ensure this job never runs on forked repos. It's only executed for 'dspace/dspace'
+    # Ensure this job never runs on forked repos. It's only executed for 'dataquest/dspace'
     if: github.repository == 'dspace/dspace'
     runs-on: ubuntu-latest
 
