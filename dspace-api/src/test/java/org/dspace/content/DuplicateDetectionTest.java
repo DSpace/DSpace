@@ -176,7 +176,8 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
         // Check metadata is populated as per configuration, using item1 (first in results)
         // Check for date
         Optional<String> foundDate = potentialDuplicates.get(0).getMetadataValueList().stream()
-                .filter(metadataValue -> metadataValue.getMetadataField().toString('.').equals("dc.date.issued"))
+                .filter(metadataValue -> metadataValue.getMetadataField().toString('.')
+                        .equals("dc.date.issued"))
                 .map(MetadataValue::getValue).findFirst();
         assertThat("There should be an issue date found", foundDate.isPresent());
         assertEquals("item1 issue date should match the duplicate obj metadata issue date",
@@ -231,12 +232,110 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
 
         // Make sure result list is size 1
         int size = 1;
-        assertEquals("Potential duplicates of item1 should have size " + size,
+        assertEquals("Potential duplicates of item4 (special characters) should have size " + size,
                 size, potentialDuplicates.size());
 
         // The only member should be item 5
         assertEquals("Item 5 should be be the detected duplicate",
                 item5.getID(), potentialDuplicates.get(0).getUuid());
+
+    }
+
+    /**
+     * Test that a search for a very long title which also contains reserved characters
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testSearchDuplicatesWithVeryLongTitle() throws Exception {
+
+        Item item6 = ItemBuilder.createItem(context, col)
+                .withTitle("Testing: This title is over 200 characters long and should behave just the same as a " +
+                        "shorter title, with or without reserved characters. This integration test will prove that " +
+                        "long titles are detected as potential duplicates.")
+                .withIssueDate(item1IssueDate)
+                .withAuthor(item1Author)
+                .withSubject(item1Subject)
+                .build();
+        // This item is the same as above, just missing a comma from the title.
+        Item item7 = ItemBuilder.createItem(context, col)
+                .withTitle("Testing: This title is over 200 characters long and should behave just the same as a " +
+                        "shorter title with or without reserved characters. This integration test will prove that " +
+                        "long titles are detected as potential duplicates.")
+                .withIssueDate("2012-10-17")
+                .withAuthor("Smith, Donald X.")
+                .withSubject("ExtraEntry 2")
+                .build();
+
+        // Get potential duplicates of item 4 and make sure no exceptions are thrown
+        List<PotentialDuplicate> potentialDuplicates = new ArrayList<>();
+        try {
+            potentialDuplicates = duplicateDetectionService.getPotentialDuplicates(context, item6);
+        } catch (SearchServiceException e) {
+            fail("Duplicate search with special characters (long title) should NOT result in search exception (" +
+                    e.getMessage() + ")");
+        }
+
+        // Make sure result list is size 1
+        int size = 1;
+        assertEquals("Potential duplicates of item6 (long title) should have size " + size,
+                size, potentialDuplicates.size());
+
+        // The only member should be item 5
+        assertEquals("Item 7's long title should match Item 6 as a potential duplicate",
+                item7.getID(), potentialDuplicates.get(0).getUuid());
+
+    }
+
+    /**
+     * Test that a search for a very long title which also contains reserved characters
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testSearchDuplicatesExactMatch() throws Exception {
+
+        // Set distance to 0 manually
+        configurationService.setProperty("duplicate.signature.distance", 0);
+
+        Item item8 = ItemBuilder.createItem(context, col)
+                .withTitle("This integration test will prove that the edit distance of 0 results in an exact match")
+                .withIssueDate(item1IssueDate)
+                .withAuthor(item1Author)
+                .withSubject(item1Subject)
+                .build();
+        // This item is the same as above
+        Item item9 = ItemBuilder.createItem(context, col)
+                .withTitle("This integration test will prove that the edit distance of 0 results in an exact match")
+                .withIssueDate("2012-10-17")
+                .withAuthor("Smith, Donald X.")
+                .withSubject("ExtraEntry")
+                .build();
+        // This item has one character different, greater than the edit distance
+        Item item10 = ItemBuilder.createItem(context, col)
+                .withTitle("This integration test will prove that the edit distance of 0 results in an exact match.")
+                .withIssueDate("2012-10-17")
+                .withAuthor("Smith, Donald X.")
+                .withSubject("ExtraEntry")
+                .build();
+
+        // Get potential duplicates of item 4 and make sure no exceptions are thrown
+        List<PotentialDuplicate> potentialDuplicates = new ArrayList<>();
+        try {
+            potentialDuplicates = duplicateDetectionService.getPotentialDuplicates(context, item8);
+        } catch (SearchServiceException e) {
+            fail("Duplicate search with special characters (long title) should NOT result in search exception (" +
+                    e.getMessage() + ")");
+        }
+
+        // Make sure result list is size 1 - we do NOT expect item 10 to appear
+        int size = 1;
+        assertEquals("ONLY one exact match should be found (item 9) " + size,
+                size, potentialDuplicates.size());
+
+        // The only member should be item 9
+        assertEquals("Item 9 should match Item 8 as a potential duplicate",
+                item9.getID(), potentialDuplicates.get(0).getUuid());
 
     }
 
@@ -270,5 +369,7 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
         assertEquals("Workflow item 2 should be be the detected duplicate",
                 workflowItem2.getItem().getID(), potentialDuplicates.get(0).getUuid());
     }
+
+
 
 }
