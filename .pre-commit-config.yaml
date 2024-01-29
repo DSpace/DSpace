@@ -1,0 +1,9 @@
+repos:
+-   repo: local
+    hooks:
+      - id: mvn-checkstyle
+        verbose: true
+        entry: python scripts/pre-commit/checkstyle.py
+        name: Runs maven checkstyle
+        language: python
+        files: \.(java)$
