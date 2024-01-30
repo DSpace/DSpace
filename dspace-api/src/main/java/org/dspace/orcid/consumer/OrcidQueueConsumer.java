@@ -36,6 +36,7 @@ import org.dspace.event.Consumer;
 import org.dspace.event.Event;
 import org.dspace.orcid.OrcidHistory;
 import org.dspace.orcid.OrcidOperation;
+import org.dspace.orcid.OrcidQueue;
 import org.dspace.orcid.factory.OrcidServiceFactory;
 import org.dspace.orcid.model.OrcidEntityType;
 import org.dspace.orcid.model.factory.OrcidProfileSectionFactory;
@@ -171,6 +172,38 @@ public class OrcidQueueConsumer implements Consumer {
 
             orcidQueueService.create(context, relatedItem, entity);
 
+        }
+
+        deleteOrcidQueueEntriesNotInRelationship(context, entity);
+    }
+
+    /**
+     * Loop through all orcid queue entries of entity and check if there is some relation between the entity and
+     * the profileitem of the orcidqueue entry. If no relation is found and it the record is some insert action
+     * delete the entry
+     */
+    private void deleteOrcidQueueEntriesNotInRelationship(Context context, Item entity) throws SQLException {
+        List<OrcidQueue> orcidqueueentries = this.orcidQueueService.findByProfileItemOrEntity(context, entity);
+
+        for (OrcidQueue orcidqueueentry : orcidqueueentries) {
+            List<Item> relatedEntityItems = findAllRelatedItems(context, orcidqueueentry.getEntity());
+            boolean relationshipexist = false;
+            for (Item relatedItem : relatedEntityItems) {
+
+                if (isNotProfileItem(relatedItem) || isNotLinkedToOrcid(context, relatedItem)) {
+                    continue;
+                }
+
+                if (shouldNotBeSynchronized(relatedItem, entity)) {
+                    continue;
+                }
+                if (relatedItem.getID().equals(orcidqueueentry.getProfileItem().getID())) {
+                    relationshipexist = true;
+                }
+            }
+            if (!relationshipexist && orcidqueueentry.isInsertAction()) {
+                orcidQueueService.delete(context, orcidqueueentry);
+            }
         }
 
     }

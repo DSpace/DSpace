@@ -40,9 +40,11 @@ import org.dspace.content.Collection;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.RelationshipService;
 import org.dspace.orcid.consumer.OrcidQueueConsumer;
 import org.dspace.orcid.factory.OrcidServiceFactory;
 import org.dspace.orcid.service.OrcidQueueService;
@@ -65,6 +67,8 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    protected RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
 
     private Collection profileCollection;
 
@@ -537,6 +541,75 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     @Test
+    public void testOrcidQueueRecordCreationToUpdatePublicationAndNotInRelationship() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item profile = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Test User")
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20", eperson)
+            .withOrcidSynchronizationPublicationsPreference(ALL)
+            .build();
+
+        Collection publicationCollection = createCollection("Publications", "Publication");
+
+        Item publication = ItemBuilder.createItem(context, publicationCollection)
+            .withTitle("Test publication")
+            .withAuthor("Test User")
+            .build();
+
+        Item publication1 = ItemBuilder.createItem(context, publicationCollection)
+            .withTitle("Test publication2")
+            .withAuthor("Test User")
+            .build();
+
+        createOrcidHistory(context, profile, publication)
+            .withPutCode("123456")
+            .withOperation(INSERT)
+            .build();
+
+        EntityType publicationType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType personType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+        RelationshipType isAuthorOfPublication = createRelationshipTypeBuilder(context, personType, publicationType,
+            "isAuthorOfPublication", "isPublicationOfAuthor", 0, null, 0, null).build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, profile, publication, isAuthorOfPublication).build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
+        assertThat(orcidQueueRecords, hasSize(1));
+        assertThat(orcidQueueRecords.get(0), matches(profile, publication, "Publication", "123456", UPDATE));
+
+        context.turnOffAuthorisationSystem();
+
+        Relationship rs = RelationshipBuilder
+            .createRelationshipBuilder(context, profile, publication1, isAuthorOfPublication).build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        List<OrcidQueue> orcidQueueRecordsMore = orcidQueueService.findAll(context);
+        assertThat(orcidQueueRecordsMore, hasSize(2));
+        assertThat(orcidQueueRecordsMore.get(0), matches(profile, publication, "Publication", "123456", UPDATE));
+        assertThat(orcidQueueRecordsMore.get(1), matches(profile, publication1, "Publication", INSERT));
+
+        context.turnOffAuthorisationSystem();
+
+        RelationshipBuilder.deleteRelationship(rs.getID());
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        List<OrcidQueue> orcidQueueRecordsAfterDeletion = orcidQueueService.findAll(context);
+        assertThat(orcidQueueRecordsAfterDeletion, hasSize(1));
+        assertThat(orcidQueueRecords.get(0), matches(profile, publication, "Publication", "123456", UPDATE));
+    }
+
+    @Test
     public void testNoOrcidQueueRecordCreationOccursIfPublicationSynchronizationIsDisabled() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -610,6 +683,73 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
         assertThat(orcidQueueRecords, hasSize(1));
         assertThat(orcidQueueRecords.get(0), matches(profile, project, "Project", "123456", UPDATE));
+    }
+
+    @Test
+    public void testOrcidQueueRecordCreationToUpdateProjectAndNotInRelationship() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item profile = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Test User")
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20", eperson)
+            .withOrcidSynchronizationFundingsPreference(ALL)
+            .build();
+
+        Collection projectCollection = createCollection("Projects", "Project");
+
+        Item project = ItemBuilder.createItem(context, projectCollection)
+            .withTitle("Test project")
+            .build();
+
+        Item project1 = ItemBuilder.createItem(context, projectCollection)
+            .withTitle("Test project1")
+            .build();
+
+        createOrcidHistory(context, profile, project)
+            .withPutCode("123456")
+            .build();
+
+        EntityType projectType = EntityTypeBuilder.createEntityTypeBuilder(context, "Project").build();
+        EntityType personType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+        RelationshipType isProjectOfPerson = createRelationshipTypeBuilder(context, projectType, personType,
+            "isProjectOfPerson", "isPersonOfProject", 0, null, 0, null).build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, project, profile, isProjectOfPerson).build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
+        assertThat(orcidQueueRecords, hasSize(1));
+        assertThat(orcidQueueRecords.get(0), matches(profile, project, "Project", "123456", UPDATE));
+
+        context.turnOffAuthorisationSystem();
+
+        Relationship rs =
+            RelationshipBuilder.createRelationshipBuilder(context, project1, profile, isProjectOfPerson).build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        List<OrcidQueue> orcidQueueRecordsMore = orcidQueueService.findAll(context);
+        assertThat(orcidQueueRecordsMore, hasSize(2));
+        assertThat(orcidQueueRecordsMore.get(0), matches(profile, project, "Project", "123456", UPDATE));
+        assertThat(orcidQueueRecordsMore.get(1), matches(profile, project1, "Project", INSERT));
+
+        context.turnOffAuthorisationSystem();
+
+        RelationshipBuilder.deleteRelationship(rs.getID());
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        List<OrcidQueue> orcidQueueRecordsAfterDeletion = orcidQueueService.findAll(context);
+        assertThat(orcidQueueRecordsAfterDeletion, hasSize(1));
+        assertThat(orcidQueueRecordsAfterDeletion.get(0), matches(profile, project, "Project", "123456", UPDATE));
+
     }
 
     @Test
