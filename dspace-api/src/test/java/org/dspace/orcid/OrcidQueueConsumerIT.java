@@ -44,7 +44,6 @@ import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.content.service.RelationshipService;
 import org.dspace.orcid.consumer.OrcidQueueConsumer;
 import org.dspace.orcid.factory.OrcidServiceFactory;
 import org.dspace.orcid.service.OrcidQueueService;
@@ -67,8 +66,6 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-
-    protected RelationshipService relationshipService = ContentServiceFactory.getInstance().getRelationshipService();
 
     private Collection profileCollection;
 

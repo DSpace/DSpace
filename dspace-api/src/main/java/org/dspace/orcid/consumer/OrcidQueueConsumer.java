@@ -185,24 +185,16 @@ public class OrcidQueueConsumer implements Consumer {
     private void deleteOrcidQueueEntriesNotInRelationship(Context context, Item entity) throws SQLException {
         List<OrcidQueue> orcidqueueentries = this.orcidQueueService.findByProfileItemOrEntity(context, entity);
 
-        for (OrcidQueue orcidqueueentry : orcidqueueentries) {
-            List<Item> relatedEntityItems = findAllRelatedItems(context, orcidqueueentry.getEntity());
-            boolean relationshipexist = false;
-            for (Item relatedItem : relatedEntityItems) {
-
-                if (isNotProfileItem(relatedItem) || isNotLinkedToOrcid(context, relatedItem)) {
-                    continue;
+        for (OrcidQueue entry : orcidqueueentries) {
+            //Check if there is any relationship between orcidqueueentry.profile and orcidqueueentry.entity
+            if (entry.isInsertAction()) {
+                context.uncacheEntities();
+                List<Relationship> rels = this.relationshipService.findByItem(context, entry.getProfileItem());
+                boolean exists = rels.stream().map(relationship -> relationship.getLeftItem().equals(entry.getEntity())
+                    && relationship.getRightItem().equals(entry.getEntity())).findFirst().isPresent();
+                if (!exists) {
+                    orcidQueueService.delete(context, entry);
                 }
-
-                if (shouldNotBeSynchronized(relatedItem, entity)) {
-                    continue;
-                }
-                if (relatedItem.getID().equals(orcidqueueentry.getProfileItem().getID())) {
-                    relationshipexist = true;
-                }
-            }
-            if (!relationshipexist && orcidqueueentry.isInsertAction()) {
-                orcidQueueService.delete(context, orcidqueueentry);
             }
         }
 
