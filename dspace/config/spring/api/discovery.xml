@@ -2154,6 +2154,7 @@
             	<ref bean="searchFilterNotifyQueueStatus" />
             	<ref bean="searchFilterNotifyActivityStreamType" />
             	<ref bean="searchFilterNotifyCoarNotifyType" />
+            	<ref bean="searchFilterNotifyLastStartTime" />
             </list>
         </property>
         <!--The search filters which can be used on the discovery search page -->
@@ -2166,6 +2167,7 @@
             	<ref bean="searchFilterNotifyQueueStatus" />
             	<ref bean="searchFilterNotifyActivityStreamType" />
             	<ref bean="searchFilterNotifyCoarNotifyType" />
+            	<ref bean="searchFilterNotifyLastStartTime" />
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -3220,6 +3222,22 @@
         <property name="sortOrderFilterPage" value="COUNT"/>
         <property name="isOpenByDefault" value="true"/>
         <property name="pageSize" value="10"/>
+    </bean>
+    
+    <bean id="searchFilterNotifyLastStartTime" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="queue_last_start_time"/>
+        <property name="metadataFields">
+            <list>
+                <value></value>
+            </list>
+        </property>
+        <property name="type" value="date"/>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+        <property name="exposeMinAndMaxValue" value="true"/>
     </bean>
 
     <!--Sort properties-->
