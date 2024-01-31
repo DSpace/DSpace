@@ -110,8 +110,8 @@
 
                 <!-- search for an entity that can be a Person or an OrgUnit -->
                 <entry key="personOrOrgunit" value-ref="personOrOrgunit"/>
-                <!-- OpenAIRE4 guidelines - search for an OrgUnit that have a specific dc.type=FundingOrganization -->
-                <entry key="openAIREFundingAgency" value-ref="openAIREFundingAgency"/>
+                <!-- Openaire4 guidelines - search for an OrgUnit that have a specific dc.type=FundingOrganization -->
+                <entry key="openaireFundingAgency" value-ref="openaireFundingAgency"/>
                 <entry key="eperson_claims" value-ref="eperson_claims"/>
             </map>
         </property>
@@ -2027,7 +2027,7 @@
         <property name="spellCheckEnabled" value="true"/>
     </bean>
 
-    <bean id="openAIREFundingAgency" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
+    <bean id="openaireFundingAgency" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
           scope="prototype">
         <property name="id" value="fundingAgency"/>
         <property name="indexAlways" value="true"/>

@@ -1,14 +1,15 @@
 # This image will be published as dspace/dspace-cli
 # See https://github.com/DSpace/DSpace/tree/main/dspace/src/main/docker for usage details
 #
-# - note: default tag for branch: dspace/dspace-cli: dspace/dspace-cli:dspace-7_x
+# - note: default tag for branch: dspace/dspace-cli: dspace/dspace-cli:latest
 
 # This Dockerfile uses JDK11 by default, but has also been tested with JDK17.
 # To build with JDK17, use "--build-arg JDK_VERSION=17"
 ARG JDK_VERSION=11
+ARG DSPACE_VERSION=latest
 
 # Step 1 - Run Maven Build
-FROM dspace/dspace-dependencies:dspace-7_x as build
+FROM dspace/dspace-dependencies:${DSPACE_VERSION} as build
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 # The dspace-installer directory will be written to /install

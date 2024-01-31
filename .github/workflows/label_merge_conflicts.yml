@@ -25,6 +25,8 @@ jobs:
       # See: https://github.com/prince-chrismc/label-merge-conflicts-action
       - name: Auto-label PRs with merge conflicts
         uses: prince-chrismc/label-merge-conflicts-action@v3
+        # Ignore any failures -- may occur (randomly?) for older, outdated PRs.
+        continue-on-error: true
         # Add "merge conflict" label if a merge conflict is detected. Remove it when resolved.
         # Note, the authentication token is created automatically
         # See: https://docs.github.com/en/actions/configuring-and-managing-workflows/authenticating-with-the-github_token

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dspace.AbstractUnitTest;
+import org.dspace.submit.factory.SubmissionServiceFactory;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -65,7 +66,8 @@ public class SubmissionConfigTest extends AbstractUnitTest {
 
         // Get submission configuration
         SubmissionConfig submissionConfig =
-                new SubmissionConfigReader().getSubmissionConfigByCollection(typeBindHandle);
+                SubmissionServiceFactory.getInstance().getSubmissionConfigService()
+                    .getSubmissionConfigByCollection(typeBindHandle);
         // Submission name should match name defined in item-submission.xml
         assertEquals(typeBindSubmissionName, submissionConfig.getSubmissionName());
         // Step 0 - our process only has one step. It should not be null and have the ID typebindtest
