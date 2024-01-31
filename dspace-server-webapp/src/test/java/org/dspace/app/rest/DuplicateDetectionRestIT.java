@@ -135,30 +135,7 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
     }
 
     @Test
-    public void itemsContainDuplicatesLinkTest() throws Exception {
-        String token = getAuthToken(admin.getEmail(), password);
-        log.error("EPERSON FULL NAME IS " + eperson.getFullName());
-
-        context.turnOffAuthorisationSystem();
-        WorkspaceItem workspaceItem1 = WorkspaceItemBuilder.createWorkspaceItem(context, simpleCol)
-                .withTitle(item1Title)
-                .withSubject(item1Subject)
-                .withIssueDate(item1IssueDate)
-                .withAuthor(item1Author)
-                .withSubmitter(eperson)
-                .build();
-        XmlWorkflowItem wfi1 = workflowService.start(context, workspaceItem1);
-        Item item1 = wfi1.getItem();
-        context.restoreAuthSystemState();
-
-        getClient(token).perform(get("/api/core/items/" + item1.getID()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._links.duplicates").exists());
-    }
-
-    @Test
-    public void searchDuplicatesByLinkTest() throws Exception {
+    public void searchDuplicatesBySearchMethodTest() throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
 
         context.turnOffAuthorisationSystem();
@@ -196,21 +173,26 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
 
         context.restoreAuthSystemState();
 
-        getClient(token).perform(get("/api/core/items/" + item1.getID() + "/duplicates"))
+        getClient(token).perform(get("/api/core/items/search/findDuplicates?uuid=" + item1.getID()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 // Valid duplicates array
-                .andExpect(jsonPath("$._embedded.duplicates", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$._embedded.potentialDuplicateResources", Matchers.hasSize(1)))
                 // UUID of only array member matches item2 ID
-                .andExpect(jsonPath("$._embedded.duplicates[0].uuid").value(item2.getID().toString()))
+                .andExpect(jsonPath("$._embedded.potentialDuplicateResources[0].uuid")
+                        .value(item2.getID().toString()))
                 // First item has subject and issue date metadata populated as expected
-                .andExpect(jsonPath("$._embedded.duplicates[0].metadata['dc.subject'][0].value")
+                .andExpect(jsonPath("$._embedded.potentialDuplicateResources[0]" +
+                        ".metadata['dc.subject'][0].value")
                         .value(item2Subject))
-                .andExpect(jsonPath("$._embedded.duplicates[0].metadata['dc.date.issued'][0].value")
+                .andExpect(jsonPath("$._embedded.potentialDuplicateResources[0]" +
+                        ".metadata['dc.date.issued'][0].value")
                         .value(item2IssueDate))
                 // Does NOT have other metadata e.g. author, title
-                .andExpect(jsonPath("$._embedded.duplicates[0].metadata['dc.contributor.author']").doesNotExist())
-                .andExpect(jsonPath("$._embedded.duplicates[0].metadata['dc.title']").doesNotExist());
+                .andExpect(jsonPath("$._embedded.potentialDuplicateResources[0]" +
+                        ".metadata['dc.contributor.author']").doesNotExist())
+                .andExpect(jsonPath("$._embedded.potentialDuplicateResources[0]" +
+                        ".metadata['dc.title']").doesNotExist());
     }
 
     /**
@@ -270,9 +252,11 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
                 .andExpect(jsonPath("$.sections.duplicates.potentialDuplicates[0].uuid")
                         .value(item1.getID().toString()))
                 // Metadata for subject and issue date is populated as expected
-                .andExpect(jsonPath("$.sections.duplicates.potentialDuplicates[0].metadata['dc.subject'][0].value")
+                .andExpect(jsonPath("$.sections.duplicates.potentialDuplicates[0]" +
+                        ".metadata['dc.subject'][0].value")
                         .value(item1Subject))
-                .andExpect(jsonPath("$.sections.duplicates.potentialDuplicates[0].metadata['dc.date.issued'][0].value")
+                .andExpect(jsonPath("$.sections.duplicates.potentialDuplicates[0]" +
+                        ".metadata['dc.date.issued'][0].value")
                         .value(item1IssueDate))
                 // Metadata for other metadata fields has not been copied across, as expected
                 .andExpect(jsonPath("$.sections.duplicates.potentialDuplicates[0]" +
@@ -408,23 +392,24 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
         String reviewerToken = getAuthToken(admin.getEmail(), password);
 
         // The reviewer should be able to see the workflow item as a potential duplicate of the test item
-        getClient(reviewerToken).perform(get("/api/core/items/" + workflowItem1.getItem().getID()
-                        + "/duplicates"))
+        getClient(reviewerToken).perform(get("/api/core/items/search/findDuplicates?uuid="
+                        + workflowItem1.getItem().getID()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 // Valid duplicates array
-                .andExpect(jsonPath("$._embedded.duplicates", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$._embedded.potentialDuplicateResources", Matchers.hasSize(1)))
                 // UUID of only array member matches the new workflow item ID
-                .andExpect(jsonPath("$._embedded.duplicates[0].uuid")
+                .andExpect(jsonPath("$._embedded.potentialDuplicateResources[0].uuid")
                         .value(workflowItem2.getItem().getID().toString()));
 
         // Another random user will NOT see this
         getClient(getAuthToken(anotherEPerson.getEmail(), password))
-                .perform(get("/api/core/items/" + workflowItem1.getItem().getID() + "/duplicates"))
+                .perform(get("/api/core/items/search/findDuplicates?uuid="
+                        + workflowItem1.getItem().getID()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 // Valid duplicates array
-                .andExpect(jsonPath("$._embedded.duplicates", Matchers.hasSize(0)));
+                .andExpect(jsonPath("$._embedded.potentialDuplicateResources").doesNotExist());
     }
 
 }
