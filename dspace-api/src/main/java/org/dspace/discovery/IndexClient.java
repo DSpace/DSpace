@@ -11,9 +11,12 @@ import static org.dspace.discovery.IndexClientOptions.TYPE_OPTION;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
@@ -56,7 +59,13 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
 
         String type = null;
         if (commandLine.hasOption(TYPE_OPTION)) {
+            List<String> indexableObjectTypes = IndexObjectFactoryFactory.getInstance().getIndexFactories().stream()
+                    .map((indexFactory -> indexFactory.getType())).collect(Collectors.toList());
             type = commandLine.getOptionValue(TYPE_OPTION);
+            if (!indexableObjectTypes.contains(type)) {
+                handler.handleException(String.format("%s is not a valid indexable object type, options: %s",
+                        type, Arrays.toString(indexableObjectTypes.toArray())));
+            }
         }
 
         /** Acquire from dspace-services in future */
