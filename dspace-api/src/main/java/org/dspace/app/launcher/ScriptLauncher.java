@@ -146,7 +146,7 @@ public class ScriptLauncher {
     }
 
     /**
-     * This method will execute the script and, if enabled, save it in database
+     * This method will execute the script and, if enabled, saves it in Process' table
      *
      * @param args                  The arguments of the script with the script name as first place in the array
      * @param dSpaceRunnableHandler The relevant DSpaceRunnableHandler
@@ -231,11 +231,8 @@ public class ScriptLauncher {
             // Set <passargs>false</passargs> if the arguments should not be passed on
             String[] useargs = args.clone();
             Class[] argTypes = {useargs.getClass()};
-            boolean passargs = true;
-            if ((step.getAttribute("passuserargs") != null) &&
-                ("false".equalsIgnoreCase(step.getAttribute("passuserargs").getValue()))) {
-                passargs = false;
-            }
+            boolean passargs = (step.getAttribute("passuserargs") == null) ||
+                (!"false".equalsIgnoreCase(step.getAttribute("passuserargs").getValue()));
             if ((args.length == 1) || (("dsrun".equals(request)) && (args.length == 2)) || (!passargs)) {
                 useargs = new String[0];
             } else {
