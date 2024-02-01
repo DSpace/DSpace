@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.scripts.handler.impl;
@@ -21,6 +21,7 @@ import java.util.UUID;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -39,43 +40,36 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * are used by DSpaceRunnables which are called from the CommandLine
  */
 public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
-    private static final Logger log = org.apache.logging.log4j.LogManager
+    private static final Logger log = LogManager
         .getLogger(CommandLineDSpaceRunnableHandler.class);
-
-    private final ProcessService processService = ScriptServiceFactory.getInstance().getProcessService();
-
-    private final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-
     private final ConfigurationService configurationService =
         DSpaceServicesFactory.getInstance().getConfigurationService();
-
+    private final boolean IS_SAVE_ENABLED = isSaveEnabled();
+    private final ProcessService processService = ScriptServiceFactory.getInstance().getProcessService();
+    private final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     String scriptName;
-
     Integer processId;
     UUID ePersonUUID;
 
     public CommandLineDSpaceRunnableHandler() {
-
     }
 
     public CommandLineDSpaceRunnableHandler(String scriptName, List<DSpaceCommandLineParameter> parameters) {
-        if (isSaveEnabled()) {
+        if (IS_SAVE_ENABLED) {
             Context context = new Context();
             try {
-                EPerson ePerson;
+                EPerson ePerson = null;
                 String parameter = parameters.get(0).getName();
                 if (parameter.contains("-e")) {
                     String email = Arrays.stream(parameter.split(" "))
-                            .filter(s -> s.contains("@")).findFirst()
-                            .orElseThrow(() -> new Exception("No email found in parameters"));
+                        .filter(s -> s.contains("@")).findFirst()
+                        .orElseThrow(() -> new IllegalArgumentException("No email found in parameters"));
                     ePerson = ePersonService.findByEmail(context, email);
                     if (ePerson == null) {
-                        throw new Exception("No eperson found with email: " + email);
+                        throw new IllegalArgumentException("No eperson found with email: " + email);
                     }
-                } else {
-                    ePerson = getEpersonProcess(context);
+                    this.ePersonUUID = ePerson.getID();
                 }
-                this.ePersonUUID = ePerson.getID();
                 Process process = processService.create(context, ePerson, scriptName, parameters,
                     new HashSet<>(context.getSpecialGroups()));
                 processId = process.getID();
@@ -86,29 +80,25 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
                     scriptName +
                     " and parameters: " + parameters + " could not be created", e);
             } finally {
-                if (context.isValid()) {
-                    context.abort();
-                }
+                context.close();
             }
         }
     }
 
 
+
     @Override
     public void start() {
         System.out.println("The script has started");
-        if (isSaveEnabled()) {
+        if (IS_SAVE_ENABLED) {
             Context context = new Context();
             try {
                 Process process = processService.find(context, processId);
                 processService.start(context, process);
-                context.complete();
             } catch (SQLException e) {
                 logError("CommandLineDSpaceRunnableHandler with process: " + processId + " could not be started", e);
             } finally {
-                if (context.isValid()) {
-                    context.abort();
-                }
+                context.close();
             }
         }
     }
@@ -116,7 +106,7 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
     @Override
     public void handleCompletion() {
         System.out.println("The script has completed");
-        if (isSaveEnabled()) {
+        if (IS_SAVE_ENABLED) {
             Context context = new Context();
             try {
                 Process process = processService.find(context, processId);
@@ -127,9 +117,7 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
             } catch (Exception e) {
                 logError(e.getMessage(), e);
             } finally {
-                if (context.isValid()) {
-                    context.abort();
-                }
+                context.close();
             }
         }
     }
@@ -155,21 +143,18 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
             log.error(e.getMessage(), e);
         }
 
-        if (isSaveEnabled()) {
+        if (IS_SAVE_ENABLED) {
             Context context = new Context();
             try {
                 Process process = processService.find(context, processId);
                 processService.fail(context, process);
-
                 context.complete();
             } catch (SQLException sqlException) {
                 logError("SQL exception while handling another exception", e);
             } catch (Exception exception) {
                 logError(exception.getMessage(), exception);
             } finally {
-                if (context.isValid()) {
-                    context.abort();
-                }
+                context.close();
             }
         }
 
@@ -242,21 +227,4 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
     private boolean isSaveEnabled() {
         return configurationService.getBooleanProperty("process.save-enable", false);
     }
-
-    /**
-     * Get the EPerson that is used to create the process
-     *
-     * @param context context
-     * @return the EPerson that is used to create the process
-     * @throws Exception if the EPerson UUID is not valid
-     */
-    private EPerson getEpersonProcess(Context context) throws Exception {
-        String epersonEmail = configurationService.getProperty("process.eperson");
-        EPerson ePerson = ePersonService.findByEmail(context, epersonEmail);
-        if (ePerson == null) {
-            throw new Exception("EPerson email not valid, no result found.");
-        }
-        return ePerson;
-    }
-
 }
