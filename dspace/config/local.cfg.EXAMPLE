@@ -367,6 +367,9 @@ webui.browse.index.3 = title:item:title
 webui.browse.index.4 = subject:metadata:dc.subject.*:text
 #webui.browse.index.5 = dateaccessioned:item:dateaccessioned
 
+# Disable "Browse by Subject Category
+webui.browse.vocabularies.disabled = srsc
+
 # OpenSearch settings
 websvc.opensearch.enable = true
 websvc.opensearch.shortname = drum

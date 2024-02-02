@@ -139,6 +139,7 @@ information.
 * LIBDRUM-739 - "Has Files" removed from search options
 * LIBDRUM-746 - "Abstract" field modified to not preserve line breaks when
   displayed
+* LIBDRUM-844 - Disable "By Subject Category" Browse option
 
 ## DRUM DOI
 
