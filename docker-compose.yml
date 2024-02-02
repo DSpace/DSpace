@@ -36,7 +36,7 @@ services:
     depends_on:
     - dspacedb
     networks:
-      dspacenet:
+      - dspacenet
     ports:
     - published: 8080
       target: 8080
