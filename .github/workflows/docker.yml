@@ -102,6 +102,8 @@ jobs:
       build_id: dspace-solr
       image_name: dspace/dspace-solr
       dockerfile_path: ./dspace/src/main/docker/dspace-solr/Dockerfile
+      # Must pass solrconfigs to the Dockerfile so that it can find the required Solr config files
+      dockerfile_additional_contexts: 'solrconfigs=./dspace/solr/'
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
