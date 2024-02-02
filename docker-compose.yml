@@ -36,7 +36,7 @@ services:
     depends_on:
     - dspacedb
     networks:
-      dspacenet:
+      - dspacenet
     ports:
     - published: 8080
       target: 8080
@@ -89,8 +89,10 @@ services:
     container_name: dspacesolr
     image: "${DOCKER_OWNER:-dspace}/dspace-solr:${DSPACE_VER:-dspace-7_x}"
     build:
-      context: .
-      dockerfile: ./dspace/src/main/docker/dspace-solr/Dockerfile
+      context: ./dspace/src/main/docker/dspace-solr/
+      # Provide path to Solr configs necessary to build Docker image
+      additional_contexts:
+        solrconfigs: ./dspace/solr/
       args:
         SOLR_VERSION: "${SOLR_VER:-8.11}"
     networks:
