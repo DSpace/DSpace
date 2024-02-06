@@ -495,12 +495,6 @@
         <dependency>
             <groupId>jaxen</groupId>
             <artifactId>jaxen</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>xom</artifactId>
-                    <groupId>xom</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jdom</groupId>
@@ -635,7 +629,7 @@
         <dependency>
             <groupId>dnsjava</groupId>
             <artifactId>dnsjava</artifactId>
-            <version>2.1.7</version>
+            <version>2.1.9</version>
         </dependency>
 
         <dependency>
@@ -671,7 +665,7 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>8.4.4</version>
+            <version>8.5.13</version>
         </dependency>
 
         <!-- Google Analytics -->
@@ -794,7 +788,7 @@
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
-            <version>5.6</version>
+            <version>5.7.1</version>
         </dependency>
 
         <!-- Email templating -->
@@ -812,7 +806,7 @@
         <dependency>
             <groupId>org.apache.bcel</groupId>
             <artifactId>bcel</artifactId>
-            <version>6.6.0</version>
+            <version>6.7.0</version>
             <scope>test</scope>
         </dependency>
 
@@ -821,6 +815,13 @@
             <groupId>eu.openaire</groupId>
             <artifactId>funders-model</artifactId>
             <version>2.0.0</version>
+            <exclusions>
+                <!-- Newer version pulled in via Jersey below -->
+                <exclusion>
+                    <groupId>org.javassist</groupId>
+                    <artifactId>javassist</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -925,7 +926,7 @@
           <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
-            <version>2.13.9</version>
+            <version>2.13.11</version>
             <scope>test</scope>
           </dependency>
         </dependencies>
