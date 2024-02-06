@@ -100,7 +100,7 @@ public class ProcessServiceImpl implements ProcessService {
                     scriptName + " and parameters " + parameters));
         } else {
             log.info(LogHelper.getHeader(context, "process_create",
-                "Process has been created for anonymous user with ID " + createdProcess.getID()
+                "Process has been created for command-line user with ID " + createdProcess.getID()
                     + " and scriptName " + scriptName + " and parameters " + parameters));
         }
         return createdProcess;
