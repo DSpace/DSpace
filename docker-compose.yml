@@ -123,7 +123,7 @@ services:
       cp -r /opt/solr/server/solr/configsets/statistics/* statistics
       precreate-core qaevent /opt/solr/server/solr/configsets/qaevent
       cp -r /opt/solr/server/solr/configsets/qaevent/* qaevent
-      precreate-core qaevent /opt/solr/server/solr/configsets/suggestion
+      precreate-core suggestion /opt/solr/server/solr/configsets/suggestion
       cp -r /opt/solr/server/solr/configsets/suggestion/* suggestion
       exec solr -f
 volumes:
