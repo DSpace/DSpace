@@ -8,7 +8,8 @@
 package org.dspace.app.suggestion;
 
 /**
- * 
+ * This DTO class is used to pass around the number of items interested by suggestion provided by a specific source
+ * (i.e. openaire)
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */

@@ -8,12 +8,15 @@
 package org.dspace.app.suggestion.openaire;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import org.dspace.app.suggestion.SuggestionEvidence;
 import org.dspace.app.suggestion.SuggestionUtils;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.util.MultiFormatDateParser;
@@ -28,23 +31,60 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class DateScorer implements EvidenceScorer {
 
+    /**
+     * if available it should contains the metadata field key in the form (schema.element[.qualifier]) that contains
+     * the birth date of the researcher
+     */
     private String birthDateMetadata;
 
-    //private String educationDateMetadata;
+    /**
+     * if available it should contains the metadata field key in the form (schema.element[.qualifier]) that contains
+     * the date of graduation of the researcher. If the metadata has multiple values the min will be used
+     */
+    private String educationDateMetadata;
 
+    /**
+     * Force the scorer to reject any publication that was issued before the specified date
+     */
     private String minDateMetadata;
 
+    /**
+     * Force the scorer to reject any publication that was issued after the specified date
+     */
     private String maxDateMetadata;
 
+    /**
+     * The minimal age that is expected for a researcher to be a potential author of a scholarly contribution
+     * (i.e. the minimum delta from the publication date and the birth date)
+     */
     private int birthDateDelta = 20;
+
+    /**
+     * The maximum age that is expected for a researcher to be a potential author of a scholarly contribution
+     * (i.e. the maximum delta from the publication date and the birth date)
+     */
     private int birthDateRange = 50;
 
+    /**
+     * The number of year from/before the graduation that is expected for a researcher to be a potential
+     * author of a scholarly contribution (i.e. the minimum delta from the publication date and the first
+     * graduation date)
+     */
     private int educationDateDelta = -3;
+
+    /**
+     * The maximum scientific longevity that is expected for a researcher from its graduation to be a potential
+     * author of a scholarly contribution (i.e. the maximum delta from the publication date and the first
+     * graduation date)
+     */
     private int educationDateRange = 50;
 
     @Autowired
     private ItemService itemService;
 
+    /**
+     * the metadata used in the publication to track the publication date (i.e. dc.date.issued)
+     */
     private String publicationDateMetadata;
 
     public void setItemService(ItemService itemService) {
@@ -58,7 +98,7 @@ public class DateScorer implements EvidenceScorer {
     public String getBirthDateMetadata() {
         return birthDateMetadata;
     }
-    /*
+
     public void setEducationDateMetadata(String educationDate) {
         this.educationDateMetadata = educationDate;
     }
@@ -66,7 +106,6 @@ public class DateScorer implements EvidenceScorer {
     public String getEducationDateMetadata() {
         return educationDateMetadata;
     }
-    */
 
     public void setBirthDateDelta(int birthDateDelta) {
         this.birthDateDelta = birthDateDelta;
@@ -99,6 +138,7 @@ public class DateScorer implements EvidenceScorer {
     /**
      * Method which is responsible to evaluate ImportRecord based on the publication date.
      * ImportRecords which have a date outside the defined or calculated expected range will be discarded.
+     * {@link DateScorer#birthDateMetadata}, {@link DateScorer#educationDateMetadata}
      * 
      * @param importRecord the ExternalDataObject to check
      * @param researcher DSpace item
@@ -153,14 +193,8 @@ public class DateScorer implements EvidenceScorer {
         } else {
             String birthDateStr = getSingleValue(researcher, birthDateMetadata);
             int birthDateYear = getYear(birthDateStr);
-            int educationDateYear = -1;
-            /*
-            getListMetadataValues(researcher, educationDateMetadata)
-              .stream()
-              .mapToInt(x -> getYear(x.getValue()))
-              .filter(d -> d > 0)
-              .min().orElse(-1);
-            */
+            int educationDateYear = getListMetadataValues(researcher, educationDateMetadata).stream()
+                    .mapToInt(x -> getYear(x.getValue())).filter(d -> d > 0).min().orElse(-1);
             if (educationDateYear > 0) {
                 return new Integer[] {
                     minYear > 0 ? minYear : educationDateYear + educationDateDelta,
@@ -177,7 +211,6 @@ public class DateScorer implements EvidenceScorer {
         }
     }
 
-    /*
     private List<MetadataValue> getListMetadataValues(Item researcher, String metadataKey) {
         if (metadataKey != null) {
             return itemService.getMetadataByMetadataString(researcher, metadataKey);
@@ -185,7 +218,6 @@ public class DateScorer implements EvidenceScorer {
             return Collections.EMPTY_LIST;
         }
     }
-    */
 
     private String getSingleValue(Item researcher, String metadataKey) {
         if (metadataKey != null) {

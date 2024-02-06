@@ -10,7 +10,8 @@ package org.dspace.app.suggestion;
 import org.dspace.content.Item;
 
 /**
- * 
+ * This DTO class is used to pass around the number of suggestions available from a specific source for a target
+ * repository item
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
@@ -29,7 +30,7 @@ public class SuggestionTarget {
     }
 
     /**
-     * Wrap a target person into a suggestion target.
+     * Wrap a target repository item (usually a person item) into a suggestion target.
      * 
      * @param item must be not null
      */
