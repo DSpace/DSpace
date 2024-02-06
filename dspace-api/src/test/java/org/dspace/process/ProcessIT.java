@@ -95,7 +95,7 @@ public class ProcessIT extends AbstractIntegrationTestWithDatabase {
             ProcessBuilder.createProcess(context, null, "mock-script", new LinkedList<>(),
                 new HashSet<>()).build();
         } catch (NullPointerException e) {
-            fail("Should not have throw NullPointerException");
+            fail("Should not have thrown NullPointerException");
         }
     }
 }
