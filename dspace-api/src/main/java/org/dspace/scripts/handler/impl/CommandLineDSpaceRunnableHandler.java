@@ -76,9 +76,16 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
                 this.scriptName = process.getName();
                 context.complete();
             } catch (Exception e) {
-                logError("CommandLineDspaceRunnableHandler with ePerson: " + ePersonUUID + " for Script with name: " +
-                    scriptName +
-                    " and parameters: " + parameters + " could not be created", e);
+                if (ePersonUUID != null) {
+                    logError(
+                        "CommandLineDspaceRunnableHandler with ePerson: " + ePersonUUID + " for Script with name: " +
+                            scriptName +
+                            " and parameters: " + parameters + " could not be created", e);
+                } else {
+                    logError(
+                        "CommandLineDspaceRunnableHandler with command-line user for Script with name: " + scriptName +
+                            " and parameters: " + parameters + " could not be created", e);
+                }
             } finally {
                 context.close();
             }
@@ -94,6 +101,7 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
             try {
                 Process process = processService.find(context, processId);
                 processService.start(context, process);
+                context.complete();
             } catch (SQLException e) {
                 logError("CommandLineDSpaceRunnableHandler with process: " + processId + " could not be started", e);
             } finally {
