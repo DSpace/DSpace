@@ -92,7 +92,7 @@
             </Description>
         </Context>
         <!--
-            RIOXX Guidelines v3.0 Final:
+            Rioxx Guidelines v3.0 Final:
             - https://www.rioxx.net/profiles/v3-0-final
 
          -->
@@ -105,7 +105,7 @@
             <Format ref="rioxx"/>
             <Format ref="qdc"/>
             <Description>
-                This contexts complies with RIOXX rules.
+                This context complies with the Rioxx metadata profile version 3
             </Description>
         </Context>
 
@@ -203,9 +203,8 @@
             <Namespace>http://namespace.openaire.eu/schema/oaire/</Namespace>
             <SchemaLocation>https://www.openaire.eu/schema/repo-lit/4.0/openaire.xsd</SchemaLocation>
         </Format>
-        <!-- Metadata format based on the RCUK RIOXX Application Profile Version 2.0 Final AND 3.0 RC1
-             - https://www.rioxx.net/profiles/v2-0-final/
-             - https://rioxx.net/profiles/v3-0-rc-1/
+        <!-- Metadata format based on the Rioxx Application Profile Version 3.0 Final
+             - https://www.rioxx.net/profiles/v3-0-final
         -->
         <Format id="rioxx">
             <Prefix>rioxx</Prefix>
@@ -231,7 +230,7 @@
         </Transformer>
         <Transformer id="rioxxTransformer">
             <XSLT>transformers/rioxx.xsl</XSLT>
-            <Description>RIOXX context transformer</Description>
+            <Description>Rioxx context transformer</Description>
         </Transformer>
     </Transformers>
 
@@ -395,7 +394,7 @@
             </Definition>
         </Filter>
 
-        <!-- RIOXX v3.0 Final filter for records returned by OAI-PMH.
+        <!-- Rioxx v3.0 Final filter for records returned by OAI-PMH.
              By default, return an Item record:
                 * If it is publicly accessible
                 * * OR it has been withdrawn (in order to display a tombstone record).
@@ -405,7 +404,7 @@
                 * * dc.type is present OR dspace.entity.type is Publication
                 * * dateAccepted
                 * * language
-             This filter is only used in the RIOXX context ([oai]/rioxx).
+             This filter is only used in the Rioxx context ([oai]/rioxx).
         -->
         <Filter id="rioxxFilter">
             <Definition>
@@ -507,7 +506,7 @@
             </Configuration>
         </CustomCondition>
 
-        <!-- RIOXX specific custom conditions -->
+        <!-- Rioxx specific custom conditions -->
         <CustomCondition id="rioxxTypeExistsCondition">
             <Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
             <Configuration>
@@ -652,7 +651,7 @@
         </Set>
         <Set id="rioxxSet">
             <Spec>rioxx</Spec>
-            <Name>RIOXX set</Name>
+            <Name>Rioxx set</Name>
             <!-- Just an alias -->
         </Set>
     </Sets>
