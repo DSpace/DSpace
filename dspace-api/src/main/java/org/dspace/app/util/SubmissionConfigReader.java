@@ -238,17 +238,19 @@ public class SubmissionConfigReader {
                 return getSubmissionConfigByName(submitName);
             }
 
-            try {
-                List<Community> communities = col.getCommunities();
-                for (Community com : communities) {
-                    submitName = getSubmissionConfigByCommunity(com);
-                    if (submitName != null) {
-                        return getSubmissionConfigByName(submitName);
+            if (!communityToSubmissionConfig.isEmpty()) {
+                try {
+                    List<Community> communities = col.getCommunities();
+                    for (Community com : communities) {
+                        submitName = getSubmissionConfigByCommunity(com);
+                        if (submitName != null) {
+                            return getSubmissionConfigByName(submitName);
+                        }
                     }
+                } catch (SQLException sqle) {
+                    throw new IllegalStateException("Error occurred while getting item submission configured " +
+                                                    "by community", sqle);
                 }
-            } catch (SQLException sqle) {
-                throw new IllegalStateException("Error occurred while getting item submission configured " +
-                                                "by community", sqle);
             }
         }
 
