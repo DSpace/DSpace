@@ -7,6 +7,8 @@
  */
 package org.dspace.discovery.indexobject;
 
+import static org.apache.commons.lang3.time.DateFormatUtils.format;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -15,7 +17,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.app.ldn.LDNMessageEntity;
 import org.dspace.app.ldn.NotifyServiceEntity;
@@ -134,16 +135,18 @@ public class LDNMessageEntityIndexFactoryImpl extends IndexFactoryImpl<Indexable
 
     private void indexDateFieldForFacet(SolrInputDocument doc, Date queueLastStartTime) {
         if (queueLastStartTime != null) {
-            String value = DateFormatUtils.format(queueLastStartTime, "yyyy-MM-dd");
+            String value = format(queueLastStartTime, "yyyy-MM-dd");
+            addFacetIndex(doc, "queue_last_start_time", value, value);
             doc.addField("queue_last_start_time", value);
             doc.addField("queue_last_start_time_dt", queueLastStartTime);
-            doc.addField("queue_last_start_time_keyword", value);
             doc.addField("queue_last_start_time_min", value);
             doc.addField("queue_last_start_time_min_sort", value);
             doc.addField("queue_last_start_time_max", value);
             doc.addField("queue_last_start_time_max_sort", value);
             doc.addField("queue_last_start_time.year",
-                Integer.parseInt(DateFormatUtils.format(queueLastStartTime, "yyyy")));
+                Integer.parseInt(format(queueLastStartTime, "yyyy")));
+            doc.addField("queue_last_start_time.year_sort",
+                Integer.parseInt(format(queueLastStartTime, "yyyy")));
         }
     }
 
