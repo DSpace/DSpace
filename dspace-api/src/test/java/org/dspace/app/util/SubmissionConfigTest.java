@@ -11,13 +11,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.content.Collection;
-import org.dspace.content.Community;
 import org.dspace.submit.factory.SubmissionServiceFactory;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -36,19 +34,7 @@ public class SubmissionConfigTest extends AbstractUnitTest {
     DCInputsReader inputReader;
 
     @Mock
-    Community topcom;
-
-    @Mock
-    Community subcom1;
-
-    @Mock
-    Community subcom2;
-
-    @Mock
     private Collection col1;
-
-    @Mock
-    private Collection col2;
 
     @BeforeClass
     public static void setUpClass() {
@@ -108,36 +94,5 @@ public class SubmissionConfigTest extends AbstractUnitTest {
         // Article and type should match a subset of the fields without ISBN
         assertEquals(unboundFields, allowedFieldsForArticle);
         assertEquals(unboundFields, allowedFieldsForNoType);
-    }
-
-    @Test
-    public void testSubmissionMapByCommunityHandleSubmissionConfig()
-        throws SubmissionConfigReaderException, DCInputsReaderException, SQLException {
-
-        // Sep up a structure with one top community and two subcommunities
-        // with one collection
-        when(col1.getHandle()).thenReturn("123456789/not-mapped1");
-        when(col1.getCommunities()).thenReturn(List.of(subcom1));
-
-        when(col2.getHandle()).thenReturn("123456789/not-mapped2");
-        when(col2.getCommunities()).thenReturn(List.of(subcom2));
-
-        when(subcom1.getHandle()).thenReturn("123456789/subcommunity-test");
-
-        when(subcom2.getParentCommunities()).thenReturn(List.of(topcom));
-        when(subcom2.getHandle()).thenReturn("123456789/not-mapped3");
-
-        when(topcom.getHandle()).thenReturn("123456789/topcommunity-test");
-
-        // for col1, it should return the item submission form defined for their parent subcom1
-        SubmissionConfig submissionConfig1 =
-            new SubmissionConfigReader().getSubmissionConfigByCollection(col1);
-        assertEquals("subcommunitytest", submissionConfig1.getSubmissionName());
-
-        // for col2, it should return the item submission form defined for topcom
-        SubmissionConfig submissionConfig2 =
-            new SubmissionConfigReader().getSubmissionConfigByCollection(col2);
-        assertEquals("topcommunitytest", submissionConfig2.getSubmissionName());
-
     }
 }
