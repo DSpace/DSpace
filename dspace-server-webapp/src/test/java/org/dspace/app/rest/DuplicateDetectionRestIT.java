@@ -39,7 +39,6 @@ import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.I18nUtil;
 import org.dspace.discovery.IndexingService;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.service.IdentifierService;
@@ -79,6 +78,8 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
     AuthorizeService authorizeService;
     @Autowired
     XmlWorkflowService workflowService;
+    @Autowired
+    EPersonService ePersonService;
 
     private Collection col;
     private Collection simpleCol;
@@ -117,7 +118,6 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
                 .build();
         eperson.setFirstName(context, "first");
         eperson.setLastName(context, "last");
-        EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
         anotherEPerson = ePersonService.findByEmail(context, "test-another-user@email.com");
         if (anotherEPerson == null) {
             anotherEPerson = ePersonService.create(context);
@@ -213,19 +213,19 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
         // item2 is 1 edit distance from item1 and item3
         // item1 and item3 are 2 edit distance from each other
         Item item1 = ItemBuilder.createItem(context, col)
-                .withTitle(item1Title) // Public item I
+                .withTitle("Submission section test I") // Public item I
                 .withIssueDate(item1IssueDate)
                 .withAuthor(item1Author)
                 .withSubject(item1Subject)
                 .build();
         Item item2 = ItemBuilder.createItem(context, col)
-                .withTitle("Public item II")
+                .withTitle("Submission section test II")
                 .withIssueDate(item2IssueDate)
                 .withAuthor("Smith, Donald X.")
                 .withSubject(item2Subject)
                 .build();
         Item item3 = ItemBuilder.createItem(context, col)
-                .withTitle("Public item III")
+                .withTitle("Submission section test III")
                 .withIssueDate("2013-10-17")
                 .withAuthor("Smith, Donald Y.")
                 .withSubject("ExtraEntry 3")
@@ -233,7 +233,7 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
         // Create a new workspace item with a similar title to Item 1 (1 edit distance). Reuse other items
         // metadata for the rest, as it is not relevant.
         WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, workspaceCollection)
-                .withTitle("Public item X")
+                .withTitle("Submission section test 1")
                 .withSubject(item2Subject)
                 .withIssueDate(item2IssueDate)
                 .withAuthor(item1Author)
@@ -264,11 +264,9 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
                 .andExpect(jsonPath("$.sections.duplicates.potentialDuplicates[0]" +
                         ".metadata['dc.title']").doesNotExist());
 
-        // Try to add ISBN (type bound to book and book chapter) - this should not work and instead we'll get
-        // no JSON path for that field, because this item has no type yet
         List<Operation> updateOperations = new ArrayList<Operation>();
         Map<String, String> value = new HashMap<String, String>();
-        value.put("value", "Public item II");
+        value.put("value", "Submission section test II");
         updateOperations.add(new ReplaceOperation("/sections/traditionalpageone/dc.title/0", value));
         String patchBody = getPatchContent(updateOperations);
         getClient(submitterToken).perform(patch("/api/submission/workspaceitems/" + workspaceItem.getID())
@@ -410,6 +408,20 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
                 .andExpect(content().contentType(contentType))
                 // Valid duplicates array
                 .andExpect(jsonPath("$._embedded.potentialDuplicateResources").doesNotExist());
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        if (anotherEPerson != null) {
+            try {
+                context.turnOffAuthorisationSystem();
+                ePersonService.delete(context, anotherEPerson);
+                context.restoreAuthSystemState();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        super.destroy();
     }
 
 }
