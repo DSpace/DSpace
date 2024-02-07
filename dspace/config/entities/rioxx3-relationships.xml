@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE relationships SYSTEM "relationship-types.dtd">
-
+<!-- Note that these relationships are the same as those for openaire4
+ 	They are used to map to relevant fields within the Rioxx profile. See docs below. -->
 <relationships>
 
 	<!-- https://www.rioxx.net/profiles/v3-0-final/#rioxxterms:creator
