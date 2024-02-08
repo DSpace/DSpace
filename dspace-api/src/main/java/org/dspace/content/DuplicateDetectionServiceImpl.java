@@ -253,7 +253,7 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
 
         // If the item is null or otherwise invalid (template, etc) then throw an appropriate error
         if (item == null) {
-            throw new ResourceNotFoundException("No such item: " + item);
+            throw new ResourceNotFoundException("Duplicate search error: item is null");
         }
         if (item.getTemplateItemOf() != null) {
             throw new IllegalArgumentException("Cannot get duplicates for template item");
