@@ -105,10 +105,22 @@ public class PublicationLoader extends SolrSuggestionProvider {
      */
     public void importAuthorRecords(Context context, Item researcher)
             throws SolrServerException, IOException {
-        List<ExternalDataObject> metadata = getImportRecords(researcher);
-        List<Suggestion> records = reduceAndTransform(researcher, metadata);
-        for (Suggestion record : records) {
-            solrSuggestionStorageService.addSuggestion(record, false, false);
+        int offset = 0;
+        int limit = 10;
+        int loaded = limit;
+        List<String> searchValues = searchMetadataValues(researcher);
+        while (loaded > 0) {
+            List<ExternalDataObject> metadata = getImportRecords(searchValues, researcher, offset, limit);
+            if (metadata.isEmpty()) {
+                loaded = 0;
+                continue;
+            }
+            offset += limit;
+            loaded = metadata.size();
+            List<Suggestion> records = reduceAndTransform(researcher, metadata);
+            for (Suggestion record : records) {
+                solrSuggestionStorageService.addSuggestion(record, false, false);
+            }
         }
         solrSuggestionStorageService.commit();
     }
@@ -154,14 +166,18 @@ public class PublicationLoader extends SolrSuggestionProvider {
      * get from metadata key defined in class level variable names as author to query OpenAIRE.
      * 
      * @see org.dspace.importer.external.openaire.service.OpenAireImportMetadataSourceServiceImpl
+     * @param searchValues query
      * @param researcher item to extract metadata from
+     * @param limit for pagination purpose
+     * @param offset for pagination purpose
      * @return list of ImportRecord
      */
-    private List<ExternalDataObject> getImportRecords(Item researcher) {
-        List<String> searchValues = searchMetadataValues(researcher);
+    private List<ExternalDataObject> getImportRecords(List<String> searchValues,
+        Item researcher, int offset, int limit) {
         List<ExternalDataObject> matchingRecords = new ArrayList<>();
         for (String searchValue : searchValues) {
-            matchingRecords.addAll(primaryProvider.searchExternalDataObjects(searchValue, 0, 9999));
+            matchingRecords.addAll(
+                primaryProvider.searchExternalDataObjects(searchValue, offset, limit));
         }
         List<ExternalDataObject> toReturn = removeDuplicates(matchingRecords);
         return toReturn;
