@@ -97,15 +97,14 @@ public class PublicationLoaderRunnable
         SearchService searchService = new DSpace().getSingletonService(SearchService.class);
         DiscoverQueryBuilder queryBuilder = SearchUtils.getQueryBuilder();
         List<QueryBuilderSearchFilter> filters = new ArrayList<QueryBuilderSearchFilter>();
+        String query = "*:*";
         if (profileUUID != null) {
-            QueryBuilderSearchFilter queryBuilderSearchFilter =
-                new QueryBuilderSearchFilter("search.resourceid", "equals", profileUUID.toString());
-            filters.add(queryBuilderSearchFilter);
+            query = "search.resourceid:" + profileUUID.toString();
         }
         try {
             DiscoverQuery discoverQuery = queryBuilder.buildQuery(context, null,
                 SearchUtils.getDiscoveryConfigurationByName("person"),
-                "*:*", filters,
+                query, filters,
                 "Item", 10, Long.getLong("0"), null, SortOption.DESCENDING);
             return searchService.iteratorSearch(context, null, discoverQuery);
         } catch (SearchServiceException e) {
