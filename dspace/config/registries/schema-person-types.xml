@@ -155,5 +155,19 @@
         <qualifier>variant</qualifier>
         <scope_note>Full name variant</scope_note>
     </dc-type>
+    
+    <dc-type>
+        <schema>person</schema>
+        <element>range</element>
+        <qualifier>maxdate</qualifier>
+        <scope_note>Last year in which the person is likely to be a contributor</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>person</schema>
+        <element>range</element>
+        <qualifier>mindate</qualifier>
+        <scope_note>First year in which the person is likely to be a contributor</scope_note>
+    </dc-type>
 
 </dspace-dc-types>

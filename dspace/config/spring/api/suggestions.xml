@@ -52,8 +52,9 @@
                 <bean
                     class="org.dspace.app.suggestion.openaire.DateScorer">
                     <property name="birthDateMetadata" value="person.birthDate" />
-                    <!-- <property name="educationDateMetadata" value="crisrp.education.end" /> -->
                     <property name="publicationDateMetadata" value="dc.date.issued" />
+                    <property name="maxDateMetadata" value="person.range.maxdate" />
+                    <property name="minDateMetadata" value="person.range.mindate" />
                 </bean>    
             </list>
         </property>
