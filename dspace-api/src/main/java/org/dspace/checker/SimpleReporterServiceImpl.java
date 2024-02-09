@@ -152,6 +152,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService {
 
         osw.write("\n");
         osw.write(msg("bitstream-not-found-report"));
+        osw.write(" ");
         osw.write(applyDateFormatShort(startDate));
         osw.write(" ");
         osw.write(msg("date-range-to"));
@@ -230,6 +231,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService {
 
         osw.write("\n");
         osw.write(msg("unchecked-bitstream-report"));
+        osw.write(" ");
         osw.write(applyDateFormatShort(new Date()));
         osw.write("\n\n\n");
 

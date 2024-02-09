@@ -14,6 +14,7 @@ import static org.dspace.app.rest.model.SearchConfigurationRest.Filter.OPERATOR_
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
@@ -45,10 +46,10 @@ import org.dspace.discovery.indexobject.MetadataFieldIndexFactoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-
 /**
  * This is the repository responsible to manage MetadataField Rest object
  *
@@ -135,13 +136,14 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         @Parameter(value = "exactName", required = false) String exactName,
         Pageable pageable) throws SQLException {
         Context context = obtainContext();
+        long totalElements = 0;
 
         List<MetadataField> matchingMetadataFields = new ArrayList<>();
 
         if (StringUtils.isBlank(exactName)) {
             // Find matches in Solr Search core
             DiscoverQuery discoverQuery =
-                this.createDiscoverQuery(context, schemaName, elementName, qualifierName, query);
+                this.createDiscoverQuery(context, schemaName, elementName, qualifierName, query, pageable);
             try {
                 DiscoverResult searchResult = searchService.search(context, null, discoverQuery);
                 for (IndexableObject object : searchResult.getIndexableObjects()) {
@@ -149,6 +151,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
                         matchingMetadataFields.add(((IndexableMetadataField) object).getIndexedObject());
                     }
                 }
+                totalElements = searchResult.getTotalSearchResults();
             } catch (SearchServiceException e) {
                 log.error("Error while searching with Discovery", e);
                 throw new IllegalArgumentException("Error while searching with Discovery: " + e.getMessage());
@@ -163,10 +166,11 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
             MetadataField exactMatchingMdField = metadataFieldService.findByString(context, exactName, '.');
             if (exactMatchingMdField != null) {
                 matchingMetadataFields.add(exactMatchingMdField);
+                totalElements = 1;
             }
         }
 
-        return converter.toRestPage(matchingMetadataFields, pageable, utils.obtainProjection());
+        return converter.toRestPage(matchingMetadataFields, pageable, totalElements, utils.obtainProjection());
     }
 
     /**
@@ -182,7 +186,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
      * @throws SQLException If DB error
      */
     private DiscoverQuery createDiscoverQuery(Context context, String schemaName, String elementName,
-        String qualifierName, String query) throws SQLException {
+        String qualifierName, String query, Pageable pageable) throws SQLException {
         List<String> filterQueries = new ArrayList<>();
         if (StringUtils.isNotBlank(query)) {
             if (query.split("\\.").length > 3) {
@@ -210,6 +214,15 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.addFilterQueries(filterQueries.toArray(new String[filterQueries.size()]));
+        Iterator<Sort.Order> orderIterator = pageable.getSort().iterator();
+        if (orderIterator.hasNext()) {
+            Sort.Order order = orderIterator.next();
+            discoverQuery.setSortField(order.getProperty() + "_sort",
+                                       order.getDirection() == Sort.Direction.ASC ? DiscoverQuery.SORT_ORDER.asc :
+                                           DiscoverQuery.SORT_ORDER.desc);
+        }
+        discoverQuery.setStart(Math.toIntExact(pageable.getOffset()));
+        discoverQuery.setMaxResults(pageable.getPageSize());
         return discoverQuery;
     }
 
@@ -247,10 +260,18 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
 
         if (isBlank(metadataFieldRest.getElement())) {
             throw new UnprocessableEntityException("metadata element (in request body) cannot be blank");
+        } else if (!metadataFieldRest.getElement().matches("^[^. ,]{1,64}$")) {
+            throw new UnprocessableEntityException(
+                "metadata element (in request body) cannot contain dots, commas or spaces and should be smaller than" +
+                    " 64 characters");
         }
 
         if (isBlank(metadataFieldRest.getQualifier())) {
             metadataFieldRest.setQualifier(null);
+        } else if (!metadataFieldRest.getQualifier().matches("^[^. ,]{1,64}$")) {
+            throw new UnprocessableEntityException(
+                "metadata qualifier (in request body) cannot contain dots, commas or spaces and should be smaller" +
+                    " than 64 characters");
         }
 
         // create
@@ -300,24 +321,26 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         try {
             metadataFieldRest = new ObjectMapper().readValue(jsonNode.toString(), MetadataFieldRest.class);
         } catch (JsonProcessingException e) {
-            throw new UnprocessableEntityException("Cannot parse JSON in request body", e);
+            throw new DSpaceBadRequestException("Cannot parse JSON in request body", e);
         }
 
-        if (metadataFieldRest == null || isBlank(metadataFieldRest.getElement())) {
-            throw new UnprocessableEntityException("metadata element (in request body) cannot be blank");
+        MetadataField metadataField = metadataFieldService.find(context, id);
+        if (metadataField == null) {
+            throw new UnprocessableEntityException("metadata field with id: " + id + " not found");
+        }
+
+        if (!Objects.equals(metadataFieldRest.getElement(), metadataField.getElement())) {
+            throw new UnprocessableEntityException("Metadata element cannot be updated.");
+        }
+
+        if (!Objects.equals(metadataFieldRest.getQualifier(), metadataField.getQualifier())) {
+            throw new UnprocessableEntityException("Metadata qualifier cannot be updated.");
         }
 
         if (!Objects.equals(id, metadataFieldRest.getId())) {
             throw new UnprocessableEntityException("ID in request body doesn't match path ID");
         }
 
-        MetadataField metadataField = metadataFieldService.find(context, id);
-        if (metadataField == null) {
-            throw new ResourceNotFoundException("metadata field with id: " + id + " not found");
-        }
-
-        metadataField.setElement(metadataFieldRest.getElement());
-        metadataField.setQualifier(metadataFieldRest.getQualifier());
         metadataField.setScopeNote(metadataFieldRest.getScopeNote());
 
         try {

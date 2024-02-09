@@ -16,8 +16,6 @@ import java.math.BigInteger;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
@@ -415,7 +413,9 @@ public final class Utils {
      * @return metadata field key
      */
     public static String standardize(String schema, String element, String qualifier, String separator) {
-        if (StringUtils.isBlank(qualifier)) {
+        if (StringUtils.isBlank(element)) {
+            return null;
+        } else if (StringUtils.isBlank(qualifier)) {
             return schema + separator + element;
         } else {
             return schema + separator + element + separator + qualifier;
@@ -447,14 +447,14 @@ public final class Utils {
      */
     public static String getHostName(String uriString) {
         try {
-            URI uri = new URI(uriString);
-            String hostname = uri.getHost();
+            URL url = new URL(uriString);
+            String hostname = url.getHost();
             // remove the "www." from hostname, if it exists
             if (hostname != null) {
                 return hostname.startsWith("www.") ? hostname.substring(4) : hostname;
             }
             return null;
-        } catch (URISyntaxException e) {
+        } catch (MalformedURLException e) {
             return null;
         }
     }

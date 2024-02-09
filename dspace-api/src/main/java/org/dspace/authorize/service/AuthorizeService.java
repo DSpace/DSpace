@@ -470,24 +470,6 @@ public interface AuthorizeService {
     public ResourcePolicy findByTypeGroupAction(Context c, DSpaceObject dso, Group group, int action)
         throws SQLException;
 
-
-    /**
-     * Generate Policies policies READ for the date in input adding reason. New policies are assigned automatically
-     * at the groups that
-     * have right on the collection. E.g., if the anonymous can access the collection policies are assigned to
-     * anonymous.
-     *
-     * @param context          current context
-     * @param embargoDate      date
-     * @param reason           reason
-     * @param dso              DSpaceObject
-     * @param owningCollection collection
-     * @throws SQLException       if database error
-     * @throws AuthorizeException if authorization error
-     */
-    public void generateAutomaticPolicies(Context context, Date embargoDate, String reason, DSpaceObject dso,
-                                          Collection owningCollection) throws SQLException, AuthorizeException;
-
     public ResourcePolicy createResourcePolicy(Context context, DSpaceObject dso, Group group, EPerson eperson,
                                                int type, String rpType) throws SQLException, AuthorizeException;
 
@@ -531,6 +513,15 @@ public interface AuthorizeService {
      *                  false when this is not the case, or an exception occurred
      */
     boolean isCollectionAdmin(Context context) throws SQLException;
+
+    /**
+     * Checks that the context's current user is an item admin in the site by querying the solr database.
+     *
+     * @param context   context with the current user
+     * @return          true if the current user is an item admin in the site
+     *                  false when this is not the case, or an exception occurred
+     */
+    boolean isItemAdmin(Context context) throws SQLException;
 
     /**
      * Checks that the context's current user is a community or collection admin in the site.
@@ -603,7 +594,7 @@ public interface AuthorizeService {
 
     /**
      * Replace all the policies in the target object with exactly the same policies that exist in the source object
-     * 
+     *
      * @param context DSpace Context
      * @param source  source of policies
      * @param dest    destination of inherited policies

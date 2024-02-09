@@ -447,7 +447,7 @@ public class SolrUpgradePre6xStatistics {
         runReport();
         logTime(false);
         for (int processed = updateRecords(MIGQUERY); (processed != 0)
-                && (numProcessed < numRec); processed = updateRecords(MIGQUERY)) {
+                && (numProcessed <= numRec); processed = updateRecords(MIGQUERY)) {
             printTime(numProcessed, false);
             batchUpdateStats();
             if (context.getCacheSize() > CACHE_LIMIT) {

@@ -41,13 +41,14 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
     }
 
     @Override
-    public List<Bitstream> findDeletedBitstreams(Context context) throws SQLException {
+    public List<Bitstream> findDeletedBitstreams(Context context, int limit, int offset) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Bitstream.class);
         Root<Bitstream> bitstreamRoot = criteriaQuery.from(Bitstream.class);
         criteriaQuery.select(bitstreamRoot);
+        criteriaQuery.orderBy(criteriaBuilder.desc(bitstreamRoot.get(Bitstream_.ID)));
         criteriaQuery.where(criteriaBuilder.equal(bitstreamRoot.get(Bitstream_.deleted), true));
-        return list(context, criteriaQuery, false, Bitstream.class, -1, -1);
+        return list(context, criteriaQuery, false, Bitstream.class, limit, offset);
 
     }
 
@@ -67,9 +68,9 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
 
     @Override
     public List<Bitstream> findBitstreamsWithNoRecentChecksum(Context context) throws SQLException {
-        Query query = createQuery(context,
-                                  "select b from Bitstream b where b not in (select c.bitstream from " +
-                                      "MostRecentChecksum c)");
+        Query query = createQuery(context, "SELECT b FROM MostRecentChecksum c RIGHT JOIN Bitstream b " +
+            "ON c.bitstream = b WHERE c IS NULL" );
+
         return query.getResultList();
     }
 

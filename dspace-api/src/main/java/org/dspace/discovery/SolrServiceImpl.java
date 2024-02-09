@@ -256,7 +256,12 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         try {
             if (solrSearchCore.getSolr() != null) {
-                indexObjectServiceFactory.getIndexableObjectFactory(searchUniqueID).delete(searchUniqueID);
+                IndexFactory index = indexObjectServiceFactory.getIndexableObjectFactory(searchUniqueID);
+                if (index != null) {
+                    index.delete(searchUniqueID);
+                } else {
+                    log.warn("Object not found in Solr index: " + searchUniqueID);
+                }
                 if (commit) {
                     solrSearchCore.getSolr().commit();
                 }
@@ -1026,9 +1031,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         // Add information about our search fields
                         for (String field : searchFields) {
                             List<String> valuesAsString = new ArrayList<>();
-                            for (Object o : doc.getFieldValues(field)) {
-                                valuesAsString.add(String.valueOf(o));
-                            }
+                            Optional.ofNullable(doc.getFieldValues(field))
+                                    .ifPresent(l -> l.forEach(o -> valuesAsString.add(String.valueOf(o))));
                             resultDoc.addSearchField(field, valuesAsString.toArray(new String[valuesAsString.size()]));
                         }
                         result.addSearchDocument(indexableObject, resultDoc);

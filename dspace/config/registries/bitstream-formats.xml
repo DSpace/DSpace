@@ -116,6 +116,15 @@
   </bitstream-type>
 
   <bitstream-type>
+    <mimetype>text/vtt</mimetype>
+    <short_description>WebVTT</short_description>
+    <description>Web Video Text Tracks Format</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>vtt</extension>
+  </bitstream-type>
+
+  <bitstream-type>
     <mimetype>application/msword</mimetype>
     <short_description>Microsoft Word</short_description>
     <description>Microsoft Word</description>
@@ -201,7 +210,7 @@
 
   <bitstream-type>
     <mimetype>image/png</mimetype>
-    <short_description>image/png</short_description>
+    <short_description>PNG</short_description>
     <description>Portable Network Graphics</description>
     <support_level>1</support_level>
     <internal>false</internal>
@@ -216,6 +225,15 @@
     <internal>false</internal>
     <extension>tiff</extension>
     <extension>tif</extension>
+  </bitstream-type>
+
+  <bitstream-type>
+      <mimetype>image/jp2</mimetype>
+      <short_description>JPEG2000</short_description>
+      <description>JPEG 2000 Image File Format</description>
+      <support_level>1</support_level>
+      <internal>false</internal>
+      <extension>jp2</extension>
   </bitstream-type>
 
   <bitstream-type>
@@ -789,6 +807,24 @@
         <support_level>1</support_level>
         <internal>false</internal>
         <extension>mp3</extension>
+    </bitstream-type>
+
+    <bitstream-type>
+        <mimetype>image/webp</mimetype>
+        <short_description>WebP</short_description>
+        <description>WebP is a modern image format that provides superior lossless and lossy compression for images on the web.</description>
+        <support_level>1</support_level>
+        <internal>false</internal>
+        <extension>webp</extension>
+    </bitstream-type>
+
+    <bitstream-type>
+        <mimetype>image/avif</mimetype>
+        <short_description>AVIF</short_description>
+        <description>AV1 Image File Format (AVIF) is an open, royalty-free image file format specification for storing images or image sequences compressed with AV1 in the HEIF container format.</description>
+        <support_level>1</support_level>
+        <internal>false</internal>
+        <extension>avif</extension>
     </bitstream-type>
 
 </dspace-bitstream-types>
