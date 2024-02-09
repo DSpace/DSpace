@@ -17,6 +17,7 @@ import org.dspace.services.ConfigurationService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+
 /**
  * Test class for the controller ClarinDiscoJuiceFeedsController
  *
@@ -27,13 +28,21 @@ public class ClarinDiscoJuiceFeedsControllerIT extends AbstractControllerIntegra
     @Autowired
     ConfigurationService configurationService;
 
+    @Autowired
+    ClarinDiscoJuiceFeedsUpdateScheduler clarinDiscoJuiceFeedsUpdateScheduler;
+
     @Test
     public void getDiscoFeeds() throws Exception {
         String authTokenAdmin = getAuthToken(eperson.getEmail(), password);
 
+        String configKey = "shibboleth.discofeed.allowed";
+        boolean origVal = configurationService.getBooleanProperty(configKey);
+        configurationService.setProperty(configKey, true);
+        clarinDiscoJuiceFeedsUpdateScheduler.afterPropertiesSet();
+
         // Expected response created from the test file: `discofeedResponse.json`
         // Wrapped to the `callback` string = `dj_md_1`
-        String responseString = "dj_md_1([{\"country\":\"CZ\",\"keywords\":[\"Identity Provider for employees and " +
+        String expStr = "dj_md_1([{\"country\":\"CZ\",\"keywords\":[\"Identity Provider for employees and " +
                 "readers of the Archiepiscopal Gymnasium in Kromeriz - Library\",\"Identity Provider pro zamstnance " +
                 "a tene knihovny Arcibiskupskho gymnzia v Kromi\",\"Arcibiskupsk gymnzium v Kromi - " +
                 "Knihovna\"],\"entityID\":\"https:\\/\\/agkm.cz\\/idp\\/shibboleth\",\"title\":\"Archiepiscopal " +
@@ -47,12 +56,13 @@ public class ClarinDiscoJuiceFeedsControllerIT extends AbstractControllerIntegra
                 "\"Studijn a vdeck knihovna v Hradci Krlov\"],\"entityID\":\"https:\\/\\/aleph.svkhk.cz\\" +
                 "/idp\\/shibboleth\",\"title\":\"The Research Library in Hradec Krlov\"}])";
 
-
         // Load bitstream from the item.
         // Request with callback
         getClient(authTokenAdmin).perform(get("/api/discojuice/feeds?callback=dj_md_1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JAVASCRIPT_UTF8))
-                .andExpect(content().string(responseString));
+                .andExpect(content().string(expStr));
+
+        configurationService.setProperty(configKey, origVal);
     }
 }

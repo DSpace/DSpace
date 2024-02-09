@@ -49,17 +49,18 @@ public class ClarinDiscoJuiceFeedsUpdateScheduler implements InitializingBean {
      */
     @Scheduled(cron = "${discojuice.refresh:-}")
     public void cronJobSch() {
-        boolean isAllowed = configurationService.getBooleanProperty("shibboleth.discofeed.allowed", true);
+        // 2024/02 - unless explicitly turned on, do not use discofeed
+        boolean isAllowed = configurationService.getBooleanProperty("shibboleth.discofeed.allowed", false);
         if (!isAllowed) {
             return;
         }
 
-        log.debug("CRON Job - going to download the discojuice feeds.");
+        log.debug("CRON Job - going to download the discovery feeds.");
         String newFeedsContent = clarinDiscoJuiceFeedsDownloadService.createFeedsContent();
         if (isNotBlank(newFeedsContent)) {
             feedsContent = newFeedsContent;
         } else {
-            log.error("Failed to obtain discojuice feeds!");
+            log.error("Failed to obtain additional discovery feeds!");
         }
     }
 
