@@ -230,6 +230,9 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
                 } else if (StringUtils.equalsIgnoreCase(order.getProperty(), "endTime")) {
                     processQueryParameterContainer.setSortProperty(Process_.FINISHED_TIME);
                     processQueryParameterContainer.setSortOrder(order.getDirection().name());
+                } else if (StringUtils.equalsIgnoreCase(order.getProperty(), "creationTime")) {
+                    processQueryParameterContainer.setSortProperty(Process_.CREATION_TIME);
+                    processQueryParameterContainer.setSortOrder(order.getDirection().name());
                 } else {
                     throw new DSpaceBadRequestException("The given sort option was invalid: " + order.getProperty());
                 }

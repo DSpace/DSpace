@@ -14,6 +14,7 @@ import static javax.mail.internet.MimeUtility.encodeText;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -33,7 +34,6 @@ public class HttpHeadersInitializer {
 
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private static final String METHOD_HEAD = "HEAD";
     private static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";
     private static final String CONTENT_TYPE_MULTITYPE_WITH_BOUNDARY = "multipart/byteranges; boundary=" +
         MULTIPART_BOUNDARY;
@@ -144,6 +144,9 @@ public class HttpHeadersInitializer {
         if (checksum != null) {
             httpHeaders.put(ETAG, Collections.singletonList(checksum));
         }
+        if (Objects.nonNull((Long.valueOf(this.length)))) {
+            httpHeaders.put(HttpHeaders.CONTENT_LENGTH, Collections.singletonList(String.valueOf(this.length)));
+        }
         httpHeaders.put(LAST_MODIFIED, Collections.singletonList(FastHttpDateFormat.formatDate(lastModified)));
         httpHeaders.put(EXPIRES, Collections.singletonList(FastHttpDateFormat.formatDate(
             System.currentTimeMillis() + DEFAULT_EXPIRE_TIME)));
@@ -165,16 +168,14 @@ public class HttpHeadersInitializer {
 
         httpHeaders.put(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS,
                         Collections.singletonList(HttpHeaders.ACCEPT_RANGES));
-        httpHeaders.put(CONTENT_DISPOSITION, Collections.singletonList(String.format(CONTENT_DISPOSITION_FORMAT,
-                                                                                     disposition,
-                                                                                     encodeText(fileName))));
-        log.debug("Content-Disposition : {}", disposition);
 
-        // Content phase
-        if (METHOD_HEAD.equals(request.getMethod())) {
-            log.debug("HEAD request - skipping content");
-            return null;
+        // distposition may be null here if contentType is null
+        if (!isNullOrEmpty(disposition)) {
+            httpHeaders.put(CONTENT_DISPOSITION, Collections.singletonList(String.format(CONTENT_DISPOSITION_FORMAT,
+                                                                                         disposition,
+                                                                                         encodeText(fileName))));
         }
+        log.debug("Content-Disposition : {}", disposition);
 
         return httpHeaders;
 

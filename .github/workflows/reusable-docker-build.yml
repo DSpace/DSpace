@@ -24,6 +24,12 @@ on:
       dockerfile_context:
         required: false
         type: string
+        default: '.'
+      # Optionally a list of "additional_contexts" to pass to Dockerfile. Defaults to empty
+      dockerfile_additional_contexts:
+        required: false
+        type: string
+        default: ''
       # If Docker image should have additional tag flavor details (e.g. a suffix), it may be passed in.
       tags_flavor:
         required: false
@@ -123,7 +129,9 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v5
         with:
-          context: ${{ inputs.dockerfile_context || '.' }}
+          build-contexts: |
+            ${{ inputs.dockerfile_additional_contexts }}
+          context: ${{ inputs.dockerfile_context }}
           file: ${{ inputs.dockerfile_path }}
           platforms: ${{ matrix.arch }}
           # For pull requests, we run the Docker build (to ensure no PR changes break the build),
