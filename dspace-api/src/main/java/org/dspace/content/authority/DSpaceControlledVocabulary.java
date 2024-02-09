@@ -225,12 +225,12 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
 
     @Override
     public String getLabel(String key, String locale) {
-        return getNodeLabel(key, this.suggestHierarchy);
+        return getNodeValue(key, this.suggestHierarchy);
     }
 
     @Override
     public String getValue(String key, String locale) {
-        return getNodeLabel(key, this.storeHierarchy);
+        return getNodeValue(key, this.storeHierarchy);
     }
 
     @Override
@@ -337,7 +337,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
         return extras;
     }
 
-    private String getNodeLabel(String key, boolean useHierarchy) {
+    private String getNodeValue(String key, boolean useHierarchy) {
         try {
             Node node = getNode(key);
             if (Objects.isNull(node)) {
@@ -346,7 +346,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
             if (useHierarchy) {
                 return this.buildString(node);
             } else {
-                return node.getAttributes().getNamedItem("id").getNodeValue();
+                return node.getAttributes().getNamedItem(valueAttribute).getNodeValue();
             }
         } catch (XPathExpressionException e) {
             return ("");
