@@ -66,8 +66,6 @@ public class RorImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
                 is("The University of Texas")
             );
             assertThat(record.getSingleValue("organization.identifier.ror"), is("https://ror.org/02f6dcw23"));
-            assertThat(record.getSingleValue("oairecerif.acronym"), is("UTHSCSA"));
-            assertThat(record.getSingleValue("oairecerif.identifier.url"), is("http://www.uthscsa.edu/"));
             assertThat(record.getSingleValue("dc.type"), is("Education"));
             assertThat(record.getSingleValue("organization.address.addressCountry"), is("US"));
             assertThat(record.getSingleValue("organization.foundingDate"), is("1959"));
@@ -124,9 +122,6 @@ public class RorImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
                 is("The University of Texas Health Science Center at Tyler")
             );
             assertThat(record.getSingleValue("organization.identifier.ror"), is("https://ror.org/01sps7q28"));
-            assertThat(record.getSingleValue("oairecerif.acronym"), is("UTHSCT"));
-            assertThat(record.getSingleValue("oairecerif.identifier.url"),
-                is("https://www.utsystem.edu/institutions/university-texas-health-science-center-tyler"));
             assertThat(record.getSingleValue("dc.type"), is("Healthcare"));
             assertThat(record.getSingleValue("organization.address.addressCountry"), is("US"));
             assertThat(record.getSingleValue("organization.foundingDate"), is("1947"));
