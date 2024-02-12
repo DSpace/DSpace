@@ -12,13 +12,13 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.WebAppService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Represent a DSpace application while it is running.  This helps us report
@@ -29,10 +29,9 @@ import org.slf4j.LoggerFactory;
  */
 abstract public class AbstractDSpaceWebapp
     implements DSpaceWebappMXBean {
-    private static final Logger log = LoggerFactory.getLogger(AbstractDSpaceWebapp.class);
+    private static final Logger log = LogManager.getLogger();
 
     protected final WebAppService webAppService = UtilServiceFactory.getInstance().getWebAppService();
-
 
     protected String kind;
 
