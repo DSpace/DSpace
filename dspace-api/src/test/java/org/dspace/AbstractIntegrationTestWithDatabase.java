@@ -100,7 +100,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
                     .getServiceManager()
                     .getServiceByName("dataSource", DataSource.class);
             try (Connection c = dataSource.getConnection(); Statement stmt = c.createStatement()) {
-                stmt.execute("CREATE ALIAS IF NOT EXIST matches FOR 'org.dspace.util.DSpaceH2Dialect.matches'");
+                stmt.execute("CREATE ALIAS IF NOT EXISTS matches FOR 'org.dspace.util.DSpaceH2Dialect.matches'");
             }
         } catch (SQLException se) {
             log.error("Error initializing database", se);
