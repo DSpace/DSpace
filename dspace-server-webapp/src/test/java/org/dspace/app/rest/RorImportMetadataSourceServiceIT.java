@@ -11,6 +11,7 @@ import static org.dspace.app.matcher.LambdaMatcher.matches;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
@@ -132,6 +133,26 @@ public class RorImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
             assertThat(record.getSingleValue("organization.identifier.isni"), is("0000 0000 9704 5790"));
             assertThat(record.getSingleValue("organization.parentOrganization"), is("The University of Texas System"));
 
+        } finally {
+            liveImportClient.setHttpClient(originalHttpClient);
+        }
+    }
+
+    @Test
+    public void tesGetRecordsCount() throws Exception {
+        context.turnOffAuthorisationSystem();
+        CloseableHttpClient originalHttpClient = liveImportClient.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
+        try (InputStream rorResponse = getClass().getResourceAsStream("ror-records.json")) {
+            String rorJsonResponse = IOUtils.toString(rorResponse, Charset.defaultCharset());
+
+            liveImportClient.setHttpClient(httpClient);
+            CloseableHttpResponse response = mockResponse(rorJsonResponse, 200, "OK");
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
+
+            context.restoreAuthSystemState();
+            int tot = rorServiceImpl.getRecordsCount("test query");
+            assertEquals(200, tot);
         } finally {
             liveImportClient.setHttpClient(originalHttpClient);
         }

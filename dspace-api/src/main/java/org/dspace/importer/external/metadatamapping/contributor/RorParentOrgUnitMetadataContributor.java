@@ -16,20 +16,41 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 
+/**
+ * A ROR JsonPath Metadata processor that should be configured inside the {@code ror-integration.xml} file.
+ * This allows the extraction of a given contributor with a specific mappings from the ROR JSON response.
+ *
+ * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
+ */
 public class RorParentOrgUnitMetadataContributor extends SimpleJsonPathMetadataContributor {
 
+    /**
+     * Determines which field of the JSON detains the {@code type} of this
+     * specific node (that needs to be mapped).
+     *
+     */
     private String typeField;
 
+    /**
+     * Determines which is the type of the main parent node that needs to be mapped.
+     * It should match the value of the {@code typeField} of the JSON node.
+     *
+     */
     private String parentType;
 
+    /**
+     * Determines which is the field of the JSON that contains the value
+     * that needs to be mapped into a {@code MetadatumDTO}.
+     */
     private String labelField;
 
     /**
-     * Retrieve the metadata associated with the given object.
-     * The toString() of the resulting object will be used.
+     * Creates a {@code MetadatumDTO} for each correctly mapped JSON node
+     * of the ROR response.
+     * Partial / Unmatched parent-type metadatum will be ignored from this mapping.
      * 
-     * @param fullJson A class to retrieve metadata from.
-     * @return a collection of import records. Only the identifier of the found records may be put in the record.
+     * @param fullJson ROR response
+     * @return a collection of read ROR metadata.
      */
     @Override
     public Collection<MetadatumDTO> contributeMetadata(String fullJson) {

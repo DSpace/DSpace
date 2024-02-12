@@ -34,10 +34,16 @@ import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.dspace.importer.external.service.components.QuerySource;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Implements a {@code AbstractImportMetadataSourceService} for querying ROR services.
+ *
+ * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
+ */
 public class RorImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<String>
     implements QuerySource {
 
     private final static Logger log = LogManager.getLogger();
+    protected static final String ROR_IDENTIFIER_PREFIX = "https://ror.org/";
 
     private String url;
 
@@ -98,7 +104,7 @@ public class RorImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     }
 
     /**
-     * This class is a Callable implementation to get ADS entries based on query
+     * This class is a Callable implementation to get ROR entries based on query
      * object. This Callable use as query value the string queryString passed to
      * constructor. If the object will be construct through Query.class instance, a
      * Query's map entry with key "query" will be used. Pagination is supported too,
@@ -126,7 +132,7 @@ public class RorImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     }
 
     /**
-     * This class is a Callable implementation to get an ADS entry using bibcode The
+     * This class is a Callable implementation to get an ROR entry using bibcode The
      * bibcode to use can be passed through the constructor as a String or as
      * Query's map entry, with the key "id".
      *
@@ -151,12 +157,12 @@ public class RorImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     }
 
     /**
-     * This class is a Callable implementation to count the number of entries for an
-     * ADS query. This Callable use as query value to ADS the string queryString
-     * passed to constructor. If the object will be construct through Query.class
+     * This class is a Callable implementation to count the number of entries for a
+     * ROR query. This Callable uses as query value to ROR the string queryString
+     * passed to constructor. If the object will be construct through {@code Query}
      * instance, the value of the Query's map with the key "query" will be used.
      * 
-     * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+     * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
      */
     private class CountByQueryCallable implements Callable<Integer> {
         private Query query;
@@ -176,6 +182,12 @@ public class RorImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
         }
     }
 
+    /**
+     * Counts the number of results for the given query.
+     *
+     * @param  query   the query string to count results for
+     * @return        the number of results for the given query
+     */
     public Integer count(String query) {
         try {
             Map<String, Map<String, String>> params = new HashMap<String, Map<String, String>>();
@@ -197,9 +209,9 @@ public class RorImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
     private List<ImportRecord> searchById(String id) {
 
-        List<ImportRecord> adsResults = new ArrayList<>();
+        List<ImportRecord> importResults = new ArrayList<>();
 
-        id = StringUtils.removeStart(id, "https://ror.org/");
+        id = StringUtils.removeStart(id, ROR_IDENTIFIER_PREFIX);
 
         try {
             Map<String, Map<String, String>> params = new HashMap<String, Map<String, String>>();
@@ -208,20 +220,20 @@ public class RorImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
             String resp = liveImportClient.executeHttpGetRequest(timeout, uriBuilder.toString(), params);
             if (StringUtils.isEmpty(resp)) {
-                return adsResults;
+                return importResults;
             }
 
             JsonNode jsonNode = convertStringJsonToJsonNode(resp);
-            adsResults.add(transformSourceRecords(jsonNode.toString()));
+            importResults.add(transformSourceRecords(jsonNode.toString()));
 
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        return adsResults;
+        return importResults;
     }
 
     private List<ImportRecord> search(String query) {
-        List<ImportRecord> adsResults = new ArrayList<>();
+        List<ImportRecord> importResults = new ArrayList<>();
         try {
             Map<String, Map<String, String>> params = new HashMap<String, Map<String, String>>();
 
@@ -230,7 +242,7 @@ public class RorImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
 
             String resp = liveImportClient.executeHttpGetRequest(timeout, uriBuilder.toString(), params);
             if (StringUtils.isEmpty(resp)) {
-                return adsResults;
+                return importResults;
             }
 
             JsonNode jsonNode = convertStringJsonToJsonNode(resp);
@@ -239,15 +251,15 @@ public class RorImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
                 Iterator<JsonNode> nodes = docs.elements();
                 while (nodes.hasNext()) {
                     JsonNode node = nodes.next();
-                    adsResults.add(transformSourceRecords(node.toString()));
+                    importResults.add(transformSourceRecords(node.toString()));
                 }
             } else {
-                adsResults.add(transformSourceRecords(docs.toString()));
+                importResults.add(transformSourceRecords(docs.toString()));
             }
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        return adsResults;
+        return importResults;
     }
 
     private JsonNode convertStringJsonToJsonNode(String json) {
