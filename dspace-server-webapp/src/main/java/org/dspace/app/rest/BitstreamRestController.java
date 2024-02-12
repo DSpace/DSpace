@@ -138,6 +138,7 @@ public class BitstreamRestController {
                 .withBufferSize(BUFFER_SIZE)
                 .withFileName(name)
                 .withChecksum(bit.getChecksum())
+                .withLength(bit.getSizeBytes())
                 .withMimetype(mimetype)
                 .with(request)
                 .with(response);
@@ -167,6 +168,12 @@ public class BitstreamRestController {
             //Send the data
             if (httpHeadersInitializer.isValid()) {
                 HttpHeaders httpHeaders = httpHeadersInitializer.initialiseHeaders();
+
+                if (RequestMethod.HEAD.name().equals(request.getMethod())) {
+                    log.debug("HEAD request - no response body");
+                    return ResponseEntity.ok().headers(httpHeaders).build();
+                }
+
                 return ResponseEntity.ok().headers(httpHeaders).body(bitstreamResource);
             }
 

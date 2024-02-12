@@ -441,6 +441,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
             if (!predicate.getFields().isEmpty()) {
                 In<MetadataField> inFields = criteriaBuilder.in(mvRoot.get(MetadataValue_.METADATA_FIELD));
                 predicate.getFields().forEach(inFields::value);
+                mvPredicates.add(inFields);
             }
 
             JpaCriteriaBuilderKit<MetadataValue> jpaKit = new JpaCriteriaBuilderKit<>(criteriaBuilder, mvQuery, mvRoot);
