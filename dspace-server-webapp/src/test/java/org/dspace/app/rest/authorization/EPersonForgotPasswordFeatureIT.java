@@ -67,7 +67,6 @@ public class EPersonForgotPasswordFeatureIT extends AbstractControllerIntegratio
 
     @Test
     public void userForgotPasswordSuccessTest() throws Exception {
-        String property = configurationService.getProperty("user.forgot-password");
 
         context.turnOffAuthorisationSystem();
         EPerson epersonPassLogin = EPersonBuilder.createEPerson(context)
@@ -78,41 +77,31 @@ public class EPersonForgotPasswordFeatureIT extends AbstractControllerIntegratio
                                               .build();
         context.restoreAuthSystemState();
 
-        try {
-            configurationService.setProperty("user.forgot-password", true);
-            EPersonRest personRest = personConverter.convert(epersonPassLogin, Projection.DEFAULT);
-            String personUri = utils.linkToSingleResource(personRest, "self").getHref();
+        configurationService.setProperty("user.forgot-password", true);
+        EPersonRest personRest = personConverter.convert(epersonPassLogin, Projection.DEFAULT);
+        String personUri = utils.linkToSingleResource(personRest, "self").getHref();
 
         getClient().perform(get("/api/authz/authorizations/search/object")
                                 .param("uri", personUri)
                                 .param("feature", epersonForgotPasswordFeature.getName()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page.totalElements", greaterThan(0)));
-        } finally {
-            configurationService.setProperty("user.forgot-password", property);
-        }
     }
 
     @Test
     public void userForgotPasswordFeatureUnauthorizedTest() throws Exception {
-        String property = configurationService.getProperty("user.forgot-password");
 
         Site site = siteService.findSite(context);
         SiteRest SiteRest = siteConverter.convert(site, Projection.DEFAULT);
         String siteUri = utils.linkToSingleResource(SiteRest, "self").getHref();
 
-        try {
-            configurationService.setProperty("user.forgot-password", false);
+        configurationService.setProperty("user.forgot-password", false);
 
-            getClient().perform(get("/api/authz/authorizations/search/object")
-                                    .param("uri", siteUri)
-                                    .param("feature", epersonForgotPasswordFeature.getName()))
-                       .andExpect(status().isOk())
-                       .andExpect(jsonPath("$.page.totalElements", is(0)));
-
-        } finally {
-            configurationService.setProperty("user.forgot-password", property);
-        }
+        getClient().perform(get("/api/authz/authorizations/search/object")
+                                .param("uri", siteUri)
+                                .param("feature", epersonForgotPasswordFeature.getName()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
 
@@ -129,38 +118,26 @@ public class EPersonForgotPasswordFeatureIT extends AbstractControllerIntegratio
 
         EPersonRest personRest = personConverter.convert(noLoginPerson, Projection.DEFAULT);
         String personUri = utils.linkToSingleResource(personRest, "self").getHref();
-        String property = configurationService.getProperty("user.forgot-password");
-        try {
-            configurationService.setProperty("user.forgot-password", true);
+        configurationService.setProperty("user.forgot-password", true);
         getClient().perform(get("/api/authz/authorizations/search/object")
                                 .param("uri", personUri)
                                 .param("feature", epersonForgotPasswordFeature.getName()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.page.totalElements", is(0)));
-        } finally {
-            configurationService.setProperty("user.forgot-password", property);
-        }
     }
 
     @Test
     public void userForgotPasswordUnauthorizedNoPasswordAuthMethodTest() throws Exception {
         //Enable Shibboleth and password login
-        String property =
-            configurationService.getProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod");
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
 
-        try {
-            configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_ONLY);
+        EPersonRest personRest = personConverter.convert(eperson, Projection.DEFAULT);
+        String personUri = utils.linkToSingleResource(personRest, "self").getHref();
 
-            EPersonRest personRest = personConverter.convert(eperson, Projection.DEFAULT);
-            String personUri = utils.linkToSingleResource(personRest, "self").getHref();
-
-            getClient().perform(get("/api/authz/authorizations/search/object")
-                                    .param("uri", personUri)
-                                    .param("feature", epersonForgotPasswordFeature.getName()))
-                       .andExpect(status().isOk())
-                       .andExpect(jsonPath("$.page.totalElements", is(0)));
-        } finally {
-            configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", property);
-        }
+        getClient().perform(get("/api/authz/authorizations/search/object")
+                                .param("uri", personUri)
+                                .param("feature", epersonForgotPasswordFeature.getName()))
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 }
