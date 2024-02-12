@@ -23,6 +23,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Thumbnail;
 import org.dspace.content.WorkspaceItem;
