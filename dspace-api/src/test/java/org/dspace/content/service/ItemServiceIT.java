@@ -80,7 +80,8 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    protected MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
+    protected MetadataSchemaService metadataSchemaService =
+            ContentServiceFactory.getInstance().getMetadataSchemaService();
     protected MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
     protected MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
     protected VersioningService versioningService = VersionServiceFactory.getInstance().getVersionService();
@@ -938,7 +939,8 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         // Here we add an author to the item
-        MetadataValue mv = itemService.addMetadata(context, item, dcSchema, contributorElement, authorQualifier, null, "test, one");
+        MetadataValue mv = itemService.addMetadata(context, item, dcSchema, contributorElement,
+                authorQualifier, null, "test, one");
         assertNotNull(mv);
         MetadataField mf = mv.getMetadataField();
         assertEquals(fieldAuthor, mf);

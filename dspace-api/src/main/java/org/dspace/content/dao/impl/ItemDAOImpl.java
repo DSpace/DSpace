@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -314,14 +313,14 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         CriteriaQuery<Item> criteriaQuery = getCriteriaQuery(criteriaBuilder, Item.class);
         Root<Item> itemRoot = criteriaQuery.from(Item.class);
         criteriaQuery.select(itemRoot);
-        List<Predicate> predicates = toPredicates(criteriaBuilder, criteriaQuery, itemRoot, queryPredicates, collectionUuids, regexClause);
+        List<Predicate> predicates = toPredicates(criteriaBuilder, criteriaQuery, itemRoot,
+                queryPredicates, collectionUuids, regexClause);
         criteriaQuery.where(criteriaBuilder.and(predicates.stream().toArray(Predicate[]::new)));
         criteriaQuery.orderBy(criteriaBuilder.asc(itemRoot.get(DSpaceObject_.id)));
         criteriaQuery.groupBy(itemRoot.get(DSpaceObject_.id));
         try {
             return list(context, criteriaQuery, false, Item.class, limit, (int) offset);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw e;
         }
@@ -336,7 +335,8 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         // Select
         Root<Item> itemRoot = criteriaQuery.from(Item.class);
         // Apply the selected predicates
-        List<Predicate> predicates = toPredicates(criteriaBuilder, criteriaQuery, itemRoot, queryPredicates, collectionUuids, regexClause);
+        List<Predicate> predicates = toPredicates(criteriaBuilder, criteriaQuery, itemRoot,
+                queryPredicates, collectionUuids, regexClause);
         criteriaQuery.where(criteriaBuilder.and(predicates.stream().toArray(Predicate[]::new)));
         // Execute the query
         return countLong(context, criteriaQuery, criteriaBuilder, itemRoot);
@@ -436,7 +436,8 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
             List<Predicate> mvPredicates = new ArrayList<>();
             Subquery<MetadataValue> mvQuery = query.subquery(MetadataValue.class);
             Root<MetadataValue> mvRoot = mvQuery.from(MetadataValue.class);
-            mvPredicates.add(criteriaBuilder.equal(mvRoot.get(MetadataValue_.D_SPACE_OBJECT), root.get(DSpaceObject_.ID)));
+            mvPredicates.add(criteriaBuilder.equal(
+                    mvRoot.get(MetadataValue_.D_SPACE_OBJECT), root.get(DSpaceObject_.ID)));
 
             if (!predicate.getFields().isEmpty()) {
                 In<MetadataField> inFields = criteriaBuilder.in(mvRoot.get(MetadataValue_.METADATA_FIELD));
