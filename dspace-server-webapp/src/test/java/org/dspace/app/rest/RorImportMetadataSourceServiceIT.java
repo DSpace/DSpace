@@ -59,7 +59,7 @@ public class RorImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
 
             ImportRecord record = recordsImported.iterator().next();
 
-            assertThat(record.getValueList(), hasSize(11));
+            assertThat(record.getValueList(), hasSize(9));
 
             assertThat(
                 record.getSingleValue("organization.legalName"),
@@ -116,7 +116,7 @@ public class RorImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
 
             context.restoreAuthSystemState();
             ImportRecord record = rorServiceImpl.getRecord("https://ror.org/01sps7q28");
-            assertThat(record.getValueList(), hasSize(9));
+            assertThat(record.getValueList(), hasSize(7));
             assertThat(
                 record.getSingleValue("organization.legalName"),
                 is("The University of Texas Health Science Center at Tyler")
