@@ -8,15 +8,20 @@
 package org.dspace.storage.bitstore;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.services.s3.transfer.Upload;
-import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
+import org.dspace.core.Utils;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -53,29 +58,42 @@ public class SyncS3BitStoreService extends S3BitStoreService {
         String key = getFullKey(bitstream.getInternalId());
         //Copy istream to temp file, and send the file, with some metadata
         File scratchFile = File.createTempFile(bitstream.getInternalId(), "s3bs");
-        try {
-            FileUtils.copyInputStreamToFile(in, scratchFile);
-            long contentLength = scratchFile.length();
-            // The ETag may or may not be and MD5 digest of the object data.
-            // Therefore, we precalculate before uploading
-            String localChecksum = org.dspace.curate.Utils.checksum(scratchFile, CSA);
+        try (
+                FileOutputStream fos = new FileOutputStream(scratchFile);
+                // Read through a digest input stream that will work out the MD5
+                DigestInputStream dis = new DigestInputStream(in, MessageDigest.getInstance(CSA));
+        ) {
+            Utils.bufferedCopy(dis, fos);
+            in.close();
 
             Upload upload = tm.upload(getBucketName(), key, scratchFile);
 
             upload.waitForUploadResult();
 
-            bitstream.setSizeBytes(contentLength);
-            bitstream.setChecksum(localChecksum);
+            bitstream.setSizeBytes(scratchFile.length());
+            // we cannot use the S3 ETAG here as it could be not a MD5 in case of multipart upload (large files) or if
+            // the bucket is encrypted
+            bitstream.setChecksum(Utils.toHex(dis.getMessageDigest().digest()));
             bitstream.setChecksumAlgorithm(CSA);
 
             if (syncEnabled) {
-                // Upload file into local assetstore
+                // Upload file into local assetstore - use buffered copy to avoid memory issues, because of large files
                 File localFile = dsBitStoreService.getFile(bitstream);
-                FileUtils.copyFile(scratchFile, localFile);
+                // Create a new file in the assetstore if it does not exist
+                createFileIfNotExist(localFile);
+
+                // Copy content from scratch file to local assetstore file
+                FileInputStream fisScratchFile =  new FileInputStream(scratchFile);
+                FileOutputStream fosLocalFile = new FileOutputStream(localFile);
+                Utils.bufferedCopy(fisScratchFile, fosLocalFile);
+                fisScratchFile.close();
             }
         } catch (AmazonClientException | IOException | InterruptedException e) {
             log.error("put(" + bitstream.getInternalId() + ", is)", e);
             throw new IOException(e);
+        } catch (NoSuchAlgorithmException nsae) {
+            // Should never happen
+            log.warn("Caught NoSuchAlgorithmException", nsae);
         } finally {
             if (!scratchFile.delete()) {
                 scratchFile.deleteOnExit();
@@ -96,6 +114,27 @@ public class SyncS3BitStoreService extends S3BitStoreService {
         } catch (AmazonClientException e) {
             log.error("remove(" + key + ")", e);
             throw new IOException(e);
+        }
+    }
+
+    /**
+     * Create a new file in the assetstore if it does not exist
+     * @param localFile
+     * @throws IOException
+     */
+    private void createFileIfNotExist(File localFile) throws IOException {
+        if (localFile.exists()) {
+            return;
+        }
+
+        // Create the necessary parent directories if they do not yet exist
+        if (!localFile.getParentFile().mkdirs()) {
+            throw new IOException("Assetstore synchronization error: Directories in the assetstore for the file " +
+                    "with path" + localFile.getParent() + " were not created");
+        }
+        if (!localFile.createNewFile()) {
+            throw new IOException("Assetstore synchronization error: File " + localFile.getPath() +
+                    " was not created");
         }
     }
 }
