@@ -13,7 +13,6 @@ import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import org.dspace.app.rest.contentreport.Filter;
 
 /**
