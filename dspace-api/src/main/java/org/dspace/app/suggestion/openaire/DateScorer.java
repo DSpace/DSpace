@@ -44,16 +44,6 @@ public class DateScorer implements EvidenceScorer {
     private String educationDateMetadata;
 
     /**
-     * Force the scorer to reject any publication that was issued before the specified date
-     */
-    private String minDateMetadata;
-
-    /**
-     * Force the scorer to reject any publication that was issued after the specified date
-     */
-    private String maxDateMetadata;
-
-    /**
      * The minimal age that is expected for a researcher to be a potential author of a scholarly contribution
      * (i.e. the minimum delta from the publication date and the birth date)
      */
@@ -123,14 +113,6 @@ public class DateScorer implements EvidenceScorer {
         this.educationDateRange = educationDateRange;
     }
 
-    public void setMaxDateMetadata(String maxDateMetadata) {
-        this.maxDateMetadata = maxDateMetadata;
-    }
-
-    public void setMinDateMetadata(String minDateMetadata) {
-        this.minDateMetadata = minDateMetadata;
-    }
-
     public void setPublicationDateMetadata(String publicationDateMetadata) {
         this.publicationDateMetadata = publicationDateMetadata;
     }
@@ -184,30 +166,22 @@ public class DateScorer implements EvidenceScorer {
      * @return
      */
     private Integer[] calculateRange(Item researcher) {
-        String minDateStr = getSingleValue(researcher, minDateMetadata);
-        int minYear = getYear(minDateStr);
-        String maxDateStr = getSingleValue(researcher, maxDateMetadata);
-        int maxYear = getYear(maxDateStr);
-        if (minYear > 0 && maxYear > 0) {
-            return new Integer[] { minYear, maxYear };
+        String birthDateStr = getSingleValue(researcher, birthDateMetadata);
+        int birthDateYear = getYear(birthDateStr);
+        int educationDateYear = getListMetadataValues(researcher, educationDateMetadata).stream()
+                .mapToInt(x -> getYear(x.getValue())).filter(d -> d > 0).min().orElse(-1);
+        if (educationDateYear > 0) {
+            return new Integer[] {
+                educationDateYear + educationDateDelta,
+                educationDateYear + educationDateDelta + educationDateRange
+            };
+        } else if (birthDateYear > 0) {
+            return new Integer[] {
+                birthDateYear + birthDateDelta,
+                birthDateYear + birthDateDelta + birthDateRange
+            };
         } else {
-            String birthDateStr = getSingleValue(researcher, birthDateMetadata);
-            int birthDateYear = getYear(birthDateStr);
-            int educationDateYear = getListMetadataValues(researcher, educationDateMetadata).stream()
-                    .mapToInt(x -> getYear(x.getValue())).filter(d -> d > 0).min().orElse(-1);
-            if (educationDateYear > 0) {
-                return new Integer[] {
-                    minYear > 0 ? minYear : educationDateYear + educationDateDelta,
-                    maxYear > 0 ? maxYear : educationDateYear + educationDateDelta + educationDateRange
-                };
-            } else if (birthDateYear > 0) {
-                return new Integer[] {
-                    minYear > 0 ? minYear : birthDateYear + birthDateDelta,
-                    maxYear > 0 ? maxYear : birthDateYear + birthDateDelta + birthDateRange
-                };
-            } else {
-                return null;
-            }
+            return null;
         }
     }
 
