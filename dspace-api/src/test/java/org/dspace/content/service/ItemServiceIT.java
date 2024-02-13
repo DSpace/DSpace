@@ -159,7 +159,7 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
 
         // check the correct order using default method `getMetadata`
         List<MetadataValue> defaultMetadata =
-            this.itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
+            itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
 
         assertThat(defaultMetadata,hasSize(3));
 
@@ -175,7 +175,7 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
 
         // check the correct order using the method `getMetadata` without virtual fields
         List<MetadataValue> nonVirtualMetadatas =
-            this.itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY, false);
+            itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY, false);
 
         // if we don't reload the item the place order is not applied correctly
         // item = context.reloadEntity(item);
@@ -197,19 +197,19 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
         item = context.reloadEntity(item);
 
         // now just add one metadata to be the last
-        this.itemService.addMetadata(
+        itemService.addMetadata(
             context, item, dcSchema, contributorElement, authorQualifier, Item.ANY, "test, latest", null, 0
         );
         // now just remove first metadata
-        this.itemService.removeMetadataValues(context, item, List.of(placeZero));
+        itemService.removeMetadataValues(context, item, List.of(placeZero));
         // now just add one metadata to place 0
-        this.itemService.addAndShiftRightMetadata(
+        itemService.addAndShiftRightMetadata(
             context, item, dcSchema, contributorElement, authorQualifier, Item.ANY, "test, new", null, 0, 0
         );
 
         // check the metadata using method `getMetadata`
         defaultMetadata =
-            this.itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
+            itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
 
         // check correct places
         assertThat(defaultMetadata,hasSize(4));
@@ -229,7 +229,7 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
 
         // check metadata using nonVirtualMethod
         nonVirtualMetadatas =
-            this.itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY, false);
+            itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY, false);
 
         // check correct places
         assertThat(nonVirtualMetadatas,hasSize(4));
@@ -261,7 +261,7 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
 
         // check after commit
         defaultMetadata =
-            this.itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
+            itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY);
 
         // check correct places
         assertThat(defaultMetadata,hasSize(4));
@@ -281,7 +281,7 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
 
         // check metadata using nonVirtualMethod
         nonVirtualMetadatas =
-            this.itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY, false);
+            itemService.getMetadata(item, dcSchema, contributorElement, authorQualifier, Item.ANY, false);
 
         // check correct places
         assertThat(nonVirtualMetadatas,hasSize(4));
@@ -944,6 +944,8 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
         context.commit();
         context.restoreAuthSystemState();
 
+        item = context.reloadEntity(item);
+
         assertNotNull(mv);
         MetadataField mf = mv.getMetadataField();
         assertEquals(fieldAuthor, mf);
@@ -960,6 +962,10 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
                 .orElse(null);
         assertNotNull(mvAuthor1);
         assertEquals("test, one", mvAuthor1.getValue());
+
+        assertMetadataValue(
+            authorQualifier, contributorElement, dcSchema, "test, one", null, 0, mvAuthor1
+        );
 
         assertEquals(collection1, item.getOwningCollection());
 
