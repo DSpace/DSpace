@@ -969,17 +969,16 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
 
         assertEquals(collection1, item.getOwningCollection());
 
-        //List<UUID> collectionUuids = List.of(collection1.getID());
-        List<UUID> collectionUuids = List.of();
+        List<UUID> collectionUuids = List.of(collection1.getID());
 
         // First test: we should not find anything.
         QueryPredicate predicate = QueryPredicate.of(fieldAuthor, QueryOperator.MATCHES, ".*whatever.*");
-        List<Item> items = itemService.findByMetadataQuery(context, List.of(predicate), collectionUuids, 0, 0);
+        List<Item> items = itemService.findByMetadataQuery(context, List.of(predicate), collectionUuids, 0, -1);
         assertTrue(items.isEmpty());
 
         // Second test: we search against the metadata value specified above.
         predicate = QueryPredicate.of(fieldAuthor, QueryOperator.EQUALS, "test, one");
-        items = itemService.findByMetadataQuery(context, List.of(predicate), collectionUuids, 0, 0);
+        items = itemService.findByMetadataQuery(context, List.of(predicate), collectionUuids, 0, -1);
         assertEquals(1, items.size());
 
         Item item = items.get(0);
