@@ -66,7 +66,6 @@ import org.dspace.versioning.Version;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersioningService;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
@@ -935,7 +934,6 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
         assertThat(metadataValue.getPlace(), equalTo(place));
     }
 
-    @Ignore
     @Test
     public void testFindByMetadataQuery() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -944,7 +942,6 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
         MetadataValue mv = itemService.addMetadata(context, item, dcSchema, contributorElement,
                 authorQualifier, null, "test, one");
         context.commit();
-        context.restoreAuthSystemState();
 
         item = context.reloadEntity(item);
 
