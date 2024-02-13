@@ -35,7 +35,6 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.contentreport.QueryOperator;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -45,7 +44,6 @@ import org.junit.Test;
  */
 public class ContentReportRestRepositoryIT extends AbstractControllerIntegrationTest {
 
-    @Ignore
     @Test
     public void testFilteredCollections() throws Exception {
         context.turnOffAuthorisationSystem();
