@@ -3,13 +3,7 @@
     <groupId>org.dspace.modules</groupId>
     <artifactId>server</artifactId>
     <packaging>war</packaging>
-    <name>DSpace Server Webapp:: Local Customizations</name>
-    <description>Overlay customizations.
-This is probably a temporary solution to the build problems. We like to investigate about
-the possibility to remove the overlays enable a more flexible extension mechanism.
-The use of web-fragment and spring mvc technology allow us to add request handlers
-just adding new jar in the classloader</description>
-
+    <name>DSpace Server Webapp:: Tomcat deployable WAR</name>
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
@@ -18,6 +12,7 @@ just adding new jar in the classloader</description>
     </parent>
 
     <properties>
+        <dspace.version>8.0-SNAPSHOT</dspace.version>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/../../..</root.basedir>
     </properties>
@@ -70,6 +65,26 @@ just adding new jar in the classloader</description>
                 <executions>
                     <execution>
                         <phase>prepare-package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeScope>runtime</includeScope>
+                            <includeGroupIds>org.dspace</includeGroupIds>
+                            <includeArtifactIds>dspace-server-webapp</includeArtifactIds>
+                            <includes>**/static/**,**/*.properties</includes>
+                            <outputDirectory>${project.build.directory}/additions</outputDirectory>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -255,12 +270,12 @@ just adding new jar in the classloader</description>
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-server-webapp</artifactId>
-            <classifier>classes</classifier>
         </dependency>
         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-server-webapp</artifactId>
-            <type>war</type>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+            <version>${spring-boot.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
