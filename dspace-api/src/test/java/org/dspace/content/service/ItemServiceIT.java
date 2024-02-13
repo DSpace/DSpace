@@ -969,7 +969,8 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
 
         assertEquals(collection1, item.getOwningCollection());
 
-        List<UUID> collectionUuids = List.of(collection1.getID());
+        //List<UUID> collectionUuids = List.of(collection1.getID());
+        List<UUID> collectionUuids = List.of();
 
         // First test: we should not find anything.
         QueryPredicate predicate = QueryPredicate.of(fieldAuthor, QueryOperator.MATCHES, ".*whatever.*");
