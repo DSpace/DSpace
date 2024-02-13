@@ -45,7 +45,7 @@
         <property name="query" value="/acronyms"/>
     </bean>
     <bean id="ror.acronym" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="oairecerif.acronym"/>
+        <constructor-arg value="organization.alternateName"/>
     </bean>
 
     <bean id="rorLinksContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
@@ -53,7 +53,7 @@
         <property name="query" value="/links"/>
     </bean>
     <bean id="ror.links" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="oairecerif.identifier.url"/>
+        <constructor-arg value="organization.url"/>
     </bean>
 
     <bean id="rorTypesContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
