@@ -33,7 +33,6 @@ public class LDNQueueExtractor {
     }
 
     public static int extractMessageFromQueue() throws IOException, SQLException {
-        log.info("START LDNQueueExtractor.extractMessageFromQueue()");
         Context context = new Context(Context.Mode.READ_WRITE);
         int processed_messages = ldnMessageService.extractAndProcessMessageFromQueue(context);
         if (processed_messages >= 0) {
@@ -42,7 +41,6 @@ public class LDNQueueExtractor {
             log.error("Errors happened during the extract operations. Check the log above!");
         }
         context.complete();
-        log.info("END LDNQueueExtractor.extractMessageFromQueue()");
         return processed_messages;
     }
 

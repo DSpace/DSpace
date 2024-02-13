@@ -7,23 +7,23 @@
  */
 package org.dspace.app.ldn.action;
 
-import static org.dspace.app.ldn.RdfMediaType.APPLICATION_JSON_LD;
+import java.net.URI;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.google.gson.Gson;
+import org.apache.http.Header;
+import org.apache.http.HttpException;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.ldn.converter.JsonLdHttpMessageConverter;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * Action to send LDN Message
@@ -34,40 +34,37 @@ public class SendLDNMessageAction implements LDNAction {
 
     private static final Logger log = LogManager.getLogger(SendLDNMessageAction.class);
 
-    private final RestTemplate restTemplate;
+    private CloseableHttpClient client = null;
 
     public SendLDNMessageAction() {
-        restTemplate = new RestTemplate();
-        List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
-        messageConverters.add(new JsonLdHttpMessageConverter());
-        messageConverters.addAll(restTemplate.getMessageConverters());
-        restTemplate.setMessageConverters(messageConverters);
+
+        HttpClientBuilder builder = HttpClientBuilder.create();
+        client = builder
+            .disableAutomaticRetries()
+            .setMaxConnTotal(5)
+            .build();
     }
 
     @Override
     public ActionStatus execute(Context context, Notification notification, Item item) throws Exception {
         //TODO authorization with Bearer token should be supported.
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", APPLICATION_JSON_LD.toString());
+        String url = notification.getTarget().getInbox();
 
-        HttpEntity<Notification> request = new HttpEntity<>(notification, headers);
-
-        log.info("Announcing notification {}", request);
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.addHeader("Content-Type", "application, ld+json");
+        Gson gson = new Gson();
+        httpPost.setEntity(new StringEntity(gson.toJson(notification), "UTF-8"));
 
         try {
             //Server-side request forgery Critical check gitHub failure is a false positive,
             //because the LDN Service URL is configured by the user from DSpace
             //frontend configuration at /admin/ldn/services
-            ResponseEntity<String> response = restTemplate.postForEntity(
-                notification.getTarget().getInbox(),
-                request,
-                String.class);
-
-            if (isSuccessful(response.getStatusCode())) {
+            CloseableHttpResponse response = client.execute(httpPost);
+            if (isSuccessful(response.getStatusLine().getStatusCode())) {
                 return ActionStatus.CONTINUE;
-            } else if (isRedirect(response.getStatusCode())) {
-                return handleRedirect(response, request);
+            } else if (isRedirect(response.getStatusLine().getStatusCode())) {
+                return handleRedirect(response, httpPost);
             } else {
                 return ActionStatus.ABORT;
             }
@@ -77,26 +74,29 @@ public class SendLDNMessageAction implements LDNAction {
         }
     }
 
-    private boolean isSuccessful(HttpStatus statusCode) {
-        return statusCode == HttpStatus.ACCEPTED ||
-            statusCode == HttpStatus.CREATED;
+    private boolean isSuccessful(int statusCode) {
+        return statusCode == HttpStatus.SC_ACCEPTED ||
+            statusCode == HttpStatus.SC_CREATED;
     }
 
-    private boolean isRedirect(HttpStatus statusCode) {
-        return statusCode == HttpStatus.PERMANENT_REDIRECT ||
-            statusCode == HttpStatus.TEMPORARY_REDIRECT;
+    private boolean isRedirect(int statusCode) {
+        return statusCode == HttpStatus.SC_MOVED_PERMANENTLY ||
+            statusCode == HttpStatus.SC_MOVED_TEMPORARILY;
     }
 
-    private ActionStatus handleRedirect(ResponseEntity<String> response,
-                                        HttpEntity<Notification> request) {
+    private ActionStatus handleRedirect(CloseableHttpResponse oldresponse,
+                                        HttpPost request) throws HttpException {
 
-        String url = response.getHeaders().getFirst(HttpHeaders.LOCATION);
-
+        Header[] urls = oldresponse.getHeaders(HttpHeaders.LOCATION);
+        String url = urls.length > 0 && urls[0] != null ? urls[0].getValue() : null;
+        if (url == null) {
+            throw new HttpException("Error following redirect, unable to reach"
+                + " the correct url.");
+        }
         try {
-            ResponseEntity<String> responseEntity =
-                restTemplate.postForEntity(url, request, String.class);
-
-            if (isSuccessful(responseEntity.getStatusCode())) {
+            request.setURI(new URI(url));
+            CloseableHttpResponse response = client.execute(request);
+            if (isSuccessful(response.getStatusLine().getStatusCode())) {
                 return ActionStatus.CONTINUE;
             }
         } catch (Exception e) {

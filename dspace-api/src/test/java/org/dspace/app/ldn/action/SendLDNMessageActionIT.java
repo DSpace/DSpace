@@ -9,8 +9,8 @@ package org.dspace.app.ldn.action;
 
 import static org.dspace.app.ldn.action.ActionStatus.ABORT;
 import static org.dspace.app.ldn.action.ActionStatus.CONTINUE;
-import static org.hamcrest.Matchers.any;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -20,6 +20,10 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.ldn.LDNMessageEntity;
 import org.dspace.app.ldn.NotifyServiceEntity;
@@ -41,11 +45,6 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
-
-
 
 /**
  * Integration Tests against {@link SendLDNMessageAction}
@@ -89,9 +88,14 @@ public class SendLDNMessageActionIT extends AbstractIntegrationTestWithDatabase 
 
     @Test
     public void testLDNMessageConsumerRequestReview() throws Exception {
-        ResponseEntity<String> response = ResponseEntity.status(HttpStatus.ACCEPTED).build();
-        RestTemplate mockRestTemplate = mock(RestTemplate.class);
-        when(mockRestTemplate.postForEntity("https://notify-inbox.info/inbox/", any(Object.class), String.class)).thenReturn(response);
+        CloseableHttpResponse response = mock(CloseableHttpResponse.class);
+        response.setStatusCode(HttpStatus.SC_ACCEPTED);
+        CloseableHttpClient mockedClient = mock(CloseableHttpClient.class);
+        when(mockedClient.execute(any(HttpPost.class)))
+        //("https://notify-inbox.info/inbox/", any(Object.class), String.class)).thenReturn(response);
+        //        when(client.execute(any(HttpUriRequest.class), any(HttpContext.class)))
+        .thenReturn(response);
+
         ObjectMapper mapper = new ObjectMapper();
 
         context.turnOffAuthorisationSystem();
@@ -131,9 +135,11 @@ public class SendLDNMessageActionIT extends AbstractIntegrationTestWithDatabase 
 
     @Test
     public void testLDNMessageConsumerRequestReviewGotRedirection() throws Exception {
-        ResponseEntity<String> response = ResponseEntity.status(HttpStatus.ACCEPTED).build();
-        RestTemplate mockRestTemplate = mock(RestTemplate.class);
-        when(mockRestTemplate.postForEntity("https://notify-inbox.info/inbox", any(Object.class), String.class)).thenReturn(response);
+        CloseableHttpResponse response = mock(CloseableHttpResponse.class);
+        response.setStatusCode(HttpStatus.SC_ACCEPTED);
+        CloseableHttpClient mockedClient = mock(CloseableHttpClient.class);
+        when(mockedClient.execute(any(HttpPost.class))).thenReturn(response);
+
         ObjectMapper mapper = new ObjectMapper();
 
         context.turnOffAuthorisationSystem();
@@ -175,10 +181,11 @@ public class SendLDNMessageActionIT extends AbstractIntegrationTestWithDatabase 
 
     @Test
     public void testLDNMessageConsumerRequestReviewWithInvalidLdnUrl() throws Exception {
-        ResponseEntity<String> response = ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        RestTemplate mockRestTemplate = mock(RestTemplate.class);
-        when(mockRestTemplate.postForEntity("https://notify-inbox.info/inbox/", any(Object.class), String.class)).thenReturn(response);
-        //sendLDNMessageAction.setRestTemplate(mockRestTemplate);
+        CloseableHttpResponse response = mock(CloseableHttpResponse.class);
+        response.setStatusCode(HttpStatus.SC_BAD_REQUEST);
+        CloseableHttpClient mockedClient = mock(CloseableHttpClient.class);
+        when(mockedClient.execute(any(HttpPost.class))).
+        thenReturn(response);
         ObjectMapper mapper = new ObjectMapper();
 
         context.turnOffAuthorisationSystem();

@@ -33,7 +33,6 @@ public class LDNQueueTimeoutChecker {
     }
 
     public static int checkQueueMessageTimeout() throws IOException, SQLException {
-        log.info("START LDNQueueTimeoutChecker.checkQueueMessageTimeout()");
         Context context = new Context(Context.Mode.READ_WRITE);
         int fixed_messages = 0;
         fixed_messages = ldnMessageService.checkQueueMessageTimeout(context);
@@ -42,7 +41,6 @@ public class LDNQueueTimeoutChecker {
         } else {
             log.error("Errors happened during the check operation. Check the log above!");
         }
-        log.info("END LDNQueueTimeoutChecker.checkQueueMessageTimeout()");
         context.complete();
         return fixed_messages;
     }
