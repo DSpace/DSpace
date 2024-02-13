@@ -65,13 +65,13 @@ public enum QueryOperator {
                 regexClause, val, StandardBasicTypes.STRING)),
         (val, regexClause, jpaKit) -> regexPredicate(val, DSpacePostgreSQLDialect.REGEX_NOT_MATCHES, jpaKit));
 
-    private String code;
+    private final String code;
     /** Criteria builder for the old Hibernate API */
     @Deprecated(forRemoval = true)
-    private BiFunction<String, String, Criterion> criterionBuilder;
-    private TriFunction<String, String, JpaCriteriaBuilderKit<MetadataValue>, Predicate> predicateBuilder;
-    private boolean usesRegex;
-    private boolean negate;
+    private final BiFunction<String, String, Criterion> criterionBuilder;
+    private final TriFunction<String, String, JpaCriteriaBuilderKit<MetadataValue>, Predicate> predicateBuilder;
+    private final boolean usesRegex;
+    private final boolean negate;
 
     QueryOperator(String code, boolean usesRegex, boolean negate,
             BiFunction<String, String, Criterion> criterionBuilder,

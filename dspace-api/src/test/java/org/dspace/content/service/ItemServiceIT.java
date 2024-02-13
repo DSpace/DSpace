@@ -941,6 +941,9 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
         // Here we add an author to the item
         MetadataValue mv = itemService.addMetadata(context, item, dcSchema, contributorElement,
                 authorQualifier, null, "test, one");
+        context.commit();
+        context.restoreAuthSystemState();
+
         assertNotNull(mv);
         MetadataField mf = mv.getMetadataField();
         assertEquals(fieldAuthor, mf);
