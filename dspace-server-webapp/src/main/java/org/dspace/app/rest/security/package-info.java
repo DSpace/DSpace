@@ -1,7 +1,10 @@
-/*
- * Copyright 2024 Indiana University.
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
  */
-
 /**
  * DSpace-specific concepts and behaviors to support Spring Security.
  * These may be used by Spring EL expressions in Spring Security annotations.
