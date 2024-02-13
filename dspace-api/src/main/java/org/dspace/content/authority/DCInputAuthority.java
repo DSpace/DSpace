@@ -156,7 +156,8 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
         int found = 0;
         List<Choice> v = new ArrayList<Choice>();
         for (int i = 0; i < valuesLocale.length; ++i) {
-            if (query == null || StringUtils.containsIgnoreCase(valuesLocale[i], query)) {
+            // In a DCInputAuthority context, a user will want to query the labels, not the values
+            if (query == null || StringUtils.containsIgnoreCase(labelsLocale[i], query)) {
                 if (found >= start && v.size() < limit) {
                     v.add(new Choice(null, valuesLocale[i], labelsLocale[i]));
                     if (valuesLocale[i].equalsIgnoreCase(query)) {

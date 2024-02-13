@@ -77,6 +77,7 @@ import org.dspace.orcid.service.OrcidQueueService;
 import org.dspace.orcid.service.OrcidSynchronizationService;
 import org.dspace.orcid.service.OrcidTokenService;
 import org.dspace.profile.service.ResearcherProfileService;
+import org.dspace.qaevent.dao.QAEventsDAO;
 import org.dspace.services.ConfigurationService;
 import org.dspace.versioning.service.VersioningService;
 import org.dspace.workflow.WorkflowItemService;
@@ -169,6 +170,9 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Autowired(required = true)
     protected SubscribeService subscribeService;
+
+    @Autowired
+    private QAEventsDAO qaEventsDao;
 
     protected ItemServiceImpl() {
         super();
@@ -819,6 +823,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             orcidToken.setProfileItem(null);
         }
 
+        List<QAEventProcessed> qaEvents = qaEventsDao.findByItem(context, item);
+        for (QAEventProcessed qaEvent : qaEvents) {
+            qaEventsDao.delete(context, qaEvent);
+        }
+
         //Only clear collections after we have removed everything else from the item
         item.clearCollections();
         item.setOwningCollection(null);
@@ -1427,16 +1436,6 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     @Override
-    public Iterator<Item> findByMetadataQuery(Context context, List<List<MetadataField>> listFieldList,
-                                              List<String> query_op, List<String> query_val, List<UUID> collectionUuids,
-                                              String regexClause, int offset, int limit)
-        throws SQLException, AuthorizeException, IOException {
-        return itemDAO
-            .findByMetadataQuery(context, listFieldList, query_op, query_val, collectionUuids, regexClause, offset,
-                                 limit);
-    }
-
-    @Override
     public DSpaceObject getAdminObject(Context context, Item item, int action) throws SQLException {
         DSpaceObject adminObject = null;
         //Items are always owned by collections
@@ -1609,10 +1608,15 @@ prevent the generation of resource policy entry values with null dspace_object a
 
     @Override
     public Item findByIdOrLegacyId(Context context, String id) throws SQLException {
-        if (StringUtils.isNumeric(id)) {
-            return findByLegacyId(context, Integer.parseInt(id));
-        } else {
-            return find(context, UUID.fromString(id));
+        try {
+            if (StringUtils.isNumeric(id)) {
+                return findByLegacyId(context, Integer.parseInt(id));
+            } else {
+                return find(context, UUID.fromString(id));
+            }
+        } catch (IllegalArgumentException e) {
+            // Not a valid legacy ID or valid UUID
+            return null;
         }
     }
 

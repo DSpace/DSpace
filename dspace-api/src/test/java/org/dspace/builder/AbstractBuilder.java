@@ -49,6 +49,7 @@ import org.dspace.orcid.factory.OrcidServiceFactory;
 import org.dspace.orcid.service.OrcidHistoryService;
 import org.dspace.orcid.service.OrcidQueueService;
 import org.dspace.orcid.service.OrcidTokenService;
+import org.dspace.qaevent.service.QAEventService;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -56,6 +57,7 @@ import org.dspace.submit.factory.SubmissionServiceFactory;
 import org.dspace.submit.service.SubmissionConfigService;
 import org.dspace.supervision.factory.SupervisionOrderServiceFactory;
 import org.dspace.supervision.service.SupervisionOrderService;
+import org.dspace.utils.DSpace;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
@@ -113,7 +115,7 @@ public abstract class AbstractBuilder<T, S> {
     static SubmissionConfigService submissionConfigService;
     static SubscribeService subscribeService;
     static SupervisionOrderService supervisionOrderService;
-
+    static QAEventService qaEventService;
 
     protected Context context;
 
@@ -182,6 +184,7 @@ public abstract class AbstractBuilder<T, S> {
         }
         subscribeService = ContentServiceFactory.getInstance().getSubscribeService();
         supervisionOrderService = SupervisionOrderServiceFactory.getInstance().getSupervisionOrderService();
+        qaEventService = new DSpace().getSingletonService(QAEventService.class);
     }
 
 
@@ -219,6 +222,7 @@ public abstract class AbstractBuilder<T, S> {
         submissionConfigService = null;
         subscribeService = null;
         supervisionOrderService = null;
+        qaEventService = null;
 
     }
 

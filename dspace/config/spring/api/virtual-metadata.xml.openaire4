@@ -201,14 +201,12 @@
     <!-- This Related bean defines a relationship type that will be used on a publication (from a project).
          -->
     <bean class="org.dspace.content.virtual.Related" id="publicationProject_projectFunderName_related">
-        <property name="relationshipTypeString" value="isProjectOfFundingAgency"/>
-        <property name="place" value="0"/>
+        <property name="relationshipTypeString" value="isFundingAgencyOfProject"/>
         <property name="virtualMetadataConfiguration" ref="projectOrgUnit_orgName"/>
     </bean>
 
     <bean class="org.dspace.content.virtual.Related" id="publicationProject_projectFunderId_related">
-        <property name="relationshipTypeString" value="isProjectOfFundingAgency"/>
-        <property name="place" value="0"/>
+        <property name="relationshipTypeString" value="isFundingAgencyOfProject"/>
         <property name="virtualMetadataConfiguration" ref="projectOrgUnit_orgId"/>
     </bean>
 
@@ -217,7 +215,7 @@
         <property name="place" value="0"/>
         <property name="virtualMetadataConfiguration" ref="projectOrgUnit_rorId"/>
     </bean>
-    
+
     <!-- Config like this will tell our VirtualMetadataPopulator to include the virtual metadata field
      'project.funder.*' on the appropriate item with the values defined in the value-ref.
       This value-ref should be a bean of type VirtualMetadataConfiguration -->
