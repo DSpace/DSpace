@@ -31,7 +31,8 @@ public class ContentReportSupportHalLinkFactory
 
         list.add(buildLink(IanaLinkRelations.SELF.value(), getMethodOn().getContentReportSupport()));
         list.add(buildLink("filteredcollections", getMethodOn().getFilteredCollections(null, null, null)));
-        list.add(buildLink("filtereditems", getMethodOn().getFilteredItems(null, null, null, null, null, null, null, null, null)));
+        list.add(buildLink("filtereditems", getMethodOn()
+                .getFilteredItems(null, null, null, null, null, null, null, null, null)));
     }
 
     @Override

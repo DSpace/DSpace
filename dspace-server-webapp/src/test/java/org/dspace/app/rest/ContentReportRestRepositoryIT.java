@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.contentreport.Filter;
 import org.dspace.app.rest.matcher.FilteredCollectionMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
@@ -35,7 +36,6 @@ import org.dspace.content.Item;
 import org.dspace.contentreport.QueryOperator;
 import org.hamcrest.Matchers;
 import org.junit.Test;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Integration tests for the content reports ported from DSpace 6.x
