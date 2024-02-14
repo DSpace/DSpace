@@ -9,6 +9,7 @@ package org.dspace.app.rest.converter;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -18,6 +19,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ItemRest;
+import org.dspace.app.rest.model.LinkRest;
+import org.dspace.app.rest.model.LinksRest;
 import org.dspace.app.rest.model.MetadataValueList;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.dspace.app.rest.model.hateoas.ItemResource;
@@ -52,6 +55,15 @@ public class ItemConverter
     private Utils utils;
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemConverter.class);
+    private static final Link[] DUMMY_LINKS = {};
+    private static final LinkRest OWNING_COLL_LINK_REST;
+    static {
+        LinkRest[] links = ItemRest.class.getAnnotation(LinksRest.class).links();
+        OWNING_COLL_LINK_REST = Arrays.stream(links)
+                .filter(l -> ItemRest.OWNING_COLLECTION.equals(l.name()))
+                .findFirst()
+                .orElse(links.length > 0 ? links[0] : null);
+    }
 
     @Override
     public ItemRest convert(Item obj, Projection projection) {
@@ -65,7 +77,7 @@ public class ItemConverter
         // where an appropriate projection is used. In all other use cases, a default,
         // non-embedding projection is used.
         HALResource<ItemRest> res = new ItemResource(item, utils);
-        if (projection.allowEmbedding(res, null, (Link[]) null)) {
+        if (projection.allowEmbedding(res, OWNING_COLL_LINK_REST, DUMMY_LINKS)) {
             Optional.ofNullable(obj.getOwningCollection())
                     .map(coll -> collectionConverter.convert(coll, Projection.DEFAULT))
                     .ifPresent(item::setOwningCollection);
@@ -96,7 +108,7 @@ public class ItemConverter
         try {
             if (obj.isWithdrawn() && (Objects.isNull(context) ||
                                       Objects.isNull(context.getCurrentUser()) || !authorizeService.isAdmin(context))) {
-                return new MetadataValueList(new ArrayList<MetadataValue>());
+                return new MetadataValueList(new ArrayList<>());
             }
             if (context != null && (authorizeService.isAdmin(context) || itemService.canEdit(context, obj))) {
                 return new MetadataValueList(fullList);
