@@ -24,7 +24,7 @@ public class FilteredCollectionMatcher {
 
     public static Matcher<? super Object> matchFilteredCollectionProperties(FilteredCollectionRest collection) {
         return allOf(
-                hasJsonPath("$label", is(collection.getLabel())),
+                hasJsonPath("$.label", is(collection.getLabel())),
                 hasJsonPath("$.community_label", is(collection.getCommunityLabel())),
                 hasJsonPath("$.community_handle", is(collection.getCommunityHandle())),
                 hasJsonPath("$.nb_total_items", is(collection.getTotalItems())),
