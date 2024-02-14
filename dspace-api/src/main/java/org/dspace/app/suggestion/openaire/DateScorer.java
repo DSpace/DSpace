@@ -133,8 +133,7 @@ public class DateScorer implements EvidenceScorer {
             return new SuggestionEvidence(this.getClass().getSimpleName(),
                     0,
                     "No assumption was possible about the publication year range. "
-                    + "Please consider to set a min/max date in the profile, specify the birthday "
-                    + "or education achievements");
+                    + "Please consider setting your birthday in your profile.");
         } else {
             String optDate = SuggestionUtils.getFirstEntryByMetadatum(importRecord, publicationDateMetadata);
             int year = getYear(optDate);
