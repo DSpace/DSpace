@@ -5,11 +5,12 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.ldn.action;
+package org.dspace.app.ldn;
 
-/**
- * Resulting status of an execution of an action.
- */
-public enum ActionStatus {
-    CONTINUE, ABORT;
+public enum LDNMessageQueueStatus {
+
+    /**
+     * Resulting processing status of an LDN Message (aka queue management)
+     */
+    QUEUED, PROCESSING, PROCESSED, FAILED;
 }

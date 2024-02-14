@@ -19,8 +19,8 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpResponseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.ldn.action.ActionStatus;
 import org.dspace.app.ldn.action.LDNAction;
+import org.dspace.app.ldn.action.LDNActionStatus;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.ldn.utility.LDNUtils;
 import org.dspace.content.DSpaceObject;
@@ -79,8 +79,8 @@ public class LDNMetadataProcessor implements LDNProcessor {
      *
      * @throws Exception failed execute the action
      */
-    private ActionStatus runActions(Context context, Notification notification, Item item) throws Exception {
-        ActionStatus operation = ActionStatus.CONTINUE;
+    private LDNActionStatus runActions(Context context, Notification notification, Item item) throws Exception {
+        LDNActionStatus operation = LDNActionStatus.CONTINUE;
         for (LDNAction action : actions) {
             log.info("Running action {} for notification {} {}",
                     action.getClass().getSimpleName(),
@@ -88,7 +88,7 @@ public class LDNMetadataProcessor implements LDNProcessor {
                     notification.getType());
 
             operation = action.execute(context, notification, item);
-            if (operation == ActionStatus.ABORT) {
+            if (operation == LDNActionStatus.ABORT) {
                 break;
             }
         }

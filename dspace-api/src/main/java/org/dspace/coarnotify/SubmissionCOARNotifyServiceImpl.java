@@ -29,7 +29,7 @@ public class SubmissionCOARNotifyServiceImpl implements SubmissionCOARNotifyServ
 
     @Override
     public COARNotifySubmissionConfiguration findOne(String id) {
-        List<LDNPattern> patterns =
+        List<COARPattern> patterns =
             coarNotifyConfigurationService.getPatterns().get(id);
 
         if (patterns == null) {

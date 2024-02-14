@@ -17,7 +17,7 @@ import java.util.List;
 import org.dspace.app.rest.matcher.SubmissionCOARNotifyMatcher;
 import org.dspace.app.rest.repository.SubmissionCoarNotifyRestRepository;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.coarnotify.LDNPattern;
+import org.dspace.coarnotify.COARPattern;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
@@ -43,9 +43,9 @@ public class SubmissionCOARNotifyRestRepositoryIT extends AbstractControllerInte
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.submissioncoarnotifyconfigs", Matchers.containsInAnyOrder(
                         SubmissionCOARNotifyMatcher.matchCOARNotifyEntry("coarnotify", List.of(
-                            new LDNPattern("request-review", true),
-                            new LDNPattern("request-endorsement", true),
-                            new LDNPattern("request-ingest", false)))
+                            new COARPattern("request-review", true),
+                            new COARPattern("request-endorsement", true),
+                            new COARPattern("request-ingest", false)))
                 )));
     }
 
@@ -72,9 +72,9 @@ public class SubmissionCOARNotifyRestRepositoryIT extends AbstractControllerInte
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$", Matchers.is(
                         SubmissionCOARNotifyMatcher.matchCOARNotifyEntry("coarnotify", List.of(
-                            new LDNPattern("request-review", true),
-                            new LDNPattern("request-endorsement", true),
-                            new LDNPattern("request-ingest", false)))
+                            new COARPattern("request-review", true),
+                            new COARPattern("request-endorsement", true),
+                            new COARPattern("request-ingest", false)))
                 )));
     }
 

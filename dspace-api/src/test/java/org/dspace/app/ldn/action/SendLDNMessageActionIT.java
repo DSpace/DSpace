@@ -7,8 +7,8 @@
  */
 package org.dspace.app.ldn.action;
 
-import static org.dspace.app.ldn.action.ActionStatus.ABORT;
-import static org.dspace.app.ldn.action.ActionStatus.CONTINUE;
+import static org.dspace.app.ldn.action.LDNActionStatus.ABORT;
+import static org.dspace.app.ldn.action.LDNActionStatus.CONTINUE;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;

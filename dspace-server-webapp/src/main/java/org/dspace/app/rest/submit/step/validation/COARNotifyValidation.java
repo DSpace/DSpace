@@ -23,7 +23,7 @@ import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.coarnotify.COARNotifyConfigurationService;
-import org.dspace.coarnotify.LDNPattern;
+import org.dspace.coarnotify.COARPattern;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.logic.LogicalStatement;
@@ -54,7 +54,7 @@ public class COARNotifyValidation extends AbstractValidation {
         List<String> patterns =
             coarNotifyConfigurationService.getPatterns().getOrDefault(config.getId(), List.of())
                                           .stream()
-                                          .map(LDNPattern::getPattern)
+                                          .map(COARPattern::getPattern)
                                           .collect(Collectors.toList());
 
         patterns.forEach(pattern -> {

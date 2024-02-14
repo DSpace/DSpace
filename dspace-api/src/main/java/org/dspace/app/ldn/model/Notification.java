@@ -11,7 +11,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
- *
+ * the json object from witch @see org.dspace.app.ldn.LDNMessageEntity are created.
+ * <a href="https://notify.coar-repositories.org/patterns/">see official coar doc</a>
  */
 @JsonPropertyOrder(value = {
     "@context",

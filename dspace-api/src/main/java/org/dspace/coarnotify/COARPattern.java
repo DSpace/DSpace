@@ -12,16 +12,16 @@ package org.dspace.coarnotify;
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
-public class LDNPattern {
+public class COARPattern {
 
     private String pattern;
     private boolean multipleRequest;
 
-    public LDNPattern() {
+    public COARPattern() {
 
     }
 
-    public LDNPattern(String pattern, boolean multipleRequest) {
+    public COARPattern(String pattern, boolean multipleRequest) {
         this.pattern = pattern;
         this.multipleRequest = multipleRequest;
     }

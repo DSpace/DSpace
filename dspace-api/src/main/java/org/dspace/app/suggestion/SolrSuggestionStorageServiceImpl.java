@@ -10,7 +10,6 @@ package org.dspace.app.suggestion;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,9 +18,11 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
@@ -41,6 +42,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+
 /**
  * Service to deal with the local suggestion solr core used by the
  * SolrSuggestionProvider(s)
@@ -49,6 +51,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  */
 public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageService {
+
+    private static final Logger log = LogManager.getLogger(SolrSuggestionStorageServiceImpl.class);
 
     protected SolrClient solrSuggestionClient;
 
@@ -73,7 +77,7 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
     public void addSuggestion(Suggestion suggestion, boolean force, boolean commit)
             throws SolrServerException, IOException {
         if (force || !exist(suggestion)) {
-            Gson gson = new Gson();
+            ObjectMapper mapper = new ObjectMapper();
             SolrInputDocument document = new SolrInputDocument();
             document.addField(SOURCE, suggestion.getSource());
             String suggestionFullID = suggestion.getID();
@@ -89,7 +93,7 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
             document.addField(EXTERNAL_URI, suggestion.getExternalSourceUri());
             document.addField(SCORE, suggestion.getScore());
             document.addField(PROCESSED, false);
-            document.addField(EVIDENCES, gson.toJson(suggestion.getEvidences()));
+            document.addField(EVIDENCES, mapper.writeValueAsString(suggestion.getEvidences()));
             getSolr().add(document);
             if (commit) {
                 getSolr().commit();
@@ -326,10 +330,14 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
             }
         }
         String evidencesJson = (String) solrDoc.getFieldValue(EVIDENCES);
-        Type listType = new TypeToken<ArrayList<SuggestionEvidence>>() {
-        }.getType();
-        List<SuggestionEvidence> evidences = new Gson().fromJson(evidencesJson, listType);
-        suggestion.getEvidences().addAll(evidences);
+        ObjectMapper mapper = new ObjectMapper();
+        List<SuggestionEvidence> evidences;
+        try {
+            evidences = mapper.readValue(evidencesJson, List.class);
+            suggestion.getEvidences().addAll(evidences);
+        } catch (JsonProcessingException e) {
+            log.error(e);
+        }
         return suggestion;
     }
 

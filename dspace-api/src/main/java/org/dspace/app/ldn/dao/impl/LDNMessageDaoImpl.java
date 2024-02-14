@@ -39,7 +39,6 @@ public class LDNMessageDaoImpl extends AbstractHibernateDAO<LDNMessageEntity> im
 
     @Override
     public List<LDNMessageEntity> findOldestMessageToProcess(Context context, int max_attempts) throws SQLException {
-        // looking for oldest failed-processed message
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<LDNMessageEntity> criteriaQuery = getCriteriaQuery(criteriaBuilder, LDNMessageEntity.class);
         Root<LDNMessageEntity> root = criteriaQuery.from(LDNMessageEntity.class);
@@ -54,7 +53,6 @@ public class LDNMessageDaoImpl extends AbstractHibernateDAO<LDNMessageEntity> im
         orderList.add(criteriaBuilder.desc(root.get(LDNMessageEntity_.queueAttempts)));
         orderList.add(criteriaBuilder.asc(root.get(LDNMessageEntity_.queueLastStartTime)));
         criteriaQuery.orderBy(orderList);
-        // setHint("org.hibernate.cacheable", Boolean.FALSE);
         List<LDNMessageEntity> result = list(context, criteriaQuery, false, LDNMessageEntity.class, -1, -1);
         if (result == null || result.isEmpty()) {
             log.debug("No LDN messages found to be processed");
@@ -79,7 +77,6 @@ public class LDNMessageDaoImpl extends AbstractHibernateDAO<LDNMessageEntity> im
         orderList.add(criteriaBuilder.desc(root.get(LDNMessageEntity_.queueAttempts)));
         orderList.add(criteriaBuilder.asc(root.get(LDNMessageEntity_.queueLastStartTime)));
         criteriaQuery.orderBy(orderList);
-        // setHint("org.hibernate.cacheable", Boolean.FALSE);
         List<LDNMessageEntity> result = list(context, criteriaQuery, false, LDNMessageEntity.class, -1, -1);
         if (result == null || result.isEmpty()) {
             log.debug("No LDN messages found to be processed");
@@ -98,8 +95,6 @@ public class LDNMessageDaoImpl extends AbstractHibernateDAO<LDNMessageEntity> im
         Predicate relatedtypePredicate = null;
         andPredicates.add(
             criteriaBuilder.equal(root.get(LDNMessageEntity_.queueStatus), LDNMessageEntity.QUEUE_STATUS_PROCESSED));
-        /*andPredicates.add(
-            criteriaBuilder.equal(root.get(LDNMessageEntity_.object), item));*/
         andPredicates.add(
             criteriaBuilder.isNull(root.get(LDNMessageEntity_.target)));
         andPredicates.add(
@@ -113,7 +108,6 @@ public class LDNMessageDaoImpl extends AbstractHibernateDAO<LDNMessageEntity> im
         orderList.add(criteriaBuilder.asc(root.get(LDNMessageEntity_.queueLastStartTime)));
         orderList.add(criteriaBuilder.desc(root.get(LDNMessageEntity_.queueAttempts)));
         criteriaQuery.orderBy(orderList);
-        // setHint("org.hibernate.cacheable", Boolean.FALSE);
         List<LDNMessageEntity> result = list(context, criteriaQuery, false, LDNMessageEntity.class, -1, -1);
         if (result == null || result.isEmpty()) {
             log.debug("No LDN messages ACK found to be processed");
@@ -145,7 +139,6 @@ public class LDNMessageDaoImpl extends AbstractHibernateDAO<LDNMessageEntity> im
         orderList.add(criteriaBuilder.asc(root.get(LDNMessageEntity_.queueLastStartTime)));
         orderList.add(criteriaBuilder.desc(root.get(LDNMessageEntity_.queueAttempts)));
         criteriaQuery.orderBy(orderList);
-        // setHint("org.hibernate.cacheable", Boolean.FALSE);
         List<LDNMessageEntity> result = list(context, criteriaQuery, false, LDNMessageEntity.class, -1, -1);
         if (result == null || result.isEmpty()) {
             log.debug("No LDN messages found");

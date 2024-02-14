@@ -79,7 +79,7 @@
      </bean>
 
      <bean id="AddEndorsedMetadataAction" class="org.dspace.qaevent.action.QANotifySimpleMetadataAction">
-        <property name="metadata" value="notify.relation.endorsedBy"/>
+        <property name="metadata" value="coar.notify.endorsedBy"/>
      </bean>
      <!-- Add a new identifier to the given item, using the defined types mapping -->
      <bean id="PIDMetadataAction" class="org.dspace.qaevent.action.QAOpenaireMetadataMapAction">

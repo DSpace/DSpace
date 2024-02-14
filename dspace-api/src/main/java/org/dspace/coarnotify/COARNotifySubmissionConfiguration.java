@@ -26,13 +26,13 @@ public class COARNotifySubmissionConfiguration {
      * the map values of configured bean of COARNotifyConfigurationService
      * in coar-notify.xml
      */
-    private List<LDNPattern> patterns;
+    private List<COARPattern> patterns;
 
     public COARNotifySubmissionConfiguration() {
 
     }
 
-    public COARNotifySubmissionConfiguration(String id, List<LDNPattern> patterns) {
+    public COARNotifySubmissionConfiguration(String id, List<COARPattern> patterns) {
         super();
         this.id = id;
         this.patterns = patterns;
@@ -51,7 +51,7 @@ public class COARNotifySubmissionConfiguration {
      *
      * @return the list of configured COAR Notify Patterns
      */
-    public List<LDNPattern> getPatterns() {
+    public List<COARPattern> getPatterns() {
         return patterns;
     }
 
@@ -59,7 +59,7 @@ public class COARNotifySubmissionConfiguration {
      * Sets the list of configured COAR Notify Patterns
      * @param patterns
      */
-    public void setPatterns(final List<LDNPattern> patterns) {
+    public void setPatterns(final List<COARPattern> patterns) {
         this.patterns = patterns;
     }
 }

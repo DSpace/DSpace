@@ -19,7 +19,6 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.JsonSyntaxException;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -120,17 +119,15 @@ public class LDNMessageServiceImpl implements LDNMessageService {
             ldnMessage.setCoarNotifyType(notificationTypeArrayList.get(1));
         }
         ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_QUEUED);
-        //CST-12126 if source is untrusted, set the queue_status of the
-        //ldnMsgEntity to UNTRUSTED
         if (ldnMessage.getOrigin() == null && !"Offer".equalsIgnoreCase(ldnMessage.getActivityStreamType())) {
             ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_UNTRUSTED);
+        } else {
+            if (!isValidIp(ldnMessage)) {
+                ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_UNTRUSTED_IP);
+            }
         }
         ldnMessage.setQueueTimeout(new Date());
         ldnMessage.setSourceIp(sourceIp);
-
-        if (!isValidIp(ldnMessage)) {
-            ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_UNTRUSTED_IP);
-        }
 
         update(context, ldnMessage);
         return ldnMessage;
@@ -177,8 +174,6 @@ public class LDNMessageServiceImpl implements LDNMessageService {
 
     @Override
     public void update(Context context, LDNMessageEntity ldnMessage) throws SQLException {
-        //CST-12126 then LDNMessageService.update() when the origin is set != null,
-        //move the queue_status from UNTRUSTED to QUEUED
         if (ldnMessage.getOrigin() != null &&
             LDNMessageEntity.QUEUE_STATUS_UNTRUSTED.compareTo(ldnMessage.getQueueStatus()) == 0) {
             ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_QUEUED);
@@ -261,9 +256,6 @@ public class LDNMessageServiceImpl implements LDNMessageService {
                         processor.process(context, notification);
                         msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_PROCESSED);
                         result = 1;
-                    } catch (JsonSyntaxException jse) {
-                        result = -1;
-                        log.error("Unable to read JSON notification from LdnMessage " + msg, jse);
                     } catch (Exception e) {
                         result = -1;
                         log.error(e);

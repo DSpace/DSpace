@@ -9,8 +9,9 @@ package org.dspace.app.ldn.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+
 /**
- *
+ * used to map @see org.dspace.app.ldn.model.Notification
  */
 public class Citation extends Base {
 

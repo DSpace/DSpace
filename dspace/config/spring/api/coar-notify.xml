@@ -19,17 +19,17 @@
         </property>
     </bean>
 
-    <bean id="requestReview" class="org.dspace.coarnotify.LDNPattern">
+    <bean id="requestReview" class="org.dspace.coarnotify.COARPattern">
         <property name="pattern" value="request-review"/>
         <property name="multipleRequest" value="true"/>
     </bean>
 
-    <bean id="requestEndorsement" class="org.dspace.coarnotify.LDNPattern">
+    <bean id="requestEndorsement" class="org.dspace.coarnotify.COARPattern">
         <property name="pattern" value="request-endorsement"/>
         <property name="multipleRequest" value="true"/>
     </bean>
 
-    <bean id="requestIngest" class="org.dspace.coarnotify.LDNPattern">
+    <bean id="requestIngest" class="org.dspace.coarnotify.COARPattern">
         <property name="pattern" value="request-ingest"/>
         <property name="multipleRequest" value="false"/>
     </bean>

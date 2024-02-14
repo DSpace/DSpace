@@ -9,7 +9,7 @@ package org.dspace.app.ldn.action;
 
 import java.net.URI;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.Header;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHeaders;
@@ -46,31 +46,31 @@ public class SendLDNMessageAction implements LDNAction {
     }
 
     @Override
-    public ActionStatus execute(Context context, Notification notification, Item item) throws Exception {
+    public LDNActionStatus execute(Context context, Notification notification, Item item) throws Exception {
         //TODO authorization with Bearer token should be supported.
 
         String url = notification.getTarget().getInbox();
 
         HttpPost httpPost = new HttpPost(url);
         httpPost.addHeader("Content-Type", "application, ld+json");
-        Gson gson = new Gson();
-        httpPost.setEntity(new StringEntity(gson.toJson(notification), "UTF-8"));
+        ObjectMapper mapper = new ObjectMapper();
+        httpPost.setEntity(new StringEntity(mapper.writeValueAsString(notification), "UTF-8"));
 
         try {
-            //Server-side request forgery Critical check gitHub failure is a false positive,
-            //because the LDN Service URL is configured by the user from DSpace
-            //frontend configuration at /admin/ldn/services
+            // NOTE: Github believes there is a "Potential server-side request forgery due to a user-provided value"
+            // This is a false positive because the LDN Service URL is configured by the user from DSpace.
+            // See the frontend configuration at [dspace.ui.url]/admin/ldn/services
             CloseableHttpResponse response = client.execute(httpPost);
             if (isSuccessful(response.getStatusLine().getStatusCode())) {
-                return ActionStatus.CONTINUE;
+                return LDNActionStatus.CONTINUE;
             } else if (isRedirect(response.getStatusLine().getStatusCode())) {
                 return handleRedirect(response, httpPost);
             } else {
-                return ActionStatus.ABORT;
+                return LDNActionStatus.ABORT;
             }
         } catch (Exception e) {
             log.error(e);
-            return ActionStatus.ABORT;
+            return LDNActionStatus.ABORT;
         }
     }
 
@@ -84,7 +84,7 @@ public class SendLDNMessageAction implements LDNAction {
             statusCode == HttpStatus.SC_MOVED_TEMPORARILY;
     }
 
-    private ActionStatus handleRedirect(CloseableHttpResponse oldresponse,
+    private LDNActionStatus handleRedirect(CloseableHttpResponse oldresponse,
                                         HttpPost request) throws HttpException {
 
         Header[] urls = oldresponse.getHeaders(HttpHeaders.LOCATION);
@@ -97,12 +97,12 @@ public class SendLDNMessageAction implements LDNAction {
             request.setURI(new URI(url));
             CloseableHttpResponse response = client.execute(request);
             if (isSuccessful(response.getStatusLine().getStatusCode())) {
-                return ActionStatus.CONTINUE;
+                return LDNActionStatus.CONTINUE;
             }
         } catch (Exception e) {
             log.error("Error following redirect:", e);
         }
 
-        return ActionStatus.ABORT;
+        return LDNActionStatus.ABORT;
     }
 }

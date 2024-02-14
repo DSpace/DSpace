@@ -25,7 +25,7 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.step.DataCOARNotify;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.coarnotify.COARNotifyConfigurationService;
-import org.dspace.coarnotify.LDNPattern;
+import org.dspace.coarnotify.COARPattern;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,6 +90,11 @@ public class COARNotifySubmissionService {
         }
     }
 
+    /**
+     * extract pattern from path. see COARNotifyConfigurationService bean
+     * @param path
+     * @return the extracted pattern
+     */
     public String extractPattern(String path) {
         Pattern pattern = Pattern.compile("/([^/]+)/([^/]+)/([^/]+)");
         Matcher matcher = pattern.matcher(path);
@@ -107,13 +112,13 @@ public class COARNotifySubmissionService {
     }
 
     private boolean isContainPattern(String config, String pattern) {
-        List<LDNPattern> patterns = coarNotifyConfigurationService.getPatterns().get(config);
+        List<COARPattern> patterns = coarNotifyConfigurationService.getPatterns().get(config);
         if (CollectionUtils.isEmpty(patterns)) {
             return false;
         }
 
         return patterns.stream()
-                       .map(LDNPattern::getPattern)
+                       .map(COARPattern::getPattern)
                        .anyMatch(v ->
                            v.equals(pattern));
     }
