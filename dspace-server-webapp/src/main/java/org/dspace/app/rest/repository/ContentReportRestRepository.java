@@ -26,6 +26,7 @@ import org.dspace.app.rest.model.FilteredItemsQuery;
 import org.dspace.app.rest.model.FilteredItemsQueryPredicate;
 import org.dspace.app.rest.model.FilteredItemsRest;
 import org.dspace.app.rest.model.ItemRest;
+import org.dspace.app.rest.projection.FullProjection;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.FilteredCollectionsReportUtils;
 import org.dspace.content.Item;
@@ -47,6 +48,11 @@ import org.springframework.stereotype.Component;
 public class ContentReportRestRepository extends AbstractDSpaceRestRepository {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ContentReportRestRepository.class);
+    /**
+     * This projection enables embedding an item's owning collection for the specific case of
+     * the Filtered Items report.
+     */
+    private static final Projection FILTERED_ITEM_PROJECTION = new FullProjection();
 
     @Autowired
     private FilteredCollectionsReportUtils reportUtils;
@@ -91,7 +97,7 @@ public class ContentReportRestRepository extends AbstractDSpaceRestRepository {
             for (Item item : items) {
                 boolean matchesFilters = filters.stream().allMatch(f -> f.testItem(context, item));
                 if (matchesFilters) {
-                    ItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
+                    ItemRest itemRest = itemConverter.convert(item, FILTERED_ITEM_PROJECTION);
                     report.addItem(itemRest);
                 }
             }

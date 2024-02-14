@@ -19,7 +19,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.MetadataValueList;
+import org.dspace.app.rest.model.hateoas.HALResource;
+import org.dspace.app.rest.model.hateoas.ItemResource;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
@@ -27,6 +30,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
 /**
@@ -44,6 +48,8 @@ public class ItemConverter
     private ItemService itemService;
     @Autowired
     private CollectionConverter collectionConverter;
+    @Autowired
+    private Utils utils;
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemConverter.class);
 
@@ -55,9 +61,15 @@ public class ItemConverter
         item.setWithdrawn(obj.isWithdrawn());
         item.setLastModified(obj.getLastModified());
 
-        Optional.ofNullable(obj.getOwningCollection())
-                .map(coll -> collectionConverter.convert(coll, Projection.DEFAULT))
-                .ifPresent(item::setOwningCollection);
+        // Embedding the wwning collection is needed only for the Filtered Items report,
+        // where an appropriate projection is used. In all other use cases, a default,
+        // non-embedding projection is used.
+        HALResource<ItemRest> res = new ItemResource(item, utils);
+        if (projection.allowEmbedding(res, null, (Link[]) null)) {
+            Optional.ofNullable(obj.getOwningCollection())
+                    .map(coll -> collectionConverter.convert(coll, Projection.DEFAULT))
+                    .ifPresent(item::setOwningCollection);
+        }
 
         List<MetadataValue> entityTypes =
             itemService.getMetadata(obj, "dspace", "entity", "type", Item.ANY, false);
