@@ -9,6 +9,8 @@ package org.dspace.app.rest.model;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -77,6 +79,7 @@ public class ItemRest extends DSpaceObjectRest {
     private Date lastModified = new Date();
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String entityType = null;
+    @JsonInclude(Include.NON_EMPTY)
     private CollectionRest owningCollection;
 
     @Override
