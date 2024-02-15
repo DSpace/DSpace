@@ -87,9 +87,6 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
                                       .withSubject("ExtraEntry")
                                       .build();
 
-        col1 = context.reloadEntity(col1);
-        col2 = context.reloadEntity(col2);
-
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -100,7 +97,7 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
         Map<Filter, Integer> valuesCol2 = Map.of(Filter.IS_DISCOVERABLE, 2);
         FilteredCollectionRest fcol2 = FilteredCollectionRest.of(col2.getName(), col2.getHandle(),
                 parentCommunity.getName(), parentCommunity.getHandle(),
-                2, 1, valuesCol2, true);
+                2, 2, valuesCol2, true);
 
         getClient(token).perform(get("/api/contentreport/filteredcollections?filters=is_discoverable"))
                    .andExpect(status().isOk())
