@@ -57,8 +57,6 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 2").build();
 
-        List<Item> items = new ArrayList<>();
-
         LocalDate today = LocalDate.now();
         LocalDate pastDate = today.minusDays(10);
         String fmtPastDate = DateTimeFormatter.ISO_DATE.format(pastDate);
@@ -66,31 +64,31 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
         String fmtFutureDate = DateTimeFormatter.ISO_DATE.format(futureDate);
 
         //2. Three items, two of which are available and discoverable...
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
+        ItemBuilder.createItem(context, col1)
                                       .withTitle("Public item 1")
                                       .withIssueDate(fmtPastDate)
                                       .withAuthor("Smith, Donald").withAuthor("Doe, John")
                                       .withSubject("ExtraEntry")
                                       .build();
-        items.add(publicItem1);
 
-        Item publicItem2 = ItemBuilder.createItem(context, col2)
+        ItemBuilder.createItem(context, col2)
                                       .withTitle("Public item 2")
                                       .withIssueDate(fmtPastDate)
                                       .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
                                       .withSubject("TestingForMore").withSubject("ExtraEntry")
                                       .build();
-        items.add(publicItem2);
 
         // ... and one will be available in a few days.
-        Item publicItem3 = ItemBuilder.createItem(context, col2)
+        ItemBuilder.createItem(context, col2)
                                       .withTitle("Public item 3")
                                       .withIssueDate(fmtFutureDate)
                                       .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
                                       .withSubject("AnotherTest").withSubject("TestingForMore")
                                       .withSubject("ExtraEntry")
                                       .build();
-        items.add(publicItem3);
+
+        col1 = context.reloadEntity(col1);
+        col2 = context.reloadEntity(col2);
 
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
