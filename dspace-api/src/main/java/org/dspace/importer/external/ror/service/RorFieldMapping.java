@@ -15,9 +15,9 @@ import org.dspace.importer.external.metadatamapping.AbstractMetadataFieldMapping
 
 /**
  * An implementation of {@link AbstractMetadataFieldMapping}
- * Responsible for defining the mapping of the Scopus metadatum fields on the DSpace metadatum fields
+ * Responsible for defining the mapping of the ROR metadatum fields on the DSpace metadatum fields
  *
- * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
+ * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  */
 public class RorFieldMapping extends AbstractMetadataFieldMapping {
 
