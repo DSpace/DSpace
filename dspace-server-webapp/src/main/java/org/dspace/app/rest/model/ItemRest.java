@@ -10,7 +10,6 @@ package org.dspace.app.rest.model;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -79,7 +78,7 @@ public class ItemRest extends DSpaceObjectRest {
     private Date lastModified = new Date();
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String entityType = null;
-    @JsonInclude(Include.NON_EMPTY)
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private CollectionRest owningCollection;
 
     @Override
@@ -133,6 +132,12 @@ public class ItemRest extends DSpaceObjectRest {
         this.entityType = entityType;
     }
 
+    /**
+     * This specific LinkRest annotation prevents the owning collection from
+     * being embedded if it is null (i.e. in any context other than the
+     * Filtered Items report).
+     */
+    @LinkRest
     public CollectionRest getOwningCollection() {
         return owningCollection;
     }
