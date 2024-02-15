@@ -123,6 +123,20 @@
           </property>
     </bean>
 
+    <bean id="openaireImportServiceByAuthor"
+          class="org.dspace.importer.external.openaire.service.OpenAireImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="openairePublicationMetadataFieldMapping"/>
+        <property name="queryParam" value="author"/>
+    </bean>
+    <bean id="openaireImportServiceByTitle"
+          class="org.dspace.importer.external.openaire.service.OpenAireImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="openairePublicationMetadataFieldMapping"/>
+        <property name="queryParam" value="title"/>
+    </bean>
+    <bean id="openairePublicationMetadataFieldMapping"
+          class="org.dspace.importer.external.openaire.metadatamapping.OpenAIREPublicationFieldMapping">
+    </bean>
+    
     <bean id="CrossRefImportService" class="org.dspace.importer.external.crossref.CrossRefImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="CrossRefMetadataFieldMapping"/>
         <property name="url" value="${crossref.url}"/>
