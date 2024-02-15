@@ -2936,7 +2936,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                        BitstreamMatcher.matchBitstreamEntryWithoutEmbed(bitstream2.getID(), bitstream2.getSizeBytes())
                    )))
                    .andExpect(jsonPath("$._embedded.owningCollection._embedded.mappedItems." +
-                                           "_embedded.mappedItems[0]_embedded.relationships").doesNotExist())
+                                           "_embedded.mappedItems[0]._embedded.relationships").doesNotExist())
                    .andExpect(jsonPath("$._embedded.owningCollection._embedded.mappedItems" +
                                            "._embedded.mappedItems[0]._embedded.bundles._embedded.bundles[0]." +
                                            "_embedded.primaryBitstream").doesNotExist())
@@ -3045,8 +3045,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
 
-        ResourcePolicyBuilder.createResourcePolicy(context)
-            .withUser(eperson)
+        ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
             .withAction(READ)
             .withDspaceObject(item)
             .build();
