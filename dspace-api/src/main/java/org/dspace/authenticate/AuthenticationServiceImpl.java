@@ -179,10 +179,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         int totalLen = 0;
 
         for (AuthenticationMethod method : getAuthenticationMethodStack()) {
-            List<Group> gl = method.getSpecialGroups(context, request);
-            if (gl.size() > 0) {
-                result.addAll(gl);
-                totalLen += gl.size();
+
+            if (method.areSpecialGroupsApplicable(context, request)) {
+
+                List<Group> gl = method.getSpecialGroups(context, request);
+                if (gl.size() > 0) {
+                    result.addAll(gl);
+                    totalLen += gl.size();
+                }
+
             }
         }
 

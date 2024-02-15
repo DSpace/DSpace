@@ -152,5 +152,8 @@
 
     <bean class="org.dspace.supervision.SupervisionOrderServiceImpl"/>
 
+    <!-- Submission Config Service -->
+    <bean class="org.dspace.submit.service.SubmissionConfigServiceImpl"/>
+
 </beans>
 
