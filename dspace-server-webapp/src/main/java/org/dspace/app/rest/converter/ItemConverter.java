@@ -9,7 +9,6 @@ package org.dspace.app.rest.converter;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -19,13 +18,9 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.LinkRest;
-import org.dspace.app.rest.model.LinksRest;
 import org.dspace.app.rest.model.MetadataValueList;
-import org.dspace.app.rest.model.hateoas.HALResource;
-import org.dspace.app.rest.model.hateoas.ItemResource;
+import org.dspace.app.rest.projection.ContentReportOwningCollectionProjection;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.utils.Utils;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
@@ -33,7 +28,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexableObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
 /**
@@ -51,19 +45,8 @@ public class ItemConverter
     private ItemService itemService;
     @Autowired
     private CollectionConverter collectionConverter;
-    @Autowired
-    private Utils utils;
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemConverter.class);
-    private static final Link[] DUMMY_LINKS = {};
-    private static final LinkRest OWNING_COLL_LINK_REST;
-    static {
-        LinkRest[] links = ItemRest.class.getAnnotation(LinksRest.class).links();
-        OWNING_COLL_LINK_REST = Arrays.stream(links)
-                .filter(l -> ItemRest.OWNING_COLLECTION.equals(l.name()))
-                .findFirst()
-                .orElse(links.length > 0 ? links[0] : null);
-    }
 
     @Override
     public ItemRest convert(Item obj, Projection projection) {
@@ -73,11 +56,10 @@ public class ItemConverter
         item.setWithdrawn(obj.isWithdrawn());
         item.setLastModified(obj.getLastModified());
 
-        // Embedding the wwning collection is needed only for the Filtered Items report,
+        // Embedding the owning collection is needed only for the Filtered Items report,
         // where an appropriate projection is used. In all other use cases, a default,
         // non-embedding projection is used.
-        HALResource<ItemRest> res = new ItemResource(item, utils);
-        if (projection.allowEmbedding(res, OWNING_COLL_LINK_REST, DUMMY_LINKS)) {
+        if (projection instanceof ContentReportOwningCollectionProjection) {
             Optional.ofNullable(obj.getOwningCollection())
                     .map(coll -> collectionConverter.convert(coll, Projection.DEFAULT))
                     .ifPresent(item::setOwningCollection);
