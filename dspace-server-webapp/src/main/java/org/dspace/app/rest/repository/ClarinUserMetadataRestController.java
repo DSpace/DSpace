@@ -238,8 +238,8 @@ public class ClarinUserMetadataRestController {
                     currentUser.getID() + " is null.");
         }
 
-        // Copy current user_metadata records into a list and append it by a new user metadata.
-        List<ClarinUserMetadata> newClarinUserMetadataList = new ArrayList<>(clarinUserRegistration.getUserMetadata());
+        // List of the new user metadata - passed from the request
+        List<ClarinUserMetadata> clarinUserMetadataList = new ArrayList<>();
 
         // Create user metadata records from request
         for (ClarinUserMetadataRest clarinUserMetadataRest : clarinUserMetadataRestList) {
@@ -249,20 +249,20 @@ public class ClarinUserMetadataRestController {
             clarinUserMetadata.setEperson(clarinUserRegistration);
             clarinUserMetadataService.update(context, clarinUserMetadata);
             // Add userMetadata to the list of the new user metadata
-            newClarinUserMetadataList.add(clarinUserMetadata);
+            clarinUserMetadataList.add(clarinUserMetadata);
         }
 
         // Process clrua with the new clarin user metadata
         ClarinLicenseResourceUserAllowance clrua =
-                this.createClrua(context, clarinLicenseResourceMapping, newClarinUserMetadataList, downloadToken,
+                this.createClrua(context, clarinLicenseResourceMapping, clarinUserMetadataList, downloadToken,
                 clarinUserRegistration);
 
         // Add Clarin License Resource Allowance to the user metadata records
-        for (ClarinUserMetadata clarinUserMetadata : newClarinUserMetadataList) {
+        for (ClarinUserMetadata clarinUserMetadata : clarinUserMetadataList) {
             clarinUserMetadata.setTransaction(clrua);
             clarinUserMetadataService.update(context, clarinUserMetadata);
         }
-        return newClarinUserMetadataList;
+        return clarinUserMetadataList;
     }
 
     private ClarinLicenseResourceUserAllowance createClrua(Context context,

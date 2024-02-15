@@ -10,6 +10,8 @@ package org.dspace.content.clarin;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.NullArgumentException;
 import org.dspace.authorize.AuthorizeException;
@@ -75,5 +77,45 @@ public class ClarinUserMetadataServiceImpl implements ClarinUserMetadataService 
                     "You must be an admin to create an Clarin user metadata");
         }
         clarinUserMetadataDAO.delete(context, clarinUserMetadata);
+    }
+
+    @Override
+    public List<ClarinUserMetadata> findByUserRegistrationAndBitstream(Context context, Integer userRegUUID,
+                                                                       UUID bitstreamUUID, boolean lastTransaction)
+            throws SQLException {
+        if (lastTransaction) {
+            return getLastTransactionUserMetadata(clarinUserMetadataDAO.findByUserRegistrationAndBitstream(context,
+                    userRegUUID, bitstreamUUID));
+        }
+        return clarinUserMetadataDAO.findByUserRegistrationAndBitstream(context, userRegUUID, bitstreamUUID);
+    }
+
+    private List<ClarinUserMetadata> getLastTransactionUserMetadata(List<ClarinUserMetadata> userMetadataList) {
+        Integer latestTransactionId = getIdOfLastTransaction(userMetadataList);
+        if (latestTransactionId == null) {
+            return userMetadataList;
+        }
+
+        List<ClarinUserMetadata> filteredUserMetadata = null;
+        // Filter all user metadata by the last transaction
+        try {
+            filteredUserMetadata = userMetadataList.stream()
+                    .filter(clarinUserMetadata -> clarinUserMetadata.getTransaction().getID()
+                            .equals(latestTransactionId))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Error filtering user metadata by the last transaction", e);
+        }
+        return filteredUserMetadata;
+    }
+
+    private Integer getIdOfLastTransaction(List<ClarinUserMetadata> userMetadataList) {
+        // userMetadataList is filtered by the last transaction - first element is the last transaction
+        try {
+            return userMetadataList.get(0).getTransaction().getID();
+        } catch (IndexOutOfBoundsException e) {
+            log.error("No transaction found for the user metadata");
+            return null;
+        }
     }
 }

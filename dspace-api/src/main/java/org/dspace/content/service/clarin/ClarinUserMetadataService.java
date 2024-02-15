@@ -9,6 +9,7 @@ package org.dspace.content.service.clarin;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.clarin.ClarinUserMetadata;
@@ -22,4 +23,8 @@ public interface ClarinUserMetadataService {
     List<ClarinUserMetadata> findAll(Context context) throws SQLException;
     void update(Context context, ClarinUserMetadata clarinUserMetadata) throws SQLException;
     void delete(Context context, ClarinUserMetadata clarinUserMetadata) throws SQLException, AuthorizeException;
+
+    List<ClarinUserMetadata> findByUserRegistrationAndBitstream(Context context, Integer userRegUUID,
+                                                                UUID bitstreamUUID, boolean lastTransaction)
+            throws SQLException;
 }

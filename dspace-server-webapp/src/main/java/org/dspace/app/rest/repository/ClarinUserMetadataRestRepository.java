@@ -10,7 +10,10 @@ package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
+import org.dspace.app.rest.Parameter;
+import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.model.ClarinUserMetadataRest;
 import org.dspace.content.clarin.ClarinUserMetadata;
 import org.dspace.content.service.clarin.ClarinUserMetadataService;
@@ -51,6 +54,19 @@ public class ClarinUserMetadataRestRepository extends DSpaceRestRepository<Clari
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    @SearchRestMethod(name = "byUserRegistrationAndBitstream")
+    public Page<ClarinUserMetadataRest> findByUserRegistrationAndBitstream(
+            @Parameter(value = "userRegUUID", required = true) Integer userRegId,
+            @Parameter(value = "bitstreamUUID", required = true) UUID bitstreamUUID,
+            Pageable pageable) throws SQLException {
+        Context context = obtainContext();
+
+        List<ClarinUserMetadata> clarinUserMetadataList =
+                clarinUserMetadataService.findByUserRegistrationAndBitstream(context, userRegId, bitstreamUUID, true);
+
+        return converter.toRestPage(clarinUserMetadataList, pageable, utils.obtainProjection());
     }
 
     @Override
