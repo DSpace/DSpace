@@ -206,6 +206,18 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
 
             //** WHEN **
+            // we want to know what we are downloading before we download it
+            getClient().perform(head("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                       //** THEN **
+                       .andExpect(status().isOk())
+
+                       //The Content Length must match the full length
+                       .andExpect(header().longValue("Content-Length", bitstreamContent.getBytes().length))
+                       .andExpect(header().string("Content-Type", "text/plain;charset=UTF-8"))
+                       .andExpect(header().string("ETag", "\"" + bitstream.getChecksum() + "\""))
+                       .andExpect(content().bytes(new byte[] {}));
+
+            //** WHEN **
             //We download the bitstream
             getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
 
@@ -231,7 +243,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                        .andExpect(status().isNotModified());
 
             //The download and head request should also be logged as a statistics record
-            checkNumberOfStatsRecords(bitstream, 2);
+            checkNumberOfStatsRecords(bitstream, 3);
     }
 
     @Test
