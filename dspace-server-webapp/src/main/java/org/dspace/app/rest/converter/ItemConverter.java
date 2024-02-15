@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.MetadataValueList;
+import org.dspace.app.rest.projection.ContentReportOwningCollectionProjection;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
@@ -58,11 +59,11 @@ public class ItemConverter
         // Embedding the owning collection is needed only for the Filtered Items report,
         // where an appropriate projection is used. In all other use cases, a default,
         // non-embedding projection is used.
-        //if (projection instanceof ContentReportOwningCollectionProjection) {
+        if (projection instanceof ContentReportOwningCollectionProjection) {
             Optional.ofNullable(obj.getOwningCollection())
                     .map(coll -> collectionConverter.convert(coll, Projection.DEFAULT))
                     .ifPresent(item::setOwningCollection);
-        //}
+        }
 
         List<MetadataValue> entityTypes =
             itemService.getMetadata(obj, "dspace", "entity", "type", Item.ANY, false);
