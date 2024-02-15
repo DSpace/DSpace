@@ -451,7 +451,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         if (e == null) {
             return false; // anonymous users can't be admins....
         } else {
-            return groupService.isMember(c, e, Group.ADMIN);
+            return groupService.isMember(c, e, c.getAdminGroup());
         }
     }
 
@@ -891,7 +891,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                 return true;
             }
         } catch (SearchServiceException e) {
-            log.error("Failed getting getting community/collection admin status for "
+            log.error("Failed getting community/collection admin status for "
                 + context.getCurrentUser().getEmail() + " The search error is: " + e.getMessage()
                 + " The search resourceType filter was: " + query);
         }

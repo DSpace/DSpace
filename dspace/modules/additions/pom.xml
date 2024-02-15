@@ -17,7 +17,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>7.6.1-SNAPSHOT</version>
+      <version>7.6.2-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -273,7 +273,7 @@
       </dependency>
       <dependency>
          <groupId>org.hamcrest</groupId>
-         <artifactId>hamcrest-core</artifactId>
+         <artifactId>hamcrest</artifactId>
          <scope>test</scope>
       </dependency>
       <dependency>
