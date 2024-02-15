@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import javax.net.ssl.HttpsURLConnection;
 import javax.ws.rs.core.NoContentException;
 
 import com.maxmind.geoip2.DatabaseReader;
@@ -33,6 +34,7 @@ import com.maxmind.geoip2.model.CityResponse;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.utils.ClarinUtils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 import org.json.simple.JSONArray;
@@ -60,6 +62,8 @@ public class ClarinDiscoJuiceFeedsDownloadService implements InitializingBean {
      **/
     private Set<String> rewriteCountries;
     protected static DatabaseReader locationService;
+
+    private static boolean disableSSL = false;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -94,6 +98,8 @@ public class ClarinDiscoJuiceFeedsDownloadService implements InitializingBean {
         for (String country : propRewriteCountries) {
             rewriteCountries.add(country.trim());
         }
+
+        disableSSL = configurationService.getBooleanProperty("disable.ssl.check.specific.requests", false);
     }
 
     public String createFeedsContent() {
@@ -206,7 +212,7 @@ public class ClarinDiscoJuiceFeedsDownloadService implements InitializingBean {
     /**
      * Open Connection for the test file or URL defined in the cfg.
      */
-    private static URLConnection openURLConnection(String url) throws IOException {
+    public static URLConnection openURLConnection(String url) throws IOException {
         // If is not test.
         if (!StringUtils.startsWith(url,"TEST:")) {
             return new URL(url).openConnection();
@@ -229,6 +235,10 @@ public class ClarinDiscoJuiceFeedsDownloadService implements InitializingBean {
             URLConnection conn = openURLConnection(url);
             conn.setConnectTimeout(5000);
             conn.setReadTimeout(10000);
+            // Disable SSL certificate validation
+            if (disableSSL && conn instanceof HttpsURLConnection) {
+                ClarinUtils.disableCertificateValidation((HttpsURLConnection) conn);
+            }
             //Caution does not follow redirects, and even if you set it to http->https is not possible
             Object obj = parser.parse(new InputStreamReader(conn.getInputStream()));
             return (JSONArray) obj;
