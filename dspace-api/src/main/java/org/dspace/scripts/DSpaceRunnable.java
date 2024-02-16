@@ -170,6 +170,14 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
     }
 
     /**
+     * This method will call upon the {@link DSpaceRunnableHandler#handleException(Exception)} method with the script's
+     * @param e     The exception that was thrown
+     */
+    public void abort(Exception e) {
+        handler.handleException(e);
+    }
+
+    /**
      * This method will traverse all the options and it'll grab options defined as an InputStream type to then save
      * the filename specified by that option in a list of Strings that'll be returned in the end
      * @return  The list of Strings representing filenames from the options given to the script

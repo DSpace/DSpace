@@ -166,7 +166,7 @@ public class ScriptLauncher {
             return 0;
         } catch (ParseException e) {
             script.printHelp();
-            e.printStackTrace();
+            script.abort(e);
             return 1;
         }
 
