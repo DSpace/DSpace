@@ -47,7 +47,6 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
     private final boolean IS_SAVE_ENABLED = isSaveEnabled();
     private final ProcessService processService = ScriptServiceFactory.getInstance().getProcessService();
     private final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-    String scriptName;
     Integer processId;
     UUID ePersonUUID;
 
@@ -73,7 +72,6 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
                 Process process = processService.create(context, ePerson, scriptName, parameters,
                     new HashSet<>(context.getSpecialGroups()));
                 processId = process.getID();
-                this.scriptName = process.getName();
                 context.complete();
             } catch (Exception e) {
                 if (ePersonUUID != null) {
