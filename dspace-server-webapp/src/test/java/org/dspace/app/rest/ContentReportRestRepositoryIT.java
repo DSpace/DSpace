@@ -19,8 +19,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.contentreport.Filter;
 import org.dspace.app.rest.matcher.FilteredCollectionMatcher;
@@ -128,10 +126,7 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
         List<Item> items = new ArrayList<>();
 
         //2. Three items, two of which are available and discoverable...
-        UUID id1 = UUID.randomUUID();
         Item publicItem1 = ItemBuilder.createItem(context, col1)
-                                      .withIdentifier(id1.toString())
-                                      .withHandle("hdl1")
                                       .withTitle("Public item 1")
                                       .withIssueDate("2017-10-17")
                                       .withAuthor("Smith, Donald").withAuthor("Doe, John")
@@ -139,10 +134,7 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
                                       .build();
         items.add(publicItem1);
 
-        UUID id2 = UUID.randomUUID();
         Item publicItem2 = ItemBuilder.createItem(context, col2)
-                                      .withIdentifier(id2.toString())
-                                      .withHandle("hdl2")
                                       .withTitle("Public item 2")
                                       .withIssueDate("2016-02-13")
                                       .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
@@ -151,10 +143,7 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
         items.add(publicItem2);
 
         // ... and one will be available in a few days.
-        UUID id3 = UUID.randomUUID();
         Item publicItem3 = ItemBuilder.createItem(context, col2)
-                                      .withIdentifier(id3.toString())
-                                      .withHandle("hdl3")
                                       .withTitle("Public item 3")
                                       .withIssueDate("2016-02-13")
                                       .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
