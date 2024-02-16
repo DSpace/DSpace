@@ -144,12 +144,9 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     @Autowired
     protected SolrStatisticsCore solrStatisticsCore;
     @Autowired
-    private GeoIpService geoIpService;
+    protected GeoIpService geoIpService;
     @Autowired
     private AuthorizeService authorizeService;
-
-    /** URL to the current-year statistics core.  Prior-year shards will have a year suffixed. */
-    private String statisticsCoreURL;
 
     protected SolrClient solr;
 
