@@ -80,6 +80,12 @@
         <qualifier>crossrefid</qualifier>
         <scope_note>Crossref identifier</scope_note>
     </dc-type>
+
+    <dc-type>
+        <schema>organization</schema>
+        <element>parentOrganization</element>
+        <scope_note>The larger organization that this organization is a subOrganization of, if any.</scope_note>
+    </dc-type>
     
 
 </dspace-dc-types>

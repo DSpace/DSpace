@@ -5,19 +5,23 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.suggestion;
+package org.dspace.app.suggestion.openaire;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.commons.cli.ParseException;
-import org.dspace.app.suggestion.oaire.OAIREPublicationLoader;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.dspace.discovery.IndexableObject;
+import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SearchServiceException;
+import org.dspace.discovery.SearchUtils;
+import org.dspace.discovery.utils.DiscoverQueryBuilder;
+import org.dspace.discovery.utils.parameter.QueryBuilderSearchFilter;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.sort.SortOption;
 import org.dspace.utils.DSpace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,12 +36,12 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Alessandro Martelli (alessandro.martelli at 4science.it)
  */
-public class OAIREPublicationLoaderRunnable
-    extends DSpaceRunnable<OAIREPublicationLoaderScriptConfiguration<OAIREPublicationLoaderRunnable>> {
+public class PublicationLoaderRunnable
+    extends DSpaceRunnable<PublicationLoaderScriptConfiguration<PublicationLoaderRunnable>> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OAIREPublicationLoaderRunnable.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PublicationLoaderRunnable.class);
 
-    private OAIREPublicationLoader oairePublicationLoader = null;
+    private PublicationLoader oairePublicationLoader = null;
 
     protected Context context;
 
@@ -45,9 +49,9 @@ public class OAIREPublicationLoaderRunnable
 
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public OAIREPublicationLoaderScriptConfiguration<OAIREPublicationLoaderRunnable> getScriptConfiguration() {
-        OAIREPublicationLoaderScriptConfiguration configuration = new DSpace().getServiceManager()
-                .getServiceByName("import-oaire-suggestions", OAIREPublicationLoaderScriptConfiguration.class);
+    public PublicationLoaderScriptConfiguration<PublicationLoaderRunnable> getScriptConfiguration() {
+        PublicationLoaderScriptConfiguration configuration = new DSpace().getServiceManager()
+                .getServiceByName("import-openaire-suggestions", PublicationLoaderScriptConfiguration.class);
         return configuration;
     }
 
@@ -55,7 +59,7 @@ public class OAIREPublicationLoaderRunnable
     public void setup() throws ParseException {
 
         oairePublicationLoader = new DSpace().getServiceManager().getServiceByName(
-                "OAIREPublicationLoader", OAIREPublicationLoader.class);
+                "OpenairePublicationLoader", PublicationLoader.class);
 
         profile = commandLine.getOptionValue("s");
         if (profile == null) {
@@ -70,10 +74,9 @@ public class OAIREPublicationLoaderRunnable
 
         context = new Context();
 
-        List<Item> researchers = getResearchers(profile);
-
-        for (Item researcher : researchers) {
-
+        Iterator<Item> researchers = getResearchers(profile);
+        while (researchers.hasNext()) {
+            Item researcher = researchers.next();
             oairePublicationLoader.importAuthorRecords(context, researcher);
         }
 
@@ -90,24 +93,23 @@ public class OAIREPublicationLoaderRunnable
      * @return             the researcher with specified UUID or all researchers
      */
     @SuppressWarnings("rawtypes")
-    private List<Item> getResearchers(String profileUUID) {
-        final UUID uuid = profileUUID != null ? UUID.fromString(profileUUID) : null;
+    private Iterator<Item> getResearchers(String profileUUID) {
         SearchService searchService = new DSpace().getSingletonService(SearchService.class);
-        List<IndexableObject> objects = null;
-        if (uuid != null) {
-            objects = searchService.search(context, "search.resourceid:" + uuid.toString(),
-                "lastModified", false, 0, 1000, "search.resourcetype:Item", "dspace.entity.type:Person");
-        } else {
-            objects = searchService.search(context, "*:*", "lastModified", false, 0, 1000, "search.resourcetype:Item",
-                    "dspace.entity.type:Person");
+        DiscoverQueryBuilder queryBuilder = SearchUtils.getQueryBuilder();
+        List<QueryBuilderSearchFilter> filters = new ArrayList<QueryBuilderSearchFilter>();
+        String query = "*:*";
+        if (profileUUID != null) {
+            query = "search.resourceid:" + profileUUID.toString();
         }
-        List<Item> items = new ArrayList<Item>();
-        if (objects != null) {
-            for (IndexableObject o : objects) {
-                items.add((Item) o.getIndexedObject());
-            }
+        try {
+            DiscoverQuery discoverQuery = queryBuilder.buildQuery(context, null,
+                SearchUtils.getDiscoveryConfigurationByName("person"),
+                query, filters,
+                "Item", 10, Long.getLong("0"), null, SortOption.DESCENDING);
+            return searchService.iteratorSearch(context, null, discoverQuery);
+        } catch (SearchServiceException e) {
+            LOGGER.error("Unable to read researcher on solr", e);
         }
-        LOGGER.info("Found " + items.size() + " researcher(s)");
-        return items;
+        return null;
     }
 }

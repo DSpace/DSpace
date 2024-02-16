@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.suggestion.oaire;
+package org.dspace.app.suggestion.openaire;
 
 import static org.dspace.app.suggestion.SuggestionUtils.getAllEntriesByMetadatum;
 import static org.dspace.app.suggestion.SuggestionUtils.getFirstEntryByMetadatum;
@@ -33,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
  *
  */
-public class OAIREPublicationLoader extends SolrSuggestionProvider {
+public class PublicationLoader extends SolrSuggestionProvider {
 
     private List<String> names;
 
@@ -66,7 +66,7 @@ public class OAIREPublicationLoader extends SolrSuggestionProvider {
      * This method filter a list of ImportRecords using a pipeline of AuthorNamesApprover
      * and return a filtered list of ImportRecords.
      * 
-     * @see org.dspace.app.suggestion.oaire.AuthorNamesScorer
+     * @see org.dspace.app.suggestion.openaire.AuthorNamesScorer
      * @param researcher the researcher Item
      * @param importRecords List of import record
      * @return a list of filtered import records
@@ -105,10 +105,22 @@ public class OAIREPublicationLoader extends SolrSuggestionProvider {
      */
     public void importAuthorRecords(Context context, Item researcher)
             throws SolrServerException, IOException {
-        List<ExternalDataObject> metadata = getImportRecords(researcher);
-        List<Suggestion> records = reduceAndTransform(researcher, metadata);
-        for (Suggestion record : records) {
-            solrSuggestionStorageService.addSuggestion(record, false, false);
+        int offset = 0;
+        int limit = 10;
+        int loaded = limit;
+        List<String> searchValues = searchMetadataValues(researcher);
+        while (loaded > 0) {
+            List<ExternalDataObject> metadata = getImportRecords(searchValues, researcher, offset, limit);
+            if (metadata.isEmpty()) {
+                loaded = 0;
+                continue;
+            }
+            offset += limit;
+            loaded = metadata.size();
+            List<Suggestion> records = reduceAndTransform(researcher, metadata);
+            for (Suggestion record : records) {
+                solrSuggestionStorageService.addSuggestion(record, false, false);
+            }
         }
         solrSuggestionStorageService.commit();
     }
@@ -154,14 +166,18 @@ public class OAIREPublicationLoader extends SolrSuggestionProvider {
      * get from metadata key defined in class level variable names as author to query OpenAIRE.
      * 
      * @see org.dspace.importer.external.openaire.service.OpenAireImportMetadataSourceServiceImpl
+     * @param searchValues query
      * @param researcher item to extract metadata from
+     * @param limit for pagination purpose
+     * @param offset for pagination purpose
      * @return list of ImportRecord
      */
-    private List<ExternalDataObject> getImportRecords(Item researcher) {
-        List<String> searchValues = searchMetadataValues(researcher);
+    private List<ExternalDataObject> getImportRecords(List<String> searchValues,
+        Item researcher, int offset, int limit) {
         List<ExternalDataObject> matchingRecords = new ArrayList<>();
         for (String searchValue : searchValues) {
-            matchingRecords.addAll(primaryProvider.searchExternalDataObjects(searchValue, 0, 9999));
+            matchingRecords.addAll(
+                primaryProvider.searchExternalDataObjects(searchValue, offset, limit));
         }
         List<ExternalDataObject> toReturn = removeDuplicates(matchingRecords);
         return toReturn;

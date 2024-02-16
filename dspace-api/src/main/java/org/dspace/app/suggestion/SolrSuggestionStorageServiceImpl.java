@@ -13,13 +13,17 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,6 +38,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.FacetParams;
 import org.dspace.content.Item;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.content.service.ItemService;
@@ -77,7 +82,8 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
     public void addSuggestion(Suggestion suggestion, boolean force, boolean commit)
             throws SolrServerException, IOException {
         if (force || !exist(suggestion)) {
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper jsonMapper = new JsonMapper();
+            jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             SolrInputDocument document = new SolrInputDocument();
             document.addField(SOURCE, suggestion.getSource());
             String suggestionFullID = suggestion.getID();
@@ -93,7 +99,7 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
             document.addField(EXTERNAL_URI, suggestion.getExternalSourceUri());
             document.addField(SCORE, suggestion.getScore());
             document.addField(PROCESSED, false);
-            document.addField(EVIDENCES, mapper.writeValueAsString(suggestion.getEvidences()));
+            document.addField(EVIDENCES, jsonMapper.writeValueAsString(suggestion.getEvidences()));
             getSolr().add(document);
             if (commit) {
                 getSolr().commit();
@@ -244,16 +250,13 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
         solrQuery.setFacet(true);
         solrQuery.setFacetMinCount(1);
         solrQuery.addFacetField(TARGET_ID);
-        solrQuery.setFacetLimit((int) (pageSize + offset));
+        solrQuery.setParam(FacetParams.FACET_OFFSET, String.valueOf(offset));
+        solrQuery.setFacetLimit((int) (pageSize));
         QueryResponse response = getSolr().query(solrQuery);
         FacetField facetField = response.getFacetField(TARGET_ID);
         List<SuggestionTarget> suggestionTargets = new ArrayList<SuggestionTarget>();
         int idx = 0;
         for (Count c : facetField.getValues()) {
-            if (idx < offset) {
-                idx++;
-                continue;
-            }
             SuggestionTarget target = new SuggestionTarget();
             target.setSource(source);
             target.setTotal((int) c.getCount());
@@ -330,14 +333,15 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
             }
         }
         String evidencesJson = (String) solrDoc.getFieldValue(EVIDENCES);
-        ObjectMapper mapper = new ObjectMapper();
-        List<SuggestionEvidence> evidences;
+        ObjectMapper jsonMapper = new JsonMapper();
+        jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        List<SuggestionEvidence> evidences = new LinkedList<SuggestionEvidence>();
         try {
-            evidences = mapper.readValue(evidencesJson, List.class);
-            suggestion.getEvidences().addAll(evidences);
+            evidences = jsonMapper.readValue(evidencesJson, new TypeReference<List<SuggestionEvidence>>() {});
         } catch (JsonProcessingException e) {
             log.error(e);
         }
+        suggestion.getEvidences().addAll(evidences);
         return suggestion;
     }
 

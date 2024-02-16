@@ -8,16 +8,21 @@
 package org.dspace.app.suggestion;
 
 /**
- * 
+ * This DTO class is returned by an {@link org.dspace.app.suggestion.openaire.EvidenceScorer} to model the concept of
+ * an evidence / fact that has been used to evaluate the precision of a suggestion increasing or decreasing the score
+ * of the suggestion.
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class SuggestionEvidence {
 
+    /** name of the evidence */
     private String name;
 
+    /** positive or negative value to influence the score of the suggestion */
     private double score;
 
+    /** additional notes */
     private String notes;
 
     public SuggestionEvidence() {

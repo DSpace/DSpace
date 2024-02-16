@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.suggestion.oaire;
+package org.dspace.app.suggestion.openaire;
 
 import java.util.Calendar;
 import java.util.Collections;
@@ -31,23 +31,50 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class DateScorer implements EvidenceScorer {
 
+    /**
+     * if available it should contains the metadata field key in the form (schema.element[.qualifier]) that contains
+     * the birth date of the researcher
+     */
     private String birthDateMetadata;
 
+    /**
+     * if available it should contains the metadata field key in the form (schema.element[.qualifier]) that contains
+     * the date of graduation of the researcher. If the metadata has multiple values the min will be used
+     */
     private String educationDateMetadata;
 
-    private String minDateMetadata;
-
-    private String maxDateMetadata;
-
+    /**
+     * The minimal age that is expected for a researcher to be a potential author of a scholarly contribution
+     * (i.e. the minimum delta from the publication date and the birth date)
+     */
     private int birthDateDelta = 20;
+
+    /**
+     * The maximum age that is expected for a researcher to be a potential author of a scholarly contribution
+     * (i.e. the maximum delta from the publication date and the birth date)
+     */
     private int birthDateRange = 50;
 
+    /**
+     * The number of year from/before the graduation that is expected for a researcher to be a potential
+     * author of a scholarly contribution (i.e. the minimum delta from the publication date and the first
+     * graduation date)
+     */
     private int educationDateDelta = -3;
+
+    /**
+     * The maximum scientific longevity that is expected for a researcher from its graduation to be a potential
+     * author of a scholarly contribution (i.e. the maximum delta from the publication date and the first
+     * graduation date)
+     */
     private int educationDateRange = 50;
 
     @Autowired
     private ItemService itemService;
 
+    /**
+     * the metadata used in the publication to track the publication date (i.e. dc.date.issued)
+     */
     private String publicationDateMetadata;
 
     public void setItemService(ItemService itemService) {
@@ -86,14 +113,6 @@ public class DateScorer implements EvidenceScorer {
         this.educationDateRange = educationDateRange;
     }
 
-    public void setMaxDateMetadata(String maxDateMetadata) {
-        this.maxDateMetadata = maxDateMetadata;
-    }
-
-    public void setMinDateMetadata(String minDateMetadata) {
-        this.minDateMetadata = minDateMetadata;
-    }
-
     public void setPublicationDateMetadata(String publicationDateMetadata) {
         this.publicationDateMetadata = publicationDateMetadata;
     }
@@ -101,6 +120,7 @@ public class DateScorer implements EvidenceScorer {
     /**
      * Method which is responsible to evaluate ImportRecord based on the publication date.
      * ImportRecords which have a date outside the defined or calculated expected range will be discarded.
+     * {@link DateScorer#birthDateMetadata}, {@link DateScorer#educationDateMetadata}
      * 
      * @param importRecord the ExternalDataObject to check
      * @param researcher DSpace item
@@ -113,8 +133,7 @@ public class DateScorer implements EvidenceScorer {
             return new SuggestionEvidence(this.getClass().getSimpleName(),
                     0,
                     "No assumption was possible about the publication year range. "
-                    + "Please consider to set a min/max date in the profile, specify the birthday "
-                    + "or education achievements");
+                    + "Please consider setting your birthday in your profile.");
         } else {
             String optDate = SuggestionUtils.getFirstEntryByMetadatum(importRecord, publicationDateMetadata);
             int year = getYear(optDate);
@@ -139,34 +158,29 @@ public class DateScorer implements EvidenceScorer {
         }
     }
 
+    /**
+     * returns min and max year interval in between it's probably that the researcher
+     * actually contributed to the suggested item
+     * @param researcher
+     * @return
+     */
     private Integer[] calculateRange(Item researcher) {
-        String minDateStr = getSingleValue(researcher, minDateMetadata);
-        int minYear = getYear(minDateStr);
-        String maxDateStr = getSingleValue(researcher, maxDateMetadata);
-        int maxYear = getYear(maxDateStr);
-        if (minYear > 0 && maxYear > 0) {
-            return new Integer[] { minYear, maxYear };
+        String birthDateStr = getSingleValue(researcher, birthDateMetadata);
+        int birthDateYear = getYear(birthDateStr);
+        int educationDateYear = getListMetadataValues(researcher, educationDateMetadata).stream()
+                .mapToInt(x -> getYear(x.getValue())).filter(d -> d > 0).min().orElse(-1);
+        if (educationDateYear > 0) {
+            return new Integer[] {
+                educationDateYear + educationDateDelta,
+                educationDateYear + educationDateDelta + educationDateRange
+            };
+        } else if (birthDateYear > 0) {
+            return new Integer[] {
+                birthDateYear + birthDateDelta,
+                birthDateYear + birthDateDelta + birthDateRange
+            };
         } else {
-            String birthDateStr = getSingleValue(researcher, birthDateMetadata);
-            int birthDateYear = getYear(birthDateStr);
-            int educationDateYear = getListMetadataValues(researcher, educationDateMetadata)
-                      .stream()
-                      .mapToInt(x -> getYear(x.getValue()))
-                      .filter(d -> d > 0)
-                      .min().orElse(-1);
-            if (educationDateYear > 0) {
-                return new Integer[] {
-                    minYear > 0 ? minYear : educationDateYear + educationDateDelta,
-                    maxYear > 0 ? maxYear : educationDateYear + educationDateDelta + educationDateRange
-                };
-            } else if (birthDateYear > 0) {
-                return new Integer[] {
-                    minYear > 0 ? minYear : birthDateYear + birthDateDelta,
-                    maxYear > 0 ? maxYear : birthDateYear + birthDateDelta + birthDateRange
-                };
-            } else {
-                return null;
-            }
+            return null;
         }
     }
 

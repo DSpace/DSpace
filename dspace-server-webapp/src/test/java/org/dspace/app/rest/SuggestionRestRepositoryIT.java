@@ -335,6 +335,7 @@ public class SuggestionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .withSuggestionCount("reciter", 31).build();
         SuggestionTarget targetFirstScopus = SuggestionTargetBuilder.createTarget(context, itemFirst)
                 .withSuggestionCount("scopus", 3).build();
+        //targetSecond refers to eperson
         SuggestionTarget targetSecond = SuggestionTargetBuilder
                 .createTarget(context, colPeople, "Digilio, Giuseppe", eperson).withSuggestionCount("reciter", 11)
                 .build();
@@ -347,6 +348,7 @@ public class SuggestionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(jsonPath("$", matchSuggestion("reciter", itemFirst, "Suggestion reciter 6", "6")))
                 .andExpect(jsonPath("$._links.self.href",
                         Matchers.endsWith("/api/integration/suggestions/" + suggestionId)));
+        //test targetSecond refers to eperson
         Item itemSecond = targetSecond.getTarget();
         String epersonSuggestionId = "reciter:" + itemSecond.getID().toString() + ":2";
         String epersonToken = getAuthToken(eperson.getEmail(), password);

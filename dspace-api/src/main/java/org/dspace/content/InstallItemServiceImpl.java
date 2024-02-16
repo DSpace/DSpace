@@ -150,22 +150,12 @@ public class InstallItemServiceImpl implements InstallItemService {
         return finishItem(c, item, is);
     }
 
-
     protected void populateMetadata(Context c, Item item)
         throws SQLException, AuthorizeException {
         // create accession date
         DCDate now = DCDate.getCurrent();
         itemService.addMetadata(c, item, MetadataSchemaEnum.DC.getName(),
                                 "date", "accessioned", null, now.toString());
-
-        // add date available if not under embargo, otherwise it will
-        // be set when the embargo is lifted.
-        // this will flush out fatal embargo metadata
-        // problems before we set inArchive.
-        if (embargoService.getEmbargoTermsAsDate(c, item) == null) {
-            itemService.addMetadata(c, item, MetadataSchemaEnum.DC.getName(),
-                                    "date", "available", null, now.toString());
-        }
 
         // If issue date is set as "today" (literal string), then set it to current date
         // In the below loop, we temporarily clear all issued dates and re-add, one-by-one,

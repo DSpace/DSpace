@@ -5,12 +5,12 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.suggestion;
+package org.dspace.app.suggestion.openaire;
 
 import org.apache.commons.cli.Options;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 
-public class OAIREPublicationLoaderScriptConfiguration<T extends OAIREPublicationLoaderRunnable>
+public class PublicationLoaderScriptConfiguration<T extends PublicationLoaderRunnable>
     extends ScriptConfiguration<T> {
 
     private Class<T> dspaceRunnableClass;
@@ -22,7 +22,7 @@ public class OAIREPublicationLoaderScriptConfiguration<T extends OAIREPublicatio
 
     /**
      * Generic setter for the dspaceRunnableClass
-     * @param dspaceRunnableClass   The dspaceRunnableClass to be set on this OAIREPublicationLoaderScriptConfiguration
+     * @param dspaceRunnableClass   The dspaceRunnableClass to be set on this PublicationLoaderScriptConfiguration
      */
     @Override
     public void setDspaceRunnableClass(Class<T> dspaceRunnableClass) {
