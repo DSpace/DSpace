@@ -12,11 +12,12 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.model.ItemRest;
+import org.dspace.app.rest.model.FilteredItemRest;
 import org.dspace.app.rest.model.MetadataValueList;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Item;
@@ -35,22 +36,29 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-public class ItemConverter
-        extends DSpaceObjectConverter<Item, ItemRest>
-        implements IndexableObjectConverter<Item, ItemRest> {
+public class FilteredItemConverter
+        extends DSpaceObjectConverter<Item, FilteredItemRest>
+        implements IndexableObjectConverter<Item, FilteredItemRest> {
 
     @Autowired
     private ItemService itemService;
+    @Autowired
+    private CollectionConverter collectionConverter;
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ItemConverter.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(FilteredItemConverter.class);
 
     @Override
-    public ItemRest convert(Item obj, Projection projection) {
-        ItemRest item = super.convert(obj, projection);
+    public FilteredItemRest convert(Item obj, Projection projection) {
+        FilteredItemRest item = super.convert(obj, projection);
         item.setInArchive(obj.isArchived());
         item.setDiscoverable(obj.isDiscoverable());
         item.setWithdrawn(obj.isWithdrawn());
         item.setLastModified(obj.getLastModified());
+
+        // Addition specific to FilteredItemRest. The remainder is taken as-is from ItemConverter.
+        Optional.ofNullable(obj.getOwningCollection())
+                .map(coll -> collectionConverter.convert(coll, Projection.DEFAULT))
+                .ifPresent(item::setOwningCollection);
 
         List<MetadataValue> entityTypes =
             itemService.getMetadata(obj, "dspace", "entity", "type", Item.ANY, false);
@@ -98,8 +106,8 @@ public class ItemConverter
     }
 
     @Override
-    protected ItemRest newInstance() {
-        return new ItemRest();
+    protected FilteredItemRest newInstance() {
+        return new FilteredItemRest();
     }
 
     @Override
@@ -108,7 +116,7 @@ public class ItemConverter
     }
 
     @Override
-    public boolean supportsModel(IndexableObject idxo) {
+    public boolean supportsModel(@SuppressWarnings("rawtypes") IndexableObject idxo) {
         return idxo.getIndexedObject() instanceof Item;
     }
 }
