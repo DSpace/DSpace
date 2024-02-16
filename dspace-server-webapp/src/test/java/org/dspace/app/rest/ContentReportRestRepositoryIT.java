@@ -37,7 +37,6 @@ import org.dspace.content.Item;
 import org.dspace.contentreport.QueryOperator;
 import org.hamcrest.Matchers;
 import org.junit.Test;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 /**
  * Integration tests for the content reports ported from DSpace 6.x
@@ -101,7 +100,6 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
                 2, 2, valuesCol2, true);
 
         getClient(token).perform(get("/api/contentreport/filteredcollections?filters=is_discoverable"))
-                   .andDo(MockMvcResultHandlers.print(System.err))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.collections", Matchers.containsInAnyOrder(
                            FilteredCollectionMatcher.matchFilteredCollectionProperties(fcol1),
@@ -167,7 +165,6 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
         getClient(token).perform(post("/api/contentreport/filtereditems")
                 .content(mapper.writeValueAsBytes(query))
                 .contentType(contentType))
-                .andDo(MockMvcResultHandlers.print(System.err))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
                 .andExpect(jsonPath("$.itemCount", is(2)))
