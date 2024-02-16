@@ -34,6 +34,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
                 method = "getMappedCollections"
         ),
         @LinkRest(
+                name = ItemRest.OWNING_COLLECTION,
+                method = "getOwningCollection"
+        ),
+        @LinkRest(
                 name = ItemRest.RELATIONSHIPS,
                 method = "getRelationships"
         ),
@@ -51,8 +55,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
         )
 })
 public class ItemRest extends DSpaceObjectRest {
-
-    private static final long serialVersionUID = 7014445851745431873L;
     public static final String NAME = "item";
     public static final String PLURAL_NAME = "items";
     public static final String CATEGORY = RestAddressableModel.CORE;
@@ -124,5 +126,4 @@ public class ItemRest extends DSpaceObjectRest {
     public void setEntityType(String entityType) {
         this.entityType = entityType;
     }
-
 }
