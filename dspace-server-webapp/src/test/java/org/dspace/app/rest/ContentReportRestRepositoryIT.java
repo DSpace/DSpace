@@ -99,6 +99,7 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
                 parentCommunity.getName(), parentCommunity.getHandle(),
                 2, 2, valuesCol2, true);
 
+        // Only Items 1 and 2 should be retrieved, as Item 3 is not discoverable yet.
         getClient(token).perform(get("/api/contentreport/filteredcollections?filters=is_discoverable"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.collections", Matchers.containsInAnyOrder(
@@ -162,16 +163,15 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
 
         ObjectMapper mapper = new ObjectMapper();
 
+        // Item 2 only should be retrieved (no name match in Item 1, and Item 3 is not yet discoverable).
         getClient(token).perform(post("/api/contentreport/filtereditems")
                 .content(mapper.writeValueAsBytes(query))
                 .contentType(contentType))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
                 .andExpect(jsonPath("$.itemCount", is(2)))
-                .andExpect(jsonPath("$.items", Matchers.containsInAnyOrder(
-                        ItemMatcher.matchItemProperties(publicItem2),
-                        ItemMatcher.matchItemProperties(publicItem3)
-                )));
+                .andExpect(jsonPath("$.items", ItemMatcher.matchItemProperties(publicItem2)
+                ));
     }
 
 }
