@@ -48,13 +48,13 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
     private final ProcessService processService = ScriptServiceFactory.getInstance().getProcessService();
     private final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     Integer processId;
-    UUID ePersonUUID;
 
     public CommandLineDSpaceRunnableHandler() {
     }
 
     public CommandLineDSpaceRunnableHandler(String scriptName, List<DSpaceCommandLineParameter> parameters) {
         if (IS_SAVE_ENABLED) {
+            UUID ePersonUUID = null;
             Context context = new Context();
             try {
                 EPerson ePerson = null;
@@ -67,7 +67,7 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
                     if (ePerson == null) {
                         throw new IllegalArgumentException("No eperson found with email: " + email);
                     }
-                    this.ePersonUUID = ePerson.getID();
+                    ePersonUUID = ePerson.getID();
                 }
                 Process process = processService.create(context, ePerson, scriptName, parameters,
                     new HashSet<>(context.getSpecialGroups()));
