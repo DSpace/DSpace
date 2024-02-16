@@ -34,8 +34,8 @@ public class FilteredCollectionMatcher {
 
     public static Matcher<? super Object> matchFilteredCollectionSummary(int nbTotalItems, int nbFilteredItems) {
         return allOf(
-                hasJsonPath("nb_total_items", is(nbTotalItems)),
-                hasJsonPath("all_filters_value", is(nbFilteredItems)));
+                hasJsonPath("$.nb_total_items", is(nbTotalItems)),
+                hasJsonPath("$.all_filters_value", is(nbFilteredItems)));
     }
 
 }
