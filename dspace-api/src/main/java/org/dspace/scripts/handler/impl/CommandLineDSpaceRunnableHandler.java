@@ -45,6 +45,7 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
     private final ConfigurationService configurationService =
         DSpaceServicesFactory.getInstance().getConfigurationService();
     private final boolean IS_SAVE_ENABLED = isSaveEnabled();
+    private boolean SHOW_TO_UI = false;
     private final ProcessService processService = ScriptServiceFactory.getInstance().getProcessService();
     private final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     Integer processId;
@@ -53,7 +54,8 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
     }
 
     public CommandLineDSpaceRunnableHandler(String scriptName, List<DSpaceCommandLineParameter> parameters) {
-        if (IS_SAVE_ENABLED) {
+        if (IS_SAVE_ENABLED && scriptHasToBeShownToUI(scriptName)) {
+            SHOW_TO_UI = true;
             UUID ePersonUUID = null;
             Context context = new Context();
             try {
@@ -76,12 +78,14 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
             } catch (Exception e) {
                 if (ePersonUUID != null) {
                     logError(
-                        "CommandLineDspaceRunnableHandler with ePerson: " + ePersonUUID + " for Script with name: " +
+                        "CommandLineDspaceRunnableHandler with ePerson: " + ePersonUUID +
+                            " for Script with name: " +
                             scriptName +
                             " and parameters: " + parameters + " could not be created", e);
                 } else {
                     logError(
-                        "CommandLineDspaceRunnableHandler with command-line user for Script with name: " + scriptName +
+                        "CommandLineDspaceRunnableHandler with command-line user for Script with name: " +
+                            scriptName +
                             " and parameters: " + parameters + " could not be created", e);
                 }
             } finally {
@@ -90,11 +94,10 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
         }
     }
 
-
     @Override
     public void start() {
         System.out.println("The script has started");
-        if (IS_SAVE_ENABLED) {
+        if (IS_SAVE_ENABLED && SHOW_TO_UI) {
             Context context = new Context();
             try {
                 Process process = processService.find(context, processId);
@@ -111,7 +114,7 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
     @Override
     public void handleCompletion() {
         System.out.println("The script has completed");
-        if (IS_SAVE_ENABLED) {
+        if (IS_SAVE_ENABLED && SHOW_TO_UI) {
             Context context = new Context();
             try {
                 Process process = processService.find(context, processId);
@@ -231,5 +234,20 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
      */
     private boolean isSaveEnabled() {
         return configurationService.getBooleanProperty("process.save-enable", false);
+    }
+
+
+
+    /**
+     * Check if the script has to be shown to the UI because some scripts are not meant to be shown to the UI
+     * as they can be dangerous
+     *
+     * @param name the name of the script
+     * @return true if the script has to be shown to the UI, false otherwise
+     */
+    private boolean scriptHasToBeShownToUI(String name) {
+        //check if the script exists in script.xml otherwise is a one command and doesn't need to be saved
+        var scriptService = ScriptServiceFactory.getInstance().getScriptService().getScriptConfiguration(name);
+        return scriptService != null;
     }
 }
