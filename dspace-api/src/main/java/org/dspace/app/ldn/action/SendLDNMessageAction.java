@@ -80,8 +80,9 @@ public class SendLDNMessageAction implements LDNAction {
     }
 
     private boolean isRedirect(int statusCode) {
-        return statusCode == HttpStatus.SC_MOVED_PERMANENTLY ||
-            statusCode == HttpStatus.SC_MOVED_TEMPORARILY;
+        //org.apache.http.HttpStatus has no enum value for 308!
+        return statusCode == (HttpStatus.SC_TEMPORARY_REDIRECT + 1) ||
+            statusCode == HttpStatus.SC_TEMPORARY_REDIRECT;
     }
 
     private LDNActionStatus handleRedirect(CloseableHttpResponse oldresponse,
