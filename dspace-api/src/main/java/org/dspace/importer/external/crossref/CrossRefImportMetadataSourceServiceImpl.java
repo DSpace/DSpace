@@ -162,7 +162,9 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
             Iterator<JsonNode> nodes = jsonNode.at("/message/items").iterator();
             while (nodes.hasNext()) {
                 JsonNode node = nodes.next();
-                results.add(transformSourceRecords(node.toString()));
+                if (!node.isMissingNode()) {
+                    results.add(transformSourceRecords(node.toString()));
+                }
             }
             return results;
         }
@@ -196,7 +198,9 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
             String responseString = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
             JsonNode jsonNode = convertStringJsonToJsonNode(responseString);
             JsonNode messageNode = jsonNode.at("/message");
-            results.add(transformSourceRecords(messageNode.toString()));
+            if (!messageNode.isMissingNode()) {
+                results.add(transformSourceRecords(messageNode.toString()));
+            }
             return results;
         }
     }
@@ -250,7 +254,9 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
             Iterator<JsonNode> nodes = jsonNode.at("/message/items").iterator();
             while (nodes.hasNext()) {
                 JsonNode node = nodes.next();
-                results.add(transformSourceRecords(node.toString()));
+                if (!node.isMissingNode()) {
+                    results.add(transformSourceRecords(node.toString()));
+                }
             }
             return results;
         }

@@ -274,6 +274,8 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         context.restoreAuthSystemState();
         String status = helper.getAccessStatusFromItem(context, itemWithEmbargo, threshold);
         assertThat("testWithEmbargo 0", status, equalTo(DefaultAccessStatusHelper.EMBARGO));
+        String embargoDate = helper.getEmbargoFromItem(context, itemWithEmbargo, threshold);
+        assertThat("testWithEmbargo 1", embargoDate, equalTo(policy.getStartDate().toString()));
     }
 
     /**
@@ -391,6 +393,8 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         context.restoreAuthSystemState();
         String status = helper.getAccessStatusFromItem(context, itemWithPrimaryAndMultipleBitstreams, threshold);
         assertThat("testWithPrimaryAndMultipleBitstreams 0", status, equalTo(DefaultAccessStatusHelper.EMBARGO));
+        String embargoDate = helper.getEmbargoFromItem(context, itemWithPrimaryAndMultipleBitstreams, threshold);
+        assertThat("testWithPrimaryAndMultipleBitstreams 1", embargoDate, equalTo(policy.getStartDate().toString()));
     }
 
     /**
@@ -420,6 +424,8 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         context.restoreAuthSystemState();
         String status = helper.getAccessStatusFromItem(context, itemWithoutPrimaryAndMultipleBitstreams, threshold);
         assertThat("testWithNoPrimaryAndMultipleBitstreams 0", status, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+        String embargoDate = helper.getEmbargoFromItem(context, itemWithEmbargo, threshold);
+        assertThat("testWithNoPrimaryAndMultipleBitstreams 1", embargoDate, equalTo(null));
     }
 
     /**
