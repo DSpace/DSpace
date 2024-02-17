@@ -164,8 +164,8 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
 
         ObjectMapper mapper = new ObjectMapper();
 
-        // This test is diabled until someone can find out why the search function doesn't behave properly
-        // in the present test context while it does when used agsinst a standard production database.
+        // This test is disabled until someone can find out why the search function doesn't behave properly
+        // in the present test context while it does when used against a standard production database.
         getClient(token).perform(post("/api/contentreport/filtereditems")
                 .content(mapper.writeValueAsBytes(query))
                 .contentType(contentType))
