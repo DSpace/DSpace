@@ -22,7 +22,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.contentreport.Filter;
-import org.dspace.app.rest.matcher.FilteredCollectionMatcher;
+import org.dspace.app.rest.matcher.ContentReportMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.model.FilteredCollectionRest;
@@ -103,12 +103,12 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
         getClient(token).perform(get("/api/contentreport/filteredcollections?filters=is_discoverable"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.collections", Matchers.containsInAnyOrder(
-                           FilteredCollectionMatcher.matchFilteredCollectionProperties(fcol1),
-                           FilteredCollectionMatcher.matchFilteredCollectionProperties(fcol2)
+                           ContentReportMatcher.matchFilteredCollectionProperties(fcol1),
+                           ContentReportMatcher.matchFilteredCollectionProperties(fcol2)
                    )))
                    .andExpect(jsonPath("type", is("filteredcollectionsreport")))
                    .andExpect(jsonPath("$.summary",
-                           FilteredCollectionMatcher.matchFilteredCollectionSummary(3, 3)))
+                           ContentReportMatcher.matchFilteredCollectionSummary(3, 3)))
                    .andExpect(jsonPath("$._links.self.href",
                            Matchers.containsString("/api/contentreport/filteredcollections")));
     }

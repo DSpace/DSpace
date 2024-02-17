@@ -10,17 +10,17 @@ package org.dspace.app.rest.matcher;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
-
 import org.dspace.app.rest.model.FilteredCollectionRest;
+import org.dspace.content.Item;
 import org.hamcrest.Matcher;
 
 /**
  * Utility class to construct a Matcher for a FilteredCollectionRest.
  * @author Jean-François Morin (Université Laval)
  */
-public class FilteredCollectionMatcher {
+public class ContentReportMatcher {
 
-    private FilteredCollectionMatcher() { }
+    private ContentReportMatcher() { }
 
     public static Matcher<? super Object> matchFilteredCollectionProperties(FilteredCollectionRest collection) {
         return allOf(
@@ -36,6 +36,17 @@ public class FilteredCollectionMatcher {
         return allOf(
                 hasJsonPath("$.nb_total_items", is(nbTotalItems)),
                 hasJsonPath("$.all_filters_value", is(nbFilteredItems)));
+    }
+
+    public static Matcher<? super Object> matchFilteredItemProperties(Item item) {
+        return allOf(
+                hasJsonPath("$.uuid", is(item.getID().toString())),
+                hasJsonPath("$.name", is(item.getName())),
+                hasJsonPath("$.inArchive", is(item.isArchived())),
+                hasJsonPath("$.discoverable", is(item.isDiscoverable())),
+                hasJsonPath("$.withdrawn", is(item.isWithdrawn())),
+                hasJsonPath("$.type", is("item"))
+            );
     }
 
 }
