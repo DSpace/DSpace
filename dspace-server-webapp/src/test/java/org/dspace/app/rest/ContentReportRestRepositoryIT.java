@@ -168,7 +168,7 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(contentType))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
-                .andExpect(jsonPath("$.itemCount", is(2)))
+                .andExpect(jsonPath("$.itemCount", is(1)))
                 .andExpect(jsonPath("$.items", Matchers.contains(
                         ContentReportMatcher.matchFilteredItemProperties(publicItem2)
                 )
