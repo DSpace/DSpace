@@ -162,7 +162,6 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
 
         ObjectMapper mapper = new ObjectMapper();
 
-        // Items 2 and 3 are retrieved here (non-discoverable items aren't filtered out here).
         getClient(token).perform(post("/api/contentreport/filtereditems")
                 .content(mapper.writeValueAsBytes(query))
                 .contentType(contentType))
@@ -170,7 +169,7 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
                 .andExpect(jsonPath("$.itemCount", is(2)))
                 .andExpect(jsonPath("$.items", Matchers.contains(
-                        ContentReportMatcher.matchFilteredItemProperties(publicItem2)
+                        ContentReportMatcher.matchFilteredItemProperties(publicItem3)
                 )
                 ));
     }
