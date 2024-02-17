@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.contentreport.Filter;
 import org.dspace.app.rest.matcher.ContentReportMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
-import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.model.FilteredCollectionRest;
 import org.dspace.app.rest.model.FilteredItemsQuery;
 import org.dspace.app.rest.model.FilteredItemsQueryPredicate;
@@ -170,7 +169,7 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
                 .andExpect(jsonPath("$.itemCount", is(2)))
-                .andExpect(jsonPath("$.items", ItemMatcher.matchItemProperties(publicItem2)
+                .andExpect(jsonPath("$.items", ContentReportMatcher.matchFilteredItemProperties(publicItem2)
                 ));
     }
 

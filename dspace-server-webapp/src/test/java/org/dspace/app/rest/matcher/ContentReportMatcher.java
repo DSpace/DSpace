@@ -10,6 +10,7 @@ package org.dspace.app.rest.matcher;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
+
 import org.dspace.app.rest.model.FilteredCollectionRest;
 import org.dspace.content.Item;
 import org.hamcrest.Matcher;
