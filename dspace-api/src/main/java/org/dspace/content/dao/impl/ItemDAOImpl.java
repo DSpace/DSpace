@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import javax.persistence.criteria.CriteriaBuilder;
