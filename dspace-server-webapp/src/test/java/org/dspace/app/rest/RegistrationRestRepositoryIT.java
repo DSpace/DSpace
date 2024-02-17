@@ -287,6 +287,34 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
     }
 
     @Test
+    public void testUnauthorizedForgotPasswordTest() throws Exception {
+        configurationService.setProperty("user.registration", false);
+        configurationService.setProperty("user.forgot-password", false);
+
+        List<RegistrationData> registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+        try {
+            assertEquals(0, registrationDataList.size());
+
+            ObjectMapper mapper = new ObjectMapper();
+            RegistrationRest registrationRest = new RegistrationRest();
+            registrationRest.setEmail(eperson.getEmail());
+            getClient().perform(post("/api/eperson/registrations")
+                                    .param(TYPE_QUERY_PARAM, TYPE_FORGOT)
+                                    .content(mapper.writeValueAsBytes(registrationRest))
+                                    .contentType(contentType))
+                       .andExpect(status().isUnauthorized());
+            registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+            assertEquals(0, registrationDataList.size());
+        } finally {
+            Iterator<RegistrationData> iterator = registrationDataList.iterator();
+            while (iterator.hasNext()) {
+                RegistrationData registrationData = iterator.next();
+                registrationDataDAO.delete(context, registrationData);
+            }
+        }
+    }
+
+    @Test
     public void registrationFlowWithNoHeaderCaptchaTokenTest() throws Exception {
         String originVerification = configurationService.getProperty("registration.verification.enabled");
         String originSecret = configurationService.getProperty("google.recaptcha.key.secret");

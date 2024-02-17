@@ -97,4 +97,9 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkaccesscontrol.BulkAccessControlCli"/>
     </bean>
 
+    <bean id="import-openaire-suggestions" class="org.dspace.app.suggestion.openaire.PublicationLoaderCliScriptConfiguration">
+       <property name="description" value="Imports suggestions from OpenAIRE for publication claim"/>
+       <property name="dspaceRunnableClass" value="org.dspace.app.suggestion.openaire.PublicationLoaderRunnableCli"/>
+    </bean>
+
 </beans>

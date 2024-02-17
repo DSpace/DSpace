@@ -1436,16 +1436,6 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     @Override
-    public Iterator<Item> findByMetadataQuery(Context context, List<List<MetadataField>> listFieldList,
-                                              List<String> query_op, List<String> query_val, List<UUID> collectionUuids,
-                                              String regexClause, int offset, int limit)
-        throws SQLException, AuthorizeException, IOException {
-        return itemDAO
-            .findByMetadataQuery(context, listFieldList, query_op, query_val, collectionUuids, regexClause, offset,
-                                 limit);
-    }
-
-    @Override
     public DSpaceObject getAdminObject(Context context, Item item, int action) throws SQLException {
         DSpaceObject adminObject = null;
         //Items are always owned by collections
