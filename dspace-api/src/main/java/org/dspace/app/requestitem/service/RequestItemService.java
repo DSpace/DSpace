@@ -87,15 +87,4 @@ public interface RequestItemService {
      * @param request record to be removed.
      */
     public void delete(Context context, RequestItem request);
-
-    /**
-     * Is there at least one valid READ resource policy for this object?
-     * @param context current DSpace session.
-     * @param o the object.
-     * @param person EPerson for which isRestricted check is performed
-     * @return true if a READ policy applies.
-     * @throws SQLException passed through.
-     */
-    public boolean isRestricted(Context context, DSpaceObject o, EPerson person)
-            throws SQLException;
 }

@@ -120,20 +120,4 @@ public class RequestItemServiceImpl implements RequestItemService {
             log.error(e.getMessage());
         }
     }
-
-    @Override
-    public boolean isRestricted(Context context, DSpaceObject o, EPerson person) throws SQLException {
-        List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, o, Constants.READ);
-
-        for (ResourcePolicy rp : policies) {
-            boolean isSameEPerson = rp.getEPerson() != null && rp.getEPerson().equals(person);
-            boolean isGroupMember = rp.getGroup() != null && groupService.isMember(context, person, rp.getGroup());
-
-            if (resourcePolicyService.isDateValid(rp) && (isSameEPerson || isGroupMember)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
 }
