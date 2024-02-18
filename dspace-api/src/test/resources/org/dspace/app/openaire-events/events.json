@@ -1,0 +1,62 @@
+[
+
+	{
+		"originalId": "oai:www.openstarts.units.it:123456789/99998",
+		"title": "Egypt, crossroad of translations and literary interweavings",
+		"topic": "ENRICH/MORE/PROJECT",
+		"trust": 1.0,
+		"message": {
+			"projects[0].acronym": "PAThs",
+			"projects[0].code": "687567",
+			"projects[0].funder": "EC",
+			"projects[0].fundingProgram": "H2020",
+			"projects[0].jurisdiction": "EU",
+			"projects[0].openaireId": "40|corda__h2020::6e32f5eb912688f2424c68b851483ea4",
+			"projects[0].title": "Tracking Papyrus and Parchment Paths"
+		}
+	},
+	
+	{
+		"originalId": "oai:www.openstarts.units.it:123456789/99999",
+		"title": "Test Publication",
+		"topic": "ENRICH/MISSING/ABSTRACT",
+		"trust": 1.0,
+		"message": {
+			"abstracts[0]": "Missing Abstract"
+		}
+	},
+    {
+        "originalId": "oai:www.openstarts.units.it:123456789/99998",
+        "title": "Egypt, crossroad of translations and literary interweavings",
+        "topic": "ENRICH/MISSING/PID",
+        "trust": 1.0,
+        "message": {
+            "pids[0].type": "doi",
+            "pids[0].value": "10.13137/2282-572x/987"
+        }
+    },
+    {
+        "originalId": "oai:www.openstarts.units.it:123456789/99999",
+        "title": "Test Publication",
+        "topic": "ENRICH/MORE/PID",
+        "trust": 0.375,
+        "message": {
+            "pids[0].type": "doi",
+            "pids[0].value": "987654"
+        }
+    },
+    {
+        "originalId": "oai:www.openstarts.units.it:123456789/99999",
+        "title": "Test Publication",
+        "topic": "ENRICH/MISSING/PROJECT",
+        "trust": 1.0,
+        "message": {
+            "projects[0].acronym": "02.SNES missing project acronym",
+            "projects[0].code": "prjcode_snes",
+            "projects[0].funder": "02.SNES missing project funder",
+            "projects[0].fundingProgram": "02.SNES missing project fundingProgram",
+            "projects[0].jurisdiction": "02.SNES missing project jurisdiction",
+            "projects[0].title": "Project01"
+        }
+    }
+]

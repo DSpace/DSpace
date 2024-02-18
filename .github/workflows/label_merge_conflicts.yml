@@ -1,11 +1,12 @@
 # This workflow checks open PRs for merge conflicts and labels them when conflicts are found
 name: Check for merge conflicts
 
-# Run whenever the "main" branch is updated
-# NOTE: This means merge conflicts are only checked for when a PR is merged to main.
+# Run this for all pushes (i.e. merges) to 'main' or maintenance branches
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - 'dspace-**'
   # So that the `conflict_label_name` is removed if conflicts are resolved,
   # we allow this to run for `pull_request_target` so that github secrets are available.
   pull_request_target:
@@ -24,6 +25,8 @@ jobs:
       # See: https://github.com/prince-chrismc/label-merge-conflicts-action
       - name: Auto-label PRs with merge conflicts
         uses: prince-chrismc/label-merge-conflicts-action@v3
+        # Ignore any failures -- may occur (randomly?) for older, outdated PRs.
+        continue-on-error: true
         # Add "merge conflict" label if a merge conflict is detected. Remove it when resolved.
         # Note, the authentication token is created automatically
         # See: https://docs.github.com/en/actions/configuring-and-managing-workflows/authenticating-with-the-github_token

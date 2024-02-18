@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Following OpenAIRE Guidelines 4 -->
+<!-- Following Openaire Guidelines 4 -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:doc="http://www.lyncode.com/xoai">
     <xsl:output indent="yes" method="xml" omit-xml-declaration="yes"/>
@@ -12,7 +12,7 @@
 
     <!-- 
         Formatting dc.date.issued
-        based on what OpenAIRE4 specifies for issued dates 
+        based on what Openaire4 specifies for issued dates 
         https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_publicationdate.html
     -->
     <xsl:template

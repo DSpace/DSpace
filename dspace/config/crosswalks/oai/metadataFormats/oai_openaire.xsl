@@ -457,6 +457,13 @@
         </oaire:funderIdentifier>
     </xsl:template>
 
+    <!-- This template creates the sub-element <oaire:funderIdentifier> from a Funded Project built entity -->
+    <xsl:template match="doc:field[starts-with(@name,'project.funder.rorIdentifier')]" mode="entity_funding">
+        <oaire:funderIdentifier funderIdentifierType="ROR" schemeURI="http://ror.org/">
+            <xsl:value-of select="./text()"/>
+        </oaire:funderIdentifier>
+    </xsl:template>
+
     <!-- This template creates the sub-element <oaire:fundingStream> from a Funded Project built entity -->
     <xsl:template match="doc:field[starts-with(@name,'oaire.fundingStream')]" mode="entity_funding">
         <oaire:fundingStream>
@@ -883,7 +890,32 @@
     <xsl:template match="doc:element[@name='bitstreams']/doc:element[@name='bitstream']" mode="oaire">
         <oaire:file>
             <xsl:attribute name="accessRightsURI">
-                <xsl:call-template name="getRightsURI"/>
+                <!-- get the coar access rights at the individual file level -->
+                <!-- Look at resource policies to infer access level information, defaults to item-level status -->
+                <xsl:choose>
+                    <xsl:when test="doc:element[@name='resourcePolicies']/doc:element[doc:field[@name='action']/text()='READ' and doc:field[@name='group']/text()='Anonymous' and doc:field[@name='start-date']]">
+                        <xsl:call-template name="resolveRightsURI">
+                            <xsl:with-param name="field"
+                                            select="'embargo'"/>
+                        </xsl:call-template>
+                    </xsl:when>
+                    <xsl:when test="doc:element[@name='resourcePolicies']/doc:element[doc:field[@name='action']/text()='READ' and doc:field[@name='group']/text()='Anonymous' and not(doc:field[@name='start-date'])]">
+                        <xsl:call-template name="resolveRightsURI">
+                            <xsl:with-param name="field"
+                                            select="'open.access'"/>
+                        </xsl:call-template>
+                    </xsl:when>
+                    <xsl:when test="doc:element[@name='resourcePolicies']/doc:element[doc:field[@name='action']/text()='READ' and doc:field[@name='group']/text()='Administrator']">
+                        <xsl:call-template name="resolveRightsURI">
+                            <xsl:with-param name="field"
+                                            select="'restricted'"/>
+                        </xsl:call-template>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <!-- Default to item-level access status information -->
+                        <xsl:call-template name="getRightsURI"/>
+                    </xsl:otherwise>
+                </xsl:choose>
          </xsl:attribute>
             <xsl:attribute name="mimeType">
             <xsl:value-of select="doc:field[@name='format']"/>
@@ -1432,6 +1464,18 @@
             <xsl:when test="$lc_dc_type = 'book review'">
                 <xsl:text>literature</xsl:text>
             </xsl:when>
+            <xsl:when test="$lc_dc_type = 'bachelor thesis'">
+                <xsl:text>literature</xsl:text>
+            </xsl:when>
+            <xsl:when test="$lc_dc_type = 'doctoral thesis'">
+                <xsl:text>literature</xsl:text>
+            </xsl:when>
+            <xsl:when test="$lc_dc_type = 'master thesis'">
+                <xsl:text>literature</xsl:text>
+            </xsl:when>
+            <xsl:when test="$lc_dc_type = 'thesis'">
+                <xsl:text>literature</xsl:text>
+            </xsl:when>		
             <xsl:when test="$lc_dc_type = 'dataset'">
                 <xsl:text>dataset</xsl:text>
             </xsl:when>
