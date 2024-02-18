@@ -13,10 +13,8 @@ import java.util.List;
 
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.content.Bitstream;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 
 /**
  * Service interface class for the RequestItem object.
