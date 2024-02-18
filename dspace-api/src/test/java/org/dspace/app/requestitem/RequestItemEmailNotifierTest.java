@@ -29,8 +29,6 @@ import javax.mail.internet.MimeMultipart;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
 import org.dspace.AbstractUnitTest;
-import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
-import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.AbstractBuilder;
 import org.dspace.builder.BitstreamBuilder;
@@ -80,7 +78,6 @@ public class RequestItemEmailNotifierTest extends AbstractUnitTest {
     private static ConfigurationService configurationService;
     private static BitstreamService bitstreamService;
     private static HandleService handleService;
-    private static RequestItemService requestItemService;
     private static EPersonService ePersonService;
 
     public RequestItemEmailNotifierTest() {
@@ -94,7 +91,6 @@ public class RequestItemEmailNotifierTest extends AbstractUnitTest {
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
         handleService = HandleServiceFactory.getInstance().getHandleService();
-        requestItemService = RequestItemServiceFactory.getInstance().getRequestItemService();
         ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     }
 
@@ -165,7 +161,7 @@ public class RequestItemEmailNotifierTest extends AbstractUnitTest {
         requestItemEmailNotifier.bitstreamService = bitstreamService;
         requestItemEmailNotifier.configurationService = configurationService;
         requestItemEmailNotifier.handleService = handleService;
-        requestItemEmailNotifier.requestItemService = requestItemService;
+        requestItemEmailNotifier.authorizeService = authorizeService;
         requestItemEmailNotifier.ePersonService = ePersonService;
 
         // Test the unit.  Template supplies the Subject: value
@@ -285,7 +281,7 @@ public class RequestItemEmailNotifierTest extends AbstractUnitTest {
         requestItemEmailNotifier.bitstreamService = bitstreamService;
         requestItemEmailNotifier.configurationService = configurationService;
         requestItemEmailNotifier.handleService = handleService;
-        requestItemEmailNotifier.requestItemService = requestItemService;
+        requestItemEmailNotifier.authorizeService = authorizeService;
         requestItemEmailNotifier.ePersonService = ePersonService;
 
         // Test the unit.  Template supplies the Subject: value
@@ -405,7 +401,7 @@ public class RequestItemEmailNotifierTest extends AbstractUnitTest {
         requestItemEmailNotifier.bitstreamService = bitstreamService;
         requestItemEmailNotifier.configurationService = configurationService;
         requestItemEmailNotifier.handleService = handleService;
-        requestItemEmailNotifier.requestItemService = requestItemService;
+        requestItemEmailNotifier.authorizeService = authorizeService;
         requestItemEmailNotifier.ePersonService = ePersonService;
 
         // Test the unit.  Template supplies the Subject: value
