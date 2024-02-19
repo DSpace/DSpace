@@ -15,7 +15,8 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
@@ -82,19 +83,26 @@ public class ReinstateCorrectionType implements CorrectionType, InitializingBean
 
     @Override
     public QAEvent createCorrection(Context context, Item targetItem, QAMessageDTO reason) {
-        CorrectionTypeMessageDTO mesasge = (CorrectionTypeMessageDTO) reason;
+        ObjectNode reasonJson = createReasonJson(reason);
         QAEvent qaEvent = new QAEvent(DSPACE_USERS_SOURCE,
                                       context.getCurrentUser().getID().toString(),
                                       targetItem.getID().toString(),
                                       targetItem.getName(),
                                       this.getTopic(),
                                       1.0,
-                                      new Gson().toJson(mesasge),
+                                      reasonJson.toString(),
                                       new Date()
                                       );
 
         qaEventService.store(context, qaEvent);
         return qaEvent;
+    }
+
+    private ObjectNode createReasonJson(QAMessageDTO reason) {
+        CorrectionTypeMessageDTO mesasge = (CorrectionTypeMessageDTO) reason;
+        ObjectNode jsonNode = new ObjectMapper().createObjectNode();
+        jsonNode.put("reason", mesasge.getReason());
+        return jsonNode;
     }
 
     @Override
