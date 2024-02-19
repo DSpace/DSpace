@@ -8,3 +8,5 @@
 
 ALTER TABLE ResourcePolicy ADD CONSTRAINT resourcepolicy_eperson_and_epersongroup_not_nullobject_chk
     CHECK (eperson_id is not null or epersongroup_id is not null) ;
+
+DELETE FROM ResourcePolicy WHERE eperson_id is null and epersongroup_id is null;
