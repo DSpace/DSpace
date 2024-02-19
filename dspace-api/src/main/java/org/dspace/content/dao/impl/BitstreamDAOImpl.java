@@ -68,9 +68,9 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
 
     @Override
     public List<Bitstream> findBitstreamsWithNoRecentChecksum(Context context) throws SQLException {
-        Query query = createQuery(context,
-                                  "select b from Bitstream b where b not in (select c.bitstream from " +
-                                      "MostRecentChecksum c)");
+        Query query = createQuery(context, "SELECT b FROM MostRecentChecksum c RIGHT JOIN Bitstream b " +
+            "ON c.bitstream = b WHERE c IS NULL" );
+
         return query.getResultList();
     }
 
