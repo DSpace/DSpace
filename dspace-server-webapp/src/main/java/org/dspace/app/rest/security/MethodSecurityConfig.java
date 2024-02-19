@@ -8,6 +8,7 @@
 package org.dspace.app.rest.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
@@ -22,10 +23,13 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
     @Autowired
     private PermissionEvaluator dSpacePermissionEvaluator;
 
+    @Autowired
+    private ApplicationContext applicationContext;
+
     @Override
     protected MethodSecurityExpressionHandler createExpressionHandler() {
-        DefaultMethodSecurityExpressionHandler expressionHandler =
-                new DefaultMethodSecurityExpressionHandler();
+        DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
+        expressionHandler.setApplicationContext(applicationContext);
         expressionHandler.setPermissionEvaluator(dSpacePermissionEvaluator);
         return expressionHandler;
     }
