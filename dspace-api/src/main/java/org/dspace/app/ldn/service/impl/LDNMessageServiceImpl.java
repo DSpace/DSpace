@@ -287,7 +287,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
         }
         log.debug("Using parameters: [timeoutInMinutes]=" + timeoutInMinutes + ",[maxAttempts]=" + maxAttempts);
         /*
-         * CST-10631 put failed on processing messages with timed-out timeout and
+         * put failed on processing messages with timed-out timeout and
          * attempts >= configured_max_attempts put queue on processing messages with
          * timed-out timeout and attempts < configured_max_attempts
          */
@@ -300,7 +300,6 @@ public class LDNMessageServiceImpl implements LDNMessageService {
             return result;
         }
         if (msgsToCheck == null || msgsToCheck.isEmpty()) {
-            log.info("No timedout LDN messages found in queue.");
             return result;
         }
         for (int i = 0; i < msgsToCheck.size() && msgsToCheck.get(i) != null; i++) {

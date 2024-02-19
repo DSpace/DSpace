@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.is;
 
 import java.util.List;
 
-import org.dspace.coarnotify.COARPattern;
+import org.dspace.coarnotify.NotifyPattern;
 import org.hamcrest.Matcher;
 
 /**
@@ -28,7 +28,7 @@ public class SubmissionCOARNotifyMatcher {
     private SubmissionCOARNotifyMatcher() {
     }
 
-    public static Matcher<? super Object> matchCOARNotifyEntry(String id, List<COARPattern> patterns) {
+    public static Matcher<? super Object> matchCOARNotifyEntry(String id, List<NotifyPattern> patterns) {
         return allOf(
             hasJsonPath("$.id", is(id)),
             hasJsonPath(

@@ -64,7 +64,7 @@
                             <bean class="org.dspace.app.rest.submit.factory.impl.AccessConditionAddPatchOperation"/>
                         </entry>
                         <entry key="coarnotify">
-                            <bean class="org.dspace.app.rest.submit.factory.impl.COARNotifyServiceAddPatchOperation"/>
+                            <bean class="org.dspace.app.rest.submit.factory.impl.NotifyServiceAddPatchOperation"/>
                         </entry>
                     </map>
                 </entry>
@@ -101,7 +101,7 @@
                             <bean class="org.dspace.app.rest.submit.factory.impl.AccessConditionRemovePatchOperation"/>
                         </entry>
                         <entry key="coarnotify">
-                            <bean class="org.dspace.app.rest.submit.factory.impl.COARNotifyServiceRemovePatchOperation"/>
+                            <bean class="org.dspace.app.rest.submit.factory.impl.NotifyServiceRemovePatchOperation"/>
                         </entry>
                     </map>
                 </entry>
@@ -137,7 +137,7 @@
                             <bean class="org.dspace.app.rest.submit.factory.impl.AccessConditionReplacePatchOperation"/>
                         </entry>
                         <entry key="coarnotify">
-                            <bean class="org.dspace.app.rest.submit.factory.impl.COARNotifyServiceReplacePatchOperation"/>
+                            <bean class="org.dspace.app.rest.submit.factory.impl.NotifyServiceReplacePatchOperation"/>
                         </entry>
                     </map>
                 </entry>
@@ -147,6 +147,6 @@
 
     <bean id="org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils" class="org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils"/>
 
-    <bean id="coarNotifySubmissionService" class="org.dspace.app.rest.submit.factory.impl.COARNotifySubmissionService"/>
+    <bean id="coarNotifySubmissionService" class="org.dspace.app.rest.submit.factory.impl.NotifySubmissionService"/>
 
 </beans>

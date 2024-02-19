@@ -44,7 +44,7 @@ public class LDNQueueExtractor {
     public static int extractMessageFromQueue() throws SQLException {
         Context context = new Context(Context.Mode.READ_WRITE);
         int processed_messages = ldnMessageService.extractAndProcessMessageFromQueue(context);
-        if (processed_messages >= 0) {
+        if (processed_messages > 0) {
             log.info("Processed Messages x" + processed_messages);
         } else {
             log.error("Errors happened during the extract operations. Check the log above!");

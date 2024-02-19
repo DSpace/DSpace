@@ -20,11 +20,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
-public class DataCOARNotify implements SectionData {
+public class DataNotify implements SectionData {
 
     private Map<String, List<Integer>> patterns = new HashMap<>();
 
-    public DataCOARNotify() {
+    public DataNotify() {
 
     }
 
@@ -33,7 +33,7 @@ public class DataCOARNotify implements SectionData {
         patterns.put(key, values);
     }
 
-    public DataCOARNotify(Map<String, List<Integer>> patterns) {
+    public DataNotify(Map<String, List<Integer>> patterns) {
         this.patterns = patterns;
     }
 

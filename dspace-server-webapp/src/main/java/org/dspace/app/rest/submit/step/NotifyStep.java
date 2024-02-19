@@ -10,7 +10,7 @@ package org.dspace.app.rest.submit.step;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.model.patch.Operation;
-import org.dspace.app.rest.model.step.DataCOARNotify;
+import org.dspace.app.rest.model.step.DataNotify;
 import org.dspace.app.rest.submit.AbstractProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.factory.PatchOperationFactory;
@@ -25,7 +25,7 @@ import org.dspace.core.Context;
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
-public class COARNotifyStep extends AbstractProcessingStep {
+public class NotifyStep extends AbstractProcessingStep {
 
     /**
      * Retrieves the COAR Notify services data of the in progress submission
@@ -37,7 +37,7 @@ public class COARNotifyStep extends AbstractProcessingStep {
      * @throws Exception
      */
     @Override
-    public DataCOARNotify getData(SubmissionService submissionService, InProgressSubmission obj,
+    public DataNotify getData(SubmissionService submissionService, InProgressSubmission obj,
                                              SubmissionStepConfig config) throws Exception {
         return coarNotifySubmissionService.getDataCOARNotify(obj);
     }

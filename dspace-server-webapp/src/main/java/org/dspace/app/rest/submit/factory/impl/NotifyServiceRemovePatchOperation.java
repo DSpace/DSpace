@@ -30,13 +30,13 @@ import org.springframework.beans.factory.annotation.Autowired;
  * application/json" -d '[{ "op": "remove", "path": "/sections/coarnotify/review/0"}]'
  * </code>
  */
-public class COARNotifyServiceRemovePatchOperation extends RemovePatchOperation<Integer> {
+public class NotifyServiceRemovePatchOperation extends RemovePatchOperation<Integer> {
 
     @Autowired
     private NotifyPatternToTriggerService notifyPatternToTriggerService;
 
-    private COARNotifySubmissionService coarNotifySubmissionService = new DSpace().getServiceManager()
-        .getServiceByName("coarNotifySubmissionService", COARNotifySubmissionService.class);
+    private NotifySubmissionService coarNotifySubmissionService = new DSpace().getServiceManager()
+        .getServiceByName("coarNotifySubmissionService", NotifySubmissionService.class);
 
     @Override
     protected Class<Integer[]> getArrayClassForEvaluation() {

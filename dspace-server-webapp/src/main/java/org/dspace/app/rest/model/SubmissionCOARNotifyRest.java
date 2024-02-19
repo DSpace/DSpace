@@ -12,14 +12,13 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
-import org.dspace.coarnotify.COARNotifySubmissionConfiguration;
-import org.dspace.coarnotify.COARPattern;
-
+import org.dspace.coarnotify.NotifyPattern;
+import org.dspace.coarnotify.NotifySubmissionConfiguration;
 /**
  * This class is the REST representation of the COARNotifySubmissionConfiguration model object
  * and acts as a data object for the SubmissionCOARNotifyResource class.
  *
- * Refer to {@link COARNotifySubmissionConfiguration} for explanation of the properties
+ * Refer to {@link NotifySubmissionConfiguration} for explanation of the properties
  */
 public class SubmissionCOARNotifyRest extends BaseObjectRest<String> {
     public static final String NAME = "submissioncoarnotifyconfig";
@@ -27,7 +26,7 @@ public class SubmissionCOARNotifyRest extends BaseObjectRest<String> {
 
     private String id;
 
-    private List<COARPattern> patterns;
+    private List<NotifyPattern> patterns;
 
     public String getId() {
         return id;
@@ -37,11 +36,11 @@ public class SubmissionCOARNotifyRest extends BaseObjectRest<String> {
         this.id = id;
     }
 
-    public List<COARPattern> getPatterns() {
+    public List<NotifyPattern> getPatterns() {
         return patterns;
     }
 
-    public void setPatterns(final List<COARPattern> patterns) {
+    public void setPatterns(final List<NotifyPattern> patterns) {
         this.patterns = patterns;
     }
 

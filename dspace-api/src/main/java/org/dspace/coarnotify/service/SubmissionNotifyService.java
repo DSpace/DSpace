@@ -9,7 +9,7 @@ package org.dspace.coarnotify.service;
 
 import java.util.List;
 
-import org.dspace.coarnotify.COARNotifySubmissionConfiguration;
+import org.dspace.coarnotify.NotifySubmissionConfiguration;
 
 /**
  * Service interface class for the Creative Submission COAR Notify.
@@ -18,7 +18,7 @@ import org.dspace.coarnotify.COARNotifySubmissionConfiguration;
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
-public interface SubmissionCOARNotifyService {
+public interface SubmissionNotifyService {
 
     /**
      * Find the COARE Notify corresponding to the provided ID
@@ -27,13 +27,13 @@ public interface SubmissionCOARNotifyService {
      * @param id - the ID of the COAR Notify to be found
      * @return the corresponding COAR Notify if found or null when not found
      */
-    public COARNotifySubmissionConfiguration findOne(String id);
+    public NotifySubmissionConfiguration findOne(String id);
 
     /**
      * Find all configured COAR Notifies
      *
      * @return all configured COAR Notifies
      */
-    public List<COARNotifySubmissionConfiguration> findAll();
+    public List<NotifySubmissionConfiguration> findAll();
 
 }

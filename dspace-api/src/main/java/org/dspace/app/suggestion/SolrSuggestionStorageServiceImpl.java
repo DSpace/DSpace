@@ -86,6 +86,8 @@ public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageSe
             jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             SolrInputDocument document = new SolrInputDocument();
             document.addField(SOURCE, suggestion.getSource());
+            // suggestion id is written as concatenation of
+            // source + ":" + targetID + ":" + idPart (of externalDataObj)
             String suggestionFullID = suggestion.getID();
             document.addField(SUGGESTION_FULLID, suggestionFullID);
             document.addField(SUGGESTION_ID, suggestionFullID.split(":", 3)[2]);

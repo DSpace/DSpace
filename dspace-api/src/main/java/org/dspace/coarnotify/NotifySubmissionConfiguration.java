@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
-public class COARNotifySubmissionConfiguration {
+public class NotifySubmissionConfiguration {
 
     /**
      * the map key of configured bean of COARNotifyConfigurationService
@@ -26,13 +26,13 @@ public class COARNotifySubmissionConfiguration {
      * the map values of configured bean of COARNotifyConfigurationService
      * in coar-notify.xml
      */
-    private List<COARPattern> patterns;
+    private List<NotifyPattern> patterns;
 
-    public COARNotifySubmissionConfiguration() {
+    public NotifySubmissionConfiguration() {
 
     }
 
-    public COARNotifySubmissionConfiguration(String id, List<COARPattern> patterns) {
+    public NotifySubmissionConfiguration(String id, List<NotifyPattern> patterns) {
         super();
         this.id = id;
         this.patterns = patterns;
@@ -51,7 +51,7 @@ public class COARNotifySubmissionConfiguration {
      *
      * @return the list of configured COAR Notify Patterns
      */
-    public List<COARPattern> getPatterns() {
+    public List<NotifyPattern> getPatterns() {
         return patterns;
     }
 
@@ -59,7 +59,7 @@ public class COARNotifySubmissionConfiguration {
      * Sets the list of configured COAR Notify Patterns
      * @param patterns
      */
-    public void setPatterns(final List<COARPattern> patterns) {
+    public void setPatterns(final List<NotifyPattern> patterns) {
         this.patterns = patterns;
     }
 }

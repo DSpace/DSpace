@@ -15,19 +15,19 @@ import java.util.Map;
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
-public class COARNotifyConfigurationService {
+public class NotifyConfigurationService {
 
     /**
      * Mapping the submission step process identifier with the configuration
      * (see configuration at coar-notify.xml)
      */
-    private Map<String, List<COARPattern>> patterns;
+    private Map<String, List<NotifyPattern>> patterns;
 
-    public Map<String, List<COARPattern>> getPatterns() {
+    public Map<String, List<NotifyPattern>> getPatterns() {
         return patterns;
     }
 
-    public void setPatterns(Map<String, List<COARPattern>> patterns) {
+    public void setPatterns(Map<String, List<NotifyPattern>> patterns) {
         this.patterns = patterns;
     }
 

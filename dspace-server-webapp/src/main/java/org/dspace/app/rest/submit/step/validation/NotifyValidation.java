@@ -22,8 +22,8 @@ import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
-import org.dspace.coarnotify.COARNotifyConfigurationService;
-import org.dspace.coarnotify.COARPattern;
+import org.dspace.coarnotify.NotifyConfigurationService;
+import org.dspace.coarnotify.NotifyPattern;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.logic.LogicalStatement;
@@ -35,11 +35,11 @@ import org.dspace.utils.DSpace;
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
-public class COARNotifyValidation extends AbstractValidation {
+public class NotifyValidation extends AbstractValidation {
 
     private static final String ERROR_VALIDATION_INVALID_FILTER = "error.validation.coarnotify.invalidfilter";
 
-    private COARNotifyConfigurationService coarNotifyConfigurationService;
+    private NotifyConfigurationService coarNotifyConfigurationService;
 
     private NotifyPatternToTriggerService notifyPatternToTriggerService;
 
@@ -54,7 +54,7 @@ public class COARNotifyValidation extends AbstractValidation {
         List<String> patterns =
             coarNotifyConfigurationService.getPatterns().getOrDefault(config.getId(), List.of())
                                           .stream()
-                                          .map(COARPattern::getPattern)
+                                          .map(NotifyPattern::getPattern)
                                           .collect(Collectors.toList());
 
         patterns.forEach(pattern -> {
@@ -96,12 +96,12 @@ public class COARNotifyValidation extends AbstractValidation {
         }
     }
 
-    public COARNotifyConfigurationService getCoarNotifyConfigurationService() {
+    public NotifyConfigurationService getCoarNotifyConfigurationService() {
         return coarNotifyConfigurationService;
     }
 
     public void setCoarNotifyConfigurationService(
-        COARNotifyConfigurationService coarNotifyConfigurationService) {
+        NotifyConfigurationService coarNotifyConfigurationService) {
         this.coarNotifyConfigurationService = coarNotifyConfigurationService;
     }
 

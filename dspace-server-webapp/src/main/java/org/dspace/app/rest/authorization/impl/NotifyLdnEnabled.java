@@ -20,9 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-@AuthorizationFeatureDocumentation(name = CoarNotifyLdnEnabled.NAME,
+@AuthorizationFeatureDocumentation(name = NotifyLdnEnabled.NAME,
         description = "It can be used to verify if the user can see the coar notify protocol is enabled")
-public class CoarNotifyLdnEnabled implements AuthorizationFeature {
+public class NotifyLdnEnabled implements AuthorizationFeature {
 
     public final static String NAME = "coarLdnEnabled";
 

@@ -32,7 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * application/json" -d '[{ "op": "replace", "path": "/sections/coarnotify/review/0"}, "value": "10"]'
  * </code>
  */
-public class COARNotifyServiceReplacePatchOperation extends ReplacePatchOperation<Integer> {
+public class NotifyServiceReplacePatchOperation extends ReplacePatchOperation<Integer> {
 
     @Autowired
     private NotifyPatternToTriggerService notifyPatternToTriggerService;
@@ -40,8 +40,8 @@ public class COARNotifyServiceReplacePatchOperation extends ReplacePatchOperatio
     @Autowired
     private NotifyService notifyService;
 
-    private COARNotifySubmissionService coarNotifySubmissionService = new DSpace().getServiceManager()
-        .getServiceByName("coarNotifySubmissionService", COARNotifySubmissionService.class);
+    private NotifySubmissionService coarNotifySubmissionService = new DSpace().getServiceManager()
+        .getServiceByName("coarNotifySubmissionService", NotifySubmissionService.class);
 
     @Override
     protected Class<Integer[]> getArrayClassForEvaluation() {

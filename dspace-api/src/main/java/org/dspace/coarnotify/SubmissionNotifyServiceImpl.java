@@ -10,41 +10,41 @@ package org.dspace.coarnotify;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dspace.coarnotify.service.SubmissionCOARNotifyService;
+import org.dspace.coarnotify.service.SubmissionNotifyService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Service implementation of {@link SubmissionCOARNotifyService}
+ * Service implementation of {@link SubmissionNotifyService}
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
-public class SubmissionCOARNotifyServiceImpl implements SubmissionCOARNotifyService {
+public class SubmissionNotifyServiceImpl implements SubmissionNotifyService {
 
     @Autowired(required = true)
-    private COARNotifyConfigurationService coarNotifyConfigurationService;
+    private NotifyConfigurationService coarNotifyConfigurationService;
 
-    protected SubmissionCOARNotifyServiceImpl() {
+    protected SubmissionNotifyServiceImpl() {
 
     }
 
     @Override
-    public COARNotifySubmissionConfiguration findOne(String id) {
-        List<COARPattern> patterns =
+    public NotifySubmissionConfiguration findOne(String id) {
+        List<NotifyPattern> patterns =
             coarNotifyConfigurationService.getPatterns().get(id);
 
         if (patterns == null) {
             return null;
         }
 
-        return new COARNotifySubmissionConfiguration(id, patterns);
+        return new NotifySubmissionConfiguration(id, patterns);
     }
 
     @Override
-    public List<COARNotifySubmissionConfiguration> findAll() {
-        List<COARNotifySubmissionConfiguration> coarNotifies = new ArrayList<>();
+    public List<NotifySubmissionConfiguration> findAll() {
+        List<NotifySubmissionConfiguration> coarNotifies = new ArrayList<>();
 
         coarNotifyConfigurationService.getPatterns().forEach((id, patterns) ->
-            coarNotifies.add(new COARNotifySubmissionConfiguration(id, patterns)
+            coarNotifies.add(new NotifySubmissionConfiguration(id, patterns)
             ));
 
         return coarNotifies;

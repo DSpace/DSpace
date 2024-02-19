@@ -243,7 +243,7 @@
 
         <step-definition id="coarnotify">
             <heading>submit.progressbar.coarnotify</heading>
-            <processing-class>org.dspace.app.rest.submit.step.COARNotifyStep</processing-class>
+            <processing-class>org.dspace.app.rest.submit.step.NotifyStep</processing-class>
             <type>coarnotify</type>
         </step-definition>
 

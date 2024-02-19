@@ -44,7 +44,7 @@ public class LDNQueueTimeoutChecker {
         Context context = new Context(Context.Mode.READ_WRITE);
         int fixed_messages = 0;
         fixed_messages = ldnMessageService.checkQueueMessageTimeout(context);
-        if (fixed_messages >= 0) {
+        if (fixed_messages > 0) {
             log.info("Managed Messages x" + fixed_messages);
         } else {
             log.error("Errors happened during the check operation. Check the log above!");

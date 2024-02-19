@@ -12,16 +12,16 @@ package org.dspace.coarnotify;
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
-public class COARPattern {
+public class NotifyPattern {
 
     private String pattern;
     private boolean multipleRequest;
 
-    public COARPattern() {
+    public NotifyPattern() {
 
     }
 
-    public COARPattern(String pattern, boolean multipleRequest) {
+    public NotifyPattern(String pattern, boolean multipleRequest) {
         this.pattern = pattern;
         this.multipleRequest = multipleRequest;
     }
