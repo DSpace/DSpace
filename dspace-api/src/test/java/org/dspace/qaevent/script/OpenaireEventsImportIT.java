@@ -67,6 +67,7 @@ import org.junit.Test;
  */
 public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase {
 
+    private static final String ORDER_FIELD = "topic";
     private static final String BASE_JSON_DIR_PATH = "org/dspace/app/openaire-events/";
 
     private QAEventService qaEventService = new DSpace().getSingletonService(QAEventService.class);
@@ -168,7 +169,8 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         assertThat(qaEventService.findAllSources(context, 0, 20), hasItem(QASourceMatcher.with(OPENAIRE_SOURCE, 5L)));
 
-        List<QATopic> topicList = qaEventService.findAllTopicsBySource(context, OPENAIRE_SOURCE, 0, 20);
+        List<QATopic> topicList = qaEventService.findAllTopicsBySource(context, OPENAIRE_SOURCE, 0, 20,
+                                                                                ORDER_FIELD, false);
         assertThat(topicList, hasItem(QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MORE_PROJECT, 1L)));
         assertThat(topicList, hasItem(QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MORE_PID, 1L)));
         assertThat(topicList, hasItem(QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID, 1L)));
@@ -224,7 +226,8 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         assertThat(qaEventService.findAllSources(context, 0, 20), hasItem(QASourceMatcher.with(OPENAIRE_SOURCE, 3L)));
 
-        List<QATopic> topicList = qaEventService.findAllTopicsBySource(context, OPENAIRE_SOURCE, 0, 20);
+        List<QATopic> topicList = qaEventService.findAllTopicsBySource(context, OPENAIRE_SOURCE, 0, 20,
+                                                                                ORDER_FIELD, false);
         assertThat(topicList, hasItem(QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 1L)));
         assertThat(topicList, hasItem(QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MISSING_PROJECT, 1L)));
         assertThat(topicList, hasItem(QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MORE_PID, 1L)));
@@ -265,7 +268,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         assertThat(qaEventService.findAllSources(context, 0, 20), hasItem(QASourceMatcher.with(OPENAIRE_SOURCE, 1L)));
 
-        assertThat(qaEventService.findAllTopicsBySource(context, OPENAIRE_SOURCE, 0, 20),
+        assertThat(qaEventService.findAllTopicsBySource(context, OPENAIRE_SOURCE, 0, 20, ORDER_FIELD, false),
                 contains(QATopicMatcher.with(org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 1L)));
 
         String abstractMessage = "{\"abstracts[0]\":\"Missing Abstract\"}";
@@ -293,13 +296,12 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         assertThat(qaEventService.findAllSources(context, 0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 0L)));
 
-        assertThat(qaEventService.findAllTopics(context, 0, 20), empty());
+        assertThat(qaEventService.findAllTopics(context, 0, 20, ORDER_FIELD, false), empty());
 
         verifyNoInteractions(mockBrokerClient);
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testImportFromOpenaireBroker() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -340,7 +342,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         assertThat(qaEventService.findAllSources(context, 0, 20), hasItem(QASourceMatcher.with(OPENAIRE_SOURCE, 6L)));
 
-        List<QATopic> topicList = qaEventService.findAllTopicsBySource(context, OPENAIRE_SOURCE, 0, 20);
+        List<QATopic> topicList = qaEventService.findAllTopicsBySource(context, OPENAIRE_SOURCE,0,20,ORDER_FIELD,false);
         assertThat(topicList, hasItem(QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MORE_PROJECT, 1L)));
         assertThat(topicList, hasItem(QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MORE_PID, 1L)));
         assertThat(topicList, hasItem(QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID, 1L)));
@@ -395,7 +397,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         assertThat(qaEventService.findAllSources(context, 0, 20), contains(QASourceMatcher.with(OPENAIRE_SOURCE, 0L)));
 
-        assertThat(qaEventService.findAllTopics(context, 0, 20), empty());
+        assertThat(qaEventService.findAllTopics(context, 0, 20,ORDER_FIELD, false), empty());
 
         verify(mockBrokerClient).listSubscriptions(openaireURL, "user@test.com");
 
@@ -445,7 +447,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         assertThat(qaEventService.findAllSources(context, 0, 20), hasItem(QASourceMatcher.with(OPENAIRE_SOURCE, 6L)));
 
-        List<QATopic> topicList = qaEventService.findAllTopicsBySource(context, OPENAIRE_SOURCE, 0, 20);
+        List<QATopic> topicList = qaEventService.findAllTopicsBySource(context, OPENAIRE_SOURCE,0,20,ORDER_FIELD,false);
         assertThat(topicList, hasItem(QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MORE_PROJECT, 1L)));
         assertThat(topicList, hasItem(QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID, 1L)));
         assertThat(topicList, hasItem(QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MORE_PID, 1L)));

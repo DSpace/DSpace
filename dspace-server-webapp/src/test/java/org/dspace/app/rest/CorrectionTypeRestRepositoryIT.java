@@ -43,7 +43,7 @@ public class CorrectionTypeRestRepositoryIT extends AbstractControllerIntegratio
     private AuthorizeService authorizeService;
 
     @Test
-    public void findAllTest() throws Exception {
+    public void findAllAdminTest() throws Exception {
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/config/correctiontypes"))
                              .andExpect(status().isOk())
@@ -64,7 +64,34 @@ public class CorrectionTypeRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void findOneTest() throws Exception {
+    public void findAllEPersonTest() throws Exception {
+        String ePersonToken = getAuthToken(eperson.getEmail(), password);
+        getClient(ePersonToken).perform(get("/api/config/correctiontypes"))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(2)))
+                               .andExpect(jsonPath("$._embedded.correctiontypes", containsInAnyOrder(
+                                    allOf(
+                                       hasJsonPath("$.id", equalTo("request-withdrawn")),
+                                       hasJsonPath("$.topic", equalTo("REQUEST/WITHDRAWN")),
+                                       hasJsonPath("$.creationForm", equalTo("provideReason")),
+                                       hasJsonPath("$.type", equalTo("correctiontype"))
+                                    ),
+                                 allOf(
+                                   hasJsonPath("$.id", equalTo("request-reinstate")),
+                                   hasJsonPath("$.topic", equalTo("REQUEST/REINSTATE")),
+                                   hasJsonPath("$.type", equalTo("correctiontype"))
+                                   )
+                                 )));
+    }
+
+    @Test
+    public void findAllUnauthorizedTest() throws Exception {
+        getClient().perform(get("/api/config/correctiontypes"))
+                   .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void findOneAdminTest() throws Exception {
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/config/correctiontypes/request-withdrawn"))
                              .andExpect(status().isOk())
@@ -72,6 +99,23 @@ public class CorrectionTypeRestRepositoryIT extends AbstractControllerIntegratio
                              .andExpect(jsonPath("$.topic", equalTo("REQUEST/WITHDRAWN")))
                              .andExpect(jsonPath("$.creationForm", equalTo("provideReason")))
                              .andExpect(jsonPath("$.type", equalTo("correctiontype")));
+    }
+
+    @Test
+    public void findOneEPersonTest() throws Exception {
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        getClient(epersonToken).perform(get("/api/config/correctiontypes/request-withdrawn"))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$.id", equalTo("request-withdrawn")))
+                               .andExpect(jsonPath("$.topic", equalTo("REQUEST/WITHDRAWN")))
+                               .andExpect(jsonPath("$.creationForm", equalTo("provideReason")))
+                               .andExpect(jsonPath("$.type", equalTo("correctiontype")));
+    }
+
+    @Test
+    public void findOneUnauthorizedTest() throws Exception {
+        getClient().perform(get("/api/config/correctiontypes/request-withdrawn"))
+                   .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -240,7 +284,7 @@ public class CorrectionTypeRestRepositoryIT extends AbstractControllerIntegratio
     }
 
     @Test
-    public void findByTopicTest() throws Exception {
+    public void findByTopicAdminTest() throws Exception {
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken).perform(get("/api/config/correctiontypes/search/findByTopic")
                              .param("topic", "REQUEST/WITHDRAWN"))
@@ -249,6 +293,25 @@ public class CorrectionTypeRestRepositoryIT extends AbstractControllerIntegratio
                              .andExpect(jsonPath("$.topic", equalTo("REQUEST/WITHDRAWN")))
                              .andExpect(jsonPath("$.creationForm", equalTo("provideReason")))
                              .andExpect(jsonPath("$.type", equalTo("correctiontype")));
+    }
+
+    @Test
+    public void findByTopicEPersonTest() throws Exception {
+        String ePersonToken = getAuthToken(eperson.getEmail(), password);
+        getClient(ePersonToken).perform(get("/api/config/correctiontypes/search/findByTopic")
+                               .param("topic", "REQUEST/WITHDRAWN"))
+                               .andExpect(status().isOk())
+                               .andExpect(jsonPath("$.id", equalTo("request-withdrawn")))
+                               .andExpect(jsonPath("$.topic", equalTo("REQUEST/WITHDRAWN")))
+                               .andExpect(jsonPath("$.creationForm", equalTo("provideReason")))
+                               .andExpect(jsonPath("$.type", equalTo("correctiontype")));
+    }
+
+    @Test
+    public void findByTopicUnauthorizedTest() throws Exception {
+        getClient().perform(get("/api/config/correctiontypes/search/findByTopic")
+                   .param("topic", "REQUEST/WITHDRAWN"))
+                   .andExpect(status().isUnauthorized());
     }
 
 }
