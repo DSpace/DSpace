@@ -8,6 +8,10 @@
 package org.dspace.app.rest.model;
 
 /**
+ * The CorrectionTypeQAEventMessageRest class implements the QAEventMessageRest
+ * interface and represents a message structure for Quality Assurance (QA)
+ * events related to correction types.
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
  */
 public class CorrectionTypeQAEventMessageRest implements QAEventMessageRest {

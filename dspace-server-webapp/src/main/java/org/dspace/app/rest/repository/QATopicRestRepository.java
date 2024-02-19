@@ -20,6 +20,7 @@ import org.dspace.qaevent.service.QAEventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -61,8 +62,12 @@ public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, Str
     public Page<QATopicRest> findBySource(@Parameter(value = "source", required = true) String source,
            Pageable pageable) {
         Context context = obtainContext();
+        boolean ascending = false;
+        if (pageable.getSort() != null && pageable.getSort().getOrderFor(ORDER_FIELD) != null) {
+            ascending = pageable.getSort().getOrderFor(ORDER_FIELD).getDirection() == Direction.ASC;
+        }
         List<QATopic> topics = qaEventService.findAllTopicsBySource(context, source,
-                                              pageable.getOffset(), pageable.getPageSize());
+                                              pageable.getOffset(), pageable.getPageSize(), ORDER_FIELD, ascending);
         long count = qaEventService.countTopicsBySource(context, source);
         if (topics == null) {
             return null;
@@ -73,11 +78,14 @@ public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, Str
     @SearchRestMethod(name = "byTarget")
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public Page<QATopicRest> findByTarget(@Parameter(value = "target", required = true) UUID target,
-        @Parameter(value = "source", required = true) String source,
-        Pageable pageable) {
+        @Parameter(value = "source", required = true) String source, Pageable pageable) {
         Context context = obtainContext();
+        boolean ascending = false;
+        if (pageable.getSort() != null && pageable.getSort().getOrderFor(ORDER_FIELD) != null) {
+            ascending = pageable.getSort().getOrderFor(ORDER_FIELD).getDirection() == Direction.ASC;
+        }
         List<QATopic> topics = qaEventService.findAllTopicsBySourceAndTarget(context, source, target,
-                                              pageable.getOffset(), pageable.getPageSize());
+                                              pageable.getOffset(), pageable.getPageSize(), ORDER_FIELD, ascending);
         long count = qaEventService.countTopicsBySourceAndTarget(context, source, target);
         if (topics == null) {
             return null;
