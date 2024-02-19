@@ -132,20 +132,19 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public long countTopicsBySource(Context context, String source) {
-        if (isNotSupportedSource(source)
-            || !qaSecurityService.canSeeSource(context, context.getCurrentUser(), source)) {
+    public long countTopicsBySource(Context context, String sourceName) {
+        var currentUser = context.getCurrentUser();
+        if (isNotSupportedSource(sourceName) || !qaSecurityService.canSeeSource(context, currentUser, sourceName)) {
             return 0;
         }
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
-        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context,
-                context.getCurrentUser(), source);
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, sourceName);
         solrQuery.setQuery(securityQuery.orElse("*:*"));
         solrQuery.setFacet(true);
         solrQuery.setFacetMinCount(1);
         solrQuery.addFacetField(TOPIC);
-        solrQuery.addFilterQuery("source:" + source);
+        solrQuery.addFilterQuery("source:" + sourceName);
         QueryResponse response;
         try {
             response = getSolr().query(solrQuery);
@@ -157,16 +156,14 @@ public class QAEventServiceImpl implements QAEventService {
 
     @Override
     public QATopic findTopicBySourceAndNameAndTarget(Context context, String sourceName, String topicName,UUID target) {
-        if (isNotSupportedSource(sourceName)
-                || !qaSecurityService.canSeeSource(context, context.getCurrentUser(), sourceName)) {
+        var currentUser = context.getCurrentUser();
+        if (isNotSupportedSource(sourceName) || !qaSecurityService.canSeeSource(context, currentUser, sourceName)) {
             return null;
         }
         SolrQuery solrQuery = new SolrQuery();
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, sourceName);
         solrQuery.setRows(0);
-        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context,
-                context.getCurrentUser(), sourceName);
         solrQuery.setQuery(securityQuery.orElse("*:*"));
-
         solrQuery.addFilterQuery(SOURCE + ":\"" + sourceName + "\"");
         solrQuery.addFilterQuery(TOPIC + ":\"" + topicName + "\"");
         if (target != null) {
@@ -243,27 +240,29 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public List<QATopic> findAllTopics(Context context, long offset, long count) {
-        return findAllTopicsBySource(context, null, offset, count);
+    public List<QATopic> findAllTopics(Context context, long offset, long count, String orderField, boolean ascending) {
+        return findAllTopicsBySource(context, null, offset, count, orderField, ascending);
     }
 
     @Override
-    public List<QATopic> findAllTopicsBySource(Context context, String source, long offset, long count) {
+    public List<QATopic> findAllTopicsBySource(Context context, String sourceName, long offset, long count,
+                                                                String orderField, boolean ascending) {
         var currentUser = context.getCurrentUser();
-        if (isNotSupportedSource(source) || !qaSecurityService.canSeeSource(context, currentUser, source)) {
+        if (isNotSupportedSource(sourceName) || !qaSecurityService.canSeeSource(context, currentUser, sourceName)) {
             return List.of();
         }
 
-        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, source);
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, sourceName);
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
+        solrQuery.setSort(orderField, ascending ? ORDER.asc : ORDER.desc);
         solrQuery.setQuery(securityQuery.orElse("*:*"));
         solrQuery.setFacet(true);
         solrQuery.setFacetMinCount(1);
         solrQuery.setFacetLimit((int) (offset + count));
         solrQuery.addFacetField(TOPIC);
-        if (source != null) {
-            solrQuery.addFilterQuery(SOURCE + ":" + source);
+        if (sourceName != null) {
+            solrQuery.addFilterQuery(SOURCE + ":" + sourceName);
         }
         QueryResponse response;
         List<QATopic> topics = new ArrayList<>();
@@ -277,7 +276,7 @@ public class QAEventServiceImpl implements QAEventService {
                     continue;
                 }
                 QATopic topic = new QATopic();
-                topic.setSource(source);
+                topic.setSource(sourceName);
                 topic.setKey(c.getName());
                 topic.setTotalEvents(c.getCount());
                 topic.setLastEvent(new Date());
@@ -320,10 +319,17 @@ public class QAEventServiceImpl implements QAEventService {
         }
     }
 
+    /**
+     * Sends an email notification to the system administrator about a new
+     * Quality Assurance (QA) request event. The email includes details such as the
+     * topic, target, and message associated with the QA event.
+     *
+     * @param qaEvent The Quality Assurance event for which the notification is generated.
+     */
     public void sentEmailToAdminAboutNewRequest(QAEvent qaEvent) {
         try {
             Email email = Email.getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), "qaevent_admin_notification"));
-            email.addRecipient(configurationService.getProperty("mail.admin"));
+            email.addRecipient(configurationService.getProperty("qaevent.mail.notification"));
             email.addArgument(qaEvent.getTopic());
             email.addArgument(qaEvent.getTarget());
             email.addArgument(qaEvent.getMessage());
@@ -335,7 +341,7 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public QAEvent findEventByEventId(Context context, String eventId) {
+    public QAEvent findEventByEventId(String eventId) {
         SolrQuery solrQuery = new SolrQuery("*:*");
         solrQuery.addFilterQuery(EVENT_ID + ":\"" + eventId + "\"");
         try {
@@ -354,9 +360,9 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public List<QAEvent> findEventsByTopic(Context context, String source, String topic, long offset, int size) {
+    public List<QAEvent> findEventsByTopic(Context context, String sourceName, String topic, long offset, int size) {
         EPerson currentUser = context.getCurrentUser();
-        if (isNotSupportedSource(source) || !qaSecurityService.canSeeSource(context, currentUser, source)) {
+        if (isNotSupportedSource(sourceName) || !qaSecurityService.canSeeSource(context, currentUser, sourceName)) {
             return List.of();
         }
 
@@ -364,11 +370,11 @@ public class QAEventServiceImpl implements QAEventService {
         solrQuery.setStart(((Long) offset).intValue());
         solrQuery.setRows(size);
         solrQuery.setSort(TRUST, ORDER.desc);
-        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, source);
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, sourceName);
         solrQuery.setQuery(securityQuery.orElse("*:*"));
 
         solrQuery.setQuery(TOPIC + ":" + topic.replaceAll("!", "/"));
-        solrQuery.addFilterQuery(SOURCE + ":\"" + source + "\"");
+        solrQuery.addFilterQuery(SOURCE + ":\"" + sourceName + "\"");
 
         try {
             QueryResponse response = getSolr().query(solrQuery);
@@ -388,18 +394,18 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public long countEventsByTopic(Context context, String source, String topic) {
+    public long countEventsByTopic(Context context, String sourceName, String topic) {
         EPerson currentUser = context.getCurrentUser();
-        if (isNotSupportedSource(source) || !qaSecurityService.canSeeSource(context, currentUser, source)) {
+        if (isNotSupportedSource(sourceName) || !qaSecurityService.canSeeSource(context, currentUser, sourceName)) {
             return 0;
         }
 
-        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, source);
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, sourceName);
 
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
         solrQuery.setQuery(securityQuery.orElse("*:*"));
-        solrQuery.addFilterQuery(SOURCE + ":\"" + source + "\"");
+        solrQuery.addFilterQuery(SOURCE + ":\"" + sourceName + "\"");
         solrQuery.setQuery(TOPIC + ":" + topic.replaceAll("!", "/"));
         try {
             return getSolr().query(solrQuery).getResults().getNumFound();
@@ -525,19 +531,19 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public long countEventsByTopicAndTarget(Context context, String source, String topic, UUID target) {
+    public long countEventsByTopicAndTarget(Context context, String sourceName, String topic, UUID target) {
         var currentUser = context.getCurrentUser();
-        if (isNotSupportedSource(source) || !qaSecurityService.canSeeSource(context, currentUser, source)) {
+        if (isNotSupportedSource(sourceName) || !qaSecurityService.canSeeSource(context, currentUser, sourceName)) {
             return 0;
         }
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
-        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, source);
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, sourceName);
         solrQuery.setQuery(securityQuery.orElse("*:*"));
         if (target != null) {
             solrQuery.addFilterQuery(RESOURCE_UUID + ":\"" + target.toString() + "\"");
         }
-        solrQuery.addFilterQuery(SOURCE + ":\"" + source + "\"");
+        solrQuery.addFilterQuery(SOURCE + ":\"" + sourceName + "\"");
         solrQuery.addFilterQuery(TOPIC + ":\"" + topic + "\"");
         QueryResponse response = null;
         try {
@@ -549,8 +555,8 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public List<QAEvent> findEventsByTopicAndPageAndTarget(Context context, String source, String topic, long offset,
-            int pageSize, UUID target) {
+    public List<QAEvent> findEventsByTopicAndPageAndTarget(Context context, String source, String topic, UUID target,
+            long offset, int pageSize) {
         var currentUser = context.getCurrentUser();
         if (isNotSupportedSource(source) || !qaSecurityService.canSeeSource(context, currentUser, source)) {
             return List.of();
@@ -649,7 +655,7 @@ public class QAEventServiceImpl implements QAEventService {
 
     @Override
     public List<QATopic> findAllTopicsBySourceAndTarget(Context context, String source, UUID target, long offset,
-            int pageSize) {
+            int pageSize, String orderField, boolean ascending) {
         var currentUser = context.getCurrentUser();
         if (isNotSupportedSource(source) || !qaSecurityService.canSeeSource(context, currentUser, source)) {
             return List.of();
@@ -657,6 +663,7 @@ public class QAEventServiceImpl implements QAEventService {
         Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, source);
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
+        solrQuery.setSort(orderField, ascending ? ORDER.asc : ORDER.desc);
         solrQuery.setQuery(securityQuery.orElse("*:*"));
         solrQuery.setFacet(true);
         solrQuery.setFacetMinCount(1);
