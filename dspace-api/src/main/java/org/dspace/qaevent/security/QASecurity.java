@@ -14,6 +14,10 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
 /**
+ * The QASecurity interface defines methods for implementing security strategies
+ * related to Quality Assurance (QA) events. Classes implementing this interface should
+ * provide logic to filter and determine visibility of QA events based on the user's permissions.
+ * 
  * @author Andrea Bollini (andrea.bollini at 4science.com)
  */
 public interface QASecurity {

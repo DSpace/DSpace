@@ -30,6 +30,7 @@ public class AdministratorsOnlyQASecurity implements QASecurity {
         return Optional.empty();
     }
 
+    @Override
     public boolean canSeeQASource(Context context, EPerson user) {
         try {
             return authorizeService.isAdmin(context, user);
@@ -38,6 +39,7 @@ public class AdministratorsOnlyQASecurity implements QASecurity {
         }
     }
 
+    @Override
     public boolean canSeeQAEvent(Context context, EPerson user, QAEvent qaEvent) {
         try {
             return authorizeService.isAdmin(context, user);

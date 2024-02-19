@@ -20,6 +20,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * QAReinstateRequestAction is an implementation of the QualityAssuranceAction interface.
+ * It is responsible for applying a correction to reinstate a specified item.
+ *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
  */
 public class QAReinstateRequestAction implements QualityAssuranceAction {

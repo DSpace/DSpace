@@ -27,22 +27,27 @@ public interface QAEventService {
     /**
      * Find all the event's topics.
      *
-     * @param  context  the DSpace context
-     * @param  offset   the offset to apply
-     * @return          the topics list
+     * @param  context     the DSpace context
+     * @param  offset      the offset to apply
+     * @param  orderField  the field to order for
+     * @param  ascending   true if the order should be ascending, false otherwise
+     * @return             the topics list
      */
-    public List<QATopic> findAllTopics(Context context, long offset, long pageSize);
+    public List<QATopic> findAllTopics(Context context, long offset, long count, String orderField, boolean ascending);
 
     /**
      * Find all the event's topics related to the given source.
      *
-     * @param  context the DSpace context
-     * @param  source  the source to search for
-     * @param  offset  the offset to apply
-     * @param  count   the page size
-     * @return         the topics list
+     * @param  context     the DSpace context
+     * @param  source      the source to search for
+     * @param  offset      the offset to apply
+     * @param  count       the page size
+     * @param  orderField  the field to order for
+     * @param  ascending   true if the order should be ascending, false otherwise
+     * @return             the topics list
      */
-    public List<QATopic> findAllTopicsBySource(Context context, String source, long offset, long count);
+    public List<QATopic> findAllTopicsBySource(Context context, String source, long offset, long count,
+                                               String orderField, boolean ascending);
 
     /**
      * Count all the event's topics.
@@ -64,23 +69,23 @@ public interface QAEventService {
      * Find all the events by topic.
      *
      * @param  context    the DSpace context
-     * @param  source     the source name
+     * @param  sourceName the source name
      * @param  topic      the topic to search for
      * @param  offset     the offset to apply
      * @param  size       the page size
      * @return            the events
      */
-    public List<QAEvent> findEventsByTopic(Context context, String source, String topic, long offset, int size);
+    public List<QAEvent> findEventsByTopic(Context context, String sourceName, String topic, long offset, int size);
 
     /**
      * Find all the events by topic.
      *
-     * @param  context    the DSpace context
-     * @param  source     the source name
-     * @param  topic      the topic to search for
-     * @return            the events count
+     * @param  context     the DSpace context
+     * @param  sourceName  the source name
+     * @param  topic       the topic to search for
+     * @return             the events count
      */
-    public long countEventsByTopic(Context context, String source, String topic);
+    public long countEventsByTopic(Context context, String sourceName, String topic);
 
     /**
      * Find an event by the given id.
@@ -197,8 +202,8 @@ public interface QAEventService {
      * @param  target   the uuid of the QA event's target
      * @return          the events
      */
-    public List<QAEvent> findEventsByTopicAndPageAndTarget(Context context, String source, String topic, long offset,
-           int pageSize, UUID target);
+    public List<QAEvent> findEventsByTopicAndPageAndTarget(Context context, String source, String topic, UUID target,
+                                                           long offset, int pageSize);
 
     /**
      * Check if a qaevent with the provided id is visible to the current user according to the source security
@@ -255,6 +260,6 @@ public interface QAEventService {
      * @return           the topics list
      */
     public List<QATopic> findAllTopicsBySourceAndTarget(Context context, String source, UUID target, long offset,
-            int pageSize);
+            int pageSize, String orderField, boolean ascending);
 
 }

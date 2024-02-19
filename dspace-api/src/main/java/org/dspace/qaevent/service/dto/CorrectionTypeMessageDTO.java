@@ -10,7 +10,9 @@ package org.dspace.qaevent.service.dto;
 import java.io.Serializable;
 
 /**
- * Implementation of {@link QAMessageDTO} that model empty message.
+ * The CorrectionTypeMessageDTO class implements the QAMessageDTO interface
+ * and represents a Data Transfer Object (DTO) for holding information
+ * related to a correction type message in the context of Quality Assurance (QA).
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */

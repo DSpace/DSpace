@@ -31,11 +31,10 @@ public class CorrectionTypeServiceImpl implements CorrectionTypeService {
 
     @Override
     public CorrectionType findOne(String id) {
-        List<CorrectionType> correctionTypes = findAll();
-        return correctionTypes.stream()
-                              .filter(correctionType -> correctionType.getId().equals(id))
-                              .findFirst()
-                              .orElse(null);
+        return findAll().stream()
+                        .filter(correctionType -> correctionType.getId().equals(id))
+                        .findFirst()
+                        .orElse(null);
     }
 
     @Override
@@ -56,11 +55,10 @@ public class CorrectionTypeServiceImpl implements CorrectionTypeService {
 
     @Override
     public CorrectionType findByTopic(String topic) {
-        List<CorrectionType> correctionTypes = findAll();
-        return correctionTypes.stream()
-                              .filter(correctionType -> correctionType.getTopic().equals(topic))
-                              .findFirst()
-                              .orElse(null);
+        return findAll().stream()
+                        .filter(correctionType -> correctionType.getTopic().equals(topic))
+                        .findFirst()
+                        .orElse(null);
     }
 
 }

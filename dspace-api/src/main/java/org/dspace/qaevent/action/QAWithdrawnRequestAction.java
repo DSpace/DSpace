@@ -20,6 +20,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * QAWithdrawnRequestAction is an implementation of the QualityAssuranceAction interface.
+ * It is responsible for applying a correction to withdraw a specified item.
+ * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
  */
 public class QAWithdrawnRequestAction implements QualityAssuranceAction {
