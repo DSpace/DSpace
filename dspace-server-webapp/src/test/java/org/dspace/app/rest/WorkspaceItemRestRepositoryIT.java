@@ -8601,6 +8601,536 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .content("/api/submission/workspaceitems/" + workspaceItem.getID())
                 .contentType(textUriContentType))
                 .andExpect(status().isCreated());
-
     }
+
+    @Test
+    public void patchAddPrimaryTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("TITLE test")
+                                                  .withIssueDate("2023-10-18")
+                                                  .withFulltext("simple-article.pdf",
+                                                                "/local/path/simple-article.pdf", pdf)
+                                                  .withSubject("testEntry")
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<String> idRef = new AtomicReference<String>();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.upload.primary", nullValue()))
+                             .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(),
+                                    "$.sections.upload.files[0].uuid")));
+
+        List<Operation> addPrimaryOps = new ArrayList<Operation>();
+        addPrimaryOps.add(new AddOperation("/sections/upload/primary", idRef.get()));
+
+        String patchBody = getPatchContent(addPrimaryOps);
+        getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                             .content(patchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk());
+
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.upload.primary", is(idRef.get())));
+    }
+
+    @Test
+    public void patchAddPrimaryBitstreamWithOwnerTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        context.setCurrentUser(eperson);
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("TITLE test")
+                                                  .withIssueDate("2023-10-18")
+                                                  .withFulltext("simple-article.pdf",
+                                                                "/local/path/simple-article.pdf", pdf)
+                                                  .withSubject("testEntry")
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<String> idRef = new AtomicReference<String>();
+
+        String tokenSubmitter = getAuthToken(eperson.getEmail(), password);
+        getClient(tokenSubmitter).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                                 .andExpect(status().isOk())
+                                 .andExpect(jsonPath("$.sections.upload.primary", nullValue()))
+                                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(),
+                                        "$.sections.upload.files[0].uuid")));
+
+        List<Operation> addPrimaryOps = new ArrayList<Operation>();
+        addPrimaryOps.add(new AddOperation("/sections/upload/primary", idRef.get()));
+
+        String patchBody = getPatchContent(addPrimaryOps);
+        getClient(tokenSubmitter).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                                 .content(patchBody)
+                                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                                 .andExpect(status().isOk());
+
+        getClient(tokenSubmitter).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                                 .andExpect(status().isOk())
+                                 .andExpect(jsonPath("$.sections.upload.primary", is(idRef.get())));
+    }
+
+    @Test
+    public void patchAddPrimaryBitstreamWithNotOwnerTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                                          .withEmail("test-email@mail.com")
+                                          .withPassword(password)
+                                          .build();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        context.setCurrentUser(submitter);
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("TITLE test")
+                                                  .withIssueDate("2023-10-18")
+                                                  .withFulltext("simple-article.pdf",
+                                                                "/local/path/simple-article.pdf", pdf)
+                                                  .withSubject("testEntry")
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<String> idRef = new AtomicReference<String>();
+
+        String tokenSubmitter = getAuthToken(submitter.getEmail(), password);
+        getClient(tokenSubmitter).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                                 .andExpect(status().isOk())
+                                 .andExpect(jsonPath("$.sections.upload.primary", nullValue()))
+                                 .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(),
+                                        "$.sections.upload.files[0].uuid")));
+
+        List<Operation> addPrimaryOps = new ArrayList<Operation>();
+        addPrimaryOps.add(new AddOperation("/sections/upload/primary", idRef.get()));
+
+        String tokenNotSubmitter = getAuthToken(eperson.getEmail(), password);
+
+        // non submitter cannot add primary bitstream
+        getClient(tokenNotSubmitter).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                                    .content(getPatchContent(addPrimaryOps))
+                                    .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                                    .andExpect(status().isForbidden());
+
+        // even anonymous users cannot add primary bitstream
+        getClient().perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                   .content(getPatchContent(addPrimaryOps))
+                   .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                   .andExpect(status().isUnauthorized());
+
+        getClient(tokenSubmitter).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                                 .andExpect(status().isOk())
+                                 .andExpect(jsonPath("$.sections.upload.primary", nullValue()));
+    }
+
+    @Test
+    public void patchAddPrimaryBitstreamUpdateAlredySettedOneTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+        InputStream pdf2 = getClass().getResourceAsStream("bibtex-test.bib");
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("TITLE test")
+                                                  .withIssueDate("2023-10-18")
+                                                  .withFulltext("simple-article.pdf",
+                                                                "/local/path/simple-article.pdf", pdf)
+                                                  .withFulltext("bibtex-test.bib",
+                                                                "/local/path/bibtex-test.bib", pdf2)
+                                                  .withSubject("testEntry")
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<String> idFirstPdf = new AtomicReference<String>();
+        AtomicReference<String> idSecondPdf = new AtomicReference<String>();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.upload.primary", nullValue()))
+                             .andDo(result -> idFirstPdf.set(read(result.getResponse().getContentAsString(),
+                                    "$.sections.upload.files[0].uuid")))
+                             .andDo(result -> idSecondPdf.set(read(result.getResponse().getContentAsString(),
+                                     "$.sections.upload.files[1].uuid")));
+
+        List<Operation> addPrimaryOps = new ArrayList<Operation>();
+        addPrimaryOps.add(new AddOperation("/sections/upload/primary", idFirstPdf.get()));
+
+        String patchBody = getPatchContent(addPrimaryOps);
+        getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                             .content(patchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk());
+
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.upload.primary", is(idFirstPdf.get())));
+
+        List<Operation> addPrimaryOps2 = new ArrayList<Operation>();
+        addPrimaryOps2.add(new AddOperation("/sections/upload/primary", idSecondPdf.get()));
+
+        getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                             .content(getPatchContent(addPrimaryOps2))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk());
+
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.upload.primary", is(idSecondPdf.get())));
+    }
+
+    @Test
+    public void patchAddPrimaryUUIDofNotExistingBitstreamTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("TITLE test")
+                                                  .withIssueDate("2023-10-18")
+                                                  .withFulltext("simple-article.pdf",
+                                                                "/local/path/simple-article.pdf", pdf)
+                                                  .withSubject("testEntry")
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.upload.primary", nullValue()));
+
+        List<Operation> addOperations = new ArrayList<Operation>();
+        addOperations.add(new AddOperation("/sections/upload/primary", UUID.randomUUID()));
+
+        String patchBody = getPatchContent(addOperations);
+        getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                             .content(patchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isUnprocessableEntity());
+
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.upload.primary", nullValue()));
+    }
+
+    @Test
+    public void patchAddPrimaryWrongUUIDTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("TITLE test")
+                                                  .withIssueDate("2023-10-18")
+                                                  .withFulltext("simple-article.pdf",
+                                                                "/local/path/simple-article.pdf", pdf)
+                                                  .withSubject("testEntry")
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.upload.primary", nullValue()));
+
+        List<Operation> addOperations = new ArrayList<Operation>();
+        addOperations.add(new AddOperation("/sections/upload/primary", "wrong-uuid"));
+
+        String patchBody = getPatchContent(addOperations);
+        getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                             .content(patchBody)
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isUnprocessableEntity());
+
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.upload.primary", nullValue()));
+    }
+
+    @Test
+    public void patchRemovePrimaryTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("TITLE test")
+                                                  .withIssueDate("2023-10-18")
+                                                  .withFulltext("simple-article.pdf",
+                                                                "/local/path/simple-article.pdf", pdf)
+                                                  .withSubject("testEntry")
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<String> idRef = new AtomicReference<String>();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.upload.primary", nullValue()))
+                             .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(),
+                                    "$.sections.upload.files[0].uuid")));
+
+        List<Operation> addOperations = new ArrayList<Operation>();
+        addOperations.add(new AddOperation("/sections/upload/primary", idRef.get()));
+
+        getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                             .content(getPatchContent(addOperations))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk());
+
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.upload.primary", is(idRef.get())));
+
+        List<Operation> removeOps = new ArrayList<Operation>();
+        removeOps.add(new RemoveOperation("/sections/upload/primary"));
+
+        getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                             .content(getPatchContent(removeOps))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk());
+
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.upload.primary", nullValue()));
+    }
+
+    @Test
+    public void patchReplacePrimaryTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+        InputStream pdf2 = getClass().getResourceAsStream("bibtex-test.bib");
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("TITLE test")
+                                                  .withIssueDate("2023-10-18")
+                                                  .withFulltext("simple-article.pdf",
+                                                                "/local/path/simple-article.pdf", pdf)
+                                                  .withFulltext("bibtex-test.bib",
+                                                                "/local/path/bibtex-test.bib", pdf2)
+                                                  .withSubject("testEntry")
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<String> idFirstPdf = new AtomicReference<String>();
+        AtomicReference<String> idSecondPdf = new AtomicReference<String>();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.upload.primary", nullValue()))
+                             .andDo(result -> idFirstPdf.set(read(result.getResponse().getContentAsString(),
+                                    "$.sections.upload.files[0].uuid")))
+                             .andDo(result -> idSecondPdf.set(read(result.getResponse().getContentAsString(),
+                                     "$.sections.upload.files[1].uuid")));
+
+        List<Operation> addOperations = new ArrayList<Operation>();
+        addOperations.add(new AddOperation("/sections/upload/primary", idFirstPdf.get()));
+
+        getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                             .content(getPatchContent(addOperations))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk());
+
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.upload.primary", is(idFirstPdf.get())));
+
+        List<Operation> replaceOperations = new ArrayList<Operation>();
+        replaceOperations.add(new ReplaceOperation("/sections/upload/primary", idSecondPdf.get()));
+
+        getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                             .content(getPatchContent(replaceOperations))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk());
+
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.upload.primary", is(idSecondPdf.get())));
+    }
+
+    @Test
+    public void patchReplacePrimaryWhenPrimariIsUnsetTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+        InputStream pdf2 = getClass().getResourceAsStream("bibtex-test.bib");
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("TITLE test")
+                                                  .withIssueDate("2023-10-18")
+                                                  .withFulltext("simple-article.pdf",
+                                                                "/local/path/simple-article.pdf", pdf)
+                                                  .withSubject("testEntry")
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<String> idPdf = new AtomicReference<String>();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.upload.primary", nullValue()))
+                             .andDo(result -> idPdf.set(read(result.getResponse().getContentAsString(),
+                                    "$.sections.upload.files[0].uuid")));
+
+        List<Operation> replaceOperations = new ArrayList<Operation>();
+        replaceOperations.add(new ReplaceOperation("/sections/upload/primary", idPdf.get()));
+
+        getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                             .content(getPatchContent(replaceOperations))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isUnprocessableEntity());
+
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.upload.primary", nullValue()));
+    }
+
+    @Test
+    public void patchReplaceProvidingWrongPrimaryTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
+        InputStream pdf = getClass().getResourceAsStream("simple-article.pdf");
+
+        WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                                                  .withTitle("TITLE test")
+                                                  .withIssueDate("2023-10-18")
+                                                  .withFulltext("simple-article.pdf",
+                                                                "/local/path/simple-article.pdf", pdf)
+                                                  .build();
+
+        context.restoreAuthSystemState();
+
+        AtomicReference<String> idFirstPdf = new AtomicReference<String>();
+
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.upload.primary", nullValue()))
+                             .andDo(result -> idFirstPdf.set(read(result.getResponse().getContentAsString(),
+                                    "$.sections.upload.files[0].uuid")));
+
+        List<Operation> addOperations = new ArrayList<Operation>();
+        addOperations.add(new AddOperation("/sections/upload/primary", idFirstPdf.get()));
+
+        getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                             .content(getPatchContent(addOperations))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk());
+
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.upload.primary", is(idFirstPdf.get())));
+
+        List<Operation> replaceOperations = new ArrayList<Operation>();
+        replaceOperations.add(new ReplaceOperation("/sections/upload/primary", UUID.randomUUID()));
+
+        getClient(tokenAdmin).perform(patch("/api/submission/workspaceitems/" + witem.getID())
+                             .content(getPatchContent(replaceOperations))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isUnprocessableEntity());
+
+        getClient(tokenAdmin).perform(get("/api/submission/workspaceitems/" + witem.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.sections.upload.primary", is(idFirstPdf.get())));
+    }
+
 }
