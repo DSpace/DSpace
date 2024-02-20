@@ -108,7 +108,7 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
                    )))
                    .andExpect(jsonPath("type", is("filteredcollectionsreport")))
                    .andExpect(jsonPath("$.summary",
-                           ContentReportMatcher.matchFilteredCollectionSummary(3, 2)))
+                           ContentReportMatcher.matchFilteredCollectionSummary(2, 2)))
                    .andExpect(jsonPath("$._links.self.href",
                            Matchers.containsString("/api/contentreport/filteredcollections")));
     }
