@@ -27,7 +27,6 @@ public class CorrectionTypeConverter implements DSpaceConverter<CorrectionType, 
         targetRest.setProjection(projection);
         targetRest.setId(target.getId());
         targetRest.setTopic(target.getTopic());
-        targetRest.setCreationForm(target.getCreationForm());
         return targetRest;
     }
 

@@ -23,7 +23,6 @@ public class CorrectionTypeRest extends BaseObjectRest<String> {
     public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
 
     private String topic;
-    private String creationForm;
 
     public String getTopic() {
         return topic;
@@ -31,14 +30,6 @@ public class CorrectionTypeRest extends BaseObjectRest<String> {
 
     public void setTopic(String topic) {
         this.topic = topic;
-    }
-
-    public String getCreationForm() {
-        return creationForm;
-    }
-
-    public void setCreationForm(String creationForm) {
-        this.creationForm = creationForm;
     }
 
     @Override

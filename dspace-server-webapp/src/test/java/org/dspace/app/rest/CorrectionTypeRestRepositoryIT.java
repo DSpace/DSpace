@@ -52,7 +52,6 @@ public class CorrectionTypeRestRepositoryIT extends AbstractControllerIntegratio
                                  allOf(
                                    hasJsonPath("$.id", equalTo("request-withdrawn")),
                                    hasJsonPath("$.topic", equalTo("REQUEST/WITHDRAWN")),
-                                   hasJsonPath("$.creationForm", equalTo("provideReason")),
                                    hasJsonPath("$.type", equalTo("correctiontype"))
                                  ),
                                  allOf(
@@ -73,7 +72,6 @@ public class CorrectionTypeRestRepositoryIT extends AbstractControllerIntegratio
                                     allOf(
                                        hasJsonPath("$.id", equalTo("request-withdrawn")),
                                        hasJsonPath("$.topic", equalTo("REQUEST/WITHDRAWN")),
-                                       hasJsonPath("$.creationForm", equalTo("provideReason")),
                                        hasJsonPath("$.type", equalTo("correctiontype"))
                                     ),
                                  allOf(
@@ -97,7 +95,6 @@ public class CorrectionTypeRestRepositoryIT extends AbstractControllerIntegratio
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", equalTo("request-withdrawn")))
                              .andExpect(jsonPath("$.topic", equalTo("REQUEST/WITHDRAWN")))
-                             .andExpect(jsonPath("$.creationForm", equalTo("provideReason")))
                              .andExpect(jsonPath("$.type", equalTo("correctiontype")));
     }
 
@@ -108,7 +105,6 @@ public class CorrectionTypeRestRepositoryIT extends AbstractControllerIntegratio
                                .andExpect(status().isOk())
                                .andExpect(jsonPath("$.id", equalTo("request-withdrawn")))
                                .andExpect(jsonPath("$.topic", equalTo("REQUEST/WITHDRAWN")))
-                               .andExpect(jsonPath("$.creationForm", equalTo("provideReason")))
                                .andExpect(jsonPath("$.type", equalTo("correctiontype")));
     }
 
@@ -213,7 +209,6 @@ public class CorrectionTypeRestRepositoryIT extends AbstractControllerIntegratio
                                  allOf(
                                    hasJsonPath("$.id", equalTo("request-withdrawn")),
                                    hasJsonPath("$.topic", equalTo("REQUEST/WITHDRAWN")),
-                                   hasJsonPath("$.creationForm", equalTo("provideReason")),
                                    hasJsonPath("$.type", equalTo("correctiontype"))
                                    )
                               )));
@@ -238,7 +233,6 @@ public class CorrectionTypeRestRepositoryIT extends AbstractControllerIntegratio
                                  allOf(
                                    hasJsonPath("$.id", equalTo("request-withdrawn")),
                                    hasJsonPath("$.topic", equalTo("REQUEST/WITHDRAWN")),
-                                   hasJsonPath("$.creationForm", equalTo("provideReason")),
                                    hasJsonPath("$.type", equalTo("correctiontype"))
                                    )
                               )));
@@ -262,7 +256,6 @@ public class CorrectionTypeRestRepositoryIT extends AbstractControllerIntegratio
                                  allOf(
                                    hasJsonPath("$.id", equalTo("request-withdrawn")),
                                    hasJsonPath("$.topic", equalTo("REQUEST/WITHDRAWN")),
-                                   hasJsonPath("$.creationForm", equalTo("provideReason")),
                                    hasJsonPath("$.type", equalTo("correctiontype"))
                                    )
                               )));
@@ -291,7 +284,6 @@ public class CorrectionTypeRestRepositoryIT extends AbstractControllerIntegratio
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.id", equalTo("request-withdrawn")))
                              .andExpect(jsonPath("$.topic", equalTo("REQUEST/WITHDRAWN")))
-                             .andExpect(jsonPath("$.creationForm", equalTo("provideReason")))
                              .andExpect(jsonPath("$.type", equalTo("correctiontype")));
     }
 
@@ -303,7 +295,6 @@ public class CorrectionTypeRestRepositoryIT extends AbstractControllerIntegratio
                                .andExpect(status().isOk())
                                .andExpect(jsonPath("$.id", equalTo("request-withdrawn")))
                                .andExpect(jsonPath("$.topic", equalTo("REQUEST/WITHDRAWN")))
-                               .andExpect(jsonPath("$.creationForm", equalTo("provideReason")))
                                .andExpect(jsonPath("$.type", equalTo("correctiontype")));
     }
 
