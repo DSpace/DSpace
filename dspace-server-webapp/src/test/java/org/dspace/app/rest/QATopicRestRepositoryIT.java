@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.content.QAEvent.OPENAIRE_SOURCE;
 import static org.dspace.qaevent.service.impl.QAEventServiceImpl.QAEVENTS_SOURCES;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -48,7 +49,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void findOneTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        configurationService.setProperty(QAEVENTS_SOURCES, new String[] { "openaire", "test-source" });
+        configurationService.setProperty(QAEVENTS_SOURCES, new String[] { OPENAIRE_SOURCE, "test-source" });
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
@@ -79,12 +80,14 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String adminToken = getAuthToken(admin.getEmail(), password);
-        getClient(adminToken).perform(get("/api/integration/qualityassurancetopics/openaire:ENRICH!MISSING!PID"))
+        getClient(adminToken).perform(
+                              get("/api/integration/qualityassurancetopics/" + OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", QATopicMatcher.matchQATopicEntry(
                                                       QANotifyPatterns.TOPIC_ENRICH_MISSING_PID, 2)));
 
-        getClient(adminToken).perform(get("/api/integration/qualityassurancetopics/openaire:ENRICH!MISSING!ABSTRACT"))
+        getClient(adminToken).perform(get("/api/integration/qualityassurancetopics/"
+                                          + OPENAIRE_SOURCE + ":ENRICH!MISSING!ABSTRACT"))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$", QATopicMatcher.matchQATopicEntry(
                                                       QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 1)));
@@ -130,7 +133,8 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void findBySourceTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        configurationService.setProperty(QAEVENTS_SOURCES, new String[] { "openaire","test-source","test-source-2" });
+        configurationService.setProperty(QAEVENTS_SOURCES, new String[] {
+                                         OPENAIRE_SOURCE, "test-source", "test-source-2" });
 
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
@@ -172,7 +176,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/bySource")
-                            .param("source", "openaire"))
+                            .param("source", OPENAIRE_SOURCE))
                             .andExpect(status().isOk())
                             .andExpect(content().contentType(contentType))
                             .andExpect(jsonPath("$._embedded.qualityassurancetopics", Matchers.containsInAnyOrder(
@@ -218,7 +222,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/integration/qualityassurancetopics/search/bySource")
-                   .param("source", "openaire"))
+                   .param("source", OPENAIRE_SOURCE))
                    .andExpect(status().isUnauthorized());
     }
 
