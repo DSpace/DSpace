@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static org.dspace.app.rest.matcher.QASourceMatcher.matchQASourceEntry;
+import static org.dspace.qaevent.service.impl.QAEventServiceImpl.QAEVENTS_SOURCES;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -59,7 +60,7 @@ public class QASourceRestRepositoryIT extends AbstractControllerIntegrationTest 
 
         context.restoreAuthSystemState();
 
-        configurationService.setProperty("qaevent.sources", new String[] { "openaire","test-source","test-source-2" });
+        configurationService.setProperty(QAEVENTS_SOURCES, new String[] { "openaire","test-source","test-source-2" });
     }
 
     @Test

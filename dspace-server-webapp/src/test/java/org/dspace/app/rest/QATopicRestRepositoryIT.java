@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.qaevent.service.impl.QAEventServiceImpl.QAEVENTS_SOURCES;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -47,7 +48,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void findOneTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        configurationService.setProperty("qaevent.sources", new String[] { "openaire", "test-source" });
+        configurationService.setProperty(QAEVENTS_SOURCES, new String[] { "openaire", "test-source" });
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
@@ -129,7 +130,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void findBySourceTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        configurationService.setProperty("qaevent.sources", new String[] { "openaire","test-source","test-source-2" });
+        configurationService.setProperty(QAEVENTS_SOURCES, new String[] { "openaire","test-source","test-source-2" });
 
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")

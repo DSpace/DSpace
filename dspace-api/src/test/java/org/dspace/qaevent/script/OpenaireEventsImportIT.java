@@ -10,6 +10,7 @@ package org.dspace.qaevent.script;
 import static java.util.List.of;
 import static org.dspace.content.QAEvent.OPENAIRE_SOURCE;
 import static org.dspace.matcher.QAEventMatcher.pendingOpenaireEventWith;
+import static org.dspace.qaevent.service.impl.QAEventServiceImpl.QAEVENTS_SOURCES;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -98,7 +99,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
             .build();
 
         context.restoreAuthSystemState();
-        configurationService.setProperty("qaevent.sources", new String[] { QAEvent.OPENAIRE_SOURCE });
+        configurationService.setProperty(QAEVENTS_SOURCES, new String[] { QAEvent.OPENAIRE_SOURCE });
         ((OpenaireClientFactoryImpl) OpenaireClientFactory.getInstance()).setBrokerClient(mockBrokerClient);
     }
 
