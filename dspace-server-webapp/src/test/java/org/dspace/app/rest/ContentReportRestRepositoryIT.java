@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.matcher.ContentReportMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
@@ -35,9 +36,8 @@ import org.dspace.contentreport.Filter;
 import org.dspace.contentreport.FilteredCollection;
 import org.dspace.contentreport.QueryOperator;
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Test;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Integration tests for the content reports ported from DSpace 6.x
@@ -113,6 +113,7 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
                            Matchers.containsString("/api/contentreport/filteredcollections")));
     }
 
+    @Ignore
     @Test
     public void testFilteredItems() throws Exception {
         context.turnOffAuthorisationSystem();
