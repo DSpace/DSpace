@@ -12,8 +12,6 @@ import static org.dspace.correctiontype.WithdrawnCorrectionType.WITHDRAWAL_REINS
 
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.Objects;
-import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -67,12 +65,12 @@ public class ReinstateCorrectionType implements CorrectionType, InitializingBean
     }
 
     private boolean currentUserIsMemberOfwithdrawalReinstateGroup(Context context) throws SQLException {
-        String withdrawalReinstateGroupUUID = configurationService.getProperty(WITHDRAWAL_REINSTATE_GROUP);
-        if (StringUtils.isBlank(withdrawalReinstateGroupUUID)) {
+        String groupName = configurationService.getProperty(WITHDRAWAL_REINSTATE_GROUP);
+        if (StringUtils.isBlank(groupName)) {
             return false;
         }
-        Group withdrawalReinstateGroup = groupService.find(context, UUID.fromString(withdrawalReinstateGroupUUID));
-        return Objects.nonNull(withdrawalReinstateGroup) && groupService.isMember(context, withdrawalReinstateGroup);
+        Group withdrawalReinstateGroup = groupService.findByName(context, groupName);
+        return withdrawalReinstateGroup != null && groupService.isMember(context, withdrawalReinstateGroup);
     }
 
     @Override

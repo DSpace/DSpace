@@ -23,6 +23,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.commons.lang3.ArrayUtils;
@@ -69,6 +70,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class QAEventServiceImpl implements QAEventService {
 
     private static final Logger log = LoggerFactory.getLogger(QAEventServiceImpl.class);
+
+    public static final String QAEVENTS_SOURCES = "qaevents.sources";
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;
@@ -328,15 +331,27 @@ public class QAEventServiceImpl implements QAEventService {
      */
     public void sentEmailToAdminAboutNewRequest(QAEvent qaEvent) {
         try {
+            String uiUrl = configurationService.getProperty("dspace.ui.url");
             Email email = Email.getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), "qaevent_admin_notification"));
-            email.addRecipient(configurationService.getProperty("qaevent.mail.notification"));
+            email.addRecipient(configurationService.getProperty("qaevents.mail.notification"));
             email.addArgument(qaEvent.getTopic());
-            email.addArgument(qaEvent.getTarget());
-            email.addArgument(qaEvent.getMessage());
+            email.addArgument(uiUrl + "/items/" + qaEvent.getTarget());
+            email.addArgument(parsJson(qaEvent.getMessage()));
             email.send();
         } catch (Exception e) {
             log.warn("Error during sending email of Withdrawn/Reinstate request for item with uuid:"
                      + qaEvent.getTarget(), e);
+        }
+    }
+
+    private String parsJson(String jsonString) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(jsonString);
+            return jsonNode.get("reason").asText();
+        } catch (Exception e) {
+            log.warn("Unable to parse the JSON:" + jsonString);
+            return jsonString;
         }
     }
 
@@ -595,7 +610,7 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     private String[] getSupportedSources() {
-        return configurationService.getArrayProperty("qaevent.sources", new String[] { QAEvent.OPENAIRE_SOURCE });
+        return configurationService.getArrayProperty(QAEVENTS_SOURCES, new String[] { QAEvent.OPENAIRE_SOURCE });
     }
 
     @Override

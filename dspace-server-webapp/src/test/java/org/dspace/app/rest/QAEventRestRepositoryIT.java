@@ -13,6 +13,7 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
 import static org.dspace.app.rest.matcher.QAEventMatcher.matchQAEventEntry;
 import static org.dspace.content.QAEvent.DSPACE_USERS_SOURCE;
 import static org.dspace.content.QAEvent.OPENAIRE_SOURCE;
+import static org.dspace.correctiontype.WithdrawnCorrectionType.WITHDRAWAL_REINSTATE_GROUP;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
@@ -41,7 +42,9 @@ import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.EntityTypeBuilder;
+import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.QAEventBuilder;
 import org.dspace.builder.RelationshipTypeBuilder;
@@ -50,9 +53,12 @@ import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
 import org.dspace.content.QAEventProcessed;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.qaevent.QANotifyPatterns;
 import org.dspace.qaevent.dao.QAEventsDAO;
 import org.dspace.qaevent.service.dto.CorrectionTypeMessageDTO;
+import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +73,8 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private QAEventsDAO qaEventsDao;
+    @Autowired
+    private ConfigurationService configurationService;
 
     @Test
     public void findAllNotImplementedTest() throws Exception {
@@ -808,7 +816,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
             .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}")
             .build();
 
-        QAEvent event2 = QAEventBuilder.createTarget(context, col1, "Science and Freedom")
+        QAEventBuilder.createTarget(context, col1, "Science and Freedom")
             .withTopic("ENRICH/MISSING/PID")
             .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}")
             .build();
@@ -862,6 +870,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void createQAEventByCorrectionTypeWithdrawnRequestTest() throws Exception {
         context.turnOffAuthorisationSystem();
+        configurationService.setProperty(WITHDRAWAL_REINSTATE_GROUP, "Anonymous");
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
@@ -926,6 +935,7 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void createQAEventByCorrectionTypeReinstateRequestTest() throws Exception {
         context.turnOffAuthorisationSystem();
+        configurationService.setProperty(WITHDRAWAL_REINSTATE_GROUP, "Anonymous");
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
@@ -987,6 +997,88 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.inArchive", is(true)))
                              .andExpect(jsonPath("$.withdrawn", is(false)));
+    }
+
+    @Test
+    public void createQAEventOnlyUserPresentInWithdrawalReinstateGroupTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        EPerson user1 = EPersonBuilder.createEPerson(context)
+                                      .withEmail("eperson-test@mail.com")
+                                      .withPassword(password)
+                                      .build();
+
+        Group withdrawalGroup = GroupBuilder.createGroup(context)
+                                            .withName("WithdrawGroup")
+                                            .addMember(user1)
+                                            .build();
+
+        configurationService.setProperty(WITHDRAWAL_REINSTATE_GROUP, withdrawalGroup.getName());
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                                          .withName("Collection for Publications")
+                                          .withEntityType("Publication")
+                                          .build();
+
+        Item publication = ItemBuilder.createItem(context, col)
+                                      .withTitle("Publication archived item")
+                                      .build();
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        AtomicReference<String> idRef = new AtomicReference<String>();
+
+        CorrectionTypeMessageDTO message = new CorrectionTypeMessageDTO("reasone");
+
+        String ePersonToken = getAuthToken(eperson.getEmail(), password);
+        // eperson is not present into the withdraw-reinstate group
+        // and so cannot make the request
+        getClient(ePersonToken).perform(post("/api/integration/qualityassuranceevents")
+                               .param("correctionType", "request-withdrawn")
+                               .param("target", publication.getID().toString())
+                               .content(new ObjectMapper().writeValueAsBytes(message))
+                               .contentType(contentType))
+                               .andExpect(status().isUnprocessableEntity());
+
+        String user1Token = getAuthToken(user1.getEmail(), password);
+        // instead user1 is present into the withdraw-reinstate group
+        getClient(user1Token).perform(post("/api/integration/qualityassuranceevents")
+                             .param("correctionType", "request-withdrawn")
+                             .param("target", publication.getID().toString())
+                             .content(new ObjectMapper().writeValueAsBytes(message))
+                             .contentType(contentType))
+                             .andExpect(status().isCreated())
+                             .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+        getClient(adminToken).perform(get("/api/integration/qualityassuranceevents/" + idRef.get()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.id", is(idRef.get())))
+                             .andExpect(jsonPath("$.source", is(DSPACE_USERS_SOURCE)))
+                             .andExpect(jsonPath("$.title", is(publication.getName())))
+                             .andExpect(jsonPath("$.topic", is("REQUEST/WITHDRAWN")))
+                             .andExpect(jsonPath("$.trust", is("1.000")))
+                             .andExpect(jsonPath("$.status", is("PENDING")));
+
+        getClient(adminToken).perform(get("/api/core/items/" + publication.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.inArchive", is(true)))
+                             .andExpect(jsonPath("$.withdrawn", is(false)));
+
+        List<Operation> acceptOp = new ArrayList<Operation>();
+        acceptOp.add(new ReplaceOperation("/status", QAEvent.ACCEPTED));
+
+        getClient(adminToken).perform(patch("/api/integration/qualityassuranceevents/" + idRef.get())
+                             .content(getPatchContent(acceptOp))
+                             .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                             .andExpect(status().isOk());
+
+        getClient(adminToken).perform(get("/api/core/items/" + publication.getID()))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$.inArchive", is(false)))
+                             .andExpect(jsonPath("$.withdrawn", is(true)));
     }
 
 }

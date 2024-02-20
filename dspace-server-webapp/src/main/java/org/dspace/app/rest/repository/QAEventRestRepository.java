@@ -174,6 +174,10 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
             throw new UnprocessableEntityException("The given correction type in the request is not valid!");
         }
 
+        if (!correctionType.isAllowed(context, targetItem)) {
+            throw new UnprocessableEntityException("This item cannot be processed by this correction type!");
+        }
+
         ObjectMapper mapper = new ObjectMapper();
         CorrectionTypeMessageDTO reason = null;
         try {

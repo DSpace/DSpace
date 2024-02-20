@@ -12,8 +12,6 @@ import static org.dspace.core.Constants.READ;
 
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.Objects;
-import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -40,7 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class WithdrawnCorrectionType implements CorrectionType, InitializingBean {
 
-    public static final String WITHDRAWAL_REINSTATE_GROUP = "withdrawal.reinstate.group";
+    public static final String WITHDRAWAL_REINSTATE_GROUP = "qaevents.withdraw-reinstate.group";
 
     private String id;
     private String topic;
@@ -75,12 +73,12 @@ public class WithdrawnCorrectionType implements CorrectionType, InitializingBean
     }
 
     private boolean currentUserIsMemberOfwithdrawalReinstateGroup(Context context) throws SQLException {
-        String withdrawalReinstateGroupUUID = configurationService.getProperty(WITHDRAWAL_REINSTATE_GROUP);
-        if (StringUtils.isBlank(withdrawalReinstateGroupUUID)) {
+        String groupName = configurationService.getProperty(WITHDRAWAL_REINSTATE_GROUP);
+        if (StringUtils.isBlank(groupName)) {
             return false;
         }
-        Group withdrawalReinstateGroup = groupService.find(context, UUID.fromString(withdrawalReinstateGroupUUID));
-        return Objects.nonNull(withdrawalReinstateGroup) && groupService.isMember(context, withdrawalReinstateGroup);
+        Group withdrawalReinstateGroup = groupService.findByName(context, groupName);
+        return withdrawalReinstateGroup != null && groupService.isMember(context, withdrawalReinstateGroup);
     }
 
     @Override

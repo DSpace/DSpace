@@ -9,5 +9,5 @@
 Item Details:
 
 Type of request: ${params[0]}
-Relatem to item with uuid: ${params[1]}
+Relatem to item: ${params[1]}
 Reason: ${params[2]}
