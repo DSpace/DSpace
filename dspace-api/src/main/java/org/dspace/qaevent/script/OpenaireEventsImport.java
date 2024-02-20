@@ -9,6 +9,7 @@ package org.dspace.qaevent.script;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.dspace.core.Constants.ITEM;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -27,6 +28,7 @@ import eu.dnetlib.broker.BrokerClient;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
 import org.dspace.core.Context;
@@ -258,9 +260,10 @@ public class OpenaireEventsImport
 
     private String getResourceUUID(Context context, String originalId) throws IllegalStateException, SQLException {
         String id = getHandleFromOriginalId(originalId);
-        if (id != null) {
-            Item item = (Item) handleService.resolveToObject(context, id);
-            if (item != null) {
+        if (StringUtils.isNotBlank(id)) {
+            DSpaceObject dso = handleService.resolveToObject(context, id);
+            if (dso != null && dso.getType() == ITEM) {
+                Item item = (Item) dso;
                 final String itemUuid = item.getID().toString();
                 context.uncacheEntity(item);
                 return itemUuid;
