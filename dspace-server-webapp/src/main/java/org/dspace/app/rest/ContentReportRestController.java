@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.contentreport.Filter;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.ContentReportSupportRest;
 import org.dspace.app.rest.model.FilteredCollectionsQuery;
@@ -33,6 +32,7 @@ import org.dspace.app.rest.model.hateoas.FilteredCollectionsResource;
 import org.dspace.app.rest.model.hateoas.FilteredItemsResource;
 import org.dspace.app.rest.repository.ContentReportRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.contentreport.Filter;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
