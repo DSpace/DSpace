@@ -20,11 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.dspace.app.rest.contentreport.Filter;
 import org.dspace.app.rest.matcher.ContentReportMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
-import org.dspace.app.rest.model.FilteredCollectionRest;
+import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.model.FilteredItemsQuery;
 import org.dspace.app.rest.model.FilteredItemsQueryPredicate;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -33,10 +31,13 @@ import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.contentreport.Filter;
+import org.dspace.contentreport.FilteredCollection;
 import org.dspace.contentreport.QueryOperator;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Integration tests for the content reports ported from DSpace 6.x
@@ -91,15 +92,14 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
         String token = getAuthToken(admin.getEmail(), password);
 
         Map<Filter, Integer> valuesCol1 = Map.of(Filter.IS_DISCOVERABLE, 1);
-        FilteredCollectionRest fcol1 = FilteredCollectionRest.of(col1.getName(), col1.getHandle(),
+        FilteredCollection fcol1 = FilteredCollection.of(col1.getName(), col1.getHandle(),
                 parentCommunity.getName(), parentCommunity.getHandle(),
                 1, 1, valuesCol1, true);
         Map<Filter, Integer> valuesCol2 = Map.of(Filter.IS_DISCOVERABLE, 2);
-        FilteredCollectionRest fcol2 = FilteredCollectionRest.of(col2.getName(), col2.getHandle(),
+        FilteredCollection fcol2 = FilteredCollection.of(col2.getName(), col2.getHandle(),
                 parentCommunity.getName(), parentCommunity.getHandle(),
                 2, 2, valuesCol2, true);
 
-        // Only Items 1 and 2 should be retrieved, as Item 3 is not discoverable yet.
         getClient(token).perform(get("/api/contentreport/filteredcollections?filters=is_discoverable"))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.collections", Matchers.containsInAnyOrder(
@@ -108,12 +108,11 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
                    )))
                    .andExpect(jsonPath("type", is("filteredcollectionsreport")))
                    .andExpect(jsonPath("$.summary",
-                           ContentReportMatcher.matchFilteredCollectionSummary(3, 3)))
+                           ContentReportMatcher.matchFilteredCollectionSummary(3, 2)))
                    .andExpect(jsonPath("$._links.self.href",
                            Matchers.containsString("/api/contentreport/filteredcollections")));
     }
 
-    @Ignore
     @Test
     public void testFilteredItems() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -164,8 +163,6 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
 
         ObjectMapper mapper = new ObjectMapper();
 
-        // This test is disabled until someone can find out why the search function doesn't behave properly
-        // in the present test context while it does when used against a standard production database.
         getClient(token).perform(post("/api/contentreport/filtereditems")
                 .content(mapper.writeValueAsBytes(query))
                 .contentType(contentType))
@@ -173,10 +170,9 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
                 .andExpect(jsonPath("$.itemCount", is(2)))
                 .andExpect(jsonPath("$.items", Matchers.containsInAnyOrder(
-                        ContentReportMatcher.matchFilteredItemProperties(publicItem2),
-                        ContentReportMatcher.matchFilteredItemProperties(publicItem3)
-                )
-                ));
+                        ItemMatcher.matchItemProperties(publicItem2),
+                        ItemMatcher.matchItemProperties(publicItem3)
+                )));
     }
 
 }

@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.dspace.app.rest.contentreport.Filter;
+import org.dspace.contentreport.Filter;
 import org.dspace.contentreport.QueryOperator;
 
 /**

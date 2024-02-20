@@ -16,10 +16,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.contentreport.Filter;
 import org.dspace.app.rest.converter.FilteredItemConverter;
 import org.dspace.app.rest.model.ContentReportSupportRest;
-import org.dspace.app.rest.model.FilteredCollectionRest;
 import org.dspace.app.rest.model.FilteredCollectionsQuery;
 import org.dspace.app.rest.model.FilteredCollectionsRest;
 import org.dspace.app.rest.model.FilteredItemRest;
@@ -27,12 +25,15 @@ import org.dspace.app.rest.model.FilteredItemsQuery;
 import org.dspace.app.rest.model.FilteredItemsQueryPredicate;
 import org.dspace.app.rest.model.FilteredItemsRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.app.rest.utils.FilteredCollectionsReportUtils;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
+import org.dspace.contentreport.Filter;
+import org.dspace.contentreport.FilteredCollection;
+import org.dspace.contentreport.FilteredCollections;
 import org.dspace.contentreport.QueryPredicate;
+import org.dspace.contentreport.service.ContentReportService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -49,7 +50,7 @@ public class ContentReportRestRepository extends AbstractDSpaceRestRepository {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ContentReportRestRepository.class);
 
     @Autowired
-    private FilteredCollectionsReportUtils reportUtils;
+    private ContentReportService contentReportService;
     @Autowired
     private ItemService itemService;
     @Autowired
@@ -62,13 +63,12 @@ public class ContentReportRestRepository extends AbstractDSpaceRestRepository {
     }
 
     public FilteredCollectionsRest findFilteredCollections(Context context, FilteredCollectionsQuery query) {
-        FilteredCollectionsRest report = new FilteredCollectionsRest();
-        report.setId("filteredcollections");
-
         Set<Filter> filters = query.getEnabledFilters();
-        List<FilteredCollectionRest> colls = reportUtils.getFilteredCollections(context, filters);
-        colls.forEach(report::addCollection);
-        return report;
+        List<FilteredCollection> colls = contentReportService.getFilteredCollections(context, filters);
+        FilteredCollections report = FilteredCollections.of(colls);
+        FilteredCollectionsRest reportRest = FilteredCollectionsRest.of(report);
+        reportRest.setId("filteredcollections");
+        return reportRest;
     }
 
     public FilteredItemsRest findFilteredItems(Context context, FilteredItemsQuery query, Pageable pageable) {

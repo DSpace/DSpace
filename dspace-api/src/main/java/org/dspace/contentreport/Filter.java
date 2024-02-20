@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.contentreport;
+package org.dspace.contentreport;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -21,11 +21,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.contentreport.ItemFilterUtil.BundleName;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
+import org.dspace.contentreport.ItemFilterUtil.BundleName;
 import org.dspace.core.Context;
 import org.dspace.services.factory.DSpaceServicesFactory;
 

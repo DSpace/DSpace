@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.contentreport;
+package org.dspace.contentreport;
 
 import static org.dspace.content.Item.ANY;
 

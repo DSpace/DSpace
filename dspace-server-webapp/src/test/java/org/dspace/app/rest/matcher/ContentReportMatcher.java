@@ -11,8 +11,8 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
-import org.dspace.app.rest.model.FilteredCollectionRest;
 import org.dspace.content.Item;
+import org.dspace.contentreport.FilteredCollection;
 import org.hamcrest.Matcher;
 
 /**
@@ -23,7 +23,7 @@ public class ContentReportMatcher {
 
     private ContentReportMatcher() { }
 
-    public static Matcher<? super Object> matchFilteredCollectionProperties(FilteredCollectionRest collection) {
+    public static Matcher<? super Object> matchFilteredCollectionProperties(FilteredCollection collection) {
         return allOf(
                 hasJsonPath("$.label", is(collection.getLabel())),
                 hasJsonPath("$.community_label", is(collection.getCommunityLabel())),

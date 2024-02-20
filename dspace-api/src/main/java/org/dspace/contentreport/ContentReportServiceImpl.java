@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.utils;
+package org.dspace.contentreport;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,27 +14,19 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.contentreport.Filter;
-import org.dspace.app.rest.model.FilteredCollectionRest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
+import org.dspace.contentreport.service.ContentReportService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-/**
- * This is the Service dealing with the {@link FilteredCollectionRest} logic.
- *
- * @author Jean-François Morin (Université Laval)
- */
-@Component
-public class FilteredCollectionsReportUtils {
+public class ContentReportServiceImpl implements ContentReportService {
 
     private static final Logger log = org.apache.logging.log4j.LogManager
-            .getLogger(FilteredCollectionsReportUtils.class);
+            .getLogger(ContentReportServiceImpl.class);
 
     @Autowired
     private CollectionService collectionService;
@@ -48,13 +40,13 @@ public class FilteredCollectionsReportUtils {
      * @param filters Set of filters
      * @return a list of collections with the requested statistics for each of them
      */
-    public List<FilteredCollectionRest> getFilteredCollections(
-            Context context, Set<Filter> filters) {
-        List<FilteredCollectionRest> colls = new ArrayList<>();
+    @Override
+    public List<FilteredCollection> getFilteredCollections(Context context, Set<Filter> filters) {
+        List<FilteredCollection> colls = new ArrayList<>();
         try {
             List<Collection> collections = collectionService.findAll(context);
             for (Collection collection : collections) {
-                FilteredCollectionRest coll = new FilteredCollectionRest();
+                FilteredCollection coll = new FilteredCollection();
                 coll.setHandle(collection.getHandle());
                 coll.setLabel(collection.getName());
                 Community community = collection.getCommunities().stream()
