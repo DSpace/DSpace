@@ -16,10 +16,15 @@
     <!-- CONFIGURATION -->
     <!-- The parameters prefix, publisher, datamanager and hostinginstitution
          moved to DSpace's configuration. They will be substituted automatically.
-         It is not necessary anymore to change this file.
          Please take a look into the DSpace documentation for details on how to
          change those. -->
-    <!-- DO NOT CHANGE ANYTHING BELOW THIS LINE EXCEPT YOU REALLY KNOW WHAT YOU ARE DOING! -->
+    <!-- This file handles the transformation of metadata into the DataCite
+         Schema. You should customize it to match your local metadata schema
+         and submission forms. Please note that this must produce valid XML
+         according to the DataCite Schema. Otherwise you will not be able
+         to register DOIs anymore. Please follow and reuse the examples
+         included in this file. For more information on the DataCite
+         Schema, see https://schema.datacite.org. -->
     
     <!-- We need the prefix to determine DOIs that were minted by ourself. -->
     <xsl:param name="prefix">10.5072/dspace-</xsl:param>
