@@ -21,9 +21,12 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.http.HttpStatus;
+import org.apache.http.HttpVersion;
+import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.message.BasicStatusLine;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.ldn.LDNMessageEntity;
 import org.dspace.app.ldn.NotifyServiceEntity;
@@ -45,6 +48,7 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.BDDMockito.Then;
 
 /**
  * Integration Tests against {@link SendLDNMessageAction}
@@ -89,13 +93,12 @@ public class SendLDNMessageActionIT extends AbstractIntegrationTestWithDatabase 
     @Test
     public void testLDNMessageConsumerRequestReview() throws Exception {
         CloseableHttpResponse response = mock(CloseableHttpResponse.class);
-        response.setStatusCode(HttpStatus.SC_ACCEPTED);
+        StatusLine sl = mock(BasicStatusLine.class);
+        when(response.getStatusLine()).thenReturn(sl);
+        when(sl.getStatusCode()).thenReturn(HttpStatus.SC_ACCEPTED);
         CloseableHttpClient mockedClient = mock(CloseableHttpClient.class);
-        when(mockedClient.execute(any(HttpPost.class)))
-        //("https://notify-inbox.info/inbox/", any(Object.class), String.class)).thenReturn(response);
-        //        when(client.execute(any(HttpUriRequest.class), any(HttpContext.class)))
-        .thenReturn(response);
-
+        when(mockedClient.execute(any(HttpPost.class))).
+        thenReturn(response);
         ObjectMapper mapper = new ObjectMapper();
 
         context.turnOffAuthorisationSystem();
@@ -130,16 +133,19 @@ public class SendLDNMessageActionIT extends AbstractIntegrationTestWithDatabase 
 
         Notification notification = mapper.readValue(ldnMessage.getMessage(), Notification.class);
 
+        sendLDNMessageAction = new SendLDNMessageAction(mockedClient);
         assertEquals(sendLDNMessageAction.execute(context, notification, item), CONTINUE);
     }
 
     @Test
     public void testLDNMessageConsumerRequestReviewGotRedirection() throws Exception {
         CloseableHttpResponse response = mock(CloseableHttpResponse.class);
-        response.setStatusCode(HttpStatus.SC_ACCEPTED);
+        StatusLine sl = mock(BasicStatusLine.class);
+        when(response.getStatusLine()).thenReturn(sl);
+        when(sl.getStatusCode()).thenReturn(HttpStatus.SC_ACCEPTED);
         CloseableHttpClient mockedClient = mock(CloseableHttpClient.class);
-        when(mockedClient.execute(any(HttpPost.class))).thenReturn(response);
-
+        when(mockedClient.execute(any(HttpPost.class))).
+        thenReturn(response);
         ObjectMapper mapper = new ObjectMapper();
 
         context.turnOffAuthorisationSystem();
@@ -176,13 +182,16 @@ public class SendLDNMessageActionIT extends AbstractIntegrationTestWithDatabase 
 
         Notification notification = mapper.readValue(ldnMessage.getMessage(), Notification.class);
 
+        sendLDNMessageAction = new SendLDNMessageAction(mockedClient);
         assertEquals(sendLDNMessageAction.execute(context, notification, item), CONTINUE);
     }
 
     @Test
     public void testLDNMessageConsumerRequestReviewWithInvalidLdnUrl() throws Exception {
         CloseableHttpResponse response = mock(CloseableHttpResponse.class);
-        response.setStatusCode(HttpStatus.SC_BAD_REQUEST);
+        StatusLine sl = mock(BasicStatusLine.class);
+        when(response.getStatusLine()).thenReturn(sl);
+        when(sl.getStatusCode()).thenReturn(HttpStatus.SC_NOT_FOUND);
         CloseableHttpClient mockedClient = mock(CloseableHttpClient.class);
         when(mockedClient.execute(any(HttpPost.class))).
         thenReturn(response);
@@ -219,7 +228,8 @@ public class SendLDNMessageActionIT extends AbstractIntegrationTestWithDatabase 
         ldnMessage.getQueueStatus();
 
         Notification notification = mapper.readValue(ldnMessage.getMessage(), Notification.class);
-
+        
+        sendLDNMessageAction = new SendLDNMessageAction(mockedClient);
         assertEquals(sendLDNMessageAction.execute(context, notification, item), ABORT);
     }
 

@@ -14,6 +14,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -37,12 +38,18 @@ public class SendLDNMessageAction implements LDNAction {
     private CloseableHttpClient client = null;
 
     public SendLDNMessageAction() {
-
         HttpClientBuilder builder = HttpClientBuilder.create();
         client = builder
             .disableAutomaticRetries()
             .setMaxConnTotal(5)
             .build();
+    }
+    
+    public SendLDNMessageAction(CloseableHttpClient client) {
+        this();
+        if (client != null) {
+            this.client = client;
+        }
     }
 
     @Override
