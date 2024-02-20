@@ -30,7 +30,7 @@ public class QAEvent {
     public static final String REJECTED = "rejected";
     public static final String DISCARDED = "discarded";
 
-    public static final String OPENAIRE_SOURCE = "openaire";
+    public static final String OPENAIRE_SOURCE = "OpenAIRE";
     public static final String DSPACE_USERS_SOURCE = "DSpaceUsers";
 
     private String source;
