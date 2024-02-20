@@ -14,7 +14,6 @@ import org.apache.http.Header;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -44,7 +43,7 @@ public class SendLDNMessageAction implements LDNAction {
             .setMaxConnTotal(5)
             .build();
     }
-    
+
     public SendLDNMessageAction(CloseableHttpClient client) {
         this();
         if (client != null) {

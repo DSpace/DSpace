@@ -21,7 +21,6 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.http.HttpStatus;
-import org.apache.http.HttpVersion;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -48,7 +47,6 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.BDDMockito.Then;
 
 /**
  * Integration Tests against {@link SendLDNMessageAction}
@@ -228,7 +226,6 @@ public class SendLDNMessageActionIT extends AbstractIntegrationTestWithDatabase 
         ldnMessage.getQueueStatus();
 
         Notification notification = mapper.readValue(ldnMessage.getMessage(), Notification.class);
-        
         sendLDNMessageAction = new SendLDNMessageAction(mockedClient);
         assertEquals(sendLDNMessageAction.execute(context, notification, item), ABORT);
     }
