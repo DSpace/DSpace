@@ -234,6 +234,22 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return setMetadataSingleValue(item, "dspace", "orcid", "sync-fundings", value);
     }
 
+    public ItemBuilder withOrcidSynchronizationProductsPreference(OrcidEntitySyncPreference value) {
+        return withOrcidSynchronizationProductsPreference(value.name());
+    }
+
+    public ItemBuilder withOrcidSynchronizationProductsPreference(String value) {
+        return setMetadataSingleValue(item, "dspace", "orcid", "sync-products", value);
+    }
+
+    public ItemBuilder withOrcidSynchronizationPatentsPreference(OrcidEntitySyncPreference value) {
+        return withOrcidSynchronizationPatentsPreference(value.name());
+    }
+
+    public ItemBuilder withOrcidSynchronizationPatentsPreference(String value) {
+        return setMetadataSingleValue(item, "dspace", "orcid", "sync-patents", value);
+    }
+
     public ItemBuilder withOrcidSynchronizationProfilePreference(OrcidProfileSyncPreference value) {
         return withOrcidSynchronizationProfilePreference(value.name());
     }
