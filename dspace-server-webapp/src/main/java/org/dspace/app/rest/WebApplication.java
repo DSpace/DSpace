@@ -70,11 +70,17 @@ public class WebApplication {
 
     @Scheduled(cron = "${ldn.queue.extractor.cron:-}")
     public void ldnExtractFromQueue() throws IOException, SQLException {
+        if (!configuration.getLdnEnabled()) {
+            return;
+        }
         LDNQueueExtractor.extractMessageFromQueue();
     }
 
     @Scheduled(cron = "${ldn.queue.timeout.checker.cron:-}")
     public void ldnQueueTimeoutCheck() throws IOException, SQLException {
+        if (!configuration.getLdnEnabled()) {
+            return;
+        }
         LDNQueueTimeoutChecker.checkQueueMessageTimeout();
     }
 

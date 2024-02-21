@@ -53,7 +53,7 @@ public class BitstreamMetadataValueAddPatchOperation extends MetadataValueAddPat
         bitstreamMetadataValuePathUtils.validate(absolutePath);
         Item item = source.getItem();
         List<Bundle> bundle = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
-        ;
+
         for (Bundle bb : bundle) {
             int idx = 0;
             for (Bitstream b : bb.getBitstreams()) {
