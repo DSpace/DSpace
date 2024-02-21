@@ -19,14 +19,14 @@ import java.util.UUID;
 public class QASource {
 
     /**
-     * if the QASource stats (see next attributes) are related to a specific target
+     * The focus attributes specify if the QASource object is describing the status of a specific
+     * quality assurance source for the whole repository (focus = null) or for a specific
+     * DSpaceObject (focus = uuid of the DSpaceObject). This would mostly affect the totalEvents attribute below.
      */
     private UUID focus;
-
     private String name;
     private Date lastEvent;
     private long totalEvents;
-
 
     public String getName() {
         return name;
