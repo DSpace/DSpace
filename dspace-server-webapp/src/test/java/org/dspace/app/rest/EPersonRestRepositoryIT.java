@@ -266,6 +266,13 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void singularEndpointShouldNotExist() throws Exception {
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(get("/api/eperson/eperson"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
     public void findAllUnauthorizedTest() throws Exception {
         // Access endpoint without being authenticated
         getClient().perform(get("/api/eperson/epersons"))
