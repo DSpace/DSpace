@@ -22,10 +22,9 @@ import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.ContentReportSupportRest;
 import org.dspace.app.rest.model.FilteredCollectionsQuery;
 import org.dspace.app.rest.model.FilteredCollectionsRest;
-import org.dspace.app.rest.model.FilteredItemsQuery;
 import org.dspace.app.rest.model.FilteredItemsQueryPredicate;
+import org.dspace.app.rest.model.FilteredItemsQueryRest;
 import org.dspace.app.rest.model.FilteredItemsRest;
-import org.dspace.app.rest.model.RestAddressableModel;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.ContentReportSupportResource;
 import org.dspace.app.rest.model.hateoas.FilteredCollectionsResource;
@@ -61,7 +60,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Jean-François Morin (Université Laval)
  */
 @RestController
-@RequestMapping("/api/" + RestAddressableModel.CONTENT_REPORT)
+@RequestMapping("/api/" + RestModel.CONTENT_REPORT)
 public class ContentReportRestController implements InitializingBean {
 
     @Autowired
@@ -180,7 +179,7 @@ public class ContentReportRestController implements InitializingBean {
                 .filter(f -> f != null)
                 .collect(Collectors.toMap(Function.identity(), v -> Boolean.TRUE));
         List<String> addFields = Optional.ofNullable(additionalFields).orElseGet(() -> List.of());
-        FilteredItemsQuery query = FilteredItemsQuery.of(collUuids, preds, pgLimit, filtersMap, addFields);
+        FilteredItemsQueryRest query = FilteredItemsQueryRest.of(collUuids, preds, pgLimit, filtersMap, addFields);
 
         return filteredItemsReport(context, query, myPageable);
     }
@@ -211,14 +210,14 @@ public class ContentReportRestController implements InitializingBean {
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/filtereditems")
     public ResponseEntity<RepresentationModel<?>> postFilteredItems(
-            @RequestBody FilteredItemsQuery query, Pageable pageable,
+            @RequestBody FilteredItemsQueryRest query, Pageable pageable,
             HttpServletRequest request, HttpServletResponse response) throws Exception {
         Context context = ContextUtil.obtainContext(request);
         return filteredItemsReport(context, query, pageable);
     }
 
     private ResponseEntity<RepresentationModel<?>> filteredItemsReport(Context context,
-            FilteredItemsQuery query, Pageable pageable) {
+            FilteredItemsQueryRest query, Pageable pageable) {
         FilteredItemsRest report = contentReportRestRepository
                 .findFilteredItems(context, query, pageable);
         FilteredItemsResource result = converter.toResource(report);

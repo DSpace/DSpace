@@ -9,11 +9,10 @@ package org.dspace.app.rest.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.dspace.app.rest.ContentReportRestController;
 
 /**
- * This class serves as a REST representation of a Filtered Items Report from the DSpace statistics.
+ * This class serves as a REST representation of a Filtered Items Report.
  * The name must match that of the associated resource class (FilteredItemsResource) except for
  * the suffix. This is why it is not named something like FilteredItemsReportRest.
  *
@@ -31,6 +30,21 @@ public class FilteredItemsRest extends BaseObjectRest<String> {
     private List<FilteredItemRest> items = new ArrayList<>();
     /** Total item count (for pagination) */
     private long itemCount;
+
+    /**
+     * Builds a FilteredItemsRest instance from a list of items and an total item count.
+     * To avoid adding a dependency to any Spring-managed service here, the items
+     * provided here are already converted to FilteredItemRest instances.
+     * @param items the items to add to the FilteredItemsRest instance to be created
+     * @param itemCount total number of items found regardless of any pagination constraint
+     * @return a FilteredItemsRest instance built from the provided data
+     */
+    public static FilteredItemsRest of(List<FilteredItemRest> items, long itemCount) {
+        var itemsRest = new FilteredItemsRest();
+        itemsRest.items.addAll(items);
+        itemsRest.itemCount = itemCount;
+        return itemsRest;
+    }
 
     @Override
     public String getCategory() {
@@ -66,33 +80,8 @@ public class FilteredItemsRest extends BaseObjectRest<String> {
         return new ArrayList<>(items);
     }
 
-    /**
-     * Adds an {@link ItemRest} object to this report.
-     *
-     * @param item {@link ItemRest} to add to this report
-     */
-    public void addItem(FilteredItemRest item) {
-        items.add(item);
-    }
-
-    /**
-     * Sets all items for this report.
-     * The contents are copied into this object's internal list, which is protected against
-     * further tampering with the provided list.
-     *
-     * @param items Values that replace the current ones
-     */
-    public void setItems(List<FilteredItemRest> items) {
-        this.items.clear();
-        this.items.addAll(items);
-    }
-
     public long getItemCount() {
         return itemCount;
-    }
-
-    public void setItemCount(long itemCount) {
-        this.itemCount = itemCount;
     }
 
 }

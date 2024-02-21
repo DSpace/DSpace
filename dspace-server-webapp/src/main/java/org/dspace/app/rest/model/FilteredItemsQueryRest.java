@@ -22,10 +22,10 @@ import org.dspace.contentreport.Filter;
 import org.dspace.contentreport.QueryOperator;
 
 /**
- * Structured query contents for the Filtered Items report
+ * REST-based version of structured query contents for the Filtered Items report
  * @author Jean-François Morin (Université Laval)
  */
-public class FilteredItemsQuery {
+public class FilteredItemsQueryRest {
 
     private List<String> collections = new ArrayList<>();
     private List<FilteredItemsQueryPredicate> queryPredicates = new ArrayList<>();
@@ -34,17 +34,21 @@ public class FilteredItemsQuery {
     private List<String> additionalFields = new ArrayList<>();
 
     /**
-     * Shortcut method that builds a FilteredItemsQuery instance
+     * Shortcut method that builds a FilteredItemsQueryRest instance
      * from its building blocks.
-     * @param filters filters to apply to existing items.
+     * @param collectionUuids collection UUIDs to add
+     * @param predicates query predicates used to filter existing items
+     * @param pageLimit number of items per page
+     * @param filters filters to apply to existing items
      * The filters mapping to true will be applied, others (either missing or
      * mapping to false) will not.
-     * @return a FilteredItemsQuery instance built from the provided parameters
+     * @param additionalFields additional fields to display in the resulting report
+     * @return a FilteredItemsQueryRest instance built from the provided parameters
      */
-    public static FilteredItemsQuery of(Collection<String> collectionUuids,
+    public static FilteredItemsQueryRest of(Collection<String> collectionUuids,
             Collection<FilteredItemsQueryPredicate> predicates, int pageLimit,
             Map<Filter, Boolean> filters, Collection<String> additionalFields) {
-        var query = new FilteredItemsQuery();
+        var query = new FilteredItemsQueryRest();
         Optional.ofNullable(collectionUuids).ifPresent(query.collections::addAll);
         Optional.ofNullable(predicates).ifPresent(query.queryPredicates::addAll);
         query.pageLimit = pageLimit;

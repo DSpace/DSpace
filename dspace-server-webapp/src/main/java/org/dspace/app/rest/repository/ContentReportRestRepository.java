@@ -8,30 +8,25 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.FilteredItemConverter;
 import org.dspace.app.rest.model.ContentReportSupportRest;
 import org.dspace.app.rest.model.FilteredCollectionsQuery;
 import org.dspace.app.rest.model.FilteredCollectionsRest;
 import org.dspace.app.rest.model.FilteredItemRest;
-import org.dspace.app.rest.model.FilteredItemsQuery;
 import org.dspace.app.rest.model.FilteredItemsQueryPredicate;
+import org.dspace.app.rest.model.FilteredItemsQueryRest;
 import org.dspace.app.rest.model.FilteredItemsRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
-import org.dspace.content.service.ItemService;
-import org.dspace.content.service.MetadataFieldService;
 import org.dspace.contentreport.Filter;
 import org.dspace.contentreport.FilteredCollection;
 import org.dspace.contentreport.FilteredCollections;
+import org.dspace.contentreport.FilteredItems;
+import org.dspace.contentreport.FilteredItemsQuery;
 import org.dspace.contentreport.QueryPredicate;
 import org.dspace.contentreport.service.ContentReportService;
 import org.dspace.core.Context;
@@ -47,14 +42,8 @@ import org.springframework.stereotype.Component;
 @Component(ContentReportSupportRest.CATEGORY + "." + ContentReportSupportRest.NAME)
 public class ContentReportRestRepository extends AbstractDSpaceRestRepository {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ContentReportRestRepository.class);
-
     @Autowired
     private ContentReportService contentReportService;
-    @Autowired
-    private ItemService itemService;
-    @Autowired
-    private MetadataFieldService metadataFieldService;
     @Autowired
     private FilteredItemConverter itemConverter;
 
@@ -64,100 +53,45 @@ public class ContentReportRestRepository extends AbstractDSpaceRestRepository {
 
     public FilteredCollectionsRest findFilteredCollections(Context context, FilteredCollectionsQuery query) {
         Set<Filter> filters = query.getEnabledFilters();
-        List<FilteredCollection> colls = contentReportService.getFilteredCollections(context, filters);
+
+        List<FilteredCollection> colls = contentReportService.findFilteredCollections(context, filters);
         FilteredCollections report = FilteredCollections.of(colls);
+
         FilteredCollectionsRest reportRest = FilteredCollectionsRest.of(report);
         reportRest.setId("filteredcollections");
         return reportRest;
     }
 
-    public FilteredItemsRest findFilteredItems(Context context, FilteredItemsQuery query, Pageable pageable) {
-        FilteredItemsRest report = new FilteredItemsRest();
-        report.setId("filtereditems");
-
-        List<QueryPredicate> predicates = query.getQueryPredicates().stream()
+    public FilteredItemsRest findFilteredItems(Context context, FilteredItemsQueryRest queryRest, Pageable pageable) {
+        List<QueryPredicate> predicates = queryRest.getQueryPredicates().stream()
                 .map(pred -> convertPredicate(context, pred))
                 .collect(Collectors.toList());
-        List<UUID> collectionUuids = getUuidsFromStrings(query.getCollections());
-        List<Filter> filters = query.getFilters().entrySet().stream()
-                .filter(e -> e.getValue().booleanValue())
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
-        long offset = pageable.getOffset();
-        int limit = pageable.getPageSize();
+        FilteredItemsQuery query = new FilteredItemsQuery();
+        query.setCollections(queryRest.getCollections());
+        query.setQueryPredicates(predicates);
+        query.setFilters(queryRest.getFilters());
+        query.setAdditionalFields(queryRest.getAdditionalFields());
+        query.setOffset(pageable.getOffset());
+        query.setPageLimit(pageable.getPageSize());
 
-        try {
-            List<Item> items = itemService.findByMetadataQuery(context, predicates, collectionUuids, offset, limit);
-            for (Item item : items) {
-                boolean matchesFilters = filters.stream().allMatch(f -> f.testItem(context, item));
-                if (matchesFilters) {
-                    FilteredItemRest itemRest = itemConverter.convert(item, Projection.DEFAULT);
-                    report.addItem(itemRest);
-                }
-            }
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
-        }
-        try {
-            long count = itemService.countForMetadataQuery(context, predicates, collectionUuids);
-            report.setItemCount(count);
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
-        }
+        FilteredItems items = contentReportService.findFilteredItems(context, query);
+
+        List<FilteredItemRest> filteredItemsRest = items.getItems().stream()
+                .map(item -> itemConverter.convert(item, Projection.DEFAULT))
+                .collect(Collectors.toList());
+        FilteredItemsRest report = FilteredItemsRest.of(filteredItemsRest, items.getItemCount());
+        report.setId("filtereditems");
 
         return report;
     }
 
     private QueryPredicate convertPredicate(Context context, FilteredItemsQueryPredicate predicate) {
         try {
-            List<MetadataField> fields = getMetadataFields(context, predicate.getField());
+            List<MetadataField> fields = contentReportService.getMetadataFields(context, predicate.getField());
             return QueryPredicate.of(fields, predicate.getOperator(), predicate.getValue());
         } catch (SQLException e) {
             throw new IllegalArgumentException(e.getMessage(), e);
         }
-    }
-
-    private List<MetadataField> getMetadataFields(org.dspace.core.Context context, String query_field)
-            throws SQLException {
-        List<MetadataField> fields = new ArrayList<>();
-        if ("*".equals(query_field)) {
-            return fields;
-        }
-        String schema = "";
-        String element = "";
-        String qualifier = null;
-        String[] parts = query_field.split("\\.");
-        if (parts.length > 0) {
-            schema = parts[0];
-        }
-        if (parts.length > 1) {
-            element = parts[1];
-        }
-        if (parts.length > 2) {
-            qualifier = parts[2];
-        }
-
-        if (Item.ANY.equals(qualifier)) {
-            fields.addAll(metadataFieldService.findFieldsByElementNameUnqualified(context, schema, element));
-        } else {
-            MetadataField mf = metadataFieldService.findByElement(context, schema, element, qualifier);
-            if (mf != null) {
-                fields.add(mf);
-            }
-        }
-        return fields;
-    }
-
-    private static List<UUID> getUuidsFromStrings(List<String> collSel) {
-        List<UUID> uuids = new ArrayList<>();
-        for (String s: collSel) {
-            try {
-                uuids.add(UUID.fromString(s));
-            } catch (IllegalArgumentException e) {
-                log.warn("Invalid collection UUID: " + s);
-            }
-        }
-        return uuids;
     }
 
 }

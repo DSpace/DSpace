@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest;
 
-
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -24,8 +23,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.matcher.ContentReportMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
-import org.dspace.app.rest.model.FilteredItemsQuery;
 import org.dspace.app.rest.model.FilteredItemsQueryPredicate;
+import org.dspace.app.rest.model.FilteredItemsQueryRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -160,7 +159,7 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
-        FilteredItemsQuery query = FilteredItemsQuery.of(null,
+        FilteredItemsQueryRest query = FilteredItemsQueryRest.of(null,
                 List.of(FilteredItemsQueryPredicate.of("dc.contributor.author", QueryOperator.EQUALS, "Doe, Jane")),
                 100, null, List.of("dc.subject"));
 

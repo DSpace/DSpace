@@ -15,7 +15,7 @@ import org.dspace.app.rest.ContentReportRestController;
 import org.dspace.contentreport.FilteredCollections;
 
 /**
- * This class serves as a REST representation of a Filtered Collections Report from the DSpace statistics.
+ * This class serves as a REST representation of a Filtered Collections Report.
  * The name must match that of the associated resource class (FilteredCollectionsResource) except for
  * the suffix. This is why it is not named something like FilteredCollectionsReportRest.
  *
