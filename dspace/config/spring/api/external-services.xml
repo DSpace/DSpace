@@ -176,6 +176,18 @@
         </property>
     </bean>
 
+    <bean id="doiLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="DoiImportService"/>
+        <property name="sourceIdentifier" value="doi"/>
+        <property name="recordIdMetadata" value="dc.identifier.doi"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
     <bean id="vufindLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="vufindImportService"/>
         <property name="sourceIdentifier" value="vufind"/>
