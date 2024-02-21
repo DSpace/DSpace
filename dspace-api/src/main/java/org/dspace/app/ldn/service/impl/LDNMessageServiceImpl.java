@@ -82,6 +82,10 @@ public class LDNMessageServiceImpl implements LDNMessageService {
 
     @Override
     public LDNMessageEntity create(Context context, String id) throws SQLException {
+        LDNMessageEntity result = ldnMessageDao.findByID(context, LDNMessageEntity.class, id);
+        if (result != null) {
+            throw new SQLException("Duplicate LDN Message ID [" + id + "] detected. This message is rejected.");
+        }
         return ldnMessageDao.create(context, new LDNMessageEntity(id));
     }
 

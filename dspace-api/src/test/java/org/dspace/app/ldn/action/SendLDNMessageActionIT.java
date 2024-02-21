@@ -41,6 +41,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
@@ -57,7 +59,7 @@ public class SendLDNMessageActionIT extends AbstractIntegrationTestWithDatabase 
 
     private Collection collection;
     private EPerson submitter;
-
+    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     private LDNMessageService ldnMessageService = NotifyServiceFactory.getInstance().getLDNMessageService();
     private WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
     private SendLDNMessageAction sendLDNMessageAction;
@@ -65,6 +67,7 @@ public class SendLDNMessageActionIT extends AbstractIntegrationTestWithDatabase 
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        configurationService.setProperty("ldn.enabled", "true");
         sendLDNMessageAction = new SendLDNMessageAction();
         context.turnOffAuthorisationSystem();
         //** GIVEN **

@@ -46,8 +46,6 @@ public class LDNQueueExtractor {
         int processed_messages = ldnMessageService.extractAndProcessMessageFromQueue(context);
         if (processed_messages > 0) {
             log.info("Processed Messages x" + processed_messages);
-        } else {
-            log.error("Errors happened during the extract operations. Check the log above!");
         }
         context.complete();
         return processed_messages;
