@@ -570,7 +570,7 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public List<QAEvent> findEventsByTopicAndPageAndTarget(Context context, String source, String topic, UUID target,
+    public List<QAEvent> findEventsByTopicAndTarget(Context context, String source, String topic, UUID target,
             long offset, int pageSize) {
         var currentUser = context.getCurrentUser();
         if (isNotSupportedSource(source) || !qaSecurityService.canSeeSource(context, currentUser, source)) {

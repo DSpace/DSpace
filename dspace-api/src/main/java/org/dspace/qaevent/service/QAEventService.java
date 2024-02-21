@@ -202,8 +202,8 @@ public interface QAEventService {
      * @param  target   the uuid of the QA event's target
      * @return          the events
      */
-    public List<QAEvent> findEventsByTopicAndPageAndTarget(Context context, String source, String topic, UUID target,
-                                                           long offset, int pageSize);
+    public List<QAEvent> findEventsByTopicAndTarget(Context context, String source, String topic, UUID target,
+                                                    long offset, int pageSize);
 
     /**
      * Check if a qaevent with the provided id is visible to the current user according to the source security

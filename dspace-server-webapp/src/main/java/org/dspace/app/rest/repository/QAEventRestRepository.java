@@ -93,17 +93,17 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public Page<QAEventRest> findByTopic(@Parameter(value = "topic", required = true) String topic, Pageable pageable) {
         Context context = obtainContext();
-        String[] topicIdSplitted = topic.split(":", 2);
-        if (topicIdSplitted.length != 2) {
+        String[] topicIdSplitted = topic.split(":", 3);
+        if (topicIdSplitted.length < 2) {
             return null;
         }
         String sourceName = topicIdSplitted[0];
         String topicName = topicIdSplitted[1].replaceAll("!", "/");
-
-        List<QAEvent> qaEvents = qaEventService.findEventsByTopic(context, sourceName, topicName,
-                                                                  pageable.getOffset(),
-                                                                  pageable.getPageSize());
-        long count = qaEventService.countEventsByTopic(context, sourceName, topicName);
+        UUID target = topicIdSplitted.length == 3 ? UUID.fromString(topicIdSplitted[2]) : null;
+        List<QAEvent> qaEvents = qaEventService.findEventsByTopicAndTarget(context, sourceName, topicName, target,
+                                                                           pageable.getOffset(),
+                                                                           pageable.getPageSize());
+        long count = qaEventService.countEventsByTopicAndTarget(context, sourceName, topicName, target);
         return converter.toRestPage(qaEvents, pageable, count, utils.obtainProjection());
     }
 
