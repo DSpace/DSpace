@@ -9,6 +9,7 @@ package org.dspace.app.rest.model;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.dspace.app.rest.ContentReportRestController;
 
 /**
