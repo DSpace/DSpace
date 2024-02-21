@@ -82,7 +82,7 @@ public abstract class AInprogressItemConverter<T extends InProgressSubmission,
 
         if (collection != null) {
             SubmissionDefinitionRest def = converter.toRest(
-                    submissionConfigService.getSubmissionConfigByCollection(collection.getHandle()), projection);
+                    submissionConfigService.getSubmissionConfigByCollection(collection), projection);
             witem.setSubmissionDefinition(def);
             for (SubmissionSectionRest sections : def.getPanels()) {
                 SubmissionStepConfig stepConfig = submissionSectionConverter.toModel(sections);

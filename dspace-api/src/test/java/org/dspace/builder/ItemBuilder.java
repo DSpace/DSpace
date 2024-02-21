@@ -186,6 +186,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return addMetadataValue(item, "iiif", "image", "height", String.valueOf(i));
     }
 
+    public ItemBuilder withDSpaceObjectOwner(String name, String authority) {
+        return addMetadataValue(item, "dspace", "object", "owner", null, name, authority, 600);
+    }
+
     public ItemBuilder withMetadata(final String schema, final String element, final String qualifier,
         final String value) {
         return addMetadataValue(item, schema, element, qualifier, value);

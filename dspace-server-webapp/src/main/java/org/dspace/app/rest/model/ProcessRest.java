@@ -65,6 +65,7 @@ public class ProcessRest extends BaseObjectRest<Integer> {
     private Integer processId;
     private Date startTime;
     private Date endTime;
+    private Date creationTime;
     private ProcessStatus processStatus;
     @JsonProperty(value = "parameters")
     private List<ParameterValueRest> parameterRestList;
@@ -107,6 +108,14 @@ public class ProcessRest extends BaseObjectRest<Integer> {
 
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
+    }
+
+    public Date getCreationTime() {
+        return creationTime;
+    }
+
+    public void setCreationTime(Date creationTime) {
+        this.creationTime = creationTime;
     }
 
     public String getScriptName() {

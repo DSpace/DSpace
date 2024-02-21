@@ -127,6 +127,9 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
         }
         if (eperson != null && accountType.equalsIgnoreCase(TYPE_FORGOT)) {
             try {
+                if (!AuthorizeUtil.authorizeForgotPassword()) {
+                    throw new AccessDeniedException("Password reset is not allowed!");
+                }
                 if (!AuthorizeUtil.authorizeUpdatePassword(context, eperson.getEmail())) {
                     throw new DSpaceBadRequestException("Password cannot be updated for the given EPerson with email: "
                                                             + eperson.getEmail());

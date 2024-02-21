@@ -23,7 +23,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
-import org.dspace.app.rest.Application;
+import org.dspace.app.TestApplication;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.utils.DSpaceConfigurationInitializer;
 import org.dspace.app.rest.utils.DSpaceKernelInitializer;
@@ -68,7 +68,7 @@ import org.springframework.web.context.WebApplicationContext;
 // Specify main class to use to load Spring ApplicationContext
 // NOTE: By default, Spring caches and reuses ApplicationContext for each integration test (to speed up tests)
 // See: https://docs.spring.io/spring/docs/current/spring-framework-reference/testing.html#integration-testing
-@SpringBootTest(classes = Application.class)
+@SpringBootTest(classes = TestApplication.class)
 // Load DSpace initializers in Spring ApplicationContext (to initialize DSpace Kernel & Configuration)
 @ContextConfiguration(initializers = { DSpaceKernelInitializer.class, DSpaceConfigurationInitializer.class })
 // Tell Spring to make ApplicationContext an instance of WebApplicationContext (for web-based tests)
