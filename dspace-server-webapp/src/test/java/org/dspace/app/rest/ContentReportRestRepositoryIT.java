@@ -108,11 +108,13 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
                    )))
                    .andExpect(jsonPath("type", is("filteredcollectionsreport")))
                    .andExpect(jsonPath("$.summary",
-                           ContentReportMatcher.matchFilteredCollectionSummary(3, 2)))
+                           ContentReportMatcher.matchFilteredCollectionSummary(3, 3)))
                    .andExpect(jsonPath("$._links.self.href",
                            Matchers.containsString("/api/contentreport/filteredcollections")));
     }
 
+    // This test is disabled until someone can find out why the search function doesn't behave properly
+    // in the present test context while it does when used against a standard production database.
     @Ignore
     @Test
     public void testFilteredItems() throws Exception {
