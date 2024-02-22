@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
-@Component(SubmissionCOARNotifyRest.CATEGORY + "." + SubmissionCOARNotifyRest.NAME)
+@Component(SubmissionCOARNotifyRest.CATEGORY + "." + SubmissionCOARNotifyRest.PLURAL_NAME)
 public class SubmissionCoarNotifyRestRepository extends DSpaceRestRepository<SubmissionCOARNotifyRest, String> {
 
     @Autowired

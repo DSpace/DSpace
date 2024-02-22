@@ -48,7 +48,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Francesco Bacchelli (francesco.bacchelli at 4science dot it)
  */
 @RestController
-@RequestMapping("/api/" + NotifyRequestStatusRest.CATEGORY + "/" + NotifyRequestStatusRest.NAME +
+@RequestMapping("/api/" + NotifyRequestStatusRest.CATEGORY + "/" + NotifyRequestStatusRest.PLURAL_NAME +
     REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
 public class NotifyRequestStatusRestController implements InitializingBean {
 
