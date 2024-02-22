@@ -20,6 +20,7 @@ public class CorrectionTypeRest extends BaseObjectRest<String> {
     private static final long serialVersionUID = -8297846719538025938L;
 
     public static final String NAME = "correctiontype";
+    public static final String PLURAL_NAME = "correctiontypes";
     public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
 
     private String topic;
@@ -41,6 +42,11 @@ public class CorrectionTypeRest extends BaseObjectRest<String> {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     @Override
