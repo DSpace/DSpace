@@ -26,6 +26,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.contentreport.service.ContentReportService;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class ContentReportServiceImpl implements ContentReportService {
@@ -34,11 +35,18 @@ public class ContentReportServiceImpl implements ContentReportService {
             .getLogger(ContentReportServiceImpl.class);
 
     @Autowired
+    protected ConfigurationService configurationService;
+    @Autowired
     private CollectionService collectionService;
     @Autowired
     private ItemService itemService;
     @Autowired
     private MetadataFieldService metadataFieldService;
+
+    @Override
+    public boolean getEnabled() {
+        return configurationService.getBooleanProperty("contentreport.enable");
+    }
 
     /**
      * Retrieves item statistics per collection according to a set of Boolean filters.

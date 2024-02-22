@@ -20,6 +20,7 @@ import org.dspace.core.Context;
 
 public interface ContentReportService {
 
+    boolean getEnabled();
     List<FilteredCollection> findFilteredCollections(Context context, Set<Filter> filters);
     FilteredItems findFilteredItems(Context context, FilteredItemsQuery query);
     List<MetadataField> getMetadataFields(org.dspace.core.Context context, String queryField)
