@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repositoy for the Steps subresources of an individual PoolTask
  */
-@Component(PoolTaskRest.CATEGORY + "." + PoolTaskRest.NAME + "." + PoolTaskRest.STEP)
+@Component(PoolTaskRest.CATEGORY + "." + PoolTaskRest.PLURAL_NAME + "." + PoolTaskRest.STEP)
 public class PoolTaskStepLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     @Autowired

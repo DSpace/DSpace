@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for the parent object of a group.
  */
-@Component(GroupRest.CATEGORY + "." + GroupRest.NAME + "." + GroupRest.OBJECT)
+@Component(GroupRest.CATEGORY + "." + GroupRest.PLURAL_NAME + "." + GroupRest.OBJECT)
 public class GroupParentObjectLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

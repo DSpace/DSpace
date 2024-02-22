@@ -31,7 +31,7 @@ import org.dspace.usage.UsageEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component(ViewEventRest.CATEGORY + "." + ViewEventRest.NAME)
+@Component(ViewEventRest.CATEGORY + "." + ViewEventRest.PLURAL_NAME)
 public class ViewEventRestRepository extends AbstractDSpaceRestRepository {
 
     @Autowired

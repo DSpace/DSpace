@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-@Component(QATopicRest.CATEGORY + "." + QATopicRest.NAME)
+@Component(QATopicRest.CATEGORY + "." + QATopicRest.PLURAL_NAME)
 public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, String> {
 
     final static String ORDER_FIELD = "topic";

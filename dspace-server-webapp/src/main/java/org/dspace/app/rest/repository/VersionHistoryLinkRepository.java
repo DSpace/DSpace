@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
  * This is the Repository that takes care of the retrieval of the {@link VersionHistory} object
  * for a given {@link Version}
  */
-@Component(VersionRest.CATEGORY + "." + VersionRest.NAME + "." + VersionRest.VERSION_HISTORY)
+@Component(VersionRest.CATEGORY + "." + VersionRest.PLURAL_NAME + "." + VersionRest.VERSION_HISTORY)
 public class VersionHistoryLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
 

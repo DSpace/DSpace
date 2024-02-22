@@ -33,6 +33,11 @@ public class ExternalSourceEntryRest extends RestAddressableModel {
         return NAME;
     }
 
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
     private String id;
     private String display;
     private String value;

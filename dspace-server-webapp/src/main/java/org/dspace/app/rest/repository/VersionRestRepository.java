@@ -48,7 +48,7 @@ import org.springframework.stereotype.Component;
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
-@Component(VersionRest.CATEGORY + "." + VersionRest.NAME)
+@Component(VersionRest.CATEGORY + "." + VersionRest.PLURAL_NAME)
 public class VersionRestRepository extends DSpaceRestRepository<VersionRest, Integer>
                                     implements ReloadableEntityObjectRepository<Version, Integer> {
 
