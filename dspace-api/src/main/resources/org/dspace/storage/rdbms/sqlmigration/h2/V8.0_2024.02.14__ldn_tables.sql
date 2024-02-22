@@ -64,11 +64,11 @@ CREATE TABLE ldn_message
   queue_last_start_time TIMESTAMP,
   queue_timeout TIMESTAMP,
   source_ip VARCHAR(45),
-  FOREIGN KEY (object) REFERENCES dspaceobject (uuid),
-  FOREIGN KEY (context) REFERENCES dspaceobject (uuid),
-  FOREIGN KEY (origin) REFERENCES notifyservice (id),
-  FOREIGN KEY (target) REFERENCES notifyservice (id),
-  FOREIGN KEY (inReplyTo) REFERENCES ldn_message (id)
+  FOREIGN KEY (object) REFERENCES dspaceobject (uuid) ON DELETE SET NULL,
+  FOREIGN KEY (context) REFERENCES dspaceobject (uuid) ON DELETE SET NULL,
+  FOREIGN KEY (origin) REFERENCES notifyservice (id) ON DELETE SET NULL,
+  FOREIGN KEY (target) REFERENCES notifyservice (id) ON DELETE SET NULL,
+  FOREIGN KEY (inReplyTo) REFERENCES ldn_message (id) ON DELETE SET NULL
 );
 
 

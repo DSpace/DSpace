@@ -136,6 +136,8 @@ public class SendLDNMessageActionIT extends AbstractIntegrationTestWithDatabase 
 
         sendLDNMessageAction = new SendLDNMessageAction(mockedClient);
         assertEquals(sendLDNMessageAction.execute(context, notification, item), CONTINUE);
+        mockedClient.close();
+        response.close();
     }
 
     @Test
@@ -179,12 +181,12 @@ public class SendLDNMessageActionIT extends AbstractIntegrationTestWithDatabase 
         LDNMessageEntity ldnMessage =
             ldnMessageService.findAll(context).stream().findFirst().orElse(null);
 
-        ldnMessage.getQueueStatus();
-
         Notification notification = mapper.readValue(ldnMessage.getMessage(), Notification.class);
 
         sendLDNMessageAction = new SendLDNMessageAction(mockedClient);
         assertEquals(sendLDNMessageAction.execute(context, notification, item), CONTINUE);
+        mockedClient.close();
+        response.close();
     }
 
     @Test
@@ -226,11 +228,11 @@ public class SendLDNMessageActionIT extends AbstractIntegrationTestWithDatabase 
         LDNMessageEntity ldnMessage =
             ldnMessageService.findAll(context).stream().findFirst().orElse(null);
 
-        ldnMessage.getQueueStatus();
-
         Notification notification = mapper.readValue(ldnMessage.getMessage(), Notification.class);
         sendLDNMessageAction = new SendLDNMessageAction(mockedClient);
         assertEquals(sendLDNMessageAction.execute(context, notification, item), ABORT);
+        mockedClient.close();
+        response.close();
     }
 
     @Override
