@@ -73,6 +73,11 @@
                 <entry key="undiscoverable" value-ref="unDiscoverableItems" />
                 <entry key="administrativeView" value-ref="administrativeView" />
 
+                <!-- "community" is the search configuration for community pages -->
+                <entry key="community" value-ref="communityConfiguration" />
+                <!-- "collection" is the search configuration for collection pages -->
+                <entry key="collection" value-ref="collectionConfiguration" />
+
                 <entry key="publication" value-ref="publication"/>
                 <!-- Same as the "publication" configuration, but does NOT filter out older versions of items -->
                 <!-- Used to display related items on single-item pages, because a relationship does not always point to the latest version of the related item -->
@@ -304,6 +309,40 @@
         </property>
         <!-- When true a "did you mean" example will be displayed, value can be true or false -->
         <property name="spellCheckEnabled" value="true"/>
+    </bean>
+
+    <bean id="communityConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
+          scope="prototype" parent="defaultConfiguration">
+        <!--The sort filters for the discovery search-->
+        <property name="searchSortConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="sortFields">
+                    <list>
+                        <ref bean="sortDateAccessioned"/>
+                        <ref bean="sortScore"/>
+                        <ref bean="sortTitle"/>
+                        <ref bean="sortDateIssued"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="collectionConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration"
+          scope="prototype" parent="defaultConfiguration">
+        <!--The sort filters for the discovery search-->
+        <property name="searchSortConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="sortFields">
+                    <list>
+                        <ref bean="sortDateAccessioned"/>
+                        <ref bean="sortScore"/>
+                        <ref bean="sortTitle"/>
+                        <ref bean="sortDateIssued"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
     </bean>
 
     <bean id="defaultRelationshipsConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
