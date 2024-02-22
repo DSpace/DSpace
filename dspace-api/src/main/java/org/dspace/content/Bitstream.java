@@ -307,8 +307,16 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
         return collection;
     }
 
+    public void setCollection(Collection collection) {
+        this.collection = collection;
+    }
+
     public Community getCommunity() {
         return community;
+    }
+
+    public void setCommunity(Community community) {
+        this.community = community;
     }
 
     /**
