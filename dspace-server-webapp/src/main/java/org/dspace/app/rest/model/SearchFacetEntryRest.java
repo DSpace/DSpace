@@ -21,6 +21,7 @@ import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 public class SearchFacetEntryRest extends RestAddressableModel {
 
     public static final String NAME = "discover";
+    public static final String PLURAL_NAME = NAME;
     public static final String CATEGORY = RestModel.DISCOVER;
 
     private String name;
@@ -52,6 +53,14 @@ public class SearchFacetEntryRest extends RestAddressableModel {
     @JsonIgnore
     public String getType() {
         return NAME;
+    }
+
+    /**
+     * The plural name is the same as the singular name
+     */
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     public Class getController() {

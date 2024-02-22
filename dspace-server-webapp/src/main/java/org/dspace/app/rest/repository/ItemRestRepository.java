@@ -59,7 +59,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
-@Component(ItemRest.CATEGORY + "." + ItemRest.NAME)
+@Component(ItemRest.CATEGORY + "." + ItemRest.PLURAL_NAME)
 public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRest> {
 
     private static final Logger log = LogManager.getLogger(ItemRestRepository.class);

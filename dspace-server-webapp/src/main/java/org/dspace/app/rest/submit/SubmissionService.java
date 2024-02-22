@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
@@ -37,7 +36,6 @@ import org.dspace.app.rest.repository.WorkflowItemRestRepository;
 import org.dspace.app.rest.repository.WorkspaceItemRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.util.SubmissionConfig;
-import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.authorize.AuthorizeException;
@@ -58,6 +56,8 @@ import org.dspace.license.service.CreativeCommonsService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
+import org.dspace.submit.factory.SubmissionServiceFactory;
+import org.dspace.submit.service.SubmissionConfigService;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.WorkflowService;
@@ -100,10 +100,10 @@ public class SubmissionService {
     private ConverterService converter;
     @Autowired
     private org.dspace.app.rest.utils.Utils utils;
-    private SubmissionConfigReader submissionConfigReader;
+    private SubmissionConfigService submissionConfigService;
 
     public SubmissionService() throws SubmissionConfigReaderException {
-        submissionConfigReader = new SubmissionConfigReader();
+        submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
     }
 
     /**
@@ -218,7 +218,7 @@ public class SubmissionService {
         data.setCheckSum(checksum);
         data.setSizeBytes(source.getSizeBytes());
         data.setUrl(configurationService.getProperty("dspace.server.url") + "/api/" + BitstreamRest.CATEGORY + "/" +
-                        English.plural(BitstreamRest.NAME) + "/" + source.getID() + "/content");
+                        BitstreamRest.PLURAL_NAME + "/" + source.getID() + "/content");
         return data;
     }
 
@@ -240,7 +240,7 @@ public class SubmissionService {
         if (StringUtils.isBlank(requestUriListString)) {
             throw new UnprocessableEntityException("Malformed body..." + requestUriListString);
         }
-        String regex = "\\/api\\/" + WorkspaceItemRest.CATEGORY + "\\/" + English.plural(WorkspaceItemRest.NAME)
+        String regex = "\\/api\\/" + WorkspaceItemRest.CATEGORY + "\\/" + WorkspaceItemRest.PLURAL_NAME
                 + "\\/";
         String[] split = requestUriListString.split(regex, 2);
         if (split.length != 2) {
@@ -329,7 +329,7 @@ public class SubmissionService {
             AInprogressSubmissionRest wsi, InProgressSubmission source, MultipartFile file) {
         List<ErrorRest> errors = new ArrayList<ErrorRest>();
         SubmissionConfig submissionConfig =
-            submissionConfigReader.getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
+            submissionConfigService.getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
         List<Object[]> stepInstancesAndConfigs = new ArrayList<Object[]>();
         // we need to run the preProcess of all the appropriate steps and move on to the
         // upload and postProcess step
@@ -396,7 +396,7 @@ public class SubmissionService {
     public void evaluatePatchToInprogressSubmission(Context context, HttpServletRequest request,
             InProgressSubmission source, AInprogressSubmissionRest wsi, String section, Operation op) {
         boolean sectionExist = false;
-        SubmissionConfig submissionConfig = submissionConfigReader
+        SubmissionConfig submissionConfig = submissionConfigService
                 .getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
         List<Object[]> stepInstancesAndConfigs = new ArrayList<Object[]>();
         // we need to run the preProcess of all the appropriate steps and move on to the

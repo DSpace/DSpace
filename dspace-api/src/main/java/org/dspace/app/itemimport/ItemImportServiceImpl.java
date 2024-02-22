@@ -774,6 +774,10 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             // put item in system
             if (!isTest) {
                 try {
+                    // Add provenance info
+                    String provenance = installItemService.getSubmittedByProvenanceMessage(c, wi.getItem());
+                    itemService.addMetadata(c, wi.getItem(), MetadataSchemaEnum.DC.getName(),
+                        "description", "provenance", "en", provenance);
                     installItemService.installItem(c, wi, myhandle);
                 } catch (Exception e) {
                     workspaceItemService.deleteAll(c, wi);

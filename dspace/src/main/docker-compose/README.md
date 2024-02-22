@@ -78,6 +78,7 @@ docker-compose -p d7 up -d
 ```
 docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml up -d
 ```
+NOTE: This starts the UI in development mode. It will take a few minutes to see the UI as the Angular code needs to be compiled.
 
 ## Run DSpace REST and DSpace Angular from local branches
 
@@ -268,8 +269,8 @@ Here's how to fix those issues by migrating your old Postgres data to the new ve
         * Pull down an older version of the image from Dockerhub (using a tag)
         * Or, temporarily rebuild your local image with the old version of Postgres. For example:
           ```
-          # This command will rebuild using PostgreSQL v11 & tag it locally as "dspace-7_x"
-          docker build --build-arg POSTGRES_VERSION=11 -t dspace/dspace-postgres-pgcrypto:dspace-7_x ./dspace/src/main/docker/dspace-postgres-pgcrypto/
+          # This command will rebuild using PostgreSQL v11 & tag it locally as "latest"
+          docker build --build-arg POSTGRES_VERSION=11 -t dspace/dspace-postgres-pgcrypto:latest ./dspace/src/main/docker/dspace-postgres-pgcrypto/
           # Then restart container with that image
           docker-compose -p d7 up -d
           ```

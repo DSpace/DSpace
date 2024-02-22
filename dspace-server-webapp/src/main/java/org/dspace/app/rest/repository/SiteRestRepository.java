@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
-@Component(SiteRest.CATEGORY + "." + SiteRest.NAME)
+@Component(SiteRest.CATEGORY + "." + SiteRest.PLURAL_NAME)
 public class SiteRestRepository extends DSpaceObjectRestRepository<Site, SiteRest> {
 
     private final SiteService sitesv;
