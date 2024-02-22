@@ -29,4 +29,10 @@ public class ContentReportSupportRest extends BaseObjectRest<String> {
     public String getType() {
         return NAME;
     }
+
+    @Override
+    public String getTypePlural() {
+        return NAME;
+    }
+
 }
