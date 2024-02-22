@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
-@Component(EntityTypeRest.CATEGORY + "." + EntityTypeRest.NAME + "." + EntityTypeRest.RELATION_SHIP_TYPES)
+@Component(EntityTypeRest.CATEGORY + "." + EntityTypeRest.PLURAL_NAME + "." + EntityTypeRest.RELATION_SHIP_TYPES)
 public class EntityTypeRelationshipLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

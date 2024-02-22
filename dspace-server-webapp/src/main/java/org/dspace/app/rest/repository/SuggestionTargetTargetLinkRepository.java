@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-@Component(SuggestionTargetRest.CATEGORY + "." + SuggestionTargetRest.NAME + "." + SuggestionTargetRest.TARGET)
+@Component(SuggestionTargetRest.CATEGORY + "." + SuggestionTargetRest.PLURAL_NAME + "." + SuggestionTargetRest.TARGET)
 public class SuggestionTargetTargetLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     @Autowired

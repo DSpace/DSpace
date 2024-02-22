@@ -16,6 +16,7 @@ import org.dspace.app.rest.DiscoveryRestController;
 public class SearchFacetValueRest extends RestAddressableModel {
 
     public static final String NAME = "discover";
+    public static final String PLURAL_NAME = NAME;
     public static final String CATEGORY = RestModel.DISCOVER;
 
     private String label;
@@ -34,6 +35,14 @@ public class SearchFacetValueRest extends RestAddressableModel {
 
     public String getType() {
         return NAME;
+    }
+
+    /**
+     * The plural name is the same as the singular name
+     */
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     public Class getController() {

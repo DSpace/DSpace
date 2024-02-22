@@ -42,6 +42,11 @@ public class ExternalSourceRest extends BaseObjectRest<String> {
         return NAME;
     }
 
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
     private String id;
     private String name;
     private boolean hierarchical;

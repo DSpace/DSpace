@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-@Component(QASourceRest.CATEGORY + "." + QASourceRest.NAME)
+@Component(QASourceRest.CATEGORY + "." + QASourceRest.PLURAL_NAME)
 public class QASourceRestRepository extends DSpaceRestRepository<QASourceRest, String> {
 
     @Autowired

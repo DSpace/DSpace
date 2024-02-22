@@ -55,6 +55,11 @@ public class ProcessRest extends BaseObjectRest<Integer> {
         return NAME;
     }
 
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
     private String scriptName;
     private UUID userId;
     private Integer processId;

@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  * Link repository for "admingroup" subresource of an individual collection.
  *
  */
-@Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME + "." + CollectionRest.ADMIN_GROUP)
+@Component(CollectionRest.CATEGORY + "." + CollectionRest.PLURAL_NAME + "." + CollectionRest.ADMIN_GROUP)
 public class CollectionAdminGroupLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     @Autowired

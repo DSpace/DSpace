@@ -61,7 +61,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
-@Component(CommunityRest.CATEGORY + "." + CommunityRest.NAME)
+@Component(CommunityRest.CATEGORY + "." + CommunityRest.PLURAL_NAME)
 public class CommunityRestRepository extends DSpaceObjectRestRepository<Community, CommunityRest> {
 
     private static final Logger log = org.apache.logging.log4j.LogManager

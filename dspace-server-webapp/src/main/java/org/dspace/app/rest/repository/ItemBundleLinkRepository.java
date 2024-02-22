@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "bundles" subresource of an individual item.
  */
-@Component(ItemRest.CATEGORY + "." + ItemRest.NAME + "." + ItemRest.BUNDLES)
+@Component(ItemRest.CATEGORY + "." + ItemRest.PLURAL_NAME + "." + ItemRest.BUNDLES)
 public class ItemBundleLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 
