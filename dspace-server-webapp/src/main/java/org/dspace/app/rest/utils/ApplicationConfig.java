@@ -73,7 +73,7 @@ public class ApplicationConfig {
     private String uiURL;
 
     // LDN enable status
-    @Value("ldn.enabled")
+    @Value("${ldn.enabled}")
     private boolean ldnEnabled;
 
     /**
