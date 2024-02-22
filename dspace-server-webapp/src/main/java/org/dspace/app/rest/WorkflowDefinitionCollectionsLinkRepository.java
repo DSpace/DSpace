@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Maria Verdonck (Atmire) on 11/12/2019
  */
-@Component(WorkflowDefinitionRest.CATEGORY + "." + WorkflowDefinitionRest.NAME + "."
+@Component(WorkflowDefinitionRest.CATEGORY + "." + WorkflowDefinitionRest.PLURAL_NAME + "."
     + WorkflowDefinitionRest.COLLECTIONS_MAPPED_TO)
 public class WorkflowDefinitionCollectionsLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {

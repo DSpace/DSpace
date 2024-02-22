@@ -48,7 +48,7 @@ import org.springframework.stereotype.Component;
 /**
  * This is the repository that is responsible for managing Registration Rest objects
  */
-@Component(RegistrationRest.CATEGORY + "." + RegistrationRest.NAME)
+@Component(RegistrationRest.CATEGORY + "." + RegistrationRest.PLURAL_NAME)
 public class RegistrationRestRepository extends DSpaceRestRepository<RegistrationRest, Integer> {
 
     private static Logger log = LogManager.getLogger(RegistrationRestRepository.class);

@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "DSpaceObject" of subscription
  */
-@Component(SubscriptionRest.CATEGORY + "." + SubscriptionRest.NAME + "." + SubscriptionRest.DSPACE_OBJECT)
+@Component(SubscriptionRest.CATEGORY + "." + SubscriptionRest.PLURAL_NAME + "." + SubscriptionRest.DSPACE_OBJECT)
 public class SubscriptionDSpaceObjectLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     @Autowired

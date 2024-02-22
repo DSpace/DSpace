@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-@Component(QAEventRest.CATEGORY + "." + QAEventRest.NAME + "." + QAEventRest.TOPIC)
+@Component(QAEventRest.CATEGORY + "." + QAEventRest.PLURAL_NAME + "." + QAEventRest.TOPIC)
 public class QAEventTopicLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     @Autowired

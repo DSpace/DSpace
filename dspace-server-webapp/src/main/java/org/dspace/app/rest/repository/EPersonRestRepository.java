@@ -60,7 +60,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
-@Component(EPersonRest.CATEGORY + "." + EPersonRest.NAME)
+@Component(EPersonRest.CATEGORY + "." + EPersonRest.PLURAL_NAME)
 public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, EPersonRest>
                                    implements InitializingBean {
 

@@ -49,7 +49,7 @@ import org.springframework.stereotype.Component;
  * @author Jelle Pelgrims (jelle.pelgrims at atmire.com)
  */
 
-@Component(BundleRest.CATEGORY + "." + BundleRest.NAME)
+@Component(BundleRest.CATEGORY + "." + BundleRest.PLURAL_NAME)
 public class BundleRestRepository extends DSpaceObjectRestRepository<Bundle, BundleRest> {
 
     private static final Logger log = LogManager.getLogger();

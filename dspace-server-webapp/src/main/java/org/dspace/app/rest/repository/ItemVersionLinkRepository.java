@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 /**
  * This is the Repository that will take care of fetching the Version for a given Item
  */
-@Component(ItemRest.CATEGORY + "." + ItemRest.NAME + "." + ItemRest.VERSION)
+@Component(ItemRest.CATEGORY + "." + ItemRest.PLURAL_NAME + "." + ItemRest.VERSION)
 public class ItemVersionLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
 

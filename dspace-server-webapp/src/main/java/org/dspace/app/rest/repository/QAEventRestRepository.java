@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-@Component(QAEventRest.CATEGORY + "." + QAEventRest.NAME)
+@Component(QAEventRest.CATEGORY + "." + QAEventRest.PLURAL_NAME)
 public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, String> {
 
     final static String ORDER_FIELD = "trust";

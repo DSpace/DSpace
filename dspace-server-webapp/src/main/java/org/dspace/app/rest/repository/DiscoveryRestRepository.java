@@ -44,7 +44,7 @@ import org.springframework.stereotype.Component;
  * information lookup
  * that has to be done for the endpoint
  */
-@Component(SearchResultsRest.CATEGORY + "." + SearchResultsRest.NAME)
+@Component(SearchResultsRest.CATEGORY + "." + SearchResultsRest.PLURAL_NAME)
 public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
 
     private static final Logger log = LogManager.getLogger();

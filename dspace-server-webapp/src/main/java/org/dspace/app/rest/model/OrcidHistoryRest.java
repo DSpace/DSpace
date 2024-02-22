@@ -25,6 +25,7 @@ public class OrcidHistoryRest extends BaseObjectRest<Integer> {
 
     public static final String CATEGORY = RestModel.EPERSON;
     public static final String NAME = "orcidhistory";
+    public static final String PLURAL_NAME = "orcidhistories";
 
     private UUID profileItemId;
 
@@ -44,6 +45,11 @@ public class OrcidHistoryRest extends BaseObjectRest<Integer> {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     @Override
