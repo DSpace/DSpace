@@ -31,7 +31,7 @@ public class CoarNotifyEnabled implements AuthorizationFeature {
 
     @Override
     public boolean isAuthorized(Context context, BaseObjectRest object) throws SQLException, SearchServiceException {
-        return configurationService.getBooleanProperty("coar-notify.enabled", true);
+        return configurationService.getBooleanProperty("ldn.enabled", true);
     }
 
     @Override
