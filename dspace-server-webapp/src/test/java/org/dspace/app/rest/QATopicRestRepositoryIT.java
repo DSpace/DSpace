@@ -417,7 +417,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void findByTargetUnauthorizedTest() throws Exception {
+    public void findByTargetZeroEventsOpenaireTest() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
             .withName("Parent Community")
@@ -430,11 +430,11 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/integration/qualityassurancetopics/search/byTarget")
                 .param("source", QAEvent.OPENAIRE_SOURCE)
                 .param("target", item1.getID().toString()))
-            .andExpect(status().isUnauthorized());
+                .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
-    public void findByTargetForbiddenTest() throws Exception {
+    public void findByTargetZeroEventsAnotherSourceTest() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
             .withName("Parent Community")
@@ -448,7 +448,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/byTarget")
             .param("target", item1.getID().toString())
             .param("source", "test-source"))
-            .andExpect(status().isForbidden());
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
