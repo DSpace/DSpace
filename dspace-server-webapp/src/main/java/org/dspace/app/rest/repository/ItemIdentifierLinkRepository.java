@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for the identifier of an Item
  */
-@Component(ItemRest.CATEGORY + "." + ItemRest.NAME + "." + ItemRest.IDENTIFIERS)
+@Component(ItemRest.CATEGORY + "." + ItemRest.PLURAL_NAME + "." + ItemRest.IDENTIFIERS)
 public class ItemIdentifierLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
     @Autowired
     ItemService itemService;

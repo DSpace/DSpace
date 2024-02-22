@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  * Link repository for "admingroup" subresource of an individual community.
  *
  */
-@Component(CommunityRest.CATEGORY + "." + CommunityRest.NAME + "." + CommunityRest.ADMIN_GROUP)
+@Component(CommunityRest.CATEGORY + "." + CommunityRest.PLURAL_NAME + "." + CommunityRest.ADMIN_GROUP)
 public class CommunityAdminGroupLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     @Autowired

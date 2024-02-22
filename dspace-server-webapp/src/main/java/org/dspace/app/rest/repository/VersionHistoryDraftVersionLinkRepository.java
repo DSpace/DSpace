@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
-@Component(VersionHistoryRest.CATEGORY + "." + VersionHistoryRest.NAME + "." + VersionHistoryRest.DRAFT_VERSION)
+@Component(VersionHistoryRest.CATEGORY + "." + VersionHistoryRest.PLURAL_NAME + "." + VersionHistoryRest.DRAFT_VERSION)
 public class VersionHistoryDraftVersionLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

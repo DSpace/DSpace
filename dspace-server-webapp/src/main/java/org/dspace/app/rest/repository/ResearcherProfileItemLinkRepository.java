@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-@Component(ResearcherProfileRest.CATEGORY + "." + ResearcherProfileRest.NAME + "." + ResearcherProfileRest.ITEM)
+@Component(ResearcherProfileRest.CATEGORY + "." + ResearcherProfileRest.PLURAL_NAME + "." + ResearcherProfileRest.ITEM)
 public class ResearcherProfileItemLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     @Autowired

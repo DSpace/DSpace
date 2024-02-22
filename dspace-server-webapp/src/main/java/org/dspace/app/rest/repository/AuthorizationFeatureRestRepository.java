@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-@Component(AuthorizationFeatureRest.CATEGORY + "." + AuthorizationFeatureRest.NAME)
+@Component(AuthorizationFeatureRest.CATEGORY + "." + AuthorizationFeatureRest.PLURAL_NAME)
 public class AuthorizationFeatureRestRepository extends DSpaceRestRepository<AuthorizationFeatureRest, String> {
 
     @Autowired

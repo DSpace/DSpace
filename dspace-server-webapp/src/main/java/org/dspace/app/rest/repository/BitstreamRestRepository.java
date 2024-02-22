@@ -56,7 +56,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
-@Component(BitstreamRest.CATEGORY + "." + BitstreamRest.NAME)
+@Component(BitstreamRest.CATEGORY + "." + BitstreamRest.PLURAL_NAME)
 public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstream, BitstreamRest> {
 
     private final BitstreamService bs;

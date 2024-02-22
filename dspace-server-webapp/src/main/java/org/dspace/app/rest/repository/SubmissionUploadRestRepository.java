@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
-@Component(SubmissionUploadRest.CATEGORY + "." + SubmissionUploadRest.NAME)
+@Component(SubmissionUploadRest.CATEGORY + "." + SubmissionUploadRest.PLURAL_NAME)
 public class SubmissionUploadRestRepository extends DSpaceRestRepository<SubmissionUploadRest, String> {
 
     private static final Logger log = org.apache.logging.log4j.LogManager

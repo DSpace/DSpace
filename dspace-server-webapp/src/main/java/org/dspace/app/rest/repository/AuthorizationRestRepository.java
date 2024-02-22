@@ -49,7 +49,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
-@Component(AuthorizationRest.CATEGORY + "." + AuthorizationRest.NAME)
+@Component(AuthorizationRest.CATEGORY + "." + AuthorizationRest.PLURAL_NAME)
 public class AuthorizationRestRepository extends DSpaceRestRepository<AuthorizationRest, String> {
 
     private static final Logger log = LoggerFactory.getLogger(AuthorizationRestRepository.class);

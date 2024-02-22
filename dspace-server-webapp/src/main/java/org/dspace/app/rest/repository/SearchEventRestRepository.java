@@ -25,7 +25,7 @@ import org.dspace.usage.UsageSearchEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component(SearchEventRest.CATEGORY + "." + SearchEventRest.NAME)
+@Component(SearchEventRest.CATEGORY + "." + SearchEventRest.PLURAL_NAME)
 public class SearchEventRestRepository extends AbstractDSpaceRestRepository {
 
     @Autowired

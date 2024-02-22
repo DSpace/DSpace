@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "format" subresource of an individual bitstream.
  */
-@Component(BitstreamRest.CATEGORY + "." + BitstreamRest.NAME + "." + BitstreamRest.FORMAT)
+@Component(BitstreamRest.CATEGORY + "." + BitstreamRest.PLURAL_NAME + "." + BitstreamRest.FORMAT)
 public class BitstreamFormatLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

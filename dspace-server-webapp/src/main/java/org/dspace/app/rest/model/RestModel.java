@@ -10,7 +10,6 @@ package org.dspace.app.rest.model;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.atteo.evo.inflector.English;
 
 /**
  * A REST resource directly or indirectly (in a collection) exposed must have at
@@ -34,11 +33,10 @@ public interface RestModel extends Serializable {
     public static final String VERSIONING = "versioning";
     public static final String AUTHENTICATION = "authn";
     public static final String TOOLS = "tools";
+    public static final String PID = "pid";
 
     public String getType();
 
     @JsonIgnore
-    default public String getTypePlural() {
-        return English.plural(getType());
-    }
+    String getTypePlural();
 }

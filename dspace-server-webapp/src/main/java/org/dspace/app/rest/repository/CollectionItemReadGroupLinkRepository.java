@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
  * Link repository for "ItemReadGroup" subresource of an individual collection.
  *
  */
-@Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME + "." + CollectionRest.ITEM_READ_GROUP)
+@Component(CollectionRest.CATEGORY + "." + CollectionRest.PLURAL_NAME + "." + CollectionRest.ITEM_READ_GROUP)
 public class CollectionItemReadGroupLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     @Autowired

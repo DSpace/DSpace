@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Maria Verdonck (Atmire) on 2019-12-13
  */
 @RestController
-@RequestMapping("/api/" + EntityTypeRest.CATEGORY + "/" + EntityTypeRest.NAME_PLURAL)
+@RequestMapping("/api/" + EntityTypeRest.CATEGORY + "/" + EntityTypeRest.PLURAL_NAME)
 public class EntityTypeLabelRestController {
 
     protected final EntityTypeService entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
