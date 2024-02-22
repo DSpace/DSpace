@@ -135,6 +135,9 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
 
     protected void setLogo(Bitstream logo) {
         this.logo = logo;
+        if (logo != null) {
+            logo.setCollection(this);
+        }
         setModified();
     }
 
