@@ -73,9 +73,12 @@ public interface QAEventService {
      * @param  topic      the topic to search for
      * @param  offset     the offset to apply
      * @param  size       the page size
+     * @param  orderField  the field to order for
+     * @param  ascending   true if the order should be ascending, false otherwise
      * @return            the events
      */
-    public List<QAEvent> findEventsByTopic(Context context, String sourceName, String topic, long offset, int size);
+    public List<QAEvent> findEventsByTopic(Context context, String sourceName, String topic, long offset, int size,
+                                           String orderField, boolean ascending);
 
     /**
      * Find all the events by topic.

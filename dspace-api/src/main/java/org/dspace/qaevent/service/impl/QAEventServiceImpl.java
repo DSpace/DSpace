@@ -40,6 +40,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.FacetParams;
 import org.dspace.content.QAEvent;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
@@ -259,6 +260,7 @@ public class QAEventServiceImpl implements QAEventService {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
         solrQuery.setSort(orderField, ascending ? ORDER.asc : ORDER.desc);
+        solrQuery.setFacetSort(FacetParams.FACET_SORT_INDEX);
         solrQuery.setQuery(securityQuery.orElse("*:*"));
         solrQuery.setFacet(true);
         solrQuery.setFacetMinCount(1);
@@ -375,7 +377,8 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public List<QAEvent> findEventsByTopic(Context context, String sourceName, String topic, long offset, int size) {
+    public List<QAEvent> findEventsByTopic(Context context, String sourceName, String topic, long offset, int size,
+                                           String orderField, boolean ascending) {
         EPerson currentUser = context.getCurrentUser();
         if (isNotSupportedSource(sourceName) || !qaSecurityService.canSeeSource(context, currentUser, sourceName)) {
             return List.of();
@@ -384,7 +387,7 @@ public class QAEventServiceImpl implements QAEventService {
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setStart(((Long) offset).intValue());
         solrQuery.setRows(size);
-        solrQuery.setSort(TRUST, ORDER.desc);
+        solrQuery.setSort(orderField, ascending ? ORDER.asc : ORDER.desc);
         Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, sourceName);
         solrQuery.setQuery(securityQuery.orElse("*:*"));
 
