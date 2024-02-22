@@ -377,7 +377,7 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public List<QAEvent> findEventsByTopic(Context context, String sourceName, String topic, long offset, int size,
+    public List<QAEvent> findEventsByTopic(Context context, String sourceName, String topic, long offset, int pageSize,
                                            String orderField, boolean ascending) {
         EPerson currentUser = context.getCurrentUser();
         if (isNotSupportedSource(sourceName) || !qaSecurityService.canSeeSource(context, currentUser, sourceName)) {
@@ -386,7 +386,9 @@ public class QAEventServiceImpl implements QAEventService {
 
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setStart(((Long) offset).intValue());
-        solrQuery.setRows(size);
+        if (pageSize != -1) {
+            solrQuery.setRows(pageSize);
+        }
         solrQuery.setSort(orderField, ascending ? ORDER.asc : ORDER.desc);
         Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, sourceName);
         solrQuery.setQuery(securityQuery.orElse("*:*"));
