@@ -237,6 +237,7 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
                 )));
     }
 
+    @Test
     public void testFilteredItemsOff() throws Exception {
         context.turnOffAuthorisationSystem();
 
