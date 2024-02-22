@@ -22,6 +22,7 @@ import org.dspace.coarnotify.NotifySubmissionConfiguration;
  */
 public class SubmissionCOARNotifyRest extends BaseObjectRest<String> {
     public static final String NAME = "submissioncoarnotifyconfig";
+    public static final String PLURAL_NAME = "submissioncoarnotifyconfigs";
     public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
 
     private String id;
@@ -60,5 +61,10 @@ public class SubmissionCOARNotifyRest extends BaseObjectRest<String> {
     @JsonIgnore
     public Class getController() {
         return RestResourceController.class;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 }

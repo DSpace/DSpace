@@ -74,4 +74,9 @@ public class NotifyRequestStatusRest extends RestAddressableModel {
         this.notifyStatus = notifyStatus;
     }
 
+    @Override
+    public String getTypePlural() {
+        return NAME;
+    }
+
 }

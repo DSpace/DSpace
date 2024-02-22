@@ -121,4 +121,9 @@ public class NotifyServiceRest extends BaseObjectRest<Integer> {
         this.upperIp = upperIp;
     }
 
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
 }
