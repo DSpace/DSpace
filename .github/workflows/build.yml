@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - dtq-dev
+      - customer/*
   pull_request:
 
 permissions:

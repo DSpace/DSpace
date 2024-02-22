@@ -7,7 +7,7 @@ on:
   push:
     branches:
       - dtq-dev
-      - rework-actions
+      - customer/*
   pull_request:
   workflow_dispatch:
 
