@@ -142,11 +142,6 @@ public class WithdrawnCorrectionType implements CorrectionType, InitializingBean
     @Override
     public void afterPropertiesSet() throws Exception {}
 
-    @Override
-    public String getCreationForm() {
-        return this.creationForm;
-    }
-
     public void setCreationForm(String creationForm) {
         this.creationForm = creationForm;
     }

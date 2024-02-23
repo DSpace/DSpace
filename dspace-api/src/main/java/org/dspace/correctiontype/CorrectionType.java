@@ -32,8 +32,6 @@ public interface CorrectionType {
      */
     public String getTopic();
 
-    public String getCreationForm();
-
     /**
      * Checks whether the CorrectionType required related item.
      */
