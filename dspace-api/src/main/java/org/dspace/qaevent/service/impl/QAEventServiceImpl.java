@@ -335,6 +335,9 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     private void performAutomaticProcessingIfNeeded(Context context, QAEvent qaEvent) {
+        if (qaAutomaticProcessingMap == null) {
+            return;
+        }
         QAEventAutomaticProcessingEvaluation evaluation = qaAutomaticProcessingMap.get(qaEvent.getSource());
 
         if (evaluation == null) {
