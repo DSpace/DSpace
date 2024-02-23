@@ -8,8 +8,8 @@
 package org.dspace.contentreport.service;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import org.dspace.content.MetadataField;
 import org.dspace.contentreport.Filter;
@@ -21,7 +21,7 @@ import org.dspace.core.Context;
 public interface ContentReportService {
 
     boolean getEnabled();
-    List<FilteredCollection> findFilteredCollections(Context context, Set<Filter> filters);
+    List<FilteredCollection> findFilteredCollections(Context context, Collection<Filter> filters);
     FilteredItems findFilteredItems(Context context, FilteredItemsQuery query);
     List<MetadataField> getMetadataFields(org.dspace.core.Context context, String queryField)
             throws SQLException;

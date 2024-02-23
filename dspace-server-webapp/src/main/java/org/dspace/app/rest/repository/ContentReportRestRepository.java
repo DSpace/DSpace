@@ -52,7 +52,7 @@ public class ContentReportRestRepository extends AbstractDSpaceRestRepository {
     }
 
     public FilteredCollectionsRest findFilteredCollections(Context context, FilteredCollectionsQuery query) {
-        Set<Filter> filters = query.getEnabledFilters();
+        Set<Filter> filters = query.getFilters();
 
         List<FilteredCollection> colls = contentReportService.findFilteredCollections(context, filters);
         FilteredCollections report = FilteredCollections.of(colls);

@@ -8,11 +8,11 @@
 package org.dspace.app.rest;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
@@ -49,8 +49,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -105,11 +103,11 @@ public class ContentReportRestController implements InitializingBean {
             HttpServletRequest request, HttpServletResponse response) throws IOException {
         if (contentReportService.getEnabled()) {
             Context context = ContextUtil.obtainContext(request);
-            Map<Filter, Boolean> filtersMap = listToStream(filters)
+            Set<Filter> filtersSet = listToStream(filters)
                     .map(Filter::get)
                     .filter(f -> f != null)
-                    .collect(Collectors.toMap(Function.identity(), v -> Boolean.TRUE));
-            FilteredCollectionsQuery query = FilteredCollectionsQuery.of(filtersMap);
+                    .collect(Collectors.toSet());
+            FilteredCollectionsQuery query = FilteredCollectionsQuery.of(filtersSet);
             return filteredCollectionsReport(context, query);
         }
 
@@ -117,26 +115,6 @@ public class ContentReportRestController implements InitializingBean {
         return null;
     }
 
-    /**
-     * POST-based endpoint for the Filtered Collections contents report.
-     * @param query structured query parameters
-     * @param request HTTP request
-     * @param response HTTP response
-     * @return the list of collections with their respective statistics
-     */
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @PostMapping("/filteredcollections")
-    public ResponseEntity<RepresentationModel<?>> postFilteredCollections(
-            @RequestBody FilteredCollectionsQuery query,
-            HttpServletRequest request, HttpServletResponse response) throws IOException {
-        if (contentReportService.getEnabled()) {
-            Context context = ContextUtil.obtainContext(request);
-            return filteredCollectionsReport(context, query);
-        }
-
-        error404(response);
-        return null;
-    }
 
     private ResponseEntity<RepresentationModel<?>> filteredCollectionsReport(Context context,
             FilteredCollectionsQuery query) {
@@ -147,10 +125,9 @@ public class ContentReportRestController implements InitializingBean {
     }
 
     /**
-     * GET-based endpoint for the Filtered Items contents report.
+     * Endpoint for the Filtered Items contents report.
      * All parameters received as comma-separated lists can also be repeated
      * instead (e.g., filters=a&filters=b&...).
-     * This method also serves as a feed for the HAL Browser infrastructure.
      * @param collections comma-separated list UUIDs of collections to include in the report
      * @param predicates predicates to filter the requested items.
      * A given predicate has the form
@@ -158,6 +135,8 @@ public class ContentReportRestController implements InitializingBean {
      * field:operator (if no value is required by the operator).
      * The colon is used here as a separator to avoid conflicts with the
      * comma, which is already used by Spring as a multi-value separator.
+     * Predicates are actually retrieved directly through the request to prevent comma-containing
+     * predicate values from being split by the Spring infrastructure.
      * @param pageNumber page number (starting at 0)
      * @param pageLimit maximum number of items per page
      * @param filters querying filters received as a comma-separated string
@@ -171,7 +150,7 @@ public class ContentReportRestController implements InitializingBean {
     @GetMapping("/filtereditems")
     public ResponseEntity<RepresentationModel<?>> getFilteredItems(
             @RequestParam(name = "collections", required = false) List<String> collections,
-            @RequestParam(name = "queryPredicates", required = false) List<String> predicates,
+            @RequestParam(name = "queryPredicates", required = false) List<String> queryPredicates,
             @RequestParam(name = "pageNumber", defaultValue = "0") String pageNumber,
             @RequestParam(name = "pageLimit", defaultValue = "10") String pageLimit,
             @RequestParam(name = "filters", required = false) List<String> filters,
@@ -179,8 +158,9 @@ public class ContentReportRestController implements InitializingBean {
             HttpServletRequest request, HttpServletResponse response, Pageable pageable) throws IOException {
         if (contentReportService.getEnabled()) {
             Context context = ContextUtil.obtainContext(request);
+            String[] realPredicates = request.getParameterValues("queryPredicates");
             List<String> collUuids = Optional.ofNullable(collections).orElseGet(() -> List.of());
-            List<FilteredItemsQueryPredicate> preds = listToStream(predicates)
+            List<FilteredItemsQueryPredicate> preds = arrayToStream(realPredicates)
                     .map(FilteredItemsQueryPredicate::of)
                     .collect(Collectors.toList());
             int pgLimit = parseInt(pageLimit, 10);
@@ -190,10 +170,10 @@ public class ContentReportRestController implements InitializingBean {
                 Sort sort = Optional.ofNullable(pageable).map(Pageable::getSort).orElse(Sort.unsorted());
                 myPageable = PageRequest.of(pgNumber, pgLimit, sort);
             }
-            Map<Filter, Boolean> filtersMap = listToStream(filters)
+            Set<Filter> filtersMap = listToStream(filters)
                     .map(Filter::get)
                     .filter(f -> f != null)
-                    .collect(Collectors.toMap(Function.identity(), v -> Boolean.TRUE));
+                    .collect(Collectors.toSet());
             List<String> addFields = Optional.ofNullable(additionalFields).orElseGet(() -> List.of());
             FilteredItemsQueryRest query = FilteredItemsQueryRest.of(collUuids, preds, pgLimit, filtersMap, addFields);
 
@@ -211,34 +191,19 @@ public class ContentReportRestController implements InitializingBean {
                 .filter(StringUtils::isNotBlank);
     }
 
+    private static Stream<String> arrayToStream(String... array) {
+        return Optional.ofNullable(array)
+                .stream()
+                .flatMap(Arrays::stream)
+                .filter(StringUtils::isNotBlank);
+    }
+
     private static int parseInt(String value, int defaultValue) {
         return Optional.ofNullable(value)
                 .stream()
                 .mapToInt(Integer::parseInt)
                 .findFirst()
                 .orElse(defaultValue);
-    }
-
-    /**
-     * POST-based endpoint for the Filtered Items contents report.
-     * @param query structured query parameters
-     * @param pageable paging parameters
-     * @param request HTTP request
-     * @param response HTTP response
-     * @return the list of items with their respective statistics
-     */
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @PostMapping("/filtereditems")
-    public ResponseEntity<RepresentationModel<?>> postFilteredItems(
-            @RequestBody FilteredItemsQueryRest query, Pageable pageable,
-            HttpServletRequest request, HttpServletResponse response) throws IOException {
-        if (contentReportService.getEnabled()) {
-            Context context = ContextUtil.obtainContext(request);
-            return filteredItemsReport(context, query, pageable);
-        }
-
-        error404(response);
-        return null;
     }
 
     private ResponseEntity<RepresentationModel<?>> filteredItemsReport(Context context,

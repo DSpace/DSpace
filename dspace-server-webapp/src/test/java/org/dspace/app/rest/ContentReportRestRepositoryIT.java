@@ -9,7 +9,6 @@ package org.dspace.app.rest;
 
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -18,11 +17,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.matcher.ContentReportMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
+import org.dspace.app.rest.model.FilteredCollectionsQuery;
 import org.dspace.app.rest.model.FilteredItemsQueryPredicate;
 import org.dspace.app.rest.model.FilteredItemsQueryRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -106,7 +107,9 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
                 parentCommunity.getName(), parentCommunity.getHandle(),
                 2, 2, valuesCol2, true);
 
-        getClient(token).perform(get("/api/contentreport/filteredcollections?filters=is_discoverable"))
+        FilteredCollectionsQuery query = FilteredCollectionsQuery.of(Set.of(Filter.IS_DISCOVERABLE));
+
+        getClient(token).perform(get("/api/contentreport/filteredcollections?" + query.toQueryString()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.collections", Matchers.containsInAnyOrder(
                            ContentReportMatcher.matchFilteredCollectionProperties(fcol1),
@@ -166,7 +169,9 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(get("/api/contentreport/filteredcollections?filters=is_discoverable"))
+        FilteredCollectionsQuery query = FilteredCollectionsQuery.of(Set.of(Filter.IS_DISCOVERABLE));
+
+        getClient(token).perform(get("/api/contentreport/filteredcollections?" + query.toQueryString()))
                    .andExpect(status().isNotFound());
     }
 
@@ -225,7 +230,7 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
 
         ObjectMapper mapper = new ObjectMapper();
 
-        getClient(token).perform(post("/api/contentreport/filtereditems")
+        getClient(token).perform(get("/api/contentreport/filtereditems?" + query.toQueryString())
                 .content(mapper.writeValueAsBytes(query))
                 .contentType(contentType))
                 .andExpect(status().isOk())
@@ -283,7 +288,11 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
 
-        getClient(token).perform(get("/api/contentreport/filtereditems"))
+        FilteredItemsQueryRest query = FilteredItemsQueryRest.of(null,
+                List.of(FilteredItemsQueryPredicate.of("dc.contributor.author", QueryOperator.EQUALS, "Doe, Jane")),
+                100, null, List.of("dc.subject"));
+
+        getClient(token).perform(get("/api/contentreport/filtereditems?" + query.toQueryString()))
                 .andExpect(status().isNotFound());
     }
 

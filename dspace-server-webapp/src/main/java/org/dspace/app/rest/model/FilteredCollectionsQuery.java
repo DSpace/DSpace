@@ -7,15 +7,11 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.EnumMap;
 import java.util.EnumSet;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.dspace.contentreport.Filter;
 
 /**
@@ -24,7 +20,7 @@ import org.dspace.contentreport.Filter;
  */
 public class FilteredCollectionsQuery {
 
-    private Map<Filter, Boolean> filters = new EnumMap<>(Filter.class);
+    private Set<Filter> filters = EnumSet.noneOf(Filter.class);
 
     /**
      * Shortcut method that builds a FilteredCollectionsQuery instance
@@ -34,32 +30,24 @@ public class FilteredCollectionsQuery {
      * mapping to false) will not.
      * @return a FilteredCollectionsQuery instance built from the provided parameters
      */
-    public static FilteredCollectionsQuery of(Map<Filter, Boolean> filters) {
-        var query = new FilteredCollectionsQuery();
-        Optional.ofNullable(filters).ifPresent(query.filters::putAll);
-        return query;
-    }
-
     public static FilteredCollectionsQuery of(Collection<Filter> filters) {
         var query = new FilteredCollectionsQuery();
-        Arrays.stream(Filter.values()).forEach(f -> query.filters.put(f, Boolean.FALSE));
-        filters.forEach(f -> query.filters.put(f, Boolean.TRUE));
+        Optional.ofNullable(filters).ifPresent(query.filters::addAll);
         return query;
     }
 
-    public Map<Filter, Boolean> getFilters() {
+    public Set<Filter> getFilters() {
         return filters;
     }
 
-    public void setFilters(Map<Filter, Boolean> filters) {
+    public void setFilters(Set<Filter> filters) {
         this.filters = filters;
     }
 
-    public Set<Filter> getEnabledFilters() {
-        return filters.entrySet().stream()
-                .filter(e -> e.getValue().booleanValue())
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toCollection(() -> EnumSet.noneOf(Filter.class)));
+    public String toQueryString() {
+        return filters.stream()
+                .map(f -> "filters=" + f.getId())
+                .collect(Collectors.joining("&"));
     }
 
 }

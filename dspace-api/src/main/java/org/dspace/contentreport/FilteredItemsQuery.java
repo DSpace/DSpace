@@ -9,13 +9,10 @@ package org.dspace.contentreport;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Structured query contents for the Filtered Items report
@@ -27,7 +24,7 @@ public class FilteredItemsQuery {
     private List<QueryPredicate> queryPredicates = new ArrayList<>();
     private long offset;
     private int pageLimit;
-    private Map<Filter, Boolean> filters = new EnumMap<>(Filter.class);
+    private Set<Filter> filters = EnumSet.noneOf(Filter.class);
     private List<String> additionalFields = new ArrayList<>();
 
     /**
@@ -44,13 +41,13 @@ public class FilteredItemsQuery {
      */
     public static FilteredItemsQuery of(Collection<String> collectionUuids,
             Collection<QueryPredicate> predicates, long offset, int pageLimit,
-            Map<Filter, Boolean> filters, Collection<String> additionalFields) {
+            Set<Filter> filters, Collection<String> additionalFields) {
         var query = new FilteredItemsQuery();
         Optional.ofNullable(collectionUuids).ifPresent(query.collections::addAll);
         Optional.ofNullable(predicates).ifPresent(query.queryPredicates::addAll);
         query.offset = offset;
         query.pageLimit = pageLimit;
-        Optional.ofNullable(filters).ifPresent(query.filters::putAll);
+        Optional.ofNullable(filters).ifPresent(query.filters::addAll);
         Optional.ofNullable(additionalFields).ifPresent(query.additionalFields::addAll);
         return query;
     }
@@ -123,22 +120,15 @@ public class FilteredItemsQuery {
         this.pageLimit = pageLimit;
     }
 
-    public Map<Filter, Boolean> getFilters() {
+    public Set<Filter> getFilters() {
         return filters;
     }
 
-    public void setFilters(Map<Filter, Boolean> filters) {
+    public void setFilters(Set<Filter> filters) {
         this.filters.clear();
         if (filters != null) {
-            this.filters.putAll(filters);
+            this.filters.addAll(filters);
         }
-    }
-
-    public Set<Filter> getEnabledFilters() {
-        return filters.entrySet().stream()
-                .filter(e -> e.getValue().booleanValue())
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toCollection(() -> EnumSet.noneOf(Filter.class)));
     }
 
     public List<String> getAdditionalFields() {

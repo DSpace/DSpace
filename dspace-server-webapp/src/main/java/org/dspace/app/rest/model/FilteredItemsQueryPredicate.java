@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.model;
 
+import java.util.Optional;
+
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.contentreport.QueryOperator;
 
@@ -61,6 +63,12 @@ public class FilteredItemsQueryPredicate {
 
     public String getValue() {
         return value;
+    }
+
+    @Override
+    public String toString() {
+        String op = Optional.ofNullable(operator).map(QueryOperator::getCode).orElse("");
+        return field + ":" + op + ":" + value;
     }
 
 }

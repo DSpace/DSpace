@@ -11,11 +11,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
-
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -55,7 +52,7 @@ public class ContentReportServiceImpl implements ContentReportService {
      * @return a list of collections with the requested statistics for each of them
      */
     @Override
-    public List<FilteredCollection> findFilteredCollections(Context context, Set<Filter> filters) {
+    public List<FilteredCollection> findFilteredCollections(Context context, java.util.Collection<Filter> filters) {
         List<FilteredCollection> colls = new ArrayList<>();
         try {
             List<Collection> collections = collectionService.findAll(context);
@@ -113,10 +110,7 @@ public class ContentReportServiceImpl implements ContentReportService {
 
         List<QueryPredicate> predicates = query.getQueryPredicates();
         List<UUID> collectionUuids = getUuidsFromStrings(query.getCollections());
-        List<Filter> filters = query.getFilters().entrySet().stream()
-                .filter(e -> e.getValue().booleanValue())
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+        Set<Filter> filters = query.getFilters();
 
         try {
             List<Item> items = itemService.findByMetadataQuery(context, predicates, collectionUuids,

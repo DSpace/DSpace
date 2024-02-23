@@ -10,14 +10,14 @@ package org.dspace.app.rest.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.contentreport.Filter;
 import org.dspace.contentreport.QueryOperator;
 
@@ -30,7 +30,7 @@ public class FilteredItemsQueryRest {
     private List<String> collections = new ArrayList<>();
     private List<FilteredItemsQueryPredicate> queryPredicates = new ArrayList<>();
     private int pageLimit;
-    private Map<Filter, Boolean> filters = new EnumMap<>(Filter.class);
+    private Set<Filter> filters = EnumSet.noneOf(Filter.class);
     private List<String> additionalFields = new ArrayList<>();
 
     /**
@@ -47,12 +47,12 @@ public class FilteredItemsQueryRest {
      */
     public static FilteredItemsQueryRest of(Collection<String> collectionUuids,
             Collection<FilteredItemsQueryPredicate> predicates, int pageLimit,
-            Map<Filter, Boolean> filters, Collection<String> additionalFields) {
+            Collection<Filter> filters, Collection<String> additionalFields) {
         var query = new FilteredItemsQueryRest();
         Optional.ofNullable(collectionUuids).ifPresent(query.collections::addAll);
         Optional.ofNullable(predicates).ifPresent(query.queryPredicates::addAll);
         query.pageLimit = pageLimit;
-        Optional.ofNullable(filters).ifPresent(query.filters::putAll);
+        Optional.ofNullable(filters).ifPresent(query.filters::addAll);
         Optional.ofNullable(additionalFields).ifPresent(query.additionalFields::addAll);
         return query;
     }
@@ -109,19 +109,12 @@ public class FilteredItemsQueryRest {
         this.pageLimit = pageLimit;
     }
 
-    public Map<Filter, Boolean> getFilters() {
+    public Set<Filter> getFilters() {
         return filters;
     }
 
-    public void setFilters(Map<Filter, Boolean> filters) {
+    public void setFilters(Set<Filter> filters) {
         this.filters = filters;
-    }
-
-    public Set<Filter> getEnabledFilters() {
-        return filters.entrySet().stream()
-                .filter(e -> e.getValue().booleanValue())
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toCollection(() -> EnumSet.noneOf(Filter.class)));
     }
 
     public List<String> getAdditionalFields() {
@@ -130,6 +123,26 @@ public class FilteredItemsQueryRest {
 
     public void setAdditionalFields(List<String> additionalFields) {
         this.additionalFields = additionalFields;
+    }
+
+    public String toQueryString() {
+        String colls = collections.stream()
+                .map(coll -> "collection=" + coll)
+                .collect(Collectors.joining("&"));
+        String preds = queryPredicates.stream()
+                .map(pred -> "queryPredicates=" + pred)
+                .collect(Collectors.joining("&"));
+        String pgLimit = "pageLimit=" + pageLimit;
+        String fltrs = filters.stream()
+                .map(e -> "filters=" + e.getId())
+                .collect(Collectors.joining("&"));
+        String flds = additionalFields.stream()
+                .map(fld -> "additionalFields=" + fld)
+                .collect(Collectors.joining("&"));
+
+        return Stream.of(colls, preds, pgLimit, fltrs, flds)
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.joining("&"));
     }
 
 }
