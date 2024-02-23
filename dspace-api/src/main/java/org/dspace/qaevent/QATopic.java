@@ -26,7 +26,7 @@ public class QATopic {
     private UUID focus;
     private String key;
     /**
-     * The source attributes contains the name of the AQ source like: OpenAIRE, DSpaceUsers
+     * The source attributes contains the name of the QA source like: OpenAIRE, DSpaceUsers
      */
     private String source;
     private Date lastEvent;
