@@ -41,7 +41,7 @@ public class FilteredItemsQuery {
      */
     public static FilteredItemsQuery of(Collection<String> collectionUuids,
             Collection<QueryPredicate> predicates, long offset, int pageLimit,
-            Set<Filter> filters, Collection<String> additionalFields) {
+            Collection<Filter> filters, Collection<String> additionalFields) {
         var query = new FilteredItemsQuery();
         Optional.ofNullable(collectionUuids).ifPresent(query.collections::addAll);
         Optional.ofNullable(predicates).ifPresent(query.queryPredicates::addAll);
@@ -73,36 +73,6 @@ public class FilteredItemsQuery {
             this.queryPredicates.addAll(queryPredicates);
         }
     }
-
-    /*public List<MetadataField> getPredicateFields() {
-        if (queryPredicates == null) {
-            return Collections.emptyList();
-        }
-        return queryPredicates.stream()
-                .map(QueryPredicate::getFields)
-                .flatMap(List::stream)
-                .distinct()
-                .collect(Collectors.toList());
-    }
-
-    public List<QueryOperator> getPredicateOperators() {
-        if (queryPredicates == null) {
-            return Collections.emptyList();
-        }
-        return queryPredicates.stream()
-                .map(QueryPredicate::getOperator)
-                .collect(Collectors.toList());
-    }
-
-    public List<String> getPredicateValues() {
-        if (queryPredicates == null) {
-            return Collections.emptyList();
-        }
-        return queryPredicates.stream()
-                .map(QueryPredicate::getValue)
-                .map(s -> s == null ? "" : s)
-                .collect(Collectors.toList());
-    }*/
 
     public long getOffset() {
         return offset;
