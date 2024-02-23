@@ -184,15 +184,16 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
             + "\"projects[0].openaireId\":\"40|corda__h2020::6e32f5eb912688f2424c68b851483ea4\","
             + "\"projects[0].title\":\"Tracking Papyrus and Parchment Paths\"}";
 
-        assertThat(qaEventService.findEventsByTopic(context, OPENAIRE_SOURCE, "ENRICH/MORE/PROJECT", 0, 20), contains(
+        assertThat(qaEventService.findEventsByTopic(context, OPENAIRE_SOURCE, "ENRICH/MORE/PROJECT", 0, 20,
+                ORDER_FIELD, false), contains(
             pendingOpenaireEventWith("oai:www.openstarts.units.it:123456789/99998", firstItem,
                 "Egypt, crossroad of translations and literary interweavings", projectMessage,
                 "ENRICH/MORE/PROJECT", 1.00d)));
 
         String abstractMessage = "{\"abstracts[0]\":\"Missing Abstract\"}";
 
-        assertThat(qaEventService.findEventsByTopic(context, OPENAIRE_SOURCE,"ENRICH/MISSING/ABSTRACT", 0, 20),
-                contains(
+        assertThat(qaEventService.findEventsByTopic(context, OPENAIRE_SOURCE,"ENRICH/MISSING/ABSTRACT", 0, 20,
+                ORDER_FIELD, false), contains(
             pendingOpenaireEventWith("oai:www.openstarts.units.it:123456789/99999", secondItem, "Test Publication",
                 abstractMessage, "ENRICH/MISSING/ABSTRACT", 1.00d)));
 
@@ -235,8 +236,8 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         String abstractMessage = "{\"abstracts[0]\":\"Missing Abstract\"}";
 
-        assertThat(qaEventService.findEventsByTopic(context, OPENAIRE_SOURCE, "ENRICH/MISSING/ABSTRACT", 0, 20),
-                contains(
+        assertThat(qaEventService.findEventsByTopic(context, OPENAIRE_SOURCE, "ENRICH/MISSING/ABSTRACT", 0, 20,
+                ORDER_FIELD, false), contains(
             pendingOpenaireEventWith("oai:www.openstarts.units.it:123456789/99999", item, "Test Publication",
                 abstractMessage, "ENRICH/MISSING/ABSTRACT", 1.00d)));
 
@@ -275,7 +276,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
         String abstractMessage = "{\"abstracts[0]\":\"Missing Abstract\"}";
 
         assertThat(qaEventService.findEventsByTopic(context, OPENAIRE_SOURCE,
-            QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 0, 20), contains(
+            QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 0, 20, ORDER_FIELD, false), contains(
             pendingOpenaireEventWith("oai:www.openstarts.units.it:123456789/999991", secondItem, "Test Publication 2",
                 abstractMessage, org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 1.00d)));
 
@@ -356,15 +357,16 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
             + "\"projects[0].openaireId\":\"40|corda__h2020::6e32f5eb912688f2424c68b851483ea4\","
             + "\"projects[0].title\":\"Tracking Papyrus and Parchment Paths\"}";
 
-        assertThat(qaEventService.findEventsByTopic(context, OPENAIRE_SOURCE, "ENRICH/MORE/PROJECT", 0 ,20), contains(
+        assertThat(qaEventService.findEventsByTopic(context, OPENAIRE_SOURCE, "ENRICH/MORE/PROJECT", 0 , 20,
+                ORDER_FIELD, false), contains(
             pendingOpenaireEventWith("oai:www.openstarts.units.it:123456789/99998", firstItem,
                 "Egypt, crossroad of translations and literary interweavings", projectMessage,
                 "ENRICH/MORE/PROJECT", 1.00d)));
 
         String abstractMessage = "{\"abstracts[0]\":\"Missing Abstract\"}";
 
-        assertThat(qaEventService.findEventsByTopic(context, OPENAIRE_SOURCE, "ENRICH/MISSING/ABSTRACT", 0, 20),
-              containsInAnyOrder(
+        assertThat(qaEventService.findEventsByTopic(context, OPENAIRE_SOURCE, "ENRICH/MISSING/ABSTRACT", 0, 20,
+                ORDER_FIELD, false), containsInAnyOrder(
             pendingOpenaireEventWith("oai:www.openstarts.units.it:123456789/99999", secondItem, "Test Publication",
                 abstractMessage, "ENRICH/MISSING/ABSTRACT", 1.00d),
             pendingOpenaireEventWith("oai:www.openstarts.units.it:123456789/999991", thirdItem, "Test Publication 2",
@@ -456,9 +458,9 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
         assertThat(topicList, hasItem(QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 2L)));
 
         assertThat(qaEventService.findEventsByTopic(context, OPENAIRE_SOURCE,
-                   QANotifyPatterns.TOPIC_ENRICH_MORE_PROJECT, 0, 20), hasSize(1));
+                   QANotifyPatterns.TOPIC_ENRICH_MORE_PROJECT, 0, 20, ORDER_FIELD, false), hasSize(1));
         assertThat(qaEventService.findEventsByTopic(context, OPENAIRE_SOURCE,
-                   QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 0, 20), hasSize(2));
+                   QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 0, 20, ORDER_FIELD, false), hasSize(2));
 
         verify(mockBrokerClient).listSubscriptions(openaireURL, "user@test.com");
         verify(mockBrokerClient).downloadEvents(eq(openaireURL), eq("sub1"), any());
