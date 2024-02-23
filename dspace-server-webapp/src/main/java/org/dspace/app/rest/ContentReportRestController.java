@@ -150,7 +150,7 @@ public class ContentReportRestController implements InitializingBean {
     @GetMapping("/filtereditems")
     public ResponseEntity<RepresentationModel<?>> getFilteredItems(
             @RequestParam(name = "collections", required = false) List<String> collections,
-            @RequestParam(name = "queryPredicates", required = false) List<String> queryPredicates,
+            @RequestParam(name = "queryPredicates", required = false) List<String> predicates,
             @RequestParam(name = "pageNumber", defaultValue = "0") String pageNumber,
             @RequestParam(name = "pageLimit", defaultValue = "10") String pageLimit,
             @RequestParam(name = "filters", required = false) List<String> filters,
