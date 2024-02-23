@@ -92,12 +92,11 @@ public interface QAEventService {
 
     /**
      * Find an event by the given id.
-     *
-     * @param  context the DSpace context
      * @param  id      the id of the event to search for
+     *
      * @return         the event
      */
-    public QAEvent findEventByEventId(Context context, String id);
+    public QAEvent findEventByEventId(String id);
 
     /**
      * Store the given event.

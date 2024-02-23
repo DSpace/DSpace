@@ -358,7 +358,7 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public QAEvent findEventByEventId(Context context, String eventId) {
+    public QAEvent findEventByEventId(String eventId) {
         SolrQuery solrQuery = new SolrQuery("*:*");
         solrQuery.addFilterQuery(EVENT_ID + ":\"" + eventId + "\"");
         try {

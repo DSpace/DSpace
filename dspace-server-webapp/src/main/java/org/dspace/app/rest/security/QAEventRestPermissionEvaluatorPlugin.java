@@ -61,7 +61,7 @@ public class QAEventRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
             if (Objects.isNull(targetId)) {
                 return true;
             }
-            QAEvent qaEvent = qaEventService.findEventByEventId(context, targetId.toString());
+            QAEvent qaEvent = qaEventService.findEventByEventId(targetId.toString());
             // everyone is expected to be able to see a not existing event (so we can return not found)
             if ((qaEvent == null
                     || qaEventSecurityService.canSeeEvent(context, context.getCurrentUser(), qaEvent))) {

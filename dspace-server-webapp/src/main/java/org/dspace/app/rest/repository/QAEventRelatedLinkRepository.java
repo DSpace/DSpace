@@ -55,7 +55,7 @@ public class QAEventRelatedLinkRepository extends AbstractDSpaceRestRepository i
     public ItemRest getRelated(@Nullable HttpServletRequest request, String id, @Nullable Pageable pageable,
             Projection projection) {
         Context context = obtainContext();
-        QAEvent qaEvent = qaEventService.findEventByEventId(context, id);
+        QAEvent qaEvent = qaEventService.findEventByEventId(id);
         if (qaEvent == null) {
             throw new ResourceNotFoundException("No qa event with ID: " + id);
         }
