@@ -9,8 +9,11 @@ package org.dspace.discovery;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.tika.utils.StringUtils;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.DuplicateDetectionService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.discovery.indexobject.IndexableWorkflowItem;
@@ -28,6 +31,10 @@ public class SolrServiceIndexComparisonPlugin implements SolrServiceIndexPlugin 
 
     @Autowired
     ConfigurationService configurationService;
+    @Autowired
+    ItemService itemService;
+    @Autowired
+    DuplicateDetectionService duplicateDetectionService;
 
     private static final Logger log = org.apache.logging.log4j.LogManager
         .getLogger(SolrServiceIndexComparisonPlugin.class);
@@ -76,15 +83,9 @@ public class SolrServiceIndexComparisonPlugin implements SolrServiceIndexPlugin 
      */
     private void indexItemComparisonValue(Context context, Item item, SolrInputDocument document) {
         if (item != null) {
-            // Construct comparisonValue object
-            String comparisonValue = item.getName();
-            if (comparisonValue != null) {
-                if (configurationService.getBooleanProperty("duplicate.comparison.normalise.lowercase")) {
-                    comparisonValue = comparisonValue.toLowerCase(context.getCurrentLocale());
-                }
-                if (configurationService.getBooleanProperty("duplicate.comparison.normalise.whitespace")) {
-                    comparisonValue = comparisonValue.replaceAll("\\s+", "");
-                }
+            // Build normalised comparison value and add to the document
+            String comparisonValue = duplicateDetectionService.buildComparisonValue(context, item);
+            if (!StringUtils.isBlank(comparisonValue)) {
                 // Add the field to the document
                 document.addField(configurationService.getProperty("duplicate.comparison.solr.field",
                         "deduplication_keyword"), comparisonValue);

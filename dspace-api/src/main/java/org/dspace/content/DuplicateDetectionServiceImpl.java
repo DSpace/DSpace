@@ -7,6 +7,9 @@
  */
 package org.dspace.content;
 
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.naturalOrder;
+
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -264,39 +267,11 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
             throw new IllegalArgumentException("Cannot get duplicates for template item");
         }
 
-        // Get configured fields to use for comparison values
-        String[] comparisonFields = configurationService.getArrayProperty("duplication.comparison.metadata.field",
-                new String[]{"dc.title"});
-        // Get all values, in order, for these fields
-        StringBuilder comparisonValueBuilder = new StringBuilder();
-        for (String field : comparisonFields) {
-            try {
-                String[] fieldParts = MetadataUtilities.parseCompoundForm(field);
-                for (MetadataValue metadataValue : itemService.getMetadata(item,
-                        fieldParts[0], fieldParts[1], (fieldParts.length > 2 ? fieldParts[3] : null), Item.ANY)) {
-                    // Add each found value to the string builder (null values interpreted as empty)
-                    if (metadataValue != null) {
-                        comparisonValueBuilder.append(metadataValue.getValue());
-                    }
-                }
-            } catch (ParseException e) {
-                // Log error and continue processing
-                log.error("Error parsing configured field for deduplication comparison: {}", field);
-            }
-        }
-
-        // Build comparison value
-        String comparisonValue = comparisonValueBuilder.toString();
+        // Build normalised comparison value
+        String comparisonValue = buildComparisonValue(context, item);
 
         // Construct query
         if (StringUtils.isNotBlank(comparisonValue)) {
-            if (configurationService.getBooleanProperty("duplicate.comparison.normalise.lowercase")) {
-                comparisonValue = comparisonValue.toLowerCase(context.getCurrentLocale());
-            }
-            if (configurationService.getBooleanProperty("duplicate.comparison.normalise.whitespace")) {
-                comparisonValue = comparisonValue.replaceAll("\\s+", "");
-            }
-
             // Get search service
             SearchService searchService = SearchUtils.getSearchService();
 
@@ -325,4 +300,62 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
         return null;
 
     }
+
+    /**
+     * Build a comparison value string made up of values of configured fields, used when indexing and querying
+     * items for deduplication
+     * @param context DSpace context
+     * @param item The DSpace item
+     * @return a constructed, normalised string
+     */
+    @Override
+    public String buildComparisonValue(Context context, Item item) {
+        // Get configured fields to use for comparison values
+        String[] comparisonFields = configurationService.getArrayProperty("duplicate.comparison.metadata.field",
+                new String[]{"dc.title"});
+        // Get all values, in order, for these fields
+        StringBuilder comparisonValueBuilder = new StringBuilder();
+        String comparisonValue = null;
+        for (String field : comparisonFields) {
+            try {
+                // Get field components
+                String[] fieldParts = MetadataUtilities.parseCompoundForm(field);
+                // Get all values of this field
+                List<MetadataValue> metadataValues = itemService.getMetadata(item,
+                        fieldParts[0], fieldParts[1], (fieldParts.length > 2 ? fieldParts[2] : null), Item.ANY);
+                // Sort metadata values by text value, so their 'position' in db doesn't matter for dedupe purposes
+                metadataValues.sort(comparing(MetadataValue::getValue, naturalOrder()));
+                for (MetadataValue metadataValue : metadataValues) {
+                    // Add each found value to the string builder (null values interpreted as empty)
+                    if (metadataValue != null) {
+                        comparisonValueBuilder.append(metadataValue.getValue());
+                    }
+                }
+            } catch (ParseException e) {
+                // Log error and continue processing
+                log.error("Error parsing configured field for deduplication comparison: item={}, field={}",
+                        item.getID(), field);
+            } catch (NullPointerException e) {
+                log.error("Null pointer encountered, probably during metadata value sort, when deduping:" +
+                        "item={}, field={}", item.getID(), field);
+            }
+        }
+
+        // Build string
+        comparisonValue = comparisonValueBuilder.toString();
+
+        // Normalise according to configuration
+        if (!StringUtils.isBlank(comparisonValue)) {
+            if (configurationService.getBooleanProperty("duplicate.comparison.normalise.lowercase")) {
+                comparisonValue = comparisonValue.toLowerCase(context.getCurrentLocale());
+            }
+            if (configurationService.getBooleanProperty("duplicate.comparison.normalise.whitespace")) {
+                comparisonValue = comparisonValue.replaceAll("\\s+", "");
+            }
+        }
+
+        // Return comparison value
+        return comparisonValue;
+    }
+
 }

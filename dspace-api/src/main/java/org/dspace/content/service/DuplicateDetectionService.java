@@ -73,4 +73,13 @@ public interface DuplicateDetectionService {
      * @throws SearchServiceException if an error was encountered during the discovery search itself.
      */
     DiscoverResult searchDuplicates(Context context, Item item) throws SearchServiceException;
+
+    /**
+     * Build a comparison value string made up of values of configured fields, used when indexing and querying
+     * items for deduplication
+     * @param context DSpace context
+     * @param item The DSpace item
+     * @return a constructed, normalised string
+     */
+    String buildComparisonValue(Context context, Item item);
 }
