@@ -223,25 +223,6 @@
             <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
         </analyzer>
     </fieldType>
-
-      <fieldType name="dspaceDuplicationSignature" class="solr.TextField"
-                 sortMissingLast="true" omitNorms="true" stored="true" multiValued="true">
-          <analyzer type="index">
-              <!-- Strip out the following characters: .,!?/\-_{}[]()'" as well as any whitespace -->
-              <charFilter class="solr.PatternReplaceCharFilterFactory"
-                          pattern="\s*" replacement=""/>
-              <tokenizer class="solr.KeywordTokenizerFactory"/>
-              <filter class="solr.LowerCaseFilterFactory" />
-          </analyzer>
-          <analyzer type="query">
-              <!-- Strip out the following characters: .,!?/\-_{}[]()'" as well as any whitespace -->
-              <charFilter class="solr.PatternReplaceCharFilterFactory"
-                          pattern="\s*" replacement=""/>
-              <tokenizer class="solr.KeywordTokenizerFactory"/>
-              <filter class="solr.LowerCaseFilterFactory" />
-          </analyzer>
-      </fieldType>
-
  </types>
 
 
@@ -344,9 +325,6 @@
     <!--Date matching-->
     <dynamicField name="*.year" type="sint" indexed="true" stored="true" multiValued="true" omitNorms="true" />
     <dynamicField name="*_dt" type="date" indexed="true" stored="true" multiValued="false" omitNorms="true"  docValues="true"/>
-
-     <!-- Duplication signature (normalised) fields -->
-     <dynamicField name="*_signature" type="string" indexed="true" stored="true" multiValued="true" omitNorms="true"/>
 
     <!--Used for matching on all other fields -->
     <dynamicField name="*" type="text" multiValued="true"/>
