@@ -20,20 +20,20 @@ import org.dspace.workflow.WorkflowItem;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Indexes item "signatures" used for duplicate detection
+ * Indexes special normalised values used for comparing items, to be used in e.g. basic duplicate detection
  *
  * @author Kim Shepherd
  */
-public class SolrServiceIndexItemSignaturePlugin implements SolrServiceIndexPlugin {
+public class SolrServiceIndexComparisonPlugin implements SolrServiceIndexPlugin {
 
     @Autowired
     ConfigurationService configurationService;
 
     private static final Logger log = org.apache.logging.log4j.LogManager
-        .getLogger(SolrServiceIndexItemSignaturePlugin.class);
+        .getLogger(SolrServiceIndexComparisonPlugin.class);
 
     /**
-     * Index the normalised name of the item to a _signature field
+     * Index the normalised name of the item to a solr field
      *
      * @param context DSpace context
      * @param idxObj the indexable item
@@ -47,13 +47,13 @@ public class SolrServiceIndexItemSignaturePlugin implements SolrServiceIndexPlug
         }
         // Otherwise, continue with item indexing. Handle items, workflow items, and workspace items
         if (idxObj instanceof IndexableItem) {
-            indexItemSignature(context, ((IndexableItem) idxObj).getIndexedObject(), document);
+            indexItemComparisonValue(context, ((IndexableItem) idxObj).getIndexedObject(), document);
         } else if (idxObj instanceof IndexableWorkspaceItem) {
             WorkspaceItem workspaceItem = ((IndexableWorkspaceItem) idxObj).getIndexedObject();
             if (workspaceItem != null) {
                 Item item = workspaceItem.getItem();
                 if (item != null) {
-                    indexItemSignature(context, item, document);
+                    indexItemComparisonValue(context, item, document);
                 }
             }
         } else if (idxObj instanceof IndexableWorkflowItem) {
@@ -61,32 +61,33 @@ public class SolrServiceIndexItemSignaturePlugin implements SolrServiceIndexPlug
             if (workflowItem != null) {
                 Item item = workflowItem.getItem();
                 if (item != null) {
-                    indexItemSignature(context, item, document);
+                    indexItemComparisonValue(context, item, document);
                 }
             }
         }
     }
 
     /**
-     * Add the actual signature field to the given solr doc
+     * Add the actual comparison value field to the given solr doc
      *
      * @param context DSpace context
      * @param item DSpace item
      * @param document Solr document
      */
-    private void indexItemSignature(Context context, Item item, SolrInputDocument document) {
+    private void indexItemComparisonValue(Context context, Item item, SolrInputDocument document) {
         if (item != null) {
-            // Construct signature object
-            String signature = item.getName();
-            if (signature != null) {
-                if (configurationService.getBooleanProperty("duplicate.signature.normalise.lowercase")) {
-                    signature = signature.toLowerCase(context.getCurrentLocale());
+            // Construct comparisonValue object
+            String comparisonValue = item.getName();
+            if (comparisonValue != null) {
+                if (configurationService.getBooleanProperty("duplicate.comparison.normalise.lowercase")) {
+                    comparisonValue = comparisonValue.toLowerCase(context.getCurrentLocale());
                 }
-                if (configurationService.getBooleanProperty("duplicate.signature.normalise.whitespace")) {
-                    signature = signature.replaceAll("\\s+", "");
+                if (configurationService.getBooleanProperty("duplicate.comparison.normalise.whitespace")) {
+                    comparisonValue = comparisonValue.replaceAll("\\s+", "");
                 }
                 // Add the field to the document
-                document.addField("item_signature", signature);
+                document.addField(configurationService.getProperty("duplicate.comparison.solr.field",
+                        "deduplication_keyword"), comparisonValue);
             }
         }
     }

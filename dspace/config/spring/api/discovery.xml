@@ -44,8 +44,8 @@
     <!-- Additional indexing plugin enables searching by supervised (true,false) -->
     <bean id="solrServiceSupervisionOrderIndexingPlugin" class="org.dspace.discovery.SolrServiceSupervisionOrderIndexingPlugin"/>
 
-    <!-- Additional indexing plugin that normalises and indexes a signature for duplication detection -->
-    <bean id="solrServiceIndexItemSignaturePlugin" class="org.dspace.discovery.SolrServiceIndexItemSignaturePlugin" scope="prototype"/>
+    <!-- Additional indexing plugin that normalises and indexes value(s) for comparison to be used in e.g. duplication detection -->
+    <bean id="solrServiceIndexComparisonPlugin" class="org.dspace.discovery.SolrServiceIndexComparisonPlugin" scope="prototype"/>
 
     <!--Bean that is used for mapping communities/collections to certain discovery configurations.-->
     <bean id="org.dspace.discovery.configuration.DiscoveryConfigurationService" class="org.dspace.discovery.configuration.DiscoveryConfigurationService">

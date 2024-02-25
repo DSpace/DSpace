@@ -8,6 +8,7 @@
 package org.dspace.content;
 
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -16,9 +17,11 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.exception.ResourceNotFoundException;
+import org.dspace.app.itemupdate.MetadataUtilities;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.service.DuplicateDetectionService;
+import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.WorkspaceItemService;
@@ -66,6 +69,8 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
     XmlWorkflowItemService workflowItemService;
     @Autowired
     WorkspaceItemService workspaceItemService;
+    @Autowired
+    ItemService itemService;
 
     /**
      * Get a list of PotentialDuplicate objects (wrappers with some metadata included for previewing) that
@@ -240,7 +245,7 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
 
     /**
      * Search discovery for potential duplicates of a given item. The search uses levenshtein distance (configurable)
-     * and a single-term "signature" constructed out of the item title
+     * and a single-term "comparison value" constructed out of the item title
      *
      * @param context DSpace context
      * @param item The item to check
@@ -259,27 +264,50 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
             throw new IllegalArgumentException("Cannot get duplicates for template item");
         }
 
-        // Construct signature object
-        String signature = item.getName();
-        if (StringUtils.isNotBlank(signature)) {
-            if (configurationService.getBooleanProperty("duplicate.signature.normalise.lowercase")) {
-                signature = signature.toLowerCase(context.getCurrentLocale());
+        // Get configured fields to use for comparison values
+        String[] comparisonFields = configurationService.getArrayProperty("duplication.comparison.metadata.field",
+                new String[]{"dc.title"});
+        // Get all values, in order, for these fields
+        StringBuilder comparisonValueBuilder = new StringBuilder();
+        for (String field : comparisonFields) {
+            try {
+                String[] fieldParts = MetadataUtilities.parseCompoundForm(field);
+                for (MetadataValue metadataValue : itemService.getMetadata(item,
+                        fieldParts[0], fieldParts[1], (fieldParts.length > 2 ? fieldParts[3] : null), Item.ANY)) {
+                    // Add each found value to the string builder (null values interpreted as empty)
+                    if (metadataValue != null) {
+                        comparisonValueBuilder.append(metadataValue.getValue());
+                    }
+                }
+            } catch (ParseException e) {
+                // Log error and continue processing
+                log.error("Error parsing configured field for deduplication comparison: {}", field);
             }
-            if (configurationService.getBooleanProperty("duplicate.signature.normalise.whitespace")) {
-                signature = signature.replaceAll("\\s+", "");
+        }
+
+        // Build comparison value
+        String comparisonValue = comparisonValueBuilder.toString();
+
+        // Construct query
+        if (StringUtils.isNotBlank(comparisonValue)) {
+            if (configurationService.getBooleanProperty("duplicate.comparison.normalise.lowercase")) {
+                comparisonValue = comparisonValue.toLowerCase(context.getCurrentLocale());
+            }
+            if (configurationService.getBooleanProperty("duplicate.comparison.normalise.whitespace")) {
+                comparisonValue = comparisonValue.replaceAll("\\s+", "");
             }
 
             // Get search service
             SearchService searchService = SearchUtils.getSearchService();
 
             // Escape reserved solr characters
-            signature = searchService.escapeQueryChars(signature);
+            comparisonValue = searchService.escapeQueryChars(comparisonValue);
 
-            // Construct discovery query based on signature
+            // Construct discovery query based on comparison value
             DiscoverQuery discoverQuery = new DiscoverQuery();
-            discoverQuery.setQuery("(" + configurationService.getProperty("duplicate.signature.field",
-                    "item_signature") + ":" + signature + "~" +
-                    configurationService.getIntProperty("duplicate.signature.distance", 0) + ")");
+            discoverQuery.setQuery("(" + configurationService.getProperty("duplicate.comparison.solr.field",
+                    "deduplication_keyword") + ":" + comparisonValue + "~" +
+                    configurationService.getIntProperty("duplicate.comparison.distance", 0) + ")");
             // Add filter queries for the resource type
             discoverQuery.addFilterQueries("(search.resourcetype:Item OR " +
                     "search.resourcetype:WorkspaceItem OR " +
@@ -290,7 +318,7 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
             // Perform search and populate list with results, update total count integer
             return searchService.search(context, discoverQuery);
         } else {
-            log.warn("empty item signature, ignoring for duplicate search");
+            log.warn("empty item comparison value, ignoring for duplicate search");
         }
 
         // Return null by default

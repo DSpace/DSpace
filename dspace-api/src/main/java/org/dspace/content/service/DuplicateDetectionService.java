@@ -64,7 +64,7 @@ public interface DuplicateDetectionService {
 
     /**
      * Search discovery for potential duplicates of a given item. The search uses levenshtein distance (configurable)
-     * and a single-term "signature" constructed out of the item title
+     * and a single-term "comparison value" constructed out of the item title
      *
      * @param context DSpace context
      * @param item The item to check

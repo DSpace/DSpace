@@ -59,12 +59,13 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        // Temporarily enable duplicate detection and set signature distance to 1
+        // Temporarily enable duplicate detection and set comparison distance to 1
         configurationService.setProperty("duplicate.enable", true);
-        configurationService.setProperty("duplicate.signature.distance", 1);
-        configurationService.setProperty("duplicate.signature.normalise.lowercase", true);
-        configurationService.setProperty("duplicate.signature.normalise.whitespace", true);
-        configurationService.setProperty("duplicate.signature.field", "item_signature");
+        configurationService.setProperty("duplicate.comparison.distance", 1);
+        configurationService.setProperty("duplicate.comparison.normalise.lowercase", true);
+        configurationService.setProperty("duplicate.comparison.normalise.whitespace", true);
+        configurationService.setProperty("duplicate.comparison.solr.field", "deduplication_keyword");
+        configurationService.setProperty("duplicate.comparison.metadata.field", new String[]{"dc.title"});
         configurationService.setProperty("duplicate.preview.metadata.field",
                 new String[]{"dc.date.issued", "dc.subject"});
 
@@ -296,7 +297,7 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
     public void testSearchDuplicatesExactMatch() throws Exception {
 
         // Set distance to 0 manually
-        configurationService.setProperty("duplicate.signature.distance", 0);
+        configurationService.setProperty("duplicate.comparison.distance", 0);
 
         Item item8 = ItemBuilder.createItem(context, col)
                 .withTitle("This integration test will prove that the edit distance of 0 results in an exact match")
