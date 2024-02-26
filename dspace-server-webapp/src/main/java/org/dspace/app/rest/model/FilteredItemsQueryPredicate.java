@@ -46,7 +46,7 @@ public class FilteredItemsQueryPredicate {
      * @return a FilteredItemsQueryPredicate instance built from the provided value
      */
     public static FilteredItemsQueryPredicate of(String value) {
-        String[] tokens = value.split("\\s*\\:\\s*");
+        String[] tokens = value.split("\\:");
         String field = tokens.length > 0 ? tokens[0].trim() : "";
         QueryOperator operator = tokens.length > 1 ? QueryOperator.get(tokens[1].trim()) : null;
         String object = tokens.length > 2 ? StringUtils.trimToEmpty(tokens[2]) : "";
