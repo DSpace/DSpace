@@ -47,6 +47,7 @@ jobs:
       image_name: dataquest/dspace
       dockerfile_path: ./Dockerfile
       run_python_version_script: true
+      python_version_script_dest: dspace/config/VERSION_D.txt
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}

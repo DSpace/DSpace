@@ -8,6 +8,10 @@ on:
   workflow_call:
     # Possible Inputs to this reusable job
     inputs:
+      python_version_script_dest:
+        required: false
+        default: version.txt
+        type: string
       run_python_version_script:
         required: false
         default: false
@@ -104,7 +108,7 @@ jobs:
 
       - name: Add version
         if: ${{ inputs.run_python_version_script }}
-        run: python scripts/sourceversion.py > dspace/config/VERSION_D.txt
+        run: python scripts/sourceversion.py > ${{ inputs.python_version_script_dest }}
 
       # https://github.com/docker/setup-buildx-action
       - name: Setup Docker Buildx
