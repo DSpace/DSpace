@@ -289,4 +289,35 @@
         </property>
     </bean>
 
+    <bean class="org.dspace.coarnotify.SubmissionNotifyServiceImpl"/>
+
+    <bean class="org.dspace.coarnotify.NotifyConfigurationService">
+        <property name="patterns">
+            <map>
+                <entry key="coarnotify">
+                    <list>
+                        <ref bean="requestReview"/>
+                        <ref bean="requestEndorsement"/>
+                        <ref bean="requestIngest" />
+                    </list>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="requestReview" class="org.dspace.coarnotify.NotifyPattern">
+        <property name="pattern" value="request-review"/>
+        <property name="multipleRequest" value="true"/>
+    </bean>
+
+    <bean id="requestEndorsement" class="org.dspace.coarnotify.NotifyPattern">
+        <property name="pattern" value="request-endorsement"/>
+        <property name="multipleRequest" value="true"/>
+    </bean>
+
+    <bean id="requestIngest" class="org.dspace.coarnotify.NotifyPattern">
+        <property name="pattern" value="request-ingest"/>
+        <property name="multipleRequest" value="false"/>
+    </bean>
+
 </beans>

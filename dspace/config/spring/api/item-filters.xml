@@ -346,4 +346,9 @@
         </property>
     </bean>
 
+    <util:map id="ldnItemFilters" key-type="java.lang.String"
+              value-type="org.dspace.content.logic.LogicalStatement">
+       <entry key="type_filter" value-ref="type_filter"/>
+       <entry key="doi-filter" value-ref="doi-filter"/>
+	</util:map>
 </beans>

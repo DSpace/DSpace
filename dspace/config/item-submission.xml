@@ -285,7 +285,7 @@
             <!-- <step id="sherpaPolicies"/> -->
 
             <!--Step will be COAR Notify services to the item -->
-            <step id="coarnotify"/>
+            <!-- <step id="coarnotify"/> -->
 
             <!--Step will be to Upload the item -->
             <step id="upload"/>

@@ -303,14 +303,10 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
             .perform(post("/ldn/inbox")
                 .contentType("application/ld+json")
                 .content(message))
-            .andExpect(status().isAccepted());
+            .andExpect(status().isBadRequest());
 
         int processed = ldnMessageService.extractAndProcessMessageFromQueue(context);
         assertEquals(processed, 0);
-
-        LDNMessageEntity ldnMessage = ldnMessageService.find(context, notification.getId());
-        checkStoredLDNMessage(notification, ldnMessage, object);
-        assertEquals(ldnMessage.getQueueStatus(), LDNMessageEntity.QUEUE_STATUS_UNTRUSTED_IP);
     }
 
     @Test
@@ -343,14 +339,80 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
             .perform(post("/ldn/inbox")
                 .contentType("application/ld+json")
                 .content(message))
-            .andExpect(status().isAccepted());
+            .andExpect(status().isBadRequest());
 
         int processed = ldnMessageService.extractAndProcessMessageFromQueue(context);
         assertEquals(processed, 0);
 
-        LDNMessageEntity ldnMessage = ldnMessageService.find(context, notification.getId());
-        checkStoredLDNMessage(notification, ldnMessage, object);
-        assertEquals(ldnMessage.getQueueStatus(), LDNMessageEntity.QUEUE_STATUS_UNTRUSTED);
+    }
+
+    @Test
+    public void ldnInboxOutOfRangeIPTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).withName("community").build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+        String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("https://overlay-journal.com/inbox/")
+                                .withLowerIp("127.0.0.2")
+                                .withUpperIp("127.0.0.3")
+                                .build();
+        context.restoreAuthSystemState();
+
+        InputStream announceEndorsementStream = getClass().getResourceAsStream("ldn_announce_endorsement.json");
+        String announceEndorsement = IOUtils.toString(announceEndorsementStream, Charset.defaultCharset());
+        announceEndorsementStream.close();
+        String message = announceEndorsement.replaceAll("<<object>>", object);
+        message = message.replaceAll("<<object_handle>>", object);
+
+        ObjectMapper mapper = new ObjectMapper();
+        Notification notification = mapper.readValue(message, Notification.class);
+        getClient()
+            .perform(post("/ldn/inbox")
+                .contentType("application/ld+json")
+                .content(message))
+            .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    public void ldnInboxOutOfRangeIPwithDisabledCheckTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).withName("community").build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+        configurationService.setProperty("ldn.notify.inbox.block-untrusted-ip", false);
+        String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("https://overlay-journal.com/inbox/")
+                                .withLowerIp("127.0.0.2")
+                                .withUpperIp("127.0.0.3")
+                                .build();
+        context.restoreAuthSystemState();
+
+        InputStream announceEndorsementStream = getClass().getResourceAsStream("ldn_announce_endorsement.json");
+        String announceEndorsement = IOUtils.toString(announceEndorsementStream, Charset.defaultCharset());
+        announceEndorsementStream.close();
+        String message = announceEndorsement.replaceAll("<<object>>", object);
+        message = message.replaceAll("<<object_handle>>", object);
+
+        ObjectMapper mapper = new ObjectMapper();
+        Notification notification = mapper.readValue(message, Notification.class);
+        getClient()
+            .perform(post("/ldn/inbox")
+                .contentType("application/ld+json")
+                .content(message))
+            .andExpect(status().isAccepted());
+
     }
 
     @Override

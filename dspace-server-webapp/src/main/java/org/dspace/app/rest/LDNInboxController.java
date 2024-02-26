@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import java.sql.SQLException;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 
@@ -14,10 +15,13 @@ import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.LDNMessageEntity;
 import org.dspace.app.ldn.LDNRouter;
+import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.ldn.service.LDNMessageService;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.InvalidLDNMessageException;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.dspace.web.ContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -44,6 +48,9 @@ public class LDNInboxController {
     @Autowired
     private LDNMessageService ldnMessageService;
 
+    @Autowired
+    private ConfigurationService configurationService;
+
     /**
      * LDN DSpace inbox.
      *
@@ -56,8 +63,7 @@ public class LDNInboxController {
         throws Exception {
 
         Context context = ContextUtil.obtainCurrentRequestContext();
-        validate(notification);
-        log.info("stored notification {} {}", notification.getId(), notification.getType());
+        validate(context, notification, request.getRemoteAddr());
 
         LDNMessageEntity ldnMsgEntity = ldnMessageService.create(context, notification, request.getRemoteAddr());
         log.info("stored ldn message {}", ldnMsgEntity);
@@ -91,7 +97,7 @@ public class LDNInboxController {
                 .body(e.getMessage());
     }
 
-    private void validate(Notification notification) {
+    private void validate(Context context, Notification notification, String sourceIp) {
         String id = notification.getId();
         Pattern URNRegex =
             Pattern.compile("^urn:uuid:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
@@ -103,6 +109,37 @@ public class LDNInboxController {
         if (notification.getOrigin() == null || notification.getTarget() == null || notification.getObject() == null) {
             throw new InvalidLDNMessageException("Origin or Target or Object is missing");
         }
-    }
 
+        if (configurationService.getBooleanProperty("ldn.notify.inbox.block-untrusted", true)) {
+            try {
+                NotifyServiceEntity originNotifyService =
+                    ldnMessageService.findNotifyService(context, notification.getOrigin());
+                if (originNotifyService == null) {
+                    throw new DSpaceBadRequestException("Notify Service [" + notification.getOrigin()
+                        + "] unknown. LDN message can not be received.");
+                }
+            } catch (SQLException sqle) {
+                throw new DSpaceBadRequestException("Notify Service [" + notification.getOrigin()
+                + "] unknown. LDN message can not be received.");
+            }
+        }
+        if (configurationService.getBooleanProperty("ldn.notify.inbox.block-untrusted-ip", true)) {
+            try {
+                NotifyServiceEntity originNotifyService =
+                    ldnMessageService.findNotifyService(context, notification.getOrigin());
+                if (originNotifyService == null) {
+                    throw new DSpaceBadRequestException("Notify Service [" + notification.getOrigin()
+                        + "] unknown. LDN message can not be received.");
+                }
+                boolean isValidIp = ldnMessageService.isValidIp(originNotifyService, sourceIp);
+                if (!isValidIp) {
+                    throw new DSpaceBadRequestException("Source IP for Incoming LDN Message [" + notification.getId()
+                        + "] out of its Notify Service IP Range. LDN message can not be received.");
+                }
+            } catch (SQLException sqle) {
+                throw new DSpaceBadRequestException("Notify Service [" + notification.getOrigin()
+                + "] unknown. LDN message can not be received.");
+            }
+        }
+    }
 }

@@ -128,6 +128,7 @@ public interface LDNMessageService {
      * @throws SQLException If something goes wrong in the database
      */
     public NotifyRequestStatus findRequestsByItem(Context context, Item item) throws SQLException;
+
     /**
      * delete the provided ldn message
      *
@@ -136,4 +137,12 @@ public interface LDNMessageService {
      * @throws SQLException if something goes wrong
      */
     public void delete(Context context, LDNMessageEntity ldnMessage) throws SQLException;
+
+    /**
+     * check if IP number is included in the configured ip-range on the Notify Service
+     * 
+     * @param origin the Notify Service entity
+     * @param sourceIp the ip to evaluate
+     */
+    public boolean isValidIp(NotifyServiceEntity origin, String sourceIp);
 }

@@ -24,7 +24,7 @@
   },
   "origin": {
     "id": "https://research-organisation.org/repository",
-    "inbox": "sookah",
+    "inbox": "https://review-service.com/inbox/",
     "type": "Service"
   },
   "target": {
