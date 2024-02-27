@@ -49,7 +49,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ConditionalOnProperty("duplicate.enable")
-@RequestMapping("/api/" + PotentialDuplicateRest.CATEGORY)
+@RequestMapping("/api/" + PotentialDuplicateRest.CATEGORY + "/" + PotentialDuplicateRest.NAME)
 public class DuplicateDetectionRestController implements InitializingBean {
 
     private static final Logger log = LogManager.getLogger(DuplicateDetectionRestController.class);
@@ -68,8 +68,9 @@ public class DuplicateDetectionRestController implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         discoverableEndpointsService
-            .register(this, Arrays.asList(Link.of("/api/" + PotentialDuplicateRest.CATEGORY,
-                    PotentialDuplicateRest.CATEGORY)));
+            .register(this, Arrays.asList(Link.of(
+                    "/api/" + PotentialDuplicateRest.CATEGORY + "/" + PotentialDuplicateRest.NAME,
+                    PotentialDuplicateRest.NAME)));
     }
 
     /**

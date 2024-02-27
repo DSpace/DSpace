@@ -17,7 +17,8 @@ import java.util.UUID;
  */
 public class PotentialDuplicateRest extends RestAddressableModel {
 
-    public static final String CATEGORY = RestModel.DUPLICATES;
+    public static final String CATEGORY = RestModel.SUBMISSION;
+    public static final String NAME = RestModel.DUPLICATES;
 
     /**
      * Type of REST resource
