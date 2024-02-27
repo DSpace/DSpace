@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.ContentReportSupportRest;
 import org.dspace.app.rest.model.FilteredCollectionsQuery;
@@ -33,10 +34,10 @@ import org.dspace.app.rest.model.hateoas.FilteredItemsResource;
 import org.dspace.app.rest.repository.ContentReportRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.contentreport.Filter;
+import org.dspace.contentreport.service.ContentReportService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -61,8 +62,9 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/" + RestModel.CONTENT_REPORT)
-@ConditionalOnProperty("contentreport.enable")
 public class ContentReportRestController implements InitializingBean {
+
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     @Autowired
     private DiscoverableEndpointsService discoverableEndpointsService;
@@ -70,6 +72,8 @@ public class ContentReportRestController implements InitializingBean {
     private ConverterService converter;
     @Autowired
     private ContentReportRestRepository contentReportRestRepository;
+    @Autowired
+    private ContentReportService contentReportService;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -97,13 +101,18 @@ public class ContentReportRestController implements InitializingBean {
     public ResponseEntity<RepresentationModel<?>> getFilteredCollections(
             @RequestParam(name = "filters", required = false) List<String> filters,
             HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Context context = ContextUtil.obtainContext(request);
-        Set<Filter> filtersSet = listToStream(filters)
-                .map(Filter::get)
-                .filter(f -> f != null)
-                .collect(Collectors.toSet());
-        FilteredCollectionsQuery query = FilteredCollectionsQuery.of(filtersSet);
-        return filteredCollectionsReport(context, query);
+        if (contentReportService.getEnabled()) {
+            Context context = ContextUtil.obtainContext(request);
+            Set<Filter> filtersSet = listToStream(filters)
+                    .map(Filter::get)
+                    .filter(f -> f != null)
+                    .collect(Collectors.toSet());
+            FilteredCollectionsQuery query = FilteredCollectionsQuery.of(filtersSet);
+            return filteredCollectionsReport(context, query);
+        }
+
+        error404(response);
+        return null;
     }
 
 
@@ -147,27 +156,32 @@ public class ContentReportRestController implements InitializingBean {
             @RequestParam(name = "filters", required = false) List<String> filters,
             @RequestParam(name = "additionalFields", required = false) List<String> additionalFields,
             HttpServletRequest request, HttpServletResponse response, Pageable pageable) throws IOException {
-        Context context = ContextUtil.obtainContext(request);
-        String[] realPredicates = request.getParameterValues("queryPredicates");
-        List<String> collUuids = Optional.ofNullable(collections).orElseGet(() -> List.of());
-        List<FilteredItemsQueryPredicate> preds = arrayToStream(realPredicates)
-                .map(FilteredItemsQueryPredicate::of)
-                .collect(Collectors.toList());
-        int pgLimit = parseInt(pageLimit, 10);
-        int pgNumber = parseInt(pageNumber, 0);
-        Pageable myPageable = pageable;
-        if (pageable == null || pageable.getPageNumber() != pgNumber || pageable.getPageSize() != pgLimit) {
-            Sort sort = Optional.ofNullable(pageable).map(Pageable::getSort).orElse(Sort.unsorted());
-            myPageable = PageRequest.of(pgNumber, pgLimit, sort);
-        }
-        Set<Filter> filtersMap = listToStream(filters)
-                .map(Filter::get)
-                .filter(f -> f != null)
-                .collect(Collectors.toSet());
-        List<String> addFields = Optional.ofNullable(additionalFields).orElseGet(() -> List.of());
-        FilteredItemsQueryRest query = FilteredItemsQueryRest.of(collUuids, preds, pgLimit, filtersMap, addFields);
+        if (contentReportService.getEnabled()) {
+            Context context = ContextUtil.obtainContext(request);
+            String[] realPredicates = request.getParameterValues("queryPredicates");
+            List<String> collUuids = Optional.ofNullable(collections).orElseGet(() -> List.of());
+            List<FilteredItemsQueryPredicate> preds = arrayToStream(realPredicates)
+                    .map(FilteredItemsQueryPredicate::of)
+                    .collect(Collectors.toList());
+            int pgLimit = parseInt(pageLimit, 10);
+            int pgNumber = parseInt(pageNumber, 0);
+            Pageable myPageable = pageable;
+            if (pageable == null || pageable.getPageNumber() != pgNumber || pageable.getPageSize() != pgLimit) {
+                Sort sort = Optional.ofNullable(pageable).map(Pageable::getSort).orElse(Sort.unsorted());
+                myPageable = PageRequest.of(pgNumber, pgLimit, sort);
+            }
+            Set<Filter> filtersMap = listToStream(filters)
+                    .map(Filter::get)
+                    .filter(f -> f != null)
+                    .collect(Collectors.toSet());
+            List<String> addFields = Optional.ofNullable(additionalFields).orElseGet(() -> List.of());
+            FilteredItemsQueryRest query = FilteredItemsQueryRest.of(collUuids, preds, pgLimit, filtersMap, addFields);
 
-        return filteredItemsReport(context, query, myPageable);
+            return filteredItemsReport(context, query, myPageable);
+        }
+
+        error404(response);
+        return null;
     }
 
     private static Stream<String> listToStream(Collection<String> array) {
@@ -198,6 +212,15 @@ public class ContentReportRestController implements InitializingBean {
                 .findFilteredItems(context, query, pageable);
         FilteredItemsResource result = converter.toResource(report);
         return ControllerUtils.toResponseEntity(HttpStatus.OK, new HttpHeaders(), result);
+    }
+
+    private void error404(HttpServletResponse response) throws IOException {
+        log.debug("Content Reports are disabled");
+        String err = "Content Reports are disabled";
+        response.setStatus(404);
+        response.setContentType("text/html");
+        response.setContentLength(err.length());
+        response.getWriter().write(err);
     }
 
 }
