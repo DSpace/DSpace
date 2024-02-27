@@ -116,9 +116,9 @@ public class BrowseIndexMatcher {
 
     public static Matcher<? super Object> languageBrowseIndex(final String order) {
         return allOf(
-                hasJsonPath("$.metadata", contains("dc.language.iso")),
-                hasJsonPath("$.metadataBrowse", Matchers.is(true)),
-                hasJsonPath("$.dataType", equalToIgnoringCase("iso_lang")),
+                hasJsonPath("$.metadata", contains("local.language.name")),
+                hasJsonPath("$.browseType", equalToIgnoringCase(BROWSE_TYPE_VALUE_LIST)),
+                hasJsonPath("$.dataType", equalToIgnoringCase("text")),
                 hasJsonPath("$.order", equalToIgnoringCase(order)),
                 hasJsonPath("$.sortOptions[*].name", containsInAnyOrder("title", "dateissued", "dateaccessioned")),
                 hasJsonPath("$._links.self.href", is(REST_SERVER_URL + "discover/browses/language")),

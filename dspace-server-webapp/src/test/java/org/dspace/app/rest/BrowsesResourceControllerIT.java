@@ -64,15 +64,15 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
 
-                   //Our default Discovery config has 5 browse indexes, so we expect this to be reflected in the page
+                   //Our default Discovery config has 6 browse indexes, so we expect this to be reflected in the page
                    // object
                    .andExpect(jsonPath("$.page.size", is(20)))
-                   .andExpect(jsonPath("$.page.totalElements", is(5)))
+                   .andExpect(jsonPath("$.page.totalElements", is(6)))
                    .andExpect(jsonPath("$.page.totalPages", is(1)))
                    .andExpect(jsonPath("$.page.number", is(0)))
 
-                   //The array of browse index should have a size 5
-                   .andExpect(jsonPath("$._embedded.browses", hasSize(5)))
+                   //The array of browse index should have a size 6
+                   .andExpect(jsonPath("$._embedded.browses", hasSize(6)))
 
                    //Check that all (and only) the default browse indexes are present
                    .andExpect(jsonPath("$._embedded.browses", containsInAnyOrder(
@@ -80,7 +80,8 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                        BrowseIndexMatcher.contributorBrowseIndex("asc"),
                        BrowseIndexMatcher.titleBrowseIndex("asc"),
                        BrowseIndexMatcher.subjectBrowseIndex("asc"),
-                       BrowseIndexMatcher.hierarchicalBrowseIndex("srsc")
+                       BrowseIndexMatcher.hierarchicalBrowseIndex("srsc"),
+                       BrowseIndexMatcher.languageBrowseIndex("asc")
                    )))
         ;
     }
