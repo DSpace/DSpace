@@ -53,7 +53,8 @@
             ref="org.dspace.services.ConfigurationService" />
         <property name="DOIConnector"
             ref="org.dspace.identifier.doi.DOIConnector" />
-        <property name="filter" ref="doi-filter" />
+        <!-- See https://umd-dit.atlassian.net/browse/LIBDRUM-848 -->
+        <!-- <property name="filter" ref="doi-filter" /> -->
     </bean>
     <!-- End UMD Customization -->
     <!--
