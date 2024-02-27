@@ -41,6 +41,10 @@ public class ContentReportServiceImpl implements ContentReportService {
     @Autowired
     private MetadataFieldService metadataFieldService;
 
+    /**
+     * Returns <code>true<</code> if Content Reports are enabled.
+     * @return <code>true<</code> if Content Reports are enabled
+     */
     @Override
     public boolean getEnabled() {
         return configurationService.getBooleanProperty("contentreport.enable");
