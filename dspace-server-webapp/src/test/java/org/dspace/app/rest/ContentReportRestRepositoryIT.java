@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.matcher.ContentReportMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
@@ -37,7 +36,6 @@ import org.dspace.contentreport.FilteredCollection;
 import org.dspace.contentreport.QueryOperator;
 import org.dspace.services.ConfigurationService;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -57,43 +55,9 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
 
         configurationService.setProperty("contentreport.enable", Boolean.TRUE);
 
-        //** GIVEN **
-        //1. A community with two collections.
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("My Community")
-                                          .build();
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 2").build();
-
-        LocalDate today = LocalDate.now();
-        LocalDate pastDate = today.minusDays(10);
-        String fmtPastDate = DateTimeFormatter.ISO_DATE.format(pastDate);
-        LocalDate futureDate = today.plusDays(10);
-        String fmtFutureDate = DateTimeFormatter.ISO_DATE.format(futureDate);
-
-        //2. Three items, two of which are available and discoverable...
-        ItemBuilder.createItem(context, col1)
-                                      .withTitle("Public item 1")
-                                      .withIssueDate(fmtPastDate)
-                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-
-        ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 2")
-                                      .withIssueDate(fmtPastDate)
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
-                                      .build();
-
-        // ... and one will be available in a few days.
-        ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 3")
-                                      .withIssueDate(fmtFutureDate)
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("AnotherTest").withSubject("TestingForMore")
-                                      .withSubject("ExtraEntry")
-                                      .build();
+        TestKit testKit = setupCollectionsAndItems();
+        Collection col1 = testKit.collections.get(0);
+        Collection col2 = testKit.collections.get(1);
 
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
@@ -123,48 +87,28 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
+    public void testFilteredCollectionsUnauthorized() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        configurationService.setProperty("contentreport.enable", Boolean.TRUE);
+
+        setupCollectionsAndItems();
+
+        context.restoreAuthSystemState();
+
+        FilteredCollectionsQuery query = FilteredCollectionsQuery.of(Set.of(Filter.IS_DISCOVERABLE));
+
+        getClient().perform(get("/api/contentreport/filteredcollections?" + query.toQueryString()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     public void testFilteredCollectionsOff() throws Exception {
         context.turnOffAuthorisationSystem();
 
         configurationService.setProperty("contentreport.enable", Boolean.FALSE);
 
-        //** GIVEN **
-        //1. A community with two collections.
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("My Community")
-                                          .build();
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 2").build();
-
-        LocalDate today = LocalDate.now();
-        LocalDate pastDate = today.minusDays(10);
-        String fmtPastDate = DateTimeFormatter.ISO_DATE.format(pastDate);
-        LocalDate futureDate = today.plusDays(10);
-        String fmtFutureDate = DateTimeFormatter.ISO_DATE.format(futureDate);
-
-        //2. Three items, two of which are available and discoverable...
-        ItemBuilder.createItem(context, col1)
-                                      .withTitle("Public item 1")
-                                      .withIssueDate(fmtPastDate)
-                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-
-        ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 2")
-                                      .withIssueDate(fmtPastDate)
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
-                                      .build();
-
-        // ... and one will be available in a few days.
-        ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 3")
-                                      .withIssueDate(fmtFutureDate)
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("AnotherTest").withSubject("TestingForMore")
-                                      .withSubject("ExtraEntry")
-                                      .build();
+        setupCollectionsAndItems();
 
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
@@ -175,51 +119,15 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
                    .andExpect(status().isNotFound());
     }
 
-    // This test is disabled until someone can find out why the search function doesn't behave properly
-    // in the present test context while it does when used against a standard production database.
-    @Ignore
     @Test
     public void testFilteredItems() throws Exception {
         context.turnOffAuthorisationSystem();
 
         configurationService.setProperty("contentreport.enable", Boolean.TRUE);
 
-        //** GIVEN **
-        //1. A community with two collections.
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("My Community")
-                                          .build();
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 2").build();
-
-        List<Item> items = new ArrayList<>();
-
-        //2. Three items, two of which are available and discoverable...
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
-                                      .withTitle("Public item 1")
-                                      .withIssueDate("2017-10-17")
-                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-        items.add(publicItem1);
-
-        Item publicItem2 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 2")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
-                                      .build();
-        items.add(publicItem2);
-
-        // ... and one will be available in a few days.
-        Item publicItem3 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 3")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("AnotherTest").withSubject("TestingForMore")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-        items.add(publicItem3);
+        TestKit testKit = setupCollectionsAndItems();
+        Item publicItem2 = testKit.items.get(1);
+        Item publicItem3 = testKit.items.get(2);
 
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
@@ -228,11 +136,7 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
                 List.of(FilteredItemsQueryPredicate.of("dc.contributor.author", QueryOperator.EQUALS, "Doe, Jane")),
                 100, null, List.of("dc.subject"));
 
-        ObjectMapper mapper = new ObjectMapper();
-
-        getClient(token).perform(get("/api/contentreport/filtereditems?" + query.toQueryString())
-                .content(mapper.writeValueAsBytes(query))
-                .contentType(contentType))
+        getClient(token).perform(get("/api/contentreport/filtereditems?" + query.toQueryString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
                 .andExpect(jsonPath("$.itemCount", is(2)))
@@ -243,47 +147,30 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
     }
 
     @Test
+    public void testFilteredItemsUnauthorized() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        configurationService.setProperty("contentreport.enable", Boolean.TRUE);
+
+        setupCollectionsAndItems();
+
+        context.restoreAuthSystemState();
+
+        FilteredItemsQueryRest query = FilteredItemsQueryRest.of(null,
+                List.of(FilteredItemsQueryPredicate.of("dc.contributor.author", QueryOperator.EQUALS, "Doe, Jane")),
+                100, null, List.of("dc.subject"));
+
+        getClient().perform(get("/api/contentreport/filtereditems?" + query.toQueryString()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     public void testFilteredItemsOff() throws Exception {
         context.turnOffAuthorisationSystem();
 
         configurationService.setProperty("contentreport.enable", Boolean.FALSE);
 
-        //** GIVEN **
-        //1. A community with two collections.
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                                          .withName("My Community")
-                                          .build();
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
-        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 2").build();
-
-        List<Item> items = new ArrayList<>();
-
-        //2. Three items, two of which are available and discoverable...
-        Item publicItem1 = ItemBuilder.createItem(context, col1)
-                                      .withTitle("Public item 1")
-                                      .withIssueDate("2017-10-17")
-                                      .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-        items.add(publicItem1);
-
-        Item publicItem2 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 2")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("TestingForMore").withSubject("ExtraEntry")
-                                      .build();
-        items.add(publicItem2);
-
-        // ... and one will be available in a few days.
-        Item publicItem3 = ItemBuilder.createItem(context, col2)
-                                      .withTitle("Public item 3")
-                                      .withIssueDate("2016-02-13")
-                                      .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
-                                      .withSubject("AnotherTest").withSubject("TestingForMore")
-                                      .withSubject("ExtraEntry")
-                                      .build();
-        items.add(publicItem3);
+        setupCollectionsAndItems();
 
         context.restoreAuthSystemState();
         String token = getAuthToken(admin.getEmail(), password);
@@ -294,6 +181,66 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
 
         getClient(token).perform(get("/api/contentreport/filtereditems?" + query.toQueryString()))
                 .andExpect(status().isNotFound());
+    }
+
+    private TestKit setupCollectionsAndItems() {
+        //** GIVEN **
+        //1. A community with two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("My Community")
+                .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 2").build();
+
+        LocalDate today = LocalDate.now();
+        LocalDate pastDate = today.minusDays(10);
+        String fmtPastDate = DateTimeFormatter.ISO_DATE.format(pastDate);
+        LocalDate futureDate = today.plusDays(10);
+        String fmtFutureDate = DateTimeFormatter.ISO_DATE.format(futureDate);
+
+        //2. Three items, two of which are available and discoverable...
+        Item item1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate(fmtPastDate)
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+
+        Item item2 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate(fmtPastDate)
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                .withSubject("TestingForMore").withSubject("ExtraEntry")
+                .build();
+
+        // ... and one will be available in a few days.
+        Item item3 = ItemBuilder.createItem(context, col2)
+                .withTitle("Public item 3")
+                .withIssueDate(fmtFutureDate)
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                .withSubject("AnotherTest").withSubject("TestingForMore")
+                .withSubject("ExtraEntry")
+                .build();
+
+        TestKit kit = new TestKit();
+        kit.collections.add(col1);
+        kit.collections.add(col2);
+        kit.items.add(item1);
+        kit.items.add(item2);
+        kit.items.add(item3);
+        return kit;
+    }
+
+    /**
+     * Data structure to help trace back the created collections and items to perform the tests.
+     * In a future version (Java 17 or later), this class could be turned into a record.
+     */
+    private static class TestKit {
+
+        public final List<Collection> collections = new ArrayList<>();
+        public final List<Item> items = new ArrayList<>();
+
     }
 
 }
