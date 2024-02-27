@@ -196,7 +196,7 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
             hasJsonPath("$.discoverable", is(item.isDiscoverable())),
             hasJsonPath("$.withdrawn", is(item.isWithdrawn())),
             hasJsonPath("$.lastModified", is(notNullValue())),
-            hasJsonPath("$.type", is("filtered item"))
+            hasJsonPath("$.type", is("filtered-item"))
         );
     }
 

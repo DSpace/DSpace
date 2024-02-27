@@ -68,6 +68,11 @@ public class FilteredCollectionRest {
         return coll;
     }
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    public String getType() {
+        return NAME;
+    }
+
     public Map<Filter, Integer> getValues() {
         return values;
     }

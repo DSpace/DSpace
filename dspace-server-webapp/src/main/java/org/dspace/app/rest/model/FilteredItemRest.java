@@ -40,6 +40,11 @@ public class FilteredItemRest {
     private String entityType = null;
     private CollectionRest owningCollection;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    public String getType() {
+        return NAME;
+    }
+
     public String getUuid() {
         return uuid;
     }
