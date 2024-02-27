@@ -173,13 +173,13 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
 
         // Result item must not be null, a template item, or actually identical to the original
         if (resultItem == null) {
-            log.error("skipping null item in duplicate search results");
+            log.warn("skipping null item in duplicate search results");
             return Optional.empty();
         } else if (resultItem.getTemplateItemOf() != null) {
-            log.error("skipping template item in duplicate search results");
+            log.info("skipping template item in duplicate search results, item={}", resultItem.getID());
             return Optional.empty();
         } else if (resultItem.getID().equals(original.getID())) {
-            log.warn("skipping a duplicate search result for the original item");
+            log.info("skipping a duplicate search result for the original item", resultItem.getID());
             return Optional.empty();
         }
 
@@ -239,7 +239,8 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
             // Admins can always read, return immediately
             return Optional.of(potentialDuplicate);
         } else {
-            log.error("No valid permission to return this item");
+            log.info("Potential duplicate result is not readable by the current user, skipping item={}",
+                    potentialDuplicate.getUuid());
         }
 
             // By default, return an empty result

@@ -28,6 +28,7 @@ import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -47,6 +48,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Kim Shepherd
  */
 @RestController
+@ConditionalOnProperty("duplicate.enable")
 @RequestMapping("/api/" + PotentialDuplicateRest.CATEGORY)
 public class DuplicateDetectionRestController implements InitializingBean {
 

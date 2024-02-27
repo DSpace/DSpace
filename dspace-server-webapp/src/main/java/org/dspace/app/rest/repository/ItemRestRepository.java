@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -23,15 +22,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.Parameter;
-import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.MetadataConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.ItemRest;
-import org.dspace.app.rest.model.PotentialDuplicateRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.handler.service.UriListHandlerService;
 import org.dspace.authorize.AuthorizeException;
@@ -49,9 +45,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.content.virtual.PotentialDuplicate;
 import org.dspace.core.Context;
-import org.dspace.discovery.SearchServiceException;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -376,52 +370,4 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         return converter.toRest(item, utils.obtainProjection());
     }
 
-    /**
-     * Search method to find and return a paged list of duplicates, if the current user has authorization
-     *
-     * @param itemUuid the UUID of the item for which we are searching duplicates
-     * @param optionalPageable pagination options
-     * @return pagination potential duplicate results
-     */
-    @PreAuthorize("hasPermission(#itemUuid, 'ITEM', 'READ')")
-    @SearchRestMethod(name = "findDuplicates")
-    public Page<PotentialDuplicateRest> findDuplicates(@Parameter(value = "uuid", required = true) UUID itemUuid,
-                                                       Pageable optionalPageable) {
-        // Instantiate object to represent this item
-        Item item;
-        // Instantiate list of potential duplicates which we will convert and return as paged ItemRest list
-        List<PotentialDuplicate> potentialDuplicates = new LinkedList<>();
-        // Instantiate total count
-        int total = 0;
-        // Obtain context
-        Context context = obtainContext();
-        // Get pagination
-        Pageable pageable = utils.getPageable(optionalPageable);
-
-        // Try to get item based on UUID parameter
-        try {
-            item = itemService.find(context, itemUuid);
-        } catch (SQLException e) {
-            throw new ResourceNotFoundException(e.getMessage());
-        }
-
-        // If the item is null or otherwise invalid (template, etc) then throw an appropriate error
-        if (item == null) {
-            throw new ResourceNotFoundException("No such item: " + itemUuid);
-        }
-        if (item.getTemplateItemOf() != null) {
-            throw new IllegalArgumentException("Cannot get duplicates for template item");
-        }
-
-        try {
-            // Search for the list of potential duplicates
-            potentialDuplicates = duplicateDetectionService.getPotentialDuplicates(context, item);
-        } catch (SearchServiceException e) {
-            // If the search fails, log an error and return an empty list rather than throwing a fatal error
-            log.error("Search service error retrieving duplicates: {}", e.getMessage());
-        }
-
-        // Return the list of items along with pagination info and max results
-        return converter.toRestPage(potentialDuplicates, pageable, total, utils.obtainProjection());
-    }
 }

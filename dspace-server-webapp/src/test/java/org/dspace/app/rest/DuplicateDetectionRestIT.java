@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.patch.ReplaceOperation;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -90,8 +88,6 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
     private final String item2Subject = "ExtraEntry 2";
     private final String item2IssueDate = "2012-10-17";
     private EPerson anotherEPerson;
-
-    private static Logger log = LogManager.getLogger();
 
     @Override
     public void setUp() throws Exception {
@@ -166,7 +162,7 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
                 .withSubject("ExtraEntry 3")
                 .withSubmitter(eperson)
                 .build();
-        log.error("EPERSON FULL NAME IS " + eperson.getFullName());
+
         XmlWorkflowItem wfi1 = workflowService.start(context, workspaceItem1);
         XmlWorkflowItem wfi2 = workflowService.start(context, workspaceItem2);
         Item item1 = wfi1.getItem();
