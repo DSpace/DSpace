@@ -169,7 +169,7 @@ public class S3BitStoreService extends BaseBitStoreService {
     @Override
     public void init() throws IOException {
 
-        if (this.isInitialized()) {
+        if (this.isInitialized() || !this.isEnabled()) {
             return;
         }
 
