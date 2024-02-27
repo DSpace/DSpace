@@ -8,18 +8,29 @@
 package org.dspace.qaevent;
 
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * This model class represent the quality assurance broker topic concept. A
  * topic represents a type of event and is therefore used to group events.
  * 
  * @author Andrea Bollini (andrea.bollini at 4science.it)
- *
  */
 public class QATopic {
+
+    /**
+     * The focus attributes specify if the QATopic object is describing the status of a specific
+     * quality assurance topic for the whole repository (focus = null) or for a specific
+     * DSpaceObject (focus = uuid of the DSpaceObject). This would mostly affect the totalEvents attribute below.
+     */
+    private UUID focus;
     private String key;
-    private long totalEvents;
+    /**
+     * The source attributes contains the name of the QA source like: OpenAIRE, DSpaceUsers
+     */
+    private String source;
     private Date lastEvent;
+    private long totalEvents;
 
     public String getKey() {
         return key;
@@ -43,5 +54,21 @@ public class QATopic {
 
     public void setLastEvent(Date lastEvent) {
         this.lastEvent = lastEvent;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public UUID getFocus() {
+        return focus;
+    }
+
+    public void setFocus(UUID focus) {
+        this.focus = focus;
     }
 }

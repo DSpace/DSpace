@@ -31,7 +31,8 @@ public class QASourceConverter implements DSpaceConverter<QASource, QASourceRest
     public QASourceRest convert(QASource modelObject, Projection projection) {
         QASourceRest rest = new QASourceRest();
         rest.setProjection(projection);
-        rest.setId(modelObject.getName());
+        rest.setId(modelObject.getName() + (modelObject.getFocus() != null ? ":" + modelObject.getFocus().toString()
+                                                                           : ""));
         rest.setLastEvent(modelObject.getLastEvent());
         rest.setTotalEvents(modelObject.getTotalEvents());
         return rest;

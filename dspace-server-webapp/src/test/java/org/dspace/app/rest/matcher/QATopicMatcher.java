@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
 import org.dspace.app.rest.model.hateoas.QATopicResource;
+import org.dspace.content.QAEvent;
 import org.hamcrest.Matcher;
 
 /**
@@ -24,22 +25,41 @@ public class QATopicMatcher {
 
     private QATopicMatcher() { }
 
-    public static Matcher<? super Object> matchQATopicEntry(String key, int totalEvents) {
+    public static Matcher<? super Object> matchQATopicEntry(String topicName, int totalEvents) {
+        return matchQATopicEntry(QAEvent.OPENAIRE_SOURCE, topicName, totalEvents);
+    }
+
+
+    public static Matcher<? super Object> matchQATopicEntry(String topicName) {
+        return matchQATopicEntry(QAEvent.OPENAIRE_SOURCE, topicName);
+    }
+
+    public static Matcher<? super Object> matchQATopicEntry(String source, String topicName, int totalEvents) {
         return allOf(
             hasJsonPath("$.type", is("qualityassurancetopic")),
-            hasJsonPath("$.name", is(key)),
-            hasJsonPath("$.id", is(key.replace("/", "!"))),
+            hasJsonPath("$.name", is(topicName)),
+            hasJsonPath("$.id", is(source + ":" + topicName.replace("/", "!"))),
             hasJsonPath("$.totalEvents", is(totalEvents))
         );
     }
 
 
-    public static Matcher<? super Object> matchQATopicEntry(String key) {
+    public static Matcher<? super Object> matchQATopicEntry(String source, String topicName) {
         return allOf(
             hasJsonPath("$.type", is("qualityassurancetopic")),
-            hasJsonPath("$.name", is(key)),
-            hasJsonPath("$.id", is(key.replace("/", "/")))
+            hasJsonPath("$.name", is(topicName)),
+            hasJsonPath("$.id", is(source + ":" + topicName.replace("/", "!")))
         );
+    }
+
+    public static Matcher<? super Object> matchQATopicEntry(String source, String topicName, String itemUuid,
+           int totalEvents) {
+        return allOf(
+                hasJsonPath("$.type", is("qualityassurancetopic")),
+                hasJsonPath("$.name", is(topicName)),
+                hasJsonPath("$.id", is(source + ":" + topicName.replace("/", "!") + ":" + itemUuid)),
+                hasJsonPath("$.totalEvents", is(totalEvents))
+            );
     }
 
 }
