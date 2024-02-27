@@ -49,7 +49,7 @@ public interface ContentReportService {
      * @param metadataField field to search for
      * @return a corresponding list of {@link MetadataField} entries
      */
-    List<MetadataField> getMetadataFields(org.dspace.core.Context context, String queryField)
+    List<MetadataField> getMetadataFields(org.dspace.core.Context context, String metadataField)
             throws SQLException;
 
 }
