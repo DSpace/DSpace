@@ -51,7 +51,7 @@ public class QAEventRelatedLinkRepository extends AbstractDSpaceRestRepository i
      * @param projection the projection object
      * @return the item rest representation of the secondary item related to qa event
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasPermission(#id, 'QUALITYASSURANCEEVENT', 'READ')")
     public ItemRest getRelated(@Nullable HttpServletRequest request, String id, @Nullable Pageable pageable,
             Projection projection) {
         Context context = obtainContext();

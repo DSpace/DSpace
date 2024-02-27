@@ -13,6 +13,8 @@ import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.is;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,10 +51,11 @@ public class QAEventMatcher {
     public static Matcher<? super Object> matchQAEventEntry(QAEvent event) {
         try {
             ObjectMapper jsonMapper = new JsonMapper();
+            DecimalFormat decimalFormat = new DecimalFormat("0.000", new DecimalFormatSymbols(Locale.ENGLISH));
             return allOf(hasJsonPath("$.id", is(event.getEventId())),
                     hasJsonPath("$.originalId", is(event.getOriginalId())),
                     hasJsonPath("$.title", is(event.getTitle())),
-                    hasJsonPath("$.trust", is(new DecimalFormat("0.000").format(event.getTrust()))),
+                    hasJsonPath("$.trust", is(decimalFormat.format(event.getTrust()))),
                     hasJsonPath("$.status", Matchers.equalToIgnoringCase(event.getStatus())),
                     hasJsonPath("$.message",
                             matchMessage(event.getTopic(), jsonMapper.readValue(event.getMessage(),

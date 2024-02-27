@@ -19,22 +19,29 @@ import org.dspace.qaevent.service.dto.QAMessageDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Implementation of {@link QualityAssuranceAction} that add a simple metadata to the given
- * item.
+ * Implementation of {@link QualityAssuranceAction} that add a simple metadata to the given item.
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
- *
  */
 public class QAOpenaireSimpleMetadataAction implements QualityAssuranceAction {
-    private String metadata;
-    private String metadataSchema;
-    private String metadataElement;
-    private String metadataQualifier;
-    @Autowired
-    private ItemService itemService;
 
-    public void setItemService(ItemService itemService) {
-        this.itemService = itemService;
+    protected String metadata;
+    protected String metadataSchema;
+    protected String metadataElement;
+    protected String metadataQualifier;
+
+    @Autowired
+    protected ItemService itemService;
+
+    @Override
+    public void applyCorrection(Context context, Item item, Item relatedItem, QAMessageDTO message) {
+        try {
+            itemService.addMetadata(context, item, metadataSchema, metadataElement, metadataQualifier, null,
+                ((OpenaireMessageDTO) message).getAbstracts());
+            itemService.update(context, item);
+        } catch (SQLException | AuthorizeException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     public String getMetadata() {
@@ -48,17 +55,6 @@ public class QAOpenaireSimpleMetadataAction implements QualityAssuranceAction {
         this.metadataElement = split[1];
         if (split.length == 3) {
             this.metadataQualifier = split[2];
-        }
-    }
-
-    @Override
-    public void applyCorrection(Context context, Item item, Item relatedItem, QAMessageDTO message) {
-        try {
-            itemService.addMetadata(context, item, metadataSchema, metadataElement, metadataQualifier, null,
-                ((OpenaireMessageDTO) message).getAbstracts());
-            itemService.update(context, item);
-        } catch (SQLException | AuthorizeException e) {
-            throw new RuntimeException(e);
         }
     }
 }

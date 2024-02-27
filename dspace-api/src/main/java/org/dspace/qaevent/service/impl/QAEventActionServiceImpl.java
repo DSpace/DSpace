@@ -23,6 +23,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
@@ -41,7 +42,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  */
 public class QAEventActionServiceImpl implements QAEventActionService {
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(QAEventActionServiceImpl.class);
+
+    private static final Logger log = LogManager.getLogger(QAEventActionServiceImpl.class);
 
     private ObjectMapper jsonMapper;
 

@@ -18,14 +18,15 @@
      <bean id="org.dspace.qaevent.service.QAEventActionService" class="org.dspace.qaevent.service.impl.QAEventActionServiceImpl">
         <property name="topicsToActions">
             <map>
-            	<!--The key are the TOPIC, the value must be a valid implementation of the 
-            		org.dspace.qaevent.QAEventAction interface -->
+            	<!--The key are the TOPIC, the value must be a valid implementation of the org.dspace.qaevent.QAEventAction interface -->
                <entry key="ENRICH/MORE/PROJECT" value-ref="ProjectLinkedEntityAction" />
                <entry key="ENRICH/MISSING/PROJECT" value-ref="ProjectLinkedEntityAction" />
                <entry key="ENRICH/MISSING/ABSTRACT" value-ref="AbstractMetadataAction" />
                <entry key="ENRICH/MORE/PID" value-ref="PIDMetadataAction" />
                <entry key="ENRICH/MISSING/PID" value-ref="PIDMetadataAction" />
-            </map>   
+               <entry key="REQUEST/WITHDRAWN" value-ref="WithdrawnRequestAction" />
+               <entry key="REQUEST/REINSTATE" value-ref="ReinstateRequestAction" />
+            </map>
         </property>
      </bean>
      
@@ -64,5 +65,28 @@
 	         </map>
 	     </property>    
      </bean>
-     
+    
+    <bean id="WithdrawnRequestAction" class="org.dspace.qaevent.action.QAWithdrawnRequestAction" />
+
+    <bean id="ReinstateRequestAction" class="org.dspace.qaevent.action.QAReinstateRequestAction" />
+
+    <bean id="org.dspace.qaevent.service.QAEventSecurityService" class="org.dspace.qaevent.service.impl.QAEventSecurityServiceImpl">
+        <property name="defaultSecurity">
+            <bean class="org.dspace.qaevent.security.AdministratorsOnlyQASecurity" />
+        </property>
+        <property name="qaSecurityConfiguration">
+            <map>
+                <entry key="DSpaceUsers" value-ref="submitterWithdrawnReinstateQASecurity" />
+            </map>
+        </property>    
+    </bean>
+    
+    <bean id="submitterWithdrawnReinstateQASecurity" class="org.dspace.qaevent.security.UserBasedFilterQASecurity">
+        <property name="filterTemplate">
+            <!-- we need to escape the { as it as a special meaning for the message format -->
+            <!-- argument {0} will be replaced with the uuid of the loggedin user -->
+            <value>original_id:{0}</value>
+        </property>    
+    </bean>
+
  </beans>
