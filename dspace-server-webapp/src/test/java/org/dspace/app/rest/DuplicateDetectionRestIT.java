@@ -25,6 +25,7 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.builder.WorkspaceItemBuilder;
@@ -115,19 +116,15 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
                 .build();
         eperson.setFirstName(context, "first");
         eperson.setLastName(context, "last");
-        anotherEPerson = ePersonService.findByEmail(context, "test-another-user@email.com");
-        if (anotherEPerson == null) {
-            anotherEPerson = ePersonService.create(context);
-            anotherEPerson.setFirstName(context, "first");
-            anotherEPerson.setLastName(context, "last");
-            anotherEPerson.setEmail("test-another-user@email.com");
-            anotherEPerson.setCanLogIn(true);
-            anotherEPerson.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
-            ePersonService.setPassword(anotherEPerson, password);
-            // actually save the eperson to unit testing DB
-            ePersonService.update(context, anotherEPerson);
-        }
-        //context.setDispatcher("noindex");
+
+        anotherEPerson = EPersonBuilder.createEPerson(context)
+                .withEmail("test-another-user@email.com")
+                .withNameInMetadata("first", "last")
+                .withCanLogin(true)
+                .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                .withPassword(password)
+                .build();
+
         context.restoreAuthSystemState();
     }
 
@@ -405,20 +402,6 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
                 .andExpect(content().contentType(contentType))
                 // Valid duplicates array
                 .andExpect(jsonPath("$._embedded.potentialDuplicateResources").doesNotExist());
-    }
-
-    @Override
-    public void destroy() throws Exception {
-        if (anotherEPerson != null) {
-            try {
-                context.turnOffAuthorisationSystem();
-                ePersonService.delete(context, anotherEPerson);
-                context.restoreAuthSystemState();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-        super.destroy();
     }
 
 }
