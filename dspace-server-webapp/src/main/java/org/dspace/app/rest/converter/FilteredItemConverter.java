@@ -20,13 +20,16 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.FilteredItemRest;
 import org.dspace.app.rest.model.MetadataValueList;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.app.util.service.MetadataExposureService;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
-import org.dspace.discovery.IndexableObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,35 +39,50 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-public class FilteredItemConverter
-        extends DSpaceObjectConverter<Item, FilteredItemRest>
-        implements IndexableObjectConverter<Item, FilteredItemRest> {
+public class FilteredItemConverter {
 
+    // Must be loaded @Lazy, as ConverterService autowires all DSpaceConverter components
+    @Lazy
+    @Autowired
+    ConverterService converter;
     @Autowired
     private ItemService itemService;
     @Autowired
     private CollectionConverter collectionConverter;
+    @Autowired
+    AuthorizeService authorizeService;
+    @Autowired
+    MetadataExposureService metadataExposureService;
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(FilteredItemConverter.class);
 
-    @Override
     public FilteredItemRest convert(Item obj, Projection projection) {
-        FilteredItemRest item = super.convert(obj, projection);
+        FilteredItemRest item = new FilteredItemRest();
+
+        item.setHandle(obj.getHandle());
+        if (obj.getID() != null) {
+            item.setUuid(obj.getID().toString());
+        }
+        item.setName(obj.getName());
+
+        MetadataValueList metadataValues = getPermissionFilteredMetadata(
+                ContextUtil.obtainCurrentRequestContext(), obj);
+        item.setMetadata(converter.toRest(metadataValues, projection));
+
         item.setInArchive(obj.isArchived());
         item.setDiscoverable(obj.isDiscoverable());
         item.setWithdrawn(obj.isWithdrawn());
         item.setLastModified(obj.getLastModified());
 
-        // Addition specific to FilteredItemRest. The remainder is taken as-is from ItemConverter.
-        Optional.ofNullable(obj.getOwningCollection())
-                .map(coll -> collectionConverter.convert(coll, Projection.DEFAULT))
-                .ifPresent(item::setOwningCollection);
-
         List<MetadataValue> entityTypes =
-            itemService.getMetadata(obj, "dspace", "entity", "type", Item.ANY, false);
+                itemService.getMetadata(obj, "dspace", "entity", "type", Item.ANY, false);
         if (CollectionUtils.isNotEmpty(entityTypes) && StringUtils.isNotBlank(entityTypes.get(0).getValue())) {
             item.setEntityType(entityTypes.get(0).getValue());
         }
+
+        Optional.ofNullable(obj.getOwningCollection())
+            .map(coll -> collectionConverter.convert(coll, Projection.DEFAULT))
+            .ifPresent(item::setOwningCollection);
 
         return item;
     }
@@ -78,8 +96,7 @@ public class FilteredItemConverter
      * @return A list of object metadata (including virtual metadata) filtered based on the hidden metadata
      * configuration
      */
-    @Override
-    public MetadataValueList getPermissionFilteredMetadata(Context context, Item obj) {
+    private MetadataValueList getPermissionFilteredMetadata(Context context, Item obj) {
         List<MetadataValue> fullList = itemService.getMetadata(obj, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
         List<MetadataValue> returnList = new LinkedList<>();
         try {
@@ -105,18 +122,4 @@ public class FilteredItemConverter
         return new MetadataValueList(returnList);
     }
 
-    @Override
-    protected FilteredItemRest newInstance() {
-        return new FilteredItemRest();
-    }
-
-    @Override
-    public Class<Item> getModelClass() {
-        return Item.class;
-    }
-
-    @Override
-    public boolean supportsModel(@SuppressWarnings("rawtypes") IndexableObject idxo) {
-        return idxo.getIndexedObject() instanceof Item;
-    }
 }

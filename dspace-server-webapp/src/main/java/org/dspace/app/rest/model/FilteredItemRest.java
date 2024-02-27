@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.model;
 
+import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -19,32 +21,95 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @author Jean-François Morin (jean-francois.morin@bibl.ulaval.ca)
  */
-@LinksRest(links = {
-        @LinkRest(
-                name = FilteredItemRest.OWNING_COLLECTION,
-                method = "getOwningCollection"
-        )
-})
-public class FilteredItemRest extends ItemRest {
+public class FilteredItemRest {
 
-    private static final long serialVersionUID = -4743487764046689861L;
-    public static final String NAME = "filtered item";
-    public static final String PLURAL_NAME = "filtered items";
+    public static final String NAME = "filtered-item";
     public static final String CATEGORY = RestAddressableModel.CONTENT_REPORT;
 
     public static final String OWNING_COLLECTION = "owningCollection";
 
+    private String uuid;
+    private String name;
+    private String handle;
+    MetadataRest metadata = new MetadataRest();
+    private boolean inArchive = false;
+    private boolean discoverable = false;
+    private boolean withdrawn = false;
+    private Date lastModified = new Date();
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String entityType = null;
     private CollectionRest owningCollection;
 
-    @Override
-    public String getCategory() {
-        return CATEGORY;
+    public String getUuid() {
+        return uuid;
     }
 
-    @Override
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    public String getType() {
-        return NAME;
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getHandle() {
+        return handle;
+    }
+
+    public void setHandle(String handle) {
+        this.handle = handle;
+    }
+
+    public MetadataRest getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(MetadataRest metadata) {
+        this.metadata = metadata;
+    }
+
+    public boolean getInArchive() {
+        return inArchive;
+    }
+
+    public void setInArchive(boolean inArchive) {
+        this.inArchive = inArchive;
+    }
+
+    public boolean getDiscoverable() {
+        return discoverable;
+    }
+
+    public void setDiscoverable(boolean discoverable) {
+        this.discoverable = discoverable;
+    }
+
+    public boolean getWithdrawn() {
+        return withdrawn;
+    }
+
+    public void setWithdrawn(boolean withdrawn) {
+        this.withdrawn = withdrawn;
+    }
+
+    public Date getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(Date lastModified) {
+        this.lastModified = lastModified;
+    }
+
+    public String getEntityType() {
+        return entityType;
+    }
+
+    public void setEntityType(String entityType) {
+        this.entityType = entityType;
     }
 
     public CollectionRest getOwningCollection() {
