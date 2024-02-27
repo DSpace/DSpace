@@ -7,7 +7,10 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -21,7 +24,6 @@ import java.util.Set;
 
 import org.dspace.app.rest.matcher.ContentReportMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
-import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.model.FilteredCollectionsQuery;
 import org.dspace.app.rest.model.FilteredItemsQueryPredicate;
 import org.dspace.app.rest.model.FilteredItemsQueryRest;
@@ -35,6 +37,7 @@ import org.dspace.contentreport.Filter;
 import org.dspace.contentreport.FilteredCollection;
 import org.dspace.contentreport.QueryOperator;
 import org.dspace.services.ConfigurationService;
+import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,8 +144,8 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
                 .andExpect(jsonPath("$.itemCount", is(2)))
                 .andExpect(jsonPath("$.items", Matchers.containsInAnyOrder(
-                        ItemMatcher.matchItemProperties(publicItem2),
-                        ItemMatcher.matchItemProperties(publicItem3)
+                        matchItemProperties(publicItem2),
+                        matchItemProperties(publicItem3)
                 )));
     }
 
@@ -181,6 +184,20 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
 
         getClient(token).perform(get("/api/contentreport/filtereditems?" + query.toQueryString()))
                 .andExpect(status().isNotFound());
+    }
+
+    // Need for a specific filtered item type...
+    private static Matcher<? super Object> matchItemProperties(Item item) {
+        return allOf(
+            hasJsonPath("$.uuid", is(item.getID().toString())),
+            hasJsonPath("$.name", is(item.getName())),
+            hasJsonPath("$.handle", is(item.getHandle())),
+            hasJsonPath("$.inArchive", is(item.isArchived())),
+            hasJsonPath("$.discoverable", is(item.isDiscoverable())),
+            hasJsonPath("$.withdrawn", is(item.isWithdrawn())),
+            hasJsonPath("$.lastModified", is(notNullValue())),
+            hasJsonPath("$.type", is("filtered item"))
+        );
     }
 
     private TestKit setupCollectionsAndItems() {
