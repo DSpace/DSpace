@@ -31,3 +31,9 @@ are minted.
 
 In DRUM, the DOI is assigned to the unqualified "dc.identifier" field, unlike
 in standard DSpace, where it is assigned to the "dc.identifier.doi" field.
+
+## DOI Filter
+
+We have disabled "doi-filter" filter config in the DOIIdentifierProvider in the
+[identifier-service.xml](../config/spring/api/identifier-service.xml) as it is
+not compatible with the our DOI generation workflow.
