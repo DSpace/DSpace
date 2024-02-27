@@ -231,11 +231,3 @@ db.password = dspace
 
 # Maximum size of a multipart request (i.e. max total size of all files in one request)
 #spring.servlet.multipart.max-request-size = 512MB
-
-###################################################################
-# CONTENT REPORTS SETTINGS (Used by Server Webapp and Angular UI) #
-###################################################################
-# NOTE: This is currently a beta feature.
-# Configuration setting to trigger showing/hiding the Content Reports
-# (REST endpoints on the REST side and menu section on the Angular side)
-contentreport.enable=true
