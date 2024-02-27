@@ -83,6 +83,9 @@ public class DSpaceCsrfTokenRepository implements CsrfTokenRepository {
     /**
      * This method has been modified for DSpace.
      * <P>
+     * It filters out GET requests to avoid them refreshing the token when one is already being set by the csrf endpoint
+     * on SecurityRestController
+     * <P>
      * It now uses ResponseCookie to build the cookie, so that the "SameSite" attribute can be applied.
      * <P>
      * It also sends the token (if not empty) in both the cookie and the custom "DSPACE-XSRF-TOKEN" header
@@ -92,6 +95,19 @@ public class DSpaceCsrfTokenRepository implements CsrfTokenRepository {
      */
     @Override
     public void saveToken(CsrfToken token, HttpServletRequest request,
+                          HttpServletResponse response) {
+        // Custom conditions on which to avoid certain default CSRF strategies to add csrf cookies to the response
+        if (request.getMethod().equals("GET") || request.getRequestURI().contains("/api/statistics/")) {
+            return;
+        }
+        saveTokenWithoutConditions(token, request, response);
+    }
+
+    /**
+     * Save the csrf token to the response (see saveToken method), assuming custom conditional checks have already been
+     * applied
+     */
+    public void saveTokenWithoutConditions(CsrfToken token, HttpServletRequest request,
                           HttpServletResponse response) {
         String tokenValue = token == null ? "" : token.getToken();
         Cookie cookie = new Cookie(this.cookieName, tokenValue);
@@ -120,9 +136,9 @@ public class DSpaceCsrfTokenRepository implements CsrfTokenRepository {
             sameSite = "Lax";
         }
         ResponseCookie responseCookie = ResponseCookie.from(cookie.getName(), cookie.getValue())
-                                              .path(cookie.getPath()).maxAge(cookie.getMaxAge())
-                                              .domain(cookie.getDomain()).httpOnly(cookie.isHttpOnly())
-                                              .secure(cookie.getSecure()).sameSite(sameSite).build();
+                .path(cookie.getPath()).maxAge(cookie.getMaxAge())
+                .domain(cookie.getDomain()).httpOnly(cookie.isHttpOnly())
+                .secure(cookie.getSecure()).sameSite(sameSite).build();
 
         // Write the ResponseCookie to the Set-Cookie header
         // This cookie is only used by the backend & not needed by client
@@ -136,6 +152,19 @@ public class DSpaceCsrfTokenRepository implements CsrfTokenRepository {
         }
     }
 
+    /**
+     * Check the current CSRF token in the request's cookie and header and if any of them are missing, or they don't
+     * match, create a new token and save it on the response
+     */
+    public void saveNewTokenWhenCookieAndHeaderDontMatch(HttpServletRequest request, HttpServletResponse response) {
+        CsrfToken token = loadToken(request);
+        CsrfToken headerToken = loadTokenFromHeader(request);
+        if (token == null || headerToken == null || !token.getToken().equals(headerToken.getToken())) {
+            CsrfToken newToken = generateToken(request);
+            saveTokenWithoutConditions(newToken, request, response);
+        }
+    }
+
     @Override
     public CsrfToken loadToken(HttpServletRequest request) {
         Cookie cookie = WebUtils.getCookie(request, this.cookieName);
@@ -143,6 +172,19 @@ public class DSpaceCsrfTokenRepository implements CsrfTokenRepository {
             return null;
         }
         String token = cookie.getValue();
+        if (!StringUtils.hasLength(token)) {
+            return null;
+        }
+
+        return new DefaultCsrfToken(this.headerName, this.parameterName, token);
+    }
+
+    /**
+     * Retrieve the csrf token from the header of the request, if present, otherwise return null
+     * As opposed to the regular loadToken method, which retrieves the token from the cookies instead
+     */
+    public CsrfToken loadTokenFromHeader(HttpServletRequest request) {
+        String token = request.getHeader(this.headerName);
         if (!StringUtils.hasLength(token)) {
             return null;
         }
