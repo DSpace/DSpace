@@ -115,7 +115,7 @@
 
                 <form method="post" action="<%=request.getContextPath()%>/tools/edit-communities">
                     <input type="hidden" name="action" value="<%= EditCommunitiesServlet.START_CREATE_COMMUNITY%>" />
-                    <input type="hidden" name="community_id" value="${community.ID}" />
+                    <input type="hidden" name="parent_community_id" value="${community.ID}" />
                         <%--<input type="submit" name="submit" value="Create Sub-community" />--%>
                     <input class="btn btn-default col-md-12" type="submit" name="submit" value="<fmt:message key="jsp.community-home.create2.button"/>" />
                 </form>
