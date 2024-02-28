@@ -281,10 +281,6 @@
             <!-- To include the 'Show Identifiers' step, uncomment the line below. Make sure
                  that identifiers.cfg and identifier-service.xml are properly configured. -->
             <!--<step id="identifiers"/>-->
-            <!-- To include the 'Duplicate Detection' step, uncomment the line below. Make sure
-                 that duplicate-detection.cfg is properly configured and items have been reindexed since
-                 enabling the feature -->
-            <!---->
             <!--Step will be to Describe the item. -->
             <step id="traditionalpageone"/>
             <step id="traditionalpagetwo"/>
@@ -294,7 +290,11 @@
 
             <!-- Uncomment this step to show when appropriate publisher policies retrieved from SHERPA/RoMEO -->
             <!-- <step id="sherpaPolicies"/> -->
-<!--            <step id="duplicates"/>-->
+
+            <!-- To include the 'Duplicate Detection' step, uncomment the line below. Make sure
+                 that duplicate-detection.cfg is properly configured and items have been reindexed since
+                 enabling the feature -->
+            <!-- <step id="duplicates"/> -->
 
             <!--Step will be COAR Notify services to the item -->
             <!-- <step id="coarnotify"/> -->

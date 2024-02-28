@@ -39,7 +39,6 @@ import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.DuplicateDetectionService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
@@ -95,9 +94,6 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
 
     @Autowired
     private UriListHandlerService uriListHandlerService;
-
-    @Autowired
-    DuplicateDetectionService duplicateDetectionService;
 
     public ItemRestRepository(ItemService dsoService) {
         super(dsoService);
