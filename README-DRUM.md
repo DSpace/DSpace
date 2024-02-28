@@ -49,10 +49,10 @@ Confluence for information about setting up a MacBook to use the Kubernetes
    where \<DOCKER_IMAGE_TAG> is the Docker image tag to associate with the
    Docker images. This will typically be the Git tag for the DRUM version,
    or some other identifier, such as a Git commit hash. For example, using the
-   Git tag of "7.4/drum-0":
+   Git tag of "7.4-drum-0":
 
     ```bash
-    $ export DRUM_TAG=7.4/drum-0
+    $ export DRUM_TAG=7.4-drum-0
     ```
 
 4) Set up a "DRUM_DIR" environment variable referring to the current
