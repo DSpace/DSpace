@@ -167,7 +167,7 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
 
         context.restoreAuthSystemState();
 
-        getClient(token).perform(get("/api/duplicates/search?uuid=" + item1.getID()))
+        getClient(token).perform(get("/api/submission/duplicates/search?uuid=" + item1.getID()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 // Valid duplicates array
@@ -384,7 +384,7 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
         String reviewerToken = getAuthToken(admin.getEmail(), password);
 
         // The reviewer should be able to see the workflow item as a potential duplicate of the test item
-        getClient(reviewerToken).perform(get("/api/duplicates/search?uuid="
+        getClient(reviewerToken).perform(get("/api/submission/duplicates/search?uuid="
                         + workflowItem1.getItem().getID()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
@@ -396,7 +396,7 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
 
         // Another random user will NOT see this
         getClient(getAuthToken(anotherEPerson.getEmail(), password))
-                .perform(get("/api/duplicates/search?uuid="
+                .perform(get("/api/submission/duplicates/search?uuid="
                         + workflowItem1.getItem().getID()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
