@@ -294,7 +294,7 @@
 
             <!-- Uncomment this step to show when appropriate publisher policies retrieved from SHERPA/RoMEO -->
             <!-- <step id="sherpaPolicies"/> -->
-            <step id="duplicates"/>
+<!--            <step id="duplicates"/>-->
 
             <!--Step will be COAR Notify services to the item -->
             <!-- <step id="coarnotify"/> -->
