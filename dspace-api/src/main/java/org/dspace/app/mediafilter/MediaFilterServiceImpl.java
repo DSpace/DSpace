@@ -132,12 +132,18 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     @Override
     public void applyFiltersCommunity(Context context, Community community)
         throws Exception {   //only apply filters if community not in skip-list
+        // ensure that the community is attached to the current hibernate session
+        // as we are committing after each item (handles, sub-communties and
+        // collections are lazy attributes)
+        community = context.reloadEntity(community);
         if (!inSkipList(community.getHandle())) {
             List<Community> subcommunities = community.getSubcommunities();
             for (Community subcommunity : subcommunities) {
                 applyFiltersCommunity(context, subcommunity);
             }
-
+            // ensure that the community is attached to the current hibernate session
+            // as we are committing after each item
+            community = context.reloadEntity(community);
             List<Collection> collections = community.getCollections();
             for (Collection collection : collections) {
                 applyFiltersCollection(context, collection);
@@ -148,6 +154,9 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     @Override
     public void applyFiltersCollection(Context context, Collection collection)
         throws Exception {
+        // ensure that the collection is attached to the current hibernate session
+        // as we are committing after each item (handles are lazy attributes)
+        collection = context.reloadEntity(collection);
         //only apply filters if collection not in skip-list
         if (!inSkipList(collection.getHandle())) {
             Iterator<Item> itemIterator = itemService.findAllByCollection(context, collection);
@@ -171,6 +180,8 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             }
             // clear item objects from context cache and internal cache
             c.uncacheEntity(currentItem);
+            // commit after each item to release DB resources
+            c.commit();
             currentItem = null;
         }
     }
