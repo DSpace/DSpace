@@ -42,7 +42,7 @@ public class QAEventTopicLinkRepository extends AbstractDSpaceRestRepository imp
      * @param id         the qa event id
      * @param pageable   the optional pageable
      * @param projection the projection object
-     * @return the qa topic rest representation
+     * @return           the qa topic rest representation
      */
     @PreAuthorize("hasPermission(#id, 'QUALITYASSURANCEEVENT', 'READ')")
     public QATopicRest getTopic(@Nullable HttpServletRequest request, String id, @Nullable Pageable pageable,

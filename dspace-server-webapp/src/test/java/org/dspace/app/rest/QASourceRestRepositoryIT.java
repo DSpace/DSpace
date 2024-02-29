@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static org.dspace.app.rest.matcher.QASourceMatcher.matchQASourceEntry;
+import static org.dspace.qaevent.service.impl.QAEventServiceImpl.QAEVENTS_SOURCES;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -45,35 +46,31 @@ public class QASourceRestRepositoryIT extends AbstractControllerIntegrationTest 
 
     @Before
     public void setup() {
-
         context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
-            .withTitle("Community")
-            .build();
+                                          .withTitle("Community")
+                                          .build();
 
         Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
-            .withName("Collection")
-            .build();
+                                                 .withName("Collection")
+                                                 .build();
 
         target = ItemBuilder.createItem(context, collection)
-            .withTitle("Item")
-            .build();
+                            .withTitle("Item")
+                            .build();
 
         context.restoreAuthSystemState();
 
-        configurationService.setProperty("qaevent.sources",
-            new String[] { "openaire", "coar-notify", "test-source", "test-source-2" });
-
+        configurationService.setProperty(QAEVENTS_SOURCES, new String[] { "openaire","coar-notify", "test-source","test-source-2" });
     }
 
     @Test
     public void testFindAll() throws Exception {
-
         context.turnOffAuthorisationSystem();
-
         createEvent("openaire", "TOPIC/OPENAIRE/1", "Title 1");
         createEvent("openaire", "TOPIC/OPENAIRE/2", "Title 2");
+        context.setCurrentUser(eperson);
         createEvent("openaire", "TOPIC/OPENAIRE/2", "Title 3");
         createEvent("openaire", "TOPIC/OPENAIRE/2", "Title 4");
 
@@ -111,7 +108,6 @@ public class QASourceRestRepositoryIT extends AbstractControllerIntegrationTest 
 
     @Test
     public void testFindAllUnauthorized() throws Exception {
-
         context.turnOffAuthorisationSystem();
 
         createEvent("openaire", "TOPIC/OPENAIRE/1", "Title 1");
@@ -120,8 +116,7 @@ public class QASourceRestRepositoryIT extends AbstractControllerIntegrationTest 
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/integration/qualityassurancesources"))
-            .andExpect(status().isUnauthorized());
-
+                   .andExpect(status().isUnauthorized());
     }
 
     @Test

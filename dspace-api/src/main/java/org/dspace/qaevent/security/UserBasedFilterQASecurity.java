@@ -23,18 +23,16 @@ import org.springframework.beans.factory.annotation.Autowired;
  * uuid
  * 
  * @author Andrea Bollini (andrea.bollini at 4science.com)
- *
  */
 public class UserBasedFilterQASecurity implements QASecurity {
-    @Autowired
-    private AuthorizeService authorizeService;
+
+    private String filterTemplate;
+    private boolean allowAdmins = true;
 
     @Autowired
     private QAEventService qaEventService;
-
-    private String filterTemplate;
-
-    private boolean allowAdmins = true;
+    @Autowired
+    private AuthorizeService authorizeService;
 
     public Optional<String> generateFilterQuery(Context context, EPerson user) {
         try {
@@ -68,4 +66,5 @@ public class UserBasedFilterQASecurity implements QASecurity {
     public void setAllowAdmins(boolean allowAdmins) {
         this.allowAdmins = allowAdmins;
     }
+
 }

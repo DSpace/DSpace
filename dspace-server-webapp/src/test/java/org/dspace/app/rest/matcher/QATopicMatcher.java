@@ -43,7 +43,6 @@ public class QATopicMatcher {
         );
     }
 
-
     public static Matcher<? super Object> matchQATopicEntry(String source, String topicName) {
         return allOf(
             hasJsonPath("$.type", is("qualityassurancetopic")),
@@ -52,7 +51,8 @@ public class QATopicMatcher {
         );
     }
 
-    public static Matcher matchQATopicEntry(String source, String topicName, String itemUuid, int totalEvents) {
+    public static Matcher<? super Object> matchQATopicEntry(String source, String topicName, String itemUuid,
+           int totalEvents) {
         return allOf(
                 hasJsonPath("$.type", is("qualityassurancetopic")),
                 hasJsonPath("$.name", is(topicName)),

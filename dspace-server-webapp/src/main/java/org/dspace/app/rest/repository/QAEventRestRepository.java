@@ -7,14 +7,18 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
+import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.QAEventRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.ResourcePatch;
@@ -23,9 +27,12 @@ import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.correctiontype.CorrectionType;
+import org.dspace.correctiontype.service.CorrectionTypeService;
 import org.dspace.eperson.EPerson;
 import org.dspace.qaevent.dao.QAEventsDAO;
 import org.dspace.qaevent.service.QAEventService;
+import org.dspace.qaevent.service.dto.CorrectionTypeMessageDTO;
 import org.dspace.util.UUIDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -56,6 +63,14 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
     @Autowired
     private ResourcePatch<QAEvent> resourcePatch;
 
+    @Autowired
+    private CorrectionTypeService correctionTypeService;
+
+    @Override
+    public Page<QAEventRest> findAll(Context context, Pageable pageable) {
+        throw new RepositoryMethodNotImplementedException(QAEventRest.NAME, "findAll");
+    }
+
     @Override
     @PreAuthorize("hasPermission(#id, 'QUALITYASSURANCEEVENT', 'READ')")
     public QAEventRest findOne(Context context, String id) {
@@ -84,11 +99,9 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
         String sourceName = topicIdSplitted[0];
         String topicName = topicIdSplitted[1].replaceAll("!", "/");
         UUID target = topicIdSplitted.length == 3 ? UUID.fromString(topicIdSplitted[2]) : null;
-        List<QAEvent> qaEvents = null;
-        long count = 0L;
-        qaEvents = qaEventService.findEventsByTopicAndPageAndTarget(context, sourceName, topicName,
+        List<QAEvent> qaEvents = qaEventService.findEventsByTopicAndPageAndTarget(context, sourceName, topicName,
             pageable.getOffset(), pageable.getPageSize(), target);
-        count = qaEventService.countEventsByTopicAndTarget(context, sourceName, topicName, target);
+        long count = qaEventService.countEventsByTopicAndTarget(context, sourceName, topicName, target);
         if (qaEvents == null) {
             return null;
         }
@@ -102,11 +115,6 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
         EPerson eperson = context.getCurrentUser();
         qaEventService.deleteEventByEventId(id);
         qaEventDao.storeEvent(context, id, eperson, item);
-    }
-
-    @Override
-    public Page<QAEventRest> findAll(Context context, Pageable pageable) {
-        throw new RepositoryMethodNotImplementedException(QAEventRest.NAME, "findAll");
     }
 
     @Override
@@ -128,6 +136,64 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    protected QAEventRest createAndReturn(Context context) throws SQLException, AuthorizeException {
+        ServletRequest request = getRequestService().getCurrentRequest().getServletRequest();
+
+        String itemUUID = request.getParameter("target");
+        String relatedItemUUID = request.getParameter("related");
+        String correctionTypeStr = request.getParameter("correctionType");
+
+
+        if (StringUtils.isBlank(correctionTypeStr) || StringUtils.isBlank(itemUUID)) {
+            throw new UnprocessableEntityException("The target item and correctionType must be provided!");
+        }
+
+        Item targetItem = null;
+        Item relatedItem = null;
+        try {
+            targetItem = itemService.find(context, UUID.fromString(itemUUID));
+            relatedItem =  StringUtils.isNotBlank(relatedItemUUID) ?
+                                       itemService.find(context, UUID.fromString(relatedItemUUID)) : null;
+        } catch (Exception e) {
+            throw new UnprocessableEntityException(e.getMessage(), e);
+        }
+
+        if (Objects.isNull(targetItem)) {
+            throw new UnprocessableEntityException("The target item UUID is not valid!");
+        }
+
+        CorrectionType correctionType = correctionTypeService.findOne(correctionTypeStr);
+        if (Objects.isNull(correctionType)) {
+            throw new UnprocessableEntityException("The given correction type in the request is not valid!");
+        }
+
+        if (correctionType.isRequiredRelatedItem() && Objects.isNull(relatedItem)) {
+            throw new UnprocessableEntityException("The given correction type in the request is not valid!");
+        }
+
+        if (!correctionType.isAllowed(context, targetItem)) {
+            throw new UnprocessableEntityException("This item cannot be processed by this correction type!");
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        CorrectionTypeMessageDTO reason = null;
+        try {
+            reason = mapper.readValue(request.getInputStream(), CorrectionTypeMessageDTO.class);
+        } catch (IOException exIO) {
+            throw new UnprocessableEntityException("error parsing the body " + exIO.getMessage(), exIO);
+        }
+
+        QAEvent qaEvent;
+        if (correctionType.isRequiredRelatedItem()) {
+            qaEvent = correctionType.createCorrection(context, targetItem, relatedItem, reason);
+        } else {
+            qaEvent = correctionType.createCorrection(context, targetItem, reason);
+        }
+        return converter.toRest(qaEvent, utils.obtainProjection());
     }
 
     @Override

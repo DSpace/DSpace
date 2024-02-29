@@ -23,6 +23,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.commons.lang3.ArrayUtils;
@@ -41,12 +42,13 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.FacetParams;
-import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.handle.service.HandleService;
+import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
+import org.dspace.eperson.EPerson;
 import org.dspace.qaevent.AutomaticProcessingAction;
 import org.dspace.qaevent.QAEventAutomaticProcessingEvaluation;
 import org.dspace.qaevent.QASource;
@@ -58,6 +60,8 @@ import org.dspace.qaevent.service.QAEventSecurityService;
 import org.dspace.qaevent.service.QAEventService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -83,9 +87,6 @@ public class QAEventServiceImpl implements QAEventService {
 
     @Autowired(required = true)
     protected ItemService itemService;
-
-    @Autowired
-    private HandleService handleService;
 
     @Autowired
     private QAEventsDAOImpl qaEventsDao;
@@ -154,23 +155,19 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public long countTopicsBySourceAndTarget(Context context, String source, UUID target) {
-        if (isNotSupportedSource(source)
-                || !qaSecurityService.canSeeSource(context, context.getCurrentUser(), source)) {
+    public long countTopicsBySource(Context context, String sourceName) {
+        var currentUser = context.getCurrentUser();
+        if (isNotSupportedSource(sourceName) || !qaSecurityService.canSeeSource(context, currentUser, sourceName)) {
             return 0;
         }
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
-        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context,
-                context.getCurrentUser(), source);
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, sourceName);
         solrQuery.setQuery(securityQuery.orElse("*:*"));
         solrQuery.setFacet(true);
         solrQuery.setFacetMinCount(1);
         solrQuery.addFacetField(TOPIC);
-        solrQuery.addFilterQuery(SOURCE + ":\"" + source + "\"");
-        if (target != null) {
-            solrQuery.addFilterQuery(RESOURCE_UUID + ":\"" + target.toString() + "\"");
-        }
+        solrQuery.addFilterQuery("source:" + sourceName);
         QueryResponse response;
         try {
             response = getSolr().query(solrQuery);
@@ -178,6 +175,44 @@ public class QAEventServiceImpl implements QAEventService {
             throw new RuntimeException(e);
         }
         return response.getFacetField(TOPIC).getValueCount();
+    }
+
+    @Override
+    public QATopic findTopicBySourceAndNameAndTarget(Context context, String sourceName, String topicName,UUID target) {
+        var currentUser = context.getCurrentUser();
+        if (isNotSupportedSource(sourceName) || !qaSecurityService.canSeeSource(context, currentUser, sourceName)) {
+            return null;
+        }
+        SolrQuery solrQuery = new SolrQuery();
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, sourceName);
+        solrQuery.setRows(0);
+        solrQuery.setQuery(securityQuery.orElse("*:*"));
+        solrQuery.addFilterQuery(SOURCE + ":\"" + sourceName + "\"");
+        solrQuery.addFilterQuery(TOPIC + ":\"" + topicName + "\"");
+        if (target != null) {
+            solrQuery.addFilterQuery(RESOURCE_UUID + ":\"" + target.toString() + "\"");
+        }
+        solrQuery.setFacet(true);
+        solrQuery.setFacetMinCount(1);
+        solrQuery.addFacetField(TOPIC);
+        QueryResponse response;
+        try {
+            response = getSolr().query(solrQuery);
+            FacetField facetField = response.getFacetField(TOPIC);
+            for (Count c : facetField.getValues()) {
+                if (c.getName().equals(topicName)) {
+                    QATopic topic = new QATopic();
+                    topic.setSource(sourceName);
+                    topic.setKey(c.getName());
+                    topic.setTotalEvents(c.getCount());
+                    topic.setLastEvent(new Date());
+                    return topic;
+                }
+            }
+        } catch (SolrServerException | IOException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
     }
 
     @Override
@@ -281,7 +316,6 @@ public class QAEventServiceImpl implements QAEventService {
         try {
             response = getSolr().query(solrQuery);
             FacetField facetField = response.getFacetField(TOPIC);
-            topics = new ArrayList<>();
             int idx = 0;
             for (Count c : facetField.getValues()) {
                 if (idx < offset) {
@@ -366,13 +400,45 @@ public class QAEventServiceImpl implements QAEventService {
 
     }
 
-    @Override
-    public QAEvent findEventByEventId(Context context, String eventId) {
-        SolrQuery param = new SolrQuery("*:*");
-        param.addFilterQuery(EVENT_ID + ":\"" + eventId + "\"");
-        QueryResponse response;
+    /**
+     * Sends an email notification to the system administrator about a new
+     * Quality Assurance (QA) request event. The email includes details such as the
+     * topic, target, and message associated with the QA event.
+     *
+     * @param qaEvent The Quality Assurance event for which the notification is generated.
+     */
+    public void sentEmailToAdminAboutNewRequest(QAEvent qaEvent) {
         try {
-            response = getSolr().query(param);
+            String uiUrl = configurationService.getProperty("dspace.ui.url");
+            Email email = Email.getEmail(I18nUtil.getEmailFilename(Locale.getDefault(), "qaevent_admin_notification"));
+            email.addRecipient(configurationService.getProperty("qaevents.mail.notification"));
+            email.addArgument(qaEvent.getTopic());
+            email.addArgument(uiUrl + "/items/" + qaEvent.getTarget());
+            email.addArgument(parsJson(qaEvent.getMessage()));
+            email.send();
+        } catch (Exception e) {
+            log.warn("Error during sending email of Withdrawn/Reinstate request for item with uuid:"
+                     + qaEvent.getTarget(), e);
+        }
+    }
+
+    private String parsJson(String jsonString) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(jsonString);
+            return jsonNode.get("reason").asText();
+        } catch (Exception e) {
+            log.warn("Unable to parse the JSON:" + jsonString);
+            return jsonString;
+        }
+    }
+
+    @Override
+    public QAEvent findEventByEventId(String eventId) {
+        SolrQuery solrQuery = new SolrQuery("*:*");
+        solrQuery.addFilterQuery(EVENT_ID + ":\"" + eventId + "\"");
+        try {
+            QueryResponse response = getSolr().query(solrQuery);
             if (response != null) {
                 SolrDocumentList list = response.getResults();
                 if (list != null && list.size() == 1) {
@@ -387,27 +453,8 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public boolean qaEventsInSource(Context context, EPerson user, String eventId, String source) {
-        SolrQuery solrQuery = new SolrQuery();
-        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context,
-                user, source);
-        solrQuery.setQuery(securityQuery.orElse("*:*"));
-        solrQuery.addFilterQuery(EVENT_ID + ":\"" + eventId + "\"");
-        QueryResponse response;
-        try {
-            response = getSolr().query(solrQuery);
-            if (response != null) {
-                return response.getResults().getNumFound() == 1;
-            }
-        } catch (SolrServerException | IOException e) {
-            throw new RuntimeException("Exception querying Solr", e);
-        }
-        return false;
-    }
-
-    @Override
     public List<QAEvent> findEventsByTopicAndPage(Context context, String source, String topic, long offset,
-            int pageSize) {
+                                                  int pageSize) {
         if (isNotSupportedSource(source)
                 || !qaSecurityService.canSeeSource(context, context.getCurrentUser(), source)) {
             return List.of();
@@ -442,7 +489,7 @@ public class QAEventServiceImpl implements QAEventService {
 
     @Override
     public List<QAEvent> findEventsByTopicAndPageAndTarget(Context context, String source, String topic, long offset,
-            int pageSize, UUID target) {
+                                                           int pageSize, UUID target) {
         if (isNotSupportedSource(source)
                 || !qaSecurityService.canSeeSource(context, context.getCurrentUser(), source)) {
             return List.of();
@@ -480,49 +527,23 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public long countEventsByTopic(Context context, String source, String topic) {
-        if (isNotSupportedSource(source)
-                || !qaSecurityService.canSeeSource(context, context.getCurrentUser(), source)) {
+    public long countEventsByTopic(Context context, String sourceName, String topic) {
+        EPerson currentUser = context.getCurrentUser();
+        if (isNotSupportedSource(sourceName) || !qaSecurityService.canSeeSource(context, currentUser, sourceName)) {
             return 0;
         }
-        SolrQuery solrQuery = new SolrQuery();
-        solrQuery.setRows(0);
-        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, context.getCurrentUser(),
-                source);
-        solrQuery.setQuery(securityQuery.orElse("*:*"));
-        solrQuery.addFilterQuery(TOPIC + ":\"" + topic + "\"");
-        solrQuery.addFilterQuery(SOURCE + ":\"" + source + "\"");
-        QueryResponse response = null;
-        try {
-            response = getSolr().query(solrQuery);
-            return response.getResults().getNumFound();
-        } catch (SolrServerException | IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
-    @Override
-    public long countEventsByTopicAndTarget(Context context, String source, String topic, UUID target) {
-        if (isNotSupportedSource(source)
-                || !qaSecurityService.canSeeSource(context, context.getCurrentUser(), source)) {
-            return 0;
-        }
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, sourceName);
+
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
-        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, context.getCurrentUser(),
-                source);
         solrQuery.setQuery(securityQuery.orElse("*:*"));
-        if (target != null) {
-            solrQuery.addFilterQuery(RESOURCE_UUID + ":\"" + target.toString() + "\"");
-        }
-        solrQuery.addFilterQuery(SOURCE + ":\"" + source + "\"");
-        solrQuery.addFilterQuery(TOPIC + ":\"" + topic + "\"");
-        QueryResponse response = null;
+        solrQuery.addFilterQuery(SOURCE + ":\"" + sourceName + "\"");
+        solrQuery.setQuery(TOPIC + ":" + topic.replaceAll("!", "/"));
         try {
-            response = getSolr().query(solrQuery);
-            return response.getResults().getNumFound();
+            return getSolr().query(solrQuery).getResults().getNumFound();
         } catch (SolrServerException | IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -534,15 +555,14 @@ public class QAEventServiceImpl implements QAEventService {
 
     @Override
     public QASource findSource(Context context, String sourceName, UUID target) {
-
-        if (isNotSupportedSource(sourceName)
-                || !qaSecurityService.canSeeSource(context, context.getCurrentUser(), sourceName)) {
+        EPerson currentUser = context.getCurrentUser();
+        if (isNotSupportedSource(sourceName) || !qaSecurityService.canSeeSource(context, currentUser, sourceName)) {
             return null;
         }
 
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, sourceName);
+
         SolrQuery solrQuery = new SolrQuery();
-        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, context.getCurrentUser(),
-                sourceName);
         solrQuery.setQuery(securityQuery.orElse("*:*"));
         solrQuery.setRows(0);
         solrQuery.addFilterQuery(SOURCE + ":\"" + sourceName + "\"");
@@ -553,9 +573,8 @@ public class QAEventServiceImpl implements QAEventService {
         solrQuery.setFacetMinCount(1);
         solrQuery.addFacetField(SOURCE);
 
-        QueryResponse response;
         try {
-            response = getSolr().query(solrQuery);
+            QueryResponse response = getSolr().query(solrQuery);
             FacetField facetField = response.getFacetField(SOURCE);
             for (Count c : facetField.getValues()) {
                 if (c.getName().equalsIgnoreCase(sourceName)) {
@@ -568,7 +587,7 @@ public class QAEventServiceImpl implements QAEventService {
                 }
             }
         } catch (SolrServerException | IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e.getMessage(), e);
         }
 
         QASource source = new QASource();
@@ -581,12 +600,13 @@ public class QAEventServiceImpl implements QAEventService {
     @Override
     public List<QASource> findAllSources(Context context, long offset, int pageSize) {
         return Arrays.stream(getSupportedSources())
-            .map((sourceName) -> findSource(context, sourceName))
+                     .map((sourceName) -> findSource(context, sourceName))
             .filter(Objects::nonNull)
-            .sorted(comparing(QASource::getTotalEvents).reversed())
-            .skip(offset)
-            .limit(pageSize)
-            .collect(Collectors.toList());
+                     .sorted(comparing(QASource::getTotalEvents)
+                     .reversed())
+                     .skip(offset)
+                     .limit(pageSize)
+                     .collect(Collectors.toList());
     }
 
     @Override
@@ -635,12 +655,7 @@ public class QAEventServiceImpl implements QAEventService {
         doc.addField(TRUST, dto.getTrust());
         doc.addField(MESSAGE, dto.getMessage());
         doc.addField(LAST_UPDATE, new Date());
-        final String resourceUUID = getResourceUUID(context, dto.getOriginalId());
-        if (resourceUUID == null) {
-            throw new IllegalArgumentException("Skipped event " + checksum +
-                " related to the oai record " + dto.getOriginalId() + " as the record was not found");
-        }
-        doc.addField(RESOURCE_UUID, resourceUUID);
+        doc.addField(RESOURCE_UUID, dto.getTarget());
         doc.addField(RELATED_UUID, dto.getRelated());
         return doc;
     }
@@ -686,13 +701,173 @@ public class QAEventServiceImpl implements QAEventService {
         return item;
     }
 
+    @Override
+    public boolean qaEventsInSource(Context context, EPerson user, String eventId, String source) {
+        SolrQuery solrQuery = new SolrQuery();
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, user, source);
+        solrQuery.setQuery(securityQuery.orElse("*:*"));
+        solrQuery.addFilterQuery(EVENT_ID + ":\"" + eventId + "\"");
+        QueryResponse response;
+        try {
+            response = getSolr().query(solrQuery);
+            if (response != null) {
+                return response.getResults().getNumFound() == 1;
+            }
+        } catch (SolrServerException | IOException e) {
+            throw new RuntimeException("Exception querying Solr", e);
+        }
+        return false;
+    }
+
+    @Override
+    public long countEventsByTopicAndTarget(Context context, String sourceName, String topic, UUID target) {
+        var currentUser = context.getCurrentUser();
+        if (isNotSupportedSource(sourceName) || !qaSecurityService.canSeeSource(context, currentUser, sourceName)) {
+            return 0;
+        }
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setRows(0);
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, sourceName);
+        solrQuery.setQuery(securityQuery.orElse("*:*"));
+        if (target != null) {
+            solrQuery.addFilterQuery(RESOURCE_UUID + ":\"" + target.toString() + "\"");
+        }
+        solrQuery.addFilterQuery(SOURCE + ":\"" + sourceName + "\"");
+        solrQuery.addFilterQuery(TOPIC + ":\"" + topic + "\"");
+        QueryResponse response = null;
+        try {
+            response = getSolr().query(solrQuery);
+            return response.getResults().getNumFound();
+        } catch (SolrServerException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<QAEvent> findEventsByTopicAndTarget(Context context, String source, String topic, UUID target,
+            long offset, int pageSize) {
+        var currentUser = context.getCurrentUser();
+        if (isNotSupportedSource(source) || !qaSecurityService.canSeeSource(context, currentUser, source)) {
+            return List.of();
+        }
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setStart(((Long) offset).intValue());
+        solrQuery.setRows(pageSize);
+        solrQuery.setSort(TRUST, ORDER.desc);
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, source);
+        solrQuery.setQuery(securityQuery.orElse("*:*"));
+        if (target != null) {
+            solrQuery.addFilterQuery(RESOURCE_UUID + ":\"" + target.toString() + "\"");
+        }
+        solrQuery.addFilterQuery(SOURCE + ":\"" + source + "\"");
+        solrQuery.addFilterQuery(TOPIC + ":\"" + topic + "\"");
+
+        try {
+            QueryResponse response = getSolr().query(solrQuery);
+            if (response != null) {
+                SolrDocumentList list = response.getResults();
+                List<QAEvent> responseItem = new ArrayList<>();
+                for (SolrDocument doc : list) {
+                    QAEvent item = getQAEventFromSOLR(doc);
+                    responseItem.add(item);
+                }
+                return responseItem;
+            }
+        } catch (SolrServerException | IOException e) {
+            throw new RuntimeException(e);
+        }
+        return List.of();
+    }
+
     private boolean isNotSupportedSource(String source) {
         return !ArrayUtils.contains(getSupportedSources(), source);
     }
 
     private String[] getSupportedSources() {
-        return configurationService.getArrayProperty("qaevent.sources",
+        return configurationService.getArrayProperty(QAEVENTS_SOURCES,
             new String[] { QAEvent.OPENAIRE_SOURCE, QAEvent.COAR_NOTIFY_SOURCE });
+    }
+
+    @Override
+    public long countTopicsBySourceAndTarget(Context context, String source, UUID target) {
+        var currentUser = context.getCurrentUser();
+        if (isNotSupportedSource(source) || !qaSecurityService.canSeeSource(context, currentUser, source)) {
+            return 0;
+        }
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setRows(0);
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, source);
+        solrQuery.setQuery(securityQuery.orElse("*:*"));
+        solrQuery.setFacet(true);
+        solrQuery.setFacetMinCount(1);
+        solrQuery.addFacetField(TOPIC);
+        solrQuery.addFilterQuery(SOURCE + ":\"" + source + "\"");
+        if (target != null) {
+            solrQuery.addFilterQuery(RESOURCE_UUID + ":\"" + target.toString() + "\"");
+        }
+        try {
+            QueryResponse response = getSolr().query(solrQuery);
+            return response.getFacetField(TOPIC).getValueCount();
+        } catch (SolrServerException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<QASource> findAllSourcesByTarget(Context context, UUID target, long offset, int pageSize) {
+        return Arrays.stream(getSupportedSources())
+                     .map((sourceName) -> findSource(context, sourceName, target))
+                     .filter(Objects::nonNull)
+                     .sorted(comparing(QASource::getTotalEvents).reversed())
+                     .filter(source -> source.getTotalEvents() > 0)
+                     .skip(offset)
+                     .limit(pageSize)
+                     .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<QATopic> findAllTopicsBySourceAndTarget(Context context, String source, UUID target, long offset,
+            int pageSize, String orderField, boolean ascending) {
+        var currentUser = context.getCurrentUser();
+        if (isNotSupportedSource(source) || !qaSecurityService.canSeeSource(context, currentUser, source)) {
+            return List.of();
+        }
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, source);
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setRows(0);
+        solrQuery.setSort(orderField, ascending ? ORDER.asc : ORDER.desc);
+        solrQuery.setQuery(securityQuery.orElse("*:*"));
+        solrQuery.setFacet(true);
+        solrQuery.setFacetMinCount(1);
+        solrQuery.setFacetLimit((int) (offset + pageSize));
+        solrQuery.addFacetField(TOPIC);
+        solrQuery.addFilterQuery(SOURCE + ":\"" + source + "\"");
+        if (target != null) {
+            solrQuery.addFilterQuery(RESOURCE_UUID + ":" + target.toString());
+        }
+        try {
+            List<QATopic> topics = new ArrayList<>();
+            QueryResponse response = getSolr().query(solrQuery);
+            FacetField facetField = response.getFacetField(TOPIC);
+            int idx = 0;
+            for (Count c : facetField.getValues()) {
+                if (idx < offset) {
+                    idx++;
+                    continue;
+                }
+                QATopic topic = new QATopic();
+                topic.setSource(source);
+                topic.setKey(c.getName());
+                topic.setFocus(target);
+                topic.setTotalEvents(c.getCount());
+                topic.setLastEvent(new Date());
+                topics.add(topic);
+                idx++;
+            }
+            return topics;
+        } catch (SolrServerException | IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

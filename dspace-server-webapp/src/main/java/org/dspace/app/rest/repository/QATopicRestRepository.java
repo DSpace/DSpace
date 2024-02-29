@@ -43,6 +43,11 @@ public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, Str
     private static final Logger log = LogManager.getLogger();
 
     @Override
+    public Page<QATopicRest> findAll(Context context, Pageable pageable) {
+        throw new RepositoryMethodNotImplementedException("Method not allowed!", "");
+    }
+
+    @Override
     @PreAuthorize("hasPermission(#id, 'QUALITYASSURANCETOPIC', 'READ')")
     public QATopicRest findOne(Context context, String id) {
         String[] topicIdSplitted = id.split(":", 3);
@@ -53,30 +58,21 @@ public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, Str
         String topicName = topicIdSplitted[1].replaceAll("!", "/");
         UUID target = topicIdSplitted.length == 3 ? UUID.fromString(topicIdSplitted[2]) : null;
         QATopic topic = qaEventService.findTopicBySourceAndNameAndTarget(context, sourceName, topicName, target);
-        if (topic == null) {
-            return null;
-        }
-        return converter.toRest(topic, utils.obtainProjection());
-    }
-
-    @Override
-    public Page<QATopicRest> findAll(Context context, Pageable pageable) {
-        throw new RepositoryMethodNotImplementedException("Method not allowed!", "");
+        return (topic != null) ? converter.toRest(topic, utils.obtainProjection()) : null;
     }
 
     @SearchRestMethod(name = "bySource")
     @PreAuthorize("hasPermission(#source, 'QUALITYASSURANCETOPIC', 'READ')")
     public Page<QATopicRest> findBySource(@Parameter(value = "source", required = true) String source,
-            Pageable pageable) {
+           Pageable pageable) {
         Context context = obtainContext();
-        long count = qaEventService.countTopicsBySource(context, source);
         boolean ascending = false;
         if (pageable.getSort() != null && pageable.getSort().getOrderFor(ORDER_FIELD) != null) {
-            ascending = pageable.getSort()
-                .getOrderFor(ORDER_FIELD).getDirection() == Direction.ASC;
+            ascending = pageable.getSort().getOrderFor(ORDER_FIELD).getDirection() == Direction.ASC;
         }
         List<QATopic> topics = qaEventService.findAllTopicsBySource(context, source,
-            pageable.getOffset(), pageable.getPageSize(), ORDER_FIELD, ascending);
+                                              pageable.getOffset(), pageable.getPageSize(), ORDER_FIELD, ascending);
+        long count = qaEventService.countTopicsBySource(context, source);
         if (topics == null) {
             return null;
         }
@@ -86,20 +82,15 @@ public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, Str
     @SearchRestMethod(name = "byTarget")
     @PreAuthorize("hasPermission(#target, 'ITEM', 'READ')")
     public Page<QATopicRest> findByTarget(@Parameter(value = "target", required = true) UUID target,
-        @Parameter(value = "source", required = true) String source,
-        Pageable pageable) {
+        @Parameter(value = "source", required = true) String source, Pageable pageable) {
         Context context = obtainContext();
-        List<QATopic> topics = qaEventService
-            .findAllTopicsBySourceAndTarget(context, source, target, pageable.getOffset(),
-                pageable.getPageSize(), null, true);
-        long count = qaEventService.countTopicsBySourceAndTarget(context, source, target);
-
-        if (topics == null) {
-            return null;
+        boolean ascending = false;
+        if (pageable.getSort() != null && pageable.getSort().getOrderFor(ORDER_FIELD) != null) {
+            ascending = pageable.getSort().getOrderFor(ORDER_FIELD).getDirection() == Direction.ASC;
         }
-        return converter.toRestPage(topics, pageable, count, utils.obtainProjection());
-    }
-
+        List<QATopic> topics = qaEventService.findAllTopicsBySourceAndTarget(context, source, target,
+                                              pageable.getOffset(), pageable.getPageSize(), ORDER_FIELD, ascending);
+        long count = qaEventService.countTopicsBySourceAndTarget(context, source, target);
     @Override
     public Class<QATopicRest> getDomainClass() {
         return QATopicRest.class;

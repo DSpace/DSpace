@@ -17,14 +17,27 @@ import org.dspace.eperson.EPerson;
 import org.dspace.qaevent.security.QASecurity;
 import org.dspace.qaevent.service.QAEventSecurityService;
 
+/**
+ * Implementation of the security service for QAEvents.
+ * This implementation manages a configuration of {@link QASecurity} instances,
+ * each responsible for security checks for a specific QA source.
+ *
+ * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
+ */
 public class QAEventSecurityServiceImpl implements QAEventSecurityService {
 
+    /**
+     * The default security settings to be used when specific configurations are not available for a QA source.
+     */
+    private QASecurity defaultSecurity;
+
+    /**
+     * A mapping of QA source names to their corresponding QASecurity configurations.
+     */
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(QAEventSecurityServiceImpl.class);
 
     private Map<String, QASecurity> qaSecurityConfiguration;
-
-    private QASecurity defaultSecurity;
-
+    
     public void setQaSecurityConfiguration(Map<String, QASecurity> qaSecurityConfiguration) {
         this.qaSecurityConfiguration = qaSecurityConfiguration;
     }
@@ -47,8 +60,7 @@ public class QAEventSecurityServiceImpl implements QAEventSecurityService {
     public boolean canSeeEvent(Context context, EPerson user, QAEvent qaEvent) {
         String source = qaEvent.getSource();
         QASecurity qaSecurity = getQASecurity(source);
-        return qaSecurity.canSeeQASource(context, user)
-                && qaSecurity.canSeeQAEvent(context, user, qaEvent);
+        return qaSecurity.canSeeQASource(context, user) && qaSecurity.canSeeQAEvent(context, user, qaEvent);
     }
 
     @Override
