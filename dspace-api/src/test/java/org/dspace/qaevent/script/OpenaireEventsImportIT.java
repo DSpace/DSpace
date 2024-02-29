@@ -189,7 +189,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
             + "\"projects[0].title\":\"Tracking Papyrus and Parchment Paths\"}";
 
         assertThat(qaEventService.findEventsByTopic(context, OPENAIRE_SOURCE,
-            QANotifyPatterns.TOPIC_ENRICH_MORE_PROJECT, 0, 20, null, true),
+            QANotifyPatterns.TOPIC_ENRICH_MORE_PROJECT, 0, 20, ORDER_FIELD, true),
                 contains(
             pendingOpenaireEventWith("oai:www.openstarts.units.it:123456789/99998", firstItem,
                 "Egypt, crossroad of translations and literary interweavings", projectMessage,
@@ -198,7 +198,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
         String abstractMessage = "{\"abstracts[0]\":\"Missing Abstract\"}";
 
         assertThat(qaEventService.findEventsByTopic(context, OPENAIRE_SOURCE,
-            QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 0, 20, null, true),
+            QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 0, 20, ORDER_FIELD, true),
                 contains(
             pendingOpenaireEventWith("oai:www.openstarts.units.it:123456789/99999",
                 secondItem, "Test Publication",
