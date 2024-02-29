@@ -72,9 +72,12 @@ public class NotifyServiceAddPatchOperation extends AddPatchOperation<Integer> {
                        .map(id ->
                            findService(context, id))
                        .collect(Collectors.toList());
-
-        services.forEach(service ->
-            createNotifyPattern(context, source.getItem(), service, pattern));
+        if (services.isEmpty()) {
+            createNotifyPattern(context, source.getItem(), null, pattern);
+        } else {
+            services.forEach(service ->
+                createNotifyPattern(context, source.getItem(), service, pattern));
+        }
     }
 
     private NotifyServiceEntity findService(Context context, int serviceId) {

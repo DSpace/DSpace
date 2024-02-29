@@ -106,7 +106,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void findOneNotFoundTest() throws Exception {
         context.turnOffAuthorisationSystem();
         configurationService.setProperty("qaevent.sources",
-                new String[] { "openaire" });
+                new String[] { QAEvent.OPENAIRE_SOURCE });
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
@@ -241,7 +241,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void findBySourcePaginationTest() throws Exception {
         context.turnOffAuthorisationSystem();
         configurationService.setProperty("qaevent.sources",
-                new String[] { "openaire", "test-source", "test-source-2" });
+                new String[] { QAEvent.OPENAIRE_SOURCE, "test-source", "test-source-2" });
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
@@ -294,13 +294,14 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$._embedded.qualityassurancetopics", Matchers.hasSize(1)))
             .andExpect(jsonPath("$.page.size", is(2))).andExpect(jsonPath("$.page.totalElements", is(3)));
+       //test unsupported
         getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/bySource")
                 .param("source", "test-source")
                 .param("size", "2"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
-            .andExpect(jsonPath("$._embedded.qualityassurancetopics", Matchers.hasSize(2)))
-            .andExpect(jsonPath("$.page.size", is(2))).andExpect(jsonPath("$.page.totalElements", is(2)));
+            .andExpect(jsonPath("$._embedded").doesNotExist())
+            .andExpect(jsonPath("$.page.size", is(2))).andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
@@ -334,7 +335,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/bySource")
-            .param("source", "openaire"))
+            .param("source", QAEvent.OPENAIRE_SOURCE))
             .andExpect(status().isForbidden());
     }
 
@@ -342,7 +343,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void findByTargetTest() throws Exception {
         context.turnOffAuthorisationSystem();
         configurationService.setProperty("qaevent.sources",
-            new String[] { "openaire", "test-source", "test-source-2" });
+            new String[] { QAEvent.OPENAIRE_SOURCE, "test-source", "test-source-2" });
         parentCommunity = CommunityBuilder.createCommunity(context)
             .withName("Parent Community")
             .build();
@@ -391,7 +392,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(2)));
         getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/byTarget")
                 .param("target", item2.getID().toString())
-                .param("source", "openaire"))
+                .param("source", QAEvent.OPENAIRE_SOURCE))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$._embedded.qualityassurancetopics",

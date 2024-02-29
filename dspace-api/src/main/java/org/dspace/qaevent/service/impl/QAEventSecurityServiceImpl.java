@@ -37,7 +37,7 @@ public class QAEventSecurityServiceImpl implements QAEventSecurityService {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(QAEventSecurityServiceImpl.class);
 
     private Map<String, QASecurity> qaSecurityConfiguration;
-    
+
     public void setQaSecurityConfiguration(Map<String, QASecurity> qaSecurityConfiguration) {
         this.qaSecurityConfiguration = qaSecurityConfiguration;
     }

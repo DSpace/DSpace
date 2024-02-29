@@ -10,7 +10,9 @@ package org.dspace.app.rest.repository;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -74,7 +76,7 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
     @Override
     @PreAuthorize("hasPermission(#id, 'QUALITYASSURANCEEVENT', 'READ')")
     public QAEventRest findOne(Context context, String id) {
-        QAEvent qaEvent = qaEventService.findEventByEventId(context, id);
+        QAEvent qaEvent = qaEventService.findEventByEventId(id);
         if (qaEvent == null) {
             // check if this request is part of a patch flow
             qaEvent = (QAEvent) requestService.getCurrentRequest().getAttribute("patchedNotificationEvent");
@@ -99,8 +101,8 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
         String sourceName = topicIdSplitted[0];
         String topicName = topicIdSplitted[1].replaceAll("!", "/");
         UUID target = topicIdSplitted.length == 3 ? UUID.fromString(topicIdSplitted[2]) : null;
-        List<QAEvent> qaEvents = qaEventService.findEventsByTopicAndPageAndTarget(context, sourceName, topicName,
-            pageable.getOffset(), pageable.getPageSize(), target);
+        List<QAEvent> qaEvents = qaEventService.findEventsByTopicAndTarget(context, sourceName, topicName, target,
+            pageable.getOffset(), pageable.getPageSize());
         long count = qaEventService.countEventsByTopicAndTarget(context, sourceName, topicName, target);
         if (qaEvents == null) {
             return null;
@@ -121,12 +123,12 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
     @PreAuthorize("hasPermission(#id, 'QUALITYASSURANCEEVENT', 'WRITE')")
     protected void patch(Context context, HttpServletRequest request, String apiCategory, String model,
         String id, Patch patch) throws SQLException, AuthorizeException {
-        QAEvent qaEvent = qaEventService.findEventByEventId(context, id);
+        QAEvent qaEvent = qaEventService.findEventByEventId(id);
         resourcePatch.patch(context, qaEvent, patch.getOperations());
     }
 
     private Item findTargetItem(Context context, String eventId) {
-        QAEvent qaEvent = qaEventService.findEventByEventId(context, eventId);
+        QAEvent qaEvent = qaEventService.findEventByEventId(eventId);
         if (qaEvent == null) {
             return null;
         }

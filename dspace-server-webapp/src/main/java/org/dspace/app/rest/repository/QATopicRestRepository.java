@@ -91,6 +91,12 @@ public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, Str
         List<QATopic> topics = qaEventService.findAllTopicsBySourceAndTarget(context, source, target,
                                               pageable.getOffset(), pageable.getPageSize(), ORDER_FIELD, ascending);
         long count = qaEventService.countTopicsBySourceAndTarget(context, source, target);
+        if (topics == null) {
+            return null;
+        }
+        return converter.toRestPage(topics, pageable, count, utils.obtainProjection());
+    }
+
     @Override
     public Class<QATopicRest> getDomainClass() {
         return QATopicRest.class;

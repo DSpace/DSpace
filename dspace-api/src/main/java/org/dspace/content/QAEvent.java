@@ -13,8 +13,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.dspace.qaevent.service.dto.NotifyMessageDTO;
 import org.dspace.qaevent.service.dto.CorrectionTypeMessageDTO;
+import org.dspace.qaevent.service.dto.NotifyMessageDTO;
 import org.dspace.qaevent.service.dto.OpenaireMessageDTO;
 import org.dspace.qaevent.service.dto.QAMessageDTO;
 import org.dspace.util.RawJsonDeserializer;
@@ -32,7 +32,7 @@ public class QAEvent {
     public static final String REJECTED = "rejected";
     public static final String DISCARDED = "discarded";
 
-    public static final String OPENAIRE_SOURCE = "OpenAIRE";
+    public static final String OPENAIRE_SOURCE = "openaire";
     public static final String DSPACE_USERS_SOURCE = "DSpaceUsers";
     public static final String COAR_NOTIFY_SOURCE = "coar-notify";
 
@@ -205,18 +205,16 @@ public class QAEvent {
     }
 
     public Class<? extends QAMessageDTO> getMessageDtoClass() {
-        Class<? extends QAMessageDTO> result = null;
         switch (getSource()) {
             case OPENAIRE_SOURCE:
-                result = OpenaireMessageDTO.class;
-            break;
+                return OpenaireMessageDTO.class;
             case COAR_NOTIFY_SOURCE:
-                result = NotifyMessageDTO.class;
-            break;
+                return NotifyMessageDTO.class;
+            case DSPACE_USERS_SOURCE:
+                return CorrectionTypeMessageDTO.class;
             default:
                 throw new IllegalArgumentException("Unknown event's source: " + getSource());
         }
-        return result;
     }
 
 }

@@ -11,7 +11,6 @@ import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
 import static org.dspace.content.QAEvent.COAR_NOTIFY_SOURCE;
-import static org.dspace.content.QAEvent.OPENAIRE_SOURCE;
 import static org.dspace.content.QAEvent.DSPACE_USERS_SOURCE;
 import static org.dspace.content.QAEvent.OPENAIRE_SOURCE;
 import static org.dspace.correctiontype.WithdrawnCorrectionType.WITHDRAWAL_REINSTATE_GROUP;
@@ -36,8 +35,8 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.MediaType;
 
-import org.dspace.app.ldn.NotifyServiceEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.rest.matcher.ItemMatcher;
 import org.dspace.app.rest.matcher.MetadataMatcher;
 import org.dspace.app.rest.matcher.QAEventMatcher;
@@ -61,6 +60,7 @@ import org.dspace.content.QAEvent;
 import org.dspace.content.QAEventProcessed;
 import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.qaevent.QANotifyPatterns;
 import org.dspace.qaevent.action.ASimpleMetadataAction;
 import org.dspace.qaevent.dao.QAEventsDAO;
@@ -446,7 +446,8 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                         get("/api/integration/qualityassuranceevents/search/findByTopic")
                                 .param("topic", QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID")
                                 .param("size", "2"))
-                .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(2)))
+                .andExpect(status().isOk()).andExpect(
+                        jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(2)))
                 .andExpect(jsonPath("$._embedded.qualityassuranceevents",
                         Matchers.containsInAnyOrder(
                                 QAEventMatcher.matchQAEventEntry(event1),
@@ -484,7 +485,8 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                         get("/api/integration/qualityassuranceevents/search/findByTopic")
                                 .param("topic", QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID")
                                 .param("size", "2").param("page", "1"))
-                .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(2)))
+                .andExpect(status().isOk()).andExpect(
+                        jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(2)))
                 .andExpect(jsonPath("$._embedded.qualityassuranceevents",
                         Matchers.containsInAnyOrder(
                                 QAEventMatcher.matchQAEventEntry(event3),
@@ -528,7 +530,8 @@ public class QAEventRestRepositoryIT extends AbstractControllerIntegrationTest {
                         get("/api/integration/qualityassuranceevents/search/findByTopic")
                                 .param("topic", QAEvent.OPENAIRE_SOURCE + ":ENRICH!MISSING!PID")
                                 .param("size", "2").param("page", "2"))
-                .andExpect(status().isOk()).andExpect(jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(2)))
+                .andExpect(status().isOk()).andExpect(
+                        jsonPath("$._embedded.qualityassuranceevents", Matchers.hasSize(2)))
                 .andExpect(jsonPath("$._embedded.qualityassuranceevents",
                         Matchers.hasItem(
                                 QAEventMatcher.matchQAEventEntry(event5))))
