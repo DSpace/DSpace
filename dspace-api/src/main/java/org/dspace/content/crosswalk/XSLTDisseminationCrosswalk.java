@@ -23,6 +23,8 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -51,8 +53,6 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.transform.JDOMResult;
 import org.jdom2.transform.JDOMSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Configurable XSLT-driven dissemination Crosswalk
@@ -88,7 +88,7 @@ public class XSLTDisseminationCrosswalk
     /**
      * log4j category
      */
-    private static final Logger LOG = LoggerFactory.getLogger(XSLTDisseminationCrosswalk.class);
+    private static final Logger LOG = LogManager.getLogger();
 
     /**
      * DSpace context, will be created if XSLTDisseminationCrosswalk had been started by command-line.
@@ -140,12 +140,13 @@ public class XSLTDisseminationCrosswalk
         // right format for value of "schemaLocation" attribute.
         schemaLocation = configurationService.getProperty(prefix + "schemaLocation");
         if (schemaLocation == null) {
-            LOG.warn("No schemaLocation for crosswalk=" + myAlias + ", key=" + prefix + "schemaLocation");
+            LOG.warn("No schemaLocation for crosswalk={}, key={}schemaLocation", myAlias, prefix);
         } else if (schemaLocation.length() > 0 && schemaLocation.indexOf(' ') < 0) {
             // sanity check: schemaLocation should have space.
-            LOG.warn("Possible INVALID schemaLocation (no space found) for crosswalk=" +
-                         myAlias + ", key=" + prefix + "schemaLocation" +
-                         "\n\tCorrect format is \"{namespace} {schema-URL}\"");
+            LOG.warn("Possible INVALID schemaLocation (no space found) for crosswalk={},"
+                         + " key={}schemaLocation"
+                         + "\n\tCorrect format is \"{namespace} {schema-URL}\"",
+                    myAlias, prefix);
         }
 
         // grovel for namespaces of the form:
@@ -172,7 +173,7 @@ public class XSLTDisseminationCrosswalk
         try {
             init();
         } catch (CrosswalkInternalException e) {
-            LOG.error(e.toString());
+            LOG.error(e::toString);
         }
         return (Namespace[]) ArrayUtils.clone(namespaces);
     }
@@ -187,7 +188,7 @@ public class XSLTDisseminationCrosswalk
         try {
             init();
         } catch (CrosswalkInternalException e) {
-            LOG.error(e.toString());
+            LOG.error(e::toString);
         }
         return schemaLocation;
     }
@@ -220,7 +221,7 @@ public class XSLTDisseminationCrosswalk
         }
 
         for (Map.Entry<String, String> parameter : parameters.entrySet()) {
-            LOG.debug("Setting parameter {} to {}", parameter.getKey(), parameter.getValue());
+            LOG.debug("Setting parameter {} to {}", parameter::getKey, parameter::getValue);
             xform.setParameter(parameter.getKey(), parameter.getValue());
         }
 
@@ -232,7 +233,7 @@ public class XSLTDisseminationCrosswalk
             root.detach();
             return root;
         } catch (TransformerException e) {
-            LOG.error("Got error: " + e.toString());
+            LOG.error("Got error: ()", e::toString);
             throw new CrosswalkInternalException("XSL translation failed: " + e.toString(), e);
         }
     }
@@ -278,13 +279,13 @@ public class XSLTDisseminationCrosswalk
                                                    .map(Element.class::cast).collect(Collectors.toList());
             return elementList;
         } catch (TransformerException e) {
-            LOG.error("Got error: " + e.toString());
+            LOG.error("Got error: {}", e::toString);
             throw new CrosswalkInternalException("XSL translation failed: " + e.toString(), e);
         }
     }
 
     /**
-     * Determine is this crosswalk can dessiminate the given object.
+     * Determine is this crosswalk can disseminate the given object.
      *
      * @see DisseminationCrosswalk
      */
@@ -304,7 +305,7 @@ public class XSLTDisseminationCrosswalk
         try {
             init();
         } catch (CrosswalkInternalException e) {
-            LOG.error(e.toString());
+            LOG.error(e::toString);
         }
         return preferList;
     }
@@ -312,7 +313,7 @@ public class XSLTDisseminationCrosswalk
     /**
      * Generate an intermediate representation of a DSpace object.
      *
-     * @param dso  The dspace object to build a representation of.
+     * @param dso  The DSpace object to build a representation of.
      * @param dcvs list of metadata
      * @return element
      */
@@ -480,9 +481,7 @@ public class XSLTDisseminationCrosswalk
         if (reason == null) {
             return value;
         } else {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Filtering out non-XML characters in string, reason=" + reason);
-            }
+            LOG.debug("Filtering out non-XML characters in string, reason={}", reason);
             StringBuilder result = new StringBuilder(value.length());
             for (int i = 0; i < value.length(); ++i) {
                 char c = value.charAt(i);
@@ -567,11 +566,11 @@ public class XSLTDisseminationCrosswalk
             System.err.println("===  Stack Trace  ===");
             e.printStackTrace(System.err);
             System.err.println("=====================");
-            LOG.error("Caught: {}.", e.toString());
-            LOG.error(e.getMessage());
+            LOG.error("Caught: {}.", e::toString);
+            LOG.error(e::getMessage);
             CharArrayWriter traceWriter = new CharArrayWriter(2048);
             e.printStackTrace(new PrintWriter(traceWriter));
-            LOG.error(traceWriter.toString());
+            LOG.error(traceWriter::toString);
             System.exit(1);
         }
 
@@ -588,11 +587,11 @@ public class XSLTDisseminationCrosswalk
             System.err.println("===  Stack Trace  ===");
             e.printStackTrace(System.err);
             System.err.println("=====================");
-            LOG.error("Caught: {}.", e.toString());
-            LOG.error(e.getMessage());
+            LOG.error("Caught: {}.", e::toString);
+            LOG.error(e::getMessage);
             CharArrayWriter traceWriter = new CharArrayWriter(2048);
             e.printStackTrace(new PrintWriter(traceWriter));
-            LOG.error(traceWriter.toString());
+            LOG.error(traceWriter::toString);
             System.exit(1);
         }
 

@@ -36,8 +36,6 @@ import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.core.Context;
 import org.dspace.service.ClientInfoService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -63,8 +61,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/api/" + AuthnRest.CATEGORY)
 @RestController
 public class AuthenticationRestController implements InitializingBean {
-
-    private static final Logger log = LoggerFactory.getLogger(AuthenticationRestController.class);
 
     @Autowired
     DiscoverableEndpointsService discoverableEndpointsService;
