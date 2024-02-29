@@ -56,6 +56,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  */
 public class SolrSuggestionStorageServiceImpl implements SolrSuggestionStorageService {
+
     private static final Logger log = LogManager.getLogger(SolrSuggestionStorageServiceImpl.class);
 
     protected SolrClient solrSuggestionClient;

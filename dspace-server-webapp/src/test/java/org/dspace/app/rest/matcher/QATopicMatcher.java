@@ -43,7 +43,6 @@ public class QATopicMatcher {
         );
     }
 
-
     public static Matcher<? super Object> matchQATopicEntry(String source, String topicName) {
         return allOf(
             hasJsonPath("$.type", is("qualityassurancetopic")),

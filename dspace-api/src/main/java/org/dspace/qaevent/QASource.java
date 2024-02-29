@@ -59,4 +59,9 @@ public class QASource {
     public void setFocus(UUID focus) {
         this.focus = focus;
     }
+
+    @Override
+    public String toString() {
+        return name + focus + totalEvents;
+    }
 }

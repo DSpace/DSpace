@@ -20,11 +20,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.model.hateoas.QAEventResource;
 import org.dspace.content.QAEvent;
+import org.dspace.qaevent.service.dto.NotifyMessageDTO;
 import org.dspace.qaevent.service.dto.OpenaireMessageDTO;
+import org.dspace.qaevent.service.dto.QAMessageDTO;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.hamcrest.core.IsAnything;
+
 
 /**
  * Matcher related to {@link QAEventResource}.
@@ -69,23 +73,63 @@ public class QAEventMatcher {
         }
     }
 
-    private static Matcher<? super Object> matchMessage(String topic, OpenaireMessageDTO message) {
-        if (StringUtils.endsWith(topic, "/ABSTRACT")) {
-            return allOf(hasJsonPath("$.abstract", is(message.getAbstracts())));
-        } else if (StringUtils.endsWith(topic, "/PID")) {
-            return allOf(
-                    hasJsonPath("$.value", is(message.getValue())),
-                    hasJsonPath("$.type", is(message.getType())),
-                    hasJsonPath("$.pidHref", is(calculateOpenairePidHref(message.getType(), message.getValue()))));
-        } else if (StringUtils.endsWith(topic, "/PROJECT")) {
-            return allOf(
-                    hasJsonPath("$.openaireId", is(message.getOpenaireId())),
-                    hasJsonPath("$.acronym", is(message.getAcronym())),
-                    hasJsonPath("$.code", is(message.getCode())),
-                    hasJsonPath("$.funder", is(message.getFunder())),
-                    hasJsonPath("$.fundingProgram", is(message.getFundingProgram())),
-                    hasJsonPath("$.jurisdiction", is(message.getJurisdiction())),
-                    hasJsonPath("$.title", is(message.getTitle())));
+
+    public static Matcher<? super Object> matchQAEventNotifyEntry(QAEvent event) {
+        try {
+            ObjectMapper jsonMapper = new JsonMapper();
+            return allOf(hasJsonPath("$.id", is(event.getEventId())),
+                    hasJsonPath("$.originalId", is(event.getOriginalId())),
+                    hasJsonPath("$.title", is(event.getTitle())),
+                    hasJsonPath("$.trust", is(new DecimalFormat("0.000").format(event.getTrust()))),
+                    hasJsonPath("$.status", Matchers.equalToIgnoringCase(event.getStatus())),
+                    hasJsonPath("$.message",
+                            matchMessage(event.getTopic(), jsonMapper.readValue(event.getMessage(),
+                                NotifyMessageDTO.class))),
+                    hasJsonPath("$._links.target.href", Matchers.endsWith(event.getEventId() + "/target")),
+                    hasJsonPath("$._links.related.href", Matchers.endsWith(event.getEventId() + "/related")),
+                    hasJsonPath("$._links.topic.href", Matchers.endsWith(event.getEventId() + "/topic")),
+                    hasJsonPath("$.type", is("qualityassuranceevent")));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    private static Matcher<? super Object> matchMessage(String topic, QAMessageDTO message) {
+        if (message instanceof OpenaireMessageDTO) {
+            OpenaireMessageDTO oadto = (OpenaireMessageDTO) message;
+            if (StringUtils.endsWith(topic, "/ABSTRACT")) {
+                return allOf(hasJsonPath("$.abstract", is(oadto.getAbstracts())));
+            } else if (StringUtils.endsWith(topic, "/PID")) {
+                return allOf(
+                        hasJsonPath("$.value", is(oadto.getValue())),
+                        hasJsonPath("$.type", is(oadto.getType())),
+                        hasJsonPath("$.pidHref", is(calculateOpenairePidHref(oadto.getType(), oadto.getValue()))));
+            } else if (StringUtils.endsWith(topic, "/PROJECT")) {
+                return allOf(
+                        hasJsonPath("$.openaireId", is(oadto.getOpenaireId())),
+                        hasJsonPath("$.acronym", is(oadto.getAcronym())),
+                        hasJsonPath("$.code", is(oadto.getCode())),
+                        hasJsonPath("$.funder", is(oadto.getFunder())),
+                        hasJsonPath("$.fundingProgram", is(oadto.getFundingProgram())),
+                        hasJsonPath("$.jurisdiction", is(oadto.getJurisdiction())),
+                        hasJsonPath("$.title", is(oadto.getTitle())));
+            }
+        } else if (message instanceof NotifyMessageDTO) {
+            NotifyMessageDTO notifyDTO = (NotifyMessageDTO) message;
+            if (StringUtils.endsWith(topic, "/REVIEW")) {
+                return allOf(
+                            hasJsonPath("$.serviceName", is(notifyDTO.getServiceName())),
+                            hasJsonPath("$.serviceId", is(notifyDTO.getServiceId())),
+                            hasJsonPath("$.href", is(notifyDTO.getHref())),
+                            hasJsonPath("$.relationship", is(notifyDTO.getRelationship()))
+                );
+            } else if (StringUtils.endsWith(topic, "/ENDORSEMENT")) {
+                return allOf(
+                    hasJsonPath("$.serviceName", is(notifyDTO.getServiceName())),
+                    hasJsonPath("$.serviceId", is(notifyDTO.getServiceId())),
+                    hasJsonPath("$.href", is(notifyDTO.getHref())),
+                    hasJsonPath("$.relationship", is(notifyDTO.getRelationship()))
+                );
+            }
         }
         return IsAnything.anything();
     }

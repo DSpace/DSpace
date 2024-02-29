@@ -19,6 +19,7 @@ import org.dspace.eperson.EPerson;
  * provide logic to filter and determine visibility of QA events based on the user's permissions.
  * 
  * @author Andrea Bollini (andrea.bollini at 4science.com)
+ *
  */
 public interface QASecurity {
 
@@ -51,5 +52,4 @@ public interface QASecurity {
      * @return        <code>true</code> if the user can see the provided qaEvent
      */
     public boolean canSeeQAEvent(Context context, EPerson user, QAEvent qaEvent);
-
 }

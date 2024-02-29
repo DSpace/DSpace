@@ -30,4 +30,11 @@
     <bean name="licenseValidation" class="org.dspace.app.rest.submit.step.validation.LicenseValidation">
         <property name="name" value="license"/>
     </bean>
+
+    <bean name="COARNotifyValidation" class="org.dspace.app.rest.submit.step.validation.NotifyValidation" scope="prototype">
+        <property name="name" value="coarnotify"/>
+        <property name="coarNotifyConfigurationService" ref="org.dspace.coarnotify.NotifyConfigurationService"/>
+        <property name="notifyPatternToTriggerService" ref="org.dspace.app.ldn.service.impl.NotifyPatternToTriggerImpl"/>
+    </bean>
+
 </beans>

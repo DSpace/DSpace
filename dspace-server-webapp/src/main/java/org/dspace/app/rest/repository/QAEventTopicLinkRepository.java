@@ -54,7 +54,8 @@ public class QAEventTopicLinkRepository extends AbstractDSpaceRestRepository imp
         }
         String source = qaEvent.getSource();
         String topicName = qaEvent.getTopic();
-        QATopic topic = qaEventService.findTopicBySourceAndNameAndTarget(context, source, topicName, null);
+        QATopic topic = qaEventService
+                .findTopicBySourceAndNameAndTarget(context, source, topicName, null);
         if (topic == null) {
             throw new ResourceNotFoundException("No topic found with source: " + source + " topic: " + topicName);
         }

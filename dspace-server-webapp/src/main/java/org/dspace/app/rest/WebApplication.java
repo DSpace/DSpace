@@ -12,6 +12,8 @@ import java.sql.SQLException;
 import java.util.List;
 import javax.servlet.Filter;
 
+import org.dspace.app.ldn.LDNQueueExtractor;
+import org.dspace.app.ldn.LDNQueueTimeoutChecker;
 import org.dspace.app.rest.filter.DSpaceRequestContextFilter;
 import org.dspace.app.rest.model.hateoas.DSpaceLinkRelationProvider;
 import org.dspace.app.rest.parameter.resolver.SearchFilterResolver;
@@ -64,6 +66,22 @@ public class WebApplication {
     @Scheduled(cron = "${sitemap.cron:-}")
     public void generateSitemap() throws IOException, SQLException {
         GenerateSitemaps.generateSitemapsScheduled();
+    }
+
+    @Scheduled(cron = "${ldn.queue.extractor.cron:-}")
+    public void ldnExtractFromQueue() throws IOException, SQLException {
+        if (!configuration.getLdnEnabled()) {
+            return;
+        }
+        LDNQueueExtractor.extractMessageFromQueue();
+    }
+
+    @Scheduled(cron = "${ldn.queue.timeout.checker.cron:-}")
+    public void ldnQueueTimeoutCheck() throws IOException, SQLException {
+        if (!configuration.getLdnEnabled()) {
+            return;
+        }
+        LDNQueueTimeoutChecker.checkQueueMessageTimeout();
     }
 
     @Scheduled(cron = "${solr-database-resync.cron:-}")
