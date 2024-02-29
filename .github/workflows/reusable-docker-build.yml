@@ -108,7 +108,7 @@ jobs:
 
       - name: Add version
         if: ${{ inputs.run_python_version_script }}
-        run: python scripts/sourceversion.py > ${{ inputs.python_version_script_dest }}
+        run: python scripts/sourceversion.py ${{ github.server_url }}/${{ github.repository }}/actions/runs/ ${{ github.run_id }} > ${{ inputs.python_version_script_dest }}
 
       # https://github.com/docker/setup-buildx-action
       - name: Setup Docker Buildx
