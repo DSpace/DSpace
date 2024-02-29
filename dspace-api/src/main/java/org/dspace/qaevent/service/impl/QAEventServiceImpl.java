@@ -28,6 +28,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
@@ -55,8 +57,6 @@ import org.dspace.qaevent.service.QAEventSecurityService;
 import org.dspace.qaevent.service.QAEventService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -70,7 +70,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class QAEventServiceImpl implements QAEventService {
 
-    private static final Logger log = LoggerFactory.getLogger(QAEventServiceImpl.class);
+    private static final Logger log = LogManager.getLogger();
 
     public static final String QAEVENTS_SOURCES = "qaevents.sources";
 
@@ -341,8 +341,8 @@ public class QAEventServiceImpl implements QAEventService {
             email.addArgument(parsJson(qaEvent.getMessage()));
             email.send();
         } catch (Exception e) {
-            log.warn("Error during sending email of Withdrawn/Reinstate request for item with uuid:"
-                     + qaEvent.getTarget(), e);
+            log.warn("Error during sending email of Withdrawn/Reinstate request for item with uuid:  {}",
+                     qaEvent.getTarget(), e);
         }
     }
 
@@ -352,7 +352,7 @@ public class QAEventServiceImpl implements QAEventService {
             JsonNode jsonNode = objectMapper.readTree(jsonString);
             return jsonNode.get("reason").asText();
         } catch (Exception e) {
-            log.warn("Unable to parse the JSON:" + jsonString);
+            log.warn("Unable to parse the JSON:  {}", jsonString);
             return jsonString;
         }
     }
