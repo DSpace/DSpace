@@ -185,7 +185,7 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
         File spidersDir = new File(dspaceHome, "config/spiders");
         File patternsDir = new File(spidersDir, directory);
         if (patternsDir.exists() && patternsDir.isDirectory()) {
-            for (File file : patternsDir.listFiles()) {
+            for (File file : patternsDir.listFiles(new NoDotOldFilter())) {
                 Set<String> patterns;
                 try {
                     patterns = readPatterns(file);
@@ -201,7 +201,6 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
                     }
                     patternList.add(Pattern.compile(pattern));
                 }
-
 
                 log.info("Loaded pattern file:  {}", file.getPath());
             }
@@ -259,7 +258,7 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
                 File spidersDir = new File(filePath, "config/spiders");
 
                 if (spidersDir.exists() && spidersDir.isDirectory()) {
-                    for (File file : spidersDir.listFiles()) {
+                    for (File file : spidersDir.listFiles(new NoDotOldFilter())) {
                         if (file.isFile()) {
                             for (String ip : readPatterns(file)) {
                                 log.debug("Loading {}", ip);
