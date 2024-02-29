@@ -8,7 +8,6 @@
 package org.dspace.app.rest;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -16,7 +15,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -34,27 +32,30 @@ public class AbstractLiveImportIntegrationTest extends AbstractControllerIntegra
     protected void matchRecords(ArrayList<ImportRecord> recordsImported, ArrayList<ImportRecord> records2match) {
         assertEquals(records2match.size(), recordsImported.size());
         for (int i = 0; i < recordsImported.size(); i++) {
-            ImportRecord imported = recordsImported.get(i);
-            ImportRecord toMatch = records2match.get(i);
-            checkMetadataValue(imported.getValueList(), toMatch.getValueList());
+            matchRecord(recordsImported.get(i), records2match.get(i));
         }
+    }
+
+    protected void matchRecord(ImportRecord imported, ImportRecord toMatch) {
+        matchMetadataValue(imported.getValueList(), toMatch.getValueList());
+    }
+
+    protected void matchMetadataValue(List<MetadatumDTO> list, List<MetadatumDTO> list2) {
+        checkMetadataValue(list, list2);
     }
 
     private void checkMetadataValue(List<MetadatumDTO> list, List<MetadatumDTO> list2) {
         assertEquals(list.size(), list2.size());
         for (int i = 0; i < list.size(); i++) {
-            assertTrue(sameMetadatum(list.get(i), list2.get(i)));
+            sameMetadatum(list.get(i), list2.get(i));
         }
     }
 
-    private boolean sameMetadatum(MetadatumDTO metadatum, MetadatumDTO metadatum2) {
-        if (StringUtils.equals(metadatum.getSchema(), metadatum2.getSchema()) &&
-            StringUtils.equals(metadatum.getElement(), metadatum2.getElement()) &&
-            StringUtils.equals(metadatum.getQualifier(), metadatum2.getQualifier()) &&
-            StringUtils.equals(metadatum.getValue(), metadatum2.getValue())) {
-            return true;
-        }
-        return false;
+    private void sameMetadatum(MetadatumDTO metadatum, MetadatumDTO metadatum2) {
+        assertEquals(metadatum.getSchema(), metadatum2.getSchema());
+        assertEquals(metadatum.getElement(), metadatum2.getElement());
+        assertEquals(metadatum.getQualifier(), metadatum2.getQualifier());
+        assertEquals(metadatum.getValue(), metadatum2.getValue());
     }
 
     protected MetadatumDTO createMetadatumDTO(String schema, String element, String qualifier, String value) {
