@@ -8,7 +8,6 @@
 package org.dspace.contentreport;
 
 import java.util.Arrays;
-import java.util.function.BiFunction;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
@@ -21,10 +20,6 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.MetadataValue_;
 import org.dspace.util.DSpacePostgreSQLDialect;
 import org.dspace.util.JpaCriteriaBuilderKit;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Property;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.type.StandardBasicTypes;
 
 /**
  * Operators available for creating predicates to query the
@@ -34,52 +29,36 @@ import org.hibernate.type.StandardBasicTypes;
 public enum QueryOperator {
 
     EXISTS("exists", true, false,
-        (val, regexClause) -> Property.forName("mv.value").isNotNull(),
         (val, regexClause, jpaKit) -> jpaKit.criteriaBuilder().isNotNull(jpaKit.root().get(MetadataValue_.VALUE))),
     DOES_NOT_EXIST("doesnt_exist", true, true,
-        (val, regexClause) -> EXISTS.buildPredicate(val, regexClause),
         (val, regexClause, jpaKit) -> EXISTS.buildJpaPredicate(val, regexClause, jpaKit)),
     EQUALS("equals", true, false,
-        (val, regexClause) -> Property.forName("mv.value").eq(val),
         (val, regexClause, jpaKit) -> jpaKit.criteriaBuilder().equal(jpaKit.root().get(MetadataValue_.VALUE), val)),
     DOES_NOT_EQUAL("not_equals", true, true,
-        (val, regexClause) -> EQUALS.buildPredicate(val, regexClause),
         (val, regexClause, jpaKit) -> EQUALS.buildJpaPredicate(val, regexClause, jpaKit)),
     LIKE("like", true, false,
-        (val, regexClause) -> Property.forName("mv.value").like(val),
         (val, regexClause, jpaKit) -> jpaKit.criteriaBuilder().like(jpaKit.root().get(MetadataValue_.VALUE), val)),
     NOT_LIKE("not_like", true, true,
-        (val, regexClause) -> LIKE.buildPredicate(val, regexClause),
         (val, regexClause, jpaKit) -> LIKE.buildJpaPredicate(val, regexClause, jpaKit)),
     CONTAINS("contains", true, false,
-        (val, regexClause) -> Property.forName("mv.value").like("%" + val + "%"),
         (val, regexClause, jpaKit) -> LIKE.buildJpaPredicate("%" + val + "%", regexClause, jpaKit)),
     DOES_NOT_CONTAIN("doesnt_contain", true, true,
-        (val, regexClause) -> CONTAINS.buildPredicate(val, regexClause),
         (val, regexClause, jpaKit) -> CONTAINS.buildJpaPredicate(val, regexClause, jpaKit)),
     MATCHES("matches", false, false,
-        (val, regexClause) -> Restrictions.sqlRestriction(regexClause, val, StandardBasicTypes.STRING),
         (val, regexClause, jpaKit) -> regexPredicate(val, DSpacePostgreSQLDialect.REGEX_MATCHES, jpaKit)),
     DOES_NOT_MATCH("doesnt_match", false, false,
-        (val, regexClause) -> Restrictions.not(Restrictions.sqlRestriction(
-                regexClause, val, StandardBasicTypes.STRING)),
         (val, regexClause, jpaKit) -> regexPredicate(val, DSpacePostgreSQLDialect.REGEX_NOT_MATCHES, jpaKit));
 
     private final String code;
-    /** Criteria builder for the old Hibernate API */
-    @Deprecated(forRemoval = true)
-    private final BiFunction<String, String, Criterion> criterionBuilder;
     private final TriFunction<String, String, JpaCriteriaBuilderKit<MetadataValue>, Predicate> predicateBuilder;
     private final boolean usesRegex;
     private final boolean negate;
 
     QueryOperator(String code, boolean usesRegex, boolean negate,
-            BiFunction<String, String, Criterion> criterionBuilder,
             TriFunction<String, String, JpaCriteriaBuilderKit<MetadataValue>, Predicate> predicateBuilder) {
         this.code = code;
         this.usesRegex = usesRegex;
         this.negate = negate;
-        this.criterionBuilder = criterionBuilder;
         this.predicateBuilder = predicateBuilder;
     }
 
@@ -96,10 +75,6 @@ public enum QueryOperator {
         return negate;
     }
 
-    public Criterion buildPredicate(String val, String regexClause) {
-        return criterionBuilder.apply(val, regexClause);
-    }
-
     public Predicate buildJpaPredicate(String val, String regexClause, JpaCriteriaBuilderKit<MetadataValue> jpaKit) {
         return predicateBuilder.apply(val, regexClause, jpaKit);
     }
@@ -110,10 +85,6 @@ public enum QueryOperator {
                 .filter(item -> item.code.equalsIgnoreCase(code))
                 .findFirst()
                 .orElse(null);
-    }
-
-    public BiFunction<String, String, Criterion> getCriterionBuilder() {
-        return criterionBuilder;
     }
 
     private static Predicate regexPredicate(String val, String regexFunction,
