@@ -77,6 +77,8 @@
         <constructor-arg name='configPrefix' value='solr'/>
     </bean>
 
+    <bean class="org.dspace.contentreport.ContentReportServiceImpl"/>
+
     <!-- Ensure PluginService is initialized properly via init() method -->
     <bean class="org.dspace.core.LegacyPluginServiceImpl" init-method="init"/>
     <bean class="org.dspace.core.LicenseServiceImpl"/>
