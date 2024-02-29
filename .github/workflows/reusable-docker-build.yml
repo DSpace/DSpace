@@ -64,6 +64,7 @@ env:
   # For a new tag, copy that tag name as the tag for Docker image.
   IMAGE_TAGS: |
     type=raw,value=dspace-7_x,enable=${{ github.ref_name == github.event.repository.default_branch }}
+    type=raw,value=${{ github.sha }}
     type=ref,event=branch,enable=${{ github.ref_name != github.event.repository.default_branch }}
     type=ref,event=tag
   # Define default tag "flavor" for docker/metadata-action per
