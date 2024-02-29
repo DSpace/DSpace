@@ -47,7 +47,18 @@ public interface QAEventService {
      * @return             the topics list
      */
     public List<QATopic> findAllTopicsBySource(Context context, String source, long offset, long count,
-                                               String orderField, boolean ascending);
+        String orderField, boolean ascending);
+
+    /**
+     * Find a specific topic by its name, source and optionally a target.
+     *
+     * @param  context the DSpace context
+     * @param  sourceName the name of the source
+     * @param  topicName  the topic name to search for
+     * @param  target     (nullable) the uuid of the target to focus on
+     * @return            the topic
+     */
+    public QATopic findTopicBySourceAndNameAndTarget(Context context, String sourceName, String topicName, UUID target);
 
     /**
      * Count all the event's topics.
@@ -91,9 +102,9 @@ public interface QAEventService {
     public long countEventsByTopic(Context context, String sourceName, String topic);
 
     /**
-     * Find an event by the given id.
-     * @param  id      the id of the event to search for
+     * Find an event by the given id. Please note that no security filter are applied by this method.
      *
+     * @param  id      the id of the event to search for
      * @return         the event
      */
     public QAEvent findEventByEventId(String id);
@@ -195,7 +206,7 @@ public interface QAEventService {
     /**
      * Find a list of QA events according to the pagination parameters for the specified topic and target sorted by
      * trust descending
-     * 
+     *
      * @param  context  the DSpace context
      * @param  source   the source name
      * @param  topic    the topic to search for
@@ -230,17 +241,6 @@ public interface QAEventService {
     public long countEventsByTopicAndTarget(Context context, String source, String topic, UUID target);
 
     /**
-     * Find a specific topic by its name, source and optionally a target.
-     *
-     * @param  context    the DSpace context
-     * @param  sourceName the name of the source
-     * @param  topicName  the topic name to search for
-     * @param  target     (nullable) the uuid of the target to focus on
-     * @return            the topic
-     */
-    public QATopic findTopicBySourceAndNameAndTarget(Context context, String sourceName, String topicName, UUID target);
-
-    /**
      * Find all the event's sources related to a specific item
      *
      * @param  context   the DSpace context
@@ -262,6 +262,6 @@ public interface QAEventService {
      * @return           the topics list
      */
     public List<QATopic> findAllTopicsBySourceAndTarget(Context context, String source, UUID target, long offset,
-            int pageSize, String orderField, boolean ascending);
+            long pageSize, String orderField, boolean ascending);
 
 }

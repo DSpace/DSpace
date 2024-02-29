@@ -55,6 +55,9 @@
                         <entry key="accessConditions">
                             <bean class="org.dspace.app.rest.submit.factory.impl.AccessConditionAddPatchOperation"/>
                         </entry>
+                        <entry key="coarnotify">
+                            <bean class="org.dspace.app.rest.submit.factory.impl.NotifyServiceAddPatchOperation"/>
+                        </entry>
                         <entry key="primary">
                             <bean class="org.dspace.app.rest.submit.factory.impl.PrimaryBitstreamAddPatchOperation"/>
                         </entry>
@@ -85,6 +88,9 @@
                         </entry>
                         <entry key="accessConditions">
                             <bean class="org.dspace.app.rest.submit.factory.impl.AccessConditionRemovePatchOperation"/>
+                        </entry>
+                        <entry key="coarnotify">
+                            <bean class="org.dspace.app.rest.submit.factory.impl.NotifyServiceRemovePatchOperation"/>
                         </entry>
                         <entry key="primary">
                             <bean class="org.dspace.app.rest.submit.factory.impl.PrimaryBitstreamRemovePatchOperation"/>
@@ -117,6 +123,9 @@
                         <entry key="accessConditions">
                             <bean class="org.dspace.app.rest.submit.factory.impl.AccessConditionReplacePatchOperation"/>
                         </entry>
+                        <entry key="coarnotify">
+                            <bean class="org.dspace.app.rest.submit.factory.impl.NotifyServiceReplacePatchOperation"/>
+                        </entry>
                         <entry key="primary">
                             <bean class="org.dspace.app.rest.submit.factory.impl.PrimaryBitstreamReplacePatchOperation"/>
                         </entry>
@@ -127,4 +136,7 @@
     </bean>
 
     <bean id="org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils" class="org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils"/>
+
+    <bean id="coarNotifySubmissionService" class="org.dspace.app.rest.submit.factory.impl.NotifySubmissionService"/>
+
 </beans>

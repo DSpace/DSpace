@@ -7,54 +7,20 @@
  */
 package org.dspace.qaevent.action;
 
-import java.sql.SQLException;
-
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Item;
-import org.dspace.content.service.ItemService;
-import org.dspace.core.Context;
 import org.dspace.qaevent.QualityAssuranceAction;
 import org.dspace.qaevent.service.dto.OpenaireMessageDTO;
 import org.dspace.qaevent.service.dto.QAMessageDTO;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Implementation of {@link QualityAssuranceAction} that add a simple metadata to the given item.
+ * Implementation of {@link QualityAssuranceAction} that add a simple metadata to the given
+ * item.
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
  */
-public class QAOpenaireSimpleMetadataAction implements QualityAssuranceAction {
+public class QAOpenaireSimpleMetadataAction extends ASimpleMetadataAction {
 
-    protected String metadata;
-    protected String metadataSchema;
-    protected String metadataElement;
-    protected String metadataQualifier;
-
-    @Autowired
-    protected ItemService itemService;
-
-    @Override
-    public void applyCorrection(Context context, Item item, Item relatedItem, QAMessageDTO message) {
-        try {
-            itemService.addMetadata(context, item, metadataSchema, metadataElement, metadataQualifier, null,
-                ((OpenaireMessageDTO) message).getAbstracts());
-            itemService.update(context, item);
-        } catch (SQLException | AuthorizeException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
-    public String getMetadata() {
-        return metadata;
-    }
-
-    public void setMetadata(String metadata) {
-        this.metadata = metadata;
-        String[] split = metadata.split("\\.");
-        this.metadataSchema = split[0];
-        this.metadataElement = split[1];
-        if (split.length == 3) {
-            this.metadataQualifier = split[2];
-        }
+    public String extractMetadataValue(QAMessageDTO message) {
+        return ((OpenaireMessageDTO) message).getAbstracts();
     }
 }

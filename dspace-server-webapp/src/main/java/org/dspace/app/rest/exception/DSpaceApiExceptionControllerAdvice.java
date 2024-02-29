@@ -92,7 +92,7 @@ public class DSpaceApiExceptionControllerAdvice extends ResponseEntityExceptionH
                           HttpServletResponse.SC_FORBIDDEN);
     }
 
-    @ExceptionHandler({IllegalArgumentException.class, MultipartException.class})
+    @ExceptionHandler({IllegalArgumentException.class, MultipartException.class, InvalidLDNMessageException.class})
     protected void handleWrongRequestException(HttpServletRequest request, HttpServletResponse response,
                                                   Exception ex) throws IOException {
         sendErrorResponse(request, response, ex, "Request is invalid or incorrect", HttpServletResponse.SC_BAD_REQUEST);
