@@ -143,6 +143,7 @@
         <property name="qaSecurityConfiguration">
             <map>
                 <entry key="DSpaceUsers" value-ref="submitterWithdrawnReinstateQASecurity" />
+                <entry key="coar-notify" value-ref="submitterQASecurity" />
             </map>
         </property>
     </bean>
