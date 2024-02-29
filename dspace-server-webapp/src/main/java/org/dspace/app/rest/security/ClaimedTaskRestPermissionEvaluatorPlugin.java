@@ -11,6 +11,8 @@ import java.io.Serializable;
 import java.sql.SQLException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ClaimedTaskRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.core.Context;
@@ -20,8 +22,6 @@ import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
 import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -29,13 +29,13 @@ import org.springframework.stereotype.Component;
 /**
  * An authenticated user is allowed to interact with a claimed task only if they own it
  * claim.
- * 
+ *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
 public class ClaimedTaskRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(ClaimedTaskRestPermissionEvaluatorPlugin.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private RequestService requestService;
@@ -74,7 +74,7 @@ public class ClaimedTaskRestPermissionEvaluatorPlugin extends RestObjectPermissi
             }
 
         } catch (SQLException e) {
-            log.error(e.getMessage(), e);
+            log.error(e::getMessage, e);
         }
         return false;
     }
