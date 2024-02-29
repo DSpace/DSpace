@@ -133,7 +133,7 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
 
         private SearchByQueryCallable(String queryString, Integer maxResult, Integer start) {
             query = new Query();
-            query.addParameter("query", queryString);
+            query.addParameter("query", StringUtils.trim(queryString));
             query.addParameter("count", maxResult);
             query.addParameter("start", start);
         }
@@ -186,7 +186,7 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
 
         private SearchByIdCallable(String id) {
             this.query = new Query();
-            query.addParameter("id", id);
+            query.addParameter("id", StringUtils.trim(id));
         }
 
         @Override
