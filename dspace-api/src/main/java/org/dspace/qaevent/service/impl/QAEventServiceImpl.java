@@ -594,10 +594,11 @@ public class QAEventServiceImpl implements QAEventService {
         doc.addField(TRUST, dto.getTrust());
         doc.addField(MESSAGE, dto.getMessage());
         doc.addField(LAST_UPDATE, new Date());
-        final String resourceUUID = getResourceUUID(context, dto.getOriginalId());
+        String resourceUUID = getResourceUUID(context, dto.getOriginalId());
         if (resourceUUID == null) {
-            throw new IllegalArgumentException("Skipped event " + checksum +
-                " related to the oai record " + dto.getOriginalId() + " as the record was not found");
+            resourceUUID = dto.getTarget();
+            /*throw new IllegalArgumentException("Skipped event " + checksum +
+                " related to the oai record " + dto.getOriginalId() + " as the record was not found");*/
         }
         doc.addField(RESOURCE_UUID, resourceUUID);
         doc.addField(RELATED_UUID, dto.getRelated());
