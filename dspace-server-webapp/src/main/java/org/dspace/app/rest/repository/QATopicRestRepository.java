@@ -10,6 +10,8 @@ package org.dspace.app.rest.repository;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -38,6 +40,8 @@ public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, Str
     @Autowired
     private QAEventService qaEventService;
 
+    private static final Logger log = LogManager.getLogger();
+
     @Override
     public Page<QATopicRest> findAll(Context context, Pageable pageable) {
         throw new RepositoryMethodNotImplementedException("Method not allowed!", "");
@@ -58,7 +62,7 @@ public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, Str
     }
 
     @SearchRestMethod(name = "bySource")
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @PreAuthorize("hasPermission(#source, 'QUALITYASSURANCETOPIC', 'READ')")
     public Page<QATopicRest> findBySource(@Parameter(value = "source", required = true) String source,
            Pageable pageable) {
         Context context = obtainContext();
@@ -76,7 +80,7 @@ public class QATopicRestRepository extends DSpaceRestRepository<QATopicRest, Str
     }
 
     @SearchRestMethod(name = "byTarget")
-    @PreAuthorize("hasAuthority('AUTHENTICATED')")
+    @PreAuthorize("hasPermission(#target, 'ITEM', 'READ')")
     public Page<QATopicRest> findByTarget(@Parameter(value = "target", required = true) UUID target,
         @Parameter(value = "source", required = true) String source, Pageable pageable) {
         Context context = obtainContext();

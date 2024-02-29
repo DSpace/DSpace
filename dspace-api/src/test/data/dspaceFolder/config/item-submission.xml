@@ -180,6 +180,12 @@
             <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
         </step-definition>
 
+        <step-definition id="coarnotify">
+            <heading>submit.progressbar.coarnotify</heading>
+            <processing-class>org.dspace.app.rest.submit.step.NotifyStep</processing-class>
+            <type>coarnotify</type>
+        </step-definition>
+
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -211,6 +217,9 @@
             <!--Step will be to Describe the item. -->
             <step id="traditionalpageone"/>
             <step id="traditionalpagetwo"/>
+
+            <!--Step will be COAR Notify services to the item -->
+            <step id="coarnotify"/>
 
             <!--Step will be to Upload the item -->
             <step id="upload"/>

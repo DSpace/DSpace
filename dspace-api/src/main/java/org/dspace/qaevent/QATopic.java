@@ -32,12 +32,27 @@ public class QATopic {
     private Date lastEvent;
     private long totalEvents;
 
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
     public String getKey() {
         return key;
     }
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public void setFocus(UUID focus) {
+        this.focus = focus;
+    }
+
+    public UUID getFocus() {
+        return focus;
     }
 
     public long getTotalEvents() {
@@ -54,21 +69,5 @@ public class QATopic {
 
     public void setLastEvent(Date lastEvent) {
         this.lastEvent = lastEvent;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    public UUID getFocus() {
-        return focus;
-    }
-
-    public void setFocus(UUID focus) {
-        this.focus = focus;
     }
 }

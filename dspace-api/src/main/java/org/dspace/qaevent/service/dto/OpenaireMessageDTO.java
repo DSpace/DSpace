@@ -7,6 +7,7 @@
  */
 package org.dspace.qaevent.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -15,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class OpenaireMessageDTO implements QAMessageDTO {
 
     @JsonProperty("pids[0].value")
