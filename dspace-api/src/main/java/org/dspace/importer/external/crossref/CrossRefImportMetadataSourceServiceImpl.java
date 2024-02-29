@@ -192,8 +192,9 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
         @Override
         public List<ImportRecord> call() throws Exception {
             List<ImportRecord> results = new ArrayList<>();
+            URIBuilder uriBuilder = new URIBuilder(url);
             String ID = URLDecoder.decode(query.getParameterAsClass("id", String.class), "UTF-8");
-            URIBuilder uriBuilder = new URIBuilder(url + "/" + ID);
+            uriBuilder.setPath(uriBuilder.getPath() + "/" + ID);
             Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
             String responseString = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
             JsonNode jsonNode = convertStringJsonToJsonNode(responseString);
@@ -277,7 +278,7 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
 
         private CountByQueryCallable(String queryString) {
             query = new Query();
-            query.addParameter("query", queryString);
+            query.addParameter("query", StringUtils.trim(queryString));
         }
 
         private CountByQueryCallable(Query query) {
@@ -308,7 +309,7 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
 
         private DoiCheckCallable(final String id) {
             final Query query = new Query();
-            query.addParameter("id", id);
+            query.addParameter("id", StringUtils.trim(id));
             this.query = query;
         }
 
@@ -319,7 +320,8 @@ public class CrossRefImportMetadataSourceServiceImpl extends AbstractImportMetad
         @Override
         public Integer call() throws Exception {
             Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
-            URIBuilder uriBuilder = new URIBuilder(url + "/" + query.getParameterAsClass("id", String.class));
+            URIBuilder uriBuilder = new URIBuilder(url);
+            uriBuilder.setPath(uriBuilder.getPath() + "/" + query.getParameterAsClass("id", String.class));
             String responseString = liveImportClient.executeHttpGetRequest(1000, uriBuilder.toString(), params);
             JsonNode jsonNode = convertStringJsonToJsonNode(responseString);
             return StringUtils.equals(jsonNode.at("/status").toString(), "ok") ? 1 : 0;
