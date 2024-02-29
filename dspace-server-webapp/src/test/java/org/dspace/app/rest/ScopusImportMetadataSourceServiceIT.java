@@ -113,7 +113,8 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
 
             context.restoreAuthSystemState();
             Collection<ImportRecord> recordsImported = scopusServiceImpl.getRecords("roma", 0, 20);
-            assertTrue(recordsImported.isEmpty());
+            ImportRecord  importedRecord = recordsImported.iterator().next();
+            assertTrue(importedRecord.getValueList().isEmpty());
         } finally {
             liveImportClientImpl.setHttpClient(originalHttpClient);
             scopusServiceImpl.setApiKey(originApiKey);
