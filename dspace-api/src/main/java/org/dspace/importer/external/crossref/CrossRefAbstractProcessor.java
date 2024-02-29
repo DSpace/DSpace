@@ -7,6 +7,14 @@
  */
 package org.dspace.importer.external.crossref;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,14 +27,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
 
 public class CrossRefAbstractProcessor implements JsonPathMetadataProcessor {
 
@@ -88,8 +88,7 @@ public class CrossRefAbstractProcessor implements JsonPathMetadataProcessor {
                     sb.append(childElement.getTextContent());
                     sb.append("\n");
                 }
-            }
-            else if (StringUtils.equals(nodeName, "jats:sec")) {
+            } else if (StringUtils.equals(nodeName, "jats:sec")) {
                 NodeList secElements = childElement.getChildNodes();
                 for (int j = 0; j < secElements.getLength(); j++) {
                     Node secChildElement = secElements.item(j);
