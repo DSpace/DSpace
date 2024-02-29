@@ -27,19 +27,24 @@ public interface QAEventService {
     /**
      * Find all the event's topics.
      *
-     * @param  offset   the offset to apply
-     * @return          the topics list
+     * @param  context     the DSpace context
+     * @param  offset      the offset to apply
+     * @param  orderField  the field to order for
+     * @param  ascending   true if the order should be ascending, false otherwise
+     * @return             the topics list
      */
     public List<QATopic> findAllTopics(Context context, long offset, long count, String orderField, boolean ascending);
 
     /**
      * Find all the event's topics related to the given source.
      *
-     * @param  context the DSpace context
-     * @param  source the source to search for
-     * @param  offset the offset to apply
-     * @param  count  the page size
-     * @return        the topics list
+     * @param  context     the DSpace context
+     * @param  source      the source to search for
+     * @param  offset      the offset to apply
+     * @param  count       the page size
+     * @param  orderField  the field to order for
+     * @param  ascending   true if the order should be ascending, false otherwise
+     * @return             the topics list
      */
     public List<QATopic> findAllTopicsBySource(Context context, String source, long offset, long count,
         String orderField, boolean ascending);
@@ -56,6 +61,13 @@ public interface QAEventService {
     public QATopic findTopicBySourceAndNameAndTarget(Context context, String sourceName, String topicName, UUID target);
 
     /**
+     * Count all the event's topics.
+     *
+     * @return the count result
+     */
+    public long countTopics();
+
+    /**
      * Count all the event's topics related to the given source.
      *
      * @param  context the DSpace context
@@ -65,35 +77,37 @@ public interface QAEventService {
     public long countTopicsBySource(Context context, String source);
 
     /**
-     * Find all the events by topic sorted by trust descending.
+     * Find all the events by topic.
      *
-     * @param  context the DSpace context
-     * @param  source     the source name
+     * @param  context    the DSpace context
+     * @param  sourceName the source name
      * @param  topic      the topic to search for
      * @param  offset     the offset to apply
-     * @param  pageSize   the page size
+     * @param  size       the page size
+     * @param  orderField  the field to order for
+     * @param  ascending   true if the order should be ascending, false otherwise
      * @return            the events
      */
-    public List<QAEvent> findEventsByTopicAndPage(Context context, String source, String topic, long offset,
-            int pageSize);
+    public List<QAEvent> findEventsByTopic(Context context, String sourceName, String topic, long offset, int size,
+                                           String orderField, boolean ascending);
 
     /**
      * Find all the events by topic.
      *
-     * @param  context the DSpace context
-     * @param  topic   the topic to search for
-     * @return         the events count
+     * @param  context     the DSpace context
+     * @param  sourceName  the source name
+     * @param  topic       the topic to search for
+     * @return             the events count
      */
-    public long countEventsByTopic(Context context, String source, String topic);
+    public long countEventsByTopic(Context context, String sourceName, String topic);
 
     /**
      * Find an event by the given id. Please note that no security filter are applied by this method.
      *
-     * @param  context the DSpace context
      * @param  id      the id of the event to search for
      * @return         the event
      */
-    public QAEvent findEventByEventId(Context context, String id);
+    public QAEvent findEventByEventId(String id);
 
     /**
      * Store the given event.
@@ -118,6 +132,14 @@ public interface QAEventService {
     public void deleteEventsByTargetId(UUID targetId);
 
     /**
+     * Find a specific topid by the given id.
+     *
+     * @param  topicId the topic id to search for
+     * @return         the topic
+     */
+    public QATopic findTopicByTopicId(String topicId);
+
+    /**
      * Find a specific source by the given name.
      *
      * @param  context the DSpace context
@@ -132,14 +154,14 @@ public interface QAEventService {
      * @param  context the DSpace context
      * @param  source  the source name
      * @param  target  the uuid of the item target
-     * @return        the source
+     * @return         the source
      */
     public QASource findSource(Context context, String source, UUID target);
 
     /**
      * Find all the event's sources.
      *
-     * @param  context the DSpace context
+     * @param  context  the DSpace context
      * @param  offset   the offset to apply
      * @param  pageSize the page size
      * @return          the sources list
@@ -155,53 +177,13 @@ public interface QAEventService {
     public long countSources(Context context);
 
     /**
-     * Check if the given QA event supports a related item.
-     * 
-     * @param  qaevent the event to be verified
-     * @return         true if the event supports a related item, false otherwise.
-     */
-    public boolean isRelatedItemSupported(QAEvent qaevent);
-
-    /**
-     * Find a list of QA events according to the pagination parameters for the specified topic and target sorted by
-     * trust descending
-     * 
-     * @param  context the DSpace context
-     * @param  source the source name
-     * @param  topic the topic to search for
-     * @param  offset the offset to apply
-     * @param  pageSize the page size
-     * @param  target the uuid of the QA event's target
-     * @return the events
-     */
-    public List<QAEvent> findEventsByTopicAndPageAndTarget(Context context, String source, String topic, long offset,
-            int pageSize, UUID target);
-
-    /**
-     * Count the QA events related to the specified topic and target
+     * Count all the event's sources related to a specific item
      *
      * @param  context the DSpace context
-     * @param  source     the source name
-     * @param  topic      the topic to search for
-     * @param  target     the uuid of the QA event's target
-     * @return the count result
+     * @param  target  the item uuid
+     * @return         the count result
      */
-    public long countEventsByTopicAndTarget(Context context, String source, String topic, UUID target);
-
-    /**
-     * Find all the event's topics related to the given source for a specific item
-     *
-     * @param  context the DSpace context
-     * @param  source (not null) the source to search for
-     * @param  target the item referring to
-     * @param  offset the offset to apply
-     * @param  count  result count
-     * @param  orderField field name for sorting
-     * @param  ascending activate ascending sort
-     * @return        the topics list
-     */
-    public List<QATopic> findAllTopicsBySourceAndTarget(Context context, String source, UUID target, long offset,
-        long count, String orderField, boolean ascending);
+    public long countSourcesByTarget(Context context, UUID target);
 
     /**
      * Count all the event's topics related to the given source referring to a specific item
@@ -214,24 +196,27 @@ public interface QAEventService {
     public long countTopicsBySourceAndTarget(Context context, String source, UUID target);
 
     /**
-     * Find all the event's sources related to a specific item
-     *
-     * @param  context the DSpace context
-     * @param  target the item referring to
-     * @param  offset the offset to apply
-     * @param  pageSize  the page size
-     * @return        the source list
+     * Check if the given QA event supports a related item.
+     * 
+     * @param  qaevent the event to be verified
+     * @return         true if the event supports a related item, false otherwise.
      */
-    public List<QASource> findAllSourcesByTarget(Context context, UUID target, long offset, int pageSize);
+    public boolean isRelatedItemSupported(QAEvent qaevent);
 
     /**
-     * Count all the event's sources related to a specific item
+     * Find a list of QA events according to the pagination parameters for the specified topic and target sorted by
+     * trust descending
      *
-     * @param  context the DSpace context
-     * @param  target  the item uuid
-     * @return         the count result
+     * @param  context  the DSpace context
+     * @param  source   the source name
+     * @param  topic    the topic to search for
+     * @param  offset   the offset to apply
+     * @param  pageSize the page size
+     * @param  target   the uuid of the QA event's target
+     * @return          the events
      */
-    public long countSourcesByTarget(Context context, UUID target);
+    public List<QAEvent> findEventsByTopicAndTarget(Context context, String source, String topic, UUID target,
+                                                    long offset, int pageSize);
 
     /**
      * Check if a qaevent with the provided id is visible to the current user according to the source security
@@ -243,5 +228,40 @@ public interface QAEventService {
      * @return <code>true</code> if the event exists
      */
     public boolean qaEventsInSource(Context context, EPerson user, String eventId, String source);
+
+    /**
+     * Count the QA events related to the specified topic and target
+     *
+     * @param  context  the DSpace context
+     * @param  source   the source name
+     * @param  topic    the topic to search for
+     * @param  target   the uuid of the QA event's target
+     * @return          the count result
+     */
+    public long countEventsByTopicAndTarget(Context context, String source, String topic, UUID target);
+
+    /**
+     * Find all the event's sources related to a specific item
+     *
+     * @param  context   the DSpace context
+     * @param  target    the item referring to
+     * @param  offset    the offset to apply
+     * @param  pageSize  the page size
+     * @return           the source list
+     */
+    public List<QASource> findAllSourcesByTarget(Context context, UUID target, long offset, int pageSize);
+
+    /**
+     * Find all the event's topics related to the given source for a specific item
+     *
+     * @param  context   the DSpace context
+     * @param  source    (not null) the source to search for
+     * @param  target    the item referring to
+     * @param  offset    the offset to apply
+     * @param  pageSize  the page size
+     * @return           the topics list
+     */
+    public List<QATopic> findAllTopicsBySourceAndTarget(Context context, String source, UUID target, long offset,
+            long pageSize, String orderField, boolean ascending);
 
 }

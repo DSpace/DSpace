@@ -9,7 +9,7 @@ package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.SubmissionCOARNotifyRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.coarnotify.COARNotifySubmissionConfiguration;
+import org.dspace.coarnotify.NotifySubmissionConfiguration;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
  **/
 @Component
 public class SubmissionCOARNotifyConverter
-    implements DSpaceConverter<COARNotifySubmissionConfiguration, SubmissionCOARNotifyRest> {
+    implements DSpaceConverter<NotifySubmissionConfiguration, SubmissionCOARNotifyRest> {
 
     /**
      * Convert a COARNotify to its REST representation
@@ -29,7 +29,7 @@ public class SubmissionCOARNotifyConverter
      * @return the corresponding SubmissionCOARNotifyRest object
      */
     @Override
-    public SubmissionCOARNotifyRest convert(final COARNotifySubmissionConfiguration modelObject,
+    public SubmissionCOARNotifyRest convert(final NotifySubmissionConfiguration modelObject,
                                             final Projection projection) {
 
         SubmissionCOARNotifyRest submissionCOARNotifyRest = new SubmissionCOARNotifyRest();
@@ -40,8 +40,8 @@ public class SubmissionCOARNotifyConverter
     }
 
     @Override
-    public Class<COARNotifySubmissionConfiguration> getModelClass() {
-        return COARNotifySubmissionConfiguration.class;
+    public Class<NotifySubmissionConfiguration> getModelClass() {
+        return NotifySubmissionConfiguration.class;
     }
 
 }

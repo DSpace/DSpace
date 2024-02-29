@@ -72,6 +72,10 @@ public class ApplicationConfig {
     @Value("${dspace.ui.url:http://localhost:4000}")
     private String uiURL;
 
+    // LDN enable status
+    @Value("${ldn.enabled}")
+    private boolean ldnEnabled;
+
     /**
      * Return the array of allowed origins (client URLs) for the CORS "Access-Control-Allow-Origin" header
      * Used by Application class
@@ -128,6 +132,14 @@ public class ApplicationConfig {
      */
     public boolean getCorsAllowCredentials() {
         return corsAllowCredentials;
+    }
+
+    /**
+     * Return the ldn.enabled value
+     * @return true or false
+     */
+    public boolean getLdnEnabled() {
+        return this.ldnEnabled;
     }
 
     /**

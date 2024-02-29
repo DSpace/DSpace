@@ -20,6 +20,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonSyntaxException;
+
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -93,6 +94,10 @@ public class LDNMessageServiceImpl implements LDNMessageService {
 
     @Override
     public LDNMessageEntity create(Context context, String id) throws SQLException {
+        LDNMessageEntity result = ldnMessageDao.findByID(context, LDNMessageEntity.class, id);
+        if (result != null) {
+            throw new SQLException("Duplicate LDN Message ID [" + id + "] detected. This message is rejected.");
+        }
         return ldnMessageDao.create(context, new LDNMessageEntity(id));
     }
 
@@ -104,7 +109,6 @@ public class LDNMessageServiceImpl implements LDNMessageService {
             ldnMessage.setContext(findDspaceObjectByUrl(context, notification.getContext().getId()));
         }
         ldnMessage.setOrigin(findNotifyService(context, notification.getOrigin()));
-        ldnMessage.setTarget(findNotifyService(context, notification.getTarget()));
         ldnMessage.setInReplyTo(find(context, notification.getInReplyTo()));
         ObjectMapper mapper = new ObjectMapper();
         String message = null;
@@ -130,38 +134,30 @@ public class LDNMessageServiceImpl implements LDNMessageService {
             ldnMessage.setCoarNotifyType(notificationTypeArrayList.get(1));
         }
         ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_QUEUED);
-        //CST-12126 if source is untrusted, set the queue_status of the
-        //ldnMsgEntity to UNTRUSTED
+        ldnMessage.setSourceIp(sourceIp);
         if (ldnMessage.getOrigin() == null && !"Offer".equalsIgnoreCase(ldnMessage.getActivityStreamType())) {
             ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_UNTRUSTED);
+        } else {
+
+            boolean ipCheckRangeEnabled = configurationService.getBooleanProperty("ldn.ip-range.enabled", true);
+            if (ipCheckRangeEnabled && !isValidIp(ldnMessage.getOrigin(), sourceIp)) {
+                ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_UNTRUSTED_IP);
+            }
         }
         ldnMessage.setQueueTimeout(new Date());
-        ldnMessage.setSourceIp(sourceIp);
-
-        if (!isValidIp(ldnMessage)) {
-            ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_UNTRUSTED_IP);
-        }
 
         update(context, ldnMessage);
         return ldnMessage;
     }
 
-    private boolean isValidIp(LDNMessageEntity message) {
+    @Override
+    public boolean isValidIp(NotifyServiceEntity origin, String sourceIp) {
 
-        boolean enabled = configurationService.getBooleanProperty("coar-notify.ip-range.enabled", true);
-
-        if (!enabled) {
-            return true;
-        }
-
-        NotifyServiceEntity notifyService =
-            message.getOrigin() == null ? message.getTarget() : message.getOrigin();
-
-        String lowerIp = notifyService.getLowerIp();
-        String upperIp = notifyService.getUpperIp();
+        String lowerIp = origin.getLowerIp();
+        String upperIp = origin.getUpperIp();
 
         try {
-            InetAddress ip = InetAddress.getByName(message.getSourceIp());
+            InetAddress ip = InetAddress.getByName(sourceIp);
             InetAddress lowerBoundAddress = InetAddress.getByName(lowerIp);
             InetAddress upperBoundAddress = InetAddress.getByName(upperIp);
 
@@ -322,7 +318,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
         }
         log.debug("Using parameters: [timeoutInMinutes]=" + timeoutInMinutes + ",[maxAttempts]=" + maxAttempts);
         /*
-         * CST-10631 put failed on processing messages with timed-out timeout and
+         * put failed on processing messages with timed-out timeout and
          * attempts >= configured_max_attempts put queue on processing messages with
          * timed-out timeout and attempts < configured_max_attempts
          */
@@ -335,7 +331,6 @@ public class LDNMessageServiceImpl implements LDNMessageService {
             return result;
         }
         if (msgsToCheck == null || msgsToCheck.isEmpty()) {
-            log.info("No timedout LDN messages found in queue.");
             return result;
         }
         for (int i = 0; i < msgsToCheck.size() && msgsToCheck.get(i) != null; i++) {
@@ -365,8 +360,8 @@ public class LDNMessageServiceImpl implements LDNMessageService {
         if (msgs != null && !msgs.isEmpty()) {
             for (LDNMessageEntity msg : msgs) {
                 RequestStatus offer = new RequestStatus();
-                offer.setServiceName(msg.getTarget() == null ? "Unknown Service" : msg.getTarget().getName());
-                offer.setServiceUrl(msg.getTarget() == null ? "" : msg.getTarget().getUrl());
+                offer.setServiceName(msg.getOrigin() == null ? "Unknown Service" : msg.getOrigin().getName());
+                offer.setServiceUrl(msg.getOrigin() == null ? "" : msg.getOrigin().getUrl());
                 offer.setOfferType(LDNUtils.getNotifyType(msg.getCoarNotifyType()));
                 List<LDNMessageEntity> acks = ldnMessageDao.findAllRelatedMessagesByItem(
                     context, msg, item, "Accept", "TentativeReject", "TentativeAccept", "Announce");

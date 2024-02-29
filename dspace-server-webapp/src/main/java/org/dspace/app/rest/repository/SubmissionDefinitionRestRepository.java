@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-@Component(SubmissionDefinitionRest.CATEGORY + "." + SubmissionDefinitionRest.NAME)
+@Component(SubmissionDefinitionRest.CATEGORY + "." + SubmissionDefinitionRest.PLURAL_NAME)
 public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<SubmissionDefinitionRest, String> {
     private SubmissionConfigService submissionConfigService;
 
@@ -70,7 +70,7 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
             return null;
         }
         SubmissionDefinitionRest def = converter
-            .toRest(submissionConfigService.getSubmissionConfigByCollection(col.getHandle()),
+            .toRest(submissionConfigService.getSubmissionConfigByCollection(col),
                     utils.obtainProjection());
         return def;
     }

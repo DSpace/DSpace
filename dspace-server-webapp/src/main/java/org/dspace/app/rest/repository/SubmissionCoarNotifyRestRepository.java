@@ -8,8 +8,8 @@
 package org.dspace.app.rest.repository;
 
 import org.dspace.app.rest.model.SubmissionCOARNotifyRest;
-import org.dspace.coarnotify.COARNotifySubmissionConfiguration;
-import org.dspace.coarnotify.service.SubmissionCOARNotifyService;
+import org.dspace.coarnotify.NotifySubmissionConfiguration;
+import org.dspace.coarnotify.service.SubmissionNotifyService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,16 +23,16 @@ import org.springframework.stereotype.Component;
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
-@Component(SubmissionCOARNotifyRest.CATEGORY + "." + SubmissionCOARNotifyRest.NAME)
+@Component(SubmissionCOARNotifyRest.CATEGORY + "." + SubmissionCOARNotifyRest.PLURAL_NAME)
 public class SubmissionCoarNotifyRestRepository extends DSpaceRestRepository<SubmissionCOARNotifyRest, String> {
 
     @Autowired
-    protected SubmissionCOARNotifyService submissionCOARNotifyService;
+    protected SubmissionNotifyService submissionCOARNotifyService;
 
     @Override
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public SubmissionCOARNotifyRest findOne(final Context context, final String id) {
-        COARNotifySubmissionConfiguration coarNotifySubmissionConfiguration = submissionCOARNotifyService.findOne(id);
+        NotifySubmissionConfiguration coarNotifySubmissionConfiguration = submissionCOARNotifyService.findOne(id);
         if (coarNotifySubmissionConfiguration == null) {
             throw new ResourceNotFoundException(
                 "No COAR Notify Submission Configuration found for ID: " + id );

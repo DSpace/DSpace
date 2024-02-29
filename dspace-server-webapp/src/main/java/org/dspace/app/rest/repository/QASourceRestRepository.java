@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
-@Component(QASourceRest.CATEGORY + "." + QASourceRest.NAME)
+@Component(QASourceRest.CATEGORY + "." + QASourceRest.PLURAL_NAME)
 public class QASourceRestRepository extends DSpaceRestRepository<QASourceRest, String> {
 
     @Autowired
@@ -55,10 +55,10 @@ public class QASourceRestRepository extends DSpaceRestRepository<QASourceRest, S
     @SearchRestMethod(name = "byTarget")
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public Page<QASourceRest> findByTarget(@Parameter(value = "target", required = true) UUID target,
-        Pageable pageable) {
+           Pageable pageable) {
         Context context = obtainContext();
-        List<QASource> topics = qaEventService
-            .findAllSourcesByTarget(context, target, pageable.getOffset(), pageable.getPageSize());
+        List<QASource> topics = qaEventService.findAllSourcesByTarget(context, target,
+                                        pageable.getOffset(), pageable.getPageSize());
         long count = qaEventService.countSourcesByTarget(context, target);
         if (topics == null) {
             return null;

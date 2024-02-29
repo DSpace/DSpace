@@ -7,7 +7,6 @@
  */
 package org.dspace.app.ldn;
 
-import java.io.IOException;
 import java.sql.SQLException;
 
 import org.apache.logging.log4j.Logger;
@@ -32,17 +31,23 @@ public class LDNQueueExtractor {
     private LDNQueueExtractor() {
     }
 
-    public static int extractMessageFromQueue() throws IOException, SQLException {
-        log.info("START LDNQueueExtractor.extractMessageFromQueue()");
+    /**
+     * invokes
+     * @see org.dspace.app.ldn.service.impl.LDNMessageServiceImpl#extractAndProcessMessageFromQueue(Context)
+     * to process the oldest ldn messages from the queue. An LdnMessage is processed when is routed to a
+     * @see org.dspace.app.ldn.processor.LDNProcessor
+     * Also a +1 is added to the ldnMessage entity
+     * @see org.dspace.app.ldn.LDNMessageEntity#getQueueAttempts()
+     * @return the number of processed ldnMessages.
+     * @throws SQLException
+     */
+    public static int extractMessageFromQueue() throws SQLException {
         Context context = new Context(Context.Mode.READ_WRITE);
         int processed_messages = ldnMessageService.extractAndProcessMessageFromQueue(context);
-        if (processed_messages >= 0) {
+        if (processed_messages > 0) {
             log.info("Processed Messages x" + processed_messages);
-        } else {
-            log.error("Errors happened during the extract operations. Check the log above!");
         }
         context.complete();
-        log.info("END LDNQueueExtractor.extractMessageFromQueue()");
         return processed_messages;
     }
 

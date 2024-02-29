@@ -30,7 +30,8 @@ import org.springframework.stereotype.Component;
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science dot it)
  */
-@Component(WorkspaceItemRest.CATEGORY + "." + WorkspaceItemRest.NAME + "." + WorkspaceItemRest.SUPERVISION_ORDERS)
+@Component(WorkspaceItemRest.CATEGORY + "." + WorkspaceItemRest.PLURAL_NAME + "." +
+    WorkspaceItemRest.SUPERVISION_ORDERS)
 public class WorkspaceItemSupervisionOrdersLinkRepository
     extends AbstractDSpaceRestRepository implements LinkRestRepository {
 

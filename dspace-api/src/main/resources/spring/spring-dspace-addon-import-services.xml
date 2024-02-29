@@ -30,8 +30,22 @@
                 <ref bean="csvImportService" />
                 <ref bean="tsvImportService" />
                 <ref bean="endnoteImportService" />
+                <ref bean="DoiImportService" />
             </list>
          </property>
+    </bean>
+
+    <bean id="DoiImportService"
+          class="org.dspace.importer.external.MultipleParallelImportMetadataSourceServiceImpl" scope="singleton">
+        <constructor-arg name="innerProviders">
+            <list>
+                <ref bean="CrossRefImportService"/>
+                <ref bean="DataCiteImportService"/>
+            </list>
+        </constructor-arg>
+        <constructor-arg name="sourceName">
+            <value>doi</value>
+        </constructor-arg>
     </bean>
 
     <bean id="DataCiteImportService"
@@ -164,6 +178,12 @@
         <property name="viewMode" value="${scopus.search-api.viewMode}"/>
     </bean>
     <bean id="scopusMetadataFieldMapping" class="org.dspace.importer.external.scopus.service.ScopusFieldMapping"/>
+    
+    <bean id="rorImportService" class="org.dspace.importer.external.ror.service.RorImportMetadataSourceServiceImpl">
+          <property name="metadataFieldMapping" ref="rorMetadataFieldMapping"/>
+          <property name="url" value="${ror.orgunit-import.api-url}"/>
+    </bean>
+    <bean id="rorMetadataFieldMapping" class="org.dspace.importer.external.ror.service.RorFieldMapping"/>
 
     <bean id="vufindImportService" class="org.dspace.importer.external.vufind.VuFindImportMetadataSourceServiceImpl" scope="singleton">
           <!-- Set to empty to use the default set of fields  -->

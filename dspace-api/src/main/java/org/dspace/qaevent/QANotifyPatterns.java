@@ -11,9 +11,9 @@ package org.dspace.qaevent;
  * Constants for Quality Assurance configurations to be used into cfg and xml spring.
  * 
  * @author Francesco Bacchelli (francesco.bacchelli at 4science.it)
- *
  */
 public class QANotifyPatterns {
+
     public static final String TOPIC_ENRICH_MORE_PROJECT = "ENRICH/MORE/PROJECT";
     public static final String TOPIC_ENRICH_MISSING_PROJECT = "ENRICH/MISSING/PROJECT";
     public static final String TOPIC_ENRICH_MISSING_ABSTRACT = "ENRICH/MISSING/ABSTRACT";

@@ -30,9 +30,10 @@ import org.springframework.stereotype.Component;
 
 /**
  *
- * An authenticated user is allowed to view the suggestions summary
- * (SuggestionTarget) for the data that his own. This
- * {@link RestPermissionEvaluatorPlugin} implements that requirement.
+ * An authenticated user is allowed to view a suggestion summary
+ * (SuggestionTarget) related to a Target object that they own
+ * (as defined by "dspace.object.owner" metadata field)
+ * See {@link RestPermissionEvaluatorPlugin} for the inherited contract.
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *

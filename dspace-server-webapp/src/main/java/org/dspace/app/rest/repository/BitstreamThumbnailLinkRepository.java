@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for the thumbnail Bitstream of a Bitstream
  */
-@Component(BitstreamRest.CATEGORY + "." + BitstreamRest.NAME + "." + BitstreamRest.THUMBNAIL)
+@Component(BitstreamRest.CATEGORY + "." + BitstreamRest.PLURAL_NAME + "." + BitstreamRest.THUMBNAIL)
 public class BitstreamThumbnailLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
     @Autowired
     BitstreamService bitstreamService;

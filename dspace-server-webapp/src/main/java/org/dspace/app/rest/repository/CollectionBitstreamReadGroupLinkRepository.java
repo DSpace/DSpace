@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
  * Link repository for "BitstreamReadGroup" subresource of an individual collection.
  *
  */
-@Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME + "." + CollectionRest.BITSTREAM_READ_GROUP)
+@Component(CollectionRest.CATEGORY + "." + CollectionRest.PLURAL_NAME + "." + CollectionRest.BITSTREAM_READ_GROUP)
 public class CollectionBitstreamReadGroupLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
 

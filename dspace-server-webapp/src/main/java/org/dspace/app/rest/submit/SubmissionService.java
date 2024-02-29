@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
@@ -219,7 +218,7 @@ public class SubmissionService {
         data.setCheckSum(checksum);
         data.setSizeBytes(source.getSizeBytes());
         data.setUrl(configurationService.getProperty("dspace.server.url") + "/api/" + BitstreamRest.CATEGORY + "/" +
-                        English.plural(BitstreamRest.NAME) + "/" + source.getID() + "/content");
+                        BitstreamRest.PLURAL_NAME + "/" + source.getID() + "/content");
         return data;
     }
 
@@ -241,7 +240,7 @@ public class SubmissionService {
         if (StringUtils.isBlank(requestUriListString)) {
             throw new UnprocessableEntityException("Malformed body..." + requestUriListString);
         }
-        String regex = "\\/api\\/" + WorkspaceItemRest.CATEGORY + "\\/" + English.plural(WorkspaceItemRest.NAME)
+        String regex = "\\/api\\/" + WorkspaceItemRest.CATEGORY + "\\/" + WorkspaceItemRest.PLURAL_NAME
                 + "\\/";
         String[] split = requestUriListString.split(regex, 2);
         if (split.length != 2) {

@@ -32,11 +32,11 @@ public class LDNRouter {
      */
     public LDNProcessor route(LDNMessageEntity ldnMessage) {
         if (ldnMessage == null) {
-            log.warn("an null LDNMessage is received for routing!");
+            log.warn("A null LDNMessage was received and could not be routed.");
             return null;
         }
         if (StringUtils.isEmpty(ldnMessage.getType())) {
-            log.warn("LDNMessage " + ldnMessage + " has no type!");
+            log.warn("LDNMessage " + ldnMessage + " was received. It has no type, so it couldn't be routed.");
             return null;
         }
         Set<String> ldnMessageTypeSet = new HashSet<String>();

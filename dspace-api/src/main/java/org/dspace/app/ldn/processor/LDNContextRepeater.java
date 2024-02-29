@@ -50,7 +50,7 @@ public class LDNContextRepeater {
 
     /**
      * @param  notification
-     * @return              Iterator<Notification>
+     * @return Iterator<Notification>
      */
     public Iterator<Notification> iterator(Notification notification) {
         return new NotificationIterator(notification, repeatOver);
@@ -79,7 +79,7 @@ public class LDNContextRepeater {
 
                 JsonNode notificationNode = objectMapper.valueToTree(notification);
 
-                log.info("Notification {}", notificationNode);
+                log.debug("Notification {}", notificationNode);
 
                 JsonNode topContextNode = notificationNode.get(CONTEXT);
                 if (topContextNode.isNull()) {

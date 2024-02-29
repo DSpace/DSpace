@@ -11,8 +11,9 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+
 /**
- *
+ * used to map @see org.dspace.app.ldn.model.Notification
  */
 public class Context extends Citation {
 

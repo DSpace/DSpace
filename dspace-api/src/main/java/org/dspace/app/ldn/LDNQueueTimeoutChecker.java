@@ -7,7 +7,6 @@
  */
 package org.dspace.app.ldn;
 
-import java.io.IOException;
 import java.sql.SQLException;
 
 import org.apache.logging.log4j.Logger;
@@ -32,17 +31,22 @@ public class LDNQueueTimeoutChecker {
     private LDNQueueTimeoutChecker() {
     }
 
-    public static int checkQueueMessageTimeout() throws IOException, SQLException {
-        log.info("START LDNQueueTimeoutChecker.checkQueueMessageTimeout()");
+    /**
+     * invokes
+     * @see org.dspace.app.ldn.service.impl.LDNMessageServiceImpl#checkQueueMessageTimeout(Context)
+     * to refresh the queue status of timed-out and in progressing status ldn messages:
+     * according to their attempts put them back in queue or set their status as failed if maxAttempts
+     * reached.
+     * @return the number of managed ldnMessages.
+     * @throws SQLException
+     */
+    public static int checkQueueMessageTimeout() throws SQLException {
         Context context = new Context(Context.Mode.READ_WRITE);
         int fixed_messages = 0;
         fixed_messages = ldnMessageService.checkQueueMessageTimeout(context);
-        if (fixed_messages >= 0) {
+        if (fixed_messages > 0) {
             log.info("Managed Messages x" + fixed_messages);
-        } else {
-            log.error("Errors happened during the check operation. Check the log above!");
         }
-        log.info("END LDNQueueTimeoutChecker.checkQueueMessageTimeout()");
         context.complete();
         return fixed_messages;
     }

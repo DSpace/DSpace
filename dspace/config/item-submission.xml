@@ -63,6 +63,15 @@
         <name-map collection-entity-type="Journal" submission-name="Journal"/>
         <name-map collection-entity-type="JournalVolume" submission-name="JournalVolume"/>
         <name-map collection-entity-type="JournalIssue" submission-name="JournalIssue"/>
+
+        <!-- Example of configuration using a community handle to map an Item Submission Process.
+
+            This configuration maps the submission process to the community's descendant
+            collections that do not have a mapping defined by collection-handle or entity-type
+
+        <name-map community-handle="123456789/1234" submission-name="xxxx"/>
+        -->
+
     </submission-map>
 
 
@@ -234,7 +243,7 @@
 
         <step-definition id="coarnotify">
             <heading>submit.progressbar.coarnotify</heading>
-            <processing-class>org.dspace.app.rest.submit.step.COARNotifyStep</processing-class>
+            <processing-class>org.dspace.app.rest.submit.step.NotifyStep</processing-class>
             <type>coarnotify</type>
         </step-definition>
 
@@ -276,7 +285,7 @@
             <!-- <step id="sherpaPolicies"/> -->
 
             <!--Step will be COAR Notify services to the item -->
-            <step id="coarnotify"/>
+            <!-- <step id="coarnotify"/> -->
 
             <!--Step will be to Upload the item -->
             <step id="upload"/>

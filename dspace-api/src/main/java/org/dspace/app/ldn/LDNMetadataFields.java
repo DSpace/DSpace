@@ -8,7 +8,9 @@
 package org.dspace.app.ldn;
 
 /**
- *
+ * Constants for LDN metadata fields
+ * 
+ * @author Francesco Bacchelli (francesco.bacchelli at 4science.com)
  */
 public final class LDNMetadataFields {
 

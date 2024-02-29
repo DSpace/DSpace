@@ -26,6 +26,6 @@ public interface LDNAction {
      * @return ActionStatus the resulting status of the action
      * @throws Exception general exception that can be thrown while executing action
      */
-    public ActionStatus execute(Context context, Notification notification, Item item) throws Exception;
+    public LDNActionStatus execute(Context context, Notification notification, Item item) throws Exception;
 
 }

@@ -34,4 +34,9 @@ public class ItemFilterRest extends BaseObjectRest<String> {
     public Class getController() {
         return RestResourceController.class;
     }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
 }

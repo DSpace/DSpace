@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Date;
 
-import com.github.jsonldjava.utils.JsonUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.NotifyServiceEntity;
@@ -51,14 +51,12 @@ public class LDNRelationCorrectionAction implements LDNAction {
     private HandleService handleService;
 
     @Override
-    public ActionStatus execute(Context context, Notification notification, Item item) throws Exception {
-        ActionStatus result = ActionStatus.ABORT;
+    public LDNActionStatus execute(Context context, Notification notification, Item item) throws Exception {
+        LDNActionStatus result = LDNActionStatus.ABORT;
         String itemName = itemService.getName(item);
         QAEvent qaEvent = null;
         if (notification.getObject() != null) {
             NotifyMessageDTO message = new NotifyMessageDTO();
-            /*relationFormat.replace("[0]", notification.getObject().getAsRelationship());
-            hrefValue = hrefValue.replace("[1]", notification.getObject().getAsSubject());*/
             message.setHref(notification.getObject().getAsSubject());
             message.setRelationship(notification.getObject().getAsRelationship());
             if (notification.getOrigin() != null) {
@@ -67,13 +65,14 @@ public class LDNRelationCorrectionAction implements LDNAction {
             }
             BigDecimal score = getScore(context, notification);
             double doubleScoreValue = score != null ? score.doubleValue() : 0d;
+            ObjectMapper mapper = new ObjectMapper();
             qaEvent = new QAEvent(QAEvent.COAR_NOTIFY_SOURCE,
                 handleService.findHandle(context, item), item.getID().toString(), itemName,
                 this.getQaEventTopic(), doubleScoreValue,
-                JsonUtils.toString(message)
-                , new Date());
+                mapper.writeValueAsString(message),
+                new Date());
             qaEventService.store(context, qaEvent);
-            result = ActionStatus.CONTINUE;
+            result = LDNActionStatus.CONTINUE;
         }
 
         return result;

@@ -458,10 +458,9 @@ public class SwordUrlManager {
         throws DSpaceSwordException {
         WorkflowTools wft = new WorkflowTools();
 
-        // if the item is in the workspace, we need to give it it's own special identifier
+        // if the item is in the workspace, we need to give it its own special identifier
         if (wft.isItemInWorkspace(context, item)) {
-            String urlTemplate = configurationService
-                .getProperty("swordv2-server", "workspace.url-template");
+            String urlTemplate = configurationService.getProperty("swordv2-server.workspace.url-template");
             if (urlTemplate != null) {
                 return urlTemplate.replace("#wsid#", Integer.toString(
                     wft.getWorkspaceItem(context, item).getID()));

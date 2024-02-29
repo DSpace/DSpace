@@ -11,8 +11,10 @@ import static java.util.List.of;
 import static org.dspace.content.QAEvent.COAR_NOTIFY_SOURCE;
 import static org.dspace.content.QAEvent.OPENAIRE_SOURCE;
 import static org.dspace.matcher.QAEventMatcher.pendingOpenaireEventWith;
+import static org.dspace.qaevent.service.impl.QAEventServiceImpl.QAEVENTS_SOURCES;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItem;
@@ -60,7 +62,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-
 /**
  * Integration tests for {@link OpenaireEventsImport}.
  *
@@ -69,9 +70,8 @@ import org.junit.Test;
  */
 public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase {
 
-    private static final String BASE_JSON_DIR_PATH = "org/dspace/app/openaire-events/";
-
     private static final String ORDER_FIELD = "topic";
+    private static final String BASE_JSON_DIR_PATH = "org/dspace/app/openaire-events/";
 
     private QAEventService qaEventService = new DSpace().getSingletonService(QAEventService.class);
 
@@ -101,8 +101,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
             .build();
 
         context.restoreAuthSystemState();
-        configurationService.setProperty("qaevent.sources", new String[]
-                { QAEvent.OPENAIRE_SOURCE });
+        configurationService.setProperty(QAEVENTS_SOURCES, new String[] { QAEvent.OPENAIRE_SOURCE });
         ((OpenaireClientFactoryImpl) OpenaireClientFactory.getInstance()).setBrokerClient(mockBrokerClient);
     }
 
@@ -151,7 +150,6 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testManyEventsImportFromFile() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -190,8 +188,8 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
             + "\"projects[0].openaireId\":\"40|corda__h2020::6e32f5eb912688f2424c68b851483ea4\","
             + "\"projects[0].title\":\"Tracking Papyrus and Parchment Paths\"}";
 
-        assertThat(qaEventService.findEventsByTopicAndPage(context, OPENAIRE_SOURCE,
-            QANotifyPatterns.TOPIC_ENRICH_MORE_PROJECT, 0, 20),
+        assertThat(qaEventService.findEventsByTopic(context, OPENAIRE_SOURCE,
+            QANotifyPatterns.TOPIC_ENRICH_MORE_PROJECT, 0, 20, ORDER_FIELD, true),
                 contains(
             pendingOpenaireEventWith("oai:www.openstarts.units.it:123456789/99998", firstItem,
                 "Egypt, crossroad of translations and literary interweavings", projectMessage,
@@ -199,15 +197,14 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         String abstractMessage = "{\"abstracts[0]\":\"Missing Abstract\"}";
 
-        assertThat(qaEventService.findEventsByTopicAndPage(context, OPENAIRE_SOURCE,
-            QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 0, 20),
+        assertThat(qaEventService.findEventsByTopic(context, OPENAIRE_SOURCE,
+            QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 0, 20, ORDER_FIELD, true),
                 contains(
             pendingOpenaireEventWith("oai:www.openstarts.units.it:123456789/99999",
                 secondItem, "Test Publication",
                 abstractMessage, QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 1.00d)));
 
         verifyNoInteractions(mockBrokerClient);
-
     }
 
     @Test
@@ -226,12 +223,12 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         assertThat(handler.getErrorMessages(), empty());
         assertThat(handler.getWarningMessages(),
-            contains("An error occurs storing the event with id b4e09c71312cd7c397969f56c900823f: "
-                + "Skipped event b4e09c71312cd7c397969f56c900823f related to the oai record "
-                + "oai:www.openstarts.units.it:123456789/99998 as the record was not found",
-                "An error occurs storing the event with id d050d2c4399c6c6ccf27d52d479d26e4: "
-                + "Skipped event d050d2c4399c6c6ccf27d52d479d26e4 related to the oai record "
-                + "oai:www.openstarts.units.it:123456789/99998 as the record was not found"));
+                contains("An error occurs storing the event with id 406fb9c5656c7f11cac8995abb746887: "
+                        + "Skipped event 406fb9c5656c7f11cac8995abb746887 related to the oai record "
+                        + "oai:www.openstarts.units.it:123456789/99998 as the record was not found",
+                        "An error occurs storing the event with id eafd747feee49cca7603d30ba4e768dc: "
+                        + "Skipped event eafd747feee49cca7603d30ba4e768dc related to the oai record "
+                        + "oai:www.openstarts.units.it:123456789/99998 as the record was not found"));
         assertThat(handler.getInfoMessages(), contains(
             "Trying to read the QA events from the provided file",
             "Found 5 events in the given file"));
@@ -246,14 +243,13 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         String abstractMessage = "{\"abstracts[0]\":\"Missing Abstract\"}";
 
-        assertThat(qaEventService.findEventsByTopicAndPage(context, OPENAIRE_SOURCE,
-            QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 0, 20),
-                contains(
+        assertThat(qaEventService.findEventsByTopic(context, OPENAIRE_SOURCE,
+                QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 0, 20,
+                ORDER_FIELD, false), contains(
             pendingOpenaireEventWith("oai:www.openstarts.units.it:123456789/99999", item, "Test Publication",
                 abstractMessage, QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 1.00d)));
 
         verifyNoInteractions(mockBrokerClient);
-
     }
 
     @Test
@@ -273,7 +269,9 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         assertThat(handler.getErrorMessages(), empty());
         assertThat(handler.getWarningMessages(),
-            contains("Event for topic ENRICH/MORE/UNKNOWN is not allowed in the qaevents.cfg"));
+            contains("An error occurs storing the event with id 8307aa56769deba961faed7162d91aab:"
+                   + " Skipped event 8307aa56769deba961faed7162d91aab related to the oai record"
+                   + " oai:www.openstarts.units.it:123456789/99998 as the record was not found"));
         assertThat(handler.getInfoMessages(), contains(
             "Trying to read the QA events from the provided file",
             "Found 2 events in the given file"));
@@ -285,14 +283,12 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         String abstractMessage = "{\"abstracts[0]\":\"Missing Abstract\"}";
 
-        assertThat(qaEventService.findEventsByTopicAndPage(context, OPENAIRE_SOURCE,
-            QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 0, 20),
-                contains(
+        assertThat(qaEventService.findEventsByTopic(context, OPENAIRE_SOURCE,
+            QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 0, 20, ORDER_FIELD, false), contains(
             pendingOpenaireEventWith("oai:www.openstarts.units.it:123456789/999991", secondItem, "Test Publication 2",
                 abstractMessage, org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 1.00d)));
 
         verifyNoInteractions(mockBrokerClient);
-
     }
 
     @Test
@@ -310,13 +306,12 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         assertThat(qaEventService.findAllSources(context, 0, 20), hasItem(QASourceMatcher.with(OPENAIRE_SOURCE, 0L)));
 
-        assertThat(qaEventService.findAllTopicsBySource(context, OPENAIRE_SOURCE, 0, 20, ORDER_FIELD, false), empty());
+        assertThat(qaEventService.findAllTopics(context, 0, 20, ORDER_FIELD, false), empty());
 
         verifyNoInteractions(mockBrokerClient);
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testImportFromOpenaireBroker() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -357,8 +352,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         assertThat(qaEventService.findAllSources(context, 0, 20), hasItem(QASourceMatcher.with(OPENAIRE_SOURCE, 6L)));
 
-        List<QATopic> topicList = qaEventService.findAllTopicsBySource(context, OPENAIRE_SOURCE, 0, 20,
-            ORDER_FIELD, false);
+        List<QATopic> topicList = qaEventService.findAllTopicsBySource(context, OPENAIRE_SOURCE,0,20,ORDER_FIELD,false);
         assertThat(topicList, hasItem(QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MORE_PROJECT, 1L)));
         assertThat(topicList, hasItem(QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MORE_PID, 1L)));
         assertThat(topicList, hasItem(QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID, 1L)));
@@ -371,21 +365,20 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
             + "\"projects[0].openaireId\":\"40|corda__h2020::6e32f5eb912688f2424c68b851483ea4\","
             + "\"projects[0].title\":\"Tracking Papyrus and Parchment Paths\"}";
 
-        assertThat(qaEventService.findEventsByTopicAndPage(context, OPENAIRE_SOURCE,
-            QANotifyPatterns.TOPIC_ENRICH_MORE_PROJECT, 0, 20),
-                contains(
+        assertThat(qaEventService.findEventsByTopic(context, OPENAIRE_SOURCE,
+                QANotifyPatterns.TOPIC_ENRICH_MORE_PROJECT, 0 , 20,
+                ORDER_FIELD, false), contains(
             pendingOpenaireEventWith("oai:www.openstarts.units.it:123456789/99998", firstItem,
                 "Egypt, crossroad of translations and literary interweavings", projectMessage,
                 QANotifyPatterns.TOPIC_ENRICH_MORE_PROJECT, 1.00d)));
 
         String abstractMessage = "{\"abstracts[0]\":\"Missing Abstract\"}";
 
-        List<QAEvent> eventList = qaEventService.findEventsByTopicAndPage(context, OPENAIRE_SOURCE,
-                QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 0, 20);
-        assertThat(eventList, hasItem(
+        assertThat(qaEventService.findEventsByTopic(context, OPENAIRE_SOURCE,
+                QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 0, 20,
+                ORDER_FIELD, false), containsInAnyOrder(
             pendingOpenaireEventWith("oai:www.openstarts.units.it:123456789/99999", secondItem, "Test Publication",
-                abstractMessage, QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 1.00d)));
-        assertThat(eventList, hasItem(
+                abstractMessage, QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 1.00d),
             pendingOpenaireEventWith("oai:www.openstarts.units.it:123456789/999991", thirdItem, "Test Publication 2",
                 abstractMessage, QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 1.00d)));
 
@@ -417,7 +410,7 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
 
         assertThat(qaEventService.findAllSources(context, 0, 20), hasItem(QASourceMatcher.with(OPENAIRE_SOURCE, 0L)));
 
-        assertThat(qaEventService.findAllTopicsBySource(context, OPENAIRE_SOURCE, 0, 20, ORDER_FIELD, false), empty());
+        assertThat(qaEventService.findAllTopics(context, 0, 20, ORDER_FIELD, false), empty());
 
         verify(mockBrokerClient).listSubscriptions(openaireURL, "user@test.com");
 
@@ -426,7 +419,6 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testImportFromOpenaireBrokerWithErrorDuringEventsDownload() throws Exception {
 
         context.turnOffAuthorisationSystem();
@@ -476,12 +468,10 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
         assertThat(topicList, hasItem(QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MISSING_PROJECT, 1L)));
         assertThat(topicList, hasItem(QATopicMatcher.with(QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 2L)));
 
-        assertThat(qaEventService.findEventsByTopicAndPage(context, OPENAIRE_SOURCE,
-            QANotifyPatterns.TOPIC_ENRICH_MORE_PROJECT, 0, 20),
-                hasSize(1));
-        assertThat(qaEventService.findEventsByTopicAndPage(context, OPENAIRE_SOURCE,
-            QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 0, 20),
-                hasSize(2));
+        assertThat(qaEventService.findEventsByTopic(context, OPENAIRE_SOURCE,
+                   QANotifyPatterns.TOPIC_ENRICH_MORE_PROJECT, 0, 20, ORDER_FIELD, false), hasSize(1));
+        assertThat(qaEventService.findEventsByTopic(context, OPENAIRE_SOURCE,
+                   QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 0, 20, ORDER_FIELD, false), hasSize(2));
 
         verify(mockBrokerClient).listSubscriptions(openaireURL, "user@test.com");
         verify(mockBrokerClient).downloadEvents(eq(openaireURL), eq("sub1"), any());
@@ -489,12 +479,11 @@ public class OpenaireEventsImportIT extends AbstractIntegrationTestWithDatabase 
         verify(mockBrokerClient).downloadEvents(eq(openaireURL), eq("sub3"), any());
 
         verifyNoMoreInteractions(mockBrokerClient);
-
     }
 
     /**
      * Improper test for ENRICH/MORE/REVIEW qa. It has the COAR_NOTIFY source
-     * which must be tested via LDNMessage {@link LDNInboxControllerIT}
+     * which must be tested via LDNMessage at DNInboxControllerIT
     */
     @Test
     @Ignore

@@ -17,16 +17,16 @@ import java.util.UUID;
  *
  */
 public class QASource {
-    private String name;
 
     /**
-     * if the QASource stats (see next attributes) are related to a specific target
+     * The focus attributes specify if the QASource object is describing the status of a specific
+     * quality assurance source for the whole repository (focus = null) or for a specific
+     * DSpaceObject (focus = uuid of the DSpaceObject). This would mostly affect the totalEvents attribute below.
      */
     private UUID focus;
-
-    private long totalEvents;
-
+    private String name;
     private Date lastEvent;
+    private long totalEvents;
 
     public String getName() {
         return name;
@@ -34,14 +34,6 @@ public class QASource {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public UUID getFocus() {
-        return focus;
-    }
-
-    public void setFocus(UUID focus) {
-        this.focus = focus;
     }
 
     public long getTotalEvents() {
@@ -58,6 +50,14 @@ public class QASource {
 
     public void setLastEvent(Date lastEvent) {
         this.lastEvent = lastEvent;
+    }
+
+    public UUID getFocus() {
+        return focus;
+    }
+
+    public void setFocus(UUID focus) {
+        this.focus = focus;
     }
 
     @Override

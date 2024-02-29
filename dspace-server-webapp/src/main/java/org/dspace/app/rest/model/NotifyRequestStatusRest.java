@@ -31,6 +31,7 @@ public class NotifyRequestStatusRest extends RestAddressableModel {
     private static final long serialVersionUID = 1L;
     public static final String CATEGORY = RestAddressableModel.LDN;
     public static final String NAME = "notifyrequests";
+    public static final String PLURAL_NAME = "notifyrequests";
 
     private List<RequestStatus> notifyStatus;
     private UUID itemuuid;
@@ -72,6 +73,11 @@ public class NotifyRequestStatusRest extends RestAddressableModel {
 
     public void setNotifyStatus(List<RequestStatus> notifyStatus) {
         this.notifyStatus = notifyStatus;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
 }

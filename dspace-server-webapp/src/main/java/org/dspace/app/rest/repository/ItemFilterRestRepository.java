@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
 
-@Component(ItemFilterRest.CATEGORY + "." + ItemFilterRest.NAME)
+@Component(ItemFilterRest.CATEGORY + "." + ItemFilterRest.PLURAL_NAME)
 public class ItemFilterRestRepository extends DSpaceRestRepository<ItemFilterRest, String> {
 
     @Autowired

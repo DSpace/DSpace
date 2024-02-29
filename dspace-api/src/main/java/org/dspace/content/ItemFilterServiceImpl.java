@@ -8,6 +8,7 @@
 package org.dspace.content;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.dspace.app.ldn.ItemFilter;
@@ -37,12 +38,21 @@ public class ItemFilterServiceImpl implements ItemFilterService {
 
     @Override
     public List<ItemFilter> findAll() {
-        return serviceManager.getServicesWithNamesByType(LogicalStatement.class)
-                             .keySet()
-                             .stream()
-                             .sorted()
-                             .map(ItemFilter::new)
-                             .collect(Collectors.toList());
+        Map<String, LogicalStatement> ldnFilters =
+            serviceManager.getServiceByName("ldnItemFilters", Map.class);
+        return ldnFilters.keySet()
+            .stream()
+            .sorted()
+            .map(ItemFilter::new)
+            .collect(Collectors.toList());
+    }
+
+    public ServiceManager getServiceManager() {
+        return serviceManager;
+    }
+
+    public void setServiceManager(ServiceManager serviceManager) {
+        this.serviceManager = serviceManager;
     }
 
 }

@@ -70,7 +70,7 @@ public class LDNEmailAction implements LDNAction {
      * @throws Exception
      */
     @Override
-    public ActionStatus execute(Context context, Notification notification, Item item) throws Exception {
+    public LDNActionStatus execute(Context context, Notification notification, Item item) throws Exception {
         try {
             Locale supportedLocale = I18nUtil.getEPersonLocale(context.getCurrentUser());
             Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, actionSendEmailTextFile));
@@ -85,7 +85,8 @@ public class LDNEmailAction implements LDNAction {
             email.addArgument(notification.getActor().getName());
             email.addArgument(item.getName());
             email.addArgument(notification.getActor().getId());
-            email.addArgument(notification.getContext().getId());
+            email.addArgument(notification.getContext() != null ?
+                notification.getContext().getId() : notification.getObject().getId());
             email.addArgument(item.getSubmitter().getFullName());
             email.addArgument(date);
             email.addArgument(notification);
@@ -96,7 +97,7 @@ public class LDNEmailAction implements LDNAction {
             log.error("An Error Occurred while sending a notification email", e);
         }
 
-        return ActionStatus.CONTINUE;
+        return LDNActionStatus.CONTINUE;
     }
 
     /**

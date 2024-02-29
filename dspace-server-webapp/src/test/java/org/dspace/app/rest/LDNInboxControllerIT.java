@@ -12,6 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -45,6 +46,7 @@ import org.dspace.utils.DSpace;
 import org.junit.After;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 
 /**
@@ -286,8 +288,8 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
                                 .withDescription("service description")
                                 .withUrl("service url")
                                 .withLdnUrl("https://overlay-journal.com/inbox/")
-                                .withLowerIp("127.0.0.2")
-                                .withUpperIp("127.0.0.5")
+                                .withLowerIp("127.0.0.1")
+                                .withUpperIp("127.0.0.1")
                                 .build();
         context.restoreAuthSystemState();
 
@@ -300,17 +302,98 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         ObjectMapper mapper = new ObjectMapper();
         Notification notification = mapper.readValue(message, Notification.class);
         getClient()
-            .perform(post("/ldn/inbox")
+            .perform(post("/ldn/inbox").with(remoteHost("mydocker.url", "172.23.0.1"))
                 .contentType("application/ld+json")
                 .content(message))
-            .andExpect(status().isAccepted());
+            .andExpect(status().isBadRequest());
+
+        int processed = ldnMessageService.extractAndProcessMessageFromQueue(context);
+        assertEquals(processed, 0);
+        LDNMessageEntity ldnMessage = ldnMessageService.find(context, notification.getId());
+        assertNull(ldnMessage);
+    }
+
+    @Test
+    public void ldnInboxAnnounceEndorsementInvalidInboxTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).withName("community").build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+        String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("https://overlay-journal.com/inbox/")
+                                .withLowerIp("127.0.0.2")
+                                .withUpperIp("127.0.0.5")
+                                .build();
+        context.restoreAuthSystemState();
+
+        InputStream announceEndorsementStream = getClass().getResourceAsStream("ldn_origin_inbox_unregistered.json");
+        String announceEndorsement = IOUtils.toString(announceEndorsementStream, Charset.defaultCharset());
+        announceEndorsementStream.close();
+        String message = announceEndorsement.replaceAll("<<object>>", object);
+        message = message.replaceAll("<<object_handle>>", object);
+
+        ObjectMapper mapper = new ObjectMapper();
+        Notification notification = mapper.readValue(message, Notification.class);
+        getClient()
+            .perform(post("/ldn/inbox")
+            .contentType("application/ld+json")
+            .content(message))
+            .andExpect(status().isBadRequest());
 
         int processed = ldnMessageService.extractAndProcessMessageFromQueue(context);
         assertEquals(processed, 0);
 
+    }
+
+    @Test
+    public void ldnInboxOutOfRangeIPwithDisabledCheckTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).withName("community").build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+        configurationService.setProperty("ldn.notify.inbox.block-untrusted-ip", false);
+        String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+                                .withName("service name")
+                                .withDescription("service description")
+                                .withUrl("service url")
+                                .withLdnUrl("https://overlay-journal.com/inbox/")
+                                .withLowerIp("127.0.0.1")
+                                .withUpperIp("127.0.0.1")
+                                .build();
+        context.restoreAuthSystemState();
+
+        InputStream announceEndorsementStream = getClass().getResourceAsStream("ldn_announce_endorsement.json");
+        String announceEndorsement = IOUtils.toString(announceEndorsementStream, Charset.defaultCharset());
+        announceEndorsementStream.close();
+        String message = announceEndorsement.replaceAll("<<object>>", object);
+        message = message.replaceAll("<<object_handle>>", object);
+
+        ObjectMapper mapper = new ObjectMapper();
+        Notification notification = mapper.readValue(message, Notification.class);
+        getClient()
+            .perform(post("/ldn/inbox").with(remoteHost("mydocker.url", "172.23.0.1"))
+                .contentType("application/ld+json")
+                .content(message))
+            .andExpect(status().isAccepted());
+
         LDNMessageEntity ldnMessage = ldnMessageService.find(context, notification.getId());
         checkStoredLDNMessage(notification, ldnMessage, object);
         assertEquals(ldnMessage.getQueueStatus(), LDNMessageEntity.QUEUE_STATUS_UNTRUSTED_IP);
+    }
+
+    private static RequestPostProcessor remoteHost(final String remoteHost, final String remoteAddr) {
+        return request -> {
+            request.setRemoteHost(remoteHost);
+            request.setRemoteAddr(remoteAddr);
+            return request;
+        };
     }
 
     @Override

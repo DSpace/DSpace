@@ -15,10 +15,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpResponseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.ldn.action.ActionStatus;
 import org.dspace.app.ldn.action.LDNAction;
+import org.dspace.app.ldn.action.LDNActionStatus;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.app.ldn.utility.LDNUtils;
 import org.dspace.content.DSpaceObject;
@@ -28,8 +30,6 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Linked Data Notification metadata processor for consuming notifications. The
@@ -79,8 +79,8 @@ public class LDNMetadataProcessor implements LDNProcessor {
      *
      * @throws Exception failed execute the action
      */
-    private ActionStatus runActions(Context context, Notification notification, Item item) throws Exception {
-        ActionStatus operation = ActionStatus.CONTINUE;
+    private LDNActionStatus runActions(Context context, Notification notification, Item item) throws Exception {
+        LDNActionStatus operation = LDNActionStatus.CONTINUE;
         for (LDNAction action : actions) {
             log.info("Running action {} for notification {} {}",
                     action.getClass().getSimpleName(),
@@ -88,7 +88,7 @@ public class LDNMetadataProcessor implements LDNProcessor {
                     notification.getType());
 
             operation = action.execute(context, notification, item);
-            if (operation == ActionStatus.ABORT) {
+            if (operation == LDNActionStatus.ABORT) {
                 break;
             }
         }
@@ -134,8 +134,9 @@ public class LDNMetadataProcessor implements LDNProcessor {
      * @return Item associated item
      *
      * @throws SQLException failed to lookup item
+     * @throws HttpResponseException redirect failure
      */
-    private Item lookupItem(Context context, Notification notification) throws SQLException {
+    private Item lookupItem(Context context, Notification notification) throws SQLException, HttpResponseException {
         Item item = null;
 
         String url = null;
@@ -153,7 +154,7 @@ public class LDNMetadataProcessor implements LDNProcessor {
             item = itemService.find(context, uuid);
 
             if (Objects.isNull(item)) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                throw new HttpResponseException(HttpStatus.SC_NOT_FOUND,
                         format("Item with uuid %s not found", uuid));
             }
 
@@ -161,21 +162,21 @@ public class LDNMetadataProcessor implements LDNProcessor {
             String handle = handleService.resolveUrlToHandle(context, url);
 
             if (Objects.isNull(handle)) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                throw new HttpResponseException(HttpStatus.SC_NOT_FOUND,
                         format("Handle not found for %s", url));
             }
 
             DSpaceObject object = handleService.resolveToObject(context, handle);
 
             if (Objects.isNull(object)) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                throw new HttpResponseException(HttpStatus.SC_NOT_FOUND,
                         format("Item with handle %s not found", handle));
             }
 
             if (object.getType() == Constants.ITEM) {
                 item = (Item) object;
             } else {
-                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
+                throw new HttpResponseException(HttpStatus.SC_UNPROCESSABLE_ENTITY,
                         format("Handle %s does not resolve to an item", handle));
             }
         }

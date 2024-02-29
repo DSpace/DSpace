@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-@Component(QAEventRest.CATEGORY + "." + QAEventRest.NAME + "." + QAEventRest.TOPIC)
+@Component(QAEventRest.CATEGORY + "." + QAEventRest.PLURAL_NAME + "." + QAEventRest.TOPIC)
 public class QAEventTopicLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     @Autowired
@@ -42,13 +42,13 @@ public class QAEventTopicLinkRepository extends AbstractDSpaceRestRepository imp
      * @param id         the qa event id
      * @param pageable   the optional pageable
      * @param projection the projection object
-     * @return the qa topic rest representation
+     * @return           the qa topic rest representation
      */
     @PreAuthorize("hasPermission(#id, 'QUALITYASSURANCEEVENT', 'READ')")
     public QATopicRest getTopic(@Nullable HttpServletRequest request, String id, @Nullable Pageable pageable,
             Projection projection) {
         Context context = obtainContext();
-        QAEvent qaEvent = qaEventService.findEventByEventId(context, id);
+        QAEvent qaEvent = qaEventService.findEventByEventId(id);
         if (qaEvent == null) {
             throw new ResourceNotFoundException("No qa event with ID: " + id);
         }

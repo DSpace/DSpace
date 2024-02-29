@@ -51,7 +51,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
-@Component(ResourcePolicyRest.CATEGORY + "." + ResourcePolicyRest.NAME)
+@Component(ResourcePolicyRest.CATEGORY + "." + ResourcePolicyRest.PLURAL_NAME)
 public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourcePolicyRest, Integer>
                                           implements InitializingBean {
 

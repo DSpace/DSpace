@@ -44,7 +44,7 @@ import org.springframework.stereotype.Component;
  * @author Mohamed Eskander (mohamed.eskander at 4science.com)
  */
 
-@Component(NotifyServiceRest.CATEGORY + "." + NotifyServiceRest.NAME)
+@Component(NotifyServiceRest.CATEGORY + "." + NotifyServiceRest.PLURAL_NAME)
 public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServiceRest, Integer> {
 
     @Autowired

@@ -12,22 +12,22 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.RestResourceController;
-import org.dspace.coarnotify.COARNotifySubmissionConfiguration;
-import org.dspace.coarnotify.LDNPattern;
-
+import org.dspace.coarnotify.NotifyPattern;
+import org.dspace.coarnotify.NotifySubmissionConfiguration;
 /**
  * This class is the REST representation of the COARNotifySubmissionConfiguration model object
  * and acts as a data object for the SubmissionCOARNotifyResource class.
  *
- * Refer to {@link COARNotifySubmissionConfiguration} for explanation of the properties
+ * Refer to {@link NotifySubmissionConfiguration} for explanation of the properties
  */
 public class SubmissionCOARNotifyRest extends BaseObjectRest<String> {
     public static final String NAME = "submissioncoarnotifyconfig";
+    public static final String PLURAL_NAME = "submissioncoarnotifyconfigs";
     public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
 
     private String id;
 
-    private List<LDNPattern> patterns;
+    private List<NotifyPattern> patterns;
 
     public String getId() {
         return id;
@@ -37,11 +37,11 @@ public class SubmissionCOARNotifyRest extends BaseObjectRest<String> {
         this.id = id;
     }
 
-    public List<LDNPattern> getPatterns() {
+    public List<NotifyPattern> getPatterns() {
         return patterns;
     }
 
-    public void setPatterns(final List<LDNPattern> patterns) {
+    public void setPatterns(final List<NotifyPattern> patterns) {
         this.patterns = patterns;
     }
 
@@ -61,5 +61,10 @@ public class SubmissionCOARNotifyRest extends BaseObjectRest<String> {
     @JsonIgnore
     public Class getController() {
         return RestResourceController.class;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 }

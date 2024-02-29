@@ -75,30 +75,14 @@ public class ItemFilterRestRepositoryIT extends AbstractControllerIntegrationTes
             .perform(get("/api/config/itemfilters")
                 .param("size", "30"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.page.totalElements", is(21)))
+            .andExpect(jsonPath("$.page.totalElements", is(5)))
             .andExpect(jsonPath("$.page.totalPages", is(1)))
             .andExpect(jsonPath("$.page.size", is(30)))
             .andExpect(jsonPath("$._embedded.itemfilters", contains(
-                hasJsonPath("$.id", is("a-common-or_statement")),
                 hasJsonPath("$.id", is("always_true_filter")),
-                hasJsonPath("$.id", is("dc-identifier-uri-contains-doi_condition")),
                 hasJsonPath("$.id", is("demo_filter")),
                 hasJsonPath("$.id", is("doi-filter")),
-                hasJsonPath("$.id", is("driver-document-type_condition")),
-                hasJsonPath("$.id", is("example-doi_filter")),
-                hasJsonPath("$.id", is("has-at-least-one-bitstream_condition")),
-                hasJsonPath("$.id", is("has-bitstream_filter")),
-                hasJsonPath("$.id", is("has-one-bitstream_condition")),
                 hasJsonPath("$.id", is("in-outfit-collection_condition")),
-                hasJsonPath("$.id", is("is-archived_condition")),
-                hasJsonPath("$.id", is("is-withdrawn_condition")),
-                hasJsonPath("$.id", is("item-is-public_condition")),
-                hasJsonPath("$.id", is("openaire_filter")),
-                hasJsonPath("$.id", is("simple-demo_filter")),
-                hasJsonPath("$.id", is("title-contains-demo_condition")),
-                hasJsonPath("$.id", is("title-starts-with-pattern_condition")),
-                hasJsonPath("$.id", is("type-equals-dataset_condition")),
-                hasJsonPath("$.id", is("type-equals-journal-article_condition")),
                 hasJsonPath("$.id", is("type_filter")))));
     }
 }

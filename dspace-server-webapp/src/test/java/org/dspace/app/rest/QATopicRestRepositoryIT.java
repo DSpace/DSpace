@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.content.QAEvent.OPENAIRE_SOURCE;
+import static org.dspace.qaevent.service.impl.QAEventServiceImpl.QAEVENTS_SOURCES;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -44,81 +46,67 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findAllNotImplementedTest() throws Exception {
-        context.turnOffAuthorisationSystem();
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
-        QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
-                .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
-        QAEventBuilder.createTarget(context, col1, "Science and Freedom 2")
-                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
-                .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
-        QAEventBuilder.createTarget(context, col1, "Science and Freedom 3")
-                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MORE_PID)
-                .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"10.2307/2144302\"}").build();
-        QAEventBuilder.createTarget(context, col1, "Science and Freedom 4")
-                .withTopic(org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT)
-                .withMessage(
-                        "{\"abstracts[0]\": \"Descrizione delle caratteristiche...\"}")
-                .build();
-        context.restoreAuthSystemState();
-        String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/integration/qualityassurancetopics"))
-                .andExpect(status().isMethodNotAllowed());
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/integration/qualityassurancetopics"))
+                             .andExpect(status().isMethodNotAllowed());
     }
 
     @Test
     public void findOneTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        configurationService.setProperty("qaevent.sources",
-                new String[] { "openaire", "test-source" });
+        configurationService.setProperty(QAEVENTS_SOURCES, new String[] { OPENAIRE_SOURCE, "test-source" });
         parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+                                          .withName("Parent Community")
+                                          .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
-                .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
+                      .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
+                      .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}")
+                      .build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 2")
-                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
-                .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
+                      .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
+                      .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}")
+                      .build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 3")
-                .withTopic(QANotifyPatterns.TOPIC_ENRICH_MORE_PID)
-                .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"10.2307/2144302\"}").build();
+                      .withTopic(QANotifyPatterns.TOPIC_ENRICH_MORE_PID)
+                      .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"10.2307/2144302\"}")
+                      .build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 4")
-                .withTopic(org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT)
-                .withMessage(
-                        "{\"test\": \"Test...\"}")
-                .build();
+                      .withTopic(org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT)
+                      .withMessage("{\"test\": \"Test...\"}")
+                      .build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 4")
-            .withSource("test-source")
-            .withTopic("TOPIC/TEST")
-            .withMessage(
-                    "{\"abstracts[0]\": \"Descrizione delle caratteristiche...\"}")
-            .build();
+                      .withSource("test-source")
+                      .withTopic("TOPIC/TEST")
+                      .withMessage("{\"abstracts[0]\": \"Descrizione delle caratteristiche...\"}")
+                      .build();
         context.restoreAuthSystemState();
-        String authToken = getAuthToken(admin.getEmail(), password);
-        getClient(authToken).perform(get("/api/integration/qualityassurancetopics/openaire:ENRICH!MISSING!PID"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$",
-                    QATopicMatcher.matchQATopicEntry(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID, 2)));
-        getClient(authToken).perform(get("/api/integration/qualityassurancetopics/openaire:ENRICH!MISSING!ABSTRACT"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$",
-                    QATopicMatcher.matchQATopicEntry(QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 1)));
-        getClient(authToken).perform(get("/api/integration/qualityassurancetopics/test-source:TOPIC!TEST"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$",
-                    QATopicMatcher.matchQATopicEntry("test-source", "TOPIC/TEST", 1)));
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(
+                              get("/api/integration/qualityassurancetopics/" + OPENAIRE_SOURCE + ":ENRICH!MISSING!PID"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$", QATopicMatcher.matchQATopicEntry(
+                                                      QANotifyPatterns.TOPIC_ENRICH_MISSING_PID, 2)));
+
+        getClient(adminToken).perform(get("/api/integration/qualityassurancetopics/"
+                                          + OPENAIRE_SOURCE + ":ENRICH!MISSING!ABSTRACT"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$", QATopicMatcher.matchQATopicEntry(
+                                                      QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 1)));
+
+        getClient(adminToken).perform(get("/api/integration/qualityassurancetopics/test-source:TOPIC!TEST"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("$",QATopicMatcher.matchQATopicEntry("test-source", "TOPIC/TEST", 1)));
     }
 
     @Test
     public void findOneNotFoundTest() throws Exception {
         context.turnOffAuthorisationSystem();
         configurationService.setProperty("qaevent.sources",
-                new String[] { "openaire" });
+                new String[] { QAEvent.OPENAIRE_SOURCE });
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
@@ -176,75 +164,84 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void findBySourceTest() throws Exception {
         context.turnOffAuthorisationSystem();
-        configurationService.setProperty("qaevent.sources",
-            new String[] { QAEvent.OPENAIRE_SOURCE, "test-source", "test-source-2" });
+        configurationService.setProperty(QAEVENTS_SOURCES, new String[] {
+                                         OPENAIRE_SOURCE, "test-source", "test-source-2" });
+
         parentCommunity = CommunityBuilder.createCommunity(context)
-            .withName("Parent Community")
-            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+                                          .withName("Parent Community")
+                                          .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
+
         QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-            .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
-            .withSource(QAEvent.OPENAIRE_SOURCE)
-            .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}").build();
+                      .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
+                      .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144300\"}")
+                      .build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 2")
-            .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
-            .withSource(QAEvent.OPENAIRE_SOURCE)
-            .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}").build();
+                      .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
+                      .withMessage("{\"pids[0].type\":\"doi\",\"pids[0].value\":\"10.2307/2144301\"}")
+                      .build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 3")
-            .withTopic(QANotifyPatterns.TOPIC_ENRICH_MORE_PID)
-            .withSource(QAEvent.OPENAIRE_SOURCE)
-            .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"10.2307/2144302\"}").build();
+                      .withTopic(QANotifyPatterns.TOPIC_ENRICH_MORE_PID)
+                      .withMessage("{\"pids[0].type\":\"pmid\",\"pids[0].value\":\"10.2307/2144302\"}")
+                      .build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 4")
-            .withTopic(org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT)
-            .withSource(QAEvent.OPENAIRE_SOURCE)
-            .withMessage(
-                "{\"abstracts[0]\": \"Descrizione delle caratteristiche...\"}")
-            .build();
+                      .withTopic(org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT)
+                      .withMessage("{\"abstracts[0]\": \"Descrizione delle caratteristiche...\"}")
+                      .build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 5")
-            .withTopic("TEST/TOPIC")
-            .withSource("test-source")
-            .build();
+                      .withTopic("TEST/TOPIC")
+                      .withSource("test-source")
+                      .build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 6")
-            .withTopic("TEST/TOPIC")
-            .withSource("test-source")
-            .build();
+                      .withTopic("TEST/TOPIC")
+                      .withSource("test-source")
+                      .build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom 7")
-            .withTopic("TEST/TOPIC/2")
-            .withSource("test-source")
-            .build();
+                      .withTopic("TEST/TOPIC/2")
+                      .withSource("test-source")
+                      .build();
         context.restoreAuthSystemState();
+
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/bySource")
-            .param("source", "openaire"))
+                            .param("source", OPENAIRE_SOURCE))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$._embedded.qualityassurancetopics",
                 Matchers.containsInAnyOrder(
                     QATopicMatcher.matchQATopicEntry(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID, 2),
-                    QATopicMatcher.matchQATopicEntry(QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 1),
-                    QATopicMatcher.matchQATopicEntry(QANotifyPatterns.TOPIC_ENRICH_MORE_PID, 1))))
-            .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(3)));
+                                QATopicMatcher.matchQATopicEntry(QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT, 1),
+                                QATopicMatcher.matchQATopicEntry(QANotifyPatterns.TOPIC_ENRICH_MORE_PID, 1)
+                                )))
+                            .andExpect(jsonPath("$.page.size", is(20)))
+                            .andExpect(jsonPath("$.page.totalElements", is(3)));
         getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/bySource")
-            .param("source", "test-source"))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(contentType))
-            .andExpect(jsonPath("$._embedded.qualityassurancetopics",
-                Matchers.containsInAnyOrder(QATopicMatcher.matchQATopicEntry("test-source", "TEST/TOPIC/2", 1),
-                    QATopicMatcher.matchQATopicEntry("test-source", "TEST/TOPIC", 2))))
-            .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(2)));
+                            .param("source", "test-source"))
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$._embedded.qualityassurancetopics", Matchers.containsInAnyOrder(
+                                       QATopicMatcher.matchQATopicEntry("test-source", "TEST/TOPIC/2", 1),
+                                       QATopicMatcher.matchQATopicEntry("test-source", "TEST/TOPIC", 2)
+                                       )))
+                            .andExpect(jsonPath("$.page.size", is(20)))
+                            .andExpect(jsonPath("$.page.totalElements", is(2)));
         getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/bySource")
-            .param("source", "test-source-2"))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(contentType))
-            .andExpect(jsonPath("$._embedded.qualityassurancetopics").doesNotExist())
-            .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(0)));
+                            .param("source", "test-source-2"))
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$._embedded.qualityassurancetopics").doesNotExist())
+                            .andExpect(jsonPath("$.page.size", is(20)))
+                            .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
     public void findBySourcePaginationTest() throws Exception {
         context.turnOffAuthorisationSystem();
         configurationService.setProperty("qaevent.sources",
-                new String[] { "openaire", "test-source", "test-source-2" });
+                new String[] { QAEvent.OPENAIRE_SOURCE, "test-source", "test-source-2" });
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
@@ -297,28 +294,33 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$._embedded.qualityassurancetopics", Matchers.hasSize(1)))
             .andExpect(jsonPath("$.page.size", is(2))).andExpect(jsonPath("$.page.totalElements", is(3)));
+       //test unsupported
         getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/bySource")
                 .param("source", "test-source")
                 .param("size", "2"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
-            .andExpect(jsonPath("$._embedded.qualityassurancetopics", Matchers.hasSize(2)))
-            .andExpect(jsonPath("$.page.size", is(2))).andExpect(jsonPath("$.page.totalElements", is(2)));
+            .andExpect(jsonPath("$._embedded").doesNotExist())
+            .andExpect(jsonPath("$.page.size", is(2))).andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
     public void findBySourceUnauthorizedTest() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
-            .withName("Parent Community")
-            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+                                         .withName("Parent Community")
+                                         .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 1")
+                                           .build();
         QAEventBuilder.createTarget(context, col1, "Science and Freedom")
-            .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID).build();
+                      .withTopic(QANotifyPatterns.TOPIC_ENRICH_MISSING_PID)
+                      .build();
         context.restoreAuthSystemState();
+
         getClient().perform(get("/api/integration/qualityassurancetopics/search/bySource")
-            .param("source", "openaire"))
-            .andExpect(status().isUnauthorized());
+                   .param("source", OPENAIRE_SOURCE))
+                   .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -333,7 +335,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/bySource")
-            .param("source", "openaire"))
+            .param("source", QAEvent.OPENAIRE_SOURCE))
             .andExpect(status().isForbidden());
     }
 
@@ -341,7 +343,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void findByTargetTest() throws Exception {
         context.turnOffAuthorisationSystem();
         configurationService.setProperty("qaevent.sources",
-            new String[] { "openaire", "test-source", "test-source-2" });
+            new String[] { QAEvent.OPENAIRE_SOURCE, "test-source", "test-source-2" });
         parentCommunity = CommunityBuilder.createCommunity(context)
             .withName("Parent Community")
             .build();
@@ -390,7 +392,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$.page.size", is(20))).andExpect(jsonPath("$.page.totalElements", is(2)));
         getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/byTarget")
                 .param("target", item2.getID().toString())
-                .param("source", "openaire"))
+                .param("source", QAEvent.OPENAIRE_SOURCE))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
             .andExpect(jsonPath("$._embedded.qualityassurancetopics",
@@ -417,7 +419,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void findByTargetUnauthorizedTest() throws Exception {
+    public void findByTargetZeroEventsOpenaireTest() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
             .withName("Parent Community")
@@ -430,11 +432,11 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/integration/qualityassurancetopics/search/byTarget")
                 .param("source", QAEvent.OPENAIRE_SOURCE)
                 .param("target", item1.getID().toString()))
-            .andExpect(status().isUnauthorized());
+                .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
-    public void findByTargetForbiddenTest() throws Exception {
+    public void findByTargetZeroEventsAnotherSourceTest() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)
             .withName("Parent Community")
@@ -448,7 +450,7 @@ public class QATopicRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(authToken).perform(get("/api/integration/qualityassurancetopics/search/byTarget")
             .param("target", item1.getID().toString())
             .param("source", "test-source"))
-            .andExpect(status().isForbidden());
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
