@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "mappedItems" subresource of an individual collection.
  */
-@Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME + "." + CollectionRest.MAPPED_ITEMS)
+@Component(CollectionRest.CATEGORY + "." + CollectionRest.PLURAL_NAME + "." + CollectionRest.MAPPED_ITEMS)
 public class CollectionMappedItemLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

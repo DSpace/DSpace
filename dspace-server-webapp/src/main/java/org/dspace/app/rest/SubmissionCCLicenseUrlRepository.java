@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
  * It only supports a search method
  */
 
-@Component(SubmissionCCLicenseUrlRest.CATEGORY + "." + SubmissionCCLicenseUrlRest.NAME)
+@Component(SubmissionCCLicenseUrlRest.CATEGORY + "." + SubmissionCCLicenseUrlRest.PLURAL_NAME)
 public class SubmissionCCLicenseUrlRepository extends DSpaceRestRepository<SubmissionCCLicenseUrlRest, String>
                                               implements InitializingBean {
 
@@ -133,8 +133,8 @@ public class SubmissionCCLicenseUrlRepository extends DSpaceRestRepository<Submi
     public void afterPropertiesSet() {
         discoverableEndpointsService.register(this, Arrays.asList(
                 Link.of("/api/" + SubmissionCCLicenseUrlRest.CATEGORY + "/" +
-                        SubmissionCCLicenseUrlRest.PLURAL + "/search",
-                        SubmissionCCLicenseUrlRest.PLURAL + "-search")));
+                        SubmissionCCLicenseUrlRest.PLURAL_NAME + "/search",
+                        SubmissionCCLicenseUrlRest.PLURAL_NAME + "-search")));
     }
 
 }

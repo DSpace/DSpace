@@ -53,7 +53,7 @@ import org.springframework.web.util.HtmlUtils;
  *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
-@Component(RequestItemRest.CATEGORY + '.' + RequestItemRest.NAME)
+@Component(RequestItemRest.CATEGORY + '.' + RequestItemRest.PLURAL_NAME)
 public class RequestItemRepository
         extends DSpaceRestRepository<RequestItemRest, String> {
     private static final Logger LOG = LogManager.getLogger();

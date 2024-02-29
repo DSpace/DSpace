@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for calculating the access status of an Item
  */
-@Component(ItemRest.CATEGORY + "." + ItemRest.NAME + "." + ItemRest.ACCESS_STATUS)
+@Component(ItemRest.CATEGORY + "." + ItemRest.PLURAL_NAME + "." + ItemRest.ACCESS_STATUS)
 public class ItemAccessStatusLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
 

@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "owningCollection" subresource of an individual item.
  */
-@Component(ItemRest.CATEGORY + "." + ItemRest.NAME + "." + ItemRest.OWNING_COLLECTION)
+@Component(ItemRest.CATEGORY + "." + ItemRest.PLURAL_NAME + "." + ItemRest.OWNING_COLLECTION)
 public class ItemOwningCollectionLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

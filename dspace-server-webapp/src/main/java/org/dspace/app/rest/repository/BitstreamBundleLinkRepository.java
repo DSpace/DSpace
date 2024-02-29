@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "bundle" subresource of an individual bitstream.
  */
-@Component(BitstreamRest.CATEGORY + "." + BitstreamRest.NAME + "." + BitstreamRest.BUNDLE)
+@Component(BitstreamRest.CATEGORY + "." + BitstreamRest.PLURAL_NAME + "." + BitstreamRest.BUNDLE)
 public class BitstreamBundleLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

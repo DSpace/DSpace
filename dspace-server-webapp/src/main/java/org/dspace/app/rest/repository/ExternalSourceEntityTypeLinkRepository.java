@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
-@Component(ExternalSourceRest.CATEGORY + "." + ExternalSourceRest.NAME + "." + ExternalSourceRest.ENTITY_TYPES)
+@Component(ExternalSourceRest.CATEGORY + "." + ExternalSourceRest.PLURAL_NAME + "." + ExternalSourceRest.ENTITY_TYPES)
 public class ExternalSourceEntityTypeLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

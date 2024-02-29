@@ -42,7 +42,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
-@Component(GroupRest.CATEGORY + "." + GroupRest.NAME)
+@Component(GroupRest.CATEGORY + "." + GroupRest.PLURAL_NAME)
 public class GroupRestRepository extends DSpaceObjectRestRepository<Group, GroupRest> {
     @Autowired
     GroupService gs;

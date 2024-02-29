@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
  * {@link org.dspace.content.Bitstream} objects for the Process endpoints
  *
  */
-@Component(ProcessRest.CATEGORY + "." + ProcessRest.NAME + "." + ProcessRest.FILES)
+@Component(ProcessRest.CATEGORY + "." + ProcessRest.PLURAL_NAME + "." + ProcessRest.FILES)
 public class ProcessFilesLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     private static final Logger log = LogManager.getLogger();

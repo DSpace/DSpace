@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.alerts.service.SystemWideAlertService;
 import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
 import org.dspace.app.requestitem.service.RequestItemService;
+import org.dspace.app.suggestion.SolrSuggestionStorageService;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -116,6 +117,7 @@ public abstract class AbstractBuilder<T, S> {
     static SubscribeService subscribeService;
     static SupervisionOrderService supervisionOrderService;
     static QAEventService qaEventService;
+    static SolrSuggestionStorageService solrSuggestionService;
 
     protected Context context;
 
@@ -185,6 +187,7 @@ public abstract class AbstractBuilder<T, S> {
         subscribeService = ContentServiceFactory.getInstance().getSubscribeService();
         supervisionOrderService = SupervisionOrderServiceFactory.getInstance().getSupervisionOrderService();
         qaEventService = new DSpace().getSingletonService(QAEventService.class);
+        solrSuggestionService = new DSpace().getSingletonService(SolrSuggestionStorageService.class);
     }
 
 
