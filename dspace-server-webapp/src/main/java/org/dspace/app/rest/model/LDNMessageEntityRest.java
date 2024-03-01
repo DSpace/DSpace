@@ -61,6 +61,11 @@ public class LDNMessageEntityRest extends BaseObjectRest<String> {
     }
 
     @Override
+    public String getTypePlural() {
+        return NAME_PLURALS;
+    }
+
+    @Override
     public String getCategory() {
         return CATEGORY;
     }
