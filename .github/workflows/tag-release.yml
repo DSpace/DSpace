@@ -10,6 +10,7 @@ env:
 
 jobs:
   retag-BE-image:
+    runs-on: ubuntu-latest
     steps:
       - name: Login to DockerHub
         uses: docker/login-action@v3
