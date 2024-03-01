@@ -2,11 +2,12 @@ name: Release
 
 on:
   push:
-    # Pattern matched against refs/tags
     tags:      
       - '**'
 
-  
+env:
+  IMAGE_BASE_NAME: dataquest/dspace
+
 jobs:
   retag-BE-image:
     steps:
@@ -15,14 +16,12 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
-      
+
       - name: retag image
         run: |
-          echo attempting go pull dataquest/dspace:${{ github.sha }}
-          echo then will use ${{ github.ref_name }} as a tag
-          docker pull dataquest/dspace:${{ github.sha }}
-          docker tag dataquest/dspace:${{ github.sha }} dataquest/dspace:${{  github.ref_name }}
+          docker pull ${{ env.IMAGE_BASE_NAME }}:${{ github.sha }}
+          docker tag ${{ env.IMAGE_BASE_NAME }}:${{ github.sha }} ${{ env.IMAGE_BASE_NAME }}:${{ github.ref_name }}
 
       - name: push image
-        run: docker push dataquest/dspace:${{ github.ref_name }}
+        run: docker push ${{ env.IMAGE_BASE_NAME }}:${{ github.ref_name }}
 
