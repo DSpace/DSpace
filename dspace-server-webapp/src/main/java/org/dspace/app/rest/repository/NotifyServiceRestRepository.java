@@ -13,10 +13,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.NotifyServiceInboundPattern;
 import org.dspace.app.ldn.service.NotifyService;

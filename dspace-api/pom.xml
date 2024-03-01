@@ -177,7 +177,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jaxb2-maven-plugin</artifactId>
-                <version>2.5.0</version>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
                         <id>workflow-curation</id>
@@ -374,7 +374,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.13.5</version>
         </dependency>
         <dependency>
             <groupId>javax.cache</groupId>
@@ -384,11 +383,6 @@
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator-cdi</artifactId>
             <version>${hibernate-validator.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.1-api</artifactId>
-            <version>1.0.2.Final</version>
         </dependency>
 
         <dependency>

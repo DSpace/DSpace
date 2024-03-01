@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;

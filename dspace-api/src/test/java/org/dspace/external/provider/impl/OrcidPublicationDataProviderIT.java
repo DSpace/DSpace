@@ -27,9 +27,9 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Unmarshaller;
 import org.apache.commons.codec.binary.StringUtils;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.CollectionBuilder;
