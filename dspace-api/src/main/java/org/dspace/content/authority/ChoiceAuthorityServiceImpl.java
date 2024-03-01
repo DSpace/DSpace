@@ -242,7 +242,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
             // check if it is the requested collection
             Map<String, ChoiceAuthority> controllerFormDef = controllerFormDefinitions.get(fieldKey);
             SubmissionConfig submissionConfig = submissionConfigService
-                    .getSubmissionConfigByCollection(collection.getHandle());
+                    .getSubmissionConfigByCollection(collection);
             String submissionName = submissionConfig.getSubmissionName();
             // check if the requested collection has a submission definition that use an authority for the metadata
             if (controllerFormDef.containsKey(submissionName)) {
@@ -495,7 +495,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
             try {
                 configReaderService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
                 SubmissionConfig submissionName = configReaderService
-                        .getSubmissionConfigByCollection(collection.getHandle());
+                        .getSubmissionConfigByCollection(collection);
                 ma = controllerFormDefinitions.get(fieldKey).get(submissionName.getSubmissionName());
             } catch (SubmissionConfigReaderException e) {
                 // the system is in an illegal state as the submission definition is not valid

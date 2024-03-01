@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk@4science.com)
  */
-@Component(FeedbackRest.CATEGORY + "." + FeedbackRest.NAME)
+@Component(FeedbackRest.CATEGORY + "." + FeedbackRest.PLURAL_NAME)
 public class FeedbackRestRepository extends DSpaceRestRepository<FeedbackRest, Integer> {
 
     @Autowired

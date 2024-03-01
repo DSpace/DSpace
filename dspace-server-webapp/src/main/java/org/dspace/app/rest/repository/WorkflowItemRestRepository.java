@@ -67,7 +67,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
-@Component(WorkflowItemRest.CATEGORY + "." + WorkflowItemRest.NAME)
+@Component(WorkflowItemRest.CATEGORY + "." + WorkflowItemRest.PLURAL_NAME)
 public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowItemRest, Integer> {
 
     public static final String OPERATION_PATH_SECTIONS = "sections";

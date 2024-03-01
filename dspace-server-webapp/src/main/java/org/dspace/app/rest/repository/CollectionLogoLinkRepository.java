@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "logo" subresource of an individual collection.
  */
-@Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME + "." + CollectionRest.LOGO)
+@Component(CollectionRest.CATEGORY + "." + CollectionRest.PLURAL_NAME + "." + CollectionRest.LOGO)
 public class CollectionLogoLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

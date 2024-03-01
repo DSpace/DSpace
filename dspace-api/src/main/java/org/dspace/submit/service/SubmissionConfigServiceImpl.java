@@ -57,8 +57,8 @@ public class SubmissionConfigServiceImpl implements SubmissionConfigService, Ini
     }
 
     @Override
-    public SubmissionConfig getSubmissionConfigByCollection(String collectionHandle) {
-        return submissionConfigReader.getSubmissionConfigByCollection(collectionHandle);
+    public SubmissionConfig getSubmissionConfigByCollection(Collection collection) {
+        return submissionConfigReader.getSubmissionConfigByCollection(collection);
     }
 
     @Override

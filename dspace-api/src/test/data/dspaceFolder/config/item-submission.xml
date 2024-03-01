@@ -24,6 +24,9 @@
         <name-map collection-handle="123456789/typebind-test" submission-name="typebindtest"/>
         <name-map collection-handle="123456789/accessCondition-not-discoverable" submission-name="accessConditionNotDiscoverable"/>
         <name-map collection-handle="123456789/test-hidden" submission-name="test-hidden"/>
+        <name-map community-handle="123456789/topcommunity-test" submission-name="topcommunitytest"/>
+        <name-map community-handle="123456789/subcommunity-test" submission-name="subcommunitytest"/>
+        <name-map collection-handle="123456789/collection-test" submission-name="collectiontest"/>
     </submission-map>
 
 
@@ -177,6 +180,12 @@
             <scope visibility="hidden" visibilityOutside="hidden">submission</scope>
         </step-definition>
 
+        <step-definition id="coarnotify">
+            <heading>submit.progressbar.coarnotify</heading>
+            <processing-class>org.dspace.app.rest.submit.step.NotifyStep</processing-class>
+            <type>coarnotify</type>
+        </step-definition>
+
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -208,6 +217,9 @@
             <!--Step will be to Describe the item. -->
             <step id="traditionalpageone"/>
             <step id="traditionalpagetwo"/>
+
+            <!--Step will be COAR Notify services to the item -->
+            <step id="coarnotify"/>
 
             <!--Step will be to Upload the item -->
             <step id="upload"/>
@@ -255,6 +267,18 @@
             <step id="test-outside-submission-hidden"/>
             <step id="test-never-hidden"/>
             <step id="test-always-hidden"/>
+        </submission-process>
+
+        <submission-process name="topcommunitytest">
+            <step id="collection"/>
+        </submission-process>
+
+        <submission-process name="subcommunitytest">
+            <step id="collection"/>
+        </submission-process>
+
+        <submission-process name="collectiontest">
+            <step id="collection"/>
         </submission-process>
 
     </submission-definitions>

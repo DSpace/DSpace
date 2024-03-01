@@ -14,6 +14,8 @@ import static org.apache.commons.lang3.StringUtils.lowerCase;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -22,18 +24,16 @@ import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.services.ConfigurationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Service class for generation of front-end urls.
+ * Service class for generation of front-end URLs.
  */
 @Component
 public class FrontendUrlService {
 
-    private static final Logger log = LoggerFactory.getLogger(FrontendUrlService.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private ConfigurationService configurationService;
@@ -80,7 +80,8 @@ public class FrontendUrlService {
                 }
             }
         } catch (SearchServiceException e) {
-            log.error("Failed getting entitytype through solr for item " + item.getID() + ": " + e.getMessage());
+            log.error("Failed getting entitytype through solr for item {}:  {}",
+                    item::getID, e::getMessage);
         }
         return Optional.empty();
     }

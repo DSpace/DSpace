@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "collections" subresource of an individual community.
  */
-@Component(CommunityRest.CATEGORY + "." + CommunityRest.NAME + "." + CommunityRest.COLLECTIONS)
+@Component(CommunityRest.CATEGORY + "." + CommunityRest.PLURAL_NAME + "." + CommunityRest.COLLECTIONS)
 public class CommunityCollectionLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

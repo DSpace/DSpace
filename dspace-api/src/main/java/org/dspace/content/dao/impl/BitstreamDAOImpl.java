@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -26,6 +27,7 @@ import org.dspace.content.dao.BitstreamDAO;
 import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.UUIDIterator;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Bitstream object.
@@ -76,7 +78,7 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
 
     @Override
     public Iterator<Bitstream> findByCommunity(Context context, Community community) throws SQLException {
-        Query query = createQuery(context, "select b from Bitstream b " +
+        Query query = createQuery(context, "select b.id from Bitstream b " +
             "join b.bundles bitBundles " +
             "join bitBundles.items item " +
             "join item.collections itemColl " +
@@ -84,40 +86,45 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
             "WHERE :community IN community");
 
         query.setParameter("community", community);
-
-        return iterate(query);
+        @SuppressWarnings("unchecked")
+        List<UUID> uuids = query.getResultList();
+        return new UUIDIterator<Bitstream>(context, uuids, Bitstream.class, this);
     }
 
     @Override
     public Iterator<Bitstream> findByCollection(Context context, Collection collection) throws SQLException {
-        Query query = createQuery(context, "select b from Bitstream b " +
+        Query query = createQuery(context, "select b.id from Bitstream b " +
             "join b.bundles bitBundles " +
             "join bitBundles.items item " +
             "join item.collections c " +
             "WHERE :collection IN c");
 
         query.setParameter("collection", collection);
-
-        return iterate(query);
+        @SuppressWarnings("unchecked")
+        List<UUID> uuids = query.getResultList();
+        return new UUIDIterator<Bitstream>(context, uuids, Bitstream.class, this);
     }
 
     @Override
     public Iterator<Bitstream> findByItem(Context context, Item item) throws SQLException {
-        Query query = createQuery(context, "select b from Bitstream b " +
+        Query query = createQuery(context, "select b.id from Bitstream b " +
             "join b.bundles bitBundles " +
             "join bitBundles.items item " +
             "WHERE :item IN item");
 
         query.setParameter("item", item);
-
-        return iterate(query);
+        @SuppressWarnings("unchecked")
+        List<UUID> uuids = query.getResultList();
+        return new UUIDIterator<Bitstream>(context, uuids, Bitstream.class, this);
     }
 
     @Override
     public Iterator<Bitstream> findByStoreNumber(Context context, Integer storeNumber) throws SQLException {
-        Query query = createQuery(context, "select b from Bitstream b where b.storeNumber = :storeNumber");
+        Query query = createQuery(context, "select b.id from Bitstream b where b.storeNumber = :storeNumber");
         query.setParameter("storeNumber", storeNumber);
-        return iterate(query);
+        @SuppressWarnings("unchecked")
+        List<UUID> uuids = query.getResultList();
+        return new UUIDIterator<Bitstream>(context, uuids, Bitstream.class, this);
     }
 
     @Override

@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "object" subresource of an individual authorization.
  */
-@Component(AuthorizationRest.CATEGORY + "." + AuthorizationRest.NAME + "." + AuthorizationRest.OBJECT)
+@Component(AuthorizationRest.CATEGORY + "." + AuthorizationRest.PLURAL_NAME + "." + AuthorizationRest.OBJECT)
 public class AuthorizationObjectLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

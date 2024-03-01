@@ -11,6 +11,8 @@ import java.io.Serializable;
 import java.sql.SQLException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.authorization.AuthorizationRestUtil;
 import org.dspace.app.rest.model.AuthorizationRest;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -19,21 +21,19 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 /**
  * {@link RestPermissionEvaluatorPlugin} class that evaluate READ permissions for an Authorization
- * 
+ *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
 public class ReadAuthorizationPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(ReadAuthorizationPermissionEvaluatorPlugin.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     AuthorizeService authorizeService;
@@ -75,7 +75,7 @@ public class ReadAuthorizationPermissionEvaluatorPlugin extends RestObjectPermis
                 }
             }
         } catch (SQLException e) {
-            log.error(e.getMessage(), e);
+            log.error(e::getMessage, e);
         }
 
         return false;
