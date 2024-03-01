@@ -13,8 +13,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -23,7 +23,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * This class will filter /api/authn/login requests to try and authenticate them. Keep in mind, this filter runs *after*
- * StatelessAuthenticationFilter (which looks for authentication data in the request itself). So, in some scenarios
+ * {@link StatelessAuthenticationFilter} (which looks for authentication data in the request itself). So, in some scenarios
  * (e.g. after a Shibboleth login) the StatelessAuthenticationFilter does the actual authentication, and this Filter
  * just ensures the auth token (JWT) is sent back in an Authorization header.
  *
@@ -31,7 +31,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
  * @author Tom Desair (tom dot desair at atmire dot com)
  */
 public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter {
-    private static final Logger log = LoggerFactory.getLogger(StatelessLoginFilter.class);
+    private static final Logger log = LogManager.getLogger();
 
     protected AuthenticationManager authenticationManager;
 
@@ -97,7 +97,7 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
                                             Authentication auth) throws IOException, ServletException {
 
         DSpaceAuthentication dSpaceAuthentication = (DSpaceAuthentication) auth;
-        log.debug("Authentication successful for EPerson {}", dSpaceAuthentication.getName());
+        log.debug("Authentication successful for EPerson {}", dSpaceAuthentication::getName);
         restAuthenticationService.addAuthenticationDataForUser(req, res, dSpaceAuthentication, false);
     }
 

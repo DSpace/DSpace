@@ -273,7 +273,6 @@
                             <sourceDirectory>src/main/java</sourceDirectory>
                         </sourceDirectories>
                         <configLocation>${root.basedir}/checkstyle.xml</configLocation>
-                        <encoding>${project.build.sourceEncoding}</encoding>
                         <logViolationsToConsole>true</logViolationsToConsole>
                         <failOnViolation>true</failOnViolation>
                         <!-- Enable checks on all test source files -->
@@ -366,6 +365,11 @@
                     <configuration>
                         <!-- Never fail a build based on Javadoc errors -->
                         <failOnError>false</failOnError>
+                        <detectLinks/>
+                        <links>
+                          <link>https://docs.spring.io/spring-framework/docs/current/javadoc-api/</link>
+                          <link>https://docs.spring.io/spring-security/site/docs/current/api/</link>
+                        </links>
                     </configuration>
                 </plugin>
                 <!-- Used to generate source JARs for new releases (see release profile). -->

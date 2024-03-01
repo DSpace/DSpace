@@ -11,6 +11,8 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.QASourceRest;
 import org.dspace.app.rest.model.QATopicRest;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -19,8 +21,6 @@ import org.dspace.qaevent.QATopic;
 import org.dspace.qaevent.service.QAEventSecurityService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class QASourceRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(QASourceRestPermissionEvaluatorPlugin.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private QAEventSecurityService qaEventSecurityService;
