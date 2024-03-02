@@ -96,6 +96,8 @@ public class CommandLineDSpaceRunnableHandler implements DSpaceRunnableHandler {
                             scriptName +
                             " and parameters: " + parameters + " could not be created", e);
                 }
+            } finally {
+                context.close();
             }
         }
     }
