@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest;
+package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -15,11 +15,12 @@ import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.converter.ConverterService;
+import org.dspace.app.rest.DiscoverableEndpointsService;
+import org.dspace.app.rest.Parameter;
+import org.dspace.app.rest.SearchRestMethod;
+import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.PotentialDuplicateRest;
-import org.dspace.app.rest.model.hateoas.PotentialDuplicateResource;
 import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.app.rest.utils.Utils;
 import org.dspace.content.Item;
 import org.dspace.content.service.DuplicateDetectionService;
 import org.dspace.content.service.ItemService;
@@ -32,45 +33,90 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.PagedModel;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Component;
 
 /**
- * The controller for the api/duplicates endpoint, which handles requests for finding
- * potential duplicates
+ * The REST repository for the api/submission/duplicates endpoint, which handles requests for finding
+ * potential duplicates of a given item (archived or in-progress).
+ *
+ * Find one and find all are not implemented as actual REST methods because a duplicate is the result
+ * of comparing an item with other indexed items, not an object that can be referenced by some kind of ID, but
+ * we must at least implement the Java methods here in order to extend DSpaceRestRepository and implement
+ * SearchRestMethods.
  *
  * @author Kim Shepherd
  */
-@RestController
 @ConditionalOnProperty("duplicate.enable")
-@RequestMapping("/api/" + PotentialDuplicateRest.CATEGORY + "/" + PotentialDuplicateRest.NAME)
-public class DuplicateDetectionRestController implements InitializingBean {
+@Component(PotentialDuplicateRest.CATEGORY + "." + PotentialDuplicateRest.NAME)
+public class DuplicateRestRepository extends DSpaceRestRepository<PotentialDuplicateRest, String>
+        implements InitializingBean {
 
-    private static final Logger log = LogManager.getLogger(DuplicateDetectionRestController.class);
+    /**
+     * Discoverable endpoints service
+     */
+    @Autowired
+    DiscoverableEndpointsService discoverableEndpointsService;
 
+    /**
+     * Duplicate detection service
+     */
     @Autowired
-    protected Utils utils;
-    @Autowired
-    private DiscoverableEndpointsService discoverableEndpointsService;
-    @Autowired
-    private ItemService itemService;
-    @Autowired
-    private DuplicateDetectionService duplicateDetectionService;
-    @Autowired
-    private ConverterService converter;
+    DuplicateDetectionService duplicateDetectionService;
 
+    /**
+     * Item service
+     */
+    @Autowired
+    ItemService itemService;
+
+    /**
+     * Logger
+     */
+    private final static Logger log = LogManager.getLogger();
+
+    /**
+     * Register this repository endpoint as /api/submission/duplicates
+     * @throws Exception
+     */
     @Override
     public void afterPropertiesSet() throws Exception {
         discoverableEndpointsService
-            .register(this, Arrays.asList(Link.of(
-                    "/api/" + PotentialDuplicateRest.CATEGORY + "/" + PotentialDuplicateRest.NAME,
-                    PotentialDuplicateRest.NAME)));
+                .register(this, Arrays.asList(Link.of(
+                        "/api/" + PotentialDuplicateRest.CATEGORY + "/" + PotentialDuplicateRest.NAME + "/search",
+                        PotentialDuplicateRest.NAME + "-search")));
+    }
+
+    /**
+     * This REST method is NOT IMPLEMENTED - it does not make sense in duplicate detection, in which the only
+     * real addressable objects involved are Items.
+     *
+     * @param context
+     *            the dspace context
+     * @param name
+     *            the rest object id
+     * @return not implemented
+     * @throws RepositoryMethodNotImplementedException
+     */
+    @PreAuthorize("permitAll()")
+    @Override
+    public PotentialDuplicateRest findOne(Context context, String name) {
+        throw new RepositoryMethodNotImplementedException("Duplicate detection endpoint only implements searchBy", "");
+    }
+
+    /**
+     * This REST method is NOT IMPLEMENTED - it does not make sense in duplicate detection, where there can be no "all"
+     *
+     * @param context
+     *            the dspace context
+     * @return not implemented
+     * @throws RepositoryMethodNotImplementedException
+     */
+    @PreAuthorize("permitAll()")
+    @Override
+    public Page<PotentialDuplicateRest> findAll(Context context, Pageable pageable) {
+        throw new RepositoryMethodNotImplementedException("Duplicate detection endpoint only implements searchBy", "");
     }
 
     /**
@@ -80,16 +126,14 @@ public class DuplicateDetectionRestController implements InitializingBean {
      * the current user.
      *
      * @param uuid The item UUID to search
-     * @param page Pagination options
-     * @param assembler The paged resources assembler to construct the paged model
+     * @param pageable Pagination options
      * @return Paged list of potential duplicates
      * @throws Exception
      */
-    @RequestMapping(method = RequestMethod.GET, value = "/search")
     @PreAuthorize("hasPermission(#uuid, 'ITEM', 'READ')")
-    public PagedModel<PotentialDuplicateResource> searchPotentialDuplicates(
-            @RequestParam(name = "uuid", required = true) UUID uuid, Pageable page, PagedResourcesAssembler assembler) {
-
+    @SearchRestMethod(name = "findByItem")
+    public Page<PotentialDuplicateRest> findByItem(@Parameter(value = "uuid", required = true) UUID uuid,
+                                                       Pageable pageable) {
         // Instantiate object to represent this item
         Item item;
         // Instantiate list of potential duplicates which we will convert and return as paged ItemRest list
@@ -98,8 +142,6 @@ public class DuplicateDetectionRestController implements InitializingBean {
         int total = 0;
         // Obtain context
         Context context = ContextUtil.obtainCurrentRequestContext();
-        // Get pagination
-        Pageable pageable = utils.getPageable(page);
 
         // Try to get item based on UUID parameter
         try {
@@ -124,14 +166,21 @@ public class DuplicateDetectionRestController implements InitializingBean {
             log.error("Search service error retrieving duplicates: {}", e.getMessage());
         }
 
-        // Construct rest and resource pages
+        // Construct rest pages and return
         Page<PotentialDuplicateRest> restPage = converter.toRestPage(potentialDuplicates, pageable, total,
                 utils.obtainProjection());
-        Page<PotentialDuplicateResource> resourcePage = restPage.map(potentialDuplicateRest ->
-                new PotentialDuplicateResource(potentialDuplicateRest));
 
-        // Return the list of items along with pagination info and max results, assembled as PagedModel
-        return assembler.toModel(resourcePage);
+        return restPage;
 
     }
+
+    /**
+     * Return the domain class for potential duplicate objects
+     * @return PotentialDuplicateRest.class
+     */
+    @Override
+    public Class<PotentialDuplicateRest> getDomainClass() {
+        return PotentialDuplicateRest.class;
+    }
+
 }
