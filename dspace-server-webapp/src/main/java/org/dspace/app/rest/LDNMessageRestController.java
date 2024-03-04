@@ -31,7 +31,10 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Rest Controller for requesting the reprocessing of LDNMessageEntity
@@ -40,7 +43,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/api/" + LDNMessageEntityRest.CATEGORY + "/"
-    + LDNMessageEntityRest.NAME_PLURALS + REGEX_REQUESTMAPPING_IDENTIFIER_AS_URN_UUID +"/enqueueretry")
+    + LDNMessageEntityRest.NAME_PLURALS + REGEX_REQUESTMAPPING_IDENTIFIER_AS_URN_UUID + "/enqueueretry")
 public class LDNMessageRestController implements InitializingBean {
 
     private static final Logger log = LogManager.getLogger(LDNMessageRestController.class);

@@ -55,15 +55,15 @@ public class LDNMessageRestControllerIT extends AbstractControllerIntegrationTes
     @Test
     public void findByItemUnAuthorizedTest() throws Exception {
         getClient()
-            .perform(post("/api/ldn/messages/urn:uuid:668f26e0-2c8d-4117-a0d2-ee713523bcb4/enqueueretry"))
-            .andExpect(status().isUnauthorized());
+                .perform(post("/api/ldn/messages/urn:uuid:668f26e0-2c8d-4117-a0d2-ee713523bcb4/enqueueretry"))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
     public void findByItemIsForbiddenTest() throws Exception {
         String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken)
-            .perform(get("/api/ldn/messages/urn:uuid:668f26e0-2c8d-4117-a0d2-ee713523bcb4/enqueueretry"))
+            .perform(post("/api/ldn/messages/urn:uuid:668f26e0-2c8d-4117-a0d2-ee713523bcb4/enqueueretry"))
             .andExpect(status().isForbidden());
     }
 
@@ -71,7 +71,7 @@ public class LDNMessageRestControllerIT extends AbstractControllerIntegrationTes
     public void findByItemNotFoundTest() throws Exception {
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
-            .perform(get("/api/ldn/messages/urn:uuid:668f26e0-2c8d-4117-a0d2-ee713523bcb4/enqueueretry"))
+            .perform(post("/api/ldn/messages/urn:uuid:668f26e0-2c8d-4117-a0d2-ee713523bcb4/enqueueretry"))
             .andExpect(status().isNotFound());
     }
 
@@ -115,7 +115,7 @@ public class LDNMessageRestControllerIT extends AbstractControllerIntegrationTes
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken)
-            .perform(get("/api/ldn/messages/" + notification.getId() + "/enqueueretry"))
+            .perform(post("/api/ldn/messages/" + notification.getId() + "/enqueueretry"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id", is(notification.getId())))
             .andExpect(jsonPath("$.notificationId", is(notification.getId())))
