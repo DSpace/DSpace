@@ -65,4 +65,12 @@ public interface LDNMessageDao extends GenericDAO<LDNMessageEntity> {
      */
     public List<LDNMessageEntity> findAllRelatedMessagesByItem(
         Context context, LDNMessageEntity msg, Item item, String... relatedTypes) throws SQLException;
+
+    /**
+     *
+     * @param context
+     * @return the list of messages in need to be reprocessed - with queue_status as QUEUE_STATUS_QUEUED_FOR_RETRY
+     * @throws SQLException
+     */
+    public List<LDNMessageEntity> findMessagesToBeReprocessed(Context context) throws SQLException;
 }

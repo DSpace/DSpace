@@ -61,6 +61,29 @@ public class LDNMessageDaoImpl extends AbstractHibernateDAO<LDNMessageEntity> im
     }
 
     @Override
+    public List<LDNMessageEntity> findMessagesToBeReprocessed(Context context) throws SQLException {
+        // looking for LDN Messages to be reprocessed message
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<LDNMessageEntity> criteriaQuery = getCriteriaQuery(criteriaBuilder, LDNMessageEntity.class);
+        Root<LDNMessageEntity> root = criteriaQuery.from(LDNMessageEntity.class);
+        criteriaQuery.select(root);
+        List<Predicate> andPredicates = new ArrayList<>(1);
+        andPredicates
+            .add(criteriaBuilder.equal(root.get(LDNMessageEntity_.queueStatus),
+                LDNMessageEntity.QUEUE_STATUS_QUEUED_FOR_RETRY));
+        criteriaQuery.where(criteriaBuilder.and(andPredicates.toArray(new Predicate[] {})));
+        List<Order> orderList = new LinkedList<>();
+        orderList.add(criteriaBuilder.desc(root.get(LDNMessageEntity_.queueAttempts)));
+        orderList.add(criteriaBuilder.asc(root.get(LDNMessageEntity_.queueLastStartTime)));
+        criteriaQuery.orderBy(orderList);
+        List<LDNMessageEntity> result = list(context, criteriaQuery, false, LDNMessageEntity.class, -1, -1);
+        if (result == null || result.isEmpty()) {
+            log.debug("No LDN messages found to be processed");
+        }
+        return result;
+    }
+
+    @Override
     public List<LDNMessageEntity> findProcessingTimedoutMessages(Context context, int max_attempts)
         throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
