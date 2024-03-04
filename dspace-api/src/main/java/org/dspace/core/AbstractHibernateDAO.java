@@ -103,6 +103,16 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     }
 
     @Override
+    public T findByID(Context context, Class clazz, String id) throws SQLException {
+        if (id == null) {
+            return null;
+        }
+        @SuppressWarnings("unchecked")
+        T result = (T) getHibernateSession(context).get(clazz, id);
+        return result;
+    }
+
+    @Override
     public List<T> findMany(Context context, String query) throws SQLException {
         @SuppressWarnings("unchecked")
         List<T> result = (List<T>) createQuery(context, query).getResultList();

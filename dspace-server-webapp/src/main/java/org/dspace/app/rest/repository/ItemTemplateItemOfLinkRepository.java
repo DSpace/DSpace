@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "templateItemOf" subresource of an individual item.
  */
-@Component(ItemRest.CATEGORY + "." + ItemRest.NAME + "." + ItemRest.TEMPLATE_ITEM_OF)
+@Component(ItemRest.CATEGORY + "." + ItemRest.PLURAL_NAME + "." + ItemRest.TEMPLATE_ITEM_OF)
 public class ItemTemplateItemOfLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

@@ -151,7 +151,7 @@ public class ConverterService {
     private Annotation getAnnotationForRestObject(BaseObjectRest restObject) {
         BaseObjectRest baseObjectRest = restObject;
         DSpaceRestRepository repositoryToUse = utils
-            .getResourceRepositoryByCategoryAndModel(baseObjectRest.getCategory(), baseObjectRest.getType());
+            .getResourceRepositoryByCategoryAndModel(baseObjectRest.getCategory(), baseObjectRest.getTypePlural());
         Annotation preAuthorize = null;
         int maxDepth = 0;
         // DS-4530 exclude the AOP Proxy from determining the annotations

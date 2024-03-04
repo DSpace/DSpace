@@ -123,6 +123,9 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
 
     void setLogo(Bitstream logo) {
         this.logo = logo;
+        if (logo != null) {
+            logo.setCommunity(this);
+        }
         setModified();
     }
 

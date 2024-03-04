@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-@Component(VocabularyRest.CATEGORY + "." + VocabularyRest.NAME)
+@Component(VocabularyRest.CATEGORY + "." + VocabularyRest.PLURAL_NAME)
 public class VocabularyRestRepository extends DSpaceRestRepository<VocabularyRest, String> {
 
     @Autowired
@@ -100,6 +100,9 @@ public class VocabularyRestRepository extends DSpaceRestRepository<VocabularyRes
         }
 
         String authorityName = cas.getChoiceAuthorityName(tokens[0], tokens[1], tokens[2], collection);
+        if (authorityName == null) {
+            return null;
+        }
         ChoiceAuthority source = cas.getChoiceAuthorityByAuthorityName(authorityName);
         return authorityUtils.convertAuthority(source, authorityName, utils.obtainProjection());
     }

@@ -50,7 +50,7 @@ import org.springframework.stereotype.Component;
 /**
  * This is the repository that is responsible to manage Relationship Rest objects
  */
-@Component(RelationshipRest.CATEGORY + "." + RelationshipRest.NAME)
+@Component(RelationshipRest.CATEGORY + "." + RelationshipRest.PLURAL_NAME)
 public class RelationshipRestRepository extends DSpaceRestRepository<RelationshipRest, Integer> {
 
     private static final Logger log = LogManager.getLogger();

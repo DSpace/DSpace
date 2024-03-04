@@ -7,10 +7,10 @@
  */
 package org.dspace.servicemanager;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.kernel.DSpaceKernel;
 import org.dspace.kernel.DSpaceKernelManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class simplifies the handling of lookup, registration, and
@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DSpaceKernelInit {
 
-    private static Logger log = LoggerFactory.getLogger(DSpaceKernelInit.class);
+    private static final Logger log = LogManager.getLogger(DSpaceKernelInit.class);
 
     private static final Object staticLock = new Object();
 
@@ -57,7 +57,7 @@ public class DSpaceKernelInit {
 
         synchronized (staticLock) {
             DSpaceKernelImpl kernelImpl = new DSpaceKernelImpl(name);
-            log.info("Created new kernel: " + kernelImpl);
+            log.info("Created new kernel: {}", kernelImpl);
 
             if (name != null) {
                 DSpaceKernelManager.registerMBean(kernelImpl.getMBeanName(), kernelImpl);

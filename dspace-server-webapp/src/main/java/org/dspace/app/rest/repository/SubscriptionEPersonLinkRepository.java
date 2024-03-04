@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "eperson" of subscription
  */
-@Component(SubscriptionRest.CATEGORY + "." + SubscriptionRest.NAME + "." + SubscriptionRest.EPERSON)
+@Component(SubscriptionRest.CATEGORY + "." + SubscriptionRest.PLURAL_NAME + "." + SubscriptionRest.EPERSON)
 public class SubscriptionEPersonLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     @Autowired

@@ -47,8 +47,8 @@ import org.springframework.web.bind.annotation.RestController;
  * "/api/integration/qualityassuranceevents/{qaeventid}/related"
  */
 @RestController
-@RequestMapping("/api/" + QAEventRest.CATEGORY + "/qualityassuranceevents"
-    + REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG + "/related")
+@RequestMapping("/api/" + QAEventRest.CATEGORY + "/" + QAEventRest.PLURAL_NAME
+    + REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG + "/" + QAEventRest.RELATED)
 public class QAEventRelatedRestController {
 
     @Autowired
@@ -78,7 +78,6 @@ public class QAEventRelatedRestController {
         @RequestParam(name = "item") UUID relatedItemUUID) throws SQLException, AuthorizeException {
 
         Context context = ContextUtil.obtainCurrentRequestContext();
-
         QAEvent qaevent = qaEventService.findEventByEventId(qaeventId);
         if (qaevent == null) {
             throw new ResourceNotFoundException("No such qa event: " + qaeventId);

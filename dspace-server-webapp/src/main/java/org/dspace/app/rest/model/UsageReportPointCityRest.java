@@ -15,10 +15,16 @@ package org.dspace.app.rest.model;
  */
 public class UsageReportPointCityRest extends UsageReportPointRest {
     public static final String NAME = "city";
+    public static final String PLURAL_NAME = "cities";
 
     @Override
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     @Override

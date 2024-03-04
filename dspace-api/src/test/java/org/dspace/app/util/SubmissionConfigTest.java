@@ -9,17 +9,20 @@ package org.dspace.app.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.dspace.AbstractUnitTest;
+import org.dspace.content.Collection;
 import org.dspace.submit.factory.SubmissionServiceFactory;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mock;
 
 /**
  * Tests for parsing and utilities on submission config forms / readers
@@ -29,6 +32,9 @@ import org.junit.Test;
 public class SubmissionConfigTest extends AbstractUnitTest {
 
     DCInputsReader inputReader;
+
+    @Mock
+    private Collection col1;
 
     @BeforeClass
     public static void setUpClass() {
@@ -56,6 +62,8 @@ public class SubmissionConfigTest extends AbstractUnitTest {
         String typeBindSubmissionName = "typebindtest";
         String typeBindSubmissionStepName = "typebindtest";
 
+        when(col1.getHandle()).thenReturn(typeBindHandle);
+
         // Expected field lists from typebindtest form
         List<String> allConfiguredFields = new ArrayList<>();
         allConfiguredFields.add("dc.title");
@@ -67,7 +75,7 @@ public class SubmissionConfigTest extends AbstractUnitTest {
         // Get submission configuration
         SubmissionConfig submissionConfig =
                 SubmissionServiceFactory.getInstance().getSubmissionConfigService()
-                    .getSubmissionConfigByCollection(typeBindHandle);
+                    .getSubmissionConfigByCollection(col1);
         // Submission name should match name defined in item-submission.xml
         assertEquals(typeBindSubmissionName, submissionConfig.getSubmissionName());
         // Step 0 - our process only has one step. It should not be null and have the ID typebindtest

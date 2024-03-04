@@ -37,6 +37,7 @@ public final class DSpaceWebappServletFilter implements Filter {
     /* (non-Javadoc)
      * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
      */
+    @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         // ensure the kernel is running, if not then we have to die here
         try {
@@ -54,9 +55,10 @@ public final class DSpaceWebappServletFilter implements Filter {
     /* (non-Javadoc)
      * @see javax.servlet.Filter#destroy()
      */
+    @Override
     public void destroy() {
         // clean up the logger for this webapp
-        // No longer using commons-logging (JCL), use slf4j instead
+        // No longer using commons-logging (JCL), use Log4J instead
         //LogFactory.release(Thread.currentThread().getContextClassLoader());
     }
 
@@ -64,6 +66,7 @@ public final class DSpaceWebappServletFilter implements Filter {
      * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet
      * .FilterChain)
      */
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws IOException, ServletException {
         // now do some DSpace stuff
