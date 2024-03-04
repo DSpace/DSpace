@@ -17,7 +17,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import jakarta.annotation.Nonnull;
-import jakarta.persistence.Cacheable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,7 +36,6 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.HibernateProxyHelper;
 import org.dspace.eperson.Group;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * Class representing a collection.
@@ -54,8 +52,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "collection")
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
 public class Collection extends DSpaceObject implements DSpaceObjectLegacySupport {
 
     @Column(name = "collection_id", insertable = false, updatable = false)

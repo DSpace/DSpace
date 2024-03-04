@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -31,7 +30,6 @@ import org.dspace.core.Context;
 import org.dspace.core.HibernateProxyHelper;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * Class representing an e-person.
@@ -39,8 +37,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  * @author David Stuve
  */
 @Entity
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
 @Table(name = "eperson")
 public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport {
     @Column(name = "eperson_id", insertable = false, updatable = false)

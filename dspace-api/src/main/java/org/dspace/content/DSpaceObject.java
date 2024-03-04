@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.persistence.Cacheable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,6 +29,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.handle.Handle;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 
 /**
@@ -36,6 +38,8 @@ import org.hibernate.annotations.GenericGenerator;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "dspaceobject")
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, includeLazy = false)
 public abstract class DSpaceObject implements Serializable, ReloadableEntity<java.util.UUID> {
     @Id
     @GeneratedValue(generator = "predefined-uuid")

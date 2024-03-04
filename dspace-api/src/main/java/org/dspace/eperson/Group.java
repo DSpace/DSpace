@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -26,7 +25,6 @@ import org.dspace.content.DSpaceObjectLegacySupport;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.HibernateProxyHelper;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * Class representing a group of e-people.
@@ -34,8 +32,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  * @author David Stuve
  */
 @Entity
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
 @Table(name = "epersongroup")
 public class Group extends DSpaceObject implements DSpaceObjectLegacySupport {
 
