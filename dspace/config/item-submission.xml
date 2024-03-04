@@ -247,6 +247,13 @@
             <type>coarnotify</type>
         </step-definition>
 
+        <!-- Detect duplicates step -->
+        <step-definition id="duplicates">
+            <heading>submit.progressbar.duplicates</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DuplicateDetectionStep</processing-class>
+            <type>duplicates</type>
+        </step-definition>
+
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -283,6 +290,11 @@
 
             <!-- Uncomment this step to show when appropriate publisher policies retrieved from SHERPA/RoMEO -->
             <!-- <step id="sherpaPolicies"/> -->
+
+            <!-- To include the 'Duplicate Detection' step, uncomment the line below. Make sure
+                 that duplicate-detection.cfg is properly configured and items have been reindexed since
+                 enabling the feature -->
+            <!-- <step id="duplicates"/> -->
 
             <!--Step will be COAR Notify services to the item -->
             <!-- <step id="coarnotify"/> -->
