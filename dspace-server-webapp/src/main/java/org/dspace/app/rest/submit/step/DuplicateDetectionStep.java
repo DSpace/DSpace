@@ -61,8 +61,8 @@ public class DuplicateDetectionStep extends AbstractProcessingStep {
         }
         // Immediately return an empty if this feature is not configured
         if (!configurationService.getBooleanProperty("duplicate.enable", false)) {
-            throw new IllegalStateException("Duplicate detection feature is not enabled. " +
-                    "See dspace/config/modules/duplicate-detection.cfg");
+            log.debug("Duplicate detection is not enabled, returning empty section");
+            return new DataDuplicateDetection();
         }
         // Validate context
         Context context = getContext();
