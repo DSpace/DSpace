@@ -16,7 +16,9 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.discovery.IndexableObject;
 import org.springframework.stereotype.Component;
-/*
+
+/**
+ * Converter to translate between {@link LDNMessageEntity} and {@link LDNMessageEntityRest} representations.
  *  @author Stefano Maffei (stefano.maffei at 4science.com)
  */
 @Component

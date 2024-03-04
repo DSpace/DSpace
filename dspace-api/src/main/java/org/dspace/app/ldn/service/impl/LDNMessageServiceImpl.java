@@ -182,8 +182,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
 
     @Override
     public void update(Context context, LDNMessageEntity ldnMessage) throws SQLException {
-        // CST-12126 then LDNMessageService.update() when the origin is set != null,
-        // move the queue_status from UNTRUSTED to QUEUED
+        // move the queue_status from UNTRUSTED to QUEUED if origin is a known NotifyService
         if (ldnMessage.getOrigin() != null &&
             LDNMessageEntity.QUEUE_STATUS_UNTRUSTED.compareTo(ldnMessage.getQueueStatus()) == 0) {
             ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_QUEUED);

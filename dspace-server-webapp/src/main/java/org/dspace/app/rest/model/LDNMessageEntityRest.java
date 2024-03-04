@@ -11,8 +11,10 @@ import java.util.Date;
 import java.util.UUID;
 
 import org.dspace.app.rest.RestResourceController;
-/*
- *  @author Stefano Maffei (stefano.maffei at 4science.com)
+
+/**
+ * The LDN Message REST resource.
+ * @author Stefano Maffei (stefano.maffei at 4science.com)
  */
 @SuppressWarnings("serial")
 public class LDNMessageEntityRest extends BaseObjectRest<String> {
