@@ -64,7 +64,7 @@ public class LDNMessageRestController implements InitializingBean {
     public void afterPropertiesSet() {
         discoverableEndpointsService.register(this,
             List.of(Link.of("/api/" + LDNMessageEntityRest.CATEGORY + "/"
-                + LDNMessageEntityRest.NAME_PLURALS + "{id}/enqueueretry",
+                + LDNMessageEntityRest.NAME_PLURALS + "/{id}/enqueueretry",
                 "enqueueretry")));
     }
 
