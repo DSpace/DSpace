@@ -89,14 +89,14 @@ public class LDNMessageEntityIndexFactoryImpl extends IndexFactoryImpl<Indexable
         doc.addField("queue_status_s", LDNMessageEntity.getQueueStatus(ldnMessage));
         addFacetIndex(doc, "queue_status", String.valueOf(ldnMessage.getQueueStatus()),
             LDNMessageEntity.getQueueStatus(ldnMessage));
-        if (ldnMessage.getObject() != null || ldnMessage.getObject().getID() != null) {
+        if (ldnMessage.getObject() != null && ldnMessage.getObject().getID() != null) {
             Item item = itemService.findByIdOrLegacyId(context, ldnMessage.getObject().getID().toString());
             if (item != null) {
                 addFacetIndex(doc, "object", item.getID().toString(), itemService.getMetadata(item, "dc.title"));
                 addFacetIndex(doc, "relateditem", item.getID().toString(), itemService.getMetadata(item, "dc.title"));
             }
         }
-        if (ldnMessage.getContext() != null || ldnMessage.getContext().getID() != null) {
+        if (ldnMessage.getContext() != null && ldnMessage.getContext().getID() != null) {
             Item item = itemService.findByIdOrLegacyId(context, ldnMessage.getContext().getID().toString());
             if (item != null) {
                 addFacetIndex(doc, "context", item.getID().toString(), itemService.getMetadata(item, "dc.title"));
