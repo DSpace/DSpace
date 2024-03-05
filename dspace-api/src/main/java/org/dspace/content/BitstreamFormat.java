@@ -31,6 +31,8 @@ import org.dspace.core.HibernateProxyHelper;
 import org.dspace.core.ReloadableEntity;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CollectionId;
+import org.hibernate.annotations.CollectionIdJavaType;
+import org.hibernate.type.descriptor.java.IntegerJavaType;
 
 /**
  * Class representing a particular bitstream format.
@@ -54,8 +56,6 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
     @Column(name = "short_description", length = 128, unique = true)
     private String shortDescription;
 
-    //    @Column(name="description")
-//    @Lob //Generates a TEXT or LONGTEXT data type
     @Column(name = "description", columnDefinition = "text")
     private String description;
 
@@ -75,6 +75,7 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
         column = @Column(name = "file_extension_id", columnDefinition = "integer"),
         generator = "fileextension_seq"
     )
+    @CollectionIdJavaType(IntegerJavaType.class)
     @SequenceGenerator(name = "fileextension_seq", sequenceName = "fileextension_seq", allocationSize = 1)
     @Column(name = "extension")
     @Cascade( {org.hibernate.annotations.CascadeType.ALL, org.hibernate.annotations.CascadeType.DELETE_ORPHAN})

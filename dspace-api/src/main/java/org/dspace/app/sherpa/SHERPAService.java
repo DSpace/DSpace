@@ -93,7 +93,7 @@ public class SHERPAService {
      * @param query ISSN string to pass in an "issn equals" API query
      * @return      SHERPAResponse containing an error or journal policies
      */
-    @Cacheable(key = "#query", cacheNames = "sherpa.searchByJournalISSN")
+    @Cacheable(key = "#query", condition = "#query != null", cacheNames = "sherpa.searchByJournalISSN")
     public SHERPAResponse searchByJournalISSN(String query) {
         return performRequest("publication", "issn", "equals", query, 0, 1);
     }

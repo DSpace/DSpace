@@ -94,7 +94,7 @@ public class Relationship implements ReloadableEntity<Integer> {
      * or the item on that side is the most recent version that is relevant to the given relationship.
      * This column affects what version of an item appears on search pages or the relationship listings of other items.
      */
-    @Column(name = "latest_version_status")
+    @Column(name = "latest_version_status", columnDefinition = "integer")
     private LatestVersionStatus latestVersionStatus = LatestVersionStatus.BOTH;
 
     /**

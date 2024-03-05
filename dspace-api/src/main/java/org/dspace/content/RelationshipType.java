@@ -116,7 +116,7 @@ public class RelationshipType implements ReloadableEntity<Integer> {
     /**
      * The value indicating whether relationships of this type should be ignored on the right/left/neither.
      */
-    @Column(name = "tilted")
+    @Column(name = "tilted", columnDefinition = "integer")
     private Tilted tilted;
 
     /**
