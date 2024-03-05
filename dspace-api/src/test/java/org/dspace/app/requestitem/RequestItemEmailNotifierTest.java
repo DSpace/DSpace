@@ -33,6 +33,7 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -75,6 +76,13 @@ public class RequestItemEmailNotifierTest
                 = HandleServiceFactory.getInstance().getHandleService();
         requestItemService
                 = RequestItemServiceFactory.getInstance().getRequestItemService();
+    }
+
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+        // AbstractUnitTest doesn't do this for us.
+        AbstractBuilder.cleanupObjects();
+        AbstractBuilder.destroy();
     }
 
     /**
