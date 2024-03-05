@@ -471,4 +471,15 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
         return executeCriteriaQuery(context, criteria, cacheable, maxResults, offset);
     }
 
+    /**
+     * Create a Query object from a CriteriaQuery
+     * @param context current Context
+     * @param criteriaQuery CriteriaQuery built via CriteriaBuilder
+     * @return corresponding Query
+     * @throws SQLException if error occurs
+     */
+    public Query createQuery(Context context, CriteriaQuery criteriaQuery) throws SQLException {
+        return this.getHibernateSession(context).createQuery(criteriaQuery);
+    }
+
 }
