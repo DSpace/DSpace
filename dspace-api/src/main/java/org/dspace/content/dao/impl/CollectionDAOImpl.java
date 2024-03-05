@@ -71,11 +71,11 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
         query.append("SELECT c" +
                                 " FROM Collection c" +
                                 " left join c.metadata title on title.metadataField = :sortField and" +
-                                " title.dSpaceObject = c.id and" +
+                                " title.dSpaceObject = c and" +
                                 " title.place = (select min(internal.place) " +
                                 "from c.metadata internal " +
                                 "where internal.metadataField = :sortField and" +
-                                " internal.dSpaceObject = c.id)" +
+                                " internal.dSpaceObject = c)" +
                                 " ORDER BY LOWER(title.value)");
         Query hibernateQuery = createQuery(context, query.toString());
         if (offset != null) {

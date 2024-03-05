@@ -111,7 +111,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         queryStr.append(" AND discoverable = :discoverable");
 
         if (lastModified != null) {
-            queryStr.append(" AND last_modified > :last_modified");
+            queryStr.append(" AND lastModified > :last_modified");
         }
         queryStr.append(" ORDER BY i.id");
 
@@ -266,7 +266,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
             Subquery<MetadataValue> mvQuery = query.subquery(MetadataValue.class);
             Root<MetadataValue> mvRoot = mvQuery.from(MetadataValue.class);
             mvPredicates.add(criteriaBuilder.equal(
-                    mvRoot.get(MetadataValue_.D_SPACE_OBJECT), root.get(DSpaceObject_.ID)));
+                    mvRoot.get(MetadataValue_.D_SPACE_OBJECT), root));
 
             if (!predicate.getFields().isEmpty()) {
                 In<MetadataField> inFields = criteriaBuilder.in(mvRoot.get(MetadataValue_.METADATA_FIELD));

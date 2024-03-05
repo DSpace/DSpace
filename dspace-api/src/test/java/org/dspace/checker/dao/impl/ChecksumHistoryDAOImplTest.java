@@ -122,7 +122,7 @@ public class ChecksumHistoryDAOImplTest
 
         // See if matching old row is gone.
         qry = dbc.getSession().createQuery(
-            "SELECT COUNT(*) FROM ChecksumHistory WHERE process_end_date = :date");
+            "SELECT COUNT(*) FROM ChecksumHistory WHERE processEndDate = :date");
         long count;
 
         qry.setParameter("date", matchDate);

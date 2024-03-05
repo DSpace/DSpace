@@ -105,7 +105,7 @@ public class SubscriptionDAOImpl extends AbstractHibernateDAO<Subscription> impl
     public List<Subscription> findAllOrderedByIDAndResourceType(Context context, String resourceType,
                                                                 Integer limit, Integer offset) throws SQLException {
         String hqlQuery = "select s from Subscription s join %s dso " +
-                "ON dso.id = s.dSpaceObject ORDER BY subscription_id";
+                "ON dso = s.dSpaceObject ORDER BY s.id";
         if (resourceType != null) {
             hqlQuery = String.format(hqlQuery, resourceType);
         }

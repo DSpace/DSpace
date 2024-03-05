@@ -68,11 +68,11 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
         queryBuilder.append("SELECT c" +
                                 " FROM Community c" +
                                 " left join c.metadata title on title.metadataField = :sortField and" +
-                                " title.dSpaceObject = c.id and" +
+                                " title.dSpaceObject = c and" +
                                 " title.place = (select min(internal.place) " +
                                                 "from c.metadata internal " +
                                                 "where internal.metadataField = :sortField and" +
-                                                    " internal.dSpaceObject = c.id)" +
+                                                    " internal.dSpaceObject = c)" +
                                 " ORDER BY LOWER(title.value)");
         Query query = createQuery(context, queryBuilder.toString());
         if (offset != null) {
@@ -108,11 +108,11 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
         queryBuilder.append("SELECT c" +
                                 " FROM Community c" +
                                 " left join c.metadata title on title.metadataField = :sortField and" +
-                                " title.dSpaceObject = c.id and" +
+                                " title.dSpaceObject = c and" +
                                 " title.place = (select min(internal.place) " +
                                                 "from c.metadata internal " +
                                                 "where internal.metadataField = :sortField and" +
-                                                        " internal.dSpaceObject = c.id)" +
+                                                        " internal.dSpaceObject = c)" +
                                 " WHERE c.parentCommunities IS EMPTY " +
                                 " ORDER BY LOWER(title.value)");
         Query query = createQuery(context, queryBuilder.toString());

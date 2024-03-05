@@ -44,8 +44,12 @@ public class RequestItemDAOImpl extends AbstractHibernateDAO<RequestItem> implem
     }
     @Override
     public Iterator<RequestItem> findByItem(Context context, Item item) throws SQLException {
-        Query query = createQuery(context, "FROM RequestItem WHERE item_id= :uuid");
-        query.setParameter("uuid", item.getID());
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RequestItem.class);
+        Root<RequestItem> requestItemRoot = criteriaQuery.from(RequestItem.class);
+        criteriaQuery.select(requestItemRoot);
+        criteriaQuery.where(criteriaBuilder.equal(requestItemRoot.get(RequestItem_.item), item));
+        Query query = createQuery(context, criteriaQuery);
         return iterate(query);
     }
 }
