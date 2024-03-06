@@ -59,9 +59,9 @@ public class EntityTypeDAOImpl extends AbstractHibernateDAO<EntityType> implemen
     @Override
     public int countEntityTypesByNames(Context context, List<String> names) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, EntityType.class);
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         Root<EntityType> entityTypeRoot = criteriaQuery.from(EntityType.class);
-        criteriaQuery.select(entityTypeRoot);
+        criteriaQuery.select(criteriaBuilder.count(entityTypeRoot));
         criteriaQuery.where(entityTypeRoot.get(EntityType_.LABEL).in(names));
         return count(context, criteriaQuery, criteriaBuilder, entityTypeRoot);
     }

@@ -75,9 +75,9 @@ public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements Pro
     public int countRows(Context context) throws SQLException {
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         Root<Process> processRoot = criteriaQuery.from(Process.class);
-        criteriaQuery.select(processRoot);
+        criteriaQuery.select(criteriaBuilder.count(processRoot));
 
         return count(context, criteriaQuery, criteriaBuilder, processRoot);
 
@@ -143,9 +143,9 @@ public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements Pro
         throws SQLException {
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         Root<Process> processRoot = criteriaQuery.from(Process.class);
-        criteriaQuery.select(processRoot);
+        criteriaQuery.select(criteriaBuilder.count(processRoot));
 
         addProcessQueryParameters(processQueryParameterContainer, criteriaBuilder, criteriaQuery, processRoot);
         return count(context, criteriaQuery, criteriaBuilder, processRoot);
@@ -188,10 +188,10 @@ public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements Pro
     @Override
     public int countByUser(Context context, EPerson user) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery<Process> criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
 
         Root<Process> processRoot = criteriaQuery.from(Process.class);
-        criteriaQuery.select(processRoot);
+        criteriaQuery.select(criteriaBuilder.count(processRoot));
         criteriaQuery.where(criteriaBuilder.equal(processRoot.get(Process_.E_PERSON), user));
         return count(context, criteriaQuery, criteriaBuilder, processRoot);
     }

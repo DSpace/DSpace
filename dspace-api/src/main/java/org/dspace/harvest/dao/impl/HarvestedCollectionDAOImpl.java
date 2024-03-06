@@ -150,11 +150,10 @@ public class HarvestedCollectionDAOImpl extends AbstractHibernateDAO<HarvestedCo
 
     @Override
     public int count(Context context) throws SQLException {
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
-
         Root<HarvestedCollection> harvestedCollectionRoot = criteriaQuery.from(HarvestedCollection.class);
+        criteriaQuery.select(criteriaBuilder.count(harvestedCollectionRoot));
         return count(context, criteriaQuery, criteriaBuilder, harvestedCollectionRoot);
     }
 

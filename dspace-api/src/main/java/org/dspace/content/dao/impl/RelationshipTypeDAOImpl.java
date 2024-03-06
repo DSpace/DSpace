@@ -128,9 +128,9 @@ public class RelationshipTypeDAOImpl extends AbstractHibernateDAO<RelationshipTy
     @Override
     public int countByEntityType(Context context, EntityType entityType) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RelationshipType.class);
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         Root<RelationshipType> relationshipTypeRoot = criteriaQuery.from(RelationshipType.class);
-        criteriaQuery.select(relationshipTypeRoot);
+        criteriaQuery.select(criteriaBuilder.count(relationshipTypeRoot));
         criteriaQuery.where(criteriaBuilder.or(
                             criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.leftType), entityType),
                             criteriaBuilder.equal(relationshipTypeRoot.get(RelationshipType_.rightType), entityType)

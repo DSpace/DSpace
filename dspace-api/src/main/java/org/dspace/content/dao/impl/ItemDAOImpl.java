@@ -351,9 +351,9 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     @Override
     public int countArchivedByCollectionExcludingOwning(Context context, Collection collection) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery<Item> criteriaQuery = getCriteriaQuery(criteriaBuilder, Item.class);
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         Root<Item> itemRoot = criteriaQuery.from(Item.class);
-        criteriaQuery.select(itemRoot);
+        criteriaQuery.select(criteriaBuilder.count(itemRoot));
         criteriaQuery.where(criteriaBuilder.and(
                 criteriaBuilder.notEqual(itemRoot.get(Item_.owningCollection), collection),
                 criteriaBuilder.isMember(collection, itemRoot.get(Item_.collections)),
@@ -408,9 +408,9 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         // Build query to select all Items have this "collection" in their list of collections
         // AND also have the inArchive or isWithdrawn set as specified
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery<Item> criteriaQuery = getCriteriaQuery(criteriaBuilder, Item.class);
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         Root<Item> itemRoot = criteriaQuery.from(Item.class);
-        criteriaQuery.select(itemRoot);
+        criteriaQuery.select(criteriaBuilder.count(itemRoot));
         criteriaQuery.where(criteriaBuilder.and(
             criteriaBuilder.equal(itemRoot.get(Item_.inArchive), includeArchived),
             criteriaBuilder.equal(itemRoot.get(Item_.withdrawn), includeWithdrawn),

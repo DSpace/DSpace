@@ -167,9 +167,9 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
         Context context, Item item, boolean excludeTilted, boolean excludeNonLatest
     ) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
-        criteriaQuery.select(relationshipRoot);
+        criteriaQuery.select(criteriaBuilder.count(relationshipRoot));
 
         criteriaQuery.where(
             criteriaBuilder.or(
@@ -355,9 +355,9 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
     public int countByRelationshipType(Context context, RelationshipType relationshipType) throws SQLException {
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
-        criteriaQuery.select(relationshipRoot);
+        criteriaQuery.select(criteriaBuilder.count(relationshipRoot));
         criteriaQuery
                 .where(criteriaBuilder.equal(relationshipRoot.get(Relationship_.relationshipType), relationshipType));
         return count(context, criteriaQuery, criteriaBuilder, relationshipRoot);
@@ -366,9 +366,9 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
     @Override
     public int countRows(Context context) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
-        criteriaQuery.select(relationshipRoot);
+        criteriaQuery.select(criteriaBuilder.count(relationshipRoot));
         return count(context, criteriaQuery, criteriaBuilder, relationshipRoot);
     }
 
@@ -377,9 +377,9 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
         Context context, Item item, RelationshipType relationshipType, boolean isLeft, boolean excludeNonLatest
     ) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
-        criteriaQuery.select(relationshipRoot);
+        criteriaQuery.select(criteriaBuilder.count(relationshipRoot));
 
         if (isLeft) {
             criteriaQuery.where(
@@ -407,8 +407,9 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
             ids.add(relationshipType.getID());
         }
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
+        criteriaQuery.select(criteriaBuilder.count(relationshipRoot));
         criteriaQuery.where(relationshipRoot.get(Relationship_.relationshipType).in(ids));
         return count(context, criteriaQuery, criteriaBuilder, relationshipRoot);
     }

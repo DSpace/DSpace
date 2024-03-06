@@ -78,7 +78,7 @@ public class InProgressUserDAOImpl extends AbstractHibernateDAO<InProgressUser> 
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
 
         Root<InProgressUser> inProgressUserRoot = criteriaQuery.from(InProgressUser.class);
-
+        criteriaQuery.select(criteriaBuilder.count(inProgressUserRoot));
         criteriaQuery.where(criteriaBuilder.and(
             criteriaBuilder.equal(inProgressUserRoot.get(InProgressUser_.workflowItem), workflowItem),
             criteriaBuilder.equal(inProgressUserRoot.get(InProgressUser_.finished), false)
@@ -94,7 +94,7 @@ public class InProgressUserDAOImpl extends AbstractHibernateDAO<InProgressUser> 
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
 
         Root<InProgressUser> inProgressUserRoot = criteriaQuery.from(InProgressUser.class);
-
+        criteriaQuery.select(criteriaBuilder.count(inProgressUserRoot));
         criteriaQuery.where(criteriaBuilder.and(
             criteriaBuilder.equal(inProgressUserRoot.get(InProgressUser_.workflowItem), workflowItem),
             criteriaBuilder.equal(inProgressUserRoot.get(InProgressUser_.finished), true)
