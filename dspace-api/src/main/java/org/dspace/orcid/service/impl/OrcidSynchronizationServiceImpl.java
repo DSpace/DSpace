@@ -118,12 +118,8 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
         itemService.clearMetadata(context, profile, "dspace", "orcid", "scope", Item.ANY);
         itemService.clearMetadata(context, profile, "dspace", "orcid", "authenticated", Item.ANY);
 
-        itemService.clearMetadata(context, profile, "dspace", "orcid", "sync-mode", Item.ANY);
-        itemService.clearMetadata(context, profile, "dspace", "orcid", "sync-profile", Item.ANY);
-
-        for (OrcidEntityType entityType : OrcidEntityType.values()) {
-            itemService.clearMetadata(context, profile, "dspace", "orcid",
-                "sync-" + entityType.name().toLowerCase() + "s", Item.ANY);
+        if (!configurationService.getBooleanProperty("orcid.disconnection.remain-sync", false)) {
+            clearSynchronizationSettings(context, profile);
         }
 
         orcidTokenService.deleteByProfileItem(context, profile);
@@ -273,6 +269,17 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
 
         return true;
 
+    }
+
+    private void clearSynchronizationSettings(Context context, Item profile)
+        throws SQLException {
+        itemService.clearMetadata(context, profile, "dspace", "orcid", "sync-mode", Item.ANY);
+        itemService.clearMetadata(context, profile, "dspace", "orcid", "sync-profile", Item.ANY);
+
+        for (OrcidEntityType entityType : OrcidEntityType.values()) {
+            itemService.clearMetadata(context, profile, "dspace", "orcid",
+                "sync-" + entityType.name().toLowerCase() + "s", Item.ANY);
+        }
     }
 
     private boolean containsSameValues(List<String> firstList, List<String> secondList) {
