@@ -142,13 +142,10 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
     public List<BitstreamFormat> findAll(Context context, Class clazz) throws SQLException {
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, BitstreamFormat.class);
+        CriteriaQuery<BitstreamFormat> criteriaQuery = getCriteriaQuery(criteriaBuilder, BitstreamFormat.class);
         Root<BitstreamFormat> bitstreamFormatRoot = criteriaQuery.from(BitstreamFormat.class);
         criteriaQuery.select(bitstreamFormatRoot);
-
-        List<jakarta.persistence.criteria.Order> orderList = new LinkedList<>();
-        orderList.add(criteriaBuilder.asc(bitstreamFormatRoot.get(BitstreamFormat_.id)));
-        criteriaQuery.orderBy(orderList);
+        criteriaQuery.orderBy(criteriaBuilder.asc(bitstreamFormatRoot.get(BitstreamFormat_.id)));
 
         return list(context, criteriaQuery, false, BitstreamFormat.class, -1, -1);
     }
