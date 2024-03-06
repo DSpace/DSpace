@@ -73,7 +73,7 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
                                                 "from c.metadata internal " +
                                                 "where internal.metadataField = :sortField and" +
                                                     " internal.dSpaceObject = c)" +
-                                " ORDER BY LOWER(title.value)");
+                                " ORDER BY LOWER(CAST(title.value as string))");
         Query query = createQuery(context, queryBuilder.toString());
         if (offset != null) {
             query.setFirstResult(offset);
@@ -114,7 +114,7 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
                                                 "where internal.metadataField = :sortField and" +
                                                         " internal.dSpaceObject = c)" +
                                 " WHERE c.parentCommunities IS EMPTY " +
-                                " ORDER BY LOWER(title.value)");
+                                " ORDER BY LOWER(CAST(title.value as string))");
         Query query = createQuery(context, queryBuilder.toString());
         query.setParameter("sortField", sortField);
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
