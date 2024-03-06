@@ -7,6 +7,7 @@
  */
 package org.dspace.app.ldn;
 
+import java.lang.reflect.Field;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,6 +34,12 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
     /**
      * LDN messages interact with a fictitious queue. Scheduled tasks manage the queue.
      */
+
+    /*
+     * Notification Type constants
+     */
+    public static final String TYPE_INCOMING = "Incoming";
+    public static final String TYPE_OUTGOING = "Outgoing";
 
     /**
      * Message must not be processed.
@@ -68,6 +75,11 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
      * Message is not processed since action is not mapped
      */
     public static final Integer QUEUE_STATUS_UNMAPPED_ACTION = 6;
+
+    /**
+     * Message queued for retry, it has to be elaborated.
+     */
+    public static final Integer QUEUE_STATUS_QUEUED_FOR_RETRY = 7;
 
     @Id
     private String id;
@@ -274,5 +286,34 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
     @Override
     public String toString() {
         return "LDNMessage id:" + this.getID() + " typed:" + this.getType();
+    }
+
+    public static String getNotificationType(LDNMessageEntity ldnMessage) {
+        if (ldnMessage.getInReplyTo() != null || ldnMessage.getOrigin() != null) {
+            return TYPE_INCOMING;
+        }
+        return TYPE_OUTGOING;
+    }
+
+    public static String getServiceNameForNotifyServ(NotifyServiceEntity serviceEntity) {
+        if (serviceEntity != null) {
+            return serviceEntity.getName();
+        }
+        return "self";
+    }
+
+    public static String getQueueStatus(LDNMessageEntity ldnMessage) {
+        Class<LDNMessageEntity> cl = LDNMessageEntity.class;
+        try {
+            for (Field f : cl.getDeclaredFields()) {
+                String fieldName = f.getName();
+                if (fieldName.startsWith("QUEUE_") && (f.get(null) == ldnMessage.getQueueStatus())) {
+                    return fieldName;
+                }
+            }
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
     }
 }

@@ -365,4 +365,5 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
         Item item = uriListHandlerService.handle(context, req, stringList, Item.class);
         return converter.toRest(item, utils.obtainProjection());
     }
+
 }

@@ -139,9 +139,18 @@ public interface LDNMessageService {
     public void delete(Context context, LDNMessageEntity ldnMessage) throws SQLException;
 
     /**
-     * check if IP number is included in the configured ip-range on the Notify Service
+     * find the ldn messages to be reprocessed
+     *
+     * @param context the context
+     * @throws SQLException if something goes wrong
+     */
+    public List<LDNMessageEntity> findMessagesToBeReprocessed(Context context) throws SQLException;
+
+    /**
+     * check if IP number is included in the configured ip-range on the Notify
+     * Service
      * 
-     * @param origin the Notify Service entity
+     * @param origin   the Notify Service entity
      * @param sourceIp the ip to evaluate
      */
     public boolean isValidIp(NotifyServiceEntity origin, String sourceIp);
