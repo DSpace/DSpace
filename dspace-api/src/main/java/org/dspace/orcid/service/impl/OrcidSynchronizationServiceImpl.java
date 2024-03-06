@@ -118,6 +118,14 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
         itemService.clearMetadata(context, profile, "dspace", "orcid", "scope", Item.ANY);
         itemService.clearMetadata(context, profile, "dspace", "orcid", "authenticated", Item.ANY);
 
+        itemService.clearMetadata(context, profile, "dspace", "orcid", "sync-mode", Item.ANY);
+        itemService.clearMetadata(context, profile, "dspace", "orcid", "sync-profile", Item.ANY);
+
+        for (OrcidEntityType entityType : OrcidEntityType.values()) {
+            itemService.clearMetadata(context, profile, "dspace", "orcid",
+                "sync-" + entityType.name().toLowerCase() + "s", Item.ANY);
+        }
+
         orcidTokenService.deleteByProfileItem(context, profile);
 
         updateItem(context, profile);
