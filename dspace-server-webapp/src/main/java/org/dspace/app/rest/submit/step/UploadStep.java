@@ -48,8 +48,6 @@ public class UploadStep extends AbstractProcessingStep
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(UploadStep.class);
 
-    public static String UPLOAD_STEP_ID;
-
     @Override
     public DataUpload getData(SubmissionService submissionService, InProgressSubmission obj,
                               SubmissionStepConfig config) throws Exception {
@@ -94,7 +92,6 @@ public class UploadStep extends AbstractProcessingStep
             if (op.getPath().contains(UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY)) {
                 instance = stepConf.getType() + "." + UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY;
             } else if (op.getPath().contains(UPLOAD_STEP_METADATA_PATH)) {
-                UPLOAD_STEP_ID = stepConf.getId();
                 instance = UPLOAD_STEP_METADATA_OPERATION_ENTRY;
             } else if (op.getPath().contains(PRIMARY_FLAG_ENTRY)) {
                 instance = PRIMARY_FLAG_ENTRY;

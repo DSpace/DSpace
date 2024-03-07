@@ -41,15 +41,15 @@ public class BitstreamMetadataValuePathUtils {
      *                                      submission configuration
      * @throws UnprocessableEntityException if the path is invalid
      */
-    public void validate(String absolutePath) throws DCInputsReaderException {
-        UploadConfiguration uploadService = uploadConfigurationService.getMap().get(UploadStep.UPLOAD_STEP_ID);
+    public void validate(String stepId, String absolutePath) throws DCInputsReaderException {
+        UploadConfiguration uploadService = uploadConfigurationService.getMap().get(stepId);
         DCInputSet inputConfig = inputReader.getInputsByFormName(uploadService.getMetadata());
         String[] split = absolutePath.split("/");
         // according to the rest contract the absolute path must be something like files/:idx/metadata/dc.title
         if (split.length >= 4) {
             if (!inputConfig.isFieldPresent(split[3])) {
                 throw new UnprocessableEntityException("The field " + split[3] + " is not present in section "
-                                                                    + UploadStep.UPLOAD_STEP_ID);
+                                                                    + stepId);
             }
         } else {
             throw new UnprocessableEntityException("The path " + absolutePath + " cannot be patched ");

@@ -60,6 +60,15 @@ public abstract class PatchOperation<T extends Object> {
         return absolutePath;
     }
 
+    public String getStepId(String fullpath) {
+        String[] path = fullpath.substring(1).split("/", 3);
+        String stepId = "";
+        if (path.length > 1) {
+            stepId = path[1];
+        }
+        return stepId;
+    }
+
     protected abstract Class<T[]> getArrayClassForEvaluation();
 
     protected abstract Class<T> getClassForEvaluation();

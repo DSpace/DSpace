@@ -47,9 +47,10 @@ public class BitstreamMetadataValueReplacePatchOperation extends MetadataValueRe
             Object value) throws Exception {
         //"path": "/sections/upload/files/0/metadata/dc.title/2"
         //"abspath": "/files/0/metadata/dc.title/2"
+        String stepId = getStepId(path);
         String absolutePath = getAbsolutePath(path);
         String[] split = absolutePath.split("/");
-        bitstreamMetadataValuePathUtils.validate(absolutePath);
+        bitstreamMetadataValuePathUtils.validate(stepId, absolutePath);
         Item item = source.getItem();
         List<Bundle> bundle = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
         for (Bundle bb : bundle) {
