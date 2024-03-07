@@ -69,7 +69,7 @@
                                 <!-- ${agnostic.build.dir} is set dynamically by groovy-maven-plugin above -->
                                 <!-- For "dspace-services" we don't need a full test environment, we just need
                                      a valid "config-definition.xml" which exists in target/test-classes/ -->
-                                <dspace.dir>${agnostic.build.dir}/test-classes/</dspace.dir>
+                                <dspace.dir>${agnostic.build.dir}/test-classes</dspace.dir>
                             </systemPropertyVariables>
                         </configuration>
                     </plugin>
