@@ -88,7 +88,7 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
     @JoinColumn(name = "object", referencedColumnName = "uuid")
     private DSpaceObject object;
 
-    @Column(name = "message", nullable = false, columnDefinition = "text")
+    @Column(name = "message", columnDefinition = "text")
     private String message;
 
     @Column(name = "type")

@@ -75,24 +75,21 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
     public void findAllTest() throws Exception {
         context.turnOffAuthorisationSystem();
         NotifyServiceEntity notifyServiceEntityOne =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name one")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name one")
                                 .withDescription("service description one")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceEntityTwo =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name two")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name two")
                                 .withDescription("service description two")
                                 .withUrl("https://service2.ldn.org/about")
                                 .withLdnUrl("https://service2.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceEntityThree =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name three")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name three")
                                 .withDescription("service description three")
                                 .withUrl("https://service3.ldn.org/about")
                                 .withLdnUrl("https://service3.ldn.org/inbox")
@@ -132,8 +129,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
     public void findOneTest() throws Exception {
         context.turnOffAuthorisationSystem();
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -246,8 +242,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -274,8 +269,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -302,8 +296,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
                                 .isEnabled(false)
@@ -333,8 +326,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
@@ -360,8 +352,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -392,8 +383,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -424,8 +414,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -452,8 +441,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
@@ -482,8 +470,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
@@ -509,8 +496,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -541,8 +527,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -572,7 +557,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -599,8 +584,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -630,8 +614,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withUrl("https://service.ldn.org/about")
                                 .build();
         context.restoreAuthSystemState();
@@ -656,8 +639,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -687,8 +669,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -720,8 +701,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -760,23 +740,20 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
     public void findByLdnUrlTest() throws Exception {
         context.turnOffAuthorisationSystem();
         NotifyServiceEntity notifyServiceEntityOne =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name one")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name one")
                                 .withDescription("service description one")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
       NotifyServiceEntity notifyServiceEntityTwo =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name two")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name two")
                                 .withDescription("service description two")
                                 .withUrl("https://service2.ldn.org/about")
                                 .withLdnUrl("https://service2.ldn.org/inbox")
                                 .build();
 
-      NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                          .withName("service name three")
+      NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name three")
                           .withDescription("service description three")
                           .withUrl("https://service3.ldn.org/about")
                           .withLdnUrl("https://service3.ldn.org/inbox")
@@ -818,8 +795,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
     public void deleteTest() throws Exception {
         context.turnOffAuthorisationSystem();
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("service ldnUrl")
@@ -842,8 +818,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -886,8 +861,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -937,8 +911,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -1001,8 +974,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -1052,8 +1024,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -1118,8 +1089,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -1175,8 +1145,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -1241,8 +1210,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -1298,8 +1266,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -1363,8 +1330,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -1414,8 +1380,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -1480,8 +1445,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -1537,8 +1501,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -1603,8 +1566,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -1660,8 +1622,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -1726,8 +1687,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -1783,8 +1743,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -1850,8 +1809,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -1907,8 +1865,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -1964,8 +1921,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -2020,8 +1976,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -2101,24 +2056,21 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntityOne =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name one")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name one")
                                 .withDescription("service description one")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceEntityTwo =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name two")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name two")
                                 .withDescription("service description two")
                                 .withUrl("https://service2.ldn.org/about")
                                 .withLdnUrl("https://service2.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceEntityThree =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name three")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name three")
                                 .withDescription("service description")
                                 .withUrl("https://service3.ldn.org/about")
                                 .withLdnUrl("https://service3.ldn.org/inbox")
@@ -2175,8 +2127,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         context.turnOffAuthorisationSystem();
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -2204,8 +2155,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
     public void NotifyServiceScoreReplaceOperationTest() throws Exception {
         context.turnOffAuthorisationSystem();
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withScore(BigDecimal.ZERO)
                                 .withUrl("https://service.ldn.org/about")
@@ -2235,8 +2185,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
         context.turnOffAuthorisationSystem();
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("service url")
                                 .withLdnUrl("service ldn url")
@@ -2264,8 +2213,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("service url")
                                 .withLdnUrl("service ldn url")
@@ -2315,8 +2263,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withUrl("https://service.ldn.org/about")
                                 .build();
         context.restoreAuthSystemState();
@@ -2341,8 +2288,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -2375,8 +2321,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -2405,8 +2350,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withUrl("https://service.ldn.org/about")
                                 .build();
         context.restoreAuthSystemState();
@@ -2431,8 +2375,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -2465,8 +2408,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")

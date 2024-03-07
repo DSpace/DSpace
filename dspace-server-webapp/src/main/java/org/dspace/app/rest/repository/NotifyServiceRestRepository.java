@@ -106,8 +106,7 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
                 notifyServiceRest.getLdnUrl()));
         }
 
-        NotifyServiceEntity notifyServiceEntity = notifyService.create(context);
-        notifyServiceEntity.setName(notifyServiceRest.getName());
+        NotifyServiceEntity notifyServiceEntity = notifyService.create(context, notifyServiceRest.getName());
         notifyServiceEntity.setDescription(notifyServiceRest.getDescription());
         notifyServiceEntity.setUrl(notifyServiceRest.getUrl());
         notifyServiceEntity.setLdnUrl(notifyServiceRest.getLdnUrl());
