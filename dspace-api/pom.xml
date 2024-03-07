@@ -731,18 +731,16 @@
             <version>1.12.261</version>
         </dependency>
 
+        <!-- TODO: This may need to be replaced with the "orcid-model" artifact once this ticket is resolved:
+             https://github.com/ORCID/orcid-model/issues/50 -->
         <dependency>
             <groupId>org.orcid</groupId>
-            <artifactId>orcid-model</artifactId>
-            <version>3.0.2</version>
+            <artifactId>orcid-model-jakarta</artifactId>
+            <version>3.3.0</version>
             <exclusions>
                 <exclusion>
-                    <groupId>javax.validation</groupId>
-                    <artifactId>validation-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.jaxrs</groupId>
-                    <artifactId>jackson-jaxrs-json-provider</artifactId>
+                    <groupId>com.fasterxml.jackson.jarkarta.rs</groupId>
+                    <artifactId>jackson-jakarta-rs-json-provider</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.yaml</groupId>
@@ -753,8 +751,8 @@
                     <artifactId>javassist</artifactId>
                 </exclusion>
                 <exclusion>
-                	<groupId>io.swagger</groupId>
-                	<artifactId>swagger-jersey-jaxrs</artifactId>
+                    <groupId>io.swagger.core.v3</groupId>
+                    <artifactId>swagger-jaxrs2-jakarta</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

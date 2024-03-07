@@ -1955,5 +1955,14 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+        <!-- For Jakarta EE version of "orcid-model". REMOVE once official "orcid-model" is updated to Jakarta,
+             see https://github.com/ORCID/orcid-model/issues/50-->
+        <repository>
+            <id>oicr.on.ca</id>
+            <url>https://artifacts.oicr.on.ca/artifactory/collab-release/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
     </repositories>
 </project>
