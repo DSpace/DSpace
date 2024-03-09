@@ -35,7 +35,8 @@ import org.springframework.stereotype.Component;
  *
  * @author Mykhaylo Boychuk (4Science.it)
  */
-@Component(VocabularyRest.CATEGORY + "." + VocabularyEntryDetailsRest.NAME + "." + VocabularyEntryDetailsRest.CHILDREN)
+@Component(VocabularyRest.CATEGORY + "." + VocabularyEntryDetailsRest.PLURAL_NAME + "." +
+    VocabularyEntryDetailsRest.CHILDREN)
 public class VocabularyEntryDetailsChildrenLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
 

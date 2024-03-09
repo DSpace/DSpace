@@ -1,16 +1,17 @@
 # This image will be published as dspace/dspace
 # See https://github.com/DSpace/DSpace/tree/main/dspace/src/main/docker for usage details
 #
-# - note: default tag for branch: dspace/dspace: dspace/dspace:dspace-7_x-test
+# - note: default tag for branch: dspace/dspace: dspace/dspace:latest-test
 #
 # This image is meant for TESTING/DEVELOPMENT ONLY as it deploys the old v6 REST API under HTTP (not HTTPS)
 
 # This Dockerfile uses JDK11 by default, but has also been tested with JDK17.
 # To build with JDK17, use "--build-arg JDK_VERSION=17"
 ARG JDK_VERSION=11
+ARG DSPACE_VERSION=latest
 
 # Step 1 - Run Maven Build
-FROM dspace/dspace-dependencies:dspace-7_x as build
+FROM dspace/dspace-dependencies:${DSPACE_VERSION} as build
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 # The dspace-installer directory will be written to /install
@@ -20,9 +21,9 @@ RUN mkdir /install \
 USER dspace
 # Copy the DSpace source code (from local machine) into the workdir (excluding .dockerignore contents)
 ADD --chown=dspace . /app/
-# Build DSpace (INCLUDING the optional, deprecated "dspace-rest" webapp)
+# Build DSpace
 # Copy the dspace-installer directory to /install.  Clean up the build to keep the docker image small
-RUN mvn --no-transfer-progress package -Pdspace-rest && \
+RUN mvn --no-transfer-progress package && \
   mv /app/dspace/target/${TARGET_DIR}/* /install && \
   mvn clean
 
@@ -66,17 +67,10 @@ ENV CATALINA_OPTS=-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:800
 
 # Link the DSpace 'server' webapp into Tomcat's webapps directory.
 # This ensures that when we start Tomcat, it runs from /server path (e.g. http://localhost:8080/server/)
-# Also link the v6.x (deprecated) REST API off the "/rest" path
-RUN ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/server   && \
-    ln -s $DSPACE_INSTALL/webapps/rest          /usr/local/tomcat/webapps/rest
+RUN ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/server
 # If you wish to run "server" webapp off the ROOT path, then comment out the above RUN, and uncomment the below RUN.
 # You also MUST update the 'dspace.server.url' configuration to match.
 # Please note that server webapp should only run on one path at a time.
 #RUN mv /usr/local/tomcat/webapps/ROOT /usr/local/tomcat/webapps/ROOT.bk && \
-#    ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/ROOT && \
-#    ln -s $DSPACE_INSTALL/webapps/rest          /usr/local/tomcat/webapps/rest
+#    ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/ROOT
 
-# Overwrite the v6.x (deprecated) REST API's web.xml, so that we can run it on HTTP (defaults to requiring HTTPS)
-# WARNING: THIS IS OBVIOUSLY INSECURE. NEVER DO THIS IN PRODUCTION.
-COPY dspace/src/main/docker/test/rest_web.xml $DSPACE_INSTALL/webapps/rest/WEB-INF/web.xml
-RUN sed -i -e "s|\${dspace.dir}|$DSPACE_INSTALL|" $DSPACE_INSTALL/webapps/rest/WEB-INF/web.xml

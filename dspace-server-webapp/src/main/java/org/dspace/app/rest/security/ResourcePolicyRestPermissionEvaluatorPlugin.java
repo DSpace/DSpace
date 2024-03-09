@@ -11,6 +11,8 @@ import java.io.Serializable;
 import java.sql.SQLException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.service.AuthorizeService;
@@ -20,21 +22,19 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 /**
- * {@link RestPermissionEvaluatorPlugin} class that evaluate READ, WRITE and DELETE permissions over a ResourcePolicy
- * 
+ * {@link RestPermissionEvaluatorPlugin} class that evaluate READ, WRITE and DELETE permissions over a ResourcePolicy.
+ *
  * @author Mykhaylo Boychuk (4science.it)
  */
 @Component
 public class ResourcePolicyRestPermissionEvaluatorPlugin extends RestObjectPermissionEvaluatorPlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(ResourcePolicyRestPermissionEvaluatorPlugin.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     AuthorizeService authorizeService;
@@ -78,7 +78,7 @@ public class ResourcePolicyRestPermissionEvaluatorPlugin extends RestObjectPermi
                 return true;
             }
         } catch (SQLException e) {
-            log.error(e.getMessage(), e);
+            log.error(e::getMessage, e);
         }
 
         return false;

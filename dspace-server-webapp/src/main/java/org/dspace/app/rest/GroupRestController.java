@@ -47,7 +47,7 @@ import org.springframework.web.bind.annotation.RestController;
  * This will be the entry point for the api/eperson/groups endpoint with additional paths to it
  */
 @RestController
-@RequestMapping("/api/" + GroupRest.CATEGORY + "/" + GroupRest.GROUPS)
+@RequestMapping("/api/" + GroupRest.CATEGORY + "/" + GroupRest.PLURAL_NAME)
 public class GroupRestController {
 
     @Autowired

@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "relationshipType" subresource of an individual Relationship.
  */
-@Component(RelationshipRest.CATEGORY + "." + RelationshipRest.NAME + "." + RelationshipRest.RELATIONSHIP_TYPE)
+@Component(RelationshipRest.CATEGORY + "." + RelationshipRest.PLURAL_NAME + "." + RelationshipRest.RELATIONSHIP_TYPE)
 public class RelationshipTypeRelationshipLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

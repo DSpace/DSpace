@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.6</version>
+        <version>8.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -39,20 +39,6 @@
          compiling of the corresponding source module.
     -->
     <profiles>
-        <!-- As this old REST API module is deprecated, it only builds if you activate it via -Pdspace-rest -->
-        <profile>
-            <id>dspace-rest</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <!-- Enable if we are doing a release (-Drelease), to tag/release this optional module -->
-                <property>
-                    <name>release</name>
-                </property>
-            </activation>
-            <modules>
-                <module>rest</module>
-            </modules>
-        </profile>
         <profile>
             <id>dspace-server-webapp</id>
             <activation>
@@ -62,6 +48,17 @@
             </activation>
             <modules>
                 <module>server</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>dspace-server-webapp-boot</id>
+            <activation>
+                <file>
+                    <exists>server-boot/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>server-boot</module>
             </modules>
         </profile>
     </profiles>

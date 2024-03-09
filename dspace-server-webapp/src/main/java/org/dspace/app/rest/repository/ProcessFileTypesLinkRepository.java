@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
  * It'll retrieve all the bitstreams for the given Process and return a {@link ProcessFileTypesRest} object that holds
  * a list of Strings where each String represents a unique fileType of the Bitstreams for that Process
  */
-@Component(ProcessRest.CATEGORY + "." + ProcessRest.NAME + "." + ProcessRest.FILE_TYPES)
+@Component(ProcessRest.CATEGORY + "." + ProcessRest.PLURAL_NAME + "." + ProcessRest.FILE_TYPES)
 public class ProcessFileTypesLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     @Autowired

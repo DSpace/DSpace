@@ -22,6 +22,8 @@ public class IdentifiersRest  extends BaseObjectRest<String> {
 
     // Set names used in component wiring
     public static final String NAME = "identifiers";
+    public static final String PLURAL_NAME = "identifiers";
+
     private List<IdentifierRest> identifiers;
 
     // Empty constructor
@@ -35,6 +37,11 @@ public class IdentifiersRest  extends BaseObjectRest<String> {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     public List<IdentifierRest> getIdentifiers() {

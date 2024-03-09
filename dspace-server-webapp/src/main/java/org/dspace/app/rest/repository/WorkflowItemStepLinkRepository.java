@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link Repository for the Steps subresources of an individual WorkflowItem
  */
-@Component(WorkflowItemRest.CATEGORY + "." + WorkflowItemRest.NAME + "." + WorkflowItemRest.STEP)
+@Component(WorkflowItemRest.CATEGORY + "." + WorkflowItemRest.PLURAL_NAME + "." + WorkflowItemRest.STEP)
 public class WorkflowItemStepLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     @Autowired

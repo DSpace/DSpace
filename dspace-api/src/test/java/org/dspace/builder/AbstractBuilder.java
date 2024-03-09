@@ -14,8 +14,15 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.alerts.service.SystemWideAlertService;
+import org.dspace.app.ldn.factory.NotifyServiceFactory;
+import org.dspace.app.ldn.service.LDNMessageService;
+import org.dspace.app.ldn.service.NotifyPatternToTriggerService;
+import org.dspace.app.ldn.service.NotifyService;
+import org.dspace.app.ldn.service.NotifyServiceInboundPatternService;
 import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
 import org.dspace.app.requestitem.service.RequestItemService;
+import org.dspace.app.suggestion.SolrSuggestionStorageService;
+import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -50,11 +57,15 @@ import org.dspace.orcid.factory.OrcidServiceFactory;
 import org.dspace.orcid.service.OrcidHistoryService;
 import org.dspace.orcid.service.OrcidQueueService;
 import org.dspace.orcid.service.OrcidTokenService;
+import org.dspace.qaevent.service.QAEventService;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.submit.factory.SubmissionServiceFactory;
+import org.dspace.submit.service.SubmissionConfigService;
 import org.dspace.supervision.factory.SupervisionOrderServiceFactory;
 import org.dspace.supervision.service.SupervisionOrderService;
+import org.dspace.utils.DSpace;
 import org.dspace.versioning.factory.VersionServiceFactory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.versioning.service.VersioningService;
@@ -110,9 +121,16 @@ public abstract class AbstractBuilder<T, S> {
     static OrcidQueueService orcidQueueService;
     static OrcidTokenService orcidTokenService;
     static SystemWideAlertService systemWideAlertService;
+    static SubmissionConfigService submissionConfigService;
     static SubscribeService subscribeService;
     static SupervisionOrderService supervisionOrderService;
+    static NotifyService notifyService;
+    static NotifyServiceInboundPatternService inboundPatternService;
+    static NotifyPatternToTriggerService notifyPatternToTriggerService;
 
+    static QAEventService qaEventService;
+    static SolrSuggestionStorageService solrSuggestionService;
+    static LDNMessageService ldnMessageService;
 
     protected Context context;
 
@@ -175,8 +193,19 @@ public abstract class AbstractBuilder<T, S> {
         orcidTokenService = OrcidServiceFactory.getInstance().getOrcidTokenService();
         systemWideAlertService = DSpaceServicesFactory.getInstance().getServiceManager()
                                                       .getServicesByType(SystemWideAlertService.class).get(0);
+        try {
+            submissionConfigService = SubmissionServiceFactory.getInstance().getSubmissionConfigService();
+        } catch (SubmissionConfigReaderException e) {
+            log.error(e.getMessage(), e);
+        }
         subscribeService = ContentServiceFactory.getInstance().getSubscribeService();
         supervisionOrderService = SupervisionOrderServiceFactory.getInstance().getSupervisionOrderService();
+        notifyService = NotifyServiceFactory.getInstance().getNotifyService();
+        inboundPatternService = NotifyServiceFactory.getInstance().getNotifyServiceInboundPatternService();
+        notifyPatternToTriggerService = NotifyServiceFactory.getInstance().getNotifyPatternToTriggerService();
+        qaEventService = new DSpace().getSingletonService(QAEventService.class);
+        solrSuggestionService = new DSpace().getSingletonService(SolrSuggestionStorageService.class);
+        ldnMessageService = NotifyServiceFactory.getInstance().getLDNMessageService();
     }
 
 
@@ -212,8 +241,14 @@ public abstract class AbstractBuilder<T, S> {
         doiService = null;
         orcidTokenService = null;
         systemWideAlertService = null;
+        submissionConfigService = null;
         subscribeService = null;
         supervisionOrderService = null;
+        notifyService = null;
+        inboundPatternService = null;
+        notifyPatternToTriggerService = null;
+        qaEventService = null;
+        ldnMessageService = null;
 
     }
 

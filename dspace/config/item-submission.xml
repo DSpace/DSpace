@@ -55,9 +55,7 @@
             - - - - - -
             PLEASE NOTICE THAT YOU WILL HAVE TO RESTART DSPACE
             - - - - - -
-            Uncomment if you intend to use them
-        -->  
-        <!-- 
+        -->
         <name-map collection-entity-type="Publication" submission-name="Publication"/>
         <name-map collection-entity-type="Person" submission-name="Person"/>
         <name-map collection-entity-type="Project" submission-name="Project"/>
@@ -65,7 +63,14 @@
         <name-map collection-entity-type="Journal" submission-name="Journal"/>
         <name-map collection-entity-type="JournalVolume" submission-name="JournalVolume"/>
         <name-map collection-entity-type="JournalIssue" submission-name="JournalIssue"/>
-         -->
+
+        <!-- Example of configuration using a community handle to map an Item Submission Process.
+
+            This configuration maps the submission process to the community's descendant
+            collections that do not have a mapping defined by collection-handle or entity-type
+
+        <name-map community-handle="123456789/1234" submission-name="xxxx"/>
+        -->
 
     </submission-map>
 
@@ -189,28 +194,28 @@
             <type>extract</type>
         </step-definition>
 
-        <!-- OpenAIRE submission steps/forms -->
-        <step-definition id="openAIREProjectForm" mandatory="true">
+        <!-- Openaire submission steps/forms -->
+        <step-definition id="openaireProjectForm" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
         </step-definition>
-        <step-definition id="openAIREPersonForm" mandatory="true">
+        <step-definition id="openairePersonForm" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
         </step-definition>
-        <step-definition id="openAIREOrganizationForm" mandatory="true">
+        <step-definition id="openaireOrganizationForm" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
         </step-definition>
-        <step-definition id="openAIREPublicationPageoneForm" mandatory="true">
+        <step-definition id="openairePublicationPageoneForm" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
         </step-definition>
-        <step-definition id="openAIREPublicationPagetwoForm" mandatory="true">
+        <step-definition id="openairePublicationPagetwoForm" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
@@ -235,6 +240,20 @@
             <processing-class>org.dspace.app.rest.submit.step.ShowIdentifiersStep</processing-class>
             <type>identifiers</type>
         </step-definition>
+
+        <step-definition id="coarnotify">
+            <heading>submit.progressbar.coarnotify</heading>
+            <processing-class>org.dspace.app.rest.submit.step.NotifyStep</processing-class>
+            <type>coarnotify</type>
+        </step-definition>
+
+        <!-- Detect duplicates step -->
+        <step-definition id="duplicates">
+            <heading>submit.progressbar.duplicates</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DuplicateDetectionStep</processing-class>
+            <type>duplicates</type>
+        </step-definition>
+
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -271,6 +290,14 @@
 
             <!-- Uncomment this step to show when appropriate publisher policies retrieved from SHERPA/RoMEO -->
             <!-- <step id="sherpaPolicies"/> -->
+
+            <!-- To include the 'Duplicate Detection' step, uncomment the line below. Make sure
+                 that duplicate-detection.cfg is properly configured and items have been reindexed since
+                 enabling the feature -->
+            <!-- <step id="duplicates"/> -->
+
+            <!--Step will be COAR Notify services to the item -->
+            <!-- <step id="coarnotify"/> -->
 
             <!--Step will be to Upload the item -->
             <step id="upload"/>
@@ -365,13 +392,13 @@
             <step id="license"/>
         </submission-process>
 
-        <!-- OpenAIRE submission processes -->
-        <submission-process name="openAIREPublicationSubmission">
+        <!-- Openaire submission processes -->
+        <submission-process name="openairePublicationSubmission">
             <step id="collection"/>
 
             <!--Step will be to Describe the item. -->
-            <step id="openAIREPublicationPageoneForm"/>
-            <step id="openAIREPublicationPagetwoForm"/>
+            <step id="openairePublicationPageoneForm"/>
+            <step id="openairePublicationPagetwoForm"/>
 
             <!--Step will be to Upload the item -->
             <!-- step id="upload-with-embargo"/-->
@@ -380,17 +407,17 @@
             <!--Step will be to Sign off on the License -->
             <step id="license"/>
         </submission-process>
-        <submission-process name="openAIREPersonSubmission">
+        <submission-process name="openairePersonSubmission">
             <step id="collection"/>
-            <step id="openAIREPersonForm"/>
+            <step id="openairePersonForm"/>
         </submission-process>
-        <submission-process name="openAIREProjectSubmission">
+        <submission-process name="openaireProjectSubmission">
             <step id="collection"/>
-            <step id="openAIREProjectForm"/>
+            <step id="openaireProjectForm"/>
         </submission-process>
-        <submission-process name="openAIREOrganizationSubmission">
+        <submission-process name="openaireOrganizationSubmission">
             <step id="collection"/>
-            <step id="openAIREOrganizationForm"/>
+            <step id="openaireOrganizationForm"/>
         </submission-process>
     </submission-definitions>
 

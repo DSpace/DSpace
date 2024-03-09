@@ -87,5 +87,4 @@ public class SimpleXpathDateFormatMetadataContributor extends SimpleXpathMetadat
         dcValue.setSchema(field.getSchema());
         return dcValue;
     }
-
 }
