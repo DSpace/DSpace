@@ -51,8 +51,8 @@ public class SubmissionCCLicenseUrlResourceHalLinkFactory
 
 
         UriComponentsBuilder uriComponentsBuilder = uriBuilder(getMethodOn().executeSearchMethods(
-                SubmissionCCLicenseUrlRest.CATEGORY, SubmissionCCLicenseUrlRest.PLURAL, "rightsByQuestions", null, null,
-                null, null, new LinkedMultiValueMap<>()));
+            SubmissionCCLicenseUrlRest.CATEGORY, SubmissionCCLicenseUrlRest.PLURAL_NAME, "rightsByQuestions", null,
+            null, null, null, new LinkedMultiValueMap<>()));
         for (String key : parameterMap.keySet()) {
             uriComponentsBuilder.queryParam(key, parameterMap.get(key));
         }

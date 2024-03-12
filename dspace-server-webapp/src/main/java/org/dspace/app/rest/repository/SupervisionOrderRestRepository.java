@@ -52,7 +52,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science dot it)
  */
-@Component(SupervisionOrderRest.CATEGORY + "." + SupervisionOrderRest.NAME)
+@Component(SupervisionOrderRest.CATEGORY + "." + SupervisionOrderRest.PLURAL_NAME)
 public class SupervisionOrderRestRepository extends DSpaceRestRepository<SupervisionOrderRest, Integer> {
 
     private static final Logger log =

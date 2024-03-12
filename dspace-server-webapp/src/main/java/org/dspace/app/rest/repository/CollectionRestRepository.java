@@ -81,7 +81,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
-@Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME)
+@Component(CollectionRest.CATEGORY + "." + CollectionRest.PLURAL_NAME)
 public class CollectionRestRepository extends DSpaceObjectRestRepository<Collection, CollectionRest> {
 
     public static Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionRestRepository.class);

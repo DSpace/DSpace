@@ -18,11 +18,11 @@ import javax.naming.NamingException;
 import javax.naming.NoInitialContextException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.EmailService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -35,7 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class EmailServiceImpl
     extends Authenticator
     implements EmailService {
-    private static final Logger logger = LoggerFactory.getLogger(EmailServiceImpl.class);
+    private static final Logger logger = LogManager.getLogger();
 
     private Session session = null;
 

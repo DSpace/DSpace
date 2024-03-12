@@ -31,7 +31,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.JsonPatchConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -126,7 +125,7 @@ public class RestResourceController implements InitializingBean {
             // see https://github.com/spring-projects/spring-hateoas/issues/408
             // Link l = linkTo(this.getClass(), r).withRel(r);
             String[] split = r.split("\\.", 2);
-            String plural = English.plural(split[1]);
+            String plural = split[1];
             Link l = Link.of("/api/" + split[0] + "/" + plural, plural);
             links.add(l);
             log.debug(l.getRel().value() + " " + l.getHref());
@@ -948,7 +947,7 @@ public class RestResourceController implements InitializingBean {
             int start = Math.toIntExact(page.getOffset());
             int end = (start + page.getPageSize()) > fullList.size() ? fullList.size() : (start + page.getPageSize());
             DSpaceRestRepository<RestAddressableModel, ?> resourceRepository = utils
-                .getResourceRepository(fullList.get(0).getCategory(), fullList.get(0).getType());
+                .getResourceRepository(fullList.get(0).getCategory(), fullList.get(0).getTypePlural());
             PageImpl<RestAddressableModel> pageResult = new PageImpl(fullList.subList(start, end), page,
                                                                      fullList.size());
             return assembler.toModel(pageResult.map(converter::toResource));

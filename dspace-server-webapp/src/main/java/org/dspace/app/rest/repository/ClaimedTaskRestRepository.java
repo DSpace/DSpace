@@ -64,7 +64,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
-@Component(PoolTaskRest.CATEGORY + "." + ClaimedTaskRest.NAME)
+@Component(PoolTaskRest.CATEGORY + "." + ClaimedTaskRest.PLURAL_NAME)
 public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskRest, Integer>
                                        implements InitializingBean {
 

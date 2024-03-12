@@ -55,7 +55,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-@Component(MetadataFieldRest.CATEGORY + "." + MetadataFieldRest.NAME)
+@Component(MetadataFieldRest.CATEGORY + "." + MetadataFieldRest.PLURAL_NAME)
 public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFieldRest, Integer> {
     /**
      * log4j logger
