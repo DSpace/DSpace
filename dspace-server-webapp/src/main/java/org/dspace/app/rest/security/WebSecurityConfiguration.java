@@ -20,11 +20,10 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
@@ -70,32 +69,14 @@ public class WebSecurityConfiguration {
     private String actuatorBasePath;
 
     /**
-     * Bean to customize WebSecurity to ignore specific URL paths entirely
-     */
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (webSecurity) ->
-            webSecurity.ignoring()
-                       // These /login request types are purposefully unsecured, as they all throw errors.
-                       .requestMatchers(HttpMethod.GET, "/api/authn/login")
-                       .requestMatchers(HttpMethod.PUT, "/api/authn/login")
-                       .requestMatchers(HttpMethod.PATCH, "/api/authn/login")
-                       .requestMatchers(HttpMethod.DELETE, "/api/authn/login");
-    }
-
-
-    /**
      * Create a Spring Security AuthenticationManager with our custom AuthenticationProvider
-     * @param http HttpSecurity
      * @return AuthenticationManager
      */
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http)
-        throws Exception {
-        AuthenticationManagerBuilder authenticationManagerBuilder =
-            http.getSharedObject(AuthenticationManagerBuilder.class);
-        authenticationManagerBuilder.authenticationProvider(ePersonRestAuthenticationProvider);
-        return authenticationManagerBuilder.build();
+    public AuthenticationManager authenticationManager() {
+        ProviderManager manager = new ProviderManager(ePersonRestAuthenticationProvider);
+        return manager;
+
     }
 
     /**
@@ -104,21 +85,20 @@ public class WebSecurityConfiguration {
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // Get the current AuthenticationManager to use to apply filters below
-        AuthenticationManager authenticationManager =
-            authenticationManager(http);
+        // Get the current AuthenticationManager (defined above) to apply filters below
+        AuthenticationManager authenticationManager = authenticationManager();
 
         // Configure authentication requirements for ${dspace.server.url}/api/ URL only
         // NOTE: REST API is hardcoded to respond on /api/. Other modules (OAI, SWORD, IIIF, etc) use other root paths.
         http.securityMatcher("/api/**", "/iiif/**", actuatorBasePath + "/**", "/signposting/**")
-            // Enable Spring Security authorization on these paths
-            .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
-                // Allow POST by anyone on the login endpoint
-                .requestMatchers(HttpMethod.POST,"/api/authn/login").permitAll()
-                // Everyone can call GET on the status endpoint (used to check your authentication status)
-                .requestMatchers(HttpMethod.GET, "/api/authn/status").permitAll()
-                .requestMatchers(HttpMethod.GET, actuatorBasePath + "/info").hasAnyAuthority(ADMIN_GRANT)
-            )
+            .authorizeHttpRequests((requests) -> requests
+                // Ensure /actuator/info endpoint is restricted to admins
+                .requestMatchers(new AntPathRequestMatcher(actuatorBasePath + "/info", HttpMethod.GET.name()))
+                    .hasAnyAuthority(ADMIN_GRANT)
+                // All other requests should be permitted at this layer because we check permissions on each method
+                // via @PreAuthorize annotations. As this code runs first, we must permitAll() here in order to pass
+                // the request on to those annotations.
+                .anyRequest().permitAll())
             // Tell Spring to not create Sessions
             .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             // Anonymous requests should have the "ANONYMOUS" security grant
@@ -148,31 +128,33 @@ public class WebSecurityConfiguration {
                 .logoutRequestMatcher(new AntPathRequestMatcher("/api/authn/logout", HttpMethod.POST.name()))
                 // When logout is successful, return OK (204) status
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT))
-                // Everyone can call this endpoint
-                .permitAll()
             )
             // Add a filter before any request to handle DSpace IP-based authorization/authentication
             // (e.g. anonymous users may be added to special DSpace groups if they are in a given IP range)
             .addFilterBefore(new AnonymousAdditionalAuthorizationFilter(authenticationManager, authenticationService),
                              StatelessAuthenticationFilter.class)
-            // Add a filter before our login endpoints to do the authentication based on the data in the HTTP request
-            .addFilterBefore(new StatelessLoginFilter("/api/authn/login", authenticationManager,
-                                                      restAuthenticationService),
+            // Add a filter before our login endpoints to do the authentication based on the data in the HTTP request.
+            // This login endpoint only responds to POST as it is used for PasswordAuthentication
+            .addFilterBefore(new StatelessLoginFilter("/api/authn/login", HttpMethod.POST.name(),
+                                                      authenticationManager, restAuthenticationService),
                              LogoutFilter.class)
-            // Add a filter before our shibboleth endpoints to do the authentication based on the data in the
-            // HTTP request
-            .addFilterBefore(new ShibbolethLoginFilter("/api/authn/shibboleth", authenticationManager,
-                                                       restAuthenticationService),
+            // Add a filter before our shibboleth endpoints to do the authentication based on the data in the HTTP
+            // request. This endpoint only responds to GET as the actual authentication is performed by Shibboleth,
+            // which then redirects to this endpoint to forward the authentication data to DSpace.
+            .addFilterBefore(new ShibbolethLoginFilter("/api/authn/shibboleth", HttpMethod.GET.name(),
+                                                       authenticationManager, restAuthenticationService),
                              LogoutFilter.class)
-            //Add a filter before our ORCID endpoints to do the authentication based on the data in the
-            // HTTP request
-            .addFilterBefore(new OrcidLoginFilter("/api/authn/orcid", authenticationManager,
-                                                  restAuthenticationService),
+            // Add a filter before our ORCID endpoints to do the authentication based on the data in the HTTP request.
+            // This endpoint only responds to GET as the actual authentication is performed by ORCID, which then
+            // redirects to this endpoint to forward the authentication data to DSpace.
+            .addFilterBefore(new OrcidLoginFilter("/api/authn/orcid", HttpMethod.GET.name(),
+                                                  authenticationManager, restAuthenticationService),
                              LogoutFilter.class)
-            //Add a filter before our OIDC endpoints to do the authentication based on the data in the
-            // HTTP request
-            .addFilterBefore(new OidcLoginFilter("/api/authn/oidc", authenticationManager,
-                                                 restAuthenticationService),
+            // Add a filter before our OIDC endpoints to do the authentication based on the data in the HTTP request.
+            // This endpoint only responds to GET as the actual authentication is performed by OIDC, which then
+            // redirects to this endpoint to forward the authentication data to DSpace.
+            .addFilterBefore(new OidcLoginFilter("/api/authn/oidc", HttpMethod.GET.name(),
+                                                 authenticationManager, restAuthenticationService),
                              LogoutFilter.class)
             // Add a custom Token based authentication filter based on the token previously given to the client
             // before each URL

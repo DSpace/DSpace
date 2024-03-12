@@ -32,6 +32,8 @@ import org.springframework.security.core.AuthenticationException;
 
 /**
  * This class will filter ORCID requests and try and authenticate them.
+ * In this case, the actual authentication is performed by ORCID. After authentication succeeds, ORCID will send
+ * the authentication data to this filter in order for it to be processed by DSpace.
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  */
@@ -45,9 +47,9 @@ public class OrcidLoginFilter extends StatelessLoginFilter {
     private OrcidAuthenticationBean orcidAuthentication = new DSpace().getServiceManager()
         .getServiceByName("orcidAuthentication", OrcidAuthenticationBean.class);
 
-    public OrcidLoginFilter(String url, AuthenticationManager authenticationManager,
+    public OrcidLoginFilter(String url, String httpMethod, AuthenticationManager authenticationManager,
                                      RestAuthenticationService restAuthenticationService) {
-        super(url, authenticationManager, restAuthenticationService);
+        super(url, httpMethod, authenticationManager, restAuthenticationService);
     }
 
     @Override
@@ -57,7 +59,7 @@ public class OrcidLoginFilter extends StatelessLoginFilter {
         if (!OrcidAuthentication.isEnabled()) {
             throw new ProviderNotFoundException("Orcid login is disabled.");
         }
-
+        // NOTE: because this authentication is implicit, we pass in an empty DSpaceAuthentication
         return authenticationManager.authenticate(new DSpaceAuthentication());
 
     }

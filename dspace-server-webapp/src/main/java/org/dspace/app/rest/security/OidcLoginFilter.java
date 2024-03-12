@@ -20,16 +20,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
 /**
- * This class will filter openID Connect requests and try and authenticate them.
+ * This class will filter OpenID Connect (OIDC) requests and try and authenticate them.
+ * In this case, the actual authentication is performed by OIDC. After authentication succeeds, OIDC will send
+ * the authentication data to this filter in order for it to be processed by DSpace.
  *
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
  */
-
 public class OidcLoginFilter extends StatelessLoginFilter {
 
-    public OidcLoginFilter(String url, AuthenticationManager authenticationManager,
+    public OidcLoginFilter(String url, String httpMethod, AuthenticationManager authenticationManager,
             RestAuthenticationService restAuthenticationService) {
-        super(url, authenticationManager, restAuthenticationService);
+        super(url, httpMethod, authenticationManager, restAuthenticationService);
     }
 
     @Override
