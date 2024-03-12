@@ -8,6 +8,7 @@
 package org.dspace.authorize.dao.impl;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -17,7 +18,9 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Order;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import org.apache.commons.collections.CollectionUtils;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.ResourcePolicy_;
 import org.dspace.authorize.dao.ResourcePolicyDAO;
@@ -153,16 +156,30 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
 
     public List<ResourcePolicy> findByEPersonGroupTypeIdAction(Context context, EPerson e, List<Group> groups,
                                                                int action, int type_id) throws SQLException {
+        // If groups and eperson are empty, return immediately
+        if (CollectionUtils.isEmpty(groups) && e == null) {
+            return Collections.emptyList();
+        }
+
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
         Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
         criteriaQuery.select(resourcePolicyRoot);
+
+        // Determine which predicate to use to match EPerson or Group(s) based on which were specified in params
+        Predicate compareEpersonOrGroups =
+            (CollectionUtils.isNotEmpty(groups) && e != null) ?
+                // Both are non-empty, so check both via an OR clause
+                criteriaBuilder.or(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.eperson), e),
+                                   resourcePolicyRoot.get(ResourcePolicy_.epersonGroup).in(groups)) :
+                // Otherwise only check one based on which is non-empty
+                (e != null ? criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.eperson), e) :
+                             resourcePolicyRoot.get(ResourcePolicy_.epersonGroup).in(groups));
+
         criteriaQuery.where(
             criteriaBuilder.and(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.resourceTypeId), type_id),
                                 criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.actionId), action),
-                                criteriaBuilder
-                                    .or(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.eperson), e),
-                                        (resourcePolicyRoot.get(ResourcePolicy_.epersonGroup).in(groups)))
+                                compareEpersonOrGroups
             )
         );
         return list(context, criteriaQuery, false, ResourcePolicy.class, 1, -1);

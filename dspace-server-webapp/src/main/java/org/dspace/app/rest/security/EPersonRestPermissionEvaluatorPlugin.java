@@ -61,6 +61,9 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
         if (Constants.getTypeID(targetType) != Constants.EPERSON) {
             return false;
         }
+        if (targetId == null) {
+            return false;
+        }
 
         Request request = requestService.getCurrentRequest();
         Context context = ContextUtil.obtainContext(request.getHttpServletRequest());
