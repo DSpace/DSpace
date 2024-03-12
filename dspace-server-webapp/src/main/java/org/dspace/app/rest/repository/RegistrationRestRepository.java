@@ -43,6 +43,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -79,6 +80,7 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
     private RegistrationDataService registrationDataService;
 
     @Override
+    @PreAuthorize("permitAll()")
     public RegistrationRest findOne(Context context, Integer integer) {
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
