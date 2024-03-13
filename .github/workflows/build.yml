@@ -45,7 +45,7 @@ jobs:
     steps:
       # https://github.com/actions/checkout
       - name: Checkout codebase
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # https://github.com/actions/setup-java
       - name: Install JDK ${{ matrix.java }}
@@ -53,16 +53,7 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
-
-      # https://github.com/actions/cache
-      - name: Cache Maven dependencies
-        uses: actions/cache@v3
-        with:
-          # Cache entire ~/.m2/repository
-          path: ~/.m2/repository
-          # Cache key is hash of all pom.xml files. Therefore any changes to POMs will invalidate cache
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-maven-
+          cache: 'maven'
 
       # Run parallel Maven builds based on the above 'strategy.matrix'
       - name: Run Maven ${{ matrix.type }}
@@ -96,7 +87,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Download artifacts from previous 'tests' job
       - name: Download coverage artifacts
@@ -108,10 +99,13 @@ jobs:
       # Retry action: https://github.com/marketplace/actions/retry-action
       # Codecov action: https://github.com/codecov/codecov-action
       - name: Upload coverage to Codecov.io
-        uses: Wandalen/wretry.action@v1.0.36
+        uses: Wandalen/wretry.action@v1.3.0
         with:
           action: codecov/codecov-action@v3
-          # Try upload 5 times max
+          # Ensure codecov-action throws an error when it fails to upload
+          with: |
+            fail_ci_if_error: true
+          # Try re-running action 5 times max
           attempt_limit: 5
           # Run again in 30 seconds
           attempt_delay: 30000

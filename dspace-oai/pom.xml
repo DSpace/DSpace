@@ -8,7 +8,7 @@
     <parent>
         <artifactId>dspace-parent</artifactId>
         <groupId>org.dspace</groupId>
-        <version>7.6.1</version>
+        <version>7.6.2-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -156,7 +156,7 @@
         <!-- As our Parent POM sets this to 'test' scope, we must override it -->
         <dependency>
             <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-all</artifactId>
+            <artifactId>hamcrest</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>
