@@ -162,6 +162,9 @@ public class SubmissionConfigReader {
         } catch (FactoryConfigurationError fe) {
             throw new SubmissionConfigReaderException(
                 "Cannot create Item Submission Configuration parser", fe);
+        } catch (SQLException sqle) {
+            throw new SubmissionConfigReaderException(
+                 "Cannot perform a SQL command for Item Submission Configuration", sqle);
         } catch (SearchServiceException se) {
             throw new SubmissionConfigReaderException(
                 "Cannot perform a discovery search for Item Submission Configuration", se);
@@ -300,7 +303,8 @@ public class SubmissionConfigReader {
      * should correspond to the collection-form maps, the form definitions, and
      * the display/storage word pairs.
      */
-    private void doNodes(Node n) throws SAXException, SearchServiceException, SubmissionConfigReaderException {
+    private void doNodes(Node n)
+            throws SAXException, SQLException, SearchServiceException, SubmissionConfigReaderException {
         if (n == null) {
             return;
         }
@@ -347,7 +351,7 @@ public class SubmissionConfigReader {
      * the collection handle and item submission name, put name in hashmap keyed
      * by the collection handle.
      */
-    private void processMap(Node e) throws SAXException, SearchServiceException {
+    private void processMap(Node e) throws SAXException, SQLException, SearchServiceException {
         // create a context
         Context context = new Context();
 

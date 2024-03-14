@@ -40,6 +40,12 @@ public interface CollectionService
     public static final String SOLR_SORT_FIELD = "dc.title_sort";
 
     /**
+     * the number of collections to be returned by solr
+     * for each page result
+     */
+    public static final int SOLR_ROWS_PER_PAGE = 100;
+
+    /**
      * Create a new collection with a new ID.
      * Once created the collection is added to the given community
      *
@@ -469,7 +475,7 @@ public interface CollectionService
      * @throws SearchServiceException    if search error
      */
     public List<Collection> findAllCollectionsByEntityType(Context context, String entityType)
-        throws SearchServiceException;
+        throws SQLException, SearchServiceException;
 
     /**
      * Returns total collection archived items
