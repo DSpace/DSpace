@@ -23,6 +23,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
@@ -41,7 +42,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  */
 public class QAEventActionServiceImpl implements QAEventActionService {
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(QAEventActionServiceImpl.class);
+
+    private static final Logger log = LogManager.getLogger(QAEventActionServiceImpl.class);
 
     private ObjectMapper jsonMapper;
 
@@ -78,12 +80,21 @@ public class QAEventActionServiceImpl implements QAEventActionService {
             if (qaevent.getRelated() != null) {
                 related = itemService.find(context, UUID.fromString(qaevent.getRelated()));
             }
+            if (topicsToActions.get(qaevent.getTopic()) == null) {
+                String msg = "Unable to manage QA Event typed " + qaevent.getTopic()
+                    + ". Managed types are: " + topicsToActions;
+                log.error(msg);
+                throw new RuntimeException(msg);
+            }
+            context.turnOffAuthorisationSystem();
             topicsToActions.get(qaevent.getTopic()).applyCorrection(context, item, related,
                 jsonMapper.readValue(qaevent.getMessage(), qaevent.getMessageDtoClass()));
             qaEventService.deleteEventByEventId(qaevent.getEventId());
             makeAcknowledgement(qaevent.getEventId(), qaevent.getSource(), QAEvent.ACCEPTED);
         } catch (SQLException | JsonProcessingException e) {
             throw new RuntimeException(e);
+        } finally {
+            context.restoreAuthSystemState();
         }
     }
 

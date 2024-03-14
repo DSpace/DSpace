@@ -19,6 +19,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.ItemService;
@@ -42,8 +44,6 @@ import org.orcid.jaxb.model.v3.release.record.ExternalIDs;
 import org.orcid.jaxb.model.v3.release.record.Work;
 import org.orcid.jaxb.model.v3.release.record.WorkContributors;
 import org.orcid.jaxb.model.v3.release.record.WorkTitle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -55,7 +55,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class OrcidWorkFactory implements OrcidEntityFactory {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrcidWorkFactory.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired
     private ItemService itemService;
@@ -164,7 +164,7 @@ public class OrcidWorkFactory implements OrcidEntityFactory {
      */
     private List<ExternalID> getWorkSelfExternalIds(Context context, Item item) {
 
-        List<ExternalID> selfExternalIds = new ArrayList<ExternalID>();
+        List<ExternalID> selfExternalIds = new ArrayList<>();
 
         Map<String, String> externalIdentifierFields = fieldMapping.getExternalIdentifierFields();
 

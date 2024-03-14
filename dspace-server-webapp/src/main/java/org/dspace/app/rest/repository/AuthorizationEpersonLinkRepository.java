@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "eperson" subresource of an individual authorization.
  */
-@Component(AuthorizationRest.CATEGORY + "." + AuthorizationRest.NAME + "." + AuthorizationRest.EPERSON)
+@Component(AuthorizationRest.CATEGORY + "." + AuthorizationRest.PLURAL_NAME + "." + AuthorizationRest.EPERSON)
 public class AuthorizationEpersonLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

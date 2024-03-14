@@ -17,8 +17,6 @@ import javax.servlet.ServletResponse;
 
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.core.Context;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A Servlet Filter whose only role is to clean up open Context objects in
@@ -29,8 +27,6 @@ import org.slf4j.LoggerFactory;
  * @see ContextUtil
  */
 public class DSpaceRequestContextFilter implements Filter {
-    private static final Logger log = LoggerFactory.getLogger(DSpaceRequestContextFilter.class);
-
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         //noop

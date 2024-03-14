@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
  * This Repository takes care of the retrieval of the {@link org.dspace.content.Item} objects
  * for a given {@link Version}
  */
-@Component(VersionRest.CATEGORY + "." + VersionRest.NAME + "." + VersionRest.ITEM)
+@Component(VersionRest.CATEGORY + "." + VersionRest.PLURAL_NAME + "." + VersionRest.ITEM)
 public class VersionItemLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
 

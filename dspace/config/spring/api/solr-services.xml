@@ -37,5 +37,7 @@
     
     <bean class="org.dspace.statistics.GeoIpService" autowire-candidate="true"/>
     
-
+    <!-- suggestion service for solr providers -->     
+    <bean id="org.dspace.app.suggestion.SolrSuggestionStorageService" class="org.dspace.app.suggestion.SolrSuggestionStorageServiceImpl" />
+    
 </beans>

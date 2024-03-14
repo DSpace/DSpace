@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "subcommunities" subresource of an individual community.
  */
-@Component(CommunityRest.CATEGORY + "." + CommunityRest.NAME + "." + CommunityRest.SUBCOMMUNITIES)
+@Component(CommunityRest.CATEGORY + "." + CommunityRest.PLURAL_NAME + "." + CommunityRest.SUBCOMMUNITIES)
 public class CommunitySubcommunityLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

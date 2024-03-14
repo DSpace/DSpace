@@ -13,8 +13,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.statistics.factory.StatisticsServiceFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * SpiderDetector delegates static methods to SpiderDetectorService, which is used to find IP's that are spiders...
@@ -26,11 +24,9 @@ import org.slf4j.LoggerFactory;
  */
 public class SpiderDetector {
 
-    private static final Logger log = LoggerFactory.getLogger(SpiderDetector.class);
-
     //Service where all methods get delegated to, this is instantiated by a spring-bean defined in core-services.xml
-    private static SpiderDetectorService spiderDetectorService = StatisticsServiceFactory.getInstance()
-                                                                                         .getSpiderDetectorService();
+    private static final SpiderDetectorService spiderDetectorService
+            = StatisticsServiceFactory.getInstance().getSpiderDetectorService();
 
     /**
      * Default constructor
