@@ -21,10 +21,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.NotFoundException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -67,6 +72,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 /**
  * A Controller for fetching the data for the ref-box in the Item View (FE).
@@ -77,6 +85,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/core/refbox")
 public class ClarinRefBoxController {
+
+    private final static String BIBTEX_TYPE = "bibtex";
+
     private final Logger log = org.apache.logging.log4j.LogManager.getLogger(ClarinRefBoxController.class);
 
     @Autowired
@@ -228,7 +239,7 @@ public class ClarinRefBoxController {
             XmlOutputContext xmlOutContext = XmlOutputContext.emptyContext(output);
             xmlOutContext.getWriter().writeStartDocument();
 
-            //Try to obtain just the metadata, if that fails return "normal" response
+            // Try to obtain just the metadata, if that fails return "normal" response
             try {
                 oaipmh.getInfo().getGetRecord().getRecord().getMetadata().write(xmlOutContext);
             } catch (Exception e) {
@@ -246,8 +257,10 @@ public class ClarinRefBoxController {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     "Unexpected error while writing the output. For more information visit the log files.");
         } catch (XOAIManagerResolverException e) {
-            throw new ServletException("OAI 2.0 wasn't correctly initialized," +
-                    " please check the log for previous errors", e);
+            String errMessage = "OAI 2.0 wasn't correctly initialized, please check the log for previous errors. " +
+                    "Error message: " + e.getMessage();
+            log.error(errMessage);
+            throw new ServletException(errMessage);
         } catch (OAIException e) {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     "Unexpected error. For more information visit the log files.");
@@ -263,8 +276,11 @@ public class ClarinRefBoxController {
                     HttpStatus.valueOf(HttpServletResponse.SC_NO_CONTENT));
         }
 
+        // Update the output string and remove the unwanted parts.
+        String outputString = updateOutput(type, output.toString());
+
         // Wrap the String output to the class for better parsing in the FE
-        OaiMetadataWrapper oaiMetadataWrapper = new OaiMetadataWrapper(output.toString());
+        OaiMetadataWrapper oaiMetadataWrapper = new OaiMetadataWrapper(StringUtils.defaultIfEmpty(outputString, ""));
         return new ResponseEntity<>(oaiMetadataWrapper, HttpStatus.valueOf(SC_OK));
     }
 
@@ -331,6 +347,56 @@ public class ClarinRefBoxController {
         return featuredServiceLinkList;
     }
 
+    /**
+     * Remove the unnecessary parts from the output.
+     */
+    private String updateOutput(String type, String output) {
+        try {
+            if (StringUtils.equals(type, BIBTEX_TYPE)) {
+                // Remove the XML header tag and the <bib:bibtex> tag from the string.
+                return getXmlTextContent(output);
+            } else {
+                // Remove the XML header tag from the string.
+                return removeXmlHeaderTag(output);
+            }
+        } catch (Exception e) {
+            log.error("Cannot update the xml string for citation because of: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Remove the XML header tag from the string.
+     *
+     * @param xml
+     * @return
+     */
+    private String removeXmlHeaderTag(String xml) {
+        String xmlHeaderPattern = "<\\?xml[^>]*\\?>";
+        Pattern xmlHeaderRegex = Pattern.compile(xmlHeaderPattern);
+        Matcher xmlHeaderMatcher = xmlHeaderRegex.matcher(xml);
+        if (xmlHeaderMatcher.find()) {
+            return xml.replaceFirst(xmlHeaderPattern, "");
+        } else {
+            return xml;
+        }
+    }
+
+    /**
+     * Get the text content from the xml string.
+     */
+    private String getXmlTextContent(String xml) throws ParserConfigurationException, IOException, SAXException {
+        // Parse the XML string
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document = builder.parse(new org.xml.sax.InputSource(new java.io.StringReader(xml)));
+
+        // Get the root element
+        Node root = document.getDocumentElement();
+
+        // Get the text content of the root element
+        return root.getTextContent().trim();
+    }
 }
 
 /**
