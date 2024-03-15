@@ -23,14 +23,14 @@ public class MetadataBitstreamWrapperRest extends BaseObjectRest<String> {
 
     private String name;
     private String description;
-    private String fileSize;
+    private long fileSize;
     private String checksum;
     private List<FileInfo> fileInfo;
     private String format;
     private String href;
     private boolean canPreview;
 
-    public MetadataBitstreamWrapperRest(String name, String description, String fileSize, String checksum,
+    public MetadataBitstreamWrapperRest(String name, String description, long fileSize, String checksum,
                                         List<FileInfo> fileInfo, String format, String href, boolean canPreview) {
         this.name = name;
         this.description = description;
@@ -93,11 +93,11 @@ public class MetadataBitstreamWrapperRest extends BaseObjectRest<String> {
         this.description = description;
     }
 
-    public String getFileSize() {
+    public long getFileSize() {
         return fileSize;
     }
 
-    public void setFileSize(String fileSize) {
+    public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
     }
 

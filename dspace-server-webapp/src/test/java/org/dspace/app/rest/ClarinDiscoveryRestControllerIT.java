@@ -122,7 +122,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)))
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)))
                 );
     }
 
@@ -1006,9 +1007,11 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         SortOptionMatcher.sortOptionMatcher(
                                 "dc.title", DiscoverySortFieldConfiguration.SORT_ORDER.asc.name()),
                         SortOptionMatcher.sortOptionMatcher(
-                                "dc.date.issued", DiscoverySortFieldConfiguration.SORT_ORDER.desc.name()),
+                                "dc.title", DiscoverySortFieldConfiguration.SORT_ORDER.desc.name()),
                         SortOptionMatcher.sortOptionMatcher(
-                                "dc.date.accessioned", DiscoverySortFieldConfiguration.SORT_ORDER.desc.name())
+                                "dc.date.issued", DiscoverySortFieldConfiguration.SORT_ORDER.asc.name()),
+                        SortOptionMatcher.sortOptionMatcher(
+                                "dc.date.issued", DiscoverySortFieldConfiguration.SORT_ORDER.desc.name())
                 )));
     }
 
@@ -1146,7 +1149,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -1287,7 +1291,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -1379,7 +1384,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -1461,7 +1467,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -1571,7 +1578,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -1653,7 +1661,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
@@ -1690,7 +1699,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
@@ -1728,7 +1738,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
@@ -1770,7 +1781,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
@@ -1859,7 +1871,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //We want to get the sort that's been used as well in the response
                 .andExpect(jsonPath("$.sort", is(
@@ -2073,7 +2086,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
                         FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
-                        FacetEntryMatcher.entityTypeFacet(false)
+                        FacetEntryMatcher.entityTypeFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -2165,7 +2179,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -2257,7 +2272,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -2343,7 +2359,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -2424,7 +2441,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -2511,7 +2529,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -2693,7 +2712,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -2839,7 +2859,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -2917,7 +2938,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -2993,7 +3015,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -3070,7 +3093,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -3157,7 +3181,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -3228,7 +3253,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/facets")))
@@ -3304,7 +3330,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -3381,7 +3408,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -3458,7 +3486,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -3536,7 +3565,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -3612,7 +3642,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -3689,7 +3720,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         FacetEntryMatcher.clarinLicenseRightsFacet(false),
                         FacetEntryMatcher.clarinItemsLanguageFacet(false),
                         FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false)
+                        FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
+                        FacetEntryMatcher.typeFacet(false)
                 )))
                 //There always needs to be a self link available
                 .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
@@ -4138,7 +4170,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                             FacetEntryMatcher.clarinItemsLanguageFacet(false),
                             FacetEntryMatcher.clarinItemsCommunityFacet(false),
                             FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
-                            FacetEntryMatcher.entityTypeFacet(false)
+                            FacetEntryMatcher.entityTypeFacet(false),
+                            FacetEntryMatcher.typeFacet(false)
                     )))
                     //There always needs to be a self link
                     .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))

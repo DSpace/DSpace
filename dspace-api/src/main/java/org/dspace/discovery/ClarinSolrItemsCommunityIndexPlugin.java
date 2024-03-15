@@ -39,7 +39,11 @@ public class ClarinSolrItemsCommunityIndexPlugin implements SolrServiceIndexPlug
             Community owningCommunity = clarinItemService.getOwningCommunity(context, item);
             String communityName = Objects.isNull(owningCommunity) ? " " : owningCommunity.getName();
 
+            // _keyword and _filter because
+            // they are needed in order to work as a facet and filter.
             document.addField("items_owning_community", communityName);
+            document.addField("items_owning_community_keyword", communityName);
+            document.addField("items_owning_community_filter", communityName);
         }
     }
 }

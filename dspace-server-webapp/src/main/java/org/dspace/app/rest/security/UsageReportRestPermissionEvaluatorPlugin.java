@@ -18,6 +18,7 @@ import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Site;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
@@ -92,6 +93,15 @@ public class UsageReportRestPermissionEvaluatorPlugin extends RestObjectPermissi
                 // If the dso is null then we give permission so we can throw another status code instead
                 if (Objects.isNull(dso)) {
                     return true;
+                }
+
+                // Show Site usage reports to anonymous users if the configuration is set to do so
+                // This Site usage reports are used in the home page and are not sensitive
+                if (dso instanceof Site) {
+                    if (!configurationService.getBooleanProperty("site.usage-reports.enable.auth.anonymous",
+                            false)) {
+                        return true;
+                    }
                 }
                 return authorizeService.authorizeActionBoolean(context, dso, restPermission.getDspaceApiActionId());
             } catch (SQLException e) {

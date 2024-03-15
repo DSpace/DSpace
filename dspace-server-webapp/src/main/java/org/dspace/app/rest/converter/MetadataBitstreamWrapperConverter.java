@@ -10,7 +10,6 @@ package org.dspace.app.rest.converter;
 import org.dspace.app.rest.model.MetadataBitstreamWrapperRest;
 import org.dspace.app.rest.model.wrapper.MetadataBitstreamWrapper;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.util.FileTreeViewGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -41,8 +40,7 @@ public class MetadataBitstreamWrapperConverter implements DSpaceConverter<Metada
         bitstreamWrapperRest.setId(modelObject.getBitstream().getID().toString());
         bitstreamWrapperRest.setDescription(modelObject.getDescription());
         bitstreamWrapperRest.setChecksum(modelObject.getBitstream().getChecksum());
-        bitstreamWrapperRest.setFileSize(FileTreeViewGenerator.humanReadableFileSize(
-                modelObject.getBitstream().getSizeBytes()));
+        bitstreamWrapperRest.setFileSize(modelObject.getBitstream().getSizeBytes());
         bitstreamWrapperRest.setFileInfo(modelObject.getFileInfo());
         bitstreamWrapperRest.setHref(modelObject.getHref());
         bitstreamWrapperRest.setFormat(modelObject.getFormat());

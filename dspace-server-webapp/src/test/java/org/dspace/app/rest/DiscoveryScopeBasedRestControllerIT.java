@@ -509,7 +509,8 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
                                       FacetEntryMatcher.entityTypeFacet(false),
                                       FacetEntryMatcher.clarinLicenseRightsFacet(false),
                                       FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                                      FacetEntryMatcher.clarinItemsLanguageFacet(false)
+                                      FacetEntryMatcher.clarinItemsLanguageFacet(false),
+                                      FacetEntryMatcher.typeFacet(false)
                            ))
                    );
     }
@@ -624,7 +625,8 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
                                       FacetEntryMatcher.entityTypeFacet(false),
                                       FacetEntryMatcher.clarinLicenseRightsFacet(false),
                                       FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                                      FacetEntryMatcher.clarinItemsLanguageFacet(false)
+                                      FacetEntryMatcher.clarinItemsLanguageFacet(false),
+                                      FacetEntryMatcher.typeFacet(false)
                               ))
                    );
     }
@@ -677,7 +679,8 @@ public class DiscoveryScopeBasedRestControllerIT extends AbstractControllerInteg
                                       FacetEntryMatcher.entityTypeFacet(false),
                                       FacetEntryMatcher.clarinLicenseRightsFacet(false),
                                       FacetEntryMatcher.clarinItemsCommunityFacet(false),
-                                      FacetEntryMatcher.clarinItemsLanguageFacet(false)
+                                      FacetEntryMatcher.clarinItemsLanguageFacet(false),
+                                      FacetEntryMatcher.typeFacet(false)
                            ))
                    );
     }

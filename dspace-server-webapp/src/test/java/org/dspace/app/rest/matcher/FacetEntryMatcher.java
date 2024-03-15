@@ -124,7 +124,7 @@ public class FacetEntryMatcher {
     public static Matcher<? super Object> clarinLicenseRightsFacet(boolean hasNext) {
         return allOf(
                 hasJsonPath("$.name", is("rights")),
-                hasJsonPath("$.facetType", is("standard")),
+                hasJsonPath("$.facetType", is("text")),
                 hasJsonPath("$.facetLimit", any(Integer.class)),
                 hasJsonPath("$._links.self.href", containsString("api/discover/facets/rights")),
                 hasJsonPath("$._links", matchNextLink(hasNext, "api/discover/facets/rights"))
@@ -144,7 +144,7 @@ public class FacetEntryMatcher {
     public static Matcher<? super Object> clarinItemsCommunityFacet(boolean hasNext) {
         return allOf(
                 hasJsonPath("$.name", is("items_owning_community")),
-                hasJsonPath("$.facetType", is("standard")),
+                hasJsonPath("$.facetType", is("text")),
                 hasJsonPath("$.facetLimit", any(Integer.class)),
                 hasJsonPath("$._links.self.href",
                         containsString("api/discover/facets/items_owning_community")),

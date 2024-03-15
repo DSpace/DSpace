@@ -53,6 +53,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.Site;
+import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
@@ -76,6 +77,8 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
     ConfigurationService configurationService;
     @Autowired
     protected AuthorizeService authorizeService;
+    @Autowired
+    protected SiteService siteService;
 
     private Community communityNotVisited;
     private Community communityVisited;
@@ -1530,6 +1533,22 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                     expectedTotalVisits
                 )
             )));
+    }
+
+    // Show usage reports for the Anonymous user - it could be configured by cfg property
+    // `site.usage-reports.enable.auth.anonymous`
+    @Test
+    public void usageReportsSearch_Site_For_Anonymous() throws Exception {
+        // This property is set to `true` before each test
+        configurationService.setProperty("usage-statistics.authorization.admin.usage", false);
+
+        // Get the site object UUID
+        Site site = siteService.findSite(context);
+        // Allow accessing Site usage reports for anonymous
+        getClient()
+                .perform(get("/api/statistics/usagereports/search/object?uri=http://localhost:8080/server/api/core" +
+                        "/sites/" + site.getID()))
+                .andExpect(status().isOk());
     }
 
     // Create expected points from -6 months to now, with given number of views in current month
