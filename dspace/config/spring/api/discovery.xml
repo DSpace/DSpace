@@ -306,6 +306,7 @@
                         <value>dc.title</value>
                         <value>dc.contributor.author</value>
                         <value>dc.creator</value>
+                        <value>dc.contributor.other</value>
                         <value>dc.subject</value>
                     </list>
                 </property>
@@ -464,6 +465,7 @@
                         <value>dc.title</value>
                         <value>dc.contributor.author</value>
                         <value>dc.creator</value>
+                        <value>dc.contributor.other</value>
                         <value>dc.subject</value>
                     </list>
                 </property>
@@ -615,6 +617,7 @@
                         <value>dc.title</value>
                         <value>dc.contributor.author</value>
                         <value>dc.creator</value>
+                        <value>dc.contributor.other</value>
                         <value>dc.subject</value>
                     </list>
                 </property>
@@ -754,6 +757,7 @@
                         <value>dc.title</value>
                         <value>dc.contributor.author</value>
                         <value>dc.creator</value>
+                        <value>dc.contributor.other</value>
                         <value>dc.subject</value>
                     </list>
                 </property>
@@ -893,6 +897,7 @@
                         <value>dc.title</value>
                         <value>dc.contributor.author</value>
                         <value>dc.creator</value>
+                        <value>dc.contributor.other</value>
                         <value>dc.subject</value>
                     </list>
                 </property>
@@ -2495,6 +2500,7 @@
             <list>
                 <value>dc.contributor.author</value>
                 <value>dc.creator</value>
+                <value>dc.contributor.other</value>
             </list>
         </property>
         <property name="facetLimit" value="5"/>
