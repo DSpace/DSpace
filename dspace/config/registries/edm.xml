@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dspace-dc-types>
+    <dc-schema>
+        <name>edm</name>
+        <namespace>http://www.europeana.eu/schemas/edm/</namespace>
+    </dc-schema>
+    <dc-type>
+        <schema>edm</schema>
+        <element>type</element>
+        <qualifier/>
+        <scope_note>The value must be one of the types accepted by Europeana as it will support portal functionality: TEXT, VIDEO, SOUND, IMAGE, 3D.
+        There's a huge overlap with values we allow in metashare's mediaType; eventually this might get merged.
+        </scope_note>
+    </dc-type>
+</dspace-dc-types>
+
+
