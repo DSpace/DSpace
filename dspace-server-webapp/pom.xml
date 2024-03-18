@@ -293,6 +293,14 @@
                 <artifactId>spring-expression</artifactId>
                 <version>${spring.version}</version>
             </dependency>
+
+            <!-- Specify the version of json-smart we want to use.
+                 This solves a version mismatch between nimbus-jose-jwt and json-path below. -->
+            <!--<dependency>
+                <groupId>net.minidev</groupId>
+                <artifactId>json-smart</artifactId>
+                <version>2.5.0</version>
+            </dependency>-->
         </dependencies>
     </dependencyManagement>
 
@@ -368,6 +376,13 @@
             <groupId>org.webjars.bowergithub.codeseven</groupId>
             <artifactId>toastr</artifactId>
             <version>2.1.4</version>
+            <exclusions>
+                <!-- We use a later version of JQuery as defined above -->
+                <exclusion>
+                    <groupId>org.webjars.bowergithub.jquery</groupId>
+                    <artifactId>jquery-dist</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Pull in current version of URI.js (https://medialize.github.io/URI.js/) via WebJars
              Made available at: webjars/urijs/src/URI.min.js -->
@@ -389,6 +404,13 @@
             <groupId>org.webjars.bowergithub.jashkenas</groupId>
             <artifactId>backbone</artifactId>
             <version>1.4.1</version>
+            <exclusions>
+                <!-- We use a later version of underscore as defined above -->
+                <exclusion>
+                    <groupId>org.webjars.bowergithub.jashkenas</groupId>
+                    <artifactId>underscore</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Pull in current version of json-editor.js (https://github.com/json-editor/json-editor) via WebJars
              Made available at: webjars/json-editor__json-editor/2.6.1/dist/jsoneditor.js
@@ -500,6 +522,21 @@
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
             <version>${nimbus-jose-jwt.version}</version>
+            <exclusions>
+                <!-- We pull in a later version below -->
+                <exclusion>
+                    <groupId>net.minidev</groupId>
+                    <artifactId>json-smart</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Specify the version of json-smart we want to use.
+             This solves a version mismatch between nimbus-jose-jwt and json-path below. -->
+        <dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>json-smart</artifactId>
+            <version>2.5.0</version>
         </dependency>
 
         <dependency>

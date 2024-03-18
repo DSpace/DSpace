@@ -88,7 +88,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.0.0-M3</version>
+                    <version>3.4.1</version>
                     <executions>
                         <execution>
                             <id>enforce-java</id>
@@ -175,7 +175,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.3.0</version>
                     <configuration>
                         <archive>
                             <manifest>
@@ -189,7 +189,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>3.2.3</version>
+                    <version>3.3.2</version>
                     <configuration>
                         <failOnMissingWebXml>false</failOnMissingWebXml>
                         <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
@@ -206,7 +206,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.22.2</version>
+                    <version>3.2.5</version>
                     <configuration>
                         <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                              maven-surefire-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
@@ -230,7 +230,7 @@
                 <!-- Used to run Integration tests (when enabled by -DskipIntegrationTests=false) -->
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>2.22.2</version>
+                    <version>3.2.5</version>
                     <configuration>
                         <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                              maven-failsafe-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
@@ -321,7 +321,7 @@
                 <!-- This additional configuration also cleans sub-modules -->
                 <plugin>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.2.0</version>
                     <configuration>
                         <filesets>
                             <fileset>
@@ -340,12 +340,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.1.2</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.3.1</version>
                 </plugin>
                 <!-- Used to validate License Headers (see build process) -->
                 <plugin>
@@ -357,13 +357,13 @@
                 <plugin>
                     <groupId>org.sonatype.plugins</groupId>
                     <artifactId>nexus-staging-maven-plugin</artifactId>
-                    <version>1.6.8</version>
+                    <version>1.6.13</version>
                 </plugin>
                 <!-- Used to generate JavaDocs for new releases (see release profile). -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.5.0</version>
                     <configuration>
                         <!-- Never fail a build based on Javadoc errors -->
                         <failOnError>false</failOnError>
@@ -378,7 +378,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.2.1</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <!-- Used for custom Groovy code that fills out the 'agnostic.build.dir' needed to
                      set 'dspace.dir' for our testing environment -->
@@ -409,7 +409,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.3</version>
+                <version>3.0.0</version>
                 <configuration>
                     <!-- During release:prepare and release:perform, pass the "release" property to enable the
                      "release" profile (and enable/disable other profiles based on whether they need releasing) -->

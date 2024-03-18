@@ -45,11 +45,6 @@
             </exclusions>
         </dependency>
 
-        <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-api-lang</artifactId>
-        </dependency>
-
         <!-- Needed to support Spring @Configuration classes (to register servlets/beans with Spring Boot webapp) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
