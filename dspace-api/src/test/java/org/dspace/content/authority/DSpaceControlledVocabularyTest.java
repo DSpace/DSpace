@@ -91,16 +91,6 @@ public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest {
 
     /**
      * Test of getMatches method of class
-     * DSpaceControlledVocabulary using a controlled vocabulary with configured storage of node id.
-     * @throws java.lang.ClassNotFoundException passed through.
-     */
-    @Test
-    public void testGetMatchesIdValueForLabel() throws ClassNotFoundException {
-
-    }
-
-    /**
-     * Test of getMatches method of class
      * DSpaceControlledVocabulary using a localized controlled vocabulary with no locale (fallback to default)
      * @throws java.lang.ClassNotFoundException passed through.
      */
