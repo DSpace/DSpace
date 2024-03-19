@@ -394,30 +394,26 @@
             <groupId>net.handle</groupId>
             <artifactId>handle</artifactId>
         </dependency>
+        <!-- Only necessary to run Handle Server from commandline. This is why it is a runtime dependency. -->
         <dependency>
             <groupId>net.cnri</groupId>
             <artifactId>cnri-servlet-container</artifactId>
+            <scope>runtime</scope>
             <exclusions>
-                <!-- Newer versions provided in our parent POM -->
+                <!-- Excluded because this library is incompatible with Jakarta EE. It causes errors in DSpace during
+                     startup & integration testing. Excluding doesn't seem to effect Handle Server startup. -->
                 <exclusion>
-                    <groupId>org.ow2.asm</groupId>
-                    <artifactId>asm-commons</artifactId>
-                </exclusion>
-                <!-- Newer version of Bouncycastle brought in via Tika -->
-                <exclusion>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcpkix-jdk15on</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcprov-jdk15on</artifactId>
+                    <groupId>org.mortbay.jasper</groupId>
+                    <artifactId>apache-jsp</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- Jetty is needed to run Handle Server -->
+
+        <!-- Jetty is needed to run Handle Server ONLY. This is why it is a runtime dependency. -->
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
@@ -473,6 +469,10 @@
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.el</groupId>
+            <artifactId>jakarta.el-api</artifactId>
         </dependency>
         <dependency>
             <groupId>jaxen</groupId>
@@ -861,12 +861,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-            <version>6.0.0</version>
-        </dependency>
-
     </dependencies>
 
     <dependencyManagement>

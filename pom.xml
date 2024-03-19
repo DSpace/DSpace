@@ -44,8 +44,9 @@
         <rome.version>1.19.0</rome.version>
         <slf4j.version>2.0.11</slf4j.version>
         <tika.version>2.5.0</tika.version>
-        <!-- Sync with whatever version Tika uses -->
+        <!-- Sync BouncyCastle & ASM with whatever version Tika uses -->
         <bouncycastle.version>1.70</bouncycastle.version>
+        <asm.version>8.0.1</asm.version>
         <!-- Jersey is used to integrate with external sources/services -->
         <jersey.version>3.1.5</jersey.version>
         <!--=== SERVER WEBAPP DEPENDENCIES ===-->
@@ -221,6 +222,9 @@
                         <trimStackTrace>false</trimStackTrace>
                         <!-- Whether to skip unit tests or not -->
                         <skipTests>${skipUnitTests}</skipTests>
+                        <!-- Do not fail immediately if a test specified via "-Dtest=[testClass]" isn't found.
+                             This allows the build to continue and keep trying to run that test in other modules. -->
+                        <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
                         <!--
                         Enable to debug Maven Surefire tests in remote proces
                         <debugForkedProcess>true</debugForkedProcess>
@@ -244,6 +248,9 @@
                         <trimStackTrace>false</trimStackTrace>
                         <!-- Whether to skip integration tests or not -->
                         <skipTests>${skipIntegrationTests}</skipTests>
+                        <!-- Do not fail immediately if a test specified via "-Dit.test=[testClass]" isn't found.
+                             This allows the build to continue and keep trying to run that test in other modules. -->
+                        <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
                     </configuration>
                     <executions>
                         <execution>
@@ -1285,7 +1292,22 @@
             <dependency>
                 <groupId>org.ow2.asm</groupId>
                 <artifactId>asm</artifactId>
-                <version>8.0.1</version>
+                <version>${asm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm-analysis</artifactId>
+                <version>${asm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm-commons</artifactId>
+                <version>${asm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm-tree</artifactId>
+                <version>${asm.version}</version>
             </dependency>
 
             <!-- Solr-core and Postgres disagree on versions of Checker Qual -->
@@ -1341,73 +1363,63 @@
                 <artifactId>handle</artifactId>
                 <version>9.3.1</version>
             </dependency>
-            <!-- Required to run Handle Server -->
+            <!-- Only necessary to run Handle Server from commandline. Therefore, a runtime dependency. -->
             <dependency>
                 <groupId>net.cnri</groupId>
                 <artifactId>cnri-servlet-container</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.0</version>
+                <scope>runtime</scope>
             </dependency>
-            <!-- Jetty is needed to run Handle Server (and tests in some modules)
-                 Solr and Handle Server disagree on version of Jetty, so we force a specific version here. -->
+            <!-- Jetty is ONLY needed to run Handle Server from commandline ONLY. Therefore, a runtime dependency. -->
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-server</artifactId>
                 <version>${jetty.version}</version>
+                <scope>runtime</scope>
             </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-alpn-java-server</artifactId>
-                <version>${jetty.version}</version>
-            </dependency>
+            <!-- The below Jetty dependency versions are only specified to avoid various dependency convergence errors
+                 between Solr, CNRI Handle Server, and Jetty-Server (see above). We do NOT use Jetty directly. -->
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-deploy</artifactId>
                 <version>${jetty.version}</version>
+                <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-http</artifactId>
                 <version>${jetty.version}</version>
+                <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-io</artifactId>
                 <version>${jetty.version}</version>
+                <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-servlet</artifactId>
                 <version>${jetty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-servlets</artifactId>
-                <version>${jetty.version}</version>
+                <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-util</artifactId>
                 <version>${jetty.version}</version>
+                <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-webapp</artifactId>
                 <version>${jetty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-xml</artifactId>
-                <version>${jetty.version}</version>
+                <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty.http2</groupId>
                 <artifactId>http2-common</artifactId>
                 <version>${jetty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty.http2</groupId>
-                <artifactId>http2-server</artifactId>
-                <version>${jetty.version}</version>
+                <scope>runtime</scope>
             </dependency>
 
             <dependency>
@@ -1518,6 +1530,11 @@
                 <groupId>jakarta.servlet</groupId>
                 <artifactId>jakarta.servlet-api</artifactId>
                 <version>6.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.el</groupId>
+                <artifactId>jakarta.el-api</artifactId>
+                <version>5.0.1</version>
             </dependency>
 
             <!-- Jaxen is needed by xoai and sword2-server, but they disagree on the versions -->
@@ -1642,6 +1659,12 @@
             <dependency>
                 <groupId>com.google.errorprone</groupId>
                 <artifactId>error_prone_core</artifactId>
+                <version>${errorprone.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_annotations</artifactId>
                 <version>${errorprone.version}</version>
                 <scope>compile</scope>
             </dependency>
