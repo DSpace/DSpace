@@ -60,9 +60,7 @@ import org.xml.sax.InputSource;
 public class DSpaceControlledVocabulary extends SelfNamedPlugin implements HierarchicalAuthority {
 
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DSpaceControlledVocabulary.class);
-    protected static String xpathIdTemplate = "//node[contains(translate(@id,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
-        "'abcdefghijklmnopqrstuvwxyz'),'%s')]";
-    protected static String xpathLabelTemplate = "//node[contains(translate(@label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
+    protected static String xpathTemplate = "//node[contains(translate(@label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
         "'abcdefghijklmnopqrstuvwxyz'),'%s')]";
     protected static String idTemplate = "//node[@id = '%s']";
     protected static String labelTemplate = "//node[@label = '%s']";
@@ -79,7 +77,6 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     protected Integer preloadLevel = 1;
     protected String valueAttribute = labelAttribute;
     protected String valueTemplate = labelTemplate;
-    protected String xpathValueTemplate = xpathLabelTemplate;
 
     public DSpaceControlledVocabulary() {
         super();
@@ -140,7 +137,6 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
             if (storeIDs) {
                 valueAttribute = idAttribute;
                 valueTemplate = idTemplate;
-                xpathValueTemplate = xpathIdTemplate;
             }
 
             String filename = vocabulariesPath + vocabularyName + ".xml";
@@ -184,7 +180,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
         String[] textHierarchy = text.split(hierarchyDelimiter, -1);
         for (int i = 0; i < textHierarchy.length; i++) {
             xpathExpression +=
-                String.format(xpathValueTemplate, textHierarchy[i].replaceAll("'", "&apos;").toLowerCase());
+                String.format(xpathTemplate, textHierarchy[i].replaceAll("'", "&apos;").toLowerCase());
         }
         XPath xpath = XPathFactory.newInstance().newXPath();
         int total = 0;
