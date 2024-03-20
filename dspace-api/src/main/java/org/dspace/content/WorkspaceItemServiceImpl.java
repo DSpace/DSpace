@@ -96,11 +96,18 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     @Override
     public WorkspaceItem create(Context context, Collection collection, boolean template)
             throws AuthorizeException, SQLException {
-        return create(context, collection, null, template);
+        return create(context, collection, null, template, false);
     }
 
     @Override
-    public WorkspaceItem create(Context context, Collection collection, UUID uuid, boolean template)
+    public WorkspaceItem create(Context context, Collection collection, boolean template, boolean isNewVersion)
+            throws AuthorizeException, SQLException {
+        return create(context, collection, null, template, isNewVersion);
+    }
+
+    @Override
+    public WorkspaceItem create(Context context, Collection collection, UUID uuid, boolean template,
+                                boolean isNewVersion)
         throws AuthorizeException, SQLException {
         // Check the user has permission to ADD to the collection
         authorizeService.authorizeAction(context, collection, Constants.ADD);
@@ -174,8 +181,10 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
 
         // If configured, register identifiers (eg handle, DOI) now. This is typically used with the Show Identifiers
         // submission step which previews minted handles and DOIs during the submission process. Default: false
+        // Additional check needed: if we are creating a new version of an existing item we skip the identifier
+        // generation here, as this will be performed when the new version is created in VersioningServiceImpl
         if (DSpaceServicesFactory.getInstance().getConfigurationService()
-                .getBooleanProperty("identifiers.submission.register", false)) {
+                .getBooleanProperty("identifiers.submission.register", false) && !isNewVersion) {
             try {
                 // Get map of filters to use for identifier types, while the item is in progress
                 Map<Class<? extends Identifier>, Filter> filters = FilterUtils.getIdentifierFilters(true);
