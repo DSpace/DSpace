@@ -347,7 +347,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                     .withPassword("test")
                                                     .withNameInMetadata("Create", "Bundle").build();
 
-        ResourcePolicy rp1 = ResourcePolicyBuilder.createResourcePolicy(context).withUser(createBundleEperson)
+        ResourcePolicy rp1 = ResourcePolicyBuilder.createResourcePolicy(context, createBundleEperson, null)
                                                   .withAction(Constants.ADD)
                                                   .withDspaceObject(item).build();
         context.restoreAuthSystemState();

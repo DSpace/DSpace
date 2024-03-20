@@ -516,9 +516,10 @@ public class ItemsResource extends Resource {
                         bitstreamsPolicies.remove(policy);
                     }
 
-                    org.dspace.authorize.ResourcePolicy dspacePolicy = resourcePolicyService.create(context);
+                    org.dspace.authorize.ResourcePolicy dspacePolicy =
+                            resourcePolicyService.create(context,
+                                                         null, groupService.findByIdOrLegacyId(context, groupId));
                     dspacePolicy.setAction(org.dspace.core.Constants.READ);
-                    dspacePolicy.setGroup(groupService.findByIdOrLegacyId(context, groupId));
                     dspacePolicy.setdSpaceObject(dspaceBitstream);
                     if ((year != null) || (month != null) || (day != null)) {
                         Date date = new Date();

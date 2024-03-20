@@ -253,9 +253,9 @@ public class ItemTemplateRestControllerIT extends AbstractControllerIntegrationT
 
         String itemId = installTestTemplate();
 
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(eperson)
-                .withAction(Constants.ADMIN)
-                .withDspaceObject(childCollection).build();
+        ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
+                             .withAction(Constants.ADMIN)
+                             .withDspaceObject(childCollection).build();
         String collAdminToken = getAuthToken(eperson.getEmail(), password);
 
         getClient(collAdminToken).perform(patch(getTemplateItemUrlTemplate(itemId))
@@ -374,9 +374,9 @@ public class ItemTemplateRestControllerIT extends AbstractControllerIntegrationT
         setupTestTemplate();
         String itemId = installTestTemplate();
 
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(eperson)
-                .withAction(Constants.ADMIN)
-                .withDspaceObject(childCollection).build();
+        ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
+                             .withAction(Constants.ADMIN)
+                             .withDspaceObject(childCollection).build();
         String collAdminToken = getAuthToken(eperson.getEmail(), password);
 
         getClient(collAdminToken).perform(delete(getTemplateItemUrlTemplate(itemId)))
