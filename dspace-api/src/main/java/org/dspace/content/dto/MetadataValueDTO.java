@@ -7,6 +7,9 @@
  */
 package org.dspace.content.dto;
 
+import java.util.Comparator;
+import java.util.Objects;
+
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataValue;
@@ -136,4 +139,62 @@ public class MetadataValueDTO {
     public void setConfidence(int confidence) {
         this.confidence = confidence;
     }
+
+    @Override
+    public String toString() {
+        return "MetadataValueDTO{" +
+                "schema='" + schema + '\'' +
+                ", element='" + element + '\'' +
+                ", qualifier='" + qualifier + '\'' +
+                ", language='" + language + '\'' +
+                ", value='" + value + '\'' +
+                ", authority='" + authority + '\'' +
+                ", confidence=" + confidence +
+                "}\n";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        MetadataValueDTO that = (MetadataValueDTO) o;
+        return confidence == that.confidence &&
+                Objects.equals(schema, that.schema) && Objects.equals(element, that.element) &&
+                Objects.equals(qualifier, that.qualifier) && Objects.equals(language, that.language) &&
+                Objects.equals(value, that.value) && Objects.equals(authority, that.authority);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(schema, element, qualifier, language, value, authority, confidence);
+    }
+
+    /**
+     * Build a comparator to support proper sorting of MetadataValueDTO objects.
+     * Order of sorting is based on how these things are normally sorted in human-readable formats, with
+     * field name -> value -> lang/auth/etc being the usual order we use. In all these individual tests, nulls are
+     * sorted first (eg. dc.title before dc.title.alternative)
+     * @see org.dspace.external.model.ExternalDataObject#equals(Object)
+     * 1. Qualifier
+     * 2. Element
+     * 3. Schema
+     * 4. Value
+     * 5. Language
+     * 6. Authority
+     * @return comparator
+     */
+    public static Comparator<MetadataValueDTO> comparator() {
+        return Comparator.comparing(MetadataValueDTO::getQualifier, Comparator.nullsFirst(Comparator.naturalOrder()))
+                .thenComparing(MetadataValueDTO::getElement, Comparator.nullsFirst(Comparator.naturalOrder()))
+                .thenComparing(MetadataValueDTO::getSchema, Comparator.nullsFirst(Comparator.naturalOrder()))
+                .thenComparing(MetadataValueDTO::getValue, Comparator.nullsFirst(Comparator.naturalOrder()))
+                .thenComparing(MetadataValueDTO::getLanguage, Comparator.nullsFirst(Comparator.naturalOrder()))
+                .thenComparing(MetadataValueDTO::getAuthority, Comparator.nullsFirst(Comparator.naturalOrder()));
+    }
+
+
 }
