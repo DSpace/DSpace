@@ -79,8 +79,14 @@ public class FeedbackRestRepository extends DSpaceRestRepository<FeedbackRest, I
             throw new DSpaceBadRequestException("e-mail and message fields are mandatory!");
         }
 
+        String pageUrl = feedbackRest.getPage();
+        String urlPrefix = configurationService.getProperty("dspace.ui.url");
+        if (StringUtils.isNotBlank(pageUrl) && ! StringUtils.startsWith(pageUrl, urlPrefix)) {
+            throw new DSpaceBadRequestException("unexpected page url was submitted");
+        }
+
         try {
-            feedbackService.sendEmail(context, req, recipientEmail, senderEmail, message, feedbackRest.getPage());
+            feedbackService.sendEmail(context, req, recipientEmail, senderEmail, message, pageUrl);
         } catch (IOException | MessagingException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
