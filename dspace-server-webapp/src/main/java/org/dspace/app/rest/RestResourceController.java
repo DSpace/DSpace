@@ -55,6 +55,7 @@ import org.dspace.app.rest.utils.RestRepositoryUtils;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.util.UUIDUtils;
+import org.springframework.aop.AopInvocationException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -219,8 +220,10 @@ public class RestResourceController implements InitializingBean {
         Optional<RestAddressableModel> modelObject = Optional.empty();
         try {
             modelObject = repository.findById(id);
-        } catch (ClassCastException e) {
-            // ignore, as handled below
+        } catch (ClassCastException | IllegalArgumentException | AopInvocationException e) {
+            // These exceptions may be thrown if the "id" param above is not valid for DSpaceRestRepository.findById()
+            // (e.g. passing an Integer param when a UUID is expected, or similar).
+            // We can safely ignore these exceptions as they simply mean the object was not found (see below).
         }
         if (!modelObject.isPresent()) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
