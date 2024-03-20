@@ -167,7 +167,7 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
         collections.add(collection);
     }
 
-    void removeCollection(Collection collection) {
+    public void removeCollection(Collection collection) {
         collections.remove(collection);
     }
 
