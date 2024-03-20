@@ -303,8 +303,8 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
     @Override
     public int countByEPerson(Context context, EPerson ePerson) throws SQLException {
         Query query = createQuery(context,
-                "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName() + " WHERE eperson_id = (:epersonUuid) ");
-        query.setParameter("epersonUuid", ePerson.getID());
+                "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName() + " WHERE eperson = :eperson ");
+        query.setParameter("eperson", ePerson);
         return count(query);
     }
 
@@ -324,9 +324,9 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
     @Override
     public int countByEPersonAndResourceUuid(Context context, EPerson eperson, UUID resourceUuid) throws SQLException {
         Query query = createQuery(context, "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName()
-                + " WHERE eperson_id = (:epersonUuid) AND dspace_object = (:resourceUuid) ");
+                + " WHERE eperson = :eperson AND dSpaceObject.id = :resourceUuid ");
         query.setParameter("resourceUuid", resourceUuid);
-        query.setParameter("epersonUuid", eperson.getID());
+        query.setParameter("eperson", eperson);
         return count(query);
     }
 
@@ -346,7 +346,7 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
     @Override
     public int countByResouceUuidAndActionId(Context context, UUID resourceUuid, int actionId) throws SQLException {
         Query query = createQuery(context, "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName()
-                + " WHERE dspace_object = (:resourceUuid) AND action_id = (:actionId) ");
+                + " WHERE dSpaceObject.id = :resourceUuid AND actionId = :actionId ");
         query.setParameter("resourceUuid", resourceUuid);
         query.setParameter("actionId", actionId);
         return count(query);
@@ -366,7 +366,7 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
     @Override
     public int countByResourceUuid(Context context, UUID resourceUuid) throws SQLException {
         Query query = createQuery(context, "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName()
-                + " WHERE dspace_object = (:resourceUuid) ");
+                + " WHERE dSpaceObject.id = :resourceUuid ");
         query.setParameter("resourceUuid", resourceUuid);
         return count(query);
     }
@@ -384,8 +384,8 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
     @Override
     public int countResourcePolicyByGroup(Context context, Group group) throws SQLException {
         Query query = createQuery(context, "SELECT count(*) " + "FROM " + ResourcePolicy.class.getSimpleName()
-                + " WHERE epersongroup_id = (:groupUuid) ");
-        query.setParameter("groupUuid", group.getID());
+                + " WHERE epersonGroup = :group ");
+        query.setParameter("group", group);
         return count(query);
     }
 
@@ -405,9 +405,9 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
     @Override
     public int countByGroupAndResourceUuid(Context context, Group group, UUID resourceUuid) throws SQLException {
         Query query = createQuery(context, "SELECT count(*) FROM " + ResourcePolicy.class.getSimpleName()
-                + " WHERE dspace_object = (:resourceUuid) AND epersongroup_id = (:groupUuid) ");
+                + " WHERE dSpaceObject.id = :resourceUuid AND epersonGroup = :group ");
         query.setParameter("resourceUuid", resourceUuid);
-        query.setParameter("groupUuid", group.getID());
+        query.setParameter("group", group);
         return count(query);
     }
 

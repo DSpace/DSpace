@@ -418,14 +418,14 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
     public List<Relationship> findByItemAndRelationshipTypeAndList(Context context, UUID focusUUID,
             RelationshipType relationshipType, List<UUID> items, boolean isLeft,
             int offset, int limit) throws SQLException {
-        String side = isLeft ? "left_id" : "right_id";
-        String otherSide = !isLeft ? "left_id" : "right_id";
+        String side = isLeft ? "leftItem.id" : "rightItem.id";
+        String otherSide = !isLeft ? "leftItem.id" : "rightItem.id";
         Query query = createQuery(context, "FROM " + Relationship.class.getSimpleName() +
-                                          " WHERE type_id = (:typeId) " +
+                                          " WHERE relationshipType = :type " +
                                            "AND " + side + " = (:focusUUID) " +
                                            "AND " + otherSide + " in (:list) " +
                                            "ORDER BY id");
-        query.setParameter("typeId", relationshipType.getID());
+        query.setParameter("type", relationshipType);
         query.setParameter("focusUUID", focusUUID);
         query.setParameter("list", items);
         return list(query, limit, offset);
@@ -434,14 +434,14 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
     @Override
     public int countByItemAndRelationshipTypeAndList(Context context, UUID focusUUID, RelationshipType relationshipType,
             List<UUID> items, boolean isLeft) throws SQLException {
-        String side = isLeft ? "left_id" : "right_id";
-        String otherSide = !isLeft ? "left_id" : "right_id";
+        String side = isLeft ? "leftItem.id" : "rightItem.id";
+        String otherSide = !isLeft ? "leftItem.id" : "rightItem.id";
         Query query = createQuery(context, "SELECT count(*) " +
                                            "FROM " + Relationship.class.getSimpleName() +
-                                          " WHERE type_id = (:typeId) " +
+                                          " WHERE relationshipType = :type " +
                                            "AND " + side + " = (:focusUUID) " +
                                            "AND " + otherSide + " in (:list)");
-        query.setParameter("typeId", relationshipType.getID());
+        query.setParameter("type", relationshipType);
         query.setParameter("focusUUID", focusUUID);
         query.setParameter("list", items);
         return count(query);

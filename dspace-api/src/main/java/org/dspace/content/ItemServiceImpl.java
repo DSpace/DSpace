@@ -1435,7 +1435,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     public List<Item> findByMetadataQuery(Context context, List<QueryPredicate> queryPredicates,
             List<UUID> collectionUuids, long offset, int limit)
             throws SQLException {
-        return itemDAO.findByMetadataQuery(context, queryPredicates, collectionUuids, "text_value ~ ?",
+        return itemDAO.findByMetadataQuery(context, queryPredicates, collectionUuids, "value ~ ?",
                 offset, limit);
     }
 
@@ -1444,7 +1444,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     public long countForMetadataQuery(Context context, List<QueryPredicate> queryPredicates,
             List<UUID> collectionUuids)
             throws SQLException {
-        return itemDAO.countForMetadataQuery(context, queryPredicates, collectionUuids, "text_value ~ ?");
+        return itemDAO.countForMetadataQuery(context, queryPredicates, collectionUuids, "value ~ ?");
     }
 
     @Override
