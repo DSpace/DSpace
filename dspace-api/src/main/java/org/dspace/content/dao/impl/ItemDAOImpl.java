@@ -217,7 +217,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
             List<UUID> collectionUuids, String regexClause) throws SQLException {
         // Build the query infrastructure
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery<Item> criteriaQuery = getCriteriaQuery(criteriaBuilder, Item.class);
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         // Select
         Root<Item> itemRoot = criteriaQuery.from(Item.class);
         // Apply the selected predicates
