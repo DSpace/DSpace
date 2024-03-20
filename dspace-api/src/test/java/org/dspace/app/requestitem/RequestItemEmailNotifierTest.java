@@ -30,6 +30,8 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
@@ -59,6 +61,7 @@ public class RequestItemEmailNotifierTest
     private static BitstreamService bitstreamService;
     private static HandleService handleService;
     private static RequestItemService requestItemService;
+    private static EPersonService ePersonService;
 
     public RequestItemEmailNotifierTest() {
         super();
@@ -76,6 +79,8 @@ public class RequestItemEmailNotifierTest
                 = HandleServiceFactory.getInstance().getHandleService();
         requestItemService
                 = RequestItemServiceFactory.getInstance().getRequestItemService();
+        ePersonService
+                = EPersonServiceFactory.getInstance().getEPersonService();
     }
 
     /**
@@ -131,12 +136,12 @@ public class RequestItemEmailNotifierTest
         configurationService.setProperty("mail.server.disabled", "false");
 
         // Instantiate and initialize the unit, using the "help desk" strategy.
+        RequestItemHelpdeskStrategy requestItemHelpdeskStrategy = new RequestItemHelpdeskStrategy();
+        requestItemHelpdeskStrategy.configurationService = configurationService;
+        requestItemHelpdeskStrategy.ePersonService = ePersonService;
+
         RequestItemEmailNotifier requestItemEmailNotifier
-                = new RequestItemEmailNotifier(
-                        DSpaceServicesFactory.getInstance()
-                                .getServiceManager()
-                                .getServiceByName(RequestItemHelpdeskStrategy.class.getName(),
-                                        RequestItemAuthorExtractor.class));
+                = new RequestItemEmailNotifier(requestItemHelpdeskStrategy);
         requestItemEmailNotifier.bitstreamService = bitstreamService;
         requestItemEmailNotifier.configurationService = configurationService;
         requestItemEmailNotifier.handleService = handleService;
@@ -216,12 +221,12 @@ public class RequestItemEmailNotifierTest
         configurationService.setProperty("mail.server.disabled", "false");
 
         // Instantiate and initialize the unit, using the "help desk" strategy.
+        RequestItemHelpdeskStrategy requestItemHelpdeskStrategy = new RequestItemHelpdeskStrategy();
+        requestItemHelpdeskStrategy.configurationService = configurationService;
+        requestItemHelpdeskStrategy.ePersonService = ePersonService;
+
         RequestItemEmailNotifier requestItemEmailNotifier
-                = new RequestItemEmailNotifier(
-                        DSpaceServicesFactory.getInstance()
-                                .getServiceManager()
-                                .getServiceByName(RequestItemHelpdeskStrategy.class.getName(),
-                                        RequestItemAuthorExtractor.class));
+                = new RequestItemEmailNotifier(requestItemHelpdeskStrategy);
         requestItemEmailNotifier.bitstreamService = bitstreamService;
         requestItemEmailNotifier.configurationService = configurationService;
         requestItemEmailNotifier.handleService = handleService;
