@@ -1054,23 +1054,45 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         return (int) resp.getTotalSearchResults();
     }
 
+
     @Override
     @SuppressWarnings("rawtypes")
     public List<Collection> findAllCollectionsByEntityType(Context context, String entityType)
-            throws SearchServiceException {
+            throws SQLException, SearchServiceException {
         List<Collection> collectionList = new ArrayList<>();
+
+        // we need to turn off authorization to retrieve all
+        // collections, not only the ones for the user in session
+        context.turnOffAuthorisationSystem();
+
+        //calculate the total number of collections
+        int collectionsNumber = countCollectionsWithSubmit(null, context, null, entityType);
+
+        int calculatedPages = (collectionsNumber / SOLR_ROWS_PER_PAGE) + 1;
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
         discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
-        discoverQuery.addFilterQueries("dspace.entity.type:" + entityType);
+        discoverQuery.setMaxResults(SOLR_ROWS_PER_PAGE);
 
-        DiscoverResult discoverResult = searchService.search(context, discoverQuery);
-        List<IndexableObject> solrIndexableObjects = discoverResult.getIndexableObjects();
+        for (int page = 1; page <= calculatedPages; page++) {
 
-        for (IndexableObject solrCollection : solrIndexableObjects) {
-            Collection c = ((IndexableCollection) solrCollection).getIndexedObject();
-            collectionList.add(c);
+            discoverQuery.setStart((page - 1) * SOLR_ROWS_PER_PAGE);
+
+            //retrieve the specific page with results
+            DiscoverResult discoverResult = retrieveCollectionsWithSubmit(context, discoverQuery,
+                        entityType, null, null);
+
+            List<IndexableObject> solrIndexableObjects = discoverResult.getIndexableObjects();
+
+            for (IndexableObject solrCollection : solrIndexableObjects) {
+                Collection c = ((IndexableCollection) solrCollection).getIndexedObject();
+                collectionList.add(c);
+            }
         }
+
+        // Restore the authorization system state
+        context.restoreAuthSystemState();
+
         return collectionList;
     }
 
