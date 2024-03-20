@@ -370,7 +370,8 @@ public class RestResourceController implements InitializingBean {
      * @return              The relevant ResponseEntity for this request
      * @throws HttpRequestMethodNotSupportedException   If something goes wrong
      */
-    @RequestMapping(method = RequestMethod.POST, consumes = {"application/json", "application/hal+json"})
+    @RequestMapping(method = RequestMethod.POST, value = {"", "/"},
+                    consumes = {"application/json", "application/hal+json"})
     public ResponseEntity<RepresentationModel<?>> post(HttpServletRequest request,
                                                        @PathVariable String apiCategory,
                                                        @PathVariable String model,
@@ -397,7 +398,7 @@ public class RestResourceController implements InitializingBean {
      * @return              The relevant ResponseEntity for this request
      * @throws HttpRequestMethodNotSupportedException   If something goes wrong
      */
-    @RequestMapping(method = RequestMethod.POST, consumes = {"text/uri-list"})
+    @RequestMapping(method = RequestMethod.POST, value = {"", "/"}, consumes = {"text/uri-list"})
     public ResponseEntity<RepresentationModel<?>> postWithUriListContentType(HttpServletRequest request,
                                                                              @PathVariable String apiCategory,
                                                                              @PathVariable String model)
@@ -650,7 +651,7 @@ public class RestResourceController implements InitializingBean {
      * @throws IOException
      * @throws AuthorizeException
      */
-    @RequestMapping(method = { RequestMethod.POST }, headers = "content-type=multipart/form-data")
+    @RequestMapping(method = { RequestMethod.POST }, value = {"", "/"}, headers = "content-type=multipart/form-data")
     public <T extends RestAddressableModel> ResponseEntity<RepresentationModel<?>> upload(
             HttpServletRequest request,
             @PathVariable String apiCategory,
