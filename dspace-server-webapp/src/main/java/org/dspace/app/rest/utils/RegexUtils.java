@@ -13,7 +13,7 @@ package org.dspace.app.rest.utils;
  */
 public class RegexUtils {
 
-    private RegexUtils(){}
+    private RegexUtils() {}
 
     /**
      * Regular expression in the request mapping to accept UUID as identifier
