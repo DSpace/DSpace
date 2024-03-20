@@ -247,11 +247,15 @@ public class RequestItemRepository
             message = responseMessageNode.asText();
         }
 
+        JsonNode responseSubjectNode = requestBody.findValue("subject");
+        String subject = null;
+        if (responseSubjectNode != null && !responseSubjectNode.isNull()) {
+            subject = responseSubjectNode.asText();
+        }
         ri.setDecision_date(new Date());
         requestItemService.update(context, ri);
 
         // Send the response email
-        String subject = requestBody.findValue("subject").asText();
         try {
             requestItemEmailNotifier.sendResponse(context, ri, subject, message);
         } catch (IOException ex) {
