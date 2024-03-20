@@ -961,7 +961,8 @@ public class RestResourceController implements InitializingBean {
     }
 
     /**
-     * Find all
+     * Find all via a GET request to the root endpoint. This method will trigger in cases where the called endpoint
+     * either includes a trailing slash or not.
      *
      * @param apiCategory
      * @param model
@@ -969,7 +970,7 @@ public class RestResourceController implements InitializingBean {
      * @param assembler
      * @return
      */
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET, value = {"", "/"})
     @SuppressWarnings("unchecked")
     public <T extends RestAddressableModel> PagedModel<DSpaceResource<T>> findAll(@PathVariable String apiCategory,
             @PathVariable String model, Pageable page, PagedResourcesAssembler assembler, HttpServletResponse response,
