@@ -17,11 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * This RestController takes care of the retrieval of External data from various endpoints and providers depending
@@ -57,11 +53,12 @@ public class ExternalSourcesRestController {
     public PagedModel<ExternalSourceEntryResource> getExternalSourceEntries(
         @PathVariable("externalSourceName") String externalSourceName,
         @RequestParam(name = "query") String query,
+        @RequestParam(name = "hint") String hint,
         @RequestParam(name = "parent", required = false) String parent,
         Pageable pageable, PagedResourcesAssembler assembler) {
 
         Page<ExternalSourceEntryRest> externalSourceEntryRestPage = externalSourceRestRepository
-            .getExternalSourceEntries(externalSourceName, query, parent, pageable);
+            .getExternalSourceEntries(externalSourceName, query, parent, hint, pageable);
         Page<ExternalSourceEntryResource> externalSourceEntryResources = externalSourceEntryRestPage
             .map(externalSourceEntryRest -> new ExternalSourceEntryResource(externalSourceEntryRest));
         externalSourceEntryResources.forEach(linkService::addLinks);

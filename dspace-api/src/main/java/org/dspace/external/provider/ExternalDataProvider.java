@@ -8,9 +8,11 @@
 package org.dspace.external.provider;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.dspace.external.model.ExternalDataObject;
+import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 
 /**
  * This interface should be implemented by all providers that will deal with external data
@@ -43,6 +45,20 @@ public interface ExternalDataProvider {
     List<ExternalDataObject> searchExternalDataObjects(String query, int start, int limit);
 
     /**
+     * Search external data objects with an optional 'hint' String, which the provider will use to
+     * help determine which filters or other URL parameters to apply to the query. This is a simple
+     * way to give some additional context about what and why we are searching something, and could
+     * be provided by the user, or a frontend component, etc.
+     *
+     * @param query the query text
+     * @param hint a string which the provider will use to determine additional parameters
+     * @param start start record / row
+     * @param limit page size
+     * @return list of external data objects as returned by the external data source
+     */
+    public List<ExternalDataObject> searchExternalDataObjects(String query, String hint, int start, int limit);
+
+    /**
      * This method will return a boolean indicating whether this ExternalDataProvider can deal with the given source
      * or not
      * @param source The source on which the check needs to be done
@@ -68,5 +84,29 @@ public interface ExternalDataProvider {
     public default boolean supportsEntityType(String entityType) {
         return true;
     }
+
+    /**
+     * Get entity type for a given ExternalDataObject. We leave it to the provider to determine this
+     * but the idea is to allow it to inspect the object itself rather than relying only on configuration
+     * or the hardcoded nature of the provider itself.
+     *
+     * @param externalDataObject the external data object
+     * @return a supported entity label
+     */
+    public String getEntityTypeForExternalDataObject(ExternalDataObject externalDataObject);
+
+    /**
+     * Set metadata map by external data record type (a map of maps, see external-gnd.xml)
+     *
+     * @param metadataMapsByType map of metadata maps (set in spring)
+     */
+    public void setMetadataMapsByType(Map<String, Map<String, MetadataFieldConfig>> metadataMapsByType);
+
+    /**
+     * Get metadata map by external data record type (a map of maps, see external-gnd.xml)
+     *
+     * @return metadataMapsByType map of metadata maps (set in spring)
+     */
+    public Map<String, Map<String, MetadataFieldConfig>> getMetadataMapsByType();
 
 }
