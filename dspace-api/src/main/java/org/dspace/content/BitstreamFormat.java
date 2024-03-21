@@ -72,7 +72,7 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "fileextension", joinColumns = @JoinColumn(name = "bitstream_format_id"))
     @CollectionId(
-        column = @Column(name = "file_extension_id", columnDefinition = "integer"),
+        column = @Column(name = "file_extension_id"),
         generator = "fileextension_seq"
     )
     @CollectionIdJavaType(IntegerJavaType.class)

@@ -19,6 +19,8 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /**
  * This class represents a relationship
@@ -94,7 +96,8 @@ public class Relationship implements ReloadableEntity<Integer> {
      * or the item on that side is the most recent version that is relevant to the given relationship.
      * This column affects what version of an item appears on search pages or the relationship listings of other items.
      */
-    @Column(name = "latest_version_status", columnDefinition = "integer")
+    @Column(name = "latest_version_status")
+    @JdbcTypeCode(SqlTypes.INTEGER)
     private LatestVersionStatus latestVersionStatus = LatestVersionStatus.BOTH;
 
     /**

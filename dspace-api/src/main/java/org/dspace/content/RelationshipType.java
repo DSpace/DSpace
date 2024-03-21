@@ -20,6 +20,8 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /**
  * Class representing a RelationshipType
@@ -116,7 +118,8 @@ public class RelationshipType implements ReloadableEntity<Integer> {
     /**
      * The value indicating whether relationships of this type should be ignored on the right/left/neither.
      */
-    @Column(name = "tilted", columnDefinition = "integer")
+    @Column(name = "tilted")
+    @JdbcTypeCode(SqlTypes.INTEGER)
     private Tilted tilted;
 
     /**
