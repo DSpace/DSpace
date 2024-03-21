@@ -44,8 +44,6 @@ public class CollectionRole implements ReloadableEntity<Integer> {
     @SequenceGenerator(name = "cwf_collectionrole_seq", sequenceName = "cwf_collectionrole_seq", allocationSize = 1)
     private Integer id;
 
-    //    @Column(name = "role_id")
-    //    @Lob
     @Column(name = "role_id", columnDefinition = "text")
     private String roleId;
 

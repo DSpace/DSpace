@@ -18,7 +18,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
@@ -31,6 +30,7 @@ import org.dspace.core.HibernateProxyHelper;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.hibernate.Length;
 
 /**
  * Database entity representation of the ResourcePolicy table
@@ -98,8 +98,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
     @Column(name = "rptype", length = 30)
     private String rptype;
 
-    @Lob
-    @Column(name = "rpdescription", columnDefinition = "text")
+    @Column(name = "rpdescription", length = Length.LONG32)
     private String rpdescription;
 
     /**

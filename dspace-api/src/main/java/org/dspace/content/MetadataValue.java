@@ -15,7 +15,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
@@ -23,6 +22,7 @@ import jakarta.persistence.Transient;
 import org.dspace.core.Context;
 import org.dspace.core.HibernateProxyHelper;
 import org.dspace.core.ReloadableEntity;
+import org.hibernate.Length;
 
 /**
  * Database access class representing a Dublin Core metadata value.
@@ -57,8 +57,7 @@ public class MetadataValue implements ReloadableEntity<Integer> {
     /**
      * The value of the field
      */
-    @Lob
-    @Column(name = "text_value", columnDefinition = "text")
+    @Column(name = "text_value", length = Length.LONG32)
     private String value;
 
     /**

@@ -43,18 +43,12 @@ public class ClaimedTask implements ReloadableEntity<Integer> {
     @JoinColumn(name = "workflowitem_id")
     private XmlWorkflowItem workflowItem;
 
-    //    @Column(name = "workflow_id")
-//    @Lob
     @Column(name = "workflow_id", columnDefinition = "text")
     private String workflowId;
 
-    //    @Column(name = "step_id")
-//    @Lob
     @Column(name = "step_id", columnDefinition = "text")
     private String stepId;
 
-    //    @Column(name = "action_id")
-//    @Lob
     @Column(name = "action_id", columnDefinition = "text")
     private String actionId;
 

@@ -44,8 +44,6 @@ public class WorkflowItemRole implements ReloadableEntity<Integer> {
     @SequenceGenerator(name = "cwf_workflowitemrole_seq", sequenceName = "cwf_workflowitemrole_seq", allocationSize = 1)
     private Integer id;
 
-    //    @Column(name = "role_id")
-//    @Lob
     @Column(name = "role_id", columnDefinition = "text")
     private String roleId;
 

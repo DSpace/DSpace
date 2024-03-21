@@ -57,8 +57,6 @@ public class MetadataField implements ReloadableEntity<Integer> {
     @Column(name = "qualifier", length = 64)
     private String qualifier = null;
 
-    //    @Column(name = "scope_note")
-//    @Lob
     @Column(name = "scope_note", columnDefinition = "text")
     private String scopeNote;
 

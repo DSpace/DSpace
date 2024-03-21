@@ -20,12 +20,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import org.dspace.content.Item;
 import org.dspace.core.ReloadableEntity;
+import org.hibernate.Length;
 
 /**
  * Entity that model a record on the ORCID synchronization queue. Each record in
@@ -63,8 +63,7 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
     /**
      * A description of the resource to be synchronized.
      */
-    @Lob
-    @Column(name = "description", columnDefinition = "text")
+    @Column(name = "description", length = Length.LONG32)
     private String description;
 
     /**
@@ -85,8 +84,7 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
      * The signature of the metadata to be synchronized. This is used when the
      * entity is the owner itself.
      */
-    @Lob
-    @Column(name = "metadata", columnDefinition = "text")
+    @Column(name = "metadata", length = Length.LONG32)
     private String metadata;
 
     /**

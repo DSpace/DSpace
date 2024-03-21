@@ -22,7 +22,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
@@ -36,6 +35,7 @@ import org.dspace.content.ProcessStatus;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.hibernate.Length;
 
 /**
  * This class is the DB Entity representation of the Process object to be stored in the Database
@@ -69,8 +69,7 @@ public class Process implements ReloadableEntity<Integer> {
     @Enumerated(EnumType.STRING)
     private ProcessStatus processStatus;
 
-    @Lob
-    @Column(name = "parameters", columnDefinition = "text")
+    @Column(name = "parameters", length = Length.LONG32)
     private String parameters;
 
     @ManyToMany(fetch = FetchType.LAZY)
