@@ -23,6 +23,11 @@ jobs:
           docker pull ${{ env.IMAGE_BASE_NAME }}:${{ github.sha }}
           docker tag ${{ env.IMAGE_BASE_NAME }}:${{ github.sha }} ${{ env.IMAGE_BASE_NAME }}:${{ github.ref_name }}
 
+          docker pull ${{ env.IMAGE_BASE_NAME }}-cli:${{ github.sha }}
+          docker tag ${{ env.IMAGE_BASE_NAME }}-cli:${{ github.sha }} ${{ env.IMAGE_BASE_NAME }}-cli:${{ github.ref_name }}
+
       - name: push image
-        run: docker push ${{ env.IMAGE_BASE_NAME }}:${{ github.ref_name }}
+        run: |
+          docker push ${{ env.IMAGE_BASE_NAME }}:${{ github.ref_name }}
+          docker push ${{ env.IMAGE_BASE_NAME }}-cli:${{ github.ref_name }}
 
