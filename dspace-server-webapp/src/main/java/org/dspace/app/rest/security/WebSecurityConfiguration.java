@@ -28,7 +28,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -112,8 +111,8 @@ public class WebSecurityConfiguration {
             // While we primarily use JWT in headers, CSRF protection is needed because we also support JWT via Cookies
             .csrf((csrf) -> csrf
                 .csrfTokenRepository(this.csrfTokenRepository())
-                .sessionAuthenticationStrategy(this.sessionAuthenticationStrategy())
-            )
+                .sessionAuthenticationStrategy(this.dSpaceCsrfAuthenticationStrategy())
+                .csrfTokenRequestHandler(new DSpaceCsrfTokenRequestHandler()))
             .exceptionHandling((exceptionHandling) -> exceptionHandling
                 // Return 401 on authorization failures with a correct WWWW-Authenticate header
                 .authenticationEntryPoint(new DSpace401AuthenticationEntryPoint(restAuthenticationService))
@@ -187,8 +186,13 @@ public class WebSecurityConfiguration {
     /**
      * Returns a custom DSpaceCsrfAuthenticationStrategy, which ensures that (after authenticating) the CSRF token
      * is only refreshed when it is used (or attempted to be used) by the client.
+     *
+     * This is defined as a bean so that it can also be used in other code to reset CSRF Tokens, see
+     * JWTTokenRestAuthenticationServiceImpl
      */
-    private SessionAuthenticationStrategy sessionAuthenticationStrategy() {
+    @Lazy
+    @Bean
+    public DSpaceCsrfAuthenticationStrategy dSpaceCsrfAuthenticationStrategy() {
         return new DSpaceCsrfAuthenticationStrategy(csrfTokenRepository());
     }
 

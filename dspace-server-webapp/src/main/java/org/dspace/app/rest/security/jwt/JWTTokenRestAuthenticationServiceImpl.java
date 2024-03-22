@@ -22,6 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.wrapper.AuthenticationToken;
 import org.dspace.app.rest.security.DSpaceAuthentication;
+import org.dspace.app.rest.security.DSpaceCsrfAuthenticationStrategy;
 import org.dspace.app.rest.security.RestAuthenticationService;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authenticate.AuthenticationMethod;
@@ -33,8 +34,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseCookie;
-import org.springframework.security.web.csrf.CsrfToken;
-import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.stereotype.Component;
 
 /**
@@ -67,7 +66,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
     @Lazy
     @Autowired
-    private CsrfTokenRepository csrfTokenRepository;
+    private DSpaceCsrfAuthenticationStrategy dspaceCsrfAuthenticationStrategy;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -332,11 +331,8 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
      * @param response current response
      */
     private void resetCSRFToken(HttpServletRequest request, HttpServletResponse response) {
-        // Remove current CSRF token & generate a new one
-        // We do this as we want the token to change anytime you login or logout
-        csrfTokenRepository.saveToken(null, request, response);
-        CsrfToken newToken = csrfTokenRepository.generateToken(request);
-        csrfTokenRepository.saveToken(newToken, request, response);
+        // Use our custom CsrfAuthenticationStrategy class to force reset the CSRF token in Spring Security
+        dspaceCsrfAuthenticationStrategy.resetCSRFToken(request, response);
     }
 
 }
