@@ -162,6 +162,7 @@
       <analyzer>
         <tokenizer class="solr.KeywordTokenizerFactory"/>
         <filter class="solr.LowerCaseFilterFactory" />
+        <filter class="solr.ICUFoldingFilterFactory"/>
         <filter class="solr.TrimFilterFactory" />
       </analyzer>
     </fieldType>
