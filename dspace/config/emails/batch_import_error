@@ -1,4 +1,4 @@
-## Email sent to DSpace users when they batch import fails.
+## Email sent to DSpace users when their batch import fails.
 ##
 ## Parameters: {0} the export error
 ##             {1} the URL to the feedback page
