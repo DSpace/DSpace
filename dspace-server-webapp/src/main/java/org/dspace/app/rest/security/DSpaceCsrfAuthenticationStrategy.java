@@ -110,6 +110,9 @@ public class DSpaceCsrfAuthenticationStrategy implements SessionAuthenticationSt
         this.tokenRepository.saveToken(null, request, response);
         DeferredCsrfToken deferredCsrfToken = this.tokenRepository.loadDeferredToken(request, response);
         this.requestHandler.handle(request, response, deferredCsrfToken::get);
+        // This may look odd, but reading the deferred CSRF token will cause Spring Security to send it back
+        // in the next request. This ensures our new token is sent back immediately (instead of in a later request)
+        deferredCsrfToken.get();
         this.logger.debug("Replaced CSRF Token");
     }
 
