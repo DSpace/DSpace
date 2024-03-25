@@ -52,7 +52,7 @@ public class Process implements ReloadableEntity<Integer> {
     private Integer processId;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private EPerson ePerson;
 
     @Column(name = "start_time")
