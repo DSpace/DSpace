@@ -1011,7 +1011,9 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         SortOptionMatcher.sortOptionMatcher(
                                 "dc.date.issued", DiscoverySortFieldConfiguration.SORT_ORDER.asc.name()),
                         SortOptionMatcher.sortOptionMatcher(
-                                "dc.date.issued", DiscoverySortFieldConfiguration.SORT_ORDER.desc.name())
+                                "dc.date.issued", DiscoverySortFieldConfiguration.SORT_ORDER.desc.name()),
+                        SortOptionMatcher.sortOptionMatcher(
+                                "dc.date.accessioned", DiscoverySortFieldConfiguration.SORT_ORDER.desc.name())
                 )));
     }
 

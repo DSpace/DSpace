@@ -213,6 +213,7 @@
                         <ref bean="sortTitleDesc" />
                         <ref bean="sortDateIssuedAsc" />
                         <ref bean="sortDateIssuedDesc" />
+                        <ref bean="sortDateAccessioned"/>
                     </list>
                 </property>
             </bean>
