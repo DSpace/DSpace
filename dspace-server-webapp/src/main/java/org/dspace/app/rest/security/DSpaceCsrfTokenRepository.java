@@ -53,11 +53,16 @@ import org.springframework.web.util.WebUtils;
 public class DSpaceCsrfTokenRepository implements CsrfTokenRepository {
     // This cookie name is changed from the default "XSRF-TOKEN" to ensure it is uniquely named and doesn't conflict
     // with any other XSRF-TOKEN cookies (e.g. in Angular UI, the XSRF-TOKEN cookie is a *client-side* only cookie)
-    static final String DEFAULT_CSRF_COOKIE_NAME = "DSPACE-XSRF-COOKIE";
+    public static final String DEFAULT_CSRF_COOKIE_NAME = "DSPACE-XSRF-COOKIE";
 
-    static final String DEFAULT_CSRF_PARAMETER_NAME = "_csrf";
+    // The HTTP header that is sent back to the client whenever a new CSRF token is created
+    // (NOTE: This is purposefully different from DEFAULT_CSRF_HEADER_NAME below!)
+    public static final String DSPACE_CSRF_HEADER_NAME = "DSPACE-XSRF-TOKEN";
 
-    static final String DEFAULT_CSRF_HEADER_NAME = "X-XSRF-TOKEN";
+    public static final String DEFAULT_CSRF_PARAMETER_NAME = "_csrf";
+
+    // The HTTP header that Spring Security expects to receive from the client in order to validate a CSRF token
+    public static final String DEFAULT_CSRF_HEADER_NAME = "X-XSRF-TOKEN";
 
     private String parameterName = DEFAULT_CSRF_PARAMETER_NAME;
 
@@ -132,7 +137,7 @@ public class DSpaceCsrfTokenRepository implements CsrfTokenRepository {
         // We send our token via a custom header because client can be on a different domain.
         // Cookies cannot be reliably sent cross-domain.
         if (StringUtils.hasLength(tokenValue)) {
-            response.setHeader("DSPACE-XSRF-TOKEN", tokenValue);
+            response.setHeader(DSPACE_CSRF_HEADER_NAME, tokenValue);
         }
     }
 
