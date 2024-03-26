@@ -8,7 +8,6 @@
 package org.dspace.app.rest.utils;
 
 import org.dspace.app.rest.exception.UnprocessableEntityException;
-import org.dspace.app.rest.submit.step.UploadStep;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
