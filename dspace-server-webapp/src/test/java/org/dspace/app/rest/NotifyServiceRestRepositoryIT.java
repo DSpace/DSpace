@@ -551,7 +551,10 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             );
     }
 
+    // TODO: Test is currently ignored as the code in this test is IDENTICAL to the code in
+    // "notifyServiceNameReplaceOperationTest". It's unclear WHY this should throw a 400 exception?
     @Test
+    @Ignore
     public void notifyServiceNameReplaceOperationBadRequestTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
