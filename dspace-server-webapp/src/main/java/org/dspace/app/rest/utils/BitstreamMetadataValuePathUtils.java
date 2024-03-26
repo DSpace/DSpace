@@ -34,7 +34,8 @@ public class BitstreamMetadataValuePathUtils {
     /**
      * Method to verify that the path included in the patch operation is supported
      * by the submission configuration of the upload section
-     * 
+     *
+     * @param stepId the name of the upload configuration
      * @param absolutePath the path in the json patch operation
      * @throws DCInputsReaderException      if an error occurs reading the
      *                                      submission configuration
