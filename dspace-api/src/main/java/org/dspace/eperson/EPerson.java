@@ -22,7 +22,7 @@ import jakarta.persistence.TemporalType;
 import jakarta.persistence.Transient;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.content.DSpaceObject;
+import org.dspace.content.CacheableDSpaceObject;
 import org.dspace.content.DSpaceObjectLegacySupport;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
@@ -38,7 +38,7 @@ import org.dspace.eperson.service.EPersonService;
  */
 @Entity
 @Table(name = "eperson")
-public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport {
+public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacySupport {
     @Column(name = "eperson_id", insertable = false, updatable = false)
     private Integer legacyId;
 

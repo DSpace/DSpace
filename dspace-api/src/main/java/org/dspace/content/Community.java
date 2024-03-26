@@ -45,7 +45,7 @@ import org.dspace.eperson.Group;
  */
 @Entity
 @Table(name = "community")
-public class Community extends DSpaceObject implements DSpaceObjectLegacySupport {
+public class Community extends CacheableDSpaceObject implements DSpaceObjectLegacySupport {
     @Column(name = "community_id", insertable = false, updatable = false)
     private Integer legacyId;
 

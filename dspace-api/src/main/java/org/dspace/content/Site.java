@@ -23,7 +23,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  */
 @Entity
 @Table(name = "site")
-public class Site extends DSpaceObject {
+public class Site extends CacheableDSpaceObject {
 
     @Transient
     private transient SiteService siteService;

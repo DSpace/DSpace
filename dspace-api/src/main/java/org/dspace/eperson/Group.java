@@ -20,7 +20,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.content.DSpaceObject;
+import org.dspace.content.CacheableDSpaceObject;
 import org.dspace.content.DSpaceObjectLegacySupport;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -33,7 +33,7 @@ import org.dspace.core.HibernateProxyHelper;
  */
 @Entity
 @Table(name = "epersongroup")
-public class Group extends DSpaceObject implements DSpaceObjectLegacySupport {
+public class Group extends CacheableDSpaceObject implements DSpaceObjectLegacySupport {
 
     @Transient
     public static final String ANONYMOUS = "Anonymous";

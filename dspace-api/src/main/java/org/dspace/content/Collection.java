@@ -52,7 +52,7 @@ import org.dspace.eperson.Group;
  */
 @Entity
 @Table(name = "collection")
-public class Collection extends DSpaceObject implements DSpaceObjectLegacySupport {
+public class Collection extends CacheableDSpaceObject implements DSpaceObjectLegacySupport {
 
     @Column(name = "collection_id", insertable = false, updatable = false)
     private Integer legacyId;
