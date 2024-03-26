@@ -966,6 +966,9 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void discoverSearchTest() throws Exception {
+        // Hide the sorting option for dc.date.accessioned, but ensure it is still configured
+        // for loading recent submissions on the browsing page.
+        // This sort filtering is configured by `sort.options.filtered` property
 
         //When calling this root endpoint
         getClient().perform(get("/api/discover/search"))
@@ -1011,9 +1014,7 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         SortOptionMatcher.sortOptionMatcher(
                                 "dc.date.issued", DiscoverySortFieldConfiguration.SORT_ORDER.asc.name()),
                         SortOptionMatcher.sortOptionMatcher(
-                                "dc.date.issued", DiscoverySortFieldConfiguration.SORT_ORDER.desc.name()),
-                        SortOptionMatcher.sortOptionMatcher(
-                                "dc.date.accessioned", DiscoverySortFieldConfiguration.SORT_ORDER.desc.name())
+                                "dc.date.issued", DiscoverySortFieldConfiguration.SORT_ORDER.desc.name())
                 )));
     }
 
@@ -1025,7 +1026,7 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                 .andExpect(jsonPath("$.type", is("discover")))
                 .andExpect(jsonPath("$._links.objects.href", containsString("api/discover/search/objects")))
                 .andExpect(jsonPath("$._links.self.href", containsString("api/discover/search")))
-                .andExpect(jsonPath("$.sortOptions", contains(
+                .andExpect(jsonPath("$.sortOptions", containsInAnyOrder(
                         SortOptionMatcher.sortOptionMatcher("dspace.entity.type",
                                 DiscoverySortFieldConfiguration.SORT_ORDER.desc.name()),
                         SortOptionMatcher.sortOptionMatcher("organization.legalName",
@@ -1035,14 +1036,6 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         SortOptionMatcher.sortOptionMatcher("organisation.address.addressLocality",
                                 DiscoverySortFieldConfiguration.SORT_ORDER.asc.name()),
                         SortOptionMatcher.sortOptionMatcher("organisation.foundingDate",
-                                DiscoverySortFieldConfiguration.SORT_ORDER.desc.name()),
-                        SortOptionMatcher.sortOptionMatcher("dc.date.accessioned",
-                                DiscoverySortFieldConfiguration.SORT_ORDER.desc.name()),
-                        SortOptionMatcher.sortOptionMatcher("person.familyName",
-                                DiscoverySortFieldConfiguration.SORT_ORDER.asc.name()),
-                        SortOptionMatcher.sortOptionMatcher("person.givenName",
-                                DiscoverySortFieldConfiguration.SORT_ORDER.asc.name()),
-                        SortOptionMatcher.sortOptionMatcher("person.birthDate",
                                 DiscoverySortFieldConfiguration.SORT_ORDER.desc.name())
                 )));
     }

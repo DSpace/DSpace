@@ -21,6 +21,7 @@ import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
+import org.dspace.services.ConfigurationService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,6 +45,9 @@ public class DiscoverConfigurationConverterTest {
 
     @Mock
     private DiscoveryConfiguration discoveryConfiguration;
+
+    @Mock
+    private ConfigurationService configurationService;
 
     @Before
     public void setUp() throws Exception {
