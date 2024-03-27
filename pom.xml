@@ -19,13 +19,13 @@
     <properties>
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>17</java.version>
-        <spring.version>6.1.4</spring.version>
-        <spring-boot.version>3.2.3</spring-boot.version>
-        <spring-security.version>6.2.2</spring-security.version> <!-- sync with version used by spring-boot-->
+        <spring.version>6.1.5</spring.version>
+        <spring-boot.version>3.2.4</spring-boot.version>
+        <spring-security.version>6.2.3</spring-security.version> <!-- sync with version used by spring-boot-->
         <hibernate.version>6.4.4.Final</hibernate.version>
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
-        <postgresql.driver.version>42.7.2</postgresql.driver.version>
-        <flyway.version>10.8.1</flyway.version>
+        <postgresql.driver.version>42.7.3</postgresql.driver.version>
+        <flyway.version>10.10.0</flyway.version>
         <solr.client.version>8.11.3</solr.client.version>
 
         <ehcache.version>3.10.8</ehcache.version>
@@ -39,13 +39,13 @@
         <jcache-version>1.1.1</jcache-version>
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
         <jetty.version>9.4.54.v20240208</jetty.version>
-        <log4j.version>2.22.1</log4j.version>
-        <pdfbox-version>2.0.30</pdfbox-version>
+        <log4j.version>2.23.1</log4j.version>
+        <pdfbox-version>2.0.31</pdfbox-version>
         <rome.version>1.19.0</rome.version>
         <slf4j.version>2.0.11</slf4j.version>
-        <tika.version>2.5.0</tika.version>
+        <tika.version>2.9.1</tika.version>
         <!-- Sync BouncyCastle & ASM with whatever version Tika uses -->
-        <bouncycastle.version>1.70</bouncycastle.version>
+        <bouncycastle.version>1.76</bouncycastle.version>
         <asm.version>8.0.1</asm.version>
         <!-- Jersey is used to integrate with external sources/services -->
         <jersey.version>3.1.5</jersey.version>
@@ -54,7 +54,7 @@
         <json-path.version>2.9.0</json-path.version>
         <!-- Library for managing JSON Web Tokens (JWT): https://bitbucket.org/connect2id/nimbus-jose-jwt/wiki/Home
              (used by Server webapp) -->
-        <nimbus-jose-jwt.version>7.9</nimbus-jose-jwt.version>
+        <nimbus-jose-jwt.version>9.37.3</nimbus-jose-jwt.version>
 
         <!--=== OTHER MODULE-SPECIFIC DEPENDENCIES ===-->
         <!-- Jena is used by both RDF and SWORDv2 -->
@@ -140,7 +140,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.12.1</version>
+                    <version>3.13.0</version>
                     <configuration>
                         <release>${java.version}</release>
                         <!-- Turn on http://errorprone.info (requires fork=true & below compilerArgs)-->
@@ -190,7 +190,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>3.3.2</version>
+                    <version>3.4.0</version>
                     <configuration>
                         <failOnMissingWebXml>false</failOnMissingWebXml>
                         <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
@@ -328,7 +328,7 @@
                 <!-- This additional configuration also cleans sub-modules -->
                 <plugin>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.3.2</version>
                     <configuration>
                         <filesets>
                             <fileset>
@@ -342,12 +342,12 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>3.7.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>3.6.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -370,7 +370,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>3.6.3</version>
                     <configuration>
                         <!-- Never fail a build based on Javadoc errors -->
                         <failOnError>false</failOnError>
@@ -398,7 +398,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
-                    <version>1.6</version>
+                    <version>3.2.1</version>
                 </plugin>
                 <!-- Used for code coverage reporting (see 'measure-test-coverage' profile) -->
                 <plugin>
@@ -1273,13 +1273,13 @@
             <!-- Tika brings in multiple versions of this. Select the latest version. Always sync with Tika version -->
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcpkix-jdk15on</artifactId>
+                <artifactId>bcpkix-jdk18on</artifactId>
                 <version>${bouncycastle.version}</version>
             </dependency>
             <!-- Tika brings in multiple versions of this. Select the latest version. Always sync with Tika version -->
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk15on</artifactId>
+                <artifactId>bcprov-jdk18on</artifactId>
                 <version>${bouncycastle.version}</version>
             </dependency>
             <!-- Tika and axiom-api (in dspace-swordv2) disagree on versions -->
