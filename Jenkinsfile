@@ -115,7 +115,8 @@ pipeline {
             // Filter out the hundreds of TODOs warnings at the "INFO" level
             // from the stock DSpace code
             filters: [excludeType('TodoCommentCheck')],
-            unstableTotalNormal: 1, enabledForFailure: true)
+            qualityGates: [[threshold: 1, type: 'TOTAL', criticality: 'UNSTABLE']],
+            enabledForFailure: true)
         }
       }
     }
