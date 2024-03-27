@@ -203,7 +203,6 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
                 queryPredicates, collectionUuids, regexClause);
         criteriaQuery.where(criteriaBuilder.and(predicates.stream().toArray(Predicate[]::new)));
         criteriaQuery.orderBy(criteriaBuilder.asc(itemRoot.get(DSpaceObject_.id)));
-        criteriaQuery.groupBy(itemRoot.get(DSpaceObject_.id));
         try {
             return list(context, criteriaQuery, false, Item.class, limit, (int) offset);
         } catch (Exception e) {
@@ -344,7 +343,6 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
                 criteriaBuilder.isMember(collection, itemRoot.get(Item_.collections)),
                 criteriaBuilder.isTrue(itemRoot.get(Item_.inArchive))));
         criteriaQuery.orderBy(criteriaBuilder.asc(itemRoot.get(DSpaceObject_.id)));
-        criteriaQuery.groupBy(itemRoot.get(DSpaceObject_.id));
         return list(context, criteriaQuery, false, Item.class, limit, offset).iterator();
     }
 
