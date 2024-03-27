@@ -184,6 +184,51 @@ public class DSpaceControlledVocabularyTest extends AbstractDSpaceTest {
     }
 
     /**
+     * Test of getChoice method of class
+     * DSpaceControlledVocabulary using a localized controlled vocabulary with no locale (fallback to default)
+     * @throws java.lang.ClassNotFoundException passed through.
+     */
+    @Test
+    public void testGetChoiceNoLocale() throws ClassNotFoundException {
+        final String PLUGIN_INTERFACE = "org.dspace.content.authority.ChoiceAuthority";
+
+        String idValue = "DZA";
+        // This "countries" Controlled Vocab is included in TestEnvironment data
+        // (under /src/test/data/dspaceFolder/) and it should be auto-loaded
+        // by test configs in /src/test/data/dspaceFolder/config/local.cfg
+        DSpaceControlledVocabulary instance = (DSpaceControlledVocabulary)
+            CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(Class.forName(PLUGIN_INTERFACE),
+                "countries");
+        assertNotNull(instance);
+        Choice result = instance.getChoice(idValue, null);
+        assertEquals(idValue, result.value);
+        assertEquals("Algeria", result.label);
+    }
+
+    /**
+     * Test of getChoice method of class
+     * DSpaceControlledVocabulary using a localized controlled vocabulary with valid locale parameter (localized
+     * label returned)
+     * @throws java.lang.ClassNotFoundException passed through.
+     */
+    @Test
+    public void testGetChoiceGermanLocale() throws ClassNotFoundException {
+        final String PLUGIN_INTERFACE = "org.dspace.content.authority.ChoiceAuthority";
+
+        String idValue = "DZA";
+        // This "countries" Controlled Vocab is included in TestEnvironment data
+        // (under /src/test/data/dspaceFolder/) and it should be auto-loaded
+        // by test configs in /src/test/data/dspaceFolder/config/local.cfg
+        DSpaceControlledVocabulary instance = (DSpaceControlledVocabulary)
+            CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(Class.forName(PLUGIN_INTERFACE),
+                "countries");
+        assertNotNull(instance);
+        Choice result = instance.getChoice(idValue, "de");
+        assertEquals(idValue, result.value);
+        assertEquals("Algerien", result.label);
+    }
+
+    /**
      * Test of getBestMatch method, of class DSpaceControlledVocabulary.
      */
 /*
