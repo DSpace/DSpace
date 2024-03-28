@@ -3,4 +3,5 @@ set dspace_source=C:\workspace\DSpace\
 set tomcat=C:\apache-tomcat-9.0.64\
 set dspace_application=C:\dspace\
 set m2_source=%USERPROFILE%\.m2
+set dspace_solr=C:\workspace\solr
 set dspace_source=C:\workspace\DSpace

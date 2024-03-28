@@ -206,4 +206,14 @@ public class SearchFilterMatcher {
 
         );
     }
+
+    public static Matcher<? super Object> clarinSubjectFirstValueFilter() {
+        return allOf(
+                hasJsonPath("$.filter", is("subjectFirstValue")),
+                hasJsonPath("$.hasFacets", is(false)),
+                hasJsonPath("$.type", is("hierarchical")),
+                hasJsonPath("$.openByDefault", is(false)),
+                checkOperators()
+        );
+    }
 }

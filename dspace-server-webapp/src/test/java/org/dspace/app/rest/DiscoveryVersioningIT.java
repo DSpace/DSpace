@@ -68,6 +68,7 @@ import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -290,6 +291,8 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         return collection;
     }
 
+    // CLARIN - All items are indexed by all versions
+    @Ignore
     @Test
     public void test_discoveryXml_default_expectLatestVersionsOnly() throws Exception {
         final String configuration = null;
@@ -367,6 +370,8 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         ));
     }
 
+    // CLARIN - All items are indexed by all versions
+    @Ignore
     @Test
     public void test_discoveryXml_site_expectLatestVersionsOnly() throws Exception {
         final String configuration = "site";
@@ -405,6 +410,8 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         ));
     }
 
+    // CLARIN - All items are indexed by all versions
+    @Ignore
     @Test
     public void test_discoveryXml_workspace_expectLatestVersionsOnly() throws Exception {
         final String configuration = "workspace";
@@ -444,9 +451,9 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
     }
 
     // NOTE: no test for discovery.xml configuration "workflow", because it by definition excludes items
-
     // NOTE: no test for discovery.xml configuration "workflowAdmin", because it by definition excludes items
-
+    // CLARIN - All items are indexed by all versions
+    @Ignore
     @Test
     public void test_discoveryXml_undiscoverable_expectLatestVersionsOnly() throws Exception {
         final String configuration = "undiscoverable";
@@ -488,6 +495,8 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         ));
     }
 
+    // CLARIN - All items are indexed by all versions
+    @Ignore
     @Test
     public void test_discoveryXml_administrativeView_expectLatestVersionsOnly() throws Exception {
         final String configuration = "administrativeView";
@@ -522,6 +531,8 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         ));
     }
 
+    // CLARIN - All items are indexed by all versions
+    @Ignore
     @Test
     public void test_discoveryXml_publication_expectLatestVersionsOnly() throws Exception {
         final String configuration = "publication";
@@ -593,6 +604,8 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         ));
     }
 
+    // CLARIN - All items are indexed by all versions
+    @Ignore
     @Test
     public void test_discoveryXml_person_expectLatestVersionsOnly() throws Exception {
         final String configuration = "person";
@@ -664,6 +677,8 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         ));
     }
 
+    // CLARIN - All items are indexed by all versions
+    @Ignore
     @Test
     public void test_discoveryXml_orgunit_expectLatestVersionsOnly() throws Exception {
         final String configuration = "orgunit";
@@ -735,6 +750,8 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         ));
     }
 
+    // CLARIN - All items are indexed by all versions
+    @Ignore
     @Test
     public void test_discoveryXml_journalissue_expectLatestVersionsOnly() throws Exception {
         final String configuration = "journalissue";
@@ -806,6 +823,8 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         ));
     }
 
+    // CLARIN - All items are indexed by all versions
+    @Ignore
     @Test
     public void test_discoveryXml_journalvolume_expectLatestVersionsOnly() throws Exception {
         final String configuration = "journalvolume";
@@ -878,6 +897,8 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         ));
     }
 
+    // CLARIN - All items are indexed by all versions
+    @Ignore
     @Test
     public void test_discoveryXml_journal_expectLatestVersionsOnly() throws Exception {
         final String configuration = "journal";
@@ -950,6 +971,8 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         ));
     }
 
+    // CLARIN - All items are indexed by all versions
+    @Ignore
     @Test
     public void test_discoveryXml_project_expectLatestVersionsOnly() throws Exception {
         final String configuration = "project";
@@ -1021,6 +1044,8 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         ));
     }
 
+    // CLARIN - All items are indexed by all versions
+    @Ignore
     @Test
     public void test_discoveryXml_personOrOrgunit_expectLatestVersionsOnly() throws Exception {
         final String configuration = "personOrOrgunit";
@@ -1056,6 +1081,8 @@ public class DiscoveryVersioningIT extends AbstractControllerIntegrationTest {
         ));
     }
 
+    // CLARIN - All items are indexed by all versions
+    @Ignore
     @Test
     public void test_discoveryXml_openAIREFundingAgency_expectLatestVersionsOnly() throws Exception {
         final String configuration = "openAIREFundingAgency";
