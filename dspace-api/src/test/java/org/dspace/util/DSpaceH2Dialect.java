@@ -11,8 +11,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.hibernate.boot.model.FunctionContributions;
 import org.hibernate.dialect.H2Dialect;
-import org.hibernate.dialect.function.SQLFunctionTemplate;
+import org.hibernate.type.BasicTypeRegistry;
 import org.hibernate.type.StandardBasicTypes;
 
 /**
@@ -23,8 +24,16 @@ public class DSpaceH2Dialect extends H2Dialect {
 
     private static Map<String, Pattern> regexCache = new HashMap<>();
 
-    public DSpaceH2Dialect() {
-        registerFunction("matches", new SQLFunctionTemplate(StandardBasicTypes.BOOLEAN, "matches(?1, ?2)"));
+    @Override
+    public void initializeFunctionRegistry(FunctionContributions functionContributions) {
+        super.initializeFunctionRegistry(functionContributions);
+
+        BasicTypeRegistry basicTypeRegistry = functionContributions.getTypeConfiguration().getBasicTypeRegistry();
+
+        functionContributions.getFunctionRegistry().registerPattern(
+            "matches",
+            "matches(?1, ?2)",
+            basicTypeRegistry.resolve(StandardBasicTypes.BOOLEAN));
 
         // The SQL function is registered in AbstractIntegrationTestWithDatabase.initDatabase().
     }

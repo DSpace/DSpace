@@ -190,29 +190,38 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             AbstractBuilder.cleanupObjects();
             parentCommunity = null;
             cleanupContext();
+        } catch (Exception e) {
+            throw new RuntimeException("Error cleaning up builder objects & context object", e);
+        }
 
-            ServiceManager serviceManager = DSpaceServicesFactory.getInstance().getServiceManager();
-            // Clear the search core.
-            MockSolrSearchCore searchService = serviceManager
-                    .getServiceByName(null, MockSolrSearchCore.class);
-            searchService.reset();
-            // Clear the statistics core.
-            serviceManager
-                    .getServiceByName(SolrStatisticsCore.class.getName(), MockSolrStatisticsCore.class)
-                    .reset();
+        ServiceManager serviceManager = DSpaceServicesFactory.getInstance().getServiceManager();
 
-            MockSolrLoggerServiceImpl statisticsService = serviceManager
-                    .getServiceByName("solrLoggerService", MockSolrLoggerServiceImpl.class);
-            statisticsService.reset();
+        // Clear the search core.
+        MockSolrSearchCore searchService = serviceManager
+                .getServiceByName(null, MockSolrSearchCore.class);
+        searchService.reset();
 
-            MockAuthoritySolrServiceImpl authorityService = serviceManager
-                    .getServiceByName(AuthoritySearchService.class.getName(), MockAuthoritySolrServiceImpl.class);
-            authorityService.reset();
+        // Clear the statistics core.
+        serviceManager
+                .getServiceByName(SolrStatisticsCore.class.getName(), MockSolrStatisticsCore.class)
+                .reset();
 
-            MockQAEventService qaEventService = serviceManager
-                .getServiceByName(QAEventService.class.getName(), MockQAEventService.class);
-            qaEventService.reset();
+        // Reset the statistics logger service
+        MockSolrLoggerServiceImpl loggerService = serviceManager
+                .getServiceByName("solrLoggerService", MockSolrLoggerServiceImpl.class);
+        loggerService.reset();
 
+        // Clear the authority core
+        MockAuthoritySolrServiceImpl authorityService = serviceManager
+                .getServiceByName(AuthoritySearchService.class.getName(), MockAuthoritySolrServiceImpl.class);
+        authorityService.reset();
+
+        // Clear the QA events core
+        MockQAEventService qaEventService = serviceManager
+            .getServiceByName(QAEventService.class.getName(), MockQAEventService.class);
+        qaEventService.reset();
+
+        try {
             // Reload our ConfigurationService (to reset configs to defaults again)
             DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
 
@@ -221,7 +230,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             // NOTE: we explicitly do NOT destroy our default eperson & admin as they
             // are cached and reused for all tests. This speeds up all tests.
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error reloading configuration & resetting builders", e);
         }
     }
 

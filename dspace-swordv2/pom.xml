@@ -24,42 +24,26 @@
 
     <dependencies>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
 
         <!-- SWORDv2 Java implementation -->
         <dependency>
-            <groupId>org.swordapp</groupId>
+            <groupId>io.gdcc</groupId>
             <artifactId>sword2-server</artifactId>
-            <version>1.0</version>
-            <type>jar</type>
-            <classifier>classes</classifier>
+            <version>2.0.0</version>
             <exclusions>
-                <!-- Abdera is unmaintained/obsolete. But, 'fom-impl' is a new Abdera compatible library for Axiom.
-                     Therefore, we are using 'fom-impl' instead (see below) -->
+                <!-- Exclude Woodstox, as later version provided by Solr dependencies -->
                 <exclusion>
-                    <groupId>org.apache.abdera</groupId>
-                    <artifactId>abdera-client</artifactId>
+                    <groupId>org.codehaus.woodstox</groupId>
+                    <artifactId>woodstox-core-asl</artifactId>
                 </exclusion>
+                <!-- Exclude Jersey, as later version used in dspace-api -->
                 <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-                <!-- Newer version of log4j provided below -->
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-                <!-- Exclude an old version of Jena in favor of new Apache Jena, which is pulled in by dspace-parent -->
-                <exclusion>
-                    <groupId>com.hp.hpl.jena</groupId>
-                    <artifactId>jena</artifactId>
+                    <groupId>org.glassfish.jersey.core</groupId>
+                    <artifactId>jersey-common</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -95,29 +79,6 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-web</artifactId>
-        </dependency>
-
-        <!-- Replacement for Abdera (required by sword2-server dependency). Abdera is no longer maintained
-             (https://abdera.apache.org/). But Axiom FOM is backwards compatible with Abdera.
-             See https://ws.apache.org/axiom/implementations/fom-impl/index.html -->
-        <dependency>
-            <groupId>org.apache.ws.commons.axiom</groupId>
-            <artifactId>fom-impl</artifactId>
-            <!-- CANNOT UPGRADE WITHOUT BREAKING sword2-server (see above) -->
-            <version>1.2.22</version>
-            <exclusions>
-                <!-- Exclude Geronimo as it is NOT necessary when using javax.activation (which we use)
-                     See: https://ws.apache.org/axiom/userguide/ch04.html#d0e732 -->
-                <exclusion>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <!-- Exclude Woodstox, as later version provided by Solr dependencies -->
-                <exclusion>
-                    <groupId>org.codehaus.woodstox</groupId>
-                    <artifactId>woodstox-core-asl</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 

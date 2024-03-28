@@ -10,12 +10,12 @@ package org.dspace.app.rest.converter;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
-import javax.annotation.PostConstruct;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import jakarta.annotation.PostConstruct;
 import org.dspace.app.rest.model.CorrectionTypeQAEventMessageRest;
 import org.dspace.app.rest.model.NotifyQAEventMessageRest;
 import org.dspace.app.rest.model.OpenaireQAEventMessageRest;

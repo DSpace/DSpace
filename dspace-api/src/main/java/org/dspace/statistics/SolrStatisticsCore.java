@@ -9,8 +9,7 @@ package org.dspace.statistics;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
-import javax.inject.Named;
-
+import jakarta.inject.Named;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;

@@ -7,17 +7,17 @@
  */
 package org.dspace.app.rest.utils;
 
+import static jakarta.mail.internet.MimeUtility.encodeText;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static javax.mail.internet.MimeUtility.encodeText;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -14,15 +14,15 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-import javax.persistence.Query;
-import javax.persistence.TemporalType;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaBuilder.In;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
 
+import jakarta.persistence.Query;
+import jakarta.persistence.TemporalType;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaBuilder.In;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject_;
@@ -111,7 +111,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         queryStr.append(" AND discoverable = :discoverable");
 
         if (lastModified != null) {
-            queryStr.append(" AND last_modified > :last_modified");
+            queryStr.append(" AND lastModified > :last_modified");
         }
         queryStr.append(" ORDER BY i.id");
 
@@ -203,7 +203,6 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
                 queryPredicates, collectionUuids, regexClause);
         criteriaQuery.where(criteriaBuilder.and(predicates.stream().toArray(Predicate[]::new)));
         criteriaQuery.orderBy(criteriaBuilder.asc(itemRoot.get(DSpaceObject_.id)));
-        criteriaQuery.groupBy(itemRoot.get(DSpaceObject_.id));
         try {
             return list(context, criteriaQuery, false, Item.class, limit, (int) offset);
         } catch (Exception e) {
@@ -217,7 +216,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
             List<UUID> collectionUuids, String regexClause) throws SQLException {
         // Build the query infrastructure
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery<Item> criteriaQuery = getCriteriaQuery(criteriaBuilder, Item.class);
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         // Select
         Root<Item> itemRoot = criteriaQuery.from(Item.class);
         // Apply the selected predicates
@@ -266,7 +265,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
             Subquery<MetadataValue> mvQuery = query.subquery(MetadataValue.class);
             Root<MetadataValue> mvRoot = mvQuery.from(MetadataValue.class);
             mvPredicates.add(criteriaBuilder.equal(
-                    mvRoot.get(MetadataValue_.D_SPACE_OBJECT), root.get(DSpaceObject_.ID)));
+                    mvRoot.get(MetadataValue_.D_SPACE_OBJECT), root));
 
             if (!predicate.getFields().isEmpty()) {
                 In<MetadataField> inFields = criteriaBuilder.in(mvRoot.get(MetadataValue_.METADATA_FIELD));
@@ -309,11 +308,18 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     @Override
     public Iterator<Item> findArchivedByCollection(Context context, Collection collection, Integer limit,
                                                    Integer offset) throws SQLException {
-        Query query = createQuery(context,
-              "select i.id from Item i join i.collections c " +
-              "WHERE :collection IN c AND i.inArchive=:in_archive ORDER BY i.id");
-        query.setParameter("collection", collection);
-        query.setParameter("in_archive", true);
+        // Select UUID of all items which have this "collection" in their list of collections and are in_archive
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<UUID> criteriaQuery = criteriaBuilder.createQuery(UUID.class);
+        Root<Item> itemRoot = criteriaQuery.from(Item.class);
+        criteriaQuery.select(itemRoot.get(Item_.id));
+        criteriaQuery.where(criteriaBuilder.and(
+            criteriaBuilder.isTrue((itemRoot.get(Item_.inArchive))),
+            criteriaBuilder.isMember(collection, itemRoot.get(Item_.collections))));
+        criteriaQuery.orderBy(criteriaBuilder.asc(itemRoot.get((Item_.id))));
+
+        // Transform into a query object to execute
+        Query query = createQuery(context, criteriaQuery);
         if (offset != null) {
             query.setFirstResult(offset);
         }
@@ -337,16 +343,15 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
                 criteriaBuilder.isMember(collection, itemRoot.get(Item_.collections)),
                 criteriaBuilder.isTrue(itemRoot.get(Item_.inArchive))));
         criteriaQuery.orderBy(criteriaBuilder.asc(itemRoot.get(DSpaceObject_.id)));
-        criteriaQuery.groupBy(itemRoot.get(DSpaceObject_.id));
         return list(context, criteriaQuery, false, Item.class, limit, offset).iterator();
     }
 
     @Override
     public int countArchivedByCollectionExcludingOwning(Context context, Collection collection) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery<Item> criteriaQuery = getCriteriaQuery(criteriaBuilder, Item.class);
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         Root<Item> itemRoot = criteriaQuery.from(Item.class);
-        criteriaQuery.select(itemRoot);
+        criteriaQuery.select(criteriaBuilder.count(itemRoot));
         criteriaQuery.where(criteriaBuilder.and(
                 criteriaBuilder.notEqual(itemRoot.get(Item_.owningCollection), collection),
                 criteriaBuilder.isMember(collection, itemRoot.get(Item_.collections)),
@@ -356,9 +361,16 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
 
     @Override
     public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException {
-        Query query = createQuery(context,
-                "select i.id from Item i join i.collections c WHERE :collection IN c ORDER BY i.id");
-        query.setParameter("collection", collection);
+        // Select UUID of all items which have this "collection" in their list of collections
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<UUID> criteriaQuery = criteriaBuilder.createQuery(UUID.class);
+        Root<Item> itemRoot = criteriaQuery.from(Item.class);
+        criteriaQuery.select(itemRoot.get(Item_.id));
+        criteriaQuery.where(criteriaBuilder.isMember(collection, itemRoot.get(Item_.collections)));
+        criteriaQuery.orderBy(criteriaBuilder.asc(itemRoot.get((Item_.id))));
+
+        // Transform into a query object to execute
+        Query query = createQuery(context, criteriaQuery);
         @SuppressWarnings("unchecked")
         List<UUID> uuids = query.getResultList();
         return new UUIDIterator<Item>(context, uuids, Item.class, this);
@@ -367,10 +379,16 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     @Override
     public Iterator<Item> findAllByCollection(Context context, Collection collection, Integer limit, Integer offset)
         throws SQLException {
-        Query query = createQuery(context,
-                "select i.id from Item i join i.collections c WHERE :collection IN c ORDER BY i.id");
-        query.setParameter("collection", collection);
+        // Build Query to select UUID of all items which have this "collection" in their list of collections.
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<UUID> criteriaQuery = criteriaBuilder.createQuery(UUID.class);
+        Root<Item> itemRoot = criteriaQuery.from(Item.class);
+        criteriaQuery.select(itemRoot.get(Item_.id));
+        criteriaQuery.where(criteriaBuilder.isMember(collection, itemRoot.get(Item_.collections)));
+        criteriaQuery.orderBy(criteriaBuilder.asc(itemRoot.get((Item_.id))));
 
+        // Transform into a query object to execute
+        Query query = createQuery(context, criteriaQuery);
         if (offset != null) {
             query.setFirstResult(offset);
         }
@@ -385,14 +403,18 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     @Override
     public int countItems(Context context, Collection collection, boolean includeArchived, boolean includeWithdrawn)
         throws SQLException {
-        Query query = createQuery(context,
-              "select count(i) from Item i join i.collections c " +
-              "WHERE :collection IN c AND i.inArchive=:in_archive AND i.withdrawn=:withdrawn");
-        query.setParameter("collection", collection);
-        query.setParameter("in_archive", includeArchived);
-        query.setParameter("withdrawn", includeWithdrawn);
-
-        return count(query);
+        // Build query to select all Items have this "collection" in their list of collections
+        // AND also have the inArchive or isWithdrawn set as specified
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
+        Root<Item> itemRoot = criteriaQuery.from(Item.class);
+        criteriaQuery.select(criteriaBuilder.count(itemRoot));
+        criteriaQuery.where(criteriaBuilder.and(
+            criteriaBuilder.equal(itemRoot.get(Item_.inArchive), includeArchived),
+            criteriaBuilder.equal(itemRoot.get(Item_.withdrawn), includeWithdrawn),
+            criteriaBuilder.isMember(collection, itemRoot.get(Item_.collections))));
+        // Execute and return count
+        return count(context, criteriaQuery, criteriaBuilder, itemRoot);
     }
 
     @Override

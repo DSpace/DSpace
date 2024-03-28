@@ -116,10 +116,12 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
                 delete(c, workspaceItem);
             } else {
                 item = c.reloadEntity(item);
-                // check if the wsi has been pushed to the workflow
-                XmlWorkflowItem wfi = workflowItemService.findByItem(c, item);
-                if (wfi != null) {
-                    workflowItemService.delete(c, wfi);
+                if (item != null) {
+                    // check if the wsi has been pushed to the workflow
+                    XmlWorkflowItem wfi = workflowItemService.findByItem(c, item);
+                    if (wfi != null) {
+                        workflowItemService.delete(c, wfi);
+                    }
                 }
             }
             item = c.reloadEntity(item);

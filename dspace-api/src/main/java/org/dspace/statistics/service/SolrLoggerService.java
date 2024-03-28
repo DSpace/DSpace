@@ -12,8 +12,8 @@ import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrInputDocument;

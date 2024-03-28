@@ -37,8 +37,9 @@ public class NotifyServiceImpl implements NotifyService {
     }
 
     @Override
-    public NotifyServiceEntity create(Context context) throws SQLException {
+    public NotifyServiceEntity create(Context context, String name) throws SQLException {
         NotifyServiceEntity notifyServiceEntity = new NotifyServiceEntity();
+        notifyServiceEntity.setName(name);
         return notifyServiceDao.create(context, notifyServiceEntity);
     }
 

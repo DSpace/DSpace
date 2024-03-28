@@ -88,26 +88,21 @@ public class NotifyServiceBuilder extends AbstractBuilder<NotifyServiceEntity, N
         indexingService.commit();
     }
 
-    public static NotifyServiceBuilder createNotifyServiceBuilder(Context context) {
+    public static NotifyServiceBuilder createNotifyServiceBuilder(Context context, String name) {
         NotifyServiceBuilder notifyServiceBuilder = new NotifyServiceBuilder(context);
-        return notifyServiceBuilder.create(context);
+        return notifyServiceBuilder.create(context, name);
     }
 
-    private NotifyServiceBuilder create(Context context) {
+    private NotifyServiceBuilder create(Context context, String name) {
         try {
 
             this.context = context;
-            this.notifyServiceEntity = notifyService.create(context);
+            this.notifyServiceEntity = notifyService.create(context, name);
 
         } catch (SQLException e) {
             log.warn("Failed to create the NotifyService", e);
         }
 
-        return this;
-    }
-
-    public NotifyServiceBuilder withName(String name) {
-        notifyServiceEntity.setName(name);
         return this;
     }
 

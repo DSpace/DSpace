@@ -7,10 +7,9 @@
  */
 package org.dspace.app.rest.repository;
 
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.NotFoundException;
-
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.NotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.VocabularyEntryDetailsRest;
 import org.dspace.app.rest.model.VocabularyRest;

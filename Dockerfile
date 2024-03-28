@@ -3,9 +3,9 @@
 #
 # - note: default tag for branch: dspace/dspace: dspace/dspace:latest
 
-# This Dockerfile uses JDK11 by default, but has also been tested with JDK17.
-# To build with JDK17, use "--build-arg JDK_VERSION=17"
-ARG JDK_VERSION=11
+# This Dockerfile uses JDK17 by default.
+# To build with other versions, use "--build-arg JDK_VERSION=[value]"
+ARG JDK_VERSION=17
 ARG DSPACE_VERSION=latest
 
 # Step 1 - Run Maven Build
@@ -51,7 +51,7 @@ RUN ant init_installation update_configs update_code update_webapps
 
 # Step 3 - Run tomcat
 # Create a new tomcat image that does not retain the the build directory contents
-FROM tomcat:9-jdk${JDK_VERSION}
+FROM tomcat:10-jdk${JDK_VERSION}
 # NOTE: DSPACE_INSTALL must align with the "dspace.dir" default configuration.
 ENV DSPACE_INSTALL=/dspace
 # Copy the /dspace directory from 'ant_build' container to /dspace in this container

@@ -29,11 +29,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.UUID;
-import javax.servlet.http.Cookie;
 
 import com.jayway.jsonpath.JsonPath;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
+import jakarta.servlet.http.Cookie;
 import org.dspace.app.rest.model.AuthnRest;
 import org.dspace.app.rest.security.OrcidLoginFilter;
 import org.dspace.app.rest.security.jwt.EPersonClaimProvider;

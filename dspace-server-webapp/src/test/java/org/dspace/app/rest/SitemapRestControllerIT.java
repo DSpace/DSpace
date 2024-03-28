@@ -14,8 +14,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import javax.servlet.ServletException;
-
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.builder.CollectionBuilder;
@@ -131,18 +129,20 @@ public class SitemapRestControllerIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isNotFound());
     }
 
-    @Test(expected = ServletException.class)
+    @Test
     public void testSitemap_fileSystemTraversal_dspaceCfg() throws Exception {
         //** WHEN **
         //We attempt to use endpoint for malicious file system traversal
-        getClient().perform(get("/" + SITEMAPS_ENDPOINT + "/%2e%2e/config/dspace.cfg"));
+        getClient().perform(get("/" + SITEMAPS_ENDPOINT + "/%2e%2e/config/dspace.cfg"))
+                   .andExpect(status().isBadRequest());
     }
 
-    @Test(expected = ServletException.class)
+    @Test
     public void testSitemap_fileSystemTraversal_dspaceCfg2() throws Exception {
         //** WHEN **
         //We attempt to use endpoint for malicious file system traversal
-        getClient().perform(get("/" + SITEMAPS_ENDPOINT + "/%2e%2e%2fconfig%2fdspace.cfg"));
+        getClient().perform(get("/" + SITEMAPS_ENDPOINT + "/%2e%2e%2fconfig%2fdspace.cfg"))
+                   .andExpect(status().isBadRequest());
     }
 
     @Test

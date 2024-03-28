@@ -55,7 +55,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
         context.restoreAuthSystemState();
         //When we call this owningCollection/move endpoint
         getClient().perform(
-                put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
+                put("/api/core/items/" + publicItem1.getID() + "/owningCollection")
                         .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                         .content(
                                 "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()
@@ -91,7 +91,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
 
         //When we call this owningCollection/move endpoint
         getClient(token)
-                .perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
+                .perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection")
                         .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                         .content(
                                 "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()
@@ -145,7 +145,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
         String token = getAuthToken(itemMoveEperson.getEmail(), "test");
 
         getClient(token)
-                .perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
+                .perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection")
                         .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                         .content(
                                 "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()
@@ -191,7 +191,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
         context.restoreAuthSystemState();
         String token = getAuthToken(itemMoveEperson.getEmail(), "test");
 
-        getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
+        getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection")
                 .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                 .content(
                         "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()
@@ -232,7 +232,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
         context.restoreAuthSystemState();
         String token = getAuthToken(itemMoveEperson.getEmail(), "test");
 
-        getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
+        getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection")
                 .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                 .content(
                         "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()
@@ -273,7 +273,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
         context.restoreAuthSystemState();
         String token = getAuthToken(itemMoveEperson.getEmail(), "test");
 
-        getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
+        getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection")
                 .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                 .content(
                         "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()
@@ -310,7 +310,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
 
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
 
-        getClient(tokenEPerson).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
+        getClient(tokenEPerson).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection")
                                .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                                .content("https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()))
                                .andExpect(status().isForbidden());

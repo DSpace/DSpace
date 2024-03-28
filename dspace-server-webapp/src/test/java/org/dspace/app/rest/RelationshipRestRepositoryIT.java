@@ -172,7 +172,6 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                              .withAuthor("Smith, Maria")
                              .withPersonIdentifierLastName("Smith")
                              .withPersonIdentifierFirstName("Maria")
-                             .withMetadata("dspace", "entity", "type", "Person")
                              .build();
 
         author3 = ItemBuilder.createItem(context, col1)
@@ -2632,7 +2631,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
             getClient(token).perform(patch("/api/core/items/" + publication1.getID())
                                          .content(getPatchContent(ops))
-                                         .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON));
+                                         .contentType(jakarta.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON));
 
             // Add another relationship
             mvcResult = getClient(token)

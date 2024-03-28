@@ -213,7 +213,7 @@
                             <systemPropertyVariables>
                                 <!-- Specify the dspace.dir to use for test environment -->
                                 <!-- This system property is loaded by AbstractDSpaceTest to initialize the test environment -->
-                                <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
+                                <dspace.dir>${agnostic.build.dir}/testing/dspace</dspace.dir>
                                 <!-- Turn off any DSpace logging -->
                                 <dspace.log.init.disable>true</dspace.log.init.disable>
                                 <solr.install.dir>${agnostic.build.dir}/testing/dspace/solr/</solr.install.dir>
@@ -272,7 +272,7 @@
                         <configuration>
                             <systemPropertyVariables>
                                 <!-- Specify the dspace.dir to use for test environment -->
-                                <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
+                                <dspace.dir>${agnostic.build.dir}/testing/dspace</dspace.dir>
                                 <!-- Turn off any DSpace logging -->
                                 <dspace.log.init.disable>true</dspace.log.init.disable>
                                 <solr.install.dir>${agnostic.build.dir}/testing/dspace/solr/</solr.install.dir>
@@ -293,6 +293,14 @@
                 <artifactId>spring-expression</artifactId>
                 <version>${spring.version}</version>
             </dependency>
+
+            <!-- Specify the version of json-smart we want to use.
+                 This solves a version mismatch between nimbus-jose-jwt and json-path below. -->
+            <!--<dependency>
+                <groupId>net.minidev</groupId>
+                <artifactId>json-smart</artifactId>
+                <version>2.5.0</version>
+            </dependency>-->
         </dependencies>
     </dependencyManagement>
 
@@ -368,6 +376,13 @@
             <groupId>org.webjars.bowergithub.codeseven</groupId>
             <artifactId>toastr</artifactId>
             <version>2.1.4</version>
+            <exclusions>
+                <!-- We use a later version of JQuery as defined above -->
+                <exclusion>
+                    <groupId>org.webjars.bowergithub.jquery</groupId>
+                    <artifactId>jquery-dist</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Pull in current version of URI.js (https://medialize.github.io/URI.js/) via WebJars
              Made available at: webjars/urijs/src/URI.min.js -->
@@ -389,6 +404,13 @@
             <groupId>org.webjars.bowergithub.jashkenas</groupId>
             <artifactId>backbone</artifactId>
             <version>1.4.1</version>
+            <exclusions>
+                <!-- We use a later version of underscore as defined above -->
+                <exclusion>
+                    <groupId>org.webjars.bowergithub.jashkenas</groupId>
+                    <artifactId>underscore</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Pull in current version of json-editor.js (https://github.com/json-editor/json-editor) via WebJars
              Made available at: webjars/json-editor__json-editor/2.6.1/dist/jsoneditor.js
@@ -500,6 +522,21 @@
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
             <version>${nimbus-jose-jwt.version}</version>
+            <exclusions>
+                <!-- We pull in a later version below -->
+                <exclusion>
+                    <groupId>net.minidev</groupId>
+                    <artifactId>json-smart</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Specify the version of json-smart we want to use.
+             This solves a version mismatch between nimbus-jose-jwt and json-path below. -->
+        <dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>json-smart</artifactId>
+            <version>2.5.0</version>
         </dependency>
 
         <dependency>
@@ -531,6 +568,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Required for ITs to ensure they use Apache HttpClient in AbstractWebClientIntegrationTest -->
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>5.3.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -574,6 +618,13 @@
             <artifactId>solr-core</artifactId>
             <version>${solr.client.version}</version>
             <scope>test</scope>
+            <exclusions>
+                <!-- Later version provided by Hibernate -->
+                <exclusion>
+                    <groupId>org.antlr</groupId>
+                    <artifactId>antlr4-runtime</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
@@ -597,8 +648,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-          <groupId>javax.annotation</groupId>
-          <artifactId>javax.annotation-api</artifactId>
+          <groupId>jakarta.annotation</groupId>
+          <artifactId>jakarta.annotation-api</artifactId>
         </dependency>
     </dependencies>
 

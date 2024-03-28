@@ -8,8 +8,8 @@
 package org.dspace.importer.external.ror.service;
 
 import java.util.Map;
-import javax.annotation.Resource;
 
+import jakarta.annotation.Resource;
 import org.dspace.importer.external.metadatamapping.AbstractMetadataFieldMapping;
 
 

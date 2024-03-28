@@ -23,11 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -55,6 +55,7 @@ import org.dspace.app.rest.utils.RestRepositoryUtils;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.util.UUIDUtils;
+import org.springframework.aop.AopInvocationException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -219,8 +220,10 @@ public class RestResourceController implements InitializingBean {
         Optional<RestAddressableModel> modelObject = Optional.empty();
         try {
             modelObject = repository.findById(id);
-        } catch (ClassCastException e) {
-            // ignore, as handled below
+        } catch (ClassCastException | IllegalArgumentException | AopInvocationException e) {
+            // These exceptions may be thrown if the "id" param above is not valid for DSpaceRestRepository.findById()
+            // (e.g. passing an Integer param when a UUID is expected, or similar).
+            // We can safely ignore these exceptions as they simply mean the object was not found (see below).
         }
         if (!modelObject.isPresent()) {
             throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
@@ -370,7 +373,8 @@ public class RestResourceController implements InitializingBean {
      * @return              The relevant ResponseEntity for this request
      * @throws HttpRequestMethodNotSupportedException   If something goes wrong
      */
-    @RequestMapping(method = RequestMethod.POST, consumes = {"application/json", "application/hal+json"})
+    @RequestMapping(method = RequestMethod.POST, value = {"", "/"},
+                    consumes = {"application/json", "application/hal+json"})
     public ResponseEntity<RepresentationModel<?>> post(HttpServletRequest request,
                                                        @PathVariable String apiCategory,
                                                        @PathVariable String model,
@@ -397,7 +401,7 @@ public class RestResourceController implements InitializingBean {
      * @return              The relevant ResponseEntity for this request
      * @throws HttpRequestMethodNotSupportedException   If something goes wrong
      */
-    @RequestMapping(method = RequestMethod.POST, consumes = {"text/uri-list"})
+    @RequestMapping(method = RequestMethod.POST, value = {"", "/"}, consumes = {"text/uri-list"})
     public ResponseEntity<RepresentationModel<?>> postWithUriListContentType(HttpServletRequest request,
                                                                              @PathVariable String apiCategory,
                                                                              @PathVariable String model)
@@ -650,7 +654,7 @@ public class RestResourceController implements InitializingBean {
      * @throws IOException
      * @throws AuthorizeException
      */
-    @RequestMapping(method = { RequestMethod.POST }, headers = "content-type=multipart/form-data")
+    @RequestMapping(method = { RequestMethod.POST }, value = {"", "/"}, headers = "content-type=multipart/form-data")
     public <T extends RestAddressableModel> ResponseEntity<RepresentationModel<?>> upload(
             HttpServletRequest request,
             @PathVariable String apiCategory,
@@ -961,7 +965,8 @@ public class RestResourceController implements InitializingBean {
     }
 
     /**
-     * Find all
+     * Find all via a GET request to the root endpoint. This method will trigger in cases where the called endpoint
+     * either includes a trailing slash or not.
      *
      * @param apiCategory
      * @param model
@@ -969,7 +974,7 @@ public class RestResourceController implements InitializingBean {
      * @param assembler
      * @return
      */
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET, value = {"", "/"})
     @SuppressWarnings("unchecked")
     public <T extends RestAddressableModel> PagedModel<DSpaceResource<T>> findAll(@PathVariable String apiCategory,
             @PathVariable String model, Pageable page, PagedResourcesAssembler assembler, HttpServletResponse response,

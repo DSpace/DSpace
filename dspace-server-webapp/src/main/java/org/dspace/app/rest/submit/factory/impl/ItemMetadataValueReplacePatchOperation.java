@@ -8,8 +8,8 @@
 package org.dspace.app.rest.submit.factory.impl;
 
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.patch.LateObjectEvaluator;
 import org.dspace.content.InProgressSubmission;
@@ -53,10 +53,10 @@ public class ItemMetadataValueReplacePatchOperation extends MetadataValueReplace
     void replace(Context context, HttpServletRequest currentRequest, InProgressSubmission source, String path,
             Object value) throws Exception {
         String[] split = getAbsolutePath(path).split("/");
-
+        String mdString = split[0];
         List<MetadataValue> metadataByMetadataString = itemService.getMetadataByMetadataString(source.getItem(),
-                                                                                               split[0]);
-        Assert.notEmpty(metadataByMetadataString);
+                                                                                               mdString);
+        Assert.notEmpty(metadataByMetadataString, "No metadata fields match ".concat(mdString));
 
         int index = Integer.parseInt(split[1]);
         // if split size is one so we have a call to initialize or replace

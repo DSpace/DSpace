@@ -10,8 +10,8 @@ package org.dspace.builder;
 
 import java.sql.SQLException;
 import java.util.Date;
-import javax.validation.constraints.NotNull;
 
+import jakarta.validation.constraints.NotNull;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.RequestItem;

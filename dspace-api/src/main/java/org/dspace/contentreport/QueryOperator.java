@@ -8,13 +8,13 @@
 package org.dspace.contentreport;
 
 import java.util.Arrays;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
 import org.apache.commons.lang3.function.TriFunction;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.MetadataValue_;

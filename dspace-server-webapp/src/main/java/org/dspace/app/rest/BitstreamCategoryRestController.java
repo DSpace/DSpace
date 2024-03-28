@@ -10,9 +10,9 @@ package org.dspace.app.rest;
 import static org.dspace.app.rest.utils.ContextUtil.obtainContext;
 
 import java.sql.SQLException;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.repository.BitstreamRestRepository;
 import org.dspace.authorize.AuthorizeException;
