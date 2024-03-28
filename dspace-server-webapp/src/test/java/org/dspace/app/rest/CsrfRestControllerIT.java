@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static org.junit.Assert.assertNotEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -35,10 +36,25 @@ public class CsrfRestControllerIT extends AbstractControllerIntegrationTest {
     @Test
     public void getCsrf() throws Exception {
         // NOTE: We avoid using getClient() here because that method may also call this "/api/security/csrf" endpoint.
-        mockMvc.perform(get("/api/security/csrf"))
-               .andExpect(status().isNoContent())
-               // Expect this endpoint to send back the proper HTTP Header & Cookie as set by DSpaceCsrfTokenRepository
-               .andExpect(cookie().exists(DSpaceCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME))
-               .andExpect(header().exists(DSpaceCsrfTokenRepository.DSPACE_CSRF_HEADER_NAME));
+        String headerToken = mockMvc.perform(get("/api/security/csrf"))
+                                    .andExpect(status().isNoContent())
+                                    // Expect this endpoint to send back the proper HTTP Header & Cookie
+                                    // as set by DSpaceCsrfTokenRepository
+                                    .andExpect(cookie().exists(DSpaceCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME))
+                                    .andExpect(header().exists(DSpaceCsrfTokenRepository.DSPACE_CSRF_HEADER_NAME))
+                                    .andReturn().getResponse()
+                                    .getHeader(DSpaceCsrfTokenRepository.DSPACE_CSRF_HEADER_NAME);
+
+        // Call the endpoint again, and verify we get a new token again. Endpoint should ALWAYS change the CSRF token
+        String headerToken2 = mockMvc.perform(get("/api/security/csrf"))
+                                    .andExpect(status().isNoContent())
+                                    // Expect this endpoint to send back the proper HTTP Header & Cookie
+                                    // as set by DSpaceCsrfTokenRepository
+                                    .andExpect(cookie().exists(DSpaceCsrfTokenRepository.DEFAULT_CSRF_COOKIE_NAME))
+                                    .andExpect(header().exists(DSpaceCsrfTokenRepository.DSPACE_CSRF_HEADER_NAME))
+                                    .andReturn().getResponse()
+                                    .getHeader(DSpaceCsrfTokenRepository.DSPACE_CSRF_HEADER_NAME);
+
+        assertNotEquals("CSRF Tokens should not be the same in separate requests", headerToken, headerToken2);
     }
 }
