@@ -10,8 +10,8 @@ package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Iterator;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.converter.BrowseEntryConverter;
 import org.dspace.app.rest.model.BrowseEntryRest;

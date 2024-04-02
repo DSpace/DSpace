@@ -9,8 +9,8 @@ package org.dspace.app.rest.submit.factory.impl;
 
 import java.util.List;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.ldn.NotifyPatternToTrigger;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.service.NotifyPatternToTriggerService;

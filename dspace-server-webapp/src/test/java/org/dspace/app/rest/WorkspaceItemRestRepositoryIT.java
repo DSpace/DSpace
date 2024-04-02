@@ -46,10 +46,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.matchers.JsonPathMatchers;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.dspace.app.ldn.NotifyServiceEntity;
@@ -8622,18 +8622,17 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // create three notify services
         NotifyServiceEntity notifyServiceOne =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name one")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name one")
                                 .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceTwo =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name two")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name two")
                                 .withLdnUrl("https://service2.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceThree =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name three")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name three")
                                 .withLdnUrl("https://service3.ldn.org/inbox")
                                 .build();
 
@@ -8675,18 +8674,17 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
 
         NotifyServiceEntity notifyServiceOne =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name one")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name one")
                                 .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceTwo =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name two")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name two")
                                 .withLdnUrl("https://service2.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceThree =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name three")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name three")
                                 .withLdnUrl("https://service3.ldn.org/inbox")
                                 .build();
 
@@ -8754,18 +8752,17 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
 
         NotifyServiceEntity notifyServiceOne =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name one")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name one")
                                 .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceTwo =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name two")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name two")
                                 .withLdnUrl("https://service2.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceThree =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name three")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name three")
                                 .withLdnUrl("https://service3.ldn.org/inbox")
                                 .build();
 
@@ -8817,8 +8814,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
 
         NotifyServiceEntity notifyServiceOne =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name one")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name one")
                                 .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
@@ -8860,8 +8856,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
 
         NotifyServiceEntity notifyServiceOne =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name one")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name one")
                                 .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
@@ -8911,18 +8906,17 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
 
         NotifyServiceEntity notifyServiceOne =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name one")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name one")
                                 .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceTwo =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name two")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name two")
                                 .withLdnUrl("https://service2.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceThree =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name three")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name three")
                                 .withLdnUrl("https://service3.ldn.org/inbox")
                                 .build();
 
@@ -8996,18 +8990,17 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
 
         NotifyServiceEntity notifyServiceOne =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name one")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name one")
                                 .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceTwo =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name two")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name two")
                                 .withLdnUrl("https://service2.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceThree =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name three")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name three")
                                 .withLdnUrl("https://service3.ldn.org/inbox")
                                 .build();
 
@@ -9059,13 +9052,12 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
 
         NotifyServiceEntity notifyServiceOne =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name one")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name one")
                                 .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceTwo =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name two")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name two")
                                 .withLdnUrl("https://service2.ldn.org/inbox")
                                 .build();
 
@@ -9120,18 +9112,17 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
 
         NotifyServiceEntity notifyServiceOne =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name one")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name one")
                                 .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceTwo =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name two")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name two")
                                 .withLdnUrl("https://service2.ldn.org/inbox")
                                 .build();
 
         NotifyServiceEntity notifyServiceThree =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context).withName("service name three")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name three")
                                 .withLdnUrl("https://service3.ldn.org/inbox")
                                 .build();
 
@@ -9200,8 +9191,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
 
         NotifyServiceEntity notifyServiceOne =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name one")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name one")
                                 .withLdnUrl("https://service.ldn.org/inbox")
                                 .build();
 

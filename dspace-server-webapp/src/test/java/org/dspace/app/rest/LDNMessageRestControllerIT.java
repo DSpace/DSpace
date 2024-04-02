@@ -89,8 +89,7 @@ public class LDNMessageRestControllerIT extends AbstractControllerIntegrationTes
         String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
 
         NotifyServiceEntity notifyService =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("service url")
                                 .withLdnUrl("https://overlay-journal.com/inbox/")

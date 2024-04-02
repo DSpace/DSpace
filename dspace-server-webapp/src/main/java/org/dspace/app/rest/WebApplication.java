@@ -10,8 +10,8 @@ package org.dspace.app.rest;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import javax.servlet.Filter;
 
+import jakarta.servlet.Filter;
 import org.dspace.app.ldn.LDNQueueExtractor;
 import org.dspace.app.ldn.LDNQueueTimeoutChecker;
 import org.dspace.app.rest.filter.DSpaceRequestContextFilter;

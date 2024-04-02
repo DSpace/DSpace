@@ -274,13 +274,13 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
 
     private Predicate<Contributor> contributor(String name, ContributorRole role, SequenceType sequence) {
         return contributor -> contributor.getCreditName().getContent().equals(name)
-            && role.equals(contributor.getContributorAttributes().getContributorRole())
+            && role.value().equals(contributor.getContributorAttributes().getContributorRole())
             && contributor.getContributorAttributes().getContributorSequence() == sequence;
     }
 
     private Predicate<FundingContributor> fundingContributor(String name, FundingContributorRole role) {
         return contributor -> contributor.getCreditName().getContent().equals(name)
-            && role.equals(contributor.getContributorAttributes().getContributorRole());
+            && role.value().equals(contributor.getContributorAttributes().getContributorRole());
     }
 
     private Predicate<? super FuzzyDate> date(String year, String month, String days) {

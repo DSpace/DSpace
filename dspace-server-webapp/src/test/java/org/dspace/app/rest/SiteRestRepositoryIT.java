@@ -133,7 +133,7 @@ public class SiteRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token)
             .perform(patch("/api/core/sites/" + site.getID())
             .content(requestBody)
-            .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+            .contentType(jakarta.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(
                  jsonPath("$.metadata",

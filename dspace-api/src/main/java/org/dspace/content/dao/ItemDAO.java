@@ -88,7 +88,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @param collectionUuids UUIDs of the collections to search.
      *        If none are provided, the entire repository will be searched.
      * @param regexClause Syntactic expression used to query the database using a regular expression
-     *        (e.g.: "text_value ~ ?")
+     *        (e.g.: "value ~ ?")
      * @param offset The offset for the query
      * @param limit Maximum number of items to return
      * @return A list containing the items that match the provided criteria

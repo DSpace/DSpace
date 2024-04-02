@@ -7,8 +7,8 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.AccessConditionDTO;
 import org.dspace.authorize.ResourcePolicy;

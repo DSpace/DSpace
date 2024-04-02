@@ -8,7 +8,8 @@
 package org.dspace.workflow;
 
 import java.util.List;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.NotNull;
 
 /**
  * A collection of {@link org.dspace.curate.CurationTask curation tasks} to be

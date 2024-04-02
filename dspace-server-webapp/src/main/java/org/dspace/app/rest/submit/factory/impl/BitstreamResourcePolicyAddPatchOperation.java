@@ -9,8 +9,8 @@ package org.dspace.app.rest.submit.factory.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.dspace.app.rest.model.AccessConditionDTO;
 import org.dspace.app.rest.model.patch.LateObjectEvaluator;

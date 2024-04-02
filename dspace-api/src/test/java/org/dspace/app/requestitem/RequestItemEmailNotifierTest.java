@@ -12,12 +12,11 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 
-import javax.mail.Address;
-import javax.mail.Message;
-import javax.mail.Provider;
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
-
+import jakarta.mail.Address;
+import jakarta.mail.Message;
+import jakarta.mail.Provider;
+import jakarta.mail.Session;
+import jakarta.mail.internet.InternetAddress;
 import org.dspace.AbstractUnitTest;
 import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
 import org.dspace.app.requestitem.service.RequestItemService;
@@ -34,6 +33,7 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -76,6 +76,13 @@ public class RequestItemEmailNotifierTest
                 = HandleServiceFactory.getInstance().getHandleService();
         requestItemService
                 = RequestItemServiceFactory.getInstance().getRequestItemService();
+    }
+
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+        // AbstractUnitTest doesn't do this for us.
+        AbstractBuilder.cleanupObjects();
+        AbstractBuilder.destroy();
     }
 
     /**

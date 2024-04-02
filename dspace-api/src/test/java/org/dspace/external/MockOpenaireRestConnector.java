@@ -8,7 +8,6 @@
 package org.dspace.external;
 
 import java.io.InputStream;
-import javax.xml.bind.JAXBException;
 
 import eu.openaire.jaxb.helper.OpenAIREHandler;
 import eu.openaire.jaxb.model.Response;
@@ -30,7 +29,7 @@ public class MockOpenaireRestConnector extends OpenaireRestConnector {
     public Response searchProjectByKeywords(int page, int size, String... keywords) {
         try {
             return OpenAIREHandler.unmarshal(this.getClass().getResourceAsStream("openaire-projects.xml"));
-        } catch (JAXBException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
@@ -40,7 +39,7 @@ public class MockOpenaireRestConnector extends OpenaireRestConnector {
     public Response searchProjectByIDAndFunder(String projectID, String projectFunder, int page, int size) {
         try {
             return OpenAIREHandler.unmarshal(this.getClass().getResourceAsStream("openaire-project.xml"));
-        } catch (JAXBException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
@@ -50,7 +49,7 @@ public class MockOpenaireRestConnector extends OpenaireRestConnector {
     public Response search(String path, int page, int size) {
         try {
             return OpenAIREHandler.unmarshal(this.getClass().getResourceAsStream("openaire-no-projects.xml"));
-        } catch (JAXBException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
