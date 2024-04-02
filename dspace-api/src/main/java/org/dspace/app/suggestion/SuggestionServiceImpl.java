@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.annotation.Resource;
 
+import jakarta.annotation.Resource;
 import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.springframework.stereotype.Service;

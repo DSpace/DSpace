@@ -10,8 +10,8 @@ package org.dspace.app.rest.submit.factory.impl;
 import static org.dspace.core.Constants.CONTENT_BUNDLE_NAME;
 
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.content.Bundle;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;

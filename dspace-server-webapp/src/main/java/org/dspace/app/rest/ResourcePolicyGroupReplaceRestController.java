@@ -15,9 +15,9 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.AuthorizeException;

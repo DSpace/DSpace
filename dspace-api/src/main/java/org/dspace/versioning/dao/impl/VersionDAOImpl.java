@@ -10,11 +10,11 @@ package org.dspace.versioning.dao.impl;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
-import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 
+import jakarta.persistence.Query;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.dspace.content.Item;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
@@ -74,7 +74,7 @@ public class VersionDAOImpl extends AbstractHibernateDAO<Version> implements Ver
                    )
         );
 
-        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
+        List<jakarta.persistence.criteria.Order> orderList = new LinkedList<>();
         orderList.add(criteriaBuilder.desc(versionRoot.get(Version_.versionNumber)));
         criteriaQuery.orderBy(orderList);
 
@@ -84,9 +84,9 @@ public class VersionDAOImpl extends AbstractHibernateDAO<Version> implements Ver
     @Override
     public int countVersionsByHistoryWithItem(Context context, VersionHistory versionHistory) throws SQLException {
         Query query = createQuery(context, "SELECT count(*) FROM " + Version.class.getSimpleName()
-                + " WHERE versionhistory_id = (:versionhistoryId)"
-                + " AND  item_id IS NOT NULL");
-        query.setParameter("versionhistoryId", versionHistory);
+                + " WHERE versionHistory = :versionhistory"
+                + " AND  item IS NOT NULL");
+        query.setParameter("versionhistory", versionHistory);
         return count(query);
     }
 

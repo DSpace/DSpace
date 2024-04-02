@@ -49,7 +49,7 @@ public class SpiderDetectorTest extends AbstractDSpaceTest {
 
     /**
      * Test method for
-     * {@link org.dspace.statistics.util.SpiderDetector#isSpider(javax.servlet.http.HttpServletRequest)}.
+     * {@link org.dspace.statistics.util.SpiderDetector#isSpider(jakarta.servlet.http.HttpServletRequest)}.
      */
     @Test
     public void testIsSpiderHttpServletRequest() {

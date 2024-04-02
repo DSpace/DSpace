@@ -1993,7 +1993,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient(token)
             .perform(patch("/api/core/communities/" + parentCommunity.getID())
             .content(requestBody)
-            .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+            .contentType(jakarta.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(
                  jsonPath("$.metadata",

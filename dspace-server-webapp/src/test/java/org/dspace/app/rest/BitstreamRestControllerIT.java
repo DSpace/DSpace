@@ -7,8 +7,8 @@
  */
 package org.dspace.app.rest;
 
+import static jakarta.mail.internet.MimeUtility.encodeText;
 import static java.util.UUID.randomUUID;
-import static javax.mail.internet.MimeUtility.encodeText;
 import static org.apache.commons.codec.CharEncoding.UTF_8;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.io.IOUtils.toInputStream;
