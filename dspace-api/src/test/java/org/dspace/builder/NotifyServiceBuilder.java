@@ -141,4 +141,20 @@ public class NotifyServiceBuilder extends AbstractBuilder<NotifyServiceEntity, N
         return this;
     }
 
+    /**
+     * Delete the Test NotifyServiceEntity referred to by the given ID
+     * @param id ID of NotifyServiceEntity to delete
+     * @throws SQLException if error occurs
+     */
+    public static void deleteNotifyService(Integer id) throws SQLException {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            NotifyServiceEntity notifyServiceEntity = notifyService.find(c, id);
+            if (notifyServiceEntity != null) {
+                notifyService.delete(c, notifyServiceEntity);
+            }
+            c.complete();
+        }
+    }
+
 }

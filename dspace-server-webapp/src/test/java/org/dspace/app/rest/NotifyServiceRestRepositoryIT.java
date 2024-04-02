@@ -234,6 +234,9 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     matchNotifyServicePattern("patternB", null, false)
                 )))
             ));
+
+        // Delete the created service
+        NotifyServiceBuilder.deleteNotifyService(idRef.get());
     }
 
     @Test
