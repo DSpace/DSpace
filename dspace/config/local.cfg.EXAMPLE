@@ -243,4 +243,4 @@ ldn.enabled = true
 # Behavior to generate provenance message, if set true,
 # personal data (e.g. email) of submitter will be hidden in dc.description.provenance
 # true - personal
-#dc.description.provenance.privacy=true
+#dc.description.provenance.privacy = true
