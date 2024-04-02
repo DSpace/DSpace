@@ -1194,7 +1194,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         //behavior to generate provenance message, if set true, personal data (e.g. email) of submitter will be hidden
         //default value false, personal data of submitter will be shown in provenance message
         String isProvenancePrivacyActiveProperty =
-                configurationService.getProperty("dc.description.provenance.privacy", "false");
+                configurationService.getProperty("metadata.privacy.dc.description.provenance", "false");
         boolean isProvenancePrivacyActive = Boolean.parseBoolean(isProvenancePrivacyActiveProperty);
 
         if (myitem.getSubmitter() != null && !isProvenancePrivacyActive) {

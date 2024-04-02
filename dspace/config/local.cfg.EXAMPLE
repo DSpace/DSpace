@@ -236,11 +236,3 @@ db.password = dspace
 #  LDN INBOX SETTINGS  #
 ########################
 ldn.enabled = true
-
-#---------------------------------------------------------------#
-#---------------PERSONAL DATA STORED IN PROVENANCE--------------#
-#---------------------------------------------------------------#
-# Behavior to generate provenance message, if set true,
-# personal data (e.g. email) of submitter will be hidden in dc.description.provenance
-# true - personal
-#dc.description.provenance.privacy = true
