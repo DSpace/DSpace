@@ -8,8 +8,8 @@
 package org.dspace.app.rest.submit.factory.impl;
 
 import java.sql.SQLException;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.content.Collection;
 import org.dspace.content.InProgressSubmission;

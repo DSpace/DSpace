@@ -9,15 +9,15 @@ package org.dspace.app.ldn;
 
 import java.lang.reflect.Field;
 import java.util.Date;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ReloadableEntity;
 
@@ -88,7 +88,7 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
     @JoinColumn(name = "object", referencedColumnName = "uuid")
     private DSpaceObject object;
 
-    @Column(name = "message", nullable = false, columnDefinition = "text")
+    @Column(name = "message", columnDefinition = "text")
     private String message;
 
     @Column(name = "type")

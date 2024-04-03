@@ -59,6 +59,9 @@ public class GroupRestPermissionEvaluatorPlugin extends RestObjectPermissionEval
                 || Constants.getTypeID(targetType) != Constants.GROUP) {
             return false;
         }
+        if (targetId == null) {
+            return false;
+        }
 
         Request request = requestService.getCurrentRequest();
         Context context = ContextUtil.obtainContext(request.getHttpServletRequest());

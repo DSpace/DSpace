@@ -9,8 +9,8 @@ package org.dspace.app.rest;
 
 import java.sql.SQLException;
 import java.util.regex.Pattern;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.LDNMessageEntity;
@@ -93,7 +93,7 @@ public class LDNInboxController {
      */
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<String> handleResponseStatusException(ResponseStatusException e) {
-        return ResponseEntity.status(e.getStatus().value())
+        return ResponseEntity.status(e.getStatusCode().value())
                 .body(e.getMessage());
     }
 
