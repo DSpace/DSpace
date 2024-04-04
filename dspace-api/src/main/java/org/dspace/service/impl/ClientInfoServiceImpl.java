@@ -10,9 +10,9 @@ package org.dspace.service.impl;
 import static org.apache.commons.lang3.StringUtils.ordinalIndexOf;
 
 import java.net.Inet4Address;
-import javax.servlet.http.HttpServletRequest;
 
 import com.google.common.net.InetAddresses;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;

@@ -20,9 +20,9 @@ import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.el.MethodNotFoundException;
-import javax.ws.rs.BadRequestException;
 
+import jakarta.el.MethodNotFoundException;
+import jakarta.ws.rs.BadRequestException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.dspace.content.Item;

@@ -15,8 +15,8 @@ import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import javax.persistence.Query;
 
+import jakarta.persistence.Query;
 import org.dspace.AbstractUnitTest;
 import org.dspace.checker.ChecksumResultCode;
 import org.dspace.content.Bitstream;
@@ -122,7 +122,7 @@ public class ChecksumHistoryDAOImplTest
 
         // See if matching old row is gone.
         qry = dbc.getSession().createQuery(
-            "SELECT COUNT(*) FROM ChecksumHistory WHERE process_end_date = :date");
+            "SELECT COUNT(*) FROM ChecksumHistory WHERE processEndDate = :date");
         long count;
 
         qry.setParameter("date", matchDate);

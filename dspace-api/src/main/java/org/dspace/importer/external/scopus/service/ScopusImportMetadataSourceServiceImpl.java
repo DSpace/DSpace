@@ -21,8 +21,8 @@ import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.el.MethodNotFoundException;
 
+import jakarta.el.MethodNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;

@@ -18,13 +18,14 @@
 
     <properties>
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
-        <java.version>11</java.version>
-        <spring.version>5.3.32</spring.version>
-        <spring-boot.version>2.7.18</spring-boot.version>
-        <spring-security.version>5.7.11</spring-security.version> <!-- sync with version used by spring-boot-->
-        <hibernate.version>5.6.15.Final</hibernate.version>
-        <hibernate-validator.version>6.2.5.Final</hibernate-validator.version>
-        <postgresql.driver.version>42.7.2</postgresql.driver.version>
+        <java.version>17</java.version>
+        <spring.version>6.1.5</spring.version>
+        <spring-boot.version>3.2.4</spring-boot.version>
+        <spring-security.version>6.2.3</spring-security.version> <!-- sync with version used by spring-boot-->
+        <hibernate.version>6.4.4.Final</hibernate.version>
+        <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
+        <postgresql.driver.version>42.7.3</postgresql.driver.version>
+        <flyway.version>10.10.0</flyway.version>
         <solr.client.version>8.11.3</solr.client.version>
 
         <ehcache.version>3.10.8</ehcache.version>
@@ -32,33 +33,32 @@
         <!-- NOTE: when updating jackson.version, also sync jackson-databind.version below -->
         <jackson.version>2.16.0</jackson.version>
         <jackson-databind.version>2.16.0</jackson-databind.version>
-        <javax-annotation.version>1.3.2</javax-annotation.version>
-        <jaxb-api.version>2.3.1</jaxb-api.version>
-        <jaxb-runtime.version>2.3.9</jaxb-runtime.version>
+        <jakarta-annotation.version>2.1.1</jakarta-annotation.version>
+        <jaxb-api.version>4.0.0</jaxb-api.version>
+        <jaxb-runtime.version>4.0.1</jaxb-runtime.version>
         <jcache-version>1.1.1</jcache-version>
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
         <jetty.version>9.4.54.v20240208</jetty.version>
-        <log4j.version>2.22.1</log4j.version>
-        <pdfbox-version>2.0.30</pdfbox-version>
+        <log4j.version>2.23.1</log4j.version>
+        <pdfbox-version>2.0.31</pdfbox-version>
         <rome.version>1.19.0</rome.version>
-        <slf4j.version>1.7.36</slf4j.version>
-        <tika.version>2.5.0</tika.version>
-        <!-- Sync with whatever version Tika uses -->
-        <bouncycastle.version>1.70</bouncycastle.version>
-
+        <slf4j.version>2.0.11</slf4j.version>
+        <tika.version>2.9.1</tika.version>
+        <!-- Sync BouncyCastle & ASM with whatever version Tika uses -->
+        <bouncycastle.version>1.76</bouncycastle.version>
+        <asm.version>8.0.1</asm.version>
+        <!-- Jersey is used to integrate with external sources/services -->
+        <jersey.version>3.1.5</jersey.version>
         <!--=== SERVER WEBAPP DEPENDENCIES ===-->
         <!-- Library for reading JSON documents: https://github.com/json-path/JsonPath (used by Server webapp) -->
         <json-path.version>2.9.0</json-path.version>
         <!-- Library for managing JSON Web Tokens (JWT): https://bitbucket.org/connect2id/nimbus-jose-jwt/wiki/Home
              (used by Server webapp) -->
-        <nimbus-jose-jwt.version>7.9</nimbus-jose-jwt.version>
+        <nimbus-jose-jwt.version>9.37.3</nimbus-jose-jwt.version>
 
         <!--=== OTHER MODULE-SPECIFIC DEPENDENCIES ===-->
-        <!-- PIN Jena to 2.x until both RDF and SWORDv2 can be updated to Jena 3. Requires package renaming, see
-             https://jena.apache.org/documentation/migrate_jena2_jena3.html -->
-        <jena.version>2.13.0</jena.version>
-        <!-- Jersey is used to integrate with external sources/services -->
-        <jersey.version>2.39.1</jersey.version>
+        <!-- Jena is used by both RDF and SWORDv2 -->
+        <jena.version>4.9.0</jena.version>
 
         <!--=== MAVEN SETTINGS ===-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -89,7 +89,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.0.0-M3</version>
+                    <version>3.4.1</version>
                     <executions>
                         <execution>
                             <id>enforce-java</id>
@@ -140,9 +140,9 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.1</version>
+                    <version>3.13.0</version>
                     <configuration>
-                        <release>11</release>
+                        <release>${java.version}</release>
                         <!-- Turn on http://errorprone.info (requires fork=true & below compilerArgs)-->
                         <fork>true</fork>
                         <compilerArgs>
@@ -159,6 +159,9 @@
                             <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
                             <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
                             <arg>-Xpkginfo:always</arg>
+                            <!-- Allows for the Reflection API to retrieve parameter names from methods. For example,
+                                 it enables @PathVariable annotations to use parameter names automatically. -->
+                            <arg>-parameters</arg>
                         </compilerArgs>
                         <annotationProcessorPaths>
                             <path>
@@ -173,7 +176,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.3.0</version>
                     <configuration>
                         <archive>
                             <manifest>
@@ -187,7 +190,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>3.2.3</version>
+                    <version>3.4.0</version>
                     <configuration>
                         <failOnMissingWebXml>false</failOnMissingWebXml>
                         <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
@@ -204,7 +207,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.22.2</version>
+                    <version>3.2.5</version>
                     <configuration>
                         <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                              maven-surefire-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
@@ -219,6 +222,9 @@
                         <trimStackTrace>false</trimStackTrace>
                         <!-- Whether to skip unit tests or not -->
                         <skipTests>${skipUnitTests}</skipTests>
+                        <!-- Do not fail immediately if a test specified via "-Dtest=[testClass]" isn't found.
+                             This allows the build to continue and keep trying to run that test in other modules. -->
+                        <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
                         <!--
                         Enable to debug Maven Surefire tests in remote proces
                         <debugForkedProcess>true</debugForkedProcess>
@@ -228,7 +234,7 @@
                 <!-- Used to run Integration tests (when enabled by -DskipIntegrationTests=false) -->
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>2.22.2</version>
+                    <version>3.2.5</version>
                     <configuration>
                         <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                              maven-failsafe-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
@@ -242,6 +248,9 @@
                         <trimStackTrace>false</trimStackTrace>
                         <!-- Whether to skip integration tests or not -->
                         <skipTests>${skipIntegrationTests}</skipTests>
+                        <!-- Do not fail immediately if a test specified via "-Dit.test=[testClass]" isn't found.
+                             This allows the build to continue and keep trying to run that test in other modules. -->
+                        <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
                     </configuration>
                     <executions>
                         <execution>
@@ -319,7 +328,7 @@
                 <!-- This additional configuration also cleans sub-modules -->
                 <plugin>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.3.2</version>
                     <configuration>
                         <filesets>
                             <fileset>
@@ -333,17 +342,17 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>3.7.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.1.2</version>
+                    <version>3.6.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.3.1</version>
                 </plugin>
                 <!-- Used to validate License Headers (see build process) -->
                 <plugin>
@@ -355,13 +364,13 @@
                 <plugin>
                     <groupId>org.sonatype.plugins</groupId>
                     <artifactId>nexus-staging-maven-plugin</artifactId>
-                    <version>1.6.8</version>
+                    <version>1.6.13</version>
                 </plugin>
                 <!-- Used to generate JavaDocs for new releases (see release profile). -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.6.3</version>
                     <configuration>
                         <!-- Never fail a build based on Javadoc errors -->
                         <failOnError>false</failOnError>
@@ -376,7 +385,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.2.1</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <!-- Used for custom Groovy code that fills out the 'agnostic.build.dir' needed to
                      set 'dspace.dir' for our testing environment -->
@@ -389,13 +398,13 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
-                    <version>1.6</version>
+                    <version>3.2.1</version>
                 </plugin>
                 <!-- Used for code coverage reporting (see 'measure-test-coverage' profile) -->
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.5</version>
+                    <version>0.8.11</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -407,7 +416,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.3</version>
+                <version>3.0.0</version>
                 <configuration>
                     <!-- During release:prepare and release:perform, pass the "release" property to enable the
                      "release" profile (and enable/disable other profiles based on whether they need releasing) -->
@@ -1073,19 +1082,26 @@
             </dependency>
 
             <dependency>
-                <groupId>org.hibernate</groupId>
+                <groupId>org.hibernate.orm</groupId>
                 <artifactId>hibernate-core</artifactId>
                 <version>${hibernate.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.hibernate</groupId>
+                <groupId>org.hibernate.orm</groupId>
                 <artifactId>hibernate-jpamodelgen</artifactId>
                 <version>${hibernate.version}</version>
+                <exclusions>
+                    <!-- Later version provided by Hibernate Core -->
+                    <exclusion>
+                        <groupId>org.antlr</groupId>
+                        <artifactId>antlr4-runtime</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
-                <groupId>org.hibernate</groupId>
+                <groupId>org.hibernate.orm</groupId>
                 <artifactId>hibernate-jcache</artifactId>
                 <version>${hibernate.version}</version>
             </dependency>
@@ -1097,7 +1113,7 @@
             </dependency>
 
             <dependency>
-                <groupId>org.hibernate</groupId>
+                <groupId>org.hibernate.validator</groupId>
                 <artifactId>hibernate-validator</artifactId>
                 <!-- This artifact doesn't track the main Hibernate version. -->
                 <version>${hibernate-validator.version}</version>
@@ -1257,13 +1273,13 @@
             <!-- Tika brings in multiple versions of this. Select the latest version. Always sync with Tika version -->
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcpkix-jdk15on</artifactId>
+                <artifactId>bcpkix-jdk18on</artifactId>
                 <version>${bouncycastle.version}</version>
             </dependency>
             <!-- Tika brings in multiple versions of this. Select the latest version. Always sync with Tika version -->
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk15on</artifactId>
+                <artifactId>bcprov-jdk18on</artifactId>
                 <version>${bouncycastle.version}</version>
             </dependency>
             <!-- Tika and axiom-api (in dspace-swordv2) disagree on versions -->
@@ -1276,7 +1292,37 @@
             <dependency>
                 <groupId>org.ow2.asm</groupId>
                 <artifactId>asm</artifactId>
-                <version>8.0.1</version>
+                <version>${asm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm-analysis</artifactId>
+                <version>${asm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm-commons</artifactId>
+                <version>${asm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm-tree</artifactId>
+                <version>${asm.version}</version>
+            </dependency>
+
+            <!-- Solr-core and Postgres disagree on versions of Checker Qual -->
+            <dependency>
+                <groupId>org.checkerframework</groupId>
+                <artifactId>checker-qual</artifactId>
+                <version>3.31.0</version>
+            </dependency>
+
+            <!-- Several dependencies disagree on version of GSON including Jena, Google-OAuth-Client
+                 and OpenAIRE Broker-Client -->
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>2.10.1</version>
             </dependency>
 
             <!-- Reminder: Keep icu4j (in Parent POM) synced with version used by lucene-analyzers-icu below,
@@ -1311,97 +1357,69 @@
                 <artifactId>apache-jena-libs</artifactId>
                 <type>pom</type>
                 <version>${jena.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                    <!-- Newer version brought in by Tika -->
-                    <exclusion>
-                        <groupId>org.apache.commons</groupId>
-                        <artifactId>commons-csv</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>net.handle</groupId>
                 <artifactId>handle</artifactId>
                 <version>9.3.1</version>
-		<exclusions>
-                    <!-- A later version is brought in by google-oauth-client -->
-                    <exclusion>
-                        <groupId>com.google.code.gson</groupId>
-                        <artifactId>gson</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
-            <!-- Required to run Handle Server -->
+            <!-- Only necessary to run Handle Server from commandline. Therefore, a runtime dependency. -->
             <dependency>
                 <groupId>net.cnri</groupId>
                 <artifactId>cnri-servlet-container</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.0</version>
+                <scope>runtime</scope>
             </dependency>
-            <!-- Jetty is needed to run Handle Server (and tests in some modules)
-                 Solr and Handle Server disagree on version of Jetty, so we force a specific version here. -->
+            <!-- Jetty is ONLY needed to run Handle Server from commandline ONLY. Therefore, a runtime dependency. -->
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-server</artifactId>
                 <version>${jetty.version}</version>
+                <scope>runtime</scope>
             </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-alpn-java-server</artifactId>
-                <version>${jetty.version}</version>
-            </dependency>
+            <!-- The below Jetty dependency versions are only specified to avoid various dependency convergence errors
+                 between Solr, CNRI Handle Server, and Jetty-Server (see above). We do NOT use Jetty directly. -->
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-deploy</artifactId>
                 <version>${jetty.version}</version>
+                <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-http</artifactId>
                 <version>${jetty.version}</version>
+                <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-io</artifactId>
                 <version>${jetty.version}</version>
+                <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-servlet</artifactId>
                 <version>${jetty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-servlets</artifactId>
-                <version>${jetty.version}</version>
+                <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-util</artifactId>
                 <version>${jetty.version}</version>
+                <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-webapp</artifactId>
                 <version>${jetty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-xml</artifactId>
-                <version>${jetty.version}</version>
+                <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty.http2</groupId>
                 <artifactId>http2-common</artifactId>
                 <version>${jetty.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty.http2</groupId>
-                <artifactId>http2-server</artifactId>
-                <version>${jetty.version}</version>
+                <scope>runtime</scope>
             </dependency>
 
             <dependency>
@@ -1448,11 +1466,13 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-dbcp2</artifactId>
                 <version>2.11.0</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-fileupload</groupId>
-                <artifactId>commons-fileupload</artifactId>
-                <version>1.5</version>
+                <exclusions>
+                    <!-- Newer version is pulled in by Hibernate -->
+                    <exclusion>
+                        <groupId>jakarta.transaction</groupId>
+                        <artifactId>jakarta.transaction-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
@@ -1464,12 +1484,22 @@
                 <artifactId>commons-lang3</artifactId>
                 <version>3.14.0</version>
             </dependency>
-            <!-- NOTE: We don't use commons-logging directly, but many dependencies rely on it.
-                 So, we specify the version to use to avoid dependency convergence issues. -->
+            <!-- NOTE: We don't use commons-logging, commons-compress or commons-csv directly,
+                 but many dependencies rely on them. Only here specified to avoid dependency convergence issues. -->
             <dependency>
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging</artifactId>
                 <version>1.3.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>1.26.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-csv</artifactId>
+                <version>1.10.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -1493,13 +1523,18 @@
             </dependency>
             <dependency>
                 <groupId>com.sun.mail</groupId>
-                <artifactId>javax.mail</artifactId>
-                <version>1.6.2</version>
+                <artifactId>jakarta.mail</artifactId>
+                <version>2.0.1</version>
             </dependency>
             <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>javax.servlet-api</artifactId>
-                <version>3.1.0</version>
+                <groupId>jakarta.servlet</groupId>
+                <artifactId>jakarta.servlet-api</artifactId>
+                <version>6.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.el</groupId>
+                <artifactId>jakarta.el-api</artifactId>
+                <version>5.0.1</version>
             </dependency>
 
             <!-- Jaxen is needed by xoai and sword2-server, but they disagree on the versions -->
@@ -1627,6 +1662,12 @@
                 <version>${errorprone.version}</version>
                 <scope>compile</scope>
             </dependency>
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_annotations</artifactId>
+                <version>${errorprone.version}</version>
+                <scope>compile</scope>
+            </dependency>
             <!-- JUnit, Mockito and Hamcrest are used for Unit/Integration tests -->
             <dependency>
                 <groupId>org.hamcrest</groupId>
@@ -1732,6 +1773,11 @@
                 <version>${jackson-databind.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jsr310</artifactId>
+                <version>${jackson-databind.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>32.0.0-jre</version>
@@ -1765,8 +1811,8 @@
 
             <!-- JAXB API and implementation (no longer bundled as of Java 11) -->
             <dependency>
-                <groupId>javax.xml.bind</groupId>
-                <artifactId>jaxb-api</artifactId>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jakarta.xml.bind-api</artifactId>
                 <version>${jaxb-api.version}</version>
             </dependency>
             <dependency>
@@ -1776,9 +1822,9 @@
                 <scope>runtime</scope>
             </dependency>
             <dependency>
-                <groupId>javax.annotation</groupId>
-                <artifactId>javax.annotation-api</artifactId>
-                <version>${javax-annotation.version}</version>
+                <groupId>jakarta.annotation</groupId>
+                <artifactId>jakarta.annotation-api</artifactId>
+                <version>${jakarta-annotation.version}</version>
             </dependency>
             <!-- mockito-inline and hibernate-ehcache pull in different versions of byte-buddy. Specify which we want. -->
             <!-- TODO: We might be able to remove this after hibernate-ehcache is replaced by hibernate-jcache -->
@@ -1909,8 +1955,11 @@
     <repositories>
         <!-- Check Maven Central first (before other repos below) -->
         <repository>
-            <id>maven-central</id>
+            <id>central</id>
             <url>https://repo.maven.apache.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
         <!-- Enable access to artifacts in Sonatype's snapshot repo for Snapshots ONLY -->
         <repository>
@@ -1928,6 +1977,18 @@
         <repository>
             <id>handle.net</id>
             <url>https://handle.net/maven</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <!-- For Jakarta EE version of "orcid-model". REMOVE once official "orcid-model" is updated to Jakarta,
+             see https://github.com/ORCID/orcid-model/issues/50-->
+        <repository>
+            <id>oicr.on.ca</id>
+            <url>https://artifacts.oicr.on.ca/artifactory/collab-release/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
     </repositories>
 </project>

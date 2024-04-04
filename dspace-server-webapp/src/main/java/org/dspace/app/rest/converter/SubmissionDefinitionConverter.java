@@ -11,8 +11,8 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;

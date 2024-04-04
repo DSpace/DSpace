@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.annotation.Resource;
 
+import jakarta.annotation.Resource;
 import org.apache.logging.log4j.Logger;
 import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.exception.SourceExceptionHandler;

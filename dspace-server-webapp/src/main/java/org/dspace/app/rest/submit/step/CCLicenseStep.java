@@ -7,8 +7,7 @@
  */
 package org.dspace.app.rest.submit.step;
 
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.step.DataCCLicense;
 import org.dspace.app.rest.submit.AbstractProcessingStep;
