@@ -4,7 +4,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-parent</artifactId>
     <packaging>pom</packaging>
-    <version>8.0-SNAPSHOT</version>
+    <version>8.0-rc1</version>
     <name>DSpace Parent Project</name>
     <description>
    	DSpace open source software is a turnkey institutional repository application.
@@ -374,7 +374,7 @@
                     <configuration>
                         <!-- Never fail a build based on Javadoc errors -->
                         <failOnError>false</failOnError>
-                        <detectLinks/>
+                        <detectLinks />
                         <links>
                           <link>https://docs.spring.io/spring-framework/docs/current/javadoc-api/</link>
                           <link>https://docs.spring.io/spring-security/site/docs/current/api/</link>
@@ -1009,62 +1009,62 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
-                <version>8.0-SNAPSHOT</version>
+                <version>8.0-rc1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-api</artifactId>
                 <type>test-jar</type>
-                <version>8.0-SNAPSHOT</version>
+                <version>8.0-rc1</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>additions</artifactId>
-                <version>8.0-SNAPSHOT</version>
+                <version>8.0-rc1</version>
             </dependency>
 
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-sword</artifactId>
-                <version>8.0-SNAPSHOT</version>
+                <version>8.0-rc1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-swordv2</artifactId>
-                <version>8.0-SNAPSHOT</version>
+                <version>8.0-rc1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
-                <version>8.0-SNAPSHOT</version>
+                <version>8.0-rc1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-services</artifactId>
-                <version>8.0-SNAPSHOT</version>
+                <version>8.0-rc1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
                 <type>test-jar</type>
-                <version>8.0-SNAPSHOT</version>
+                <version>8.0-rc1</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rdf</artifactId>
-                <version>8.0-SNAPSHOT</version>
+                <version>8.0-rc1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-iiif</artifactId>
-                <version>8.0-SNAPSHOT</version>
+                <version>8.0-rc1</version>
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-server-webapp</artifactId>
-                <version>8.0-SNAPSHOT</version>
+                <version>8.0-rc1</version>
             </dependency>
             <!-- DSpace API Localization Packages -->
             <dependency>
@@ -1935,7 +1935,7 @@
         <connection>scm:git:git@github.com:DSpace/DSpace.git</connection>
         <developerConnection>scm:git:git@github.com:DSpace/DSpace.git</developerConnection>
         <url>git@github.com:DSpace/DSpace.git</url>
-        <tag>HEAD</tag>
+        <tag>dspace-8.0-rc1</tag>
     </scm>
 
 
