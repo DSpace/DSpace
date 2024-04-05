@@ -294,7 +294,7 @@
             <!-- To include the 'Duplicate Detection' step, uncomment the line below. Make sure
                  that duplicate-detection.cfg is properly configured and items have been reindexed since
                  enabling the feature -->
-            <!-- <step id="duplicates"/> -->
+            <step id="duplicates"/>
 
             <!--Step will be COAR Notify services to the item -->
             <!-- <step id="coarnotify"/> -->
@@ -305,7 +305,7 @@
             <!-- <step id="extractionstep"/> -->
 
             <!-- Uncomment this step to allow the user to select a Creative Commons License -->
-            <!-- <step id="cclicense"/> -->
+            <step id="cclicense"/>
 
             <!--Step will be to Sign off on the required DSpace License agreement -->
             <step id="license"/>
