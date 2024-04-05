@@ -29,6 +29,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
@@ -112,7 +113,12 @@ public class WebSecurityConfiguration {
             .csrf((csrf) -> csrf
                 .csrfTokenRepository(this.csrfTokenRepository())
                 .sessionAuthenticationStrategy(this.dSpaceCsrfAuthenticationStrategy())
-                .csrfTokenRequestHandler(new DSpaceCsrfTokenRequestHandler()))
+                // Disable SpringSecurity BREACH protection, as this is not working well with Cookie-based storage.
+                // When enabled, BREACH protection causes the CSRF token to grow in size until UI errors occur.
+                // See https://github.com/DSpace/DSpace/issues/9450
+                // NOTE: DSpace doesn't need BREACH protection as it's only necessary when sending the token via a
+                // request attribute (e.g. "_csrf") which the DSpace UI never does.
+                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
             .exceptionHandling((exceptionHandling) -> exceptionHandling
                 // Return 401 on authorization failures with a correct WWWW-Authenticate header
                 .authenticationEntryPoint(new DSpace401AuthenticationEntryPoint(restAuthenticationService))
