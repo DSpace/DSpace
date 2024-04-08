@@ -25,6 +25,7 @@ import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.MetadataFieldBuilder;
 import org.dspace.builder.MetadataSchemaBuilder;
+import org.dspace.builder.NotifyServiceBuilder;
 import org.dspace.builder.OrcidHistoryBuilder;
 import org.dspace.builder.OrcidQueueBuilder;
 import org.dspace.builder.OrcidTokenBuilder;
@@ -83,6 +84,7 @@ public class AbstractBuilderCleanupUtil {
         map.put(MetadataSchemaBuilder.class.getName(), new ArrayList<>());
         map.put(SiteBuilder.class.getName(), new ArrayList<>());
         map.put(ProcessBuilder.class.getName(), new ArrayList<>());
+        map.put(NotifyServiceBuilder.class.getName(), new ArrayList<>());
     }
 
     /**
