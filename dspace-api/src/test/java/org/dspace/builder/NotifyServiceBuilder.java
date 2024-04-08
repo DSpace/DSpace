@@ -47,7 +47,7 @@ public class NotifyServiceBuilder extends AbstractBuilder<NotifyServiceEntity, N
             // Ensure object and any related objects are reloaded before checking to see what needs cleanup
             notifyServiceEntity = c.reloadEntity(notifyServiceEntity);
             if (notifyServiceEntity != null) {
-                delete(notifyServiceEntity);
+                delete(c, notifyServiceEntity);
             }
             c.complete();
             indexingService.commit();
@@ -73,19 +73,6 @@ public class NotifyServiceBuilder extends AbstractBuilder<NotifyServiceEntity, N
             log.error(e);
         }
         return notifyServiceEntity;
-    }
-
-    public void delete(NotifyServiceEntity notifyServiceEntity) throws Exception {
-        try (Context c = new Context()) {
-            c.turnOffAuthorisationSystem();
-            NotifyServiceEntity nsEntity = c.reloadEntity(notifyServiceEntity);
-            if (nsEntity != null) {
-                getService().delete(c, nsEntity);
-            }
-            c.complete();
-        }
-
-        indexingService.commit();
     }
 
     public static NotifyServiceBuilder createNotifyServiceBuilder(Context context, String name) {
