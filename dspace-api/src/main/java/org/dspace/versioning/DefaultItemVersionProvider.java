@@ -52,7 +52,9 @@ public class DefaultItemVersionProvider extends AbstractVersionProvider implemen
     @Override
     public Item createNewItemAndAddItInWorkspace(Context context, Item nativeItem) {
         try {
-            WorkspaceItem workspaceItem = workspaceItemService.create(context, nativeItem.getOwningCollection(), false);
+            WorkspaceItem workspaceItem = workspaceItemService.create(context, nativeItem.getOwningCollection(),
+                    false,
+                    true);
             Item itemNew = workspaceItem.getItem();
             itemService.update(context, itemNew);
             return itemNew;

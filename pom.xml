@@ -374,7 +374,7 @@
                     <configuration>
                         <!-- Never fail a build based on Javadoc errors -->
                         <failOnError>false</failOnError>
-                        <detectLinks/>
+                        <detectLinks />
                         <links>
                           <link>https://docs.spring.io/spring-framework/docs/current/javadoc-api/</link>
                           <link>https://docs.spring.io/spring-security/site/docs/current/api/</link>
