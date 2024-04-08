@@ -2246,23 +2246,6 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         ;
     }
 
-    @Override
-    @After
-    public void destroy() throws Exception {
-        List<NotifyServiceEntity> notifyServiceEntities = notifyService.findAll(context);
-        if (CollectionUtils.isNotEmpty(notifyServiceEntities)) {
-            notifyServiceEntities.forEach(notifyServiceEntity -> {
-                try {
-                    notifyService.delete(context, notifyServiceEntity);
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-        }
-
-        super.destroy();
-    }
-
     @Test
     public void notifyServiceLowerIpReplaceOperationBadRequestTest() throws Exception {
 
