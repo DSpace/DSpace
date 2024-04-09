@@ -43,7 +43,7 @@ jobs:
     needs: dspace-dependencies
     uses: ./.github/workflows/reusable-docker-build.yml
     with:
-      build_id: dspace
+      build_id: dspace-prod
       image_name: dspace/dspace
       dockerfile_path: ./Dockerfile
     secrets:
