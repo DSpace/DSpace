@@ -68,9 +68,9 @@ env:
   # See "Redeploy" steps below for more details.
   REDEPLOY_SANDBOX_URL: ${{ secrets.REDEPLOY_SANDBOX_URL }}
   REDEPLOY_DEMO_URL: ${{ secrets.REDEPLOY_DEMO_URL }}
-  # Current DSpace maintenance branch (and architecture) which is deployed to demo.dspace.org / sandbox.dspace.org
-  # (NOTE: No deployment branch specified for sandbox.dspace.org as it uses the default_branch)
+  # Current DSpace branches (and architecture) which are deployed to demo.dspace.org & sandbox.dspace.org respectively
   DEPLOY_DEMO_BRANCH: 'dspace-7_x'
+  DEPLOY_SANDBOX_BRANCH: 'dspace-8.0-testathon'
   DEPLOY_ARCH: 'linux/amd64'
 
 jobs:
@@ -174,7 +174,7 @@ jobs:
           !matrix.isPR &&
           env.REDEPLOY_SANDBOX_URL != '' &&
           matrix.arch == env.DEPLOY_ARCH &&
-          github.ref_name == github.event.repository.default_branch
+          github.ref_name == env.DEPLOY_SANDBOX_BRANCH
         run: |
           curl -X POST $REDEPLOY_SANDBOX_URL
 
