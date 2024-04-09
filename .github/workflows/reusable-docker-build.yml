@@ -154,7 +154,7 @@ jobs:
         if: ${{ ! matrix.isPr }}
         uses: actions/upload-artifact@v4
         with:
-          name: digests-${{ inputs.build_id }}
+          name: digests-${{ inputs.build_id }}-${{ matrix.arch }}
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
@@ -172,7 +172,7 @@ jobs:
 
       # If this build is NOT a PR and passed in a REDEPLOY_DEMO_URL secret,
       # Then redeploy https://demo.dspace.org if this build is for our deployment architecture and demo branch.
-      - name: Redeploy demo.dspace.org (based on maintenace branch)
+      - name: Redeploy demo.dspace.org (based on maintenance branch)
         if: |
           !matrix.isPR &&
           env.REDEPLOY_DEMO_URL != '' &&
@@ -194,8 +194,10 @@ jobs:
       - name: Download Docker build digests
         uses: actions/download-artifact@v4
         with:
-          name: digests-${{ inputs.build_id }}
           path: /tmp/digests
+          # Download digests for both AMD64 and ARM64 into same directory
+          pattern: digests-${{ inputs.build_id }}-*
+          merge-multiple: true
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
