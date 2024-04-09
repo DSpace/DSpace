@@ -93,6 +93,14 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
+      # This step converts the slashes in the "arch" matrix values above into dashes & saves to env.ARCH_NAME
+      # E.g. "linux/amd64" becomes "linux-amd64"
+      # This is necessary because all upload artifacts CANNOT have special chars (like slashes)
+      - name: Prepare
+        run: |
+          platform=${{ matrix.arch }}
+          echo "ARCH_NAME=${platform//\//-}" >> $GITHUB_ENV
+
       # https://github.com/actions/checkout
       - name: Checkout codebase
         uses: actions/checkout@v4
@@ -154,7 +162,7 @@ jobs:
         if: ${{ ! matrix.isPr }}
         uses: actions/upload-artifact@v4
         with:
-          name: digests-${{ inputs.build_id }}-${{ matrix.arch }}
+          name: digests-${{ inputs.build_id }}-${{ env.ARCH_NAME }}
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
