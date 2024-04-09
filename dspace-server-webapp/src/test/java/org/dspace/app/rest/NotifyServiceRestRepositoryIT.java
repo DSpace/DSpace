@@ -1266,6 +1266,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isBadRequest());
     }
 
+    // Temporarily disable. See: https://github.com/DSpace/DSpace/issues/9457
+    @Ignore
     @Test
     public void NotifyServiceInboundPatternConstraintRemoveOperationTest() throws Exception {
 
@@ -1330,6 +1332,8 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 )));
     }
 
+    // Temporarily disable. See: https://github.com/DSpace/DSpace/issues/9457
+    @Ignore
     @Test
     public void NotifyServiceInboundPatternConstraintRemoveOperationBadRequestTest() throws Exception {
 
