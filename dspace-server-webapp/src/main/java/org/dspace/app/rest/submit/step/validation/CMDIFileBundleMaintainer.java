@@ -32,7 +32,7 @@ import org.dspace.core.Context;
  */
 public class CMDIFileBundleMaintainer {
 
-    private static final String hasCMDYesOptionValue = "yes";
+    private static final String hasCMDYesOptionValue = "true";
 
     private static BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     private static ItemService itemService = ContentServiceFactory.getInstance().getItemService();

@@ -108,7 +108,7 @@ public class CMDIFileBundleMaintainerTest extends AbstractDSpaceObjectTest {
         this.it = installItemService.installItem(context, workspaceItem);
         this.mf = metadataFieldService.findByString(context, "local.hasCMDI", '.');
         this.mv = metadataValueService.create(context, it, mf);
-        this.mv.setValue("yes");
+        this.mv.setValue("true");
         this.listMv = new ArrayList<>();
         listMv.add(this.mv);
         this.dspaceObject = it;

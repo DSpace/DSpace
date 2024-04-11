@@ -1452,7 +1452,7 @@
         <value-pairs value-pairs-name="hasCMDI_checkbox" dc-term="identifier">
             <pair>
                 <displayed-value>Yes</displayed-value>
-                <stored-value>yes</stored-value>
+                <stored-value>true</stored-value>
             </pair>
         </value-pairs>
         <value-pairs value-pairs-name="common_identifiers" dc-term="identifier">
