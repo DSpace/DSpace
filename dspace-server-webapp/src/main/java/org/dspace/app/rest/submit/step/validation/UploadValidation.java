@@ -43,10 +43,14 @@ public class UploadValidation extends AbstractValidation {
         //TODO MANAGE METADATA
         List<ErrorRest> errors = new ArrayList<>();
         UploadConfiguration uploadConfig = uploadConfigurationService.getMap().get(config.getId());
-        if (uploadConfig.isRequired() && !itemService.hasUploadedFiles(obj.getItem())) {
-            addError(errors, ERROR_VALIDATION_FILEREQUIRED,
-                     "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/"
-                         + config.getId());
+        if (uploadConfig != null) {
+            if (uploadConfig.isRequired() && !itemService.hasUploadedFiles(obj.getItem())) {
+                addError(errors, ERROR_VALIDATION_FILEREQUIRED,
+                        "/" + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/"
+                                + config.getId());
+            }
+        } else {
+            log.warn("No UploadConfiguration configured for submission step ID " + config.getId());
         }
         return errors;
     }

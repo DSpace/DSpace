@@ -10,6 +10,7 @@ package org.dspace.app.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.RestResourceController;
 
 /**
@@ -28,6 +29,7 @@ public class SubmissionSectionRest extends BaseObjectRest<String> {
     private String header;
     private boolean mandatory;
     private String sectionType;
+    private String extendsSectionType;
     private ScopeEnum scope;
     private SubmissionVisibilityRest visibility;
 
@@ -87,4 +89,21 @@ public class SubmissionSectionRest extends BaseObjectRest<String> {
         this.sectionType = panelType;
     }
 
+    public String getExtendsSectionType() {
+        return extendsSectionType;
+    }
+
+    public void setExtendsSectionType(String extendsSectionType) {
+        this.extendsSectionType = extendsSectionType;
+    }
+
+    /**
+     * Check if this step supports the given type
+     *
+     * @param type  Type of step to check support for
+     * @return true if the type matches either this step's type, or the step it extends from
+     */
+    public boolean supportsType(String type) {
+        return StringUtils.equals(this.sectionType, type) || StringUtils.equals(this.extendsSectionType, type);
+    }
 }

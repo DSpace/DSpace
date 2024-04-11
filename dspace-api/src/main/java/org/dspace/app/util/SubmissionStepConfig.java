@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.WorkspaceItem;
 import org.hibernate.proxy.HibernateProxyHelper;
@@ -68,6 +69,7 @@ public class SubmissionStepConfig implements Serializable {
      **/
     private String type = null;
 
+    private String extendsType = null;
 
     /**
      * The scope restriction for this step (submission or workflow).
@@ -112,6 +114,7 @@ public class SubmissionStepConfig implements Serializable {
         heading = stepMap.get("heading");
         processingClassName = stepMap.get("processing-class");
         type = stepMap.get("type");
+        extendsType = stepMap.get("type.extends");
         scope = stepMap.get("scope");
         visibility = stepMap.get("scope.visibility");
         visibilityOutside = stepMap.get("scope.visibilityOutside");
@@ -159,6 +162,10 @@ public class SubmissionStepConfig implements Serializable {
      */
     public String getType() {
         return type;
+    }
+
+    public String getExtendsType() {
+        return extendsType;
     }
 
     /**
@@ -242,5 +249,15 @@ public class SubmissionStepConfig implements Serializable {
 
     public boolean isMandatory() {
         return mandatory;
+    }
+
+    /**
+     * Check if this step supports the given type
+     *
+     * @param type  Type of step to check support for
+     * @return true if the type matches either this step's type, or the step it extends from
+     */
+    public boolean supportsType(String type) {
+        return StringUtils.equals(this.type, type) || StringUtils.equals(this.extendsType, type);
     }
 }
