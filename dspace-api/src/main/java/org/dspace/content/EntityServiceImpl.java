@@ -8,6 +8,7 @@
 package org.dspace.content;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -103,7 +104,12 @@ public class EntityServiceImpl implements EntityService {
     @Override
     public List<RelationshipType> getAllRelationshipTypes(Context context, Entity entity, Integer limit, Integer offset)
             throws SQLException {
-        return relationshipTypeService.findByEntityType(context, this.getType(context, entity), limit, offset);
+        EntityType entityType = this.getType(context, entity);
+        if (entityType != null) {
+            return relationshipTypeService.findByEntityType(context, entityType, limit, offset);
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @Override
@@ -115,7 +121,12 @@ public class EntityServiceImpl implements EntityService {
     @Override
     public List<RelationshipType> getLeftRelationshipTypes(Context context, Entity entity, boolean isLeft,
                                                            Integer limit, Integer offset) throws SQLException {
-        return relationshipTypeService.findByEntityType(context, this.getType(context, entity), isLeft, limit, offset);
+        EntityType entityType = this.getType(context, entity);
+        if (entityType != null) {
+            return relationshipTypeService.findByEntityType(context, entityType, isLeft, limit, offset);
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @Override
@@ -128,7 +139,12 @@ public class EntityServiceImpl implements EntityService {
     public List<RelationshipType> getRightRelationshipTypes(Context context, Entity entity, boolean isLeft,
                                                             Integer limit, Integer offset) throws SQLException {
 
-        return relationshipTypeService.findByEntityType(context, this.getType(context, entity), isLeft, limit, offset);
+        EntityType entityType = this.getType(context, entity);
+        if (entityType != null) {
+            return relationshipTypeService.findByEntityType(context, entityType, isLeft, limit, offset);
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @Override
