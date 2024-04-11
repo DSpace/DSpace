@@ -13,7 +13,7 @@
     "id": "<<object_handle>>",
     "ietf:cite-as": "https://doi.org/10.5555/12345680",
     "type": "sorg:AboutPage",
-    "url": {
+    "ietf:item": {
       "id": "url.pdf",
       "mediaType": "applicationpdf",
       "type": [
