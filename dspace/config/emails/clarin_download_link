@@ -11,7 +11,7 @@
 ##
 ## See org.dspace.core.Email for information on the format of this file.
 ##
-Subject: ${params[5]}: Download instructions for ${params[0]}
+#set($subject = 'Download instructions')
 To download the file you have requested, please click the link below:
  ${params[1]}
   

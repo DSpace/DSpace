@@ -9,7 +9,7 @@
 ##
 ## See org.dspace.core.Email for information on the format of this file.
 ##
-Subject: ${params[3]}: Account Registration
+#set($subject = 'Account Registration')
 To complete registration for a ${params[3]} repository account at {params[5]}, please click the link below:
 
   ${params[0]}
