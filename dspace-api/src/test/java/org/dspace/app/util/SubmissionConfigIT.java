@@ -51,12 +51,12 @@ public class SubmissionConfigIT extends AbstractIntegrationTestWithDatabase {
         // col3 should use the item submission form directly mapped for this collection
         Collection col3 = CollectionBuilder.createCollection(context, subcom1, "123456789/collection-test")
             .withName("Collection 3")
-            .withEntityType("Publication")
+            .withEntityType("CustomEntityType")
             .build();
         // col4 should use the item submission form mapped for the entity type Publication
         Collection col4 = CollectionBuilder.createCollection(context, subcom1, "123456789/not-mapped4")
             .withName("Collection 4")
-            .withEntityType("Publication")
+            .withEntityType("CustomEntityType")
             .build();
         context.restoreAuthSystemState();
 
