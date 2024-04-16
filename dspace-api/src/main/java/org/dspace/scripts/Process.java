@@ -51,7 +51,7 @@ public class Process implements ReloadableEntity<Integer> {
     @Column(name = "process_id", unique = true, nullable = false)
     private Integer processId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private EPerson ePerson;
 
