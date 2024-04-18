@@ -738,26 +738,15 @@
 
         <!-- TODO: This may need to be replaced with the "orcid-model" artifact once this ticket is resolved:
              https://github.com/ORCID/orcid-model/issues/50 -->
+        <!-- Maintained at https://github.com/DSpace/orcid-model -->
         <dependency>
-            <groupId>org.orcid</groupId>
+            <groupId>org.dspace</groupId>
             <artifactId>orcid-model-jakarta</artifactId>
-            <version>3.3.0</version>
+            <version>3.3.0-SNAPSHOT</version>
             <exclusions>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.jarkarta.rs</groupId>
-                    <artifactId>jackson-jakarta-rs-json-provider</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.yaml</groupId>
-                    <artifactId>snakeyaml</artifactId>
-                </exclusion>
                 <exclusion>
                     <groupId>org.javassist</groupId>
                     <artifactId>javassist</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>io.swagger.core.v3</groupId>
-                    <artifactId>swagger-jaxrs2-jakarta</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
