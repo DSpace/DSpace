@@ -163,7 +163,7 @@
                     <input-type value-pairs-name="common_types">dropdown</input-type>
                     <hint>Select the type of content of the item.
                     </hint>
-                    <required></required>
+                    <required>You must choose at least one type.</required>
                 </field>
             </row>
             <row>
@@ -366,7 +366,7 @@
                     <hint>Select the type(s) of content of the item. To select more than one value in the list, you may
                         have to hold down the "CTRL" or "Shift" key.
                     </hint>
-                    <required></required>
+                    <required>You must choose at least one type.</required>
                 </field>
             </row>
             <row>
@@ -1041,7 +1041,7 @@
                     <hint>Select the type(s) of content of the item. To select more than one value in the list, you may
                         have to hold down the "CTRL" or "Shift" key.
                     </hint>
-                    <required></required>
+                    <required>You must choose at least one type.</required>
                 </field>
             </row>
             <row>
