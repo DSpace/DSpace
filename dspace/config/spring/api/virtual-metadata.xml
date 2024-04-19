@@ -77,7 +77,7 @@
     </bean>
 
     <util:map id="isPersonOfProjectMap">
-        <entry key="dc.contributor.author" value-ref="projectPerson_author"/>
+        <entry key="project.investigator" value-ref="projectPerson_author"/>
     </util:map>
     <!--
      If the related item has:
