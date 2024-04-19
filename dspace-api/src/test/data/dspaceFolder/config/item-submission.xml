@@ -24,6 +24,8 @@
         <name-map collection-handle="123456789/typebind-test" submission-name="typebindtest"/>
         <name-map collection-handle="123456789/accessCondition-not-discoverable" submission-name="accessConditionNotDiscoverable"/>
         <name-map collection-handle="123456789/test-hidden" submission-name="test-hidden"/>
+        <name-map collection-handle="123456789/collection-test" submission-name="collectiontest"/>
+        <name-map collection-entity-type="CustomEntityType" submission-name="entitytypetest"/>
     </submission-map>
 
 
@@ -255,6 +257,14 @@
             <step id="test-outside-submission-hidden"/>
             <step id="test-never-hidden"/>
             <step id="test-always-hidden"/>
+        </submission-process>
+
+        <submission-process name="collectiontest">
+            <step id="collection"/>
+        </submission-process>
+
+        <submission-process name="entitytypetest">
+            <step id="collection"/>
         </submission-process>
 
     </submission-definitions>
