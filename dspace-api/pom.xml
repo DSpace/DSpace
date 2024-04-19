@@ -742,7 +742,7 @@
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>orcid-model-jakarta</artifactId>
-            <version>3.3.0-SNAPSHOT</version>
+            <version>3.3.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.javassist</groupId>
