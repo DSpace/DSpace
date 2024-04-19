@@ -210,18 +210,26 @@ public class SubmissionConfigReader {
      * Returns the Item Submission process config used for a particular
      * collection, or the default if none is defined for the collection
      *
-     * @param collectionHandle collection's unique Handle
+     * @param col collection for which search Submission process config
      * @return the SubmissionConfig representing the item submission config
-     * @throws SubmissionConfigReaderException if no default submission process configuration defined
+     * @throws IllegalStateException if no default submission process configuration defined
      */
-    public SubmissionConfig getSubmissionConfigByCollection(String collectionHandle) {
-        // get the name of the submission process config for this collection
-        String submitName = collectionToSubmissionConfig
-            .get(collectionHandle);
-        if (submitName == null) {
+    public SubmissionConfig getSubmissionConfigByCollection(Collection col) {
+
+        String submitName;
+
+        if (col != null) {
+
+            // get the name of the submission process config for this collection
             submitName = collectionToSubmissionConfig
-                .get(DEFAULT_COLLECTION);
+                .get(col.getHandle());
+            if (submitName != null) {
+                return getSubmissionConfigByName(submitName);
+            }
         }
+
+        submitName = collectionToSubmissionConfig.get(DEFAULT_COLLECTION);
+
         if (submitName == null) {
             throw new IllegalStateException(
                 "No item submission process configuration designated as 'default' in 'submission-map' section of " +
