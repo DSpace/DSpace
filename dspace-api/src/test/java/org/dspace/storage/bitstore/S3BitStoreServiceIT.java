@@ -147,8 +147,8 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
 
     }
 
-	private void checkGetPut(String bucketName, String content, Bitstream bitstream) throws IOException {
-		s3BitStoreService.put(bitstream, toInputStream(content));
+    private void checkGetPut(String bucketName, String content, Bitstream bitstream) throws IOException {
+        s3BitStoreService.put(bitstream, toInputStream(content));
         String expectedChecksum = Utils.toHex(generateChecksum(content));
 
         assertThat(bitstream.getSizeBytes(), is((long) content.length()));
@@ -161,7 +161,7 @@ public class S3BitStoreServiceIT extends AbstractIntegrationTestWithDatabase {
         String key = s3BitStoreService.getFullKey(bitstream.getInternalId());
         ObjectMetadata objectMetadata = amazonS3Client.getObjectMetadata(bucketName, key);
         assertThat(objectMetadata.getContentMD5(), is(expectedChecksum));
-	}
+    }
 
     @Test
     public void testBitstreamPutAndGetWithoutSpecifingBucket() throws IOException {

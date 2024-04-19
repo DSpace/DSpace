@@ -25,7 +25,6 @@ import java.util.function.Supplier;
 import javax.validation.constraints.NotNull;
 
 import com.amazonaws.AmazonClientException;
-import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -37,7 +36,6 @@ import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.transfer.Download;
-import com.amazonaws.services.s3.transfer.Transfer.TransferState;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.amazonaws.services.s3.transfer.Upload;
@@ -621,6 +619,14 @@ public class S3BitStoreService extends BaseBitStoreService {
         this.bufferSize = bufferSize;
     }
 
+    /**
+     * This inner class represent an InputStream that uses temporary files to
+     * represent chunk of the object downloaded from S3. When the input stream is
+     * read the class look first to the current chunk and download a new one once if
+     * the current one as been fully read. The class is responsible to close a chunk
+     * as soon as a new one is retrieved, the last chunk is closed when the input
+     * stream itself is closed or the last byte is read (the first of the two)
+     */
     public class S3LazyInputStream extends InputStream {
         private InputStream currentChunkStream;
         private String objectKey;
@@ -639,12 +645,14 @@ public class S3BitStoreService extends BaseBitStoreService {
 
         @Override
         public int read() throws IOException {
+            // is the current chunk completely read and other are available?
             if (currPos == endOfChunk && currPos < fileSize) {
                 currentChunkStream.close();
                 downloadChunk();
             }
 
-			int byteRead = currPos < endOfChunk ? currentChunkStream.read() : -1;
+            int byteRead = currPos < endOfChunk ? currentChunkStream.read() : -1;
+            // do we get any data or are we at the end of the file?
             if (byteRead != -1) {
                 currPos++;
             } else {
@@ -653,25 +661,31 @@ public class S3BitStoreService extends BaseBitStoreService {
             return byteRead;
         }
 
-		private void downloadChunk() throws IOException, FileNotFoundException {
-			// Create a DownloadFileRequest with the desired byte range
-			long startByte = currPos; // Start byte (inclusive)
-			long endByte = Long.min(startByte + chunkMaxSize - 1, fileSize - 1); // End byte (inclusive)
-			GetObjectRequest getRequest = new GetObjectRequest(bucketName, objectKey)
-			        .withRange(startByte, endByte);
+        /**
+         * This method download the next chunk from S3
+         *
+         * @throws IOException
+         * @throws FileNotFoundException
+         */
+        private void downloadChunk() throws IOException, FileNotFoundException {
+            // Create a DownloadFileRequest with the desired byte range
+            long startByte = currPos; // Start byte (inclusive)
+            long endByte = Long.min(startByte + chunkMaxSize - 1, fileSize - 1); // End byte (inclusive)
+            GetObjectRequest getRequest = new GetObjectRequest(bucketName, objectKey)
+                    .withRange(startByte, endByte);
 
-			File currentChunkFile = File.createTempFile("s3-disk-copy-" + UUID.randomUUID(), "temp");
-			currentChunkFile.deleteOnExit();
-			try {
-				Download download = tm.download(getRequest, currentChunkFile);
-			    download.waitForCompletion();
-			    currentChunkStream = new DeleteOnCloseFileInputStream(currentChunkFile);
-				endOfChunk = endOfChunk + download.getProgress().getBytesTransferred();
-			} catch (AmazonClientException | InterruptedException e) {
-				currentChunkFile.delete();
-			    throw new IOException(e);
-			}
-		}
+            File currentChunkFile = File.createTempFile("s3-disk-copy-" + UUID.randomUUID(), "temp");
+            currentChunkFile.deleteOnExit();
+            try {
+                Download download = tm.download(getRequest, currentChunkFile);
+                download.waitForCompletion();
+                currentChunkStream = new DeleteOnCloseFileInputStream(currentChunkFile);
+                endOfChunk = endOfChunk + download.getProgress().getBytesTransferred();
+            } catch (AmazonClientException | InterruptedException e) {
+                currentChunkFile.delete();
+                throw new IOException(e);
+            }
+        }
 
         @Override
         public void close() throws IOException {
