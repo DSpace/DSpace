@@ -80,15 +80,20 @@ jobs:
       matrix:
         # Architectures / Platforms for which we will build Docker images
         arch: [ 'linux/amd64', 'linux/arm64' ]
-        os: [ ubuntu-latest ]
+        os: [ ubuntu-latest, macos-latest ]
         isPr:
           - ${{ github.event_name == 'pull_request' }}
-        # If this is a PR, we ONLY build for AMD64. For PRs we only do a sanity check test to ensure Docker builds work.
-        # The below exclude therefore ensures we do NOT build ARM64 for PRs.
         exclude:
+          # If this is a PR, we ONLY build for AMD64. For PRs, we only do a sanity check to ensure Docker builds work.
+          # The below exclude therefore ensures we do NOT build ARM64 for PRs.
           - isPr: true
-            os: ubuntu-latest
             arch: linux/arm64
+            os: macos-latest
+          # Exclude invalid arch & OS combinations. Only build on native OS to avoid emulation.
+          - arch: linux/amd64
+            os: macos-latest
+          - arch: linux/arm64
+            os: ubuntu-latest
 
     runs-on: ${{ matrix.os }}
 
