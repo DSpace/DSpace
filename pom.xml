@@ -102,7 +102,7 @@
                                         <version>${java.version}</version>
                                     </requireJavaVersion>
                                     <requireMavenVersion>
-                                        <version>[3.0.5,)</version>
+                                        <version>[3.8,)</version>
                                     </requireMavenVersion>
                                 </rules>
                             </configuration>
@@ -1990,15 +1990,6 @@
         <repository>
             <id>handle.net</id>
             <url>https://handle.net/maven</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <!-- For Jakarta EE version of "orcid-model". REMOVE once official "orcid-model" is updated to Jakarta,
-             see https://github.com/ORCID/orcid-model/issues/50-->
-        <repository>
-            <id>oicr.on.ca</id>
-            <url>https://artifacts.oicr.on.ca/artifactory/collab-release/</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
