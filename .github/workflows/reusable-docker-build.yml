@@ -86,9 +86,9 @@ jobs:
         exclude:
           # If this is a PR, we ONLY build for AMD64. For PRs, we only do a sanity check to ensure Docker builds work.
           # The below exclude therefore ensures we do NOT build ARM64 for PRs.
-          - isPr: true
-            arch: linux/arm64
-            os: macos-latest
+          #- isPr: true
+          #  arch: linux/arm64
+          #  os: macos-latest
           # Exclude invalid arch & OS combinations. Only build on native OS to avoid emulation.
           - arch: linux/amd64
             os: macos-latest
