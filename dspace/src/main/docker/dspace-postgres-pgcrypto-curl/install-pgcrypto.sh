@@ -23,7 +23,6 @@ then
   rm /tmp/dspace-db-init.sql
 
   touch $CHECKFILE
-  exit
 fi
 
 # If $LOCALSQL environment variable set, then simply run it in PostgreSQL
@@ -34,7 +33,6 @@ then
   psql -U $POSTGRES_USER < ${LOCALSQL}
 
   touch $CHECKFILE
-  exit
 fi
 
 # Then, setup pgcrypto on this database
