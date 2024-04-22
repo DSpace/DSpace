@@ -110,6 +110,20 @@ jobs:
       - name: Checkout codebase
         uses: actions/checkout@v4
 
+      # MacOS runners don't have Docker by default because of a licensing issue
+      # See https://github.com/actions/runner-images/issues/2150
+      # This code borrowed from https://github.com/actions/runner/issues/1456#issuecomment-1676495453
+      - name: Setup docker and docker-compose (missing on MacOS)
+        if: runner.os == 'macos'
+        run: |
+          brew install docker docker-compose
+
+          # Link the Docker Compose v2 plugin so it's understood by the docker CLI
+          mkdir -p ~/.docker/cli-plugins
+          ln -sfn /usr/local/opt/docker-compose/bin/docker-compose ~/.docker/cli-plugins/docker-compose
+
+          colima start
+
       # https://github.com/docker/setup-buildx-action
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
