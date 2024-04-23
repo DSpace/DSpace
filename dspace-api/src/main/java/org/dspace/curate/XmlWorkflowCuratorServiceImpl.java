@@ -140,14 +140,14 @@ public class XmlWorkflowCuratorServiceImpl
             item.setOwningCollection(wfi.getCollection());
             for (Task task : step.tasks) {
                 curator.addTask(task.name);
+            }
 
-                // Check whether the task is configured to be queued rather than automatically run
-                if (StringUtils.isNotEmpty(step.queue)) {
-                    // queue attribute has been set in the FlowStep configuration: add task to configured queue
-                    curator.queue(c, item.getID().toString(), step.queue);
-                } else {
-                    // Task is configured to be run automatically
-                    curator.curate(c, item);
+            if (StringUtils.isNotEmpty(step.queue)) { // Step's tasks are to be queued.
+                curator.queue(c, item.getID().toString(), step.queue);
+            } else { // Step's tasks are to be run now.
+                curator.curate(c, item);
+
+                for (Task task : step.tasks) {
                     int status = curator.getStatus(task.name);
                     String result = curator.getResult(task.name);
                     String action = "none";
@@ -184,14 +184,14 @@ public class XmlWorkflowCuratorServiceImpl
                     }
                 }
                 curator.clear();
-            }
 
-            // Record any reporting done by the tasks.
-            if (reporter.length() > 0) {
-                LOG.info("Curation tasks over item {} for step {} report:%n{}",
-                    () -> wfi.getItem().getID(),
-                    () -> step.step,
-                    () -> reporter.toString());
+                // Record any reporting done by the tasks.
+                if (reporter.length() > 0) {
+                    LOG.info("Curation tasks over item {} for step {} report:\n{}",
+                        () -> wfi.getItem().getID(),
+                        () -> step.step,
+                        () -> reporter.toString());
+                }
             }
         }
         return true;
