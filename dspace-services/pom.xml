@@ -69,7 +69,7 @@
                                 <!-- ${agnostic.build.dir} is set dynamically by groovy-maven-plugin above -->
                                 <!-- For "dspace-services" we don't need a full test environment, we just need
                                      a valid "config-definition.xml" which exists in target/test-classes/ -->
-                                <dspace.dir>${agnostic.build.dir}/test-classes/</dspace.dir>
+                                <dspace.dir>${agnostic.build.dir}/test-classes</dspace.dir>
                             </systemPropertyVariables>
                         </configuration>
                     </plugin>
@@ -79,6 +79,11 @@
     </profiles>
 
     <dependencies>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
         <!-- spring service manager -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -92,13 +97,18 @@
         </dependency>
         <!-- for filters -->
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
+            <groupId>jakarta.mail</groupId>
+            <artifactId>jakarta.mail-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.angus</groupId>
+            <artifactId>jakarta.mail</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
@@ -143,8 +153,8 @@
             <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
         </dependency>
 
         <dependency>

@@ -16,6 +16,9 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.CommunityBuilder;
+import org.dspace.builder.EPersonBuilder;
+import org.dspace.content.Community;
+import org.dspace.eperson.EPerson;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.MediaType;
@@ -89,6 +92,29 @@ public class CommunityLogoControllerIT extends AbstractControllerIntegrationTest
     }
 
     @Test
+    public void createLogoBYCommunityAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson communityAdmin = EPersonBuilder.createEPerson(context)
+                .withEmail("test4@mail.com")
+                .withPassword(password)
+                .withCanLogin(true)
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("New Community")
+                .withAdminGroup(communityAdmin)
+                .build();
+
+        context.restoreAuthSystemState();
+        String userToken = getAuthToken(communityAdmin.getEmail(), password);
+        getClient(userToken).perform(
+                MockMvcRequestBuilders.multipart(getLogoUrlTemplate(community.getID().toString()))
+                        .file(bitstreamFile))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
     public void createDuplicateLogo() throws Exception {
         getClient(adminAuthToken).perform(
                 MockMvcRequestBuilders.multipart(getLogoUrlTemplate(parentCommunity.getID().toString()))
@@ -135,6 +161,38 @@ public class CommunityLogoControllerIT extends AbstractControllerIntegrationTest
         String userToken = getAuthToken(eperson.getEmail(), password);
         getClient(userToken).perform(delete(getBitstreamUrlTemplate(postUuid)))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void deleteLogoByCommunityAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        EPerson communityAdmin = EPersonBuilder.createEPerson(context)
+                .withEmail("test4@mail.com")
+                .withPassword(password)
+                .withCanLogin(true)
+                .build();
+
+        Community community = CommunityBuilder.createCommunity(context)
+                .withName("New Community")
+                .withAdminGroup(communityAdmin)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String userToken = getAuthToken(communityAdmin.getEmail(), password);
+        MvcResult mvcPostResult = getClient(userToken).perform(
+                        MockMvcRequestBuilders.multipart(getLogoUrlTemplate(community.getID().toString()))
+                                .file(bitstreamFile))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        String postContent = mvcPostResult.getResponse().getContentAsString();
+        Map<String, Object> mapPostResult = mapper.readValue(postContent, Map.class);
+
+        getClient(userToken)
+                .perform(delete(getBitstreamUrlTemplate(String.valueOf(mapPostResult.get("uuid")))))
+                .andExpect(status().isNoContent());
     }
 
     private String getLogoUrlTemplate(String uuid) {

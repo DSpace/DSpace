@@ -47,7 +47,7 @@ import org.springframework.stereotype.Component;
 /**
  * The repository for the Process workload
  */
-@Component(ProcessRest.CATEGORY + "." + ProcessRest.NAME)
+@Component(ProcessRest.CATEGORY + "." + ProcessRest.PLURAL_NAME)
 public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Integer> {
 
     private static final Logger log = LogManager.getLogger();

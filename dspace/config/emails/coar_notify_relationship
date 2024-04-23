@@ -1,0 +1,29 @@
+## Notification email sent that a resource has been related by a service
+##
+## Parameters: {0} Service Name
+##             {1} Item Name
+##             {2} Service URL
+##             {3} Item URL
+##             {4} Submitter's Name
+##             {5} Date of the received LDN notification
+##             {6} LDN notification
+##             {7} Item
+##
+##
+#set($subject = "DSpace: The Service ${params[0]} has related a Resource ""${params[6].object.subject}""")
+
+A relationship announce notification has been received relating to the Item: ${params[1]}
+
+Here is a more detailed report:
+Item: ${params[1]}
+Item URL: ${params[3]}
+Submitted by: ${params[4]}
+Linked Resource URL: ${params[6].object.subject}
+
+Has a new status: RELATED
+
+By Service: ${params[0]}
+Service URL: ${params[2]}
+Date: ${params[5]}
+
+The ${config.get('dspace.name')} Team

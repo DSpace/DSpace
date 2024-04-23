@@ -14,8 +14,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
@@ -73,7 +73,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  * @author Pasquale Cavallo (pasquale.cavallo at 4science.it)
  */
-@Component(WorkspaceItemRest.CATEGORY + "." + WorkspaceItemRest.NAME)
+@Component(WorkspaceItemRest.CATEGORY + "." + WorkspaceItemRest.PLURAL_NAME)
 public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceItemRest, Integer>
     implements ReloadableEntityObjectRepository<WorkspaceItem, Integer> {
 

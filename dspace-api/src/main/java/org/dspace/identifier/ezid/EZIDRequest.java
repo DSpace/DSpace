@@ -27,10 +27,10 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.identifier.DOI;
 import org.dspace.identifier.IdentifierException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A request to EZID concerning a given (or expected) identifier.
@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * @author Mark H. Wood
  */
 public class EZIDRequest {
-    private static final Logger log = LoggerFactory.getLogger(EZIDRequest.class);
+    private static final Logger log = LogManager.getLogger();
 
     private static final String ID_PATH = "/id/" + DOI.SCHEME;
 
@@ -149,7 +149,7 @@ public class EZIDRequest {
         // GET path
         HttpGet request;
         URI uri = new URI(scheme, host, path + ID_PATH + authority + name, null);
-        log.debug("EZID lookup {}", uri.toASCIIString());
+        log.debug("EZID lookup {}", uri::toASCIIString);
         request = new HttpGet(uri);
         HttpResponse response = client.execute(request, httpContext);
         return new EZIDResponse(response);
@@ -172,7 +172,7 @@ public class EZIDRequest {
         // PUT path [+metadata]
         HttpPut request;
         URI uri = new URI(scheme, host, path + ID_PATH + authority + '/' + name, null);
-        log.debug("EZID create {}", uri.toASCIIString());
+        log.debug("EZID create {}", uri::toASCIIString);
         request = new HttpPut(uri);
         if (null != metadata) {
             request.setEntity(new StringEntity(formatMetadata(metadata), UTF_8));
@@ -196,7 +196,7 @@ public class EZIDRequest {
         // POST path [+metadata]
         HttpPost request;
         URI uri = new URI(scheme, host, path + SHOULDER_PATH + authority, null);
-        log.debug("EZID mint {}", uri.toASCIIString());
+        log.debug("EZID mint {}", uri::toASCIIString);
         request = new HttpPost(uri);
         if (null != metadata) {
             request.setEntity(new StringEntity(formatMetadata(metadata), UTF_8));
@@ -225,7 +225,7 @@ public class EZIDRequest {
         // POST path +metadata
         HttpPost request;
         URI uri = new URI(scheme, host, path + ID_PATH + authority + name, null);
-        log.debug("EZID modify {}", uri.toASCIIString());
+        log.debug("EZID modify {}", uri::toASCIIString);
         request = new HttpPost(uri);
         request.setEntity(new StringEntity(formatMetadata(metadata), UTF_8));
         HttpResponse response = client.execute(request, httpContext);
@@ -246,7 +246,7 @@ public class EZIDRequest {
         // DELETE path
         HttpDelete request;
         URI uri = new URI(scheme, host, path + ID_PATH + authority + name, null);
-        log.debug("EZID delete {}", uri.toASCIIString());
+        log.debug("EZID delete {}", uri::toASCIIString);
         request = new HttpDelete(uri);
         HttpResponse response = client.execute(request, httpContext);
         return new EZIDResponse(response);

@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -32,8 +34,6 @@ import org.dspace.identifier.ezid.EZIDRequest;
 import org.dspace.identifier.ezid.EZIDRequestFactory;
 import org.dspace.identifier.ezid.EZIDResponse;
 import org.dspace.identifier.ezid.Transform;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -83,7 +83,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class EZIDIdentifierProvider
     extends IdentifierProvider {
-    private static final Logger log = LoggerFactory.getLogger(EZIDIdentifierProvider.class);
+    private static final Logger log = LogManager.getLogger();
 
     // Configuration property names
     static final String CFG_SHOULDER = "identifier.doi.ezid.shoulder";
@@ -184,7 +184,8 @@ public class EZIDIdentifierProvider
                                                              loadUser(), loadPassword());
             response = request.create(identifier, crosswalkMetadata(context, object));
         } catch (IdentifierException | IOException | URISyntaxException e) {
-            log.error("Identifier '{}' not registered:  {}", identifier, e.getMessage());
+            log.error("Identifier '{}' not registered:  {}",
+                () -> identifier, e::getMessage);
             return;
         }
 
@@ -201,7 +202,7 @@ public class EZIDIdentifierProvider
             }
         } else {
             log.error("Identifier '{}' not registered -- EZID returned: {}",
-                      identifier, response.getEZIDStatusValue());
+                () -> identifier, response::getEZIDStatusValue);
         }
     }
 
@@ -218,7 +219,8 @@ public class EZIDIdentifierProvider
             metadata.put("_status", "reserved");
             response = request.create(identifier, metadata);
         } catch (IOException | URISyntaxException e) {
-            log.error("Identifier '{}' not registered:  {}", identifier, e.getMessage());
+            log.error("Identifier '{}' not registered:  {}",
+                () -> identifier, e::getMessage);
             return;
         }
 
@@ -233,7 +235,7 @@ public class EZIDIdentifierProvider
             }
         } else {
             log.error("Identifier '{}' not registered -- EZID returned: {}",
-                      identifier, response.getEZIDStatusValue());
+                () -> identifier, response::getEZIDStatusValue);
         }
     }
 
@@ -247,7 +249,7 @@ public class EZIDIdentifierProvider
         try {
             request = requestFactory.getInstance(loadAuthority(), loadUser(), loadPassword());
         } catch (URISyntaxException ex) {
-            log.error(ex.getMessage());
+            log.error(ex::getMessage);
             throw new IdentifierException("DOI request not sent:  " + ex.getMessage());
         }
 
@@ -256,18 +258,16 @@ public class EZIDIdentifierProvider
         try {
             response = request.mint(crosswalkMetadata(context, dso));
         } catch (IOException | URISyntaxException ex) {
-            log.error("Failed to send EZID request:  {}", ex.getMessage());
+            log.error("Failed to send EZID request:  {}", ex::getMessage);
             throw new IdentifierException("DOI request not sent:  " + ex.getMessage());
         }
 
         // Good response?
         if (HttpURLConnection.HTTP_CREATED != response.getHttpStatusCode()) {
             log.error("EZID server responded:  {} {}: {}",
-                      new String[] {
-                          String.valueOf(response.getHttpStatusCode()),
-                          response.getHttpReasonPhrase(),
-                          response.getEZIDStatusValue()
-                      });
+                    response::getHttpStatusCode,
+                    response::getHttpReasonPhrase,
+                    response::getEZIDStatusValue);
             throw new IdentifierException("DOI not created:  "
                                               + response.getHttpReasonPhrase()
                                               + ":  "
@@ -285,7 +285,7 @@ public class EZIDIdentifierProvider
             log.info("Created {}", doi);
             return doi;
         } else {
-            log.error("EZID responded:  {}", response.getEZIDStatusValue());
+            log.error("EZID responded:  {}", response::getEZIDStatusValue);
             throw new IdentifierException("No DOI returned");
         }
     }
@@ -302,7 +302,7 @@ public class EZIDIdentifierProvider
                                                     MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER,
                                                     idToDOI(identifier));
         } catch (IdentifierException | SQLException | AuthorizeException | IOException ex) {
-            log.error(ex.getMessage());
+            log.error(ex::getMessage);
             throw new IdentifierNotResolvableException(ex);
         }
         if (!found.hasNext()) {
@@ -360,24 +360,24 @@ public class EZIDIdentifierProvider
                                                                  loadUser(), loadPassword());
                 response = request.delete(DOIToId(id.getValue()));
             } catch (URISyntaxException e) {
-                log.error("Bad URI in metadata value:  {}", e.getMessage());
+                log.error("Bad URI in metadata value:  {}", e::getMessage);
                 remainder.add(id.getValue());
                 skipped++;
                 continue;
             } catch (IOException e) {
-                log.error("Failed request to EZID:  {}", e.getMessage());
+                log.error("Failed request to EZID:  {}", e::getMessage);
                 remainder.add(id.getValue());
                 skipped++;
                 continue;
             }
             if (!response.isSuccess()) {
-                log.error("Unable to delete {} from DataCite:  {}", id.getValue(),
-                          response.getEZIDStatusValue());
+                log.error("Unable to delete {} from DataCite:  {}", id::getValue,
+                        response::getEZIDStatusValue);
                 remainder.add(id.getValue());
                 skipped++;
                 continue;
             }
-            log.info("Deleted {}", id.getValue());
+            log.info("Deleted {}", id::getValue);
         }
 
         // delete from item
@@ -386,7 +386,7 @@ public class EZIDIdentifierProvider
             dsoService.addMetadata(context, dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, remainder);
             dsoService.update(context, dso);
         } catch (SQLException | AuthorizeException e) {
-            log.error("Failed to re-add identifiers:  {}", e.getMessage());
+            log.error("Failed to re-add identifiers:  {}", e::getMessage);
         }
 
         if (skipped > 0) {
@@ -415,25 +415,25 @@ public class EZIDIdentifierProvider
                                                                  loadUser(), loadPassword());
                 response = request.delete(DOIToId(id.getValue()));
             } catch (URISyntaxException e) {
-                log.error("Bad URI in metadata value {}:  {}", id.getValue(), e.getMessage());
+                log.error("Bad URI in metadata value {}:  {}", id::getValue, e::getMessage);
                 remainder.add(id.getValue());
                 skipped++;
                 continue;
             } catch (IOException e) {
-                log.error("Failed request to EZID:  {}", e.getMessage());
+                log.error("Failed request to EZID:  {}", e::getMessage);
                 remainder.add(id.getValue());
                 skipped++;
                 continue;
             }
 
             if (!response.isSuccess()) {
-                log.error("Unable to delete {} from DataCite:  {}", id.getValue(),
-                          response.getEZIDStatusValue());
+                log.error("Unable to delete {} from DataCite:  {}", id::getValue,
+                        response::getEZIDStatusValue);
                 remainder.add(id.getValue());
                 skipped++;
                 continue;
             }
-            log.info("Deleted {}", id.getValue());
+            log.info("Deleted {}", id::getValue);
         }
 
         // delete from item
@@ -442,7 +442,7 @@ public class EZIDIdentifierProvider
             dsoService.addMetadata(context, dso, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null, remainder);
             dsoService.update(context, dso);
         } catch (SQLException | AuthorizeException e) {
-            log.error("Failed to re-add identifiers:  {}", e.getMessage());
+            log.error("Failed to re-add identifiers:  {}", e::getMessage);
         }
 
         if (skipped > 0) {
@@ -544,12 +544,10 @@ public class EZIDIdentifierProvider
                             mappedValue = xfrm.transform(value.getValue());
                         } catch (Exception ex) {
                             log.error("Unable to transform '{}' from {} to {}:  {}",
-                                      new String[] {
-                                          value.getValue(),
-                                          value.toString(),
-                                          key,
-                                          ex.getMessage()
-                                      });
+                                value::getValue,
+                                value::toString,
+                                () -> key,
+                                ex::getMessage);
                             continue;
                         }
                     } else {

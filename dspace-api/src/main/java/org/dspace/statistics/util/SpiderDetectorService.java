@@ -10,7 +10,8 @@ package org.dspace.statistics.util;
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Interface to implement a SpiderDetectorService.
@@ -33,7 +34,7 @@ public interface SpiderDetectorService {
     /**
      * Service Method for testing spiders against existing spider files.
      *
-     * @param request
+     * @param request the current HTTP request.
      * @return true|false if the request was detected to be from a spider.
      */
     public boolean isSpider(HttpServletRequest request);
@@ -41,7 +42,7 @@ public interface SpiderDetectorService {
     /**
      * Check individual IP is a spider.
      *
-     * @param ip
+     * @param ip the IP address to be checked.
      * @return if is spider IP
      */
     public boolean isSpider(String ip);

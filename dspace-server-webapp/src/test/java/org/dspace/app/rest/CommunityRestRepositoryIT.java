@@ -110,6 +110,12 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
     private EPerson submitter;
 
     @Test
+    public void singularEndpointShouldNotExist() throws Exception {
+        getClient().perform(get("/api/core/community"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
     public void createTest() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         CommunityRest comm = new CommunityRest();
@@ -1987,7 +1993,7 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient(token)
             .perform(patch("/api/core/communities/" + parentCommunity.getID())
             .content(requestBody)
-            .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+            .contentType(jakarta.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(
                  jsonPath("$.metadata",

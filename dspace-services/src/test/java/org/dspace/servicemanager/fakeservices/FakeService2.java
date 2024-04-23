@@ -8,7 +8,8 @@
 package org.dspace.servicemanager.fakeservices;
 
 import java.io.Serializable;
-import javax.annotation.PostConstruct;
+
+import jakarta.annotation.PostConstruct;
 
 /**
  * Simple fake service 2

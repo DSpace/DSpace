@@ -11,9 +11,9 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.projection.Projection;
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "mappedCollections" subresource of an individual item.
  */
-@Component(ItemRest.CATEGORY + "." + ItemRest.NAME + "." + ItemRest.MAPPED_COLLECTIONS)
+@Component(ItemRest.CATEGORY + "." + ItemRest.PLURAL_NAME + "." + ItemRest.MAPPED_COLLECTIONS)
 public class ItemMappedCollectionLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

@@ -17,9 +17,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.NotNull;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.configuration2.ex.ConversionException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -40,7 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class SpiderDetectorServiceImpl implements SpiderDetectorService {
 
-    private static final Logger log = LogManager.getLogger(SpiderDetectorServiceImpl.class);
+    private static final Logger log = LogManager.getLogger();
 
     private Boolean useCaseInsensitiveMatching;
 
@@ -180,7 +180,7 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
                     patterns = readPatterns(file);
                 } catch (IOException ex) {
                     log.error("Patterns not read from {}:  {}",
-                              file.getPath(), ex.getMessage());
+                            file::getPath, ex::getMessage);
                     continue;
                 }
                 //If case insensitive matching is enabled, lowercase the patterns so they can be lowercase matched
@@ -192,10 +192,10 @@ public class SpiderDetectorServiceImpl implements SpiderDetectorService {
                 }
 
 
-                log.info("Loaded pattern file:  {}", file.getPath());
+                log.info("Loaded pattern file:  {}", file::getPath);
             }
         } else {
-            log.info("No patterns loaded from {}", patternsDir.getPath());
+            log.info("No patterns loaded from {}", patternsDir::getPath);
         }
     }
 

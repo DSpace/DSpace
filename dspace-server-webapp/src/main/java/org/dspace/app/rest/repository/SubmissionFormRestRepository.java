@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-@Component(SubmissionFormRest.CATEGORY + "." + SubmissionFormRest.NAME)
+@Component(SubmissionFormRest.CATEGORY + "." + SubmissionFormRest.PLURAL_NAME)
 public class SubmissionFormRestRepository extends DSpaceRestRepository<SubmissionFormRest, String> {
     private Map<Locale, DCInputsReader> inputReaders;
     private DCInputsReader defaultInputReader;

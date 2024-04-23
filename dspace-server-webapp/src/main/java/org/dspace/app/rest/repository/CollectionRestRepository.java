@@ -14,11 +14,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.SortedMap;
 import java.util.UUID;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
@@ -81,7 +81,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
-@Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME)
+@Component(CollectionRest.CATEGORY + "." + CollectionRest.PLURAL_NAME)
 public class CollectionRestRepository extends DSpaceObjectRestRepository<Collection, CollectionRest> {
 
     public static Logger log = org.apache.logging.log4j.LogManager.getLogger(CollectionRestRepository.class);

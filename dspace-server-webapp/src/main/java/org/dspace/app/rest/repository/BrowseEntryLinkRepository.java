@@ -10,8 +10,8 @@ package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Iterator;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.converter.BrowseEntryConverter;
 import org.dspace.app.rest.model.BrowseEntryRest;
@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-@Component(BrowseIndexRest.CATEGORY + "." + BrowseIndexRest.NAME + "." + BrowseIndexRest.LINK_ENTRIES)
+@Component(BrowseIndexRest.CATEGORY + "." + BrowseIndexRest.PLURAL_NAME + "." + BrowseIndexRest.LINK_ENTRIES)
 public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
 

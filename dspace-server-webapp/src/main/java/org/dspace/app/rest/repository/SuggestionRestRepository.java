@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
-@Component(SuggestionRest.CATEGORY + "." + SuggestionRest.NAME)
+@Component(SuggestionRest.CATEGORY + "." + SuggestionRest.PLURAL_NAME)
 public class SuggestionRestRepository extends DSpaceRestRepository<SuggestionRest, String> {
     private final static String ORDER_FIELD = "trust";
 

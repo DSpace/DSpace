@@ -16,11 +16,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.NotSupportedException;
 
-import org.atteo.evo.inflector.English;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.NotSupportedException;
 import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
@@ -73,8 +72,8 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Kim Shepherd
  */
 @RestController
-@RequestMapping("/api/" + IdentifierRestRepository.CATEGORY)
-@Component(IdentifierRestRepository.CATEGORY + "." + IdentifierRestRepository.NAME)
+@RequestMapping("/api/" + IdentifierRest.CATEGORY)
+@Component(IdentifierRest.CATEGORY + "." + IdentifierRest.PLURAL_NAME)
 public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRest, String> implements InitializingBean {
     @Autowired
     private DiscoverableEndpointsService discoverableEndpointsService;
@@ -86,10 +85,6 @@ public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRes
     private HandleService handleService;
     @Autowired
     private ItemService itemService;
-
-    // Set category and name for routing
-    public static final String CATEGORY = "pid";
-    public static final String NAME = IdentifierRest.NAME;
 
     /**
      * Register /api/pid/find?id=... as a discoverable endpoint service
@@ -104,7 +99,7 @@ public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRes
                                                 new TemplateVariables(
                                                         new TemplateVariable("id",
                                                                 TemplateVariable.VariableType.REQUEST_PARAM))),
-                                        CATEGORY)));
+                                        IdentifierRest.CATEGORY)));
     }
 
     /**
@@ -163,7 +158,7 @@ public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRes
                 results.add(new IdentifierRest(handleUrl, "handle", null));
             }
         } catch (SQLException | IdentifierException e) {
-            throw new LinkNotFoundException(IdentifierRestRepository.CATEGORY, IdentifierRest.NAME, uuid);
+            throw new LinkNotFoundException(IdentifierRest.CATEGORY, IdentifierRest.NAME, uuid);
         }
         // Return list of identifiers for this DSpaceObject
         return new PageImpl<>(results, pageable, results.size());
@@ -281,8 +276,7 @@ public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRes
             if (dso != null) {
                 // Convert and respond with a redirect to the object itself
                 DSpaceObjectRest dsor = converter.toRest(dso, utils.obtainProjection());
-                URI link = linkTo(dsor.getController(), dsor.getCategory(),
-                        English.plural(dsor.getType()))
+                URI link = linkTo(dsor.getController(), dsor.getCategory(), dsor.getTypePlural())
                         .slash(dsor.getId()).toUri();
                 response.setStatus(HttpServletResponse.SC_FOUND);
                 response.sendRedirect(link.toString());

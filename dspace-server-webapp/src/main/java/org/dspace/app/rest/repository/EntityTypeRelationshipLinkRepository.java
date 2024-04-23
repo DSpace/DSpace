@@ -9,9 +9,9 @@ package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.EntityTypeRest;
 import org.dspace.app.rest.model.RelationshipTypeRest;
 import org.dspace.app.rest.projection.Projection;
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  * 
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
-@Component(EntityTypeRest.CATEGORY + "." + EntityTypeRest.NAME + "." + EntityTypeRest.RELATION_SHIP_TYPES)
+@Component(EntityTypeRest.CATEGORY + "." + EntityTypeRest.PLURAL_NAME + "." + EntityTypeRest.RELATION_SHIP_TYPES)
 public class EntityTypeRelationshipLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

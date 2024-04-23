@@ -9,9 +9,9 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.UUID;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.QAEventRest;
 import org.dspace.app.rest.projection.Projection;
@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-@Component(QAEventRest.CATEGORY + "." + QAEventRest.NAME + "." + QAEventRest.RELATED)
+@Component(QAEventRest.CATEGORY + "." + QAEventRest.PLURAL_NAME + "." + QAEventRest.RELATED)
 public class QAEventRelatedLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     @Autowired
@@ -51,7 +51,7 @@ public class QAEventRelatedLinkRepository extends AbstractDSpaceRestRepository i
      * @param projection the projection object
      * @return the item rest representation of the secondary item related to qa event
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasPermission(#id, 'QUALITYASSURANCEEVENT', 'READ')")
     public ItemRest getRelated(@Nullable HttpServletRequest request, String id, @Nullable Pageable pageable,
             Projection projection) {
         Context context = obtainContext();

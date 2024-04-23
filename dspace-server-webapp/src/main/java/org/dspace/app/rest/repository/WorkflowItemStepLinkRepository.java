@@ -9,9 +9,9 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.List;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.WorkflowItemRest;
 import org.dspace.app.rest.model.WorkflowStepRest;
 import org.dspace.app.rest.projection.Projection;
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link Repository for the Steps subresources of an individual WorkflowItem
  */
-@Component(WorkflowItemRest.CATEGORY + "." + WorkflowItemRest.NAME + "." + WorkflowItemRest.STEP)
+@Component(WorkflowItemRest.CATEGORY + "." + WorkflowItemRest.PLURAL_NAME + "." + WorkflowItemRest.STEP)
 public class WorkflowItemStepLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     @Autowired

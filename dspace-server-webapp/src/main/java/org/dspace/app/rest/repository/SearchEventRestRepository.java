@@ -8,10 +8,10 @@
 package org.dspace.app.rest.repository;
 
 import java.io.IOException;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.converter.SearchEventConverter;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -25,7 +25,7 @@ import org.dspace.usage.UsageSearchEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component(SearchEventRest.CATEGORY + "." + SearchEventRest.NAME)
+@Component(SearchEventRest.CATEGORY + "." + SearchEventRest.PLURAL_NAME)
 public class SearchEventRestRepository extends AbstractDSpaceRestRepository {
 
     @Autowired

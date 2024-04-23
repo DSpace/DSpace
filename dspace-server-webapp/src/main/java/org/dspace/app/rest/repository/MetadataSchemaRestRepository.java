@@ -13,11 +13,11 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.MetadataSchemaRest;
@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-@Component(MetadataSchemaRest.CATEGORY + "." + MetadataSchemaRest.NAME)
+@Component(MetadataSchemaRest.CATEGORY + "." + MetadataSchemaRest.PLURAL_NAME)
 public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataSchemaRest, Integer> {
 
     @Autowired

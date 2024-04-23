@@ -13,8 +13,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
@@ -67,7 +67,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
-@Component(WorkflowItemRest.CATEGORY + "." + WorkflowItemRest.NAME)
+@Component(WorkflowItemRest.CATEGORY + "." + WorkflowItemRest.PLURAL_NAME)
 public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowItemRest, Integer> {
 
     public static final String OPERATION_PATH_SECTIONS = "sections";

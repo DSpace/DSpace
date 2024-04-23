@@ -22,7 +22,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -36,11 +35,11 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.util.Base64;
 import java.util.Map;
-import javax.servlet.http.Cookie;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import jakarta.servlet.http.Cookie;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.rest.authorization.Authorization;
@@ -791,7 +790,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         // POSTing to /login should be a valid request...it just refreshes your token (see testRefreshToken())
         // However, in this case, we are POSTing with an *INVALID* CSRF Token in Header.
-        getClient().perform(post("/api/authn/login").with(csrf().useInvalidToken().asHeader())
+        getClient().perform(post("/api/authn/login").with(invalidCsrfToken())
                                                     .secure(true)
                                                     .cookie(cookies))
                    // Should return a 403 Forbidden, for an invalid CSRF token
@@ -1401,7 +1400,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         // Same request as prior method, but this time we are sending the CSRF token as a querystring param.
         // NOTE: getClient() method defaults to sending CSRF tokens as Headers, so we are overriding its behavior here
-        getClient(token).perform(post("/api/authn/shortlivedtokens").with(csrf()))
+        getClient(token).perform(post("/api/authn/shortlivedtokens").with(validCsrfTokenViaParam()))
             // BECAUSE we sent the CSRF token on querystring, it should be regenerated & a new token
             // is sent back (in cookie and header).
             .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))

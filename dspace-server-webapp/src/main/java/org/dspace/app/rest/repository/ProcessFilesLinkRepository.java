@@ -9,9 +9,9 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.List;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.BitstreamRest;
@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
  * {@link org.dspace.content.Bitstream} objects for the Process endpoints
  *
  */
-@Component(ProcessRest.CATEGORY + "." + ProcessRest.NAME + "." + ProcessRest.FILES)
+@Component(ProcessRest.CATEGORY + "." + ProcessRest.PLURAL_NAME + "." + ProcessRest.FILES)
 public class ProcessFilesLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     private static final Logger log = LogManager.getLogger();
