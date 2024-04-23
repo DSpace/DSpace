@@ -20,6 +20,8 @@
         <!-- Default submission process -->
         <name-map collection-handle="default" submission-name="traditional"/>
         <name-map collection-handle="123456789/1127" submission-name="clariah"/>
+        <name-map collection-handle="20.500.12800/3" submission-name="clariahSubmissions"/>
+        <name-map collection-handle="11234/5012" submission-name="teachingSubmissions"/>
         <!-- Sample Entities Collection configuration based on the demo Entities dataset available at:
              https://github.com/DSpace-Labs/AIP-Files/releases/tag/demo-entities-data
              This sets up the following Entity-based Collections in that dataset:
@@ -241,6 +243,38 @@
             <processing-class>org.dspace.app.rest.submit.step.ShowIdentifiersStep</processing-class>
             <type>identifiers</type>
         </step-definition>
+
+        <step-definition id="clariahSubmissionsPageOne" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+        <step-definition id="clariahSubmissionsPageTwo" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+        <step-definition id="clariahSubmissionsPageThree" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+
+        <step-definition id="teachingSubmissionsPageOne" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+        <step-definition id="teachingSubmissionsPageTwo" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+        <step-definition id="teachingSubmissionsPageThree" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -405,6 +439,28 @@
             <step id="clarin-notice"/>
             <step id="traditionalpageone"/>
             <step id="traditionalpagetwo"/>
+            <step id="upload"/>
+            <step id="license"/>
+            <step id="clarin-license"/>
+        </submission-process>
+
+        <submission-process name="clariahSubmissions">
+            <step id="collection"/>
+            <step id="clarin-notice"/>
+            <step id="clariahSubmissionsPageOne"/>
+            <step id="clariahSubmissionsPageTwo"/>
+            <step id="clariahSubmissionsPageThree"/>
+            <step id="upload"/>
+            <step id="license"/>
+            <step id="clarin-license"/>
+        </submission-process>
+
+        <submission-process name="teachingSubmissions">
+            <step id="collection"/>
+            <step id="clarin-notice"/>
+            <step id="teachingSubmissionsPageOne"/>
+            <step id="teachingSubmissionsPageTwo"/>
+            <step id="teachingSubmissionsPageThree"/>
             <step id="upload"/>
             <step id="license"/>
             <step id="clarin-license"/>
