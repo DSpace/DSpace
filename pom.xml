@@ -19,13 +19,13 @@
     <properties>
         <!--=== GENERAL / DSPACE-API DEPENDENCIES ===-->
         <java.version>11</java.version>
-        <spring.version>5.3.31</spring.version>
+        <spring.version>5.3.33</spring.version>
         <spring-boot.version>2.7.18</spring-boot.version>
         <spring-security.version>5.7.11</spring-security.version> <!-- sync with version used by spring-boot-->
         <hibernate.version>5.6.15.Final</hibernate.version>
         <hibernate-validator.version>6.2.5.Final</hibernate-validator.version>
-        <postgresql.driver.version>42.6.0</postgresql.driver.version>
-        <solr.client.version>8.11.2</solr.client.version>
+        <postgresql.driver.version>42.7.2</postgresql.driver.version>
+        <solr.client.version>8.11.3</solr.client.version>
 
         <ehcache.version>3.10.8</ehcache.version>
         <errorprone.version>2.10.0</errorprone.version>
@@ -37,7 +37,7 @@
         <jaxb-runtime.version>2.3.9</jaxb-runtime.version>
         <jcache-version>1.1.1</jcache-version>
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
-        <jetty.version>9.4.53.v20231009</jetty.version>
+        <jetty.version>9.4.54.v20240208</jetty.version>
         <log4j.version>2.22.1</log4j.version>
         <pdfbox-version>2.0.30</pdfbox-version>
         <rome.version>1.19.0</rome.version>
@@ -1201,6 +1201,12 @@
             </dependency>
 
             <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context-support</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+
+            <dependency>
                 <artifactId>spring-tx</artifactId>
                 <groupId>org.springframework</groupId>
                 <version>${spring.version}</version>
@@ -1302,7 +1308,7 @@
             <dependency>
                 <groupId>org.apache.james</groupId>
                 <artifactId>apache-mime4j-core</artifactId>
-                <version>0.8.9</version>
+                <version>0.8.10</version>
             </dependency>
             <!-- Tika and solr-core disagree on versions of ASM -->
             <dependency>

@@ -43,7 +43,7 @@ jobs:
     needs: dspace-dependencies
     uses: ./.github/workflows/reusable-docker-build.yml
     with:
-      build_id: dspace
+      build_id: dspace-prod
       image_name: dspace/dspace
       dockerfile_path: ./Dockerfile
     secrets:
@@ -120,7 +120,7 @@ jobs:
     if: github.repository == 'dspace/dspace'
     uses: ./.github/workflows/reusable-docker-build.yml
     with:
-      build_id: dspace-postgres-pgcrypto
+      build_id: dspace-postgres-pgcrypto-prod
       image_name: dspace/dspace-postgres-pgcrypto
       # Must build out of subdirectory to have access to install script for pgcrypto.
       # NOTE: this context will build the image based on the Dockerfile in the specified directory
