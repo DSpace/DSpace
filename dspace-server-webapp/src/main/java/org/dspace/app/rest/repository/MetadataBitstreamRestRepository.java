@@ -20,8 +20,11 @@ import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -60,6 +63,7 @@ import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.dspace.util.FileInfo;
 import org.dspace.util.FileTreeViewGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -72,7 +76,6 @@ import org.xml.sax.SAXException;
 @Component(MetadataBitstreamWrapperRest.CATEGORY + "." + MetadataBitstreamWrapperRest.NAME)
 public class MetadataBitstreamRestRepository extends DSpaceRestRepository<MetadataBitstreamWrapperRest, Integer> {
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(MetadataBitstreamRestRepository.class);
-    private final static int MAX_FILE_PREVIEW_COUNT = 1000;
 
     @Autowired
     HandleService handleService;
@@ -101,6 +104,10 @@ public class MetadataBitstreamRestRepository extends DSpaceRestRepository<Metada
 
     @Autowired
     ConfigurationService configurationService;
+
+    // Configured ZIP file preview limit (default: 1000) - if the ZIP file contains more files, it will be truncated
+    @Value("${file.preview.zip.limit.length:1000}")
+    private int maxPreviewCount;
 
     @SearchRestMethod(name = "byHandle")
     public Page<MetadataBitstreamWrapperRest> findByHandle(@Parameter(value = "handle", required = true) String handle,
@@ -345,29 +352,28 @@ public class MetadataBitstreamRestRepository extends DSpaceRestRepository<Metada
             }
         }
 
+        // Is a folder regex
+        String folderRegex = "/|\\d+";
+        Pattern pattern = Pattern.compile(folderRegex);
+
         StringBuilder sb = new StringBuilder();
         sb.append(("<root>"));
-        List<String> allFiles = filePaths;
+        Iterator<String> iterator = filePaths.iterator();
         int fileCounter = 0;
-        for (String filePath : allFiles) {
-            if (!filePath.isEmpty() && filePath.length() > 3) {
-                if (filePath.contains(".")) {
-                    fileCounter++;
-                }
-                sb.append("<element>");
-                sb.append(filePath);
-                sb.append("</element>");
+        while ((iterator.hasNext() && fileCounter < maxPreviewCount)) {
+            String filePath = iterator.next();
 
-                if (fileCounter > MAX_FILE_PREVIEW_COUNT) {
-                    sb.append("<element>");
-                    sb.append("/|0");
-                    sb.append("</element>");
-                    sb.append("<element>");
-                    sb.append("...too many files...|0");
-                    sb.append("</element>");
-                    break;
-                }
+            // Check if the file is a folder
+            Matcher matcher = pattern.matcher(filePath);
+            if (!matcher.matches()) {
+                // It is a file
+                fileCounter++;
             }
+            sb.append("<element>").append(filePath).append("</element>");
+        }
+
+        if (fileCounter > maxPreviewCount) {
+            sb.append("<element>...too many files...|0</element>");
         }
         sb.append(("</root>"));
         return sb.toString();
