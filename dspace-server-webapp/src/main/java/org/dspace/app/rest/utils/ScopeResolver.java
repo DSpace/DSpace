@@ -35,6 +35,24 @@ public class ScopeResolver {
     @Autowired
     CommunityService communityService;
 
+    // UMD Customization
+    // This change has been provided to DSpace in Pull Request 9482
+    // https://github.com/DSpace/DSpace/pull/9482
+    // This customization marker can be remove when MD-SOAR is update to
+    // a DSpace version containing this change.
+    /**
+     * Returns an IndexableObject corresponding to the community or collection
+     * of the given scope, or null if the scope is not a valid UUID, or is a
+     * valid UUID that does not correspond to a community of collection.
+     *
+     * @param context the DSpace context
+     * @param scope a String containing the UUID of the community or collection
+     * to return.
+     * @return an IndexableObject corresponding to the community or collection
+     * of the given scope, or null if the scope is not a valid UUID, or is a
+     * valid UUID that does not correspond to a community of collection.
+     */
+    // End UMD Customization
     public IndexableObject resolveScope(Context context, String scope) {
         IndexableObject scopeObj = null;
         if (StringUtils.isNotBlank(scope)) {
@@ -43,6 +61,22 @@ public class ScopeResolver {
                 scopeObj = new IndexableCommunity(communityService.find(context, uuid));
                 if (scopeObj.getIndexedObject() == null) {
                     scopeObj = new IndexableCollection(collectionService.find(context, uuid));
+                    // UMD Customization
+                    // This change has been provided to DSpace in Pull Request 9482
+                    // https://github.com/DSpace/DSpace/pull/9482
+                    // This customization marker can be remove when MD-SOAR is update to
+                    // a DSpace version containing this change.
+                    if (scopeObj.getIndexedObject() == null) {
+                        // Can't find the UUID as a community or collection
+                        // so log and return null
+                        log.warn(
+                            "The given scope string " +
+                            StringUtils.trimToEmpty(scope) +
+                            " is not a collection or community UUID."
+                        );
+                        scopeObj = null;
+                    }
+                    // End UMD Customization
                 }
             } catch (IllegalArgumentException ex) {
                 log.warn("The given scope string " + StringUtils.trimToEmpty(scope) + " is not a UUID", ex);
