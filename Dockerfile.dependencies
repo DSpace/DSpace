@@ -7,7 +7,7 @@
 ARG JDK_VERSION=11
 
 # Step 1 - Run Maven Build
-FROM maven:3-openjdk-${JDK_VERSION}-slim as build
+FROM maven:3-eclipse-temurin-${JDK_VERSION} as build
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 # Create the 'dspace' user account & home directory
