@@ -1091,13 +1091,6 @@
                 <groupId>org.hibernate.orm</groupId>
                 <artifactId>hibernate-jpamodelgen</artifactId>
                 <version>${hibernate.version}</version>
-                <exclusions>
-                    <!-- Later version provided by Hibernate Core -->
-                    <exclusion>
-                        <groupId>org.antlr</groupId>
-                        <artifactId>antlr4-runtime</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <dependency>
@@ -1124,6 +1117,13 @@
                 <groupId>org.jboss.logging</groupId>
                 <artifactId>jboss-logging</artifactId>
                 <version>3.4.3.Final</version>
+            </dependency>
+
+            <!-- Hibernate & Solr disagree on the version of antlr. So, specify the latest version -->
+            <dependency>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-runtime</artifactId>
+                <version>4.13.0</version>
             </dependency>
 
             <!-- Rome is used for RSS / ATOM syndication feeds -->
