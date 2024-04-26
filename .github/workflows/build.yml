@@ -99,13 +99,14 @@ jobs:
       # Retry action: https://github.com/marketplace/actions/retry-action
       # Codecov action: https://github.com/codecov/codecov-action
       - name: Upload coverage to Codecov.io
-        uses: Wandalen/wretry.action@v1.3.0
+        uses: Wandalen/wretry.action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           action: codecov/codecov-action@v4
           # Ensure codecov-action throws an error when it fails to upload
           with: |
             fail_ci_if_error: true
-            token: ${{ secrets.CODECOV_TOKEN }}
           # Try re-running action 5 times max
           attempt_limit: 5
           # Run again in 30 seconds
