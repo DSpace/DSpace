@@ -53,7 +53,7 @@ public class SubmissionConfigIT extends AbstractIntegrationTestWithDatabase {
             .withName("Collection 3")
             .withEntityType("CustomEntityType")
             .build();
-        // col4 should use the item submission form mapped for the entity type Publication
+        // col4 should use the item submission form mapped for the entity type CustomEntityType
         Collection col4 = CollectionBuilder.createCollection(context, subcom1, "123456789/not-mapped4")
             .withName("Collection 4")
             .withEntityType("CustomEntityType")
@@ -75,7 +75,7 @@ public class SubmissionConfigIT extends AbstractIntegrationTestWithDatabase {
         SubmissionConfig submissionConfig3 = submissionConfigService.getSubmissionConfigByCollection(col3);
         assertEquals("collectiontest", submissionConfig3.getSubmissionName());
 
-        // for col4, it should return the item submission form defined for the entitytype Publication
+        // for col4, it should return the item submission form defined for the entitytype CustomEntityType
         SubmissionConfig submissionConfig4 = submissionConfigService.getSubmissionConfigByCollection(col4);
         assertEquals("entitytypetest", submissionConfig4.getSubmissionName());
     }
