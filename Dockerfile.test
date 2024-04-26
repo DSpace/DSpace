@@ -26,6 +26,9 @@ ADD --chown=dspace . /app/
 RUN mvn --no-transfer-progress package && \
   mv /app/dspace/target/${TARGET_DIR}/* /install && \
   mvn clean
+# Remove the server webapp to keep image small. Rename runnable JAR to server-boot.jar.
+RUN rm -rf /install/webapps/server/ && \
+  mv /install/webapps/server-boot-*.jar /install/webapps/server-boot.jar
 
 # Step 2 - Run Ant Deploy
 FROM eclipse-temurin:${JDK_VERSION} as ant_build
@@ -48,29 +51,18 @@ RUN mkdir $ANT_HOME && \
 # Run necessary 'ant' deploy scripts
 RUN ant init_installation update_configs update_code update_webapps
 
-# Step 3 - Run tomcat
-# Create a new tomcat image that does not retain the the build directory contents
-FROM tomcat:10-jdk${JDK_VERSION}
+# Step 3 - Start up DSpace via Runnable JAR
+FROM eclipse-temurin:${JDK_VERSION}
+# NOTE: DSPACE_INSTALL must align with the "dspace.dir" default configuration.
 ENV DSPACE_INSTALL=/dspace
-ENV TOMCAT_INSTALL=/usr/local/tomcat
-# Copy the /dspace directory from 'ant_build' containger to /dspace in this container
+# Copy the /dspace directory from 'ant_build' container to /dspace in this container
 COPY --from=ant_build /dspace $DSPACE_INSTALL
-# Enable the AJP connector in Tomcat's server.xml
-# NOTE: secretRequired="false" should only be used when AJP is NOT accessible from an external network. But, secretRequired="true" isn't supported by mod_proxy_ajp until Apache 2.5
-RUN sed -i '/Service name="Catalina".*/a \\n    <Connector protocol="AJP/1.3" port="8009" address="0.0.0.0" redirectPort="8443" URIEncoding="UTF-8" secretRequired="false" />' $TOMCAT_INSTALL/conf/server.xml
-# Expose Tomcat port and AJP port
-EXPOSE 8080 8009 8000
+WORKDIR $DSPACE_INSTALL
+# Expose Tomcat port and debugging port
+EXPOSE 8080 8000
 # Give java extra memory (2GB)
 ENV JAVA_OPTS=-Xmx2000m
 # Set up debugging
 ENV CATALINA_OPTS=-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:8000
-
-# Link the DSpace 'server' webapp into Tomcat's webapps directory.
-# This ensures that when we start Tomcat, it runs from /server path (e.g. http://localhost:8080/server/)
-RUN ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/server
-# If you wish to run "server" webapp off the ROOT path, then comment out the above RUN, and uncomment the below RUN.
-# You also MUST update the 'dspace.server.url' configuration to match.
-# Please note that server webapp should only run on one path at a time.
-#RUN mv /usr/local/tomcat/webapps/ROOT /usr/local/tomcat/webapps/ROOT.bk && \
-#    ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/ROOT
-
+# On startup, run DSpace Runnable JAR
+ENTRYPOINT ["java", "-jar", "webapps/server-boot.jar", "--dspace.dir=$DSPACE_INSTALL"]
