@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "item" subresource of a workspace item.
  */
-@Component(WorkspaceItemRest.CATEGORY + "." + WorkspaceItemRest.NAME + "." + WorkspaceItemRest.ITEM)
+@Component(WorkspaceItemRest.CATEGORY + "." + WorkspaceItemRest.PLURAL_NAME + "." + WorkspaceItemRest.ITEM)
 public class WorkspaceItemItemLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

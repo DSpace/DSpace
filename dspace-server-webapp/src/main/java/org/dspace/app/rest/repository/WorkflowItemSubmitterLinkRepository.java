@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "submitter" subresource of a workflow item.
  */
-@Component(WorkflowItemRest.CATEGORY + "." + WorkflowItemRest.NAME + "." + WorkflowItemRest.SUBMITTER)
+@Component(WorkflowItemRest.CATEGORY + "." + WorkflowItemRest.PLURAL_NAME + "." + WorkflowItemRest.SUBMITTER)
 public class WorkflowItemSubmitterLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

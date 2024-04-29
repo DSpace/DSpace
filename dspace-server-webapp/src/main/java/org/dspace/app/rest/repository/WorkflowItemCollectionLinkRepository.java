@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "collection" subresource of a workflow item.
  */
-@Component(WorkflowItemRest.CATEGORY + "." + WorkflowItemRest.NAME + "." + WorkflowItemRest.COLLECTION)
+@Component(WorkflowItemRest.CATEGORY + "." + WorkflowItemRest.PLURAL_NAME + "." + WorkflowItemRest.COLLECTION)
 public class WorkflowItemCollectionLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 
