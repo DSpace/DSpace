@@ -314,20 +314,26 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     @Override
     public MetadataValue addMetadata(Context context, T dso, MetadataField metadataField, String language,
                             String value, String authority, int confidence) throws SQLException {
-        return addMetadata(context, dso, metadataField, language, Arrays.asList(value), Arrays.asList(authority),
-                    Arrays.asList(confidence)).get(0);
+        List<MetadataValue> metadataValues =
+            addMetadata(context, dso, metadataField, language, Arrays.asList(value), Arrays.asList(authority),
+                        Arrays.asList(confidence));
+        return CollectionUtils.isNotEmpty(metadataValues) ? metadataValues.get(0) : null;
     }
 
     @Override
     public MetadataValue addMetadata(Context context, T dso, String schema, String element, String qualifier,
                              String lang, String value) throws SQLException {
-        return addMetadata(context, dso, schema, element, qualifier, lang, Arrays.asList(value)).get(0);
+        List<MetadataValue> metadataValues =
+            addMetadata(context, dso, schema, element, qualifier, lang, Arrays.asList(value));
+        return CollectionUtils.isNotEmpty(metadataValues) ? metadataValues.get(0) : null;
     }
 
     @Override
     public MetadataValue addMetadata(Context context, T dso, MetadataField metadataField, String language, String value)
         throws SQLException {
-        return addMetadata(context, dso, metadataField, language, Arrays.asList(value)).get(0);
+        List<MetadataValue> metadataValues =
+            addMetadata(context, dso, metadataField, language, Arrays.asList(value));
+        return CollectionUtils.isNotEmpty(metadataValues) ? metadataValues.get(0) : null;
     }
 
     @Override
