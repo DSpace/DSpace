@@ -92,10 +92,17 @@ public class ProcessServiceImpl implements ProcessService {
             });
 
         Process createdProcess = processDAO.create(context, process);
-        log.info(LogHelper.getHeader(context, "process_create",
-                                      "Process has been created for eperson with email " + ePerson.getEmail()
-                                          + " with ID " + createdProcess.getID() + " and scriptName " +
-                                          scriptName + " and parameters " + parameters));
+
+        if (ePerson != null) {
+            log.info(LogHelper.getHeader(context, "process_create",
+                "Process has been created for eperson with email " + ePerson.getEmail()
+                    + " with ID " + createdProcess.getID() + " and scriptName " +
+                    scriptName + " and parameters " + parameters));
+        } else {
+            log.info(LogHelper.getHeader(context, "process_create",
+                "Process has been created for command-line user with ID " + createdProcess.getID()
+                    + " and scriptName " + scriptName + " and parameters " + parameters));
+        }
         return createdProcess;
     }
 
