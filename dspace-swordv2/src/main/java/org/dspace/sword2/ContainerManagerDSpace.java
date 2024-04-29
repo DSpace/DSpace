@@ -760,9 +760,6 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
                 WorkflowItem wfi = wft.getWorkflowItem(context, item);
                 workflowItemService.deleteWrapper(context, wfi);
             }
-
-            // then delete the item
-            itemService.delete(context, item);
         } catch (SQLException | IOException e) {
             throw new DSpaceSwordException(e);
         } catch (AuthorizeException e) {
