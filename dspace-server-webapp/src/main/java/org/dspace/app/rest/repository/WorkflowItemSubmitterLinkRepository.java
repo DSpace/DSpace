@@ -9,8 +9,8 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.WorkflowItemRest;
 import org.dspace.app.rest.projection.Projection;
