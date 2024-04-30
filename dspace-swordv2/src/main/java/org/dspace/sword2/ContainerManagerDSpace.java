@@ -755,11 +755,14 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
             WorkflowTools wft = new WorkflowTools();
             if (wft.isItemInWorkspace(swordContext.getContext(), item)) {
                 WorkspaceItem wsi = wft.getWorkspaceItem(context, item);
-                workspaceItemService.deleteAll(context, wsi);
+                workspaceItemService.deleteWrapper(context, wsi);
             } else if (wft.isItemInWorkflow(context, item)) {
                 WorkflowItem wfi = wft.getWorkflowItem(context, item);
                 workflowItemService.deleteWrapper(context, wfi);
             }
+
+            // then delete the item
+            itemService.delete(context, item);
         } catch (SQLException | IOException e) {
             throw new DSpaceSwordException(e);
         } catch (AuthorizeException e) {

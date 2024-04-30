@@ -20,9 +20,13 @@ import org.dspace.app.rest.test.AbstractWebClientIntegrationTest;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.WorkflowItemBuilder;
+import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.services.ConfigurationService;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -295,7 +299,7 @@ public class Swordv2IT extends AbstractWebClientIntegrationTest {
         assertThat(response.getBody(), containsString(newTitle));
 
         //----
-        // STEP 5: Verify uploaded content can be DELETED via SWORDv2 (by an Admin ONLY)
+        // STEP 5: Verify archived Item can be DELETED via SWORDv2 (by an Admin ONLY)
         //----
         // Edit URI should also allow user to DELETE the uploaded content
         // Since we submitted to a collection WITHOUT a workflow, this item is in archive. That means DELETE
@@ -306,11 +310,140 @@ public class Swordv2IT extends AbstractWebClientIntegrationTest {
                                .headers(authHeaders)
                                .build();
         response = responseAsString(request);
-
         // Expect a 204 No Content response
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
 
         // Verify that Edit URI now returns a 404 (using eperson login info)
+        authHeaders = new HttpHeaders();
+        authHeaders.setBasicAuth(eperson.getEmail(), password);
+        request = RequestEntity.get(editLink)
+                               .accept(MediaType.valueOf("application/atom+xml"))
+                               .headers(authHeaders)
+                               .build();
+        response = responseAsString(request);
+        // Expect a 404 response as content was deleted
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    public void deleteWorkspaceItemViaSwordTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create a top level community and one Collection
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Test SWORDv2 Collection")
+                                                 .withSubmitterGroup(eperson)
+                                                 .build();
+
+        String titleOfItem = "This is a test SWORD workspace item";
+        WorkspaceItem wsi = WorkspaceItemBuilder.createWorkspaceItem(context, collection)
+                                                .withSubmitter(eperson)
+                                                .withTitle(titleOfItem)
+                                                .build();
+
+        // Above changes MUST be committed to the database for SWORDv2 to see them.
+        context.commit();
+        context.restoreAuthSystemState();
+
+        // Edit link of WorkspaceItem is the Item UUID
+        String editLink = "/swordv2/edit/" + wsi.getItem().getID();
+
+        //----
+        // STEP 1: Verify WorkspaceItem is found via SWORDv2 when logged in as the submitter
+        //----
+        HttpHeaders authHeaders = new HttpHeaders();
+        authHeaders.setBasicAuth(eperson.getEmail(), password);
+        RequestEntity request = RequestEntity.get(editLink)
+                                             .accept(MediaType.valueOf("application/atom+xml"))
+                                             .headers(authHeaders)
+                                             .build();
+        ResponseEntity<String> response = responseAsString(request);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        // Verify the new Item title is now included in the response body
+        assertThat(response.getBody(), containsString(titleOfItem));
+
+        //----
+        // STEP 2: Verify WorkspaceItem can be deleted by submitter
+        //----
+        authHeaders = new HttpHeaders();
+        authHeaders.setBasicAuth(eperson.getEmail(), password);
+        request = RequestEntity.delete(editLink)
+                               .headers(authHeaders)
+                               .build();
+        response = responseAsString(request);
+        // Expect a 204 No Content response
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+
+        // Verify that Edit URI now returns a 404 (deleted successfully)
+        authHeaders = new HttpHeaders();
+        authHeaders.setBasicAuth(eperson.getEmail(), password);
+        request = RequestEntity.get(editLink)
+                               .accept(MediaType.valueOf("application/atom+xml"))
+                               .headers(authHeaders)
+                               .build();
+        response = responseAsString(request);
+        // Expect a 404 response as content was deleted
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+
+    @Test
+    public void deleteWorkflowItemViaSwordTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        // Create a top level community and one Collection
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        // Create a Collection with a workflow step enabled
+        Collection collection = CollectionBuilder.createCollection(context, parentCommunity)
+                                                 .withName("Test SWORDv2 Workflow Collection")
+                                                 .withSubmitterGroup(eperson)
+                                                 .withWorkflowGroup(1, admin)
+                                                 .build();
+
+        String titleOfItem = "This is a test SWORD workflow item";
+        XmlWorkflowItem workflowItem = WorkflowItemBuilder.createWorkflowItem(context, collection)
+                                                          .withSubmitter(eperson)
+                                                          .withTitle(titleOfItem)
+                                                          .withIssueDate("2017-10-17")
+                                                          .build();
+        // Above changes MUST be committed to the database for SWORDv2 to see them.
+        context.commit();
+        context.restoreAuthSystemState();
+
+        // Edit link of WorkflowItem is the Item UUID
+        String editLink = "/swordv2/edit/" + workflowItem.getItem().getID();
+
+        //----
+        // STEP 1: Verify WorkflowItem is found via SWORDv2 when logged in as the submitter
+        //----
+        HttpHeaders authHeaders = new HttpHeaders();
+        authHeaders.setBasicAuth(eperson.getEmail(), password);
+        RequestEntity request = RequestEntity.get(editLink)
+                                             .accept(MediaType.valueOf("application/atom+xml"))
+                                             .headers(authHeaders)
+                                             .build();
+        ResponseEntity<String> response = responseAsString(request);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        // Verify the new Item title is now included in the response body
+        assertThat(response.getBody(), containsString(titleOfItem));
+
+        //----
+        // STEP 2: Verify WorkflowItem can be deleted by ADMIN only
+        //----
+        // NOTE: Once Item is in Workflow, deletion requires ADMIN permissions
+        authHeaders = new HttpHeaders();
+        authHeaders.setBasicAuth(admin.getEmail(), password);
+        request = RequestEntity.delete(editLink)
+                               .headers(authHeaders)
+                               .build();
+        response = responseAsString(request);
+        // Expect a 204 No Content response
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+
+        // Verify that Edit URI now returns a 404 (deleted successfully)
         authHeaders = new HttpHeaders();
         authHeaders.setBasicAuth(eperson.getEmail(), password);
         request = RequestEntity.get(editLink)
