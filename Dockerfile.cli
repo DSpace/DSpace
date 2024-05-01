@@ -33,9 +33,9 @@ WORKDIR /dspace-src
 ENV ANT_VERSION 1.10.13
 ENV ANT_HOME /tmp/ant-$ANT_VERSION
 ENV PATH $ANT_HOME/bin:$PATH
-# Need wget to install ant, and unzip for managing AIPs
+# Need wget to install ant
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends wget unzip \
+    && apt-get install -y --no-install-recommends wget \
     && apt-get purge -y --auto-remove \
     && rm -rf /var/lib/apt/lists/*
 # Download and install 'ant'
@@ -52,3 +52,8 @@ ENV DSPACE_INSTALL=/dspace
 COPY --from=ant_build /dspace $DSPACE_INSTALL
 # Give java extra memory (1GB)
 ENV JAVA_OPTS=-Xmx1000m
+# Install unzip for AIPs
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends unzip \
+    && apt-get purge -y --auto-remove \
+    && rm -rf /var/lib/apt/lists/*
