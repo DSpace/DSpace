@@ -10,7 +10,6 @@ package org.dspace.external.provider.impl;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import javax.xml.bind.JAXBException;
 
 import eu.openaire.jaxb.helper.OpenAIREHandler;
 import eu.openaire.jaxb.model.Response;
@@ -37,7 +36,7 @@ public class MockOpenaireFundingDataProvider extends OpenaireFundingDataProvider
                         try {
                             return OpenAIREHandler
                                     .unmarshal(this.getClass().getResourceAsStream("openaire-projects.xml"));
-                        } catch (JAXBException e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                         return null;
@@ -50,7 +49,7 @@ public class MockOpenaireFundingDataProvider extends OpenaireFundingDataProvider
                         try {
                             return OpenAIREHandler
                                     .unmarshal(this.getClass().getResourceAsStream("openaire-no-projects.xml"));
-                        } catch (JAXBException e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                         return null;
@@ -63,7 +62,7 @@ public class MockOpenaireFundingDataProvider extends OpenaireFundingDataProvider
                         try {
                             return OpenAIREHandler
                                     .unmarshal(this.getClass().getResourceAsStream("openaire-project.xml"));
-                        } catch (JAXBException e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                         return null;

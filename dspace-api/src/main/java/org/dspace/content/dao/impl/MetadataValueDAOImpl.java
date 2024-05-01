@@ -10,12 +10,12 @@ package org.dspace.content.dao.impl;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
-import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Root;
 
+import jakarta.persistence.Query;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Root;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataField_;
 import org.dspace.content.MetadataValue;
@@ -53,7 +53,7 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
                                                                  MetadataField metadataField, String value)
             throws SQLException {
         String queryString = "SELECT m from MetadataValue m " +
-                "join Item i on m.dSpaceObject = i.id where m.metadataField.id = :metadata_field_id " +
+                "join Item i on m.dSpaceObject = i where m.metadataField.id = :metadata_field_id " +
                 "and m.value = :text_value";
         Query query = createQuery(context, queryString);
         query.setParameter("metadata_field_id", metadataField.getID());
@@ -84,7 +84,7 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
     public MetadataValue getMinimum(Context context, int metadataFieldId)
         throws SQLException {
         String queryString = "SELECT m FROM MetadataValue m JOIN FETCH m.metadataField WHERE m.metadataField.id = " +
-            ":metadata_field_id ORDER BY text_value";
+            ":metadata_field_id ORDER BY value";
         Query query = createQuery(context, queryString);
         query.setParameter("metadata_field_id", metadataFieldId);
         query.setMaxResults(1);

@@ -755,7 +755,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
             WorkflowTools wft = new WorkflowTools();
             if (wft.isItemInWorkspace(swordContext.getContext(), item)) {
                 WorkspaceItem wsi = wft.getWorkspaceItem(context, item);
-                workspaceItemService.deleteAll(context, wsi);
+                workspaceItemService.deleteWrapper(context, wsi);
             } else if (wft.isItemInWorkflow(context, item)) {
                 WorkflowItem wfi = wft.getWorkflowItem(context, item);
                 workflowItemService.deleteWrapper(context, wfi);

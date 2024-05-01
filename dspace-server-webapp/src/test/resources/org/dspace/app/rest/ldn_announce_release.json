@@ -13,7 +13,7 @@
     "id_handle": "http://localhost:4000/handle/123456789/1119",
     "ietf:cite-as": "https://doi.org/10.5555/12345680",
     "type": "sorg:AboutPage",
-    "url": {
+    "ietf:item": {
       "id": "https://another-research-organisation.org/repository/datasets/item/201203421/data_archive.zip",
       "mediaType": "application/zip",
       "type": [

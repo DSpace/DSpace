@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -95,8 +95,7 @@ public class LDNMessageRestRepositoryIT extends AbstractControllerIntegrationTes
         String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
 
         NotifyServiceEntity notifyService =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("service url")
                                 .withLdnUrl("https://overlay-journal.com/inbox/")
@@ -165,8 +164,7 @@ public class LDNMessageRestRepositoryIT extends AbstractControllerIntegrationTes
         String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
 
         NotifyServiceEntity notifyService =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("service url")
                                 .withLdnUrl("https://overlay-journal.com/inbox/")

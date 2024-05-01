@@ -281,6 +281,23 @@ public class DCDateTest {
         assertThat("testDCDateString 10", dc.getHourUTC(), equalTo(0));
         assertThat("testDCDateString 11", dc.getMinuteUTC(), equalTo(0));
         assertThat("testDCDateString 12", dc.getSecondUTC(), equalTo(1));
+
+        // test additional ISO format
+        dc = new DCDate("2010-04-14T00:00:01.000");
+        assertThat("testDCDateString 1", dc.getYear(), equalTo(2010));
+        assertThat("testDCDateString 2", dc.getMonth(), equalTo(04));
+        assertThat("testDCDateString 3", dc.getDay(), equalTo(13));
+        assertThat("testDCDateString 4", dc.getHour(), equalTo(16));
+        assertThat("testDCDateString 5", dc.getMinute(), equalTo(0));
+        assertThat("testDCDateIntBits 6", dc.getSecond(), equalTo(1));
+
+        assertThat("testDCDateString 7", dc.getYearUTC(), equalTo(2010));
+        assertThat("testDCDateString 8", dc.getMonthUTC(), equalTo(04));
+        assertThat("testDCDateString 9", dc.getDayUTC(), equalTo(14));
+        assertThat("testDCDateString 10", dc.getHourUTC(), equalTo(0));
+        assertThat("testDCDateString 11", dc.getMinuteUTC(), equalTo(0));
+        assertThat("testDCDateString 12", dc.getSecondUTC(), equalTo(1));
+
     }
 
 
@@ -381,6 +398,11 @@ public class DCDateTest {
         assertThat("testDisplayDate 7 ", dc.displayDate(false, false,
                                                         new Locale("en_GB")),
                    equalTo("14-Apr-2010"));
+
+        dc = new DCDate("2010-04-14T00:00:01.000");
+        assertThat("testDisplayDate 8 ", dc.displayDate(false, false,
+                        new Locale("en_GB")),
+                equalTo("14-Apr-2010"));
     }
 
     /**

@@ -31,7 +31,7 @@
         <!-- hibernate.javax.cache.uri is defined in
                   config/spring/api/core-hibernate.xml so that we can use
                   property substitution. -->
-        <property name="javax.persistence.sharedCache.mode">ENABLE_SELECTIVE</property>
+        <property name="jakarta.persistence.sharedCache.mode">ENABLE_SELECTIVE</property>
 
         <!-- Entities to be loaded by hibernate -->
         <mapping class="org.dspace.app.util.WebApp"/>

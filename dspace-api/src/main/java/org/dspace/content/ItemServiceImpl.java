@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -97,7 +98,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     /**
      * log4j category
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Item.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     @Autowired(required = true)
     protected ItemDAO itemDAO;
@@ -277,6 +278,55 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             return template;
         }
         return collection.getTemplateItem();
+    }
+
+    @Override
+    public void populateWithTemplateItemMetadata(Context context, Collection collection, boolean template, Item item)
+        throws SQLException {
+
+        Item templateItem = collection.getTemplateItem();
+
+        Optional<MetadataValue> colEntityType = getDSpaceEntityType(collection);
+        Optional<MetadataValue> templateItemEntityType = getDSpaceEntityType(templateItem);
+
+        if (template && colEntityType.isPresent() && templateItemEntityType.isPresent() &&
+            !StringUtils.equals(colEntityType.get().getValue(), templateItemEntityType.get().getValue())) {
+            throw new IllegalStateException("The template item has entity type : (" +
+                templateItemEntityType.get().getValue() + ") different than collection entity type : " +
+                colEntityType.get().getValue());
+        }
+
+        if (template && colEntityType.isPresent() && templateItemEntityType.isEmpty()) {
+            MetadataValue original = colEntityType.get();
+            MetadataField metadataField = original.getMetadataField();
+            MetadataSchema metadataSchema = metadataField.getMetadataSchema();
+            // NOTE: dspace.entity.type = <blank> does not make sense
+            //       the collection entity type is by default blank when a collection is first created
+            if (StringUtils.isNotBlank(original.getValue())) {
+                addMetadata(context, item, metadataSchema.getName(), metadataField.getElement(),
+                    metadataField.getQualifier(), original.getLanguage(), original.getValue());
+            }
+        }
+
+        if (template && (templateItem != null)) {
+            List<MetadataValue> md = getMetadata(templateItem, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+
+            for (MetadataValue aMd : md) {
+                MetadataField metadataField = aMd.getMetadataField();
+                MetadataSchema metadataSchema = metadataField.getMetadataSchema();
+                addMetadata(context, item, metadataSchema.getName(), metadataField.getElement(),
+                    metadataField.getQualifier(), aMd.getLanguage(), aMd.getValue());
+            }
+        }
+    }
+
+    private Optional<MetadataValue> getDSpaceEntityType(DSpaceObject dSpaceObject) {
+        return Objects.nonNull(dSpaceObject) ? dSpaceObject.getMetadata()
+            .stream()
+            .filter(x -> x.getMetadataField().toString('.')
+                .equalsIgnoreCase("dspace.entity.type"))
+            .findFirst()
+            : Optional.empty();
     }
 
     @Override
@@ -1435,7 +1485,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     public List<Item> findByMetadataQuery(Context context, List<QueryPredicate> queryPredicates,
             List<UUID> collectionUuids, long offset, int limit)
             throws SQLException {
-        return itemDAO.findByMetadataQuery(context, queryPredicates, collectionUuids, "text_value ~ ?",
+        return itemDAO.findByMetadataQuery(context, queryPredicates, collectionUuids, "value ~ ?",
                 offset, limit);
     }
 
@@ -1444,7 +1494,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     public long countForMetadataQuery(Context context, List<QueryPredicate> queryPredicates,
             List<UUID> collectionUuids)
             throws SQLException {
-        return itemDAO.countForMetadataQuery(context, queryPredicates, collectionUuids, "text_value ~ ?");
+        return itemDAO.countForMetadataQuery(context, queryPredicates, collectionUuids, "value ~ ?");
     }
 
     @Override
@@ -1742,6 +1792,8 @@ prevent the generation of resource policy entry values with null dspace_object a
      */
     @Override
     protected void moveSingleMetadataValue(Context context, Item dso, int place, MetadataValue rr) {
+        // If this is a (virtual) metadata value representing a relationship,
+        // then we must also update the corresponding Relationship with the new place
         if (rr instanceof RelationshipMetadataValue) {
             try {
                 //Retrieve the applicable relationship
@@ -1757,10 +1809,10 @@ prevent the generation of resource policy entry values with null dspace_object a
                 //should not occur, otherwise metadata can't be updated either
                 log.error("An error occurred while moving " + rr.getAuthority() + " for item " + dso.getID(), e);
             }
-        } else {
-            //just move the metadata
-            rr.setPlace(place);
         }
+
+        // Update the MetadataValue object with the new place setting
+        rr.setPlace(place);
     }
 
     @Override
