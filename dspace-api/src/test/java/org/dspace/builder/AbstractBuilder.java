@@ -51,6 +51,8 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.eperson.service.SubscribeService;
+import org.dspace.identifier.factory.IdentifierServiceFactory;
+import org.dspace.identifier.service.DOIService;
 import org.dspace.orcid.factory.OrcidServiceFactory;
 import org.dspace.orcid.service.OrcidHistoryService;
 import org.dspace.orcid.service.OrcidQueueService;
@@ -114,6 +116,7 @@ public abstract class AbstractBuilder<T, S> {
     static ProcessService processService;
     static RequestItemService requestItemService;
     static VersioningService versioningService;
+    static DOIService doiService;
     static OrcidHistoryService orcidHistoryService;
     static OrcidQueueService orcidQueueService;
     static OrcidTokenService orcidTokenService;
@@ -178,6 +181,7 @@ public abstract class AbstractBuilder<T, S> {
         requestItemService = RequestItemServiceFactory.getInstance().getRequestItemService();
         versioningService = DSpaceServicesFactory.getInstance().getServiceManager()
                                  .getServiceByName(VersioningService.class.getName(), VersioningService.class);
+        doiService = IdentifierServiceFactory.getInstance().getDOIService();
 
         // Temporarily disabled
         claimedTaskService = XmlWorkflowServiceFactory.getInstance().getClaimedTaskService();
@@ -234,6 +238,7 @@ public abstract class AbstractBuilder<T, S> {
         processService = null;
         requestItemService = null;
         versioningService = null;
+        doiService = null;
         orcidTokenService = null;
         systemWideAlertService = null;
         submissionConfigService = null;
