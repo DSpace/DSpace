@@ -11,6 +11,7 @@ import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -22,10 +23,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
-import org.dspace.discovery.SearchServiceException;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.w3c.dom.Document;
@@ -97,6 +98,13 @@ public class SubmissionConfigReader {
     private Map<String, Map<String, String>> stepDefns = null;
 
     /**
+     * Hashmap which stores which submission process configuration is used by
+     * which entityType, computed from the item submission config file
+     * (specifically, the 'submission-map' tag)
+     */
+    private Map<String, String> entityTypeToSubmissionConfig = null;
+
+    /**
      * Reference to the item submission definitions defined in the
      * "submission-definitions" section
      */
@@ -127,6 +135,7 @@ public class SubmissionConfigReader {
 
     public void reload() throws SubmissionConfigReaderException {
         collectionToSubmissionConfig = null;
+        entityTypeToSubmissionConfig = null;
         stepDefns = null;
         submitDefns = null;
         buildInputs(configDir + SUBMIT_DEF_FILE_PREFIX + SUBMIT_DEF_FILE_SUFFIX);
@@ -145,7 +154,8 @@ public class SubmissionConfigReader {
      */
     private void buildInputs(String fileName) throws SubmissionConfigReaderException {
         collectionToSubmissionConfig = new HashMap<String, String>();
-        submitDefns = new HashMap<String, List<Map<String, String>>>();
+        entityTypeToSubmissionConfig = new HashMap<String, String>();
+        submitDefns = new LinkedHashMap<String, List<Map<String, String>>>();
 
         String uri = "file:" + new File(fileName).getAbsolutePath();
 
@@ -162,9 +172,6 @@ public class SubmissionConfigReader {
         } catch (FactoryConfigurationError fe) {
             throw new SubmissionConfigReaderException(
                 "Cannot create Item Submission Configuration parser", fe);
-        } catch (SearchServiceException se) {
-            throw new SubmissionConfigReaderException(
-                "Cannot perform a discovery search for Item Submission Configuration", se);
         } catch (Exception e) {
             throw new SubmissionConfigReaderException(
                 "Error creating Item Submission Configuration: " + e);
@@ -210,18 +217,36 @@ public class SubmissionConfigReader {
      * Returns the Item Submission process config used for a particular
      * collection, or the default if none is defined for the collection
      *
-     * @param collectionHandle collection's unique Handle
+     * @param col collection for which search Submission process config
      * @return the SubmissionConfig representing the item submission config
-     * @throws SubmissionConfigReaderException if no default submission process configuration defined
+     * @throws IllegalStateException if no default submission process configuration defined
      */
-    public SubmissionConfig getSubmissionConfigByCollection(String collectionHandle) {
-        // get the name of the submission process config for this collection
-        String submitName = collectionToSubmissionConfig
-            .get(collectionHandle);
-        if (submitName == null) {
+    public SubmissionConfig getSubmissionConfigByCollection(Collection col) {
+
+        String submitName;
+
+        if (col != null) {
+
+            // get the name of the submission process config for this collection
             submitName = collectionToSubmissionConfig
-                .get(DEFAULT_COLLECTION);
+                .get(col.getHandle());
+            if (submitName != null) {
+                return getSubmissionConfigByName(submitName);
+            }
         }
+
+        // get the name of the submission process based on the entity type of this collections
+        if (!entityTypeToSubmissionConfig.isEmpty()) {
+            String entityType = collectionService.getMetadataFirstValue(col, "dspace", "entity", "type", Item.ANY);
+            submitName = entityTypeToSubmissionConfig
+                .get(entityType);
+            if (submitName != null) {
+                return getSubmissionConfigByName(submitName);
+            }
+        }
+
+        submitName = collectionToSubmissionConfig.get(DEFAULT_COLLECTION);
+
         if (submitName == null) {
             throw new IllegalStateException(
                 "No item submission process configuration designated as 'default' in 'submission-map' section of " +
@@ -300,7 +325,7 @@ public class SubmissionConfigReader {
      * should correspond to the collection-form maps, the form definitions, and
      * the display/storage word pairs.
      */
-    private void doNodes(Node n) throws SAXException, SearchServiceException, SubmissionConfigReaderException {
+    private void doNodes(Node n) throws SAXException, SubmissionConfigReaderException {
         if (n == null) {
             return;
         }
@@ -347,9 +372,7 @@ public class SubmissionConfigReader {
      * the collection handle and item submission name, put name in hashmap keyed
      * by the collection handle.
      */
-    private void processMap(Node e) throws SAXException, SearchServiceException {
-        // create a context
-        Context context = new Context();
+    private void processMap(Node e) throws SAXException {
 
         NodeList nl = e.getChildNodes();
         int len = nl.getLength();
@@ -369,7 +392,7 @@ public class SubmissionConfigReader {
                     throw new SAXException(
                         "name-map element is missing submission-name attribute in 'item-submission.xml'");
                 }
-                if (content != null && content.length() > 0) {
+                if (content != null && !content.isEmpty()) {
                     throw new SAXException(
                         "name-map element has content in 'item-submission.xml', it should be empty.");
                 }
@@ -377,12 +400,7 @@ public class SubmissionConfigReader {
                     collectionToSubmissionConfig.put(id, value);
 
                 } else {
-                    // get all collections for this entity-type
-                    List<Collection> collections = collectionService.findAllCollectionsByEntityType( context,
-                                    entityType);
-                    for (Collection collection : collections) {
-                        collectionToSubmissionConfig.putIfAbsent(collection.getHandle(), value);
-                    }
+                    entityTypeToSubmissionConfig.put(entityType, value);
                 }
             } // ignore any child node that isn't a "name-map"
         }

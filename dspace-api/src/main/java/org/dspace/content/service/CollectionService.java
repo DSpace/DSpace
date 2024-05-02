@@ -457,21 +457,6 @@ public interface CollectionService
         throws SQLException, SearchServiceException;
 
     /**
-     * Returns a list of all collections for a specific entity type.
-     * NOTE: for better performance, this method retrieves its results from an index (cache)
-     *       and does not query the database directly.
-     *       This means that results may be stale or outdated until
-     *       https://github.com/DSpace/DSpace/issues/2853 is resolved."
-     *
-     * @param context          DSpace Context
-     * @param entityType       limit the returned collection to those related to given entity type
-     * @return                 list of collections found
-     * @throws SearchServiceException    if search error
-     */
-    public List<Collection> findAllCollectionsByEntityType(Context context, String entityType)
-        throws SearchServiceException;
-
-    /**
      * Returns total collection archived items
      *
      * @param collection       Collection
