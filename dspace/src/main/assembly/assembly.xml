@@ -117,6 +117,7 @@
             <includeDependencies>false</includeDependencies>
             <outputDirectory>webapps</outputDirectory>
             <unpack>false</unpack>
+            <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
          </binaries>
       </moduleSet>
 

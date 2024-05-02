@@ -27,9 +27,8 @@ ENV MAVEN_FLAGS="-P-test-environment -Denforcer.skip=true -Dcheckstyle.skip=true
 RUN mvn --no-transfer-progress package ${MAVEN_FLAGS} && \
   mv /app/dspace/target/${TARGET_DIR}/* /install && \
   mvn clean
-# Remove the server webapp to keep image small. Rename runnable JAR to server-boot.jar.
-RUN rm -rf /install/webapps/server/ && \
-  mv /install/webapps/server-boot-*.jar /install/webapps/server-boot.jar
+# Remove the server webapp to keep image small.
+RUN rm -rf /install/webapps/server/
 
 # Step 2 - Run Ant Deploy
 FROM eclipse-temurin:${JDK_VERSION} as ant_build
