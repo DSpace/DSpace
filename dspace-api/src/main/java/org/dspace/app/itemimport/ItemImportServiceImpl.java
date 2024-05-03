@@ -1816,11 +1816,10 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             authorizeService.removeAllPolicies(c, bs);
 
             // add the policy
-            ResourcePolicy rp = resourcePolicyService.create(c);
+            ResourcePolicy rp = resourcePolicyService.create(c, null, g);
 
             rp.setdSpaceObject(bs);
             rp.setAction(actionID);
-            rp.setGroup(g);
             rp.setRpType(rpType);
 
             resourcePolicyService.update(c, rp);

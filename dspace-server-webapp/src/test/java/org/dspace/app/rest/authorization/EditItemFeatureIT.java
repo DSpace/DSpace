@@ -96,8 +96,7 @@ public class EditItemFeatureIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void testDirectEPersonWritePolicy() throws Exception {
-        ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context)
-            .withUser(eperson)
+        ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
             .withDspaceObject(itemA1X)
             .withAction(Constants.WRITE)
             .build();
@@ -108,8 +107,7 @@ public class EditItemFeatureIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void testDirectGroupWritePolicy() throws Exception {
-        ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context)
-            .withGroup(group)
+        ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context, null, group)
             .withDspaceObject(itemA1X)
             .withAction(Constants.WRITE)
             .build();
@@ -120,8 +118,7 @@ public class EditItemFeatureIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void testDirectEPersonAdminPolicy() throws Exception {
-        ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context)
-            .withUser(eperson)
+        ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
             .withDspaceObject(itemA1X)
             .withAction(Constants.ADMIN)
             .build();
@@ -132,8 +129,7 @@ public class EditItemFeatureIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void testDirectGroupAdminPolicy() throws Exception {
-        ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context)
-            .withGroup(group)
+        ResourcePolicy rp = ResourcePolicyBuilder.createResourcePolicy(context, null, group)
             .withDspaceObject(itemA1X)
             .withAction(Constants.ADMIN)
             .build();
