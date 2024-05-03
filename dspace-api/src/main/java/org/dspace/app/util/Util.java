@@ -405,21 +405,13 @@ public class Util {
         DCInput myInputs = null;
         boolean myInputsFound = false;
         String formFileName = I18nUtil.getInputFormsFileName(locale);
-        String col_handle = "";
 
         Collection collection = item.getOwningCollection();
-
-        if (collection == null) {
-            // set an empty handle so to get the default input set
-            col_handle = "";
-        } else {
-            col_handle = collection.getHandle();
-        }
 
         // Read the input form file for the specific collection
         DCInputsReader inputsReader = new DCInputsReader(formFileName);
 
-        List<DCInputSet> inputSets = inputsReader.getInputsByCollectionHandle(col_handle);
+        List<DCInputSet> inputSets = inputsReader.getInputsByCollection(collection);
 
         // Replace the values of Metadatum[] with the correct ones in case
         // of
@@ -500,8 +492,8 @@ public class Util {
     public static List<String> differenceInSubmissionFields(Collection fromCollection, Collection toCollection)
         throws DCInputsReaderException {
         DCInputsReader reader = new DCInputsReader();
-        List<DCInputSet> from = reader.getInputsByCollectionHandle(fromCollection.getHandle());
-        List<DCInputSet> to = reader.getInputsByCollectionHandle(toCollection.getHandle());
+        List<DCInputSet> from = reader.getInputsByCollection(fromCollection);
+        List<DCInputSet> to = reader.getInputsByCollection(toCollection);
 
         Set<String> fromFieldName = new HashSet<>();
         Set<String> toFieldName = new HashSet<>();

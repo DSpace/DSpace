@@ -24,7 +24,7 @@ RUN mvn --no-transfer-progress package && \
   mvn clean
 
 # Step 2 - Run Ant Deploy
-FROM openjdk:${JDK_VERSION}-slim as ant_build
+FROM eclipse-temurin:${JDK_VERSION} as ant_build
 ARG TARGET_DIR=dspace-installer
 # COPY the /install directory from 'build' container to /dspace-src in this container
 COPY --from=build /install /dspace-src
@@ -33,9 +33,9 @@ WORKDIR /dspace-src
 ENV ANT_VERSION 1.10.13
 ENV ANT_HOME /tmp/ant-$ANT_VERSION
 ENV PATH $ANT_HOME/bin:$PATH
-# Need wget to install ant, and unzip for managing AIPs
+# Need wget to install ant
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends wget unzip \
+    && apt-get install -y --no-install-recommends wget \
     && apt-get purge -y --auto-remove \
     && rm -rf /var/lib/apt/lists/*
 # Download and install 'ant'
@@ -45,10 +45,15 @@ RUN mkdir $ANT_HOME && \
 RUN ant init_installation update_configs update_code
 
 # Step 3 - Run jdk
-FROM openjdk:${JDK_VERSION}
+FROM eclipse-temurin:${JDK_VERSION}
 # NOTE: DSPACE_INSTALL must align with the "dspace.dir" default configuration.
 ENV DSPACE_INSTALL=/dspace
 # Copy the /dspace directory from 'ant_build' container to /dspace in this container
 COPY --from=ant_build /dspace $DSPACE_INSTALL
 # Give java extra memory (1GB)
 ENV JAVA_OPTS=-Xmx1000m
+# Install unzip for AIPs
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends unzip \
+    && apt-get purge -y --auto-remove \
+    && rm -rf /var/lib/apt/lists/*

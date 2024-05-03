@@ -6,8 +6,6 @@
 # http://www.dspace.org/license/
 #
 
-version: "3.7"
-
 services:
   dspacedb:
     image: dspace/dspace-postgres-pgcrypto:dspace-7_x-loadsql

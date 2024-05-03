@@ -1054,26 +1054,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         return (int) resp.getTotalSearchResults();
     }
 
-    @Override
-    @SuppressWarnings("rawtypes")
-    public List<Collection> findAllCollectionsByEntityType(Context context, String entityType)
-            throws SearchServiceException {
-        List<Collection> collectionList = new ArrayList<>();
-
-        DiscoverQuery discoverQuery = new DiscoverQuery();
-        discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
-        discoverQuery.addFilterQueries("dspace.entity.type:" + entityType);
-
-        DiscoverResult discoverResult = searchService.search(context, discoverQuery);
-        List<IndexableObject> solrIndexableObjects = discoverResult.getIndexableObjects();
-
-        for (IndexableObject solrCollection : solrIndexableObjects) {
-            Collection c = ((IndexableCollection) solrCollection).getIndexedObject();
-            collectionList.add(c);
-        }
-        return collectionList;
-    }
-
     /**
      * Returns total collection archived items
      *
