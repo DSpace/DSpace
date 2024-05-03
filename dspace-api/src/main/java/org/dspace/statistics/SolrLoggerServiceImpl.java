@@ -1136,32 +1136,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         return response;
     }
 
-
-    /**
-     * String of IP and Ranges in IPTable as a Solr Query
-     */
-    protected String filterQuery = null;
-
-    @Override
-    public String getIgnoreSpiderIPs() {
-        if (filterQuery == null) {
-            StringBuilder query = new StringBuilder();
-            boolean first = true;
-            for (String ip : SpiderDetector.getSpiderIpAddresses()) {
-                if (first) {
-                    query.append(" AND ");
-                    first = false;
-                }
-
-                query.append(" NOT(ip: ").append(ip).append(")");
-            }
-            filterQuery = query.toString();
-        }
-
-        return filterQuery;
-
-    }
-
     @Override
     public void shardSolrIndex() throws IOException, SolrServerException {
         if (!(solr instanceof HttpSolrClient)) {

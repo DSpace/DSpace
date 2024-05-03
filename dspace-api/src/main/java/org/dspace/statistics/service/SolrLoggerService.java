@@ -262,13 +262,6 @@ public interface SolrLoggerService {
                                int facetMinCount, boolean defaultFilterQueries)
             throws SolrServerException, IOException;
 
-    /**
-     * Returns in a filterQuery string all the ip addresses that should be ignored
-     *
-     * @return a string query with ip addresses
-     */
-    public String getIgnoreSpiderIPs();
-
     public void shardSolrIndex() throws IOException, SolrServerException;
 
     public void reindexBitstreamHits(boolean removeDeletedBitstreams) throws Exception;

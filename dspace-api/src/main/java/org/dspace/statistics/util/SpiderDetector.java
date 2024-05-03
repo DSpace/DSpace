@@ -35,17 +35,6 @@ public class SpiderDetector {
     private SpiderDetector() { }
 
     /**
-     * Get an immutable Set representing all the Spider Addresses here
-     *
-     * @return a set of IP addresses as strings
-     */
-    public static Set<String> getSpiderIpAddresses() {
-
-        spiderDetectorService.loadSpiderIpAddresses();
-        return spiderDetectorService.getTable().toSet();
-    }
-
-    /**
      * Utility method which reads lines from a file & returns them in a Set.
      *
      * @param patternFile the location of our spider file
