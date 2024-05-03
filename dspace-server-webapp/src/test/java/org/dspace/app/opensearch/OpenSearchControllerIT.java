@@ -269,4 +269,32 @@ public class OpenSearchControllerIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isOk())
                    .andExpect(xpath("rss/channel/description").string("No Description"));
     }
+
+    @Test
+    public void scopeNotCommunityOrCollectionUUIDTest() throws Exception {
+        // Tests that a OpenSearch response with 1 result (equivalent to an
+        // unscoped request) is returned if the "scope" UUID is a
+        // validly-formatted UUID, but not a community or collection UUID.
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection collection1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                                           .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, collection1)
+                                           .withTitle("Boars at Yellowstone")
+                                           .withIssueDate("2017-10-17")
+                                           .withAuthor("Ballini, Andreas").withAuthor("Moriarti, Susan")
+                                           .build();
+
+        // UUID is valid, but not a community or collection UUID
+        String testUUID = "b68f0d1c-7316-41dc-835d-46b79b35642e";
+
+        getClient().perform(get("/opensearch/search")
+                   .param("scope", testUUID)
+                   .param("query", "*"))
+                   .andExpect(status().isOk())
+                   .andExpect(xpath("feed/totalResults").string("1"));
+    }
 }
