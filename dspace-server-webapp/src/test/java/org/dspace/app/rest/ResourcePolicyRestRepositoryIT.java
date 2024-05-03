@@ -80,8 +80,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
 
-        ResourcePolicyBuilder.createResourcePolicy(context).withDspaceObject(community).withAction(Constants.READ)
-            .withUser(admin).build();
+        ResourcePolicyBuilder.createResourcePolicy(context, admin, null)
+                             .withDspaceObject(community)
+                             .withAction(Constants.READ)
+                             .build();
         context.restoreAuthSystemState();
 
         String authToken = getAuthToken(admin.getEmail(), password);
@@ -94,8 +96,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
 
-        ResourcePolicyBuilder.createResourcePolicy(context).withDspaceObject(community).withAction(Constants.READ)
-            .withUser(admin).build();
+        ResourcePolicyBuilder.createResourcePolicy(context, admin, null)
+                             .withDspaceObject(community)
+                             .withAction(Constants.READ)
+                             .build();
         context.restoreAuthSystemState();
 
         getClient().perform(get("/api/authz/resourcepolicies")).andExpect(status().isUnauthorized());
@@ -112,10 +116,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson1, null)
             .withDspaceObject(community)
             .withAction(Constants.READ)
-            .withUser(eperson1)
             .build();
 
         context.restoreAuthSystemState();
@@ -144,10 +147,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null, groupAnonymous)
             .withDspaceObject(community)
             .withAction(Constants.READ)
-            .withGroup(groupAnonymous)
             .build();
 
         context.restoreAuthSystemState();
@@ -165,8 +167,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context).withDspaceObject(community)
-            .withAction(Constants.READ).withUser(eperson).build();
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
+                                                             .withDspaceObject(community)
+                                                             .withAction(Constants.READ)
+                                                             .build();
 
         context.restoreAuthSystemState();
 
@@ -201,10 +205,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         Collection collection = CollectionBuilder.createCollection(context, community)
             .withName("My collection").build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson1, null)
             .withDspaceObject(collection)
-            .withAction(Constants.WRITE)
-            .withUser(eperson1).build();
+            .withAction(Constants.WRITE).build();
 
         context.restoreAuthSystemState();
 
@@ -228,10 +231,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson1, null)
             .withDspaceObject(community)
-            .withAction(Constants.WRITE)
-            .withUser(eperson1).build();
+            .withAction(Constants.WRITE).build();
 
         context.restoreAuthSystemState();
 
@@ -262,10 +264,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         Collection collection = CollectionBuilder.createCollection(context, community)
             .withName("My collection").build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null, group1)
             .withDspaceObject(collection)
             .withAction(Constants.ADD)
-            .withGroup(group1)
             .build();
 
         context.restoreAuthSystemState();
@@ -297,15 +298,13 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
         Community community2 = CommunityBuilder.createCommunity(context).withName("My community_2").build();
 
-        ResourcePolicy resourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context, eperson1, null)
             .withDspaceObject(community)
-            .withAction(Constants.ADD)
-            .withUser(eperson1).build();
+            .withAction(Constants.ADD).build();
 
-        ResourcePolicy resourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context, eperson2, null)
             .withDspaceObject(community2)
-            .withAction(Constants.REMOVE)
-            .withUser(eperson2).build();
+            .withAction(Constants.REMOVE).build();
 
         context.restoreAuthSystemState();
 
@@ -336,20 +335,18 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         Collection collection = CollectionBuilder.createCollection(context, community).withName("My collection")
             .build();
 
-        ResourcePolicy resourcePolicyOfCommunity = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicyOfCommunity = ResourcePolicyBuilder.createResourcePolicy(context, eperson1, null)
             .withDspaceObject(community)
-            .withAction(Constants.READ)
-            .withUser(eperson1).build();
+            .withAction(Constants.READ).build();
 
-        ResourcePolicy secondResourcePolicyOfCommunity = ResourcePolicyBuilder.createResourcePolicy(context)
-            .withDspaceObject(community)
-            .withAction(Constants.REMOVE)
-            .withUser(eperson1).build();
+        ResourcePolicy secondResourcePolicyOfCommunity = ResourcePolicyBuilder
+                .createResourcePolicy(context, eperson1, null)
+                .withDspaceObject(community)
+                .withAction(Constants.REMOVE).build();
 
-        ResourcePolicy resourcePolicyOfCollection = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicyOfCollection = ResourcePolicyBuilder.createResourcePolicy(context, eperson1, null)
             .withDspaceObject(collection)
-            .withAction(Constants.REMOVE)
-            .withUser(eperson1).build();
+            .withAction(Constants.REMOVE).build();
 
         context.restoreAuthSystemState();
 
@@ -395,10 +392,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson1, null)
             .withDspaceObject(community)
-            .withAction(Constants.READ)
-            .withUser(eperson1).build();
+            .withAction(Constants.READ).build();
 
         context.restoreAuthSystemState();
 
@@ -437,15 +433,13 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Community community2 = CommunityBuilder.createCommunity(context).withName("My 2 community").build();
 
-        ResourcePolicy resourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context, eperson1, null)
             .withDspaceObject(community).withAction(Constants.WRITE)
-            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
-            .withUser(eperson1).build();
+            .withPolicyType(ResourcePolicy.TYPE_CUSTOM).build();
 
-        ResourcePolicy resourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context, eperson2, null)
             .withDspaceObject(community2).withAction(Constants.ADD)
-            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
-            .withUser(eperson2).build();
+            .withPolicyType(ResourcePolicy.TYPE_CUSTOM).build();
 
         context.restoreAuthSystemState();
 
@@ -474,16 +468,18 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Community community2 = CommunityBuilder.createCommunity(context).withName("My second community").build();
 
-        ResourcePolicy firstResourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
-            .withDspaceObject(community)
-            .withAction(Constants.ADMIN)
-            .withUser(eperson1).build();
+        ResourcePolicy firstResourcePolicyOfEPerson1 = ResourcePolicyBuilder
+                .createResourcePolicy(context, eperson1, null)
+                .withDspaceObject(community)
+                .withAction(Constants.ADMIN)
+                .build();
 
-        ResourcePolicy firstResourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context)
-            .withDspaceObject(community2)
-            .withAction(Constants.ADD)
-            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
-            .withUser(eperson2).build();
+        ResourcePolicy firstResourcePolicyOfEPerson2 = ResourcePolicyBuilder
+                .createResourcePolicy(context, eperson2, null)
+                .withDspaceObject(community2)
+                .withAction(Constants.ADD)
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .build();
 
         ResourcePolicy resourcePolicyAnonymous = authorizeService
             .findByTypeGroupAction(context, community, EPersonServiceFactory.getInstance()
@@ -528,20 +524,23 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Community community2 = CommunityBuilder.createCommunity(context).withName("My 2 community").build();
 
-        ResourcePolicy firstResourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
-            .withDspaceObject(community)
-            .withAction(Constants.ADMIN)
-            .withUser(eperson1).build();
+        ResourcePolicy firstResourcePolicyOfEPerson1 = ResourcePolicyBuilder
+                .createResourcePolicy(context, eperson1, null)
+                .withDspaceObject(community)
+                .withAction(Constants.ADMIN)
+                .build();
 
-        ResourcePolicy firstResourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context)
-            .withDspaceObject(community)
-            .withAction(Constants.ADD)
-            .withUser(eperson2).build();
+        ResourcePolicy firstResourcePolicyOfEPerson2 = ResourcePolicyBuilder
+                .createResourcePolicy(context, eperson2, null)
+                .withDspaceObject(community)
+                .withAction(Constants.ADD)
+                .build();
 
-        ResourcePolicy secondResourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context)
-            .withDspaceObject(community2)
-            .withAction(Constants.ADD)
-            .withUser(eperson2).build();
+        ResourcePolicy secondResourcePolicyOfEPerson2 = ResourcePolicyBuilder
+                .createResourcePolicy(context, eperson2, null)
+                .withDspaceObject(community2)
+                .withAction(Constants.ADD)
+                .build();
 
         context.restoreAuthSystemState();
 
@@ -592,28 +591,32 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
 
 
-        ResourcePolicy firstResourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
-            .withDspaceObject(community)
-            .withAction(Constants.ADMIN)
-            .withUser(eperson1).build();
+        ResourcePolicy firstResourcePolicyOfEPerson1 = ResourcePolicyBuilder
+                .createResourcePolicy(context, eperson1, null)
+                .withDspaceObject(community)
+                .withAction(Constants.ADMIN)
+                .build();
 
-        ResourcePolicy firstResourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context)
-            .withDspaceObject(community)
-            .withAction(Constants.ADD)
-            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
-            .withUser(eperson2).build();
+        ResourcePolicy firstResourcePolicyOfEPerson2 = ResourcePolicyBuilder
+                .createResourcePolicy(context, eperson2, null)
+                .withDspaceObject(community)
+                .withAction(Constants.ADD)
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .build();
 
-        ResourcePolicy firstResourcePolicyOfEPerson3 = ResourcePolicyBuilder.createResourcePolicy(context)
-            .withDspaceObject(community)
-            .withAction(Constants.DELETE)
-            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
-            .withUser(eperson3).build();
+        ResourcePolicy firstResourcePolicyOfEPerson3 = ResourcePolicyBuilder
+                .createResourcePolicy(context, eperson3, null)
+                .withDspaceObject(community)
+                .withAction(Constants.DELETE)
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
+                .build();
 
-        ResourcePolicy firstResourcePolicyOfEPerson4 = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy firstResourcePolicyOfEPerson4 = ResourcePolicyBuilder
+                .createResourcePolicy(context, eperson4, null)
                 .withDspaceObject(community)
                 .withAction(Constants.WRITE)
                 .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
-                .withUser(eperson4).build();
+                .build();
 
         ResourcePolicy resourcePolicyAnonymous = authorizeService
             .findByTypeGroupAction(context, community, EPersonServiceFactory.getInstance()
@@ -701,10 +704,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson1, null)
             .withDspaceObject(community)
-            .withAction(Constants.READ)
-            .withUser(eperson1).build();
+            .withAction(Constants.READ).build();
 
         context.restoreAuthSystemState();
 
@@ -742,17 +744,15 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Community community2 = CommunityBuilder.createCommunity(context).withName("My 2 community").build();
 
-        ResourcePolicy resourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicyOfEPerson1 = ResourcePolicyBuilder.createResourcePolicy(context, eperson1, null)
             .withDspaceObject(community)
             .withAction(Constants.REMOVE)
-            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
-            .withUser(eperson1).build();
+            .withPolicyType(ResourcePolicy.TYPE_CUSTOM).build();
 
-        ResourcePolicy resourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicyOfEPerson2 = ResourcePolicyBuilder.createResourcePolicy(context, eperson2, null)
             .withDspaceObject(community2)
             .withAction(Constants.ADD)
-            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
-            .withUser(eperson2).build();
+            .withPolicyType(ResourcePolicy.TYPE_CUSTOM).build();
 
         context.restoreAuthSystemState();
 
@@ -791,25 +791,22 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withName("My collection")
             .build();
 
-        ResourcePolicy firstResourcePolicyOfGroup1 = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy firstResourcePolicyOfGroup1 = ResourcePolicyBuilder.createResourcePolicy(context, null, group1)
             .withDspaceObject(community)
-            .withAction(Constants.ADD)
-            .withGroup(group1).build();
+            .withAction(Constants.ADD).build();
 
-        ResourcePolicy secondResourcePolicyOfGroup1 = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy secondResourcePolicyOfGroup1 = ResourcePolicyBuilder.createResourcePolicy(context, null, group1)
             .withDspaceObject(community)
-            .withAction(Constants.READ)
-            .withGroup(group1).build();
+            .withAction(Constants.READ).build();
 
-        ResourcePolicy collectionResourcePolicyOfGroup1 = ResourcePolicyBuilder.createResourcePolicy(context)
-            .withDspaceObject(collection)
-            .withAction(Constants.WRITE)
-            .withGroup(group1).build();
+        ResourcePolicy collectionResourcePolicyOfGroup1 = ResourcePolicyBuilder
+                .createResourcePolicy(context, null, group1)
+                .withDspaceObject(collection)
+                .withAction(Constants.WRITE).build();
 
-        ResourcePolicy firstResourcePolicyOfGroup2 = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy firstResourcePolicyOfGroup2 = ResourcePolicyBuilder.createResourcePolicy(context, null, group2)
             .withDspaceObject(community2)
-            .withAction(Constants.ADD)
-            .withGroup(group2).build();
+            .withAction(Constants.ADD).build();
 
         context.restoreAuthSystemState();
 
@@ -857,15 +854,13 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
         Community community2 = CommunityBuilder.createCommunity(context).withName("My second community").build();
 
-        ResourcePolicy firstResourcePolicyOfGroup1 = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy firstResourcePolicyOfGroup1 = ResourcePolicyBuilder.createResourcePolicy(context, null, group1)
             .withDspaceObject(community)
-            .withAction(Constants.ADD)
-            .withGroup(group1).build();
+            .withAction(Constants.ADD).build();
 
-        ResourcePolicy secondResourcePolicyOfGroup1 = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy secondResourcePolicyOfGroup1 = ResourcePolicyBuilder.createResourcePolicy(context, null, group1)
             .withDspaceObject(community2)
-            .withAction(Constants.WRITE)
-            .withGroup(group1).build();
+            .withAction(Constants.WRITE).build();
 
         context.restoreAuthSystemState();
 
@@ -913,10 +908,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
 
-        ResourcePolicy firstResourcePolicyOfGroup1 = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy firstResourcePolicyOfGroup1 = ResourcePolicyBuilder.createResourcePolicy(context, null, group1)
             .withDspaceObject(community)
-            .withAction(Constants.ADD)
-            .withGroup(group1).build();
+            .withAction(Constants.ADD).build();
 
         context.restoreAuthSystemState();
 
@@ -953,10 +947,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
 
-        ResourcePolicy resourcePolicyOfGroup1 = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicyOfGroup1 = ResourcePolicyBuilder.createResourcePolicy(context, null, group1)
             .withDspaceObject(community).withAction(Constants.WRITE)
-            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
-            .withGroup(group1).build();
+            .withPolicyType(ResourcePolicy.TYPE_CUSTOM).build();
 
         context.restoreAuthSystemState();
 
@@ -981,10 +974,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
 
-        ResourcePolicy resourcePolicyOfGroup1 = ResourcePolicyBuilder.createResourcePolicy(context)
-            .withDspaceObject(community).withAction(Constants.WRITE)
-            .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
-            .withGroup(groupAnonymous).build();
+        ResourcePolicy resourcePolicyOfGroup1 = ResourcePolicyBuilder
+                .createResourcePolicy(context, null, groupAnonymous)
+                .withDspaceObject(community).withAction(Constants.WRITE)
+                .withPolicyType(ResourcePolicy.TYPE_CUSTOM).build();
 
         context.restoreAuthSystemState();
 
@@ -1005,7 +998,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         AtomicReference<Integer> idRef = new AtomicReference<Integer>();
         try {
             Community community = CommunityBuilder.createCommunity(context)
-                .withName("My commynity")
+                .withName("My community")
                 .build();
 
             EPerson eperson1 = EPersonBuilder.createEPerson(context)
@@ -1051,6 +1044,98 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         } finally {
             ResourcePolicyBuilder.delete(idRef.get());
         }
+    }
+    @Test
+    public void createWithGroupTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        AtomicReference<Integer> idRef = new AtomicReference<Integer>();
+        try {
+            Community community = CommunityBuilder.createCommunity(context)
+                .withName("My community")
+                .build();
+
+            EPerson eperson1 = EPersonBuilder.createEPerson(context)
+                .withEmail("eperson1@mail.com")
+                .withPassword("qwerty01")
+                .build();
+
+            Group group1 = GroupBuilder.createGroup(context)
+                                       .withName("Group 1")
+                                       .addMember(eperson1)
+                                       .build();
+
+            context.restoreAuthSystemState();
+
+            ObjectMapper mapper = new ObjectMapper();
+            ResourcePolicyRest resourcePolicyRest = new ResourcePolicyRest();
+
+            resourcePolicyRest.setPolicyType(ResourcePolicy.TYPE_SUBMISSION);
+            resourcePolicyRest.setAction(Constants.actionText[Constants.READ]);
+
+            String authToken = getAuthToken(admin.getEmail(), password);
+            getClient(authToken)
+                .perform(post("/api/authz/resourcepolicies")
+                    .content(mapper.writeValueAsBytes(resourcePolicyRest))
+                    .param("resource", community.getID().toString())
+                    .param("group", group1.getID().toString())
+                    .param("projections", "full")
+                    .contentType(contentType))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$", ResourcePolicyMatcher.matchFullEmbeds()))
+                .andExpect(jsonPath("$", Matchers.allOf(
+                    hasJsonPath("$.name", is(resourcePolicyRest.getName())),
+                    hasJsonPath("$.description", is(resourcePolicyRest.getDescription())),
+                    hasJsonPath("$.policyType", is(resourcePolicyRest.getPolicyType())),
+                    hasJsonPath("$.action", is(resourcePolicyRest.getAction())),
+                    hasJsonPath("$.startDate", is(resourcePolicyRest.getStartDate())),
+                    hasJsonPath("$.endDate", is(resourcePolicyRest.getEndDate())),
+                    hasJsonPath("$.type", is(resourcePolicyRest.getType())))))
+                .andDo(result -> idRef.set(read(result.getResponse().getContentAsString(), "$.id")));
+
+            String authToken1 = getAuthToken(eperson1.getEmail(), "qwerty01");
+            getClient(authToken1).perform(get("/api/authz/resourcepolicies/" + idRef.get()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._links.self.href",
+                    Matchers.containsString("/api/authz/resourcepolicies/" + idRef.get())));
+        } finally {
+            ResourcePolicyBuilder.delete(idRef.get());
+        }
+    }
+
+    @Test
+    public void createWithoutGroupOrPersonTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context)
+                                              .withName("My commynity")
+                                              .build();
+
+
+        context.restoreAuthSystemState();
+
+        ObjectMapper mapper = new ObjectMapper();
+        ResourcePolicyRest resourcePolicyRest = new ResourcePolicyRest();
+
+        resourcePolicyRest.setPolicyType(ResourcePolicy.TYPE_SUBMISSION);
+        resourcePolicyRest.setAction(Constants.actionText[Constants.ADMIN]);
+
+        String authToken = getAuthToken(admin.getEmail(), password);
+        getClient(authToken).perform(post("/api/authz/resourcepolicies")
+                                    .content(mapper.writeValueAsBytes(resourcePolicyRest))
+                                    .param("resource", community.getID().toString())
+                                    .contentType(contentType))
+                   .andExpect(status().isBadRequest());
+
+        getClient(authToken).perform(get("/api/authz/resourcepolicies/search/resource")
+                                             .param("uuid", community.getID().toString())
+                                             .param("action", "ADMIN"))
+                            .andExpect(status().isOk())
+                            .andExpect(content().contentType(contentType))
+                            .andExpect(jsonPath("$._links.self.href",
+                                                Matchers.containsString("api/authz/resourcepolicies/search/resource")))
+                            .andExpect(jsonPath("$.page.totalElements", is(0)));
     }
 
     @Test
@@ -1143,9 +1228,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withName("My community")
             .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson1, null)
             .withDspaceObject(community)
-            .withUser(eperson1)
             .withAction(Constants.ADMIN)
             .build();
 
@@ -1170,11 +1254,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withPassword("qwerty01")
             .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson1, null)
             .withDspaceObject(community)
             .withAction(Constants.DELETE)
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
-            .withUser(eperson1)
             .build();
 
         context.restoreAuthSystemState();
@@ -1200,10 +1283,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         Collection collection = CollectionBuilder.createCollection(context, community)
             .withName("My collection").build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson1, null)
             .withDspaceObject(collection)
-            .withAction(Constants.ADD)
-            .withUser(eperson1).build();
+            .withAction(Constants.ADD).build();
 
         context.restoreAuthSystemState();
 
@@ -1253,10 +1335,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Date data = calendar.getTime();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
+                   EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withAction(Constants.READ)
             .withDspaceObject(publicItem1)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withStartDate(data)
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
@@ -1323,10 +1405,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Date date = calendar.getTime();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
+                           EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withAction(Constants.READ)
             .withDspaceObject(publicItem1)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withEndDate(date)
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
@@ -1385,10 +1467,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
+                       EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withAction(Constants.READ)
             .withDspaceObject(publicItem1)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
@@ -1446,13 +1528,12 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                                       .withTitle("Public item")
                                       .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context,null,
+                                                           EPersonServiceFactory.getInstance().getGroupService()
+                                                                                 .findByName(context, Group.ANONYMOUS)
+                                                                                   )
                                                              .withAction(Constants.READ)
                                                              .withDspaceObject(publicItem1)
-                                                             .withGroup(
-                                                                 EPersonServiceFactory.getInstance().getGroupService()
-                                                                                      .findByName(context,
-                                                                                          Group.ANONYMOUS))
                                                              .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                                                              .build();
 
@@ -1513,10 +1594,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Date data = calendar.getTime();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
+                       EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withAction(Constants.READ)
             .withDspaceObject(publicItem1)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withStartDate(data)
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
@@ -1574,10 +1655,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Date date = calendar.getTime();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
+                           EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withAction(Constants.READ)
             .withDspaceObject(publicItem1)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withStartDate(date)
             .withDescription("my description")
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
@@ -1625,7 +1706,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Date date = calendar.getTime();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
             .withAction(Constants.WRITE)
             .withDspaceObject(item)
             .withStartDate(date)
@@ -1687,10 +1768,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Date date = calendar.getTime();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
+                       EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withAction(Constants.READ)
             .withDspaceObject(item)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withStartDate(date)
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
@@ -1793,10 +1874,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Date endDate = calendarEndDate.getTime();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson1, null)
             .withAction(Constants.READ)
             .withDspaceObject(publicItem1)
-            .withUser(eperson1)
             .withStartDate(startDate)
             .withEndDate(endDate)
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
@@ -1851,10 +1931,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
+                       EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withAction(Constants.READ)
             .withDspaceObject(publicItem1)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withDescription("my description")
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
@@ -1903,10 +1983,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
+                       EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withAction(Constants.READ)
             .withDspaceObject(item)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
@@ -1954,11 +2034,11 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
+                           EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withAction(Constants.READ)
             .withDspaceObject(item)
             .withDescription("my description")
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
@@ -1996,7 +2076,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Item item = ItemBuilder.createItem(context, collection).build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
             .withAction(Constants.WRITE)
             .withDspaceObject(item)
             .withDescription("My Description")
@@ -2042,10 +2122,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
+                       EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withAction(Constants.READ)
             .withDspaceObject(item)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withDescription("My Description")
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
@@ -2098,10 +2178,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
+                           EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withAction(Constants.READ)
             .withDspaceObject(publicItem1)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withDescription("my description")
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
@@ -2146,10 +2226,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
+                       EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withAction(Constants.READ)
             .withDspaceObject(myItem)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withName("My name")
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
@@ -2197,10 +2277,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
+                       EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withAction(Constants.READ)
             .withDspaceObject(myItem)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withName("My name")
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
@@ -2245,10 +2325,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
+                       EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withAction(Constants.READ)
             .withDspaceObject(myItem)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
@@ -2290,10 +2370,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
             .withAction(Constants.READ)
             .withDspaceObject(myItem)
-            .withUser(eperson)
             .withName("My Name")
             .build();
 
@@ -2334,10 +2413,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
             .withAction(Constants.READ)
             .withDspaceObject(myItem)
-            .withUser(eperson)
             .withName("My name")
             .withPolicyType(ResourcePolicy.TYPE_SUBMISSION)
             .build();
@@ -2374,7 +2452,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Item item = ItemBuilder.createItem(context, collection).build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
             .withAction(Constants.WRITE)
             .withDspaceObject(item)
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
@@ -2413,10 +2491,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
             .withAction(Constants.READ)
             .withDspaceObject(item)
-            .withUser(eperson)
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
@@ -2464,10 +2541,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
             .withAction(Constants.READ)
             .withDspaceObject(publicItem1)
-            .withUser(eperson)
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
@@ -2500,10 +2576,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
             .withAction(Constants.READ)
             .withDspaceObject(myItem)
-            .withUser(eperson)
             .withName("My Name")
             .build();
 
@@ -2545,10 +2620,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
             .withAction(Constants.READ)
             .withDspaceObject(myItem)
-            .withUser(eperson)
             .withName("My Name")
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
@@ -2590,10 +2664,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
             .withAction(Constants.READ)
             .withDspaceObject(myItem)
-            .withUser(eperson)
             .withName("My name")
             .withPolicyType(ResourcePolicy.TYPE_SUBMISSION)
             .build();
@@ -2632,7 +2705,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Item item = ItemBuilder.createItem(context, collection).build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
             .withAction(Constants.WRITE)
             .withDspaceObject(item)
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
@@ -2672,10 +2745,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
             .withAction(Constants.READ)
             .withDspaceObject(item)
-            .withUser(eperson)
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
@@ -2722,10 +2794,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
             .withAction(Constants.READ)
             .withDspaceObject(publicItem1)
-            .withUser(eperson)
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
@@ -2763,11 +2834,11 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
+                       EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withAction(Constants.READ)
             .withDspaceObject(myItem)
             .withName("My name")
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
@@ -2811,10 +2882,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
+                       EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withAction(Constants.READ)
             .withDspaceObject(myItem)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withName("My Name")
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
@@ -2860,10 +2931,10 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
+                       EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withAction(Constants.READ)
             .withDspaceObject(myItem)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withName("My Name")
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
@@ -2923,12 +2994,12 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Date endDate = calendarEndDate.getTime();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
+                       EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withAction(Constants.READ)
             .withDspaceObject(publicItem1)
             .withStartDate(startDate)
             .withEndDate(endDate)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
@@ -3013,12 +3084,12 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Date endDate = calendarEndDate.getTime();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
+                       EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withAction(Constants.READ)
             .withDspaceObject(publicItem1)
             .withName("My Name")
             .withEndDate(endDate)
-            .withGroup(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
@@ -3092,25 +3163,21 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withName("My collection")
             .build();
 
-        ResourcePolicy rpCommunityADD = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy rpCommunityADD = ResourcePolicyBuilder.createResourcePolicy(context, null, group1)
             .withDspaceObject(community)
-            .withAction(Constants.ADD)
-            .withGroup(group1).build();
+            .withAction(Constants.ADD).build();
 
-        ResourcePolicy rpCommunityREAD = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy rpCommunityREAD = ResourcePolicyBuilder.createResourcePolicy(context, null, group1)
             .withDspaceObject(community)
-            .withAction(Constants.READ)
-            .withGroup(group1).build();
+            .withAction(Constants.READ).build();
 
-        ResourcePolicy rpCommunity2READ = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy rpCommunity2READ = ResourcePolicyBuilder.createResourcePolicy(context, null, group1)
             .withDspaceObject(community2)
-            .withAction(Constants.READ)
-            .withGroup(group1).build();
+            .withAction(Constants.READ).build();
 
-        ResourcePolicy rpCollectionWRITE = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy rpCollectionWRITE = ResourcePolicyBuilder.createResourcePolicy(context, null, group1)
             .withDspaceObject(collection)
-            .withAction(Constants.WRITE)
-            .withGroup(group1).build();
+            .withAction(Constants.WRITE).build();
 
         context.restoreAuthSystemState();
 
@@ -3213,10 +3280,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                                           .withName("Collection 1")
                                           .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
                                             .withAction(Constants.ADD)
                                             .withDspaceObject(col)
-                                            .withUser(eperson)
                                             .withDescription("My Description")
                                             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                                             .build();
@@ -3260,10 +3326,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                                           .withName("Collection 1")
                                           .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
                                             .withAction(Constants.ADD)
                                             .withDspaceObject(col)
-                                            .withUser(eperson)
                                             .withDescription("My Description")
                                             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                                             .build();
@@ -3308,10 +3373,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                                           .withName("Collection 1")
                                           .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
                                             .withAction(Constants.ADD)
                                             .withDspaceObject(col)
-                                            .withUser(eperson)
                                             .withDescription("My Description")
                                             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                                             .build();
@@ -3358,10 +3422,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                                           .withName("Collection 1")
                                           .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null, originGroup)
                                             .withAction(Constants.ADD)
                                             .withDspaceObject(col)
-                                            .withGroup(originGroup)
                                             .withDescription("My Description")
                                             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                                             .build();
@@ -3408,10 +3471,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                                           .withName("Collection 1")
                                           .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null, originGroup)
                                             .withAction(Constants.ADD)
                                             .withDspaceObject(col)
-                                            .withGroup(originGroup)
                                             .withDescription("My Description")
                                             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                                             .build();
@@ -3459,10 +3521,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                                           .withName("Collection 1")
                                           .build();
 
-        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null, originGroup)
                                             .withAction(Constants.ADD)
                                             .withDspaceObject(col)
-                                            .withGroup(originGroup)
                                             .withDescription("My Description")
                                             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
                                             .build();
@@ -3501,10 +3562,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                                               .withName("My community")
                                               .build();
 
-        ResourcePolicy resourcePolicyOfEPerson = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicyOfEPerson = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
                                                              .withDspaceObject(community)
                                                              .withAction(Constants.READ)
-                                                             .withUser(eperson)
                                                              .build();
         context.restoreAuthSystemState();
 
@@ -3534,10 +3594,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                                               .withName("My community")
                                               .build();
 
-        ResourcePolicy resourcePolicyOfGroup = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicyOfGroup = ResourcePolicyBuilder.createResourcePolicy(context, null, group)
                                                                     .withDspaceObject(community)
-                                                                    .withAction(Constants.ADD)
-                                                                    .withGroup(group).build();
+                                                                    .withAction(Constants.ADD).build();
 
         context.restoreAuthSystemState();
 
@@ -3597,10 +3656,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                                               .build();
 
 
-        ResourcePolicy resourcePolicyOfGroup = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicyOfGroup = ResourcePolicyBuilder.createResourcePolicy(context, null, group)
                                                                     .withDspaceObject(community)
-                                                                    .withAction(Constants.ADD)
-                                                                    .withGroup(group).build();
+                                                                    .withAction(Constants.ADD).build();
         context.restoreAuthSystemState();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
@@ -3622,10 +3680,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                                               .withName("My community")
                                               .build();
 
-        ResourcePolicy resourcePolicyOfGroup = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy resourcePolicyOfGroup = ResourcePolicyBuilder.createResourcePolicy(context, null, group1)
                                                                     .withDspaceObject(community)
-                                                                    .withAction(Constants.ADD)
-                                                                    .withGroup(group1).build();
+                                                                    .withAction(Constants.ADD).build();
         context.restoreAuthSystemState();
 
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
@@ -3642,10 +3699,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
 
-        ResourcePolicy rpOfEPerson = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy rpOfEPerson = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
                                                           .withDspaceObject(community)
                                                           .withAction(Constants.READ)
-                                                          .withUser(eperson)
                                                           .build();
         context.restoreAuthSystemState();
 
@@ -3671,10 +3727,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Community community = CommunityBuilder.createCommunity(context).withName("My community").build();
 
-        ResourcePolicy rpOfEPerson = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy rpOfEPerson = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
                                                           .withDspaceObject(community)
                                                           .withAction(Constants.READ)
-                                                          .withUser(eperson)
                                                           .build();
         context.restoreAuthSystemState();
 

@@ -644,7 +644,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         // Replace anon read policy on bundle of bitstream with ePerson READ policy
         resourcePolicyService.removePolicies(context, bitstream.getBundles().get(0), Constants.READ);
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(eperson)
+        ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
                              .withAction(Constants.READ)
                              .withDspaceObject(bitstream.getBundles().get(0)).build();
 
@@ -707,9 +707,9 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         // Replace anon read policy on bundle of bitstream with ePerson READ policy
         resourcePolicyService.removePolicies(context, bitstream.getBundles().get(0), Constants.READ);
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(eperson)
-            .withAction(Constants.READ)
-            .withDspaceObject(bitstream.getBundles().get(0)).build();
+        ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
+                             .withAction(Constants.READ)
+                             .withDspaceObject(bitstream.getBundles().get(0)).build();
 
         context.restoreAuthSystemState();
 
@@ -832,7 +832,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         // Replace anon read policy on item of bitstream with ePerson READ policy
         resourcePolicyService.removePolicies(context, publicItem1, Constants.READ);
-        ResourcePolicyBuilder.createResourcePolicy(context).withUser(eperson)
+        ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
                              .withAction(Constants.READ)
                              .withDspaceObject(publicItem1).build();
 
@@ -1480,8 +1480,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                         .build();
         }
 
-        ResourcePolicyBuilder.createResourcePolicy(context)
-                             .withUser(eperson)
+        ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
                              .withAction(WRITE)
                              .withDspaceObject(col1)
                              .build();

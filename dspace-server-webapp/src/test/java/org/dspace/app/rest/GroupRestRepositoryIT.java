@@ -3461,10 +3461,10 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                                            .build();
 
         Group adminGroup = groupService.findByName(context, Group.ADMIN);
-        ResourcePolicyBuilder.createResourcePolicy(context).withAction(Constants.DEFAULT_ITEM_READ)
-                .withGroup(adminGroup).withDspaceObject(child1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withAction(Constants.DEFAULT_ITEM_READ)
-                .withGroup(adminGroup).withDspaceObject(col1).build();
+        ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup).withAction(Constants.DEFAULT_ITEM_READ)
+                             .withDspaceObject(child1).build();
+        ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup).withAction(Constants.DEFAULT_ITEM_READ)
+                             .withDspaceObject(col1).build();
         context.restoreAuthSystemState();
 
         String tokenAdminComm = getAuthToken(adminChild1.getEmail(), password);
@@ -3524,10 +3524,12 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                                            .build();
 
         Group adminGroup = groupService.findByName(context, Group.ADMIN);
-        ResourcePolicyBuilder.createResourcePolicy(context).withAction(Constants.DEFAULT_BITSTREAM_READ)
-                .withGroup(adminGroup).withDspaceObject(child1).build();
-        ResourcePolicyBuilder.createResourcePolicy(context).withAction(Constants.DEFAULT_BITSTREAM_READ)
-                .withGroup(adminGroup).withDspaceObject(col1).build();
+        ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
+                             .withAction(Constants.DEFAULT_BITSTREAM_READ)
+                             .withDspaceObject(child1).build();
+        ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
+                             .withAction(Constants.DEFAULT_BITSTREAM_READ)
+                             .withDspaceObject(col1).build();
         context.restoreAuthSystemState();
 
         String tokenAdminComm = getAuthToken(adminChild1.getEmail(), password);
