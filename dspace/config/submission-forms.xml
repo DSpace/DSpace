@@ -393,10 +393,10 @@
                     <label>Big file URL</label>
                     <input-type>onebox</input-type>
                     <hint>
-                        The actual maximum upload size of the file is 4GB. To upload the file bigger than maximum
-                        upload size type the URL of that big file. Admin must know URL to that bitstream file.
-                        Then click on the 'Save' button and the file will start to upload. The file will be loaded
-                        from the '/temp' folder of the server. Example: /tomcat/temp/bitstream.png
+                        The actual maximum upload size of the file is 4GB. To upload a file bigger than the
+                        maximum upload size, enter the URL of that large file. The admin must know the URL
+                        of that bitstream file. Then, click on the 'Save' button, and the file will start
+                        to upload. The file path must be an absolute path.
                     </hint>
                     <required></required>
                     <acl>
