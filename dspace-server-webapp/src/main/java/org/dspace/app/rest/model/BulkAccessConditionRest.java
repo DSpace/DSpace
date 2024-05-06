@@ -23,7 +23,7 @@ public class BulkAccessConditionRest extends BaseObjectRest<String> {
     private static final long serialVersionUID = -7708437586052984082L;
 
     public static final String NAME = "bulkaccessconditionoption";
-    public static final String PLURAL = "bulkaccessconditionoptions";
+    public static final String PLURAL_NAME = "bulkaccessconditionoptions";
     public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
 
     private String id;
@@ -67,6 +67,11 @@ public class BulkAccessConditionRest extends BaseObjectRest<String> {
     @Override
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     @Override

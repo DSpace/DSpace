@@ -4,7 +4,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
        default-lazy-init="true">
 
-    <!-- Hibernate 4 Configuration -->
+    <!-- Hibernate Configuration -->
     <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean" lazy-init="true">
         <!-- Load most Hibernate settings from hibernate.cfg.xml -->
         <property name="configLocation" value="file:${dspace.dir}/config/hibernate.cfg.xml"/>

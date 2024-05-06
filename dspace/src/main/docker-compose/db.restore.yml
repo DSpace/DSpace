@@ -6,8 +6,6 @@
 # http://www.dspace.org/license/
 #
 
-version: "3.7"
-
 #
 # Overrides the default "dspacedb" container behavior to load a local SQL file into PostgreSQL.
 #

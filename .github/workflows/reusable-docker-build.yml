@@ -1,0 +1,235 @@
+#
+# DSpace's reusable Docker build/push workflow.
+#
+# This is used by docker.yml for all Docker image builds
+name: Reusable DSpace Docker Build
+
+on:
+  workflow_call:
+    # Possible Inputs to this reusable job
+    inputs:
+      # Build name/id for this Docker build. Used for digest storage to avoid digest overlap between builds.
+      build_id:
+        required: true
+        type: string
+      # Requires the image name to build (e.g dspace/dspace-test)
+      image_name:
+        required: true
+        type: string
+      # Optionally the path to the Dockerfile to use for the build. (Default is [dockerfile_context]/Dockerfile)
+      dockerfile_path:
+        required: false
+        type: string
+      # Optionally the context directory to build the Dockerfile within. Defaults to "." (current directory)
+      dockerfile_context:
+        required: false
+        type: string
+        default: '.'
+      # Optionally a list of "additional_contexts" to pass to Dockerfile. Defaults to empty
+      dockerfile_additional_contexts:
+        required: false
+        type: string
+        default: ''
+      # If Docker image should have additional tag flavor details (e.g. a suffix), it may be passed in.
+      tags_flavor:
+        required: false
+        type: string
+    secrets:
+      # Requires that Docker login info be passed in as secrets.
+      DOCKER_USERNAME:
+        required: true
+      DOCKER_ACCESS_TOKEN:
+        required: true
+      # These URL secrets are optional. When specified & branch checks match, the redeployment code below will trigger.
+      # Therefore builds which need to trigger redeployment MUST specify these URLs. All others should leave them empty.
+      REDEPLOY_SANDBOX_URL:
+        required: false
+      REDEPLOY_DEMO_URL:
+        required: false
+
+# Define shared default settings as environment variables
+env:
+  IMAGE_NAME: ${{ inputs.image_name }}
+  # Define tags to use for Docker images based on Git tags/branches (for docker/metadata-action)
+  # For a new commit on default branch (main), use the literal tag 'latest' on Docker image.
+  # For a new commit on other branches, use the branch name as the tag for Docker image.
+  # For a new tag, copy that tag name as the tag for Docker image.
+  IMAGE_TAGS: |
+    type=raw,value=latest,enable=${{ github.ref_name == github.event.repository.default_branch }}
+    type=ref,event=branch,enable=${{ github.ref_name != github.event.repository.default_branch }}
+    type=ref,event=tag
+  # Define default tag "flavor" for docker/metadata-action per
+  # https://github.com/docker/metadata-action#flavor-input
+  # We manage the 'latest' tag ourselves to the 'main' branch (see settings above)
+  TAGS_FLAVOR: |
+    latest=false
+    ${{ inputs.tags_flavor }}
+  # When these URL variables are specified & required branch matches, then the sandbox or demo site will be redeployed.
+  # See "Redeploy" steps below for more details.
+  REDEPLOY_SANDBOX_URL: ${{ secrets.REDEPLOY_SANDBOX_URL }}
+  REDEPLOY_DEMO_URL: ${{ secrets.REDEPLOY_DEMO_URL }}
+  # Current DSpace branches (and architecture) which are deployed to demo.dspace.org & sandbox.dspace.org respectively
+  DEPLOY_DEMO_BRANCH: 'dspace-7_x'
+  DEPLOY_SANDBOX_BRANCH: 'main'
+  DEPLOY_ARCH: 'linux/amd64'
+
+jobs:
+  docker-build:
+
+    strategy:
+      matrix:
+        # Architectures / Platforms for which we will build Docker images
+        arch: [ 'linux/amd64', 'linux/arm64' ]
+        os: [ ubuntu-latest ]
+        isPr:
+          - ${{ github.event_name == 'pull_request' }}
+        # If this is a PR, we ONLY build for AMD64. For PRs we only do a sanity check test to ensure Docker builds work.
+        # The below exclude therefore ensures we do NOT build ARM64 for PRs.
+        exclude:
+          - isPr: true
+            os: ubuntu-latest
+            arch: linux/arm64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      # This step converts the slashes in the "arch" matrix values above into dashes & saves to env.ARCH_NAME
+      # E.g. "linux/amd64" becomes "linux-amd64"
+      # This is necessary because all upload artifacts CANNOT have special chars (like slashes)
+      - name: Prepare
+        run: |
+          platform=${{ matrix.arch }}
+          echo "ARCH_NAME=${platform//\//-}" >> $GITHUB_ENV
+
+      # https://github.com/actions/checkout
+      - name: Checkout codebase
+        uses: actions/checkout@v4
+
+      # https://github.com/docker/setup-buildx-action
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # https://github.com/docker/setup-qemu-action
+      - name: Set up QEMU emulation to build for multiple architectures
+        uses: docker/setup-qemu-action@v3
+
+      # https://github.com/docker/login-action
+      - name: Login to DockerHub
+        # Only login if not a PR, as PRs only trigger a Docker build and not a push
+        if: ${{ ! matrix.isPr }}
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+
+      # https://github.com/docker/metadata-action
+      # Get Metadata for docker_build_deps step below
+      - name: Sync metadata (tags, labels) from GitHub to Docker for image
+        id: meta_build
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: ${{ env.IMAGE_TAGS }}
+          flavor: ${{ env.TAGS_FLAVOR }}
+
+      # https://github.com/docker/build-push-action
+      - name: Build and push image
+        id: docker_build
+        uses: docker/build-push-action@v5
+        with:
+          build-contexts: |
+            ${{ inputs.dockerfile_additional_contexts }}
+          context: ${{ inputs.dockerfile_context }}
+          file: ${{ inputs.dockerfile_path }}
+          platforms: ${{ matrix.arch }}
+          # For pull requests, we run the Docker build (to ensure no PR changes break the build),
+          # but we ONLY do an image push to DockerHub if it's NOT a PR
+          push: ${{ ! matrix.isPr }}
+          # Use tags / labels provided by 'docker/metadata-action' above
+          tags: ${{ steps.meta_build.outputs.tags }}
+          labels: ${{ steps.meta_build.outputs.labels }}
+
+      # Export the digest of Docker build locally (for non PRs only)
+      - name: Export Docker build digest
+        if: ${{ ! matrix.isPr }}
+        run: |
+            mkdir -p /tmp/digests
+            digest="${{ steps.docker_build.outputs.digest }}"
+            touch "/tmp/digests/${digest#sha256:}"
+
+      # Upload digest to an artifact, so that it can be used in manifest below
+      - name: Upload Docker build digest to artifact
+        if: ${{ ! matrix.isPr }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ inputs.build_id }}-${{ env.ARCH_NAME }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+      # If this build is NOT a PR and passed in a REDEPLOY_SANDBOX_URL secret,
+      # Then redeploy https://sandbox.dspace.org if this build is for our deployment architecture and 'main' branch.
+      - name: Redeploy sandbox.dspace.org (based on main branch)
+        if: |
+          !matrix.isPR &&
+          env.REDEPLOY_SANDBOX_URL != '' &&
+          matrix.arch == env.DEPLOY_ARCH &&
+          github.ref_name == env.DEPLOY_SANDBOX_BRANCH
+        run: |
+          curl -X POST $REDEPLOY_SANDBOX_URL
+
+      # If this build is NOT a PR and passed in a REDEPLOY_DEMO_URL secret,
+      # Then redeploy https://demo.dspace.org if this build is for our deployment architecture and demo branch.
+      - name: Redeploy demo.dspace.org (based on maintenance branch)
+        if: |
+          !matrix.isPR &&
+          env.REDEPLOY_DEMO_URL != '' &&
+          matrix.arch == env.DEPLOY_ARCH &&
+          github.ref_name == env.DEPLOY_DEMO_BRANCH
+        run: |
+          curl -X POST $REDEPLOY_DEMO_URL
+
+  # Merge Docker digests (from various architectures) into a manifest.
+  # This runs after all Docker builds complete above, and it tells hub.docker.com
+  # that these builds should be all included in the manifest for this tag.
+  # (e.g. AMD64 and ARM64 should be listed as options under the same tagged Docker image)
+  docker-build_manifest:
+    if: ${{ github.event_name != 'pull_request' }}
+    runs-on: ubuntu-latest
+    needs:
+      - docker-build
+    steps:
+      - name: Download Docker build digests
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp/digests
+          # Download digests for both AMD64 and ARM64 into same directory
+          pattern: digests-${{ inputs.build_id }}-*
+          merge-multiple: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Add Docker metadata for image
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: ${{ env.IMAGE_TAGS }}
+          flavor: ${{ env.TAGS_FLAVOR }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+
+      - name: Create manifest list from digests and push
+        working-directory: /tmp/digests
+        run: |
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+          $(printf '${{ env.IMAGE_NAME }}@sha256:%s ' *)
+
+      - name: Inspect image
+        run: |
+          docker buildx imagetools inspect ${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}

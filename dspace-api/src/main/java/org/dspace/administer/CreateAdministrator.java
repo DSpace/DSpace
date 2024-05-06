@@ -116,6 +116,17 @@ public final class CreateAdministrator {
     protected CreateAdministrator()
             throws Exception {
         context = new Context();
+        try {
+            context.getDBConfig();
+        } catch (NullPointerException npr) {
+            // if database is null, there is no point in continuing. Prior to this exception and catch,
+            // NullPointerException was thrown, that wasn't very helpful.
+            throw new IllegalStateException("Problem connecting to database. This " +
+                    "indicates issue with either network or version (or possibly some other). " +
+                    "If you are running this in docker-compose, please make sure dspace-cli was " +
+                    "built from the same sources as running dspace container AND that they are in " +
+                    "the same project/network.");
+        }
         groupService = EPersonServiceFactory.getInstance().getGroupService();
         ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     }

@@ -253,8 +253,7 @@ public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
     public CollectionBuilder withDefaultItemRead(Group group) throws SQLException, AuthorizeException {
         resourcePolicyService.removePolicies(context, collection, DEFAULT_ITEM_READ);
 
-        ResourcePolicy resourcePolicy = resourcePolicyService.create(context);
-        resourcePolicy.setGroup(group);
+        ResourcePolicy resourcePolicy = resourcePolicyService.create(context, null, group);
         resourcePolicy.setAction(DEFAULT_ITEM_READ);
         resourcePolicy.setdSpaceObject(collection);
         resourcePolicyService.update(context, resourcePolicy);

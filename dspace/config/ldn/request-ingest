@@ -1,0 +1,52 @@
+## generate LDN message json when request-ingest of an item
+##
+## Parameters: {0} config 'dspace.ui.url'
+##             {1} config 'ldn.notify.inbox'
+##             {2} config 'dspace.name'
+##             {3} Notify Service url
+##             {4} Notify Service ldnUrl
+##             {5} 'dspace.ui.url'/handle/xxxx/yyy
+##             {6} metadata value of 'dc.identifier.uri'
+##             {7} the url to the primary bitstream or the first bitstream in the ORIGINAL bundle if there is no primary bitstream. The url is 'dspace.ui.url'/bitstreams/:uuid/download
+##             {8} the bitstream  MimeType or get User Format MimeType if getFormat is 'Unknown'
+##             {9} id of the created LDNMessage
+
+{
+  "@context": [
+    "https://www.w3.org/ns/activitystreams",
+    "https://purl.org/coar/notify"
+  ],
+  "actor": {
+    "id": "${params[0]}",
+    "name": "${params[2]}",
+    "type": "Service"
+  },
+  "id": "${params[9]}",
+  "object": {
+    "id": "${params[5]}",
+    "ietf:cite-as": "${params[6]}",
+    "type": "sorg:AboutPage",
+    "ietf:item": {
+      "id": "${params[7]}",
+      "mediaType": "${params[8]}",
+      "type": [
+        "Article",
+        "sorg:ScholarlyArticle"
+      ]
+    }
+  },
+  "origin": {
+    "id": "${params[0]}",
+    "inbox": "${params[1]}",
+    "type": "Service"
+  },
+  "target": {
+    "id": "${params[3]}",
+    "inbox": "${params[4]}",
+    "type": "Service"
+  },
+  "type": [
+    "Offer",
+    "coar-notify:IngestAction"
+  ]
+}

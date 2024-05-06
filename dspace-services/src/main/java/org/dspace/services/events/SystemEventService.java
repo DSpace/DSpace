@@ -10,17 +10,17 @@ package org.dspace.services.events;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.PreDestroy;
 
+import jakarta.annotation.PreDestroy;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.services.EventService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Event;
 import org.dspace.services.model.Event.Scope;
 import org.dspace.services.model.EventListener;
 import org.dspace.services.model.RequestInterceptor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -32,7 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public final class SystemEventService implements EventService {
 
-    private final Logger log = LoggerFactory.getLogger(SystemEventService.class);
+    private final Logger log = LogManager.getLogger();
 
     /**
      * Map for holding onto the listeners which is ClassLoader safe.
@@ -127,8 +127,8 @@ public final class SystemEventService implements EventService {
      */
     private void fireClusterEvent(Event event) {
         log.debug(
-            "fireClusterEvent is not implemented yet, no support for cluster events yet, could not fire event to the " +
-                "cluster: " + event);
+            "fireClusterEvent is not implemented yet, no support for cluster"
+                + " events yet, could not fire event to the cluster: {}", event);
     }
 
     /**
@@ -139,8 +139,9 @@ public final class SystemEventService implements EventService {
      */
     private void fireExternalEvent(Event event) {
         log.debug(
-            "fireExternalEvent is not implemented yet, no support for external events yet, could not fire event to " +
-                "external listeners: " + event);
+            "fireExternalEvent is not implemented yet, no support for external"
+                    + " events yet, could not fire event to external listeners: {}",
+                event);
     }
 
     /**

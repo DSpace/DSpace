@@ -14,6 +14,8 @@ package org.dspace.app.rest.model;
  */
 public class LicenseRest implements RestModel {
     public static final String NAME = "license";
+    public static final String PLURAL_NAME = "licenses";
+
     private boolean custom = false;
     private String text;
 
@@ -36,5 +38,10 @@ public class LicenseRest implements RestModel {
     @Override
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 }

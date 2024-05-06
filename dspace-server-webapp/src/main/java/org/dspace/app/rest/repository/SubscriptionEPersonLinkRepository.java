@@ -9,9 +9,9 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.Objects;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.SubscriptionRest;
 import org.dspace.app.rest.projection.Projection;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "eperson" of subscription
  */
-@Component(SubscriptionRest.CATEGORY + "." + SubscriptionRest.NAME + "." + SubscriptionRest.EPERSON)
+@Component(SubscriptionRest.CATEGORY + "." + SubscriptionRest.PLURAL_NAME + "." + SubscriptionRest.EPERSON)
 public class SubscriptionEPersonLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     @Autowired

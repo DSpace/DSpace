@@ -26,7 +26,8 @@ import org.dspace.app.rest.RestResourceController;
 })
 public class RelationshipRest extends BaseObjectRest<Integer> {
     public static final String NAME = "relationship";
-    public static final String CATEGORY = "core";
+    public static final String PLURAL_NAME = "relationships";
+    public static final String CATEGORY = RestModel.CORE;
 
     public static final String RELATIONSHIP_TYPE = "relationshipType";
 
@@ -45,6 +46,11 @@ public class RelationshipRest extends BaseObjectRest<Integer> {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     public String getCategory() {

@@ -126,7 +126,9 @@
    <field name="item.submitter" type="string" indexed="true" stored="true" multiValued="false" />
    <field name="item.deleted" type="boolean" indexed="true" stored="true" multiValued="false" />
    <!-- if true, item.public will change in the future due to an embargo being set/lifted -->
-   <field name="item.willChangeStatus" type="boolean" indexed="true" stored="true" multiValued="false" />																									 
+   <field name="item.willChangeStatus" type="boolean" indexed="true" stored="true" multiValued="false" />
+   <!-- Used in RIOXX OAI context to determine whether an item has files in ORIGINAL Bundle -->
+   <field name="item.hasbitstream" type="boolean" indexed="true" stored="true" multiValued="false" />
 
    <!-- Item compiled -->
    <field name="item.compile" type="string" indexed="false" stored="true" multiValued="false" />

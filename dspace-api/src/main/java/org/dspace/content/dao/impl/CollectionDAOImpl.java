@@ -12,13 +12,13 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 
+import jakarta.persistence.Query;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.ResourcePolicy_;
 import org.dspace.content.Collection;
@@ -71,12 +71,12 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
         query.append("SELECT c" +
                                 " FROM Collection c" +
                                 " left join c.metadata title on title.metadataField = :sortField and" +
-                                " title.dSpaceObject = c.id and" +
+                                " title.dSpaceObject = c and" +
                                 " title.place = (select min(internal.place) " +
                                 "from c.metadata internal " +
                                 "where internal.metadataField = :sortField and" +
-                                " internal.dSpaceObject = c.id)" +
-                                " ORDER BY LOWER(title.value)");
+                                " internal.dSpaceObject = c)" +
+                                " ORDER BY LOWER(CAST(title.value as string))");
         Query hibernateQuery = createQuery(context, query.toString());
         if (offset != null) {
             hibernateQuery.setFirstResult(offset);
@@ -159,7 +159,8 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
 
     @Override
     public List<Collection> findCollectionsWithSubscribers(Context context) throws SQLException {
-        return list(createQuery(context, "SELECT DISTINCT col FROM Subscription s join  s.collection col"));
+        return list(createQuery(context, "SELECT DISTINCT c FROM Collection c JOIN Subscription s ON c.id = " +
+                "s.dSpaceObject"));
     }
 
     @Override

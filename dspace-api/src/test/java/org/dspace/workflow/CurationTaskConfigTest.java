@@ -16,8 +16,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import javax.xml.bind.JAXBException;
 
+import jakarta.xml.bind.JAXBException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.xml.sax.SAXException;

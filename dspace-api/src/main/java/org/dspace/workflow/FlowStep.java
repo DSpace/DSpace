@@ -9,7 +9,8 @@ package org.dspace.workflow;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Linkage between a workflow step and some {@link org.dspace.curate.CurationTask}s.

@@ -12,8 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -103,10 +103,11 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
             // call with "-" or "index-based" we should receive only single
             // object member
             MetadataValueRest object = evaluateSingleObject((LateObjectEvaluator) value);
+            String mdString = split[0];
             // check if is not empty
             List<MetadataValue> metadataByMetadataString = itemService.getMetadataByMetadataString(source.getItem(),
-                                                                                                   split[0]);
-            Assert.notEmpty(metadataByMetadataString);
+                                                                                                   mdString);
+            Assert.notEmpty(metadataByMetadataString, "No metadata fields match ".concat(mdString));
             if (split.length > 1) {
                 String controlChar = split[1];
                 switch (controlChar) {

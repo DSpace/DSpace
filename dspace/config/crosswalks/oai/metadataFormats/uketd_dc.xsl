@@ -115,6 +115,20 @@
                 <!-- <dc:identifier xsi:type="dcterms:URI"><xsl:value-of select="." /></dc:identifier> -->
             </xsl:for-each>
 
+            <!-- ******* Check access-status information to determine the item's access status ******* -->
+            <xsl:for-each select="doc:metadata/doc:element[@name='others']/doc:element[@name='access-status']/doc:field[@name='value']/text()">
+                <!-- Add access status information for embargo or restricted status only in uketdterms:embargotype -->
+                <xsl:if test=".='restricted' or .='embargo'">
+                    <uketdterms:embargotype><xsl:value-of select="." /></uketdterms:embargotype>
+                </xsl:if>
+            </xsl:for-each>
+
+            <!-- ******* Check access-status embargo information for embargoed content associated with this item ******* -->
+            <xsl:for-each select="doc:metadata/doc:element[@name='others']/doc:element[@name='access-status']/doc:field[@name='embargo']/text()">
+                <!-- Add embargo information -->
+                <uketdterms:embargodate><xsl:value-of select="." /></uketdterms:embargodate>
+            </xsl:for-each>
+
             <!-- ******* URLs for digital object(s) (obtained from file 'bundles') ******* -->
             <xsl:for-each select="doc:metadata/doc:element[@name='bundles']/doc:element[@name='bundle']">
 

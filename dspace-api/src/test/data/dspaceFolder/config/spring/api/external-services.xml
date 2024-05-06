@@ -90,6 +90,8 @@
             </list>
         </property>
     </bean>
+    
+    <bean class="org.dspace.app.suggestion.MockSuggestionExternalDataSource" />
 
     <bean id="dataciteLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="DataCiteImportService"/>

@@ -12,9 +12,9 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,9 +38,11 @@ import org.dspace.authorize.service.ValidatePasswordService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EmptyWorkflowGroupException;
+import org.dspace.eperson.Group;
 import org.dspace.eperson.RegistrationData;
 import org.dspace.eperson.service.AccountService;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +60,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
-@Component(EPersonRest.CATEGORY + "." + EPersonRest.NAME)
+@Component(EPersonRest.CATEGORY + "." + EPersonRest.PLURAL_NAME)
 public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, EPersonRest>
                                    implements InitializingBean {
 
@@ -78,6 +80,9 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
 
     @Autowired
     private RegistrationDataService registrationDataService;
+
+    @Autowired
+    private GroupService groupService;
 
     private final EPersonService es;
 
@@ -283,6 +288,35 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             long total = es.searchResultCount(context, query);
             List<EPerson> epersons = es.search(context, query, Math.toIntExact(pageable.getOffset()),
                                                                Math.toIntExact(pageable.getPageSize()));
+            return converter.toRestPage(epersons, pageable, total, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Find the EPersons matching the query parameter which are NOT a member of the given Group.
+     * The search is delegated to the
+     * {@link EPersonService#searchNonMembers(Context, String, Group, int, int)}  method
+     *
+     * @param groupUUID the *required* group UUID to exclude results from
+     * @param query    is the *required* query string
+     * @param pageable contains the pagination information
+     * @return a Page of EPersonRest instances matching the user query
+     */
+    @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('MANAGE_ACCESS_GROUP')")
+    @SearchRestMethod(name = "isNotMemberOf")
+    public Page<EPersonRest> findIsNotMemberOf(@Parameter(value = "group", required = true) UUID groupUUID,
+                                             @Parameter(value = "query", required = true) String query,
+                                             Pageable pageable) {
+
+        try {
+            Context context = obtainContext();
+            Group excludeGroup = groupService.find(context, groupUUID);
+            long total = es.searchNonMembersCount(context, query, excludeGroup);
+            List<EPerson> epersons = es.searchNonMembers(context, query, excludeGroup,
+                                                     Math.toIntExact(pageable.getOffset()),
+                                                     Math.toIntExact(pageable.getPageSize()));
             return converter.toRestPage(epersons, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);

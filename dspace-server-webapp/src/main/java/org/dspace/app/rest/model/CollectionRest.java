@@ -75,6 +75,11 @@ public class CollectionRest extends DSpaceObjectRest {
         return NAME;
     }
 
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
     private int archivedItemsCount;
 
     public int getArchivedItemsCount() {

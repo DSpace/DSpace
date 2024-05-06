@@ -17,20 +17,20 @@
            http://www.springframework.org/schema/util/spring-util.xsd">
 
     <bean class="org.dspace.subscriptions.SubscriptionEmailNotificationServiceImpl">
-        <constructor-arg name="subscriptionType2generators">
-            <!-- The keys of the map used by the script "subscription-send"
-             org.dspace.subscriptions.SubscriptionEmailNotification
-             currently we support only 'content' type.   
-              --> 
-            <map>
-                <entry key="content" value-ref="contentNotifyGenerator"/>
-            </map>
-        </constructor-arg>
         <constructor-arg name="contentUpdates">
             <!-- Currently we support subscriptions ONLY for Community & Collection -->
             <map>
                 <entry key="community" value-ref="communityUpdates"/>
                 <entry key="collection" value-ref="collectionUpdates"/>
+            </map>
+        </constructor-arg>
+        <constructor-arg name="subscriptionType2generators">
+            <!-- The keys of the map used by the script "subscription-send"
+             org.dspace.subscriptions.SubscriptionEmailNotification
+             currently we support only 'content' type.
+              -->
+            <map>
+                <entry key="content" value-ref="contentNotifyGenerator"/>
             </map>
         </constructor-arg>
     </bean>

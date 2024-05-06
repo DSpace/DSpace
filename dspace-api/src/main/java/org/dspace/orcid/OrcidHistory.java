@@ -8,24 +8,23 @@
 package org.dspace.orcid;
 
 import java.util.Date;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import org.dspace.content.Item;
 import org.dspace.core.ReloadableEntity;
-import org.hibernate.annotations.Type;
+import org.hibernate.Length;
 
 /**
  * The ORCID history entity that it contains information relating to an attempt
@@ -79,18 +78,14 @@ public class OrcidHistory implements ReloadableEntity<Integer> {
     /**
      * A description of the synchronized resource.
      */
-    @Lob
-    @Type(type = "org.hibernate.type.TextType")
-    @Column(name = "description")
+    @Column(name = "description", length = Length.LONG32)
     private String description;
 
     /**
      * The signature of the synchronized metadata. This is used when the entity is
      * the owner itself.
      */
-    @Lob
-    @Type(type = "org.hibernate.type.TextType")
-    @Column(name = "metadata")
+    @Column(name = "metadata", length = Length.LONG32)
     private String metadata;
 
     /**
@@ -103,9 +98,7 @@ public class OrcidHistory implements ReloadableEntity<Integer> {
     /**
      * The response message incoming from ORCID.
      */
-    @Lob
-    @Type(type = "org.hibernate.type.TextType")
-    @Column(name = "response_message")
+    @Column(name = "response_message", length = Length.LONG32)
     private String responseMessage;
 
     /**

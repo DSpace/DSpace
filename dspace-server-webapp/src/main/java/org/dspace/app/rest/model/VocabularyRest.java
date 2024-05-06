@@ -22,6 +22,7 @@ import org.dspace.app.rest.RestResourceController;
 public class VocabularyRest extends BaseObjectRest<String> {
 
     public static final String NAME = "vocabulary";
+    public static final String PLURAL_NAME = "vocabularies";
     public static final String CATEGORY = RestAddressableModel.SUBMISSION;
     public static final String ENTRIES = "entries";
 
@@ -73,6 +74,11 @@ public class VocabularyRest extends BaseObjectRest<String> {
     @Override
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     @Override

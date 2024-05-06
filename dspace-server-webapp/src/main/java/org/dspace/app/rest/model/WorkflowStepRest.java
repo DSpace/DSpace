@@ -25,9 +25,9 @@ import org.dspace.app.rest.RestResourceController;
 })
 public class WorkflowStepRest extends BaseObjectRest {
 
-    public static final String CATEGORY = "config";
+    public static final String CATEGORY = RestModel.CONFIGURATION;
     public static final String NAME = "workflowstep";
-    public static final String NAME_PLURAL = "workflowsteps";
+    public static final String PLURAL_NAME = "workflowsteps";
 
     public static final String ACTIONS = "workflowactions";
 
@@ -46,6 +46,11 @@ public class WorkflowStepRest extends BaseObjectRest {
     @Override
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     @JsonIgnore

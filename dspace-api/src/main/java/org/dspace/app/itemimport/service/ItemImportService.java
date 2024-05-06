@@ -10,8 +10,8 @@ package org.dspace.app.itemimport.service;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import javax.mail.MessagingException;
 
+import jakarta.mail.MessagingException;
 import org.dspace.app.itemimport.BatchUpload;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;

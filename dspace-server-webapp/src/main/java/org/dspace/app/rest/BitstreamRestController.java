@@ -15,10 +15,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.core.Response;
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -138,6 +138,7 @@ public class BitstreamRestController {
                 .withBufferSize(BUFFER_SIZE)
                 .withFileName(name)
                 .withChecksum(bit.getChecksum())
+                .withLength(bit.getSizeBytes())
                 .withMimetype(mimetype)
                 .with(request)
                 .with(response);
@@ -167,6 +168,12 @@ public class BitstreamRestController {
             //Send the data
             if (httpHeadersInitializer.isValid()) {
                 HttpHeaders httpHeaders = httpHeadersInitializer.initialiseHeaders();
+
+                if (RequestMethod.HEAD.name().equals(request.getMethod())) {
+                    log.debug("HEAD request - no response body");
+                    return ResponseEntity.ok().headers(httpHeaders).build();
+                }
+
                 return ResponseEntity.ok().headers(httpHeaders).body(bitstreamResource);
             }
 

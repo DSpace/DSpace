@@ -10,6 +10,7 @@ package org.dspace.eperson;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -21,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
@@ -605,6 +607,30 @@ public class GroupTest extends AbstractUnitTest {
     }
 
     @Test
+    public void countAllMembers() throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
+        List<EPerson> allEPeopleAdded = new ArrayList<>();
+        try {
+            context.turnOffAuthorisationSystem();
+            allEPeopleAdded.add(createEPersonAndAddToGroup("allMemberGroups1@dspace.org", topGroup));
+            allEPeopleAdded.add(createEPersonAndAddToGroup("allMemberGroups2@dspace.org", level1Group));
+            allEPeopleAdded.add(createEPersonAndAddToGroup("allMemberGroups3@dspace.org", level2Group));
+            context.restoreAuthSystemState();
+
+            assertEquals(3, groupService.countAllMembers(context, topGroup));
+            assertEquals(2, groupService.countAllMembers(context, level1Group));
+            assertEquals(1, groupService.countAllMembers(context, level2Group));
+        } finally {
+            // Remove all the people added (in order to not impact other tests)
+            context.turnOffAuthorisationSystem();
+            for (EPerson ePerson : allEPeopleAdded) {
+                ePersonService.delete(context, ePerson);
+            }
+            context.restoreAuthSystemState();
+        }
+    }
+
+
+    @Test
     public void isEmpty() throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
         assertTrue(groupService.isEmpty(topGroup));
         assertTrue(groupService.isEmpty(level1Group));
@@ -618,6 +644,143 @@ public class GroupTest extends AbstractUnitTest {
         ePersonService.delete(context, person);
         context.restoreAuthSystemState();
         assertTrue(groupService.isEmpty(level2Group));
+    }
+
+    @Test
+    public void findAndCountByParent() throws SQLException, AuthorizeException, IOException {
+
+        // Create a parent group with 3 child groups
+        Group parentGroup = createGroup("parentGroup");
+        Group childGroup = createGroup("childGroup");
+        Group child2Group = createGroup("child2Group");
+        Group child3Group = createGroup("child3Group");
+        groupService.addMember(context, parentGroup, childGroup);
+        groupService.addMember(context, parentGroup, child2Group);
+        groupService.addMember(context, parentGroup, child3Group);
+        groupService.update(context, parentGroup);
+
+        try {
+            // Assert that findByParent is the same list of groups as getMemberGroups() when pagination is ignored
+            // (NOTE: Pagination is tested in GroupRestRepositoryIT)
+            // NOTE: isEqualCollection() must be used for comparison because Hibernate's "PersistentBag" cannot be
+            // compared directly to a List. See https://stackoverflow.com/a/57399383/3750035
+            assertTrue(
+                CollectionUtils.isEqualCollection(parentGroup.getMemberGroups(),
+                                                  groupService.findByParent(context, parentGroup, -1, -1)));
+            // Assert countBy parent is the same as the size of group members
+            assertEquals(parentGroup.getMemberGroups().size(), groupService.countByParent(context, parentGroup));
+        } finally {
+            // Clean up our data
+            context.turnOffAuthorisationSystem();
+            groupService.delete(context, parentGroup);
+            groupService.delete(context, childGroup);
+            groupService.delete(context, child2Group);
+            groupService.delete(context, child3Group);
+            context.restoreAuthSystemState();
+        }
+    }
+
+    @Test
+    // Tests searchNonMembers() and searchNonMembersCount()
+    // NOTE: This does not test pagination as that is tested in GroupRestRepositoryIT in server-webapp
+    public void searchAndCountNonMembers() throws SQLException, AuthorizeException, IOException {
+        // Create a parent group with 2 child groups
+        Group parentGroup = createGroup("Some Parent Group");
+        Group someStaffGroup = createGroup("Some Other Staff");
+        Group someStudentsGroup = createGroup("Some Students");
+        groupService.addMember(context, parentGroup, someStaffGroup);
+        groupService.addMember(context, parentGroup, someStudentsGroup);
+        groupService.update(context, parentGroup);
+
+        // Create a separate parent which is not a member of the first & add two child groups to it
+        Group studentsNotInParentGroup = createGroup("Students not in Parent");
+        Group otherStudentsNotInParentGroup = createGroup("Other Students");
+        Group someOtherStudentsNotInParentGroup = createGroup("Some Other Students");
+        groupService.addMember(context, studentsNotInParentGroup, otherStudentsNotInParentGroup);
+        groupService.addMember(context, studentsNotInParentGroup, someOtherStudentsNotInParentGroup);
+        groupService.update(context, studentsNotInParentGroup);
+
+        try {
+            // Assert that all Groups *not* in parent group match an empty search
+            List<Group> notInParent = Arrays.asList(studentsNotInParentGroup, otherStudentsNotInParentGroup,
+                                                    someOtherStudentsNotInParentGroup);
+            List<Group> nonMembersSearch = groupService.searchNonMembers(context, "", parentGroup, -1, -1);
+            // NOTE: Because others unit tests create groups, this search will return an undetermined number of results.
+            // Therefore, we just verify that our expected groups are included and others are NOT included.
+            assertTrue(nonMembersSearch.containsAll(notInParent));
+            // Verify it does NOT contain members of parentGroup
+            assertFalse(nonMembersSearch.contains(someStaffGroup));
+            assertFalse(nonMembersSearch.contains(someStudentsGroup));
+            // Verify it also does NOT contain the parentGroup itself
+            assertFalse(nonMembersSearch.contains(parentGroup));
+            // Verify the count for empty search matches the size of the search results
+            assertEquals(nonMembersSearch.size(), groupService.searchNonMembersCount(context, "", parentGroup));
+
+            // Assert a search on "Students" matches all those same groups (as they all include that word in their name)
+            nonMembersSearch = groupService.searchNonMembers(context, "Students", parentGroup, -1, -1);
+            assertTrue(nonMembersSearch.containsAll(notInParent));
+            //Verify an existing member group with "Students" in its name does NOT get returned
+            assertFalse(nonMembersSearch.contains(someStudentsGroup));
+            assertEquals(nonMembersSearch.size(),
+                         groupService.searchNonMembersCount(context, "Students", parentGroup));
+
+
+            // Assert a search on "other" matches just two groups
+            // (this also tests search is case insensitive)
+            nonMembersSearch = groupService.searchNonMembers(context, "other", parentGroup, -1, -1);
+            assertTrue(nonMembersSearch.containsAll(
+                Arrays.asList(otherStudentsNotInParentGroup, someOtherStudentsNotInParentGroup)));
+            // Verify an existing member group with "Other" in its name does NOT get returned
+            assertFalse(nonMembersSearch.contains(someStaffGroup));
+            assertEquals(nonMembersSearch.size(), groupService.searchNonMembersCount(context, "other", parentGroup));
+
+            // Assert a search on "Parent" matches just one group
+            nonMembersSearch = groupService.searchNonMembers(context, "Parent", parentGroup, -1, -1);
+            assertTrue(nonMembersSearch.contains(studentsNotInParentGroup));
+            // Verify Parent Group itself does NOT get returned
+            assertFalse(nonMembersSearch.contains(parentGroup));
+            assertEquals(nonMembersSearch.size(), groupService.searchNonMembersCount(context, "Parent", parentGroup));
+
+            // Assert a UUID search matching a non-member group will return just that one group
+            nonMembersSearch = groupService.searchNonMembers(context,
+                                                             someOtherStudentsNotInParentGroup.getID().toString(),
+                                                             parentGroup, -1, -1);
+            assertEquals(1, nonMembersSearch.size());
+            assertTrue(nonMembersSearch.contains(someOtherStudentsNotInParentGroup));
+            assertEquals(nonMembersSearch.size(),
+                         groupService.searchNonMembersCount(context,
+                                                            someOtherStudentsNotInParentGroup.getID().toString(),
+                                                            parentGroup));
+
+            // Assert a UUID search matching an EXISTING member will return NOTHING
+            // (as this group is excluded from the search)
+            nonMembersSearch = groupService.searchNonMembers(context, someStudentsGroup.getID().toString(),
+                                                             parentGroup,-1, -1);
+            assertEquals(0, nonMembersSearch.size());
+            assertEquals(nonMembersSearch.size(),
+                         groupService.searchNonMembersCount(context, someStudentsGroup.getID().toString(),
+                                                            parentGroup));
+
+            // Assert a UUID search matching Parent Group *itself* will return NOTHING
+            // (as this group is excluded from the search)
+            nonMembersSearch = groupService.searchNonMembers(context, parentGroup.getID().toString(),
+                                                             parentGroup,-1, -1);
+            assertEquals(0, nonMembersSearch.size());
+            assertEquals(nonMembersSearch.size(),
+                         groupService.searchNonMembersCount(context, parentGroup.getID().toString(),
+                                                            parentGroup));
+        } finally {
+            // Clean up our data
+            context.turnOffAuthorisationSystem();
+            groupService.delete(context, parentGroup);
+            groupService.delete(context, someStaffGroup);
+            groupService.delete(context, someStudentsGroup);
+            groupService.delete(context, studentsNotInParentGroup);
+            groupService.delete(context, otherStudentsNotInParentGroup);
+            groupService.delete(context, someOtherStudentsNotInParentGroup);
+            context.restoreAuthSystemState();
+        }
+
     }
 
 

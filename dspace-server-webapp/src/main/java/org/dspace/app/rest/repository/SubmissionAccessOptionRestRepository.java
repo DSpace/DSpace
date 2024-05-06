@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  */
-@Component(SubmissionAccessOptionRest.CATEGORY + "." + SubmissionAccessOptionRest.NAME)
+@Component(SubmissionAccessOptionRest.CATEGORY + "." + SubmissionAccessOptionRest.PLURAL_NAME)
 public class SubmissionAccessOptionRestRepository extends DSpaceRestRepository<SubmissionAccessOptionRest, String> {
 
     @Autowired

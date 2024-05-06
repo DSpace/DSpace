@@ -464,7 +464,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
             .forEach(accessCondition -> createResourcePolicy(item, accessCondition,
                 itemAccessConditions.get(accessCondition.getName())));
 
-        itemService.adjustItemPolicies(context, item, item.getOwningCollection());
+        itemService.adjustItemPolicies(context, item, item.getOwningCollection(), false);
     }
 
     /**

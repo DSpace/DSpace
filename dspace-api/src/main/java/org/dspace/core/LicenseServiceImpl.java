@@ -18,10 +18,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.service.LicenseService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.dspace.services.model.Request;
+import org.dspace.web.ContextUtil;
 
 /**
  * Encapsulate the deposit license.
@@ -29,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * @author mhwood
  */
 public class LicenseServiceImpl implements LicenseService {
-    private final Logger log = LoggerFactory.getLogger(LicenseServiceImpl.class);
+    private final Logger log = LogManager.getLogger();
 
     /**
      * The default license
@@ -50,7 +53,7 @@ public class LicenseServiceImpl implements LicenseService {
             out.print(newLicense);
             out.close();
         } catch (IOException e) {
-            log.warn("license_write: " + e.getLocalizedMessage());
+            log.warn("license_write: {}", e::getLocalizedMessage);
         }
         license = newLicense;
     }
@@ -101,13 +104,14 @@ public class LicenseServiceImpl implements LicenseService {
     /**
      * Get the site-wide default license that submitters need to grant
      *
+     * Localized license requires: default_{{locale}}.license file.
+     * Locale also must be listed in webui.supported.locales setting.
+     *
      * @return the default license
      */
     @Override
     public String getDefaultSubmissionLicense() {
-        if (null == license) {
-            init();
-        }
+        init();
         return license;
     }
 
@@ -115,9 +119,8 @@ public class LicenseServiceImpl implements LicenseService {
      * Load in the default license.
      */
     protected void init() {
-        File licenseFile = new File(
-            DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
-                + File.separator + "config" + File.separator + "default.license");
+        Context context = obtainContext();
+        File licenseFile = new File(I18nUtil.getDefaultLicense(context));
 
         FileInputStream fir = null;
         InputStreamReader ir = null;
@@ -137,7 +140,7 @@ public class LicenseServiceImpl implements LicenseService {
             br.close();
 
         } catch (IOException e) {
-            log.error("Can't load license: " + licenseFile.toString(), e);
+            log.error("Can't load license {}: ", licenseFile.toString(), e);
 
             // FIXME: Maybe something more graceful here, but with the
             // configuration we can't do anything
@@ -168,5 +171,25 @@ public class LicenseServiceImpl implements LicenseService {
                 }
             }
         }
+    }
+
+    /**
+     * Obtaining current request context.
+     * Return new context if getting one from current request failed.
+     *
+     * @return DSpace context object
+     */
+    private Context obtainContext() {
+        try {
+            Request currentRequest = DSpaceServicesFactory.getInstance().getRequestService().getCurrentRequest();
+            if (currentRequest != null) {
+                HttpServletRequest request = currentRequest.getHttpServletRequest();
+                return ContextUtil.obtainContext(request);
+            }
+        } catch (Exception e) {
+            log.error("Can't load current request context.");
+        }
+
+        return  new Context();
     }
 }

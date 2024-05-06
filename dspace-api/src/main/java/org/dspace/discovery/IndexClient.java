@@ -7,14 +7,20 @@
  */
 package org.dspace.discovery;
 
+import static org.dspace.discovery.IndexClientOptions.TYPE_OPTION;
+
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -49,6 +55,17 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
         if (indexClientOptions == IndexClientOptions.HELP) {
             printHelp();
             return;
+        }
+
+        String type = null;
+        if (commandLine.hasOption(TYPE_OPTION)) {
+            List<String> indexableObjectTypes = IndexObjectFactoryFactory.getInstance().getIndexFactories().stream()
+                    .map((indexFactory -> indexFactory.getType())).collect(Collectors.toList());
+            type = commandLine.getOptionValue(TYPE_OPTION);
+            if (!indexableObjectTypes.contains(type)) {
+                handler.handleException(String.format("%s is not a valid indexable object type, options: %s",
+                        type, Arrays.toString(indexableObjectTypes.toArray())));
+            }
         }
 
         /** Acquire from dspace-services in future */
@@ -113,6 +130,10 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
         } else if (indexClientOptions == IndexClientOptions.BUILD ||
             indexClientOptions == IndexClientOptions.BUILDANDSPELLCHECK) {
             handler.logInfo("(Re)building index from scratch.");
+            if (StringUtils.isNotBlank(type)) {
+                handler.logWarning(String.format("Type option, %s, not applicable for entire index rebuild option, b" +
+                        ", type will be ignored", TYPE_OPTION));
+            }
             indexer.deleteIndex();
             indexer.createIndex(context);
             if (indexClientOptions == IndexClientOptions.BUILDANDSPELLCHECK) {
@@ -133,14 +154,14 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
         } else if (indexClientOptions == IndexClientOptions.UPDATE ||
             indexClientOptions == IndexClientOptions.UPDATEANDSPELLCHECK) {
             handler.logInfo("Updating Index");
-            indexer.updateIndex(context, false);
+            indexer.updateIndex(context, false, type);
             if (indexClientOptions == IndexClientOptions.UPDATEANDSPELLCHECK) {
                 checkRebuildSpellCheck(commandLine, indexer);
             }
         } else if (indexClientOptions == IndexClientOptions.FORCEUPDATE ||
             indexClientOptions == IndexClientOptions.FORCEUPDATEANDSPELLCHECK) {
             handler.logInfo("Updating Index");
-            indexer.updateIndex(context, true);
+            indexer.updateIndex(context, true, type);
             if (indexClientOptions == IndexClientOptions.FORCEUPDATEANDSPELLCHECK) {
                 checkRebuildSpellCheck(commandLine, indexer);
             }

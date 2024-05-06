@@ -37,13 +37,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
 
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CityResponse;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -81,6 +81,7 @@ import org.apache.solr.common.params.MapSolrParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.ShardParams;
 import org.apache.solr.common.util.NamedList;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -146,6 +147,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     private SolrStatisticsCore solrStatisticsCore;
     @Autowired
     private GeoIpService geoIpService;
+    @Autowired
+    private AuthorizeService authorizeService;
 
     /** URL to the current-year statistics core.  Prior-year shards will have a year suffixed. */
     private String statisticsCoreURL;
@@ -219,6 +222,16 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     @Override
     public void postView(DSpaceObject dspaceObject, HttpServletRequest request,
                          EPerson currentUser, String referrer) {
+        Context context = new Context();
+        // Do not record statistics for Admin users
+        try {
+            if (authorizeService.isAdmin(context, currentUser)) {
+                return;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
         if (solr == null) {
             return;
         }

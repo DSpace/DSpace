@@ -25,7 +25,7 @@ import org.hamcrest.Matchers;
 public class WorkflowStepMatcher {
 
     private static final String WORKFLOW_ACTIONS_ENDPOINT
-        = "/api/" + WorkflowStepRest.CATEGORY + "/" + WorkflowStepRest.NAME_PLURAL + "/";;
+        = "/api/" + WorkflowStepRest.CATEGORY + "/" + WorkflowStepRest.PLURAL_NAME + "/";;
 
     private WorkflowStepMatcher() {}
 

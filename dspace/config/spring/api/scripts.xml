@@ -3,6 +3,12 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+    <bean id="import-openaire-events" class="org.dspace.qaevent.script.OpenaireEventsImportCliScriptConfiguration" primary="true">
+        <property name="description" value="Import new Openaire quality assurance broker events"/>
+        <property name="dspaceRunnableClass" value="org.dspace.qaevent.script.OpenaireEventsImportCli"/>
+    </bean>
+
     <bean id="index-discovery" class="org.dspace.discovery.IndexDiscoveryScriptConfiguration">
         <property name="description" value="Update Discovery Solr Search Index"/>
         <property name="dspaceRunnableClass" value="org.dspace.discovery.IndexClient"/>
@@ -89,6 +95,11 @@
     <bean id="bulk-access-control" class="org.dspace.app.bulkaccesscontrol.BulkAccessControlCliScriptConfiguration" primary="true">
         <property name="description" value="Bulk access control"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkaccesscontrol.BulkAccessControlCli"/>
+    </bean>
+
+    <bean id="import-openaire-suggestions" class="org.dspace.app.suggestion.openaire.PublicationLoaderCliScriptConfiguration">
+       <property name="description" value="Imports suggestions from OpenAIRE for publication claim"/>
+       <property name="dspaceRunnableClass" value="org.dspace.app.suggestion.openaire.PublicationLoaderRunnableCli"/>
     </bean>
 
 </beans>

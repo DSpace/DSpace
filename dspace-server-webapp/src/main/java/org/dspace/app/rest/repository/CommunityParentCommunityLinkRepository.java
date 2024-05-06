@@ -9,9 +9,9 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.UUID;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Community;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 /**
  * LinkRepository for the ParentCommunity object for a Community
  */
-@Component(CommunityRest.CATEGORY + "." + CommunityRest.NAME + "." + CommunityRest.PARENT_COMMUNITY)
+@Component(CommunityRest.CATEGORY + "." + CommunityRest.PLURAL_NAME + "." + CommunityRest.PARENT_COMMUNITY)
 public class CommunityParentCommunityLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
 
@@ -51,7 +51,7 @@ public class CommunityParentCommunityLinkRepository extends AbstractDSpaceRestRe
             Context context = obtainContext();
             Community community = communityService.find(context, communityId);
             if (community == null) {
-                throw new ResourceNotFoundException("No such community: " + community);
+                throw new ResourceNotFoundException("No such community: " + communityId);
             }
             Community parentCommunity = (Community) communityService.getParentObject(context, community);
             if (parentCommunity == null) {

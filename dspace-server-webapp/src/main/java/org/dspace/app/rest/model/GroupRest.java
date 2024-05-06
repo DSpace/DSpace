@@ -33,9 +33,8 @@ import org.dspace.app.rest.RestResourceController;
 })
 public class GroupRest extends DSpaceObjectRest {
     public static final String NAME = "group";
+    public static final String PLURAL_NAME = "groups";
     public static final String CATEGORY = RestAddressableModel.EPERSON;
-
-    public static final String GROUPS = "groups";
     public static final String SUBGROUPS = "subgroups";
     public static final String EPERSONS = "epersons";
     public static final String OBJECT = "object";
@@ -52,6 +51,11 @@ public class GroupRest extends DSpaceObjectRest {
     @Override
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     public String getName() {

@@ -13,8 +13,8 @@ import static org.dspace.app.rest.security.DSpaceRestPermission.WRITE;
 
 import java.io.Serializable;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.ResearcherProfileRest;
 import org.dspace.app.rest.utils.ContextUtil;

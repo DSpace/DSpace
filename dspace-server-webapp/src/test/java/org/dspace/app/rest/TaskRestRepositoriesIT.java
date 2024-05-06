@@ -2738,7 +2738,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         getClient(authToken).perform(patch("/api/workflow/workflowitems/" + witem.getID())
             .content(patchBody)
-            .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+            .contentType(jakarta.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isUnprocessableEntity());
     }
 
@@ -2892,7 +2892,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         getClient(authToken).perform(patch("/api/workflow/workflowitems/" + witem.getID())
             .content(patchBody)
-            .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+            .contentType(jakarta.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isUnprocessableEntity());
     }
 
@@ -3854,7 +3854,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
         String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
 
-        getClient(reviewer1Token).perform(get("/api/workflow/claimedtask/search/findByItem")
+        getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/search/findByItem")
                 .param("uuid", claimedTask1.getWorkflowItem().getItem().getID().toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(claimedTask1.getID())))
@@ -3864,7 +3864,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
                            Matchers.is(WorkflowItemMatcher.matchItemWithTitleAndDateIssuedAndSubject(
                                    claimedTask1.getWorkflowItem(), "Workflow Item 1", "2017-10-17", "ExtraEntry"))));
 
-        getClient(reviewer2Token).perform(get("/api/workflow/claimedtask/search/findByItem")
+        getClient(reviewer2Token).perform(get("/api/workflow/claimedtasks/search/findByItem")
                 .param("uuid", claimedTask2.getWorkflowItem().getItem().getID().toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(claimedTask2.getID())))
@@ -3929,27 +3929,27 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
         String reviewer2Token = getAuthToken(reviewer2.getEmail(), password);
 
-        getClient(reviewer2Token).perform(get("/api/workflow/claimedtask/search/findByItem")
+        getClient(reviewer2Token).perform(get("/api/workflow/claimedtasks/search/findByItem")
                                  .param("uuid", claimedTask1.getWorkflowItem().getItem().getID().toString()))
                                  .andExpect(status().isNoContent());
 
-        getClient(reviewer1Token).perform(get("/api/workflow/claimedtask/search/findByItem")
+        getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/search/findByItem")
                                  .param("uuid", claimedTask2.getWorkflowItem().getItem().getID().toString()))
                                  .andExpect(status().isNoContent());
 
-        getClient(adminToken).perform(get("/api/workflow/claimedtask/search/findByItem")
+        getClient(adminToken).perform(get("/api/workflow/claimedtasks/search/findByItem")
                              .param("uuid", claimedTask1.getWorkflowItem().getItem().getID().toString()))
                              .andExpect(status().isNoContent());
 
-        getClient(adminToken).perform(get("/api/workflow/claimedtask/search/findByItem")
+        getClient(adminToken).perform(get("/api/workflow/claimedtasks/search/findByItem")
                              .param("uuid", claimedTask2.getWorkflowItem().getItem().getID().toString()))
                              .andExpect(status().isNoContent());
 
-        getClient(submitterToken).perform(get("/api/workflow/claimedtask/search/findByItem")
+        getClient(submitterToken).perform(get("/api/workflow/claimedtasks/search/findByItem")
                                  .param("uuid", claimedTask1.getWorkflowItem().getItem().getID().toString()))
                                  .andExpect(status().isNoContent());
 
-        getClient(submitterToken).perform(get("/api/workflow/claimedtask/search/findByItem")
+        getClient(submitterToken).perform(get("/api/workflow/claimedtasks/search/findByItem")
                                  .param("uuid", claimedTask2.getWorkflowItem().getItem().getID().toString()))
                                  .andExpect(status().isNoContent());
 
@@ -3987,7 +3987,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         context.restoreAuthSystemState();
 
-        getClient().perform(get("/api/workflow/claimedtask/search/findByItem")
+        getClient().perform(get("/api/workflow/claimedtasks/search/findByItem")
                    .param("uuid", claimedTask.getWorkflowItem().getItem().getID().toString()))
                    .andExpect(status().isUnauthorized());
     }
@@ -4025,7 +4025,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
-        getClient(reviewer1Token).perform(get("/api/workflow/claimedtask/search/findByItem")
+        getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/search/findByItem")
                                  .param("uuid", UUID.randomUUID().toString()))
                                  .andExpect(status().isUnprocessableEntity());
     }
@@ -4063,12 +4063,12 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
 
         String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
-        getClient(reviewer1Token).perform(get("/api/workflow/claimedtask/search/findByItem")
+        getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/search/findByItem")
                                  .param("uuid", "wrongID"))
                                  .andExpect(status().isBadRequest());
 
         // the required param is no provided
-        getClient(reviewer1Token).perform(get("/api/workflow/claimedtask/search/findByItem"))
+        getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/search/findByItem"))
                                  .andExpect(status().isBadRequest());
     }
 
@@ -4100,7 +4100,7 @@ public class TaskRestRepositoriesIT extends AbstractControllerIntegrationTest {
 
         String reviewer1Token = getAuthToken(reviewer1.getEmail(), password);
 
-        getClient(reviewer1Token).perform(get("/api/workflow/claimedtask/search/findByItem")
+        getClient(reviewer1Token).perform(get("/api/workflow/claimedtasks/search/findByItem")
                                  .param("uuid", publicItem.getID().toString()))
                                  .andExpect(status().isNoContent());
 

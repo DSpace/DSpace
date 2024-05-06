@@ -9,9 +9,9 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.UUID;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.projection.Projection;
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "item" subresource of an individual bundle.
  */
-@Component(BundleRest.CATEGORY + "." + BundleRest.NAME + "." + BundleRest.ITEM)
+@Component(BundleRest.CATEGORY + "." + BundleRest.PLURAL_NAME + "." + BundleRest.ITEM)
 public class BundleItemLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

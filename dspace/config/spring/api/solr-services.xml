@@ -32,6 +32,12 @@
 
     <bean class="org.dspace.statistics.SolrStatisticsCore" autowire-candidate="true"/>
     
+    <!-- quality assurance broker service -->
+    <bean id="org.dspace.qaevent.service.QAEventService" class="org.dspace.qaevent.service.impl.QAEventServiceImpl" />
+    
     <bean class="org.dspace.statistics.GeoIpService" autowire-candidate="true"/>
-
+    
+    <!-- suggestion service for solr providers -->     
+    <bean id="org.dspace.app.suggestion.SolrSuggestionStorageService" class="org.dspace.app.suggestion.SolrSuggestionStorageServiceImpl" />
+    
 </beans>

@@ -12,13 +12,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.persistence.Query;
-import javax.persistence.Tuple;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 
+import jakarta.persistence.Query;
+import jakarta.persistence.Tuple;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.dspace.content.Item;
 import org.dspace.content.Item_;
 import org.dspace.content.Relationship;
@@ -167,9 +167,9 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
         Context context, Item item, boolean excludeTilted, boolean excludeNonLatest
     ) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
-        criteriaQuery.select(relationshipRoot);
+        criteriaQuery.select(criteriaBuilder.count(relationshipRoot));
 
         criteriaQuery.where(
             criteriaBuilder.or(
@@ -355,9 +355,9 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
     public int countByRelationshipType(Context context, RelationshipType relationshipType) throws SQLException {
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
-        criteriaQuery.select(relationshipRoot);
+        criteriaQuery.select(criteriaBuilder.count(relationshipRoot));
         criteriaQuery
                 .where(criteriaBuilder.equal(relationshipRoot.get(Relationship_.relationshipType), relationshipType));
         return count(context, criteriaQuery, criteriaBuilder, relationshipRoot);
@@ -366,9 +366,9 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
     @Override
     public int countRows(Context context) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
-        criteriaQuery.select(relationshipRoot);
+        criteriaQuery.select(criteriaBuilder.count(relationshipRoot));
         return count(context, criteriaQuery, criteriaBuilder, relationshipRoot);
     }
 
@@ -377,9 +377,9 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
         Context context, Item item, RelationshipType relationshipType, boolean isLeft, boolean excludeNonLatest
     ) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
-        criteriaQuery.select(relationshipRoot);
+        criteriaQuery.select(criteriaBuilder.count(relationshipRoot));
 
         if (isLeft) {
             criteriaQuery.where(
@@ -407,8 +407,9 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
             ids.add(relationshipType.getID());
         }
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Relationship.class);
+        CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         Root<Relationship> relationshipRoot = criteriaQuery.from(Relationship.class);
+        criteriaQuery.select(criteriaBuilder.count(relationshipRoot));
         criteriaQuery.where(relationshipRoot.get(Relationship_.relationshipType).in(ids));
         return count(context, criteriaQuery, criteriaBuilder, relationshipRoot);
     }
@@ -417,14 +418,14 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
     public List<Relationship> findByItemAndRelationshipTypeAndList(Context context, UUID focusUUID,
             RelationshipType relationshipType, List<UUID> items, boolean isLeft,
             int offset, int limit) throws SQLException {
-        String side = isLeft ? "left_id" : "right_id";
-        String otherSide = !isLeft ? "left_id" : "right_id";
+        String side = isLeft ? "leftItem.id" : "rightItem.id";
+        String otherSide = !isLeft ? "leftItem.id" : "rightItem.id";
         Query query = createQuery(context, "FROM " + Relationship.class.getSimpleName() +
-                                          " WHERE type_id = (:typeId) " +
+                                          " WHERE relationshipType = :type " +
                                            "AND " + side + " = (:focusUUID) " +
                                            "AND " + otherSide + " in (:list) " +
                                            "ORDER BY id");
-        query.setParameter("typeId", relationshipType.getID());
+        query.setParameter("type", relationshipType);
         query.setParameter("focusUUID", focusUUID);
         query.setParameter("list", items);
         return list(query, limit, offset);
@@ -433,14 +434,14 @@ public class RelationshipDAOImpl extends AbstractHibernateDAO<Relationship> impl
     @Override
     public int countByItemAndRelationshipTypeAndList(Context context, UUID focusUUID, RelationshipType relationshipType,
             List<UUID> items, boolean isLeft) throws SQLException {
-        String side = isLeft ? "left_id" : "right_id";
-        String otherSide = !isLeft ? "left_id" : "right_id";
+        String side = isLeft ? "leftItem.id" : "rightItem.id";
+        String otherSide = !isLeft ? "leftItem.id" : "rightItem.id";
         Query query = createQuery(context, "SELECT count(*) " +
                                            "FROM " + Relationship.class.getSimpleName() +
-                                          " WHERE type_id = (:typeId) " +
+                                          " WHERE relationshipType = :type " +
                                            "AND " + side + " = (:focusUUID) " +
                                            "AND " + otherSide + " in (:list)");
-        query.setParameter("typeId", relationshipType.getID());
+        query.setParameter("type", relationshipType);
         query.setParameter("focusUUID", focusUUID);
         query.setParameter("list", items);
         return count(query);

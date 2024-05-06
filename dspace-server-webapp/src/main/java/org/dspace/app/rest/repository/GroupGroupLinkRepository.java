@@ -8,10 +8,11 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.core.Context;
@@ -27,7 +28,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "groups" subresource of an individual group.
  */
-@Component(GroupRest.CATEGORY + "." + GroupRest.NAME + "." + GroupRest.SUBGROUPS)
+@Component(GroupRest.CATEGORY + "." + GroupRest.PLURAL_NAME + "." + GroupRest.SUBGROUPS)
 public class GroupGroupLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 
@@ -45,7 +46,11 @@ public class GroupGroupLinkRepository extends AbstractDSpaceRestRepository
             if (group == null) {
                 throw new ResourceNotFoundException("No such group: " + groupId);
             }
-            return converter.toRestPage(group.getMemberGroups(), optionalPageable, projection);
+            int total = groupService.countByParent(context, group);
+            Pageable pageable = utils.getPageable(optionalPageable);
+            List<Group> memberGroups = groupService.findByParent(context, group, pageable.getPageSize(),
+                                                                Math.toIntExact(pageable.getOffset()));
+            return converter.toRestPage(memberGroups, pageable, total, projection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

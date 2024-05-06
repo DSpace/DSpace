@@ -29,7 +29,7 @@ public class PipelineTest {
         InputStream input = PipelineTest.class.getClassLoader().getResourceAsStream("item.xml");
         InputStream xslt = PipelineTest.class.getClassLoader().getResourceAsStream("oai_dc.xsl");
         String output = FileUtils.readAllText(new XSLPipeline(input, true)
-                                                  .apply(factory.newTransformer(new StreamSource(xslt)))
+                                                  .apply(factory.newTemplates(new StreamSource(xslt)))
                                                   .getTransformed());
 
         assertThat(output, oai_dc().withXPath("/oai_dc:dc/dc:title", equalTo("Teste")));

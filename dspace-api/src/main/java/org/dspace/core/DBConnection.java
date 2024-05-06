@@ -148,4 +148,12 @@ public interface DBConnection<T> {
      * @throws java.sql.SQLException passed through.
      */
     public <E extends ReloadableEntity> void uncacheEntity(E entity) throws SQLException;
+
+    /**
+     * Do a manual flush. This synchronizes the in-memory state of the Session
+     * with the database (write changes to the database)
+     *
+     * @throws SQLException passed through.
+     */
+    public void flushSession() throws SQLException;
 }

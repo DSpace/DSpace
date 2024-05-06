@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static java.lang.Thread.sleep;
+import static org.dspace.app.rest.matcher.GroupMatcher.matchGroupWithName;
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_UUID;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
@@ -21,7 +22,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -35,11 +35,11 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.util.Base64;
 import java.util.Map;
-import javax.servlet.http.Cookie;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import jakarta.servlet.http.Cookie;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.rest.authorization.Authorization;
@@ -790,7 +790,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         // POSTing to /login should be a valid request...it just refreshes your token (see testRefreshToken())
         // However, in this case, we are POSTing with an *INVALID* CSRF Token in Header.
-        getClient().perform(post("/api/authn/login").with(csrf().useInvalidToken().asHeader())
+        getClient().perform(post("/api/authn/login").with(invalidCsrfToken())
                                                     .secure(true)
                                                     .cookie(cookies))
                    // Should return a 403 Forbidden, for an invalid CSRF token
@@ -1400,7 +1400,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         // Same request as prior method, but this time we are sending the CSRF token as a querystring param.
         // NOTE: getClient() method defaults to sending CSRF tokens as Headers, so we are overriding its behavior here
-        getClient(token).perform(post("/api/authn/shortlivedtokens").with(csrf()))
+        getClient(token).perform(post("/api/authn/shortlivedtokens").with(validCsrfTokenViaParam()))
             // BECAUSE we sent the CSRF token on querystring, it should be regenerated & a new token
             // is sent back (in cookie and header).
             .andExpect(cookie().exists("DSPACE-XSRF-COOKIE"))
@@ -1639,6 +1639,71 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         } finally {
             orcidConfiguration.setClientId(originalClientId);
         }
+    }
+
+    @Test
+    public void testAreSpecialGroupsApplicable() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        GroupBuilder.createGroup(context)
+            .withName("specialGroupPwd")
+            .build();
+        GroupBuilder.createGroup(context)
+            .withName("specialGroupShib")
+            .build();
+
+        configurationService.setProperty("plugin.sequence.org.dspace.authenticate.AuthenticationMethod", SHIB_AND_PASS);
+        configurationService.setProperty("authentication-password.login.specialgroup", "specialGroupPwd");
+        configurationService.setProperty("authentication-shibboleth.role.faculty", "specialGroupShib");
+        configurationService.setProperty("authentication-shibboleth.default-roles", "faculty");
+
+        context.restoreAuthSystemState();
+
+        String passwordToken = getAuthToken(eperson.getEmail(), password);
+
+        getClient(passwordToken).perform(get("/api/authn/status").param("projection", "full"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchFullEmbeds()))
+            .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchLinks()))
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.okay", is(true)))
+            .andExpect(jsonPath("$.authenticated", is(true)))
+            .andExpect(jsonPath("$.authenticationMethod", is("password")))
+            .andExpect(jsonPath("$.type", is("status")))
+            .andExpect(jsonPath("$._links.specialGroups.href", startsWith(REST_SERVER_URL)))
+            .andExpect(jsonPath("$._embedded.specialGroups._embedded.specialGroups",
+                Matchers.containsInAnyOrder(matchGroupWithName("specialGroupPwd"))));
+
+        getClient(passwordToken).perform(get("/api/authn/status/specialGroups").param("projection", "full"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.specialGroups",
+                Matchers.containsInAnyOrder(matchGroupWithName("specialGroupPwd"))));
+
+        String shibToken = getClient().perform(post("/api/authn/login")
+            .requestAttr("SHIB-MAIL", eperson.getEmail())
+            .requestAttr("SHIB-SCOPED-AFFILIATION", "faculty;staff"))
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getHeader(AUTHORIZATION_HEADER).replace(AUTHORIZATION_TYPE, "");
+
+        getClient(shibToken).perform(get("/api/authn/status").param("projection", "full"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchFullEmbeds()))
+            .andExpect(jsonPath("$", AuthenticationStatusMatcher.matchLinks()))
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$.okay", is(true)))
+            .andExpect(jsonPath("$.authenticated", is(true)))
+            .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")))
+            .andExpect(jsonPath("$.type", is("status")))
+            .andExpect(jsonPath("$._links.specialGroups.href", startsWith(REST_SERVER_URL)))
+            .andExpect(jsonPath("$._embedded.specialGroups._embedded.specialGroups",
+                Matchers.containsInAnyOrder(matchGroupWithName("specialGroupShib"))));
+
+        getClient(shibToken).perform(get("/api/authn/status/specialGroups").param("projection", "full"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(contentType))
+            .andExpect(jsonPath("$._embedded.specialGroups",
+                Matchers.containsInAnyOrder(matchGroupWithName("specialGroupShib"))));
     }
 
     // Get a short-lived token based on an active login token

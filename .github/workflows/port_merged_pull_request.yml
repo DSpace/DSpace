@@ -23,11 +23,11 @@ jobs:
     if: github.event.pull_request.merged
     steps:
       # Checkout code
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       # Port PR to other branch (ONLY if labeled with "port to")
       # See https://github.com/korthout/backport-action
       - name: Create backport pull requests
-        uses: korthout/backport-action@v1
+        uses: korthout/backport-action@v2
         with:
           # Trigger based on a "port to [branch]" label on PR
           # (This label must specify the branch name to port to)
@@ -39,6 +39,8 @@ jobs:
           # Copy all labels from original PR to (newly created) port PR
           # NOTE: The labels matching 'label_pattern' are automatically excluded
           copy_labels_pattern: '.*'
+          # Skip any merge commits in the ported PR. This means only non-merge commits are cherry-picked to the new PR
+          merge_commits: 'skip'
           # Use a personal access token (PAT) to create PR as 'dspace-bot' user.
           # A PAT is required in order for the new PR to trigger its own actions (for CI checks)
           github_token: ${{ secrets.PR_PORT_TOKEN }}

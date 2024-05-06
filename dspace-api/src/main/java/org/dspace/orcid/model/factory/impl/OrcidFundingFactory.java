@@ -18,6 +18,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Relationship;
@@ -44,8 +46,6 @@ import org.orcid.jaxb.model.v3.release.record.Funding;
 import org.orcid.jaxb.model.v3.release.record.FundingContributor;
 import org.orcid.jaxb.model.v3.release.record.FundingContributors;
 import org.orcid.jaxb.model.v3.release.record.FundingTitle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -57,7 +57,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class OrcidFundingFactory implements OrcidEntityFactory {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrcidFundingFactory.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     @Autowired
     private ItemService itemService;

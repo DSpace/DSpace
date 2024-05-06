@@ -2,12 +2,12 @@
 # The purpose of this image is to make the build for dspace/dspace run faster
 #
 
-# This Dockerfile uses JDK11 by default, but has also been tested with JDK17.
-# To build with JDK17, use "--build-arg JDK_VERSION=17"
-ARG JDK_VERSION=11
+# This Dockerfile uses JDK17 by default.
+# To build with other versions, use "--build-arg JDK_VERSION=[value]"
+ARG JDK_VERSION=17
 
 # Step 1 - Run Maven Build
-FROM maven:3-openjdk-${JDK_VERSION}-slim as build
+FROM maven:3-eclipse-temurin-${JDK_VERSION} as build
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 # Create the 'dspace' user account & home directory
@@ -15,11 +15,6 @@ RUN useradd dspace \
     && mkdir -p /home/dspace \
     && chown -Rv dspace: /home/dspace
 RUN chown -Rv dspace: /app
-# Need git to support buildnumber-maven-plugin, which lets us know what version of DSpace is being run.
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends git \
-    && apt-get purge -y --auto-remove \
-    && rm -rf /var/lib/apt/lists/*
 
 # Switch to dspace user & run below commands as that user
 USER dspace
@@ -28,7 +23,10 @@ USER dspace
 ADD --chown=dspace . /app/
 
 # Trigger the installation of all maven dependencies (hide download progress messages)
-RUN mvn --no-transfer-progress package
+# Maven flags here ensure that we skip final assembly, skip building test environment and skip all code verification checks.
+# These flags speed up this installation as much as reasonably possible.
+ENV MAVEN_FLAGS="-P-assembly -P-test-environment -Denforcer.skip=true -Dcheckstyle.skip=true -Dlicense.skip=true -Dxml.skip=true"
+RUN mvn --no-transfer-progress install ${MAVEN_FLAGS}
 
 # Clear the contents of the /app directory (including all maven builds), so no artifacts remain.
 # This ensures when dspace:dspace is built, it will use the Maven local cache (~/.m2) for dependencies

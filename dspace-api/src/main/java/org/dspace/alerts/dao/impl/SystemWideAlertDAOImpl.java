@@ -9,10 +9,10 @@ package org.dspace.alerts.dao.impl;
 
 import java.sql.SQLException;
 import java.util.List;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.dspace.alerts.SystemWideAlert;
 import org.dspace.alerts.SystemWideAlert_;
 import org.dspace.alerts.dao.SystemWideAlertDAO;

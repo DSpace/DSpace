@@ -9,7 +9,6 @@ package org.dspace.app.rest.link.relation;
 
 import java.util.LinkedList;
 
-import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.RestResourceController;
 import org.dspace.app.rest.link.HalLinkFactory;
 import org.dspace.app.rest.model.ItemRest;
@@ -29,10 +28,10 @@ public class RelationshipHalLinkFactory extends HalLinkFactory<RelationshipResou
         throws Exception {
 
         list.add(buildLink("leftItem", getMethodOn()
-            .findOne(ItemRest.CATEGORY, English.plural(ItemRest.NAME), halResource.getContent().getLeftId())));
+            .findOne(ItemRest.CATEGORY, ItemRest.PLURAL_NAME, halResource.getContent().getLeftId())));
 
         list.add(buildLink("rightItem", getMethodOn()
-            .findOne(ItemRest.CATEGORY, English.plural(ItemRest.NAME), halResource.getContent().getRightId())));
+            .findOne(ItemRest.CATEGORY, ItemRest.PLURAL_NAME, halResource.getContent().getRightId())));
     }
 
     @Override

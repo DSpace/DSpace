@@ -9,11 +9,11 @@ package org.dspace.app.iiif.model.generator;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.constraints.NotNull;
 
 import de.digitalcollections.iiif.model.Motivation;
 import de.digitalcollections.iiif.model.openannotation.Annotation;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
+import jakarta.validation.constraints.NotNull;
 
 
 /**

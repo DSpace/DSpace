@@ -10,23 +10,21 @@ package org.dspace.eperson;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.Cacheable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-import javax.persistence.Transient;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.content.DSpaceObject;
+import org.dspace.content.CacheableDSpaceObject;
 import org.dspace.content.DSpaceObjectLegacySupport;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.proxy.HibernateProxyHelper;
+import org.dspace.core.HibernateProxyHelper;
 
 /**
  * Class representing a group of e-people.
@@ -34,10 +32,8 @@ import org.hibernate.proxy.HibernateProxyHelper;
  * @author David Stuve
  */
 @Entity
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
 @Table(name = "epersongroup")
-public class Group extends DSpaceObject implements DSpaceObjectLegacySupport {
+public class Group extends CacheableDSpaceObject implements DSpaceObjectLegacySupport {
 
     @Transient
     public static final String ANONYMOUS = "Anonymous";
@@ -98,7 +94,11 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport {
     }
 
     /**
-     * Return EPerson members of a Group
+     * Return EPerson members of a Group.
+     * <P>
+     * WARNING: This method may have bad performance for Groups with large numbers of EPerson members.
+     * Therefore, only use this when you need to access every EPerson member. Instead, consider using
+     * EPersonService.findByGroups() for a paginated list of EPersons.
      *
      * @return list of EPersons
      */
@@ -143,9 +143,13 @@ public class Group extends DSpaceObject implements DSpaceObjectLegacySupport {
     }
 
     /**
-     * Return Group members of a Group.
+     * Return Group members (i.e. direct subgroups) of a Group.
+     * <P>
+     * WARNING: This method may have bad performance for Groups with large numbers of Subgroups.
+     * Therefore, only use this when you need to access every Subgroup. Instead, consider using
+     * GroupService.findByParent() for a paginated list of Subgroups.
      *
-     * @return list of groups
+     * @return list of subgroups
      */
     public List<Group> getMemberGroups() {
         return groups;

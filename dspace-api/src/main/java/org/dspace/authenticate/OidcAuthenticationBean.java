@@ -20,10 +20,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.oidc.OidcClient;
 import org.dspace.authenticate.oidc.model.OidcTokenResponseDTO;
 import org.dspace.core.Context;
@@ -31,8 +33,6 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -51,7 +51,7 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
 
     private final static String LOGIN_PAGE_URL_FORMAT = "%s?client_id=%s&response_type=code&scope=%s&redirect_uri=%s";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OidcAuthenticationBean.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String OIDC_AUTHENTICATED = "oidc.authenticated";
 
@@ -174,7 +174,7 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
                 final Entry<String, String> entry = iterator.next();
 
                 if (isBlank(entry.getValue())) {
-                    LOGGER.error(" * {} is missing", entry.getKey());
+                    LOGGER.error(" * {} is missing", entry::getKey);
                 }
             }
             return "";
@@ -183,7 +183,7 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
         try {
             return format(LOGIN_PAGE_URL_FORMAT, authorizeUrl, clientId, scopes, encode(redirectUri, "UTF-8"));
         } catch (UnsupportedEncodingException e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error(e::getMessage, e);
             return "";
         }
 
