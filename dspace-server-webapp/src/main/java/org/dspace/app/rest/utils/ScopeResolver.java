@@ -53,7 +53,7 @@ public class ScopeResolver {
         if (StringUtils.isNotBlank(scope)) {
             String myScope = StringUtils.trimToEmpty(scope);
             try {
-                UUID uuid = UUID.fromString(scope);
+                UUID uuid = UUID.fromString(myScope);
                 scopeObj = new IndexableCommunity(communityService.find(context, uuid));
                 if (scopeObj.getIndexedObject() == null) {
                     scopeObj = new IndexableCollection(collectionService.find(context, uuid));
@@ -61,9 +61,8 @@ public class ScopeResolver {
                         // Can't find the UUID as a community or collection
                         // so log and return null
                         log.warn(
-                            "The given scope string " +
-                            StringUtils.trimToEmpty(scope) +
-                            " is not a collection or community UUID."
+                            "The given scope string {} is not a collection or community UUID.",
+                                myScope
                         );
                         scopeObj = null;
                     }
