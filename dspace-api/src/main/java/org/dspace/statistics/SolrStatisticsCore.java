@@ -27,10 +27,10 @@ public class SolrStatisticsCore {
     protected SolrClient solr = null;
 
     @Autowired
-    private ConfigurationService configurationService;
+    protected ConfigurationService configurationService;
 
     @Autowired @Named("solrHttpConnectionPoolService")
-    private HttpConnectionPoolService httpConnectionPoolService;
+    protected HttpConnectionPoolService httpConnectionPoolService;
 
     /**
      * Returns the {@link SolrClient} for the Statistics core.
