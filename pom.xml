@@ -1269,6 +1269,12 @@
                 <groupId>org.apache.tika</groupId>
                 <artifactId>tika-parsers-standard-package</artifactId>
                 <version>${tika.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>xml-apis</groupId>
+                        <artifactId>xml-apis</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <!-- Tika brings in multiple versions of this. Select the latest version. Always sync with Tika version -->
             <dependency>
@@ -1812,6 +1818,12 @@
                 <groupId>xom</groupId>
                 <artifactId>xom</artifactId>
                 <version>1.3.9</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>xml-apis</groupId>
+                        <artifactId>xml-apis</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- json-path is needed by Spring HATEOAS -->
