@@ -18,6 +18,18 @@ import org.dspace.app.rest.RestResourceController;
     @LinkRest(
         name = WorkspaceItemRest.SUPERVISION_ORDERS,
         method = "getSupervisionOrders"
+    ),
+    @LinkRest(
+        name = WorkspaceItemRest.SUBMITTER,
+        method = "getWorkspaceItemSubmitter"
+    ),
+    @LinkRest(
+        name = WorkspaceItemRest.ITEM,
+        method = "getWorkspaceItemItem"
+    ),
+    @LinkRest(
+        name = WorkspaceItemRest.COLLECTION,
+        method = "getWorkspaceItemCollection"
     )
 })
 public class WorkspaceItemRest extends AInprogressSubmissionRest {
@@ -25,6 +37,9 @@ public class WorkspaceItemRest extends AInprogressSubmissionRest {
     public static final String CATEGORY = RestAddressableModel.SUBMISSION;
 
     public static final String SUPERVISION_ORDERS = "supervisionOrders";
+    public static final String SUBMITTER = "submitter";
+    public static final String ITEM = "item";
+    public static final String COLLECTION = "collection";
 
     @Override
     public String getCategory() {
