@@ -8,8 +8,8 @@
 package org.dspace.discovery.indexobject;
 
 import java.util.UUID;
-import javax.validation.constraints.NotNull;
 
+import jakarta.validation.constraints.NotNull;
 import org.dspace.content.DSpaceObject;
 import org.dspace.discovery.IndexableObject;
 
