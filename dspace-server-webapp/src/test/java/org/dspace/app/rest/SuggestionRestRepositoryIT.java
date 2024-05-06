@@ -406,6 +406,7 @@ public class SuggestionRestRepositoryIT extends AbstractControllerIntegrationTes
             ObjectMapper mapper = new ObjectMapper();
             MvcResult mvcResult = getClient(adminToken).perform(
                     post("/api/submission/workspaceitems?owningCollection=" + colPublications.getID().toString())
+                            .param("embed", "item")
                             .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                             .content("http://localhost/api/integration/externalsources/"
                                     + MockSuggestionExternalDataSource.NAME + "/entryValues/" + suggestionId))
@@ -415,7 +416,8 @@ public class SuggestionRestRepositoryIT extends AbstractControllerIntegrationTes
             workspaceItemId = (Integer) map.get("id");
             String itemUuidString = String.valueOf(((Map) ((Map) map.get("_embedded")).get("item")).get("uuid"));
 
-            getClient(adminToken).perform(get("/api/submission/workspaceitems/" + workspaceItemId))
+            getClient(adminToken).perform(get("/api/submission/workspaceitems/" + workspaceItemId)
+                                            .param("embed", "item"))
                             .andExpect(status().isOk())
                             .andExpect(jsonPath("$", Matchers.allOf(
                                 hasJsonPath("$.id", is(workspaceItemId)),
