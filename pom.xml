@@ -24,7 +24,7 @@
         <spring-security.version>5.7.11</spring-security.version> <!-- sync with version used by spring-boot-->
         <hibernate.version>5.6.15.Final</hibernate.version>
         <hibernate-validator.version>6.2.5.Final</hibernate-validator.version>
-        <postgresql.driver.version>42.7.2</postgresql.driver.version>
+        <postgresql.driver.version>42.7.3</postgresql.driver.version>
         <solr.client.version>8.11.3</solr.client.version>
 
         <ehcache.version>3.10.8</ehcache.version>
@@ -38,13 +38,13 @@
         <jcache-version>1.1.1</jcache-version>
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
         <jetty.version>9.4.54.v20240208</jetty.version>
-        <log4j.version>2.22.1</log4j.version>
-        <pdfbox-version>2.0.30</pdfbox-version>
+        <log4j.version>2.23.1</log4j.version>
+        <pdfbox-version>2.0.31</pdfbox-version>
         <rome.version>1.19.0</rome.version>
         <slf4j.version>1.7.36</slf4j.version>
-        <tika.version>2.5.0</tika.version>
+        <tika.version>2.9.2</tika.version>
         <!-- Sync with whatever version Tika uses -->
-        <bouncycastle.version>1.70</bouncycastle.version>
+        <bouncycastle.version>1.78.1</bouncycastle.version>
 
         <!--=== SERVER WEBAPP DEPENDENCIES ===-->
         <!-- Library for reading JSON documents: https://github.com/json-path/JsonPath (used by Server webapp) -->
@@ -1295,13 +1295,19 @@
             <!-- Tika brings in multiple versions of this. Select the latest version. Always sync with Tika version -->
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcpkix-jdk15on</artifactId>
+                <artifactId>bcpkix-jdk18on</artifactId>
                 <version>${bouncycastle.version}</version>
             </dependency>
             <!-- Tika brings in multiple versions of this. Select the latest version. Always sync with Tika version -->
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk15on</artifactId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <!-- Tika brings in multiple versions of this. Select the latest version. Always sync with Tika version -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcutil-jdk18on</artifactId>
                 <version>${bouncycastle.version}</version>
             </dependency>
             <!-- Tika and axiom-api (in dspace-swordv2) disagree on versions -->
@@ -1502,12 +1508,17 @@
                 <artifactId>commons-lang3</artifactId>
                 <version>3.14.0</version>
             </dependency>
-            <!-- NOTE: We don't use commons-logging directly, but many dependencies rely on it.
-                 So, we specify the version to use to avoid dependency convergence issues. -->
+            <!-- NOTE: We don't use commons-logging or commons-compress directly,
+                 but many dependencies rely on them. Only here specified to avoid dependency convergence issues. -->
             <dependency>
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging</artifactId>
                 <version>1.3.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>1.26.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
