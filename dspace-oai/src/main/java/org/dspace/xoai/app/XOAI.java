@@ -425,8 +425,14 @@ public class XOAI {
          * because this will override the item.public flag.
          */
 
+        boolean discoverable = item.isDiscoverable();
+        // The Item is not deleted when it has local metadata `local.hidden = hidden`.
+        // Without this, the item is not discoverable and harvestable; however, it should be harvestable via OAI-PMH.
+        if (!discoverable && item.isHidden()) {
+            discoverable = true;
+        }
         doc.addField("item.deleted",
-                (item.isWithdrawn() || !item.isDiscoverable() || (isEmbargoed ? isPublic : false)));
+                (item.isWithdrawn() || (!discoverable) || (isEmbargoed ? isPublic : false)));
 
         /*
          * An item that is embargoed will potentially not be harvested by incremental
