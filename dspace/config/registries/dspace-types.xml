@@ -93,4 +93,11 @@
         <scope_note>Stores the timestamp related to the user authentication on ORCID</scope_note>
     </dc-type>
 
+	<dc-type>
+        <schema>dspace</schema>
+        <element>thumbnail</element>
+        <qualifier>description</qualifier>
+        <scope_note>Stores the thumbnail description of collections or communities. Valid values; text</scope_note>
+    </dc-type>
+	
 </dspace-dc-types>
