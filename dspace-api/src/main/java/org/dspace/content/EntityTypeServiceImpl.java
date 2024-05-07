@@ -148,7 +148,7 @@ public class EntityTypeServiceImpl implements EntityTypeService {
         sQuery.setFacetMinCount(1);
         sQuery.setFacetLimit(Integer.MAX_VALUE);
         sQuery.setFacetSort(FacetParams.FACET_SORT_INDEX);
-        QueryResponse qResp = solrSearchCore.getSolr().query(sQuery);
+        QueryResponse qResp = solrSearchCore.getSolr().query(sQuery, solrSearchCore.REQUEST_METHOD);
         FacetField facetField = qResp.getFacetField("search.entitytype");
         if (Objects.nonNull(facetField)) {
             for (Count c : facetField.getValues()) {
