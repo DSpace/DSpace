@@ -281,6 +281,10 @@ public class IdentifierRestRepository extends DSpaceRestRepository<IdentifierRes
             if (dso != null) {
                 // Convert and respond with a redirect to the object itself
                 DSpaceObjectRest dsor = converter.toRest(dso, utils.obtainProjection());
+                if (dsor == null) {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication is required");
+                    return;
+                }
                 URI link = linkTo(dsor.getController(), dsor.getCategory(),
                         English.plural(dsor.getType()))
                         .slash(dsor.getId()).toUri();
