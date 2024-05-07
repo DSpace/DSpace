@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -578,7 +579,7 @@ public class ClarinShibAuthentication implements AuthenticationMethod {
 
         // 2) Second, look for an email header.
         if (eperson == null && emailHeader != null) {
-            String email = findSingleAttribute(request, emailHeader);
+            String email = getEmailAcceptedOrNull(findSingleAttribute(request, emailHeader));
             if (StringUtils.isEmpty(email) && Objects.nonNull(clarinVerificationToken)) {
                 email = clarinVerificationToken.getEmail();
             }
@@ -694,7 +695,7 @@ public class ClarinShibAuthentication implements AuthenticationMethod {
 
         // Header values
         String netid = Util.formatNetId(findSingleAttribute(request, netidHeader), org);
-        String email = findSingleAttribute(request, emailHeader);
+        String email = getEmailAcceptedOrNull(findSingleAttribute(request, emailHeader));
         String fname = Headers.updateValueByCharset(findSingleAttribute(request, fnameHeader));
         String lname = Headers.updateValueByCharset(findSingleAttribute(request, lnameHeader));
 
@@ -816,7 +817,7 @@ public class ClarinShibAuthentication implements AuthenticationMethod {
         String lnameHeader = configurationService.getProperty("authentication-shibboleth.lastname-header");
 
         String netid = Util.formatNetId(findSingleAttribute(request, netidHeader), shibheaders.get_idp());
-        String email = findSingleAttribute(request, emailHeader);
+        String email = getEmailAcceptedOrNull(findSingleAttribute(request, emailHeader));
         String fname = Headers.updateValueByCharset(findSingleAttribute(request, fnameHeader));
         String lname = Headers.updateValueByCharset(findSingleAttribute(request, lnameHeader));
 
@@ -1171,7 +1172,12 @@ public class ClarinShibAuthentication implements AuthenticationMethod {
 
         if (!StringUtils.isEmpty(value) && reconvertAttributes) {
             try {
-                value = new String(value.getBytes("ISO-8859-1"), "UTF-8");
+                String inputEncoding = configurationService.getProperty("shibboleth.name.conversion.inputEncoding",
+                        "ISO-8859-1");
+                String outputEncoding = configurationService.getProperty("shibboleth.name.conversion.outputEncoding",
+                        "UTF-8");
+
+                value = new String(value.getBytes(inputEncoding), outputEncoding);
             } catch (UnsupportedEncodingException ex) {
                 log.warn("Failed to reconvert shibboleth attribute ("
                         + name + ").", ex);
@@ -1323,6 +1329,14 @@ public class ClarinShibAuthentication implements AuthenticationMethod {
     @Override
     public boolean areSpecialGroupsApplicable(Context context, HttpServletRequest request) {
         return true;
+    }
+
+    public String getEmailAcceptedOrNull(String email) {
+        // no whitespaces in mail
+        if (StringUtils.isEmpty(email) || Pattern.compile("\\s").matcher(email).find()) {
+            return null;
+        }
+        return email;
     }
 }
 
