@@ -100,6 +100,7 @@ import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.content.service.clarin.ClarinItemService;
 import org.dspace.content.service.clarin.ClarinLicenseResourceMappingService;
 import org.dspace.content.service.clarin.ClarinLicenseService;
 import org.dspace.core.Constants;
@@ -188,6 +189,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     protected ClarinLicenseService clarinLicenseService;
     @Autowired(required = true)
     protected ClarinLicenseResourceMappingService clarinLicenseResourceMappingService;
+    @Autowired(required = true)
+    protected ClarinItemService clarinItemService;
 
     protected String tempWorkDir;
 
@@ -723,6 +726,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             itemService.clearMetadata(c, newItem, "dc", "rights", "label", Item.ANY);
             itemService.addMetadata(c, newItem, "dc", "rights", "label", Item.ANY,
                     license.getNonExtendedClarinLicenseLabel().getLabel());
+            clarinItemService.updateItemFilesMetadata(c, newItem);
+
             itemService.update(c, newItem);
             c.uncacheEntity(newItem);
         }

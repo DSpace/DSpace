@@ -88,6 +88,8 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
     private Item itemVisited;
     private Bitstream bitstreamNotVisited;
     private Bitstream bitstreamVisited;
+    private Bitstream bitstream1;
+    private Bitstream bitstream2;
 
     private String loggedInToken;
     private String adminToken;
@@ -122,6 +124,17 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         bitstreamVisited = BitstreamBuilder
             .createBitstream(context, itemNotVisitedWithBitstreams, toInputStream("test", UTF_8))
             .withName("BitstreamVisitedName").build();
+
+        // Create bitstreams for the test `usageReportsSearch_ItemVisited_FilesVisited` before the `visitedItem`
+        // is detached, otherwise the error `detached entity passed to persist: org.dspace.content.DSpaceObject` occurs.
+        bitstream1 = BitstreamBuilder
+                .createBitstream(context, itemVisited, toInputStream("test", UTF_8))
+                .withName("bitstream1")
+                .build();
+        bitstream2 = BitstreamBuilder
+                .createBitstream(context, itemVisited, toInputStream("test", UTF_8))
+                .withName("bitstream2")
+                .build();
 
         loggedInToken = getAuthToken(eperson.getEmail(), password);
         adminToken = getAuthToken(admin.getEmail(), password);
@@ -1388,15 +1401,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void usageReportsSearch_ItemVisited_FilesVisited() throws Exception {
-        context.turnOffAuthorisationSystem();
-        Bitstream bitstream1 =
-            BitstreamBuilder.createBitstream(context, itemVisited, toInputStream("test", UTF_8)).withName("bitstream1")
-                            .build();
-        Bitstream bitstream2 =
-            BitstreamBuilder.createBitstream(context, itemVisited, toInputStream("test", UTF_8)).withName("bitstream2")
-                            .build();
-        context.restoreAuthSystemState();
-
         // ** WHEN **
         // We visit an item
         ViewEventRest viewEventRest = new ViewEventRest();

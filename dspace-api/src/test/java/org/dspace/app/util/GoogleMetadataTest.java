@@ -94,7 +94,6 @@ public class GoogleMetadataTest extends AbstractUnitTest {
             Item item = wi.getItem();
             ContentServiceFactory.getInstance().getInstallItemService().installItem(context, wi, null);
             context.restoreAuthSystemState();
-            context.commit();
             it = item;
             bundleService = ContentServiceFactory.getInstance().getBundleService();
             bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();

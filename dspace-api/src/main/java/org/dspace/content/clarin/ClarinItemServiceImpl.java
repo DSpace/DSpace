@@ -14,6 +14,8 @@ import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -21,6 +23,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.dao.clarin.ClarinItemDAO;
 import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.ItemService;
 import org.dspace.content.service.clarin.ClarinItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -40,6 +43,9 @@ public class ClarinItemServiceImpl implements ClarinItemService {
 
     @Autowired
     CollectionService collectionService;
+
+    @Autowired
+    ItemService itemService;
 
     @Override
     public List<Item> findByBitstreamUUID(Context context, UUID bitstreamUUID) throws SQLException {
@@ -124,5 +130,49 @@ public class ClarinItemServiceImpl implements ClarinItemService {
                     ", because: " + e.getSQLState());
         }
         return null;
+    }
+
+    @Override
+    public void updateItemFilesMetadata(Context context, Item item) throws SQLException {
+        List<Bundle> originalBundles = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
+        if (Objects.nonNull(originalBundles.get(0))) {
+            updateItemFilesMetadata(context, item, originalBundles.get(0));
+        } else {
+            log.error("Cannot update item files metadata because the ORIGINAL bundle is null.");
+        }
+    }
+
+    @Override
+    public void updateItemFilesMetadata(Context context, Item item, Bundle bundle) throws SQLException {
+        if (!Objects.equals(bundle.getName(), Constants.CONTENT_BUNDLE_NAME)) {
+            return;
+        }
+
+        int totalNumberOfFiles = 0;
+        long totalSizeofFiles = 0;
+
+        /* Add local.has.files metadata */
+        boolean hasFiles = false;
+        List<Bundle> origs = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
+        for (Bundle orig : origs) {
+            if (CollectionUtils.isNotEmpty(orig.getBitstreams())) {
+                hasFiles = true;
+            }
+            for (Bitstream bit : orig.getBitstreams()) {
+                totalNumberOfFiles ++;
+                totalSizeofFiles += bit.getSizeBytes();
+            }
+        }
+
+        itemService.clearMetadata(context, item, "local", "has", "files", Item.ANY);
+        itemService.clearMetadata(context, item, "local", "files", "count", Item.ANY);
+        itemService.clearMetadata(context, item, "local", "files", "size", Item.ANY);
+        if ( hasFiles ) {
+            itemService.addMetadata(context, item, "local", "has", "files", Item.ANY, "yes");
+        } else {
+            itemService.addMetadata(context, item,"local", "has", "files", Item.ANY, "no");
+        }
+        itemService.addMetadata(context, item,"local", "files", "count", Item.ANY, "" + totalNumberOfFiles);
+        itemService.addMetadata(context, item,"local", "files", "size", Item.ANY, "" + totalSizeofFiles);
     }
 }

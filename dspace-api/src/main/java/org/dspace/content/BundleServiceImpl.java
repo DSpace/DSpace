@@ -32,6 +32,7 @@ import org.dspace.content.dao.BundleDAO;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.clarin.ClarinItemService;
 import org.dspace.content.service.clarin.ClarinLicenseResourceMappingService;
 import org.dspace.content.service.clarin.ClarinLicenseService;
 import org.dspace.core.Constants;
@@ -70,6 +71,8 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
     protected ClarinLicenseService clarinLicenseService;
     @Autowired(required = true)
     protected ClarinLicenseResourceMappingService clarinLicenseResourceMappingService;
+    @Autowired(required = true)
+    protected ClarinItemService clarinItemService;
 
     protected BundleServiceImpl() {
         super();
@@ -161,6 +164,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         // Ensure that the last modified from the item is triggered !
         Item owningItem = (Item) getParentObject(context, bundle);
         if (owningItem != null) {
+            clarinItemService.updateItemFilesMetadata(context, owningItem, bundle);
             itemService.updateLastModified(context, owningItem);
             itemService.update(context, owningItem);
         }
@@ -236,6 +240,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         //Ensure that the last modified from the item is triggered !
         Item owningItem = (Item) getParentObject(context, bundle);
         if (owningItem != null) {
+            clarinItemService.updateItemFilesMetadata(context, owningItem, bundle);
             itemService.updateLastModified(context, owningItem);
             itemService.update(context, owningItem);
         }
@@ -451,6 +456,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
             //The order of the bitstreams has changed, ensure that we update the last modified of our item
             Item owningItem = (Item) getParentObject(context, bundle);
             if (owningItem != null) {
+                clarinItemService.updateItemFilesMetadata(context, owningItem, bundle);
                 itemService.updateLastModified(context, owningItem);
                 itemService.update(context, owningItem);
 

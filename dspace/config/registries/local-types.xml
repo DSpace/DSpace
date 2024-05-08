@@ -145,4 +145,18 @@
     <scope_note>ISO language name</scope_note>
   </dc-type>
 
+  <dc-type>
+    <schema>local</schema>
+    <element>files</element>
+    <qualifier>size</qualifier>
+    <scope_note>Size of all the files in the item in bytes</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>local</schema>
+    <element>files</element>
+    <qualifier>count</qualifier>
+    <scope_note>Count of files in the item</scope_note>
+  </dc-type>
+
 </dspace-dc-types>
