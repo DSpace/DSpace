@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -204,27 +205,14 @@ public class DOIIdentifierProviderTest
                 provider.DOI_ELEMENT,
                 provider.DOI_QUALIFIER,
                                   null);
-<<<<<<< variant A
         if (!remainder.isEmpty()) {
-            itemService.addMetadata(context, item, DOIIdentifierProvider.MD_SCHEMA,
-                                    DOIIdentifierProvider.DOI_ELEMENT,
-                                    DOIIdentifierProvider.DOI_QUALIFIER,
+            itemService.addMetadata(context, item,
+                                    provider.MD_SCHEMA,
+                                    provider.DOI_ELEMENT,
+                                    provider.DOI_QUALIFIER,
                                     null,
                                     remainder);
         }
->>>>>>> variant B
-        itemService.addMetadata(context, item, provider.MD_SCHEMA,
-                provider.DOI_ELEMENT,
-                provider.DOI_QUALIFIER,
-                                null,
-                                remainder);
-####### Ancestor
-        itemService.addMetadata(context, item, DOIIdentifierProvider.MD_SCHEMA,
-                                DOIIdentifierProvider.DOI_ELEMENT,
-                                DOIIdentifierProvider.DOI_QUALIFIER,
-                                null,
-                                remainder);
-======= end
 
         itemService.update(context, item);
         //we need to commit the changes so we don't block the table for testing
@@ -363,6 +351,81 @@ public class DOIIdentifierProviderTest
 
         assertEquals("Failed to recognize DOI in item metadata.",
                 doi, provider.getDOIOutOfObject(item));
+    }
+
+    @Test
+    public void testGet_DOI_Belongs_To_Thesis() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        community = communityService.create(null, context, "123456789/9");
+        communityService.setMetadataSingleValue(context, community,
+            CommunityService.MD_NAME, null, "A Test Community");
+        communityService.update(context, community);
+
+        collection = collectionService.create(context, community);
+        collectionService.setMetadataSingleValue(context, collection,
+            CollectionService.MD_NAME, null, "A Test Collection");
+        collectionService.update(context, collection);
+
+        context.restoreAuthSystemState();
+
+        Item item = newItem();
+        String doi = DOI.SCHEME + PREFIX + "/" + "units/custom/" +
+            Long.toHexString(new Date().getTime());
+
+        context.turnOffAuthorisationSystem();
+        itemService.addMetadata(context, item, provider.MD_SCHEMA,
+            provider.DOI_ELEMENT,
+            provider.DOI_QUALIFIER,
+            null,
+            doiService.DOIToExternalForm(doi));
+        itemService.update(context, item);
+        context.restoreAuthSystemState();
+
+        assertEquals("Failed to recognize DOI in item metadata.",
+                     doi, provider.getDOIOutOfObject(item));
+    }
+
+    @Test
+    public void testGet_DOI_Belongs_To_EUT() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        community = communityService.create(null, context, "123456789/7520");
+        communityService.setMetadataSingleValue(context, community,
+            CommunityService.MD_NAME, null, "A Test Community");
+        communityService.update(context, community);
+
+        collection = collectionService.create(context, community);
+        collectionService.setMetadataSingleValue(context, collection,
+            CollectionService.MD_NAME, null, "A Test Collection");
+        collectionService.update(context, collection);
+
+        context.restoreAuthSystemState();
+
+        Item item = newItem();
+
+        context.turnOffAuthorisationSystem();
+        itemService.addMetadata(context, item, "dc", "identifier", "issn", null, "test-identifier");
+        itemService.update(context, item);
+        context.restoreAuthSystemState();
+
+        String doi = DOI.SCHEME + PREFIX + "/" +
+            itemService.getMetadata(item, "dc.identifier.issn") + "/" +
+            Long.toHexString(new Date().getTime());
+
+        context.turnOffAuthorisationSystem();
+
+        itemService.addMetadata(context, item, provider.MD_SCHEMA,
+            provider.DOI_ELEMENT,
+            provider.DOI_QUALIFIER,
+            null,
+            doiService.DOIToExternalForm(doi));
+        itemService.update(context, item);
+
+        context.restoreAuthSystemState();
+
+        assertEquals("Failed to recognize DOI in item metadata.",
+            doi, provider.getDOIOutOfObject(item));
     }
 
     @Test

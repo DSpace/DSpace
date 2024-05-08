@@ -179,7 +179,9 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
             String[] parts = doiMetadata.split("\\.");
             this.MD_SCHEMA = parts[0];
             this.DOI_ELEMENT = parts[1];
-            this.DOI_QUALIFIER = parts[2];
+            if (parts.length > 2) {
+                this.DOI_QUALIFIER = parts[2];
+            }
         }
     }
 
