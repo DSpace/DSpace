@@ -2234,7 +2234,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                                     String fileName) throws MessagingException {
         try {
             Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);
-            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "bte_batch_import_success"));
+            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "batch_import_success"));
             email.addRecipient(eperson.getEmail());
             email.addArgument(fileName);
 
@@ -2250,7 +2250,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         logError("An error occurred during item import, the user will be notified. " + error);
         try {
             Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);
-            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "bte_batch_import_error"));
+            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "batch_import_error"));
             email.addRecipient(eperson.getEmail());
             email.addArgument(error);
             email.addArgument(configurationService.getProperty("dspace.ui.url") + "/feedback");
