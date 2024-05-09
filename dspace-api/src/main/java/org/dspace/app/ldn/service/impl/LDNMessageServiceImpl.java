@@ -358,8 +358,12 @@ public class LDNMessageServiceImpl implements LDNMessageService {
         if (msgs != null && !msgs.isEmpty()) {
             for (LDNMessageEntity msg : msgs) {
                 RequestStatus offer = new RequestStatus();
-                offer.setServiceName(msg.getOrigin() == null ? "Unknown Service" : msg.getOrigin().getName());
-                offer.setServiceUrl(msg.getOrigin() == null ? "" : msg.getOrigin().getUrl());
+                NotifyServiceEntity nse = msg.getOrigin();
+                if (nse == null) {
+                    nse = msg.getTarget();
+                }
+                offer.setServiceName(nse == null ? "Unknown Service" : nse.getName());
+                offer.setServiceUrl(nse == null ? "" : nse.getUrl());
                 offer.setOfferType(LDNUtils.getNotifyType(msg.getCoarNotifyType()));
                 List<LDNMessageEntity> acks = ldnMessageDao.findAllRelatedMessagesByItem(
                     context, msg, item, "Accept", "TentativeReject", "TentativeAccept", "Announce");
