@@ -183,14 +183,14 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         List<MetadatumDTO> metadatums  = new ArrayList<MetadatumDTO>();
         MetadatumDTO doi = createMetadatumDTO("dc", "identifier", null, "10.3934/mine.2023004");
         MetadatumDTO title = createMetadatumDTO("dc","title", null,
-                "Hardy potential versus lower order terms in Dirichlet problems: regularizing effects<sup>†</sup>");
+            "Hardy potential versus lower order terms in Dirichlet problems: regularizing effects<sup>†</sup>");
         MetadatumDTO type = createMetadatumDTO("dc", "type", null, "Resource Types::text::journal::journal article");
         MetadatumDTO date = createMetadatumDTO("dc", "date", "issued", "2023-01-01");
         MetadatumDTO scopusId = createMetadatumDTO("dc", "identifier", "scopus", "2-s2.0-85124241875");
         MetadatumDTO citationVolume = createMetadatumDTO("oaire", "citation", "volume", "5");
         MetadatumDTO citationIssue = createMetadatumDTO("oaire", "citation", "issue", "1");
         MetadatumDTO subject = createMetadatumDTO("dc", "subject", null,
-                                                  "Hardy potentials | Laplace equation | Summability of solutions");
+            "Hardy potentials | Laplace equation | Summability of solutions");
         MetadatumDTO author = createMetadatumDTO("dc", "contributor", "author", "Arcoya, David");
         MetadatumDTO scopusAuthorId = createMetadatumDTO("person", "identifier", "scopus-author-id", "6602330574");
         MetadatumDTO orgunit = createMetadatumDTO("person", "affiliation", "name", "Universidad de Granada");
@@ -230,7 +230,7 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         List<MetadatumDTO> metadatums2  = new ArrayList<MetadatumDTO>();
         MetadatumDTO doi2 = createMetadatumDTO("dc", "identifier", null, "10.3934/mine.2023001");
         MetadatumDTO title2 = createMetadatumDTO("dc","title", null,
-                "Large deviations for a binary collision model: energy evaporation<sup>†</sup>");
+            "Large deviations for a binary collision model: energy evaporation<sup>†</sup>");
         MetadatumDTO date2 = createMetadatumDTO("dc", "date", "issued", "2023-01-01");
         MetadatumDTO scopusId2 = createMetadatumDTO("dc", "identifier", "scopus", "2-s2.0-85124226483");
         MetadatumDTO type2 = createMetadatumDTO("dc", "type", null, "Resource Types::text::journal::journal article");
@@ -238,7 +238,7 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         MetadatumDTO citationIssue2 = createMetadatumDTO("oaire", "citation", "issue", "1");
 
         MetadatumDTO subject2 = createMetadatumDTO("dc", "subject", null,
-        "Boltzmann equation | Discrete energy model | Kac model | Large deviations | Violation of energy conservation");
+            "Boltzmann equation | Discrete energy model | Kac model | Large deviations | Violation of energy conservation");
 
         MetadatumDTO author4 = createMetadatumDTO("dc", "contributor", "author", "Basile, Giada");
         MetadatumDTO scopusAuthorId4 = createMetadatumDTO("person", "identifier", "scopus-author-id", "55613229065");
@@ -255,7 +255,8 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         MetadatumDTO rights2 = createMetadatumDTO("dc", "rights", null, "true");
         MetadatumDTO ispartof2 = createMetadatumDTO("dc", "relation", "ispartof", "Mathematics In Engineering");
         MetadatumDTO ispartofseries2 = createMetadatumDTO("dc", "relation", "ispartofseries",
-                                                          "Mathematics In Engineering");
+            "Mathematics In Engineering");
+
         metadatums2.add(doi2);
         metadatums2.add(title2);
         metadatums2.add(date2);
