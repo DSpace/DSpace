@@ -26,8 +26,7 @@
         <entry key-ref="scopus.eid" value-ref="scopusEidContrib"/>
         <entry key-ref="scopus.volume" value-ref="scopusVolumeContrib"/>
         <entry key-ref="scopus.issueIdentifier" value-ref="scopusIssueIdentifierContrib"/>
-        <entry key-ref="scopus.authkeywords" value-ref="scopusAuthkeywordsContrib"/>        
-        <entry key-ref="scopus.creator" value-ref="scopusCreatorContrib"/>
+        <entry key-ref="scopus.authkeywords" value-ref="scopusAuthkeywordsContrib"/>
         <entry key-ref="scopus.openaccessFlag" value-ref="scopusOpenaccessFlagContrib"/>
         <entry key-ref="scopus.ispartof" value-ref="scopusIspartofContrib"/>
         <entry key-ref="scopus.ispartofseries" value-ref="scopusIspartofseriesContrib"/>
@@ -216,6 +215,7 @@
         <property name="scopusId" ref="scopus.scopusId"/>
         <property name="affiliation" ref="scopus.affiliation"/>
         <property name="query" value=""/>
+        <property name="creatorMetadataContributor" ref="scopusCreatorContrib"/>
         <property name="prefixToNamespaceMapping" ref="scopusNs"/>
     </bean>
 
