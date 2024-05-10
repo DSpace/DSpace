@@ -3242,7 +3242,7 @@
         <property name="indexFieldName" value="notifyEndorsement"/>
         <property name="metadataFields">
             <list>
-                <value>notify.relation.endorsedBy</value>
+                <value>coar.notify.endorsedBy</value>
             </list>
         </property>
         <property name="facetLimit" value="5"/>
