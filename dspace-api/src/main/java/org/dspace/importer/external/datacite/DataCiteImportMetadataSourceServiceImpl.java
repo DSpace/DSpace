@@ -143,12 +143,16 @@ public class DataCiteImportMetadataSourceServiceImpl
             Iterator<JsonNode> iterator = dataNode.iterator();
             while (iterator.hasNext()) {
                 JsonNode singleDoiNode = iterator.next();
-                String json = singleDoiNode.at("/attributes").toString();
-                records.add(transformSourceRecords(json));
+                JsonNode singleDoiNodeAttribute = singleDoiNode.at("/attributes");
+                if (!singleDoiNodeAttribute.isMissingNode()) {
+                    records.add(transformSourceRecords(singleDoiNodeAttribute.toString()));
+                }
             }
         } else {
-            String json = dataNode.at("/attributes").toString();
-            records.add(transformSourceRecords(json));
+            JsonNode singleDoiNodeAttribute = dataNode.at("/attributes");
+            if (!singleDoiNodeAttribute.isMissingNode()) {
+                records.add(transformSourceRecords(singleDoiNodeAttribute.toString()));
+            }
         }
 
         return records;
