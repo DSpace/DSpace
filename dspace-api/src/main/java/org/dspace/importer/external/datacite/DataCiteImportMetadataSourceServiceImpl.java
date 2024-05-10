@@ -73,8 +73,32 @@ public class DataCiteImportMetadataSourceServiceImpl
 
     @Override
     public int getRecordsCount(String query) throws MetadataSourceException {
-        Collection<ImportRecord> records = getRecords(query, 0, -1);
-        return records == null ? 0 : records.size();
+        String id = getID(query);
+        Map<String, Map<String, String>> params = new HashMap<>();
+        Map<String, String> uriParameters = new HashMap<>();
+        params.put("uriParameters", uriParameters);
+        if (StringUtils.isBlank(id)) {
+            id = query;
+        }
+        uriParameters.put("query", id);
+        uriParameters.put("page[size]", "1");
+        int timeoutMs = configurationService.getIntProperty("datacite.timeout", 180000);
+        String url = configurationService.getProperty("datacite.url", "https://api.datacite.org/dois/");
+        String responseString = liveImportClient.executeHttpGetRequest(timeoutMs, url, params);
+        JsonNode jsonNode = convertStringJsonToJsonNode(responseString);
+        if (jsonNode == null) {
+            log.warn("DataCite returned invalid JSON");
+            throw new MetadataSourceException("Could not read datacite source");
+        }
+        JsonNode dataNode = jsonNode.at("/meta/total");
+        if (dataNode != null) {
+            try {
+                return Integer.valueOf(dataNode.toString());
+            } catch (Exception e) {
+                log.debug("Could not read integer value" + dataNode.toString());
+            }
+        }
+        return 0;
     }
 
     @Override
@@ -95,6 +119,17 @@ public class DataCiteImportMetadataSourceServiceImpl
             id = query;
         }
         uriParameters.put("query", id);
+        // start = current dspace page / datacite page number starting with 1
+        // dspace rounds up/down to the next configured pagination settings.
+        if (start > 0 && count > 0) {
+            uriParameters.put("page[number]", Integer.toString((start / count) + 1));
+        }
+
+        // count = dspace page size /  default datacite page size is currently 25 https://support.datacite.org/docs/pagination
+        if (count > 0) {
+            uriParameters.put("page[size]", Integer.toString(count));
+        }
+
         int timeoutMs = configurationService.getIntProperty("datacite.timeout", 180000);
         String url = configurationService.getProperty("datacite.url", "https://api.datacite.org/dois/");
         String responseString = liveImportClient.executeHttpGetRequest(timeoutMs, url, params);
@@ -108,12 +143,16 @@ public class DataCiteImportMetadataSourceServiceImpl
             Iterator<JsonNode> iterator = dataNode.iterator();
             while (iterator.hasNext()) {
                 JsonNode singleDoiNode = iterator.next();
-                String json = singleDoiNode.at("/attributes").toString();
-                records.add(transformSourceRecords(json));
+                JsonNode singleDoiNodeAttribute = singleDoiNode.at("/attributes");
+                if (!singleDoiNodeAttribute.isMissingNode()) {
+                    records.add(transformSourceRecords(singleDoiNodeAttribute.toString()));
+                }
             }
         } else {
-            String json = dataNode.at("/attributes").toString();
-            records.add(transformSourceRecords(json));
+            JsonNode singleDoiNodeAttribute = dataNode.at("/attributes");
+            if (!singleDoiNodeAttribute.isMissingNode()) {
+                records.add(transformSourceRecords(singleDoiNodeAttribute.toString()));
+            }
         }
 
         return records;
