@@ -238,7 +238,8 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         MetadatumDTO citationIssue2 = createMetadatumDTO("oaire", "citation", "issue", "1");
 
         MetadatumDTO subject2 = createMetadatumDTO("dc", "subject", null,
-            "Boltzmann equation | Discrete energy model | Kac model | Large deviations | Violation of energy conservation");
+            "Boltzmann equation | Discrete energy model | Kac model | Large deviations | " +
+            "Violation of energy conservation");
 
         MetadatumDTO author4 = createMetadatumDTO("dc", "contributor", "author", "Basile, Giada");
         MetadatumDTO scopusAuthorId4 = createMetadatumDTO("person", "identifier", "scopus-author-id", "55613229065");
