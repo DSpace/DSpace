@@ -39,6 +39,9 @@ public interface ClaimedTaskService extends DSpaceCRUDService<ClaimedTask> {
     public ClaimedTask findByWorkflowIdAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
         throws SQLException;
 
+    public ClaimedTask findByWorkflowIdAndAdmin(Context context, XmlWorkflowItem workflowItem)
+        throws SQLException;
+
     public List<ClaimedTask> findByEperson(Context context, EPerson ePerson) throws SQLException;
 
     public List<ClaimedTask> find(Context context, XmlWorkflowItem workflowItem, String stepID) throws SQLException;

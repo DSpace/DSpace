@@ -57,8 +57,19 @@ public class ClaimedTaskDAOImpl extends AbstractHibernateDAO<ClaimedTask> implem
             )
         );
         return uniqueResult(context, criteriaQuery, false, ClaimedTask.class);
+    }
 
-
+    @Override
+    public ClaimedTask findByWorkflowItemAndAdmin(Context context, XmlWorkflowItem workflowItem) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ClaimedTask.class);
+        Root<ClaimedTask> claimedTaskRoot = criteriaQuery.from(ClaimedTask.class);
+        criteriaQuery.select(claimedTaskRoot);
+        criteriaQuery.where(
+                criteriaBuilder.and(criteriaBuilder.equal(claimedTaskRoot.get(ClaimedTask_.workflowItem), workflowItem)
+                )
+        );
+        return uniqueResult(context, criteriaQuery, false, ClaimedTask.class);
     }
 
     @Override
