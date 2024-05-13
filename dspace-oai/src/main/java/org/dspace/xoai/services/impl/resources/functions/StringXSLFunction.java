@@ -55,7 +55,7 @@ public abstract class StringXSLFunction implements ExtensionFunction {
     final public SequenceType[] getArgumentTypes() {
         return new SequenceType[]{
                 SequenceType.makeSequenceType(
-                        ItemType.STRING, OccurrenceIndicator.ONE)};
+                        ItemType.STRING, OccurrenceIndicator.ZERO_OR_MORE)};
     }
 
     @Override

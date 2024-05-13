@@ -139,7 +139,7 @@
 				</xsl:when>
                 <xsl:when
                     test="doc:metadata/doc:element[@name='local']/doc:element[@name='contact']/doc:element[@name='person']/doc:element/doc:field[@name='value']">
-                    <xsl:value-of select="tokenize(doc:metadata/doc:element[@name='local']/doc:element[@name='contact']/doc:element[@name='person']/doc:element/doc:field[@name='value'], ';')[2]"/>
+                    <xsl:value-of select="tokenize(doc:metadata/doc:element[@name='local']/doc:element[@name='contact']/doc:element[@name='person']/doc:element/doc:field[@name='value'][1], ';')[2]"/>
                 </xsl:when>
 				<xsl:otherwise>
 					<xsl:value-of select="fn:logMissing('surname',$handle)" />
@@ -155,7 +155,7 @@
                 </xsl:when>
                 <xsl:when
                     test="doc:metadata/doc:element[@name='local']/doc:element[@name='contact']/doc:element[@name='person']/doc:element/doc:field[@name='value']">
-                    <xsl:value-of select="tokenize(doc:metadata/doc:element[@name='local']/doc:element[@name='contact']/doc:element[@name='person']/doc:element/doc:field[@name='value'], ';')[1]"/>
+                    <xsl:value-of select="tokenize(doc:metadata/doc:element[@name='local']/doc:element[@name='contact']/doc:element[@name='person']/doc:element/doc:field[@name='value'][1], ';')[1]"/>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:value-of select="fn:logMissing('givenName',$handle)" />
@@ -178,7 +178,7 @@
                 test="doc:metadata/doc:element[@name='local']/doc:element[@name='contact']/doc:element[@name='person']/doc:element/doc:field[@name='value']">
 				<ms:affiliation>
 				    <ms:organizationName>
-					   <xsl:value-of select="tokenize(doc:metadata/doc:element[@name='local']/doc:element[@name='contact']/doc:element[@name='person']/doc:element/doc:field[@name='value'], ';')[4]" />
+					   <xsl:value-of select="tokenize(doc:metadata/doc:element[@name='local']/doc:element[@name='contact']/doc:element[@name='person']/doc:element/doc:field[@name='value'][1], ';')[4]" />
 					</ms:organizationName>
 					<!--another communicationInfo needed -->
 					<xsl:call-template name="CommunicationInfo" />
@@ -199,7 +199,7 @@
                         </xsl:when>
                         <xsl:when
                             test="doc:metadata/doc:element[@name='local']/doc:element[@name='contact']/doc:element[@name='person']/doc:element/doc:field[@name='value']">
-                            <xsl:value-of select="tokenize(doc:metadata/doc:element[@name='local']/doc:element[@name='contact']/doc:element[@name='person']/doc:element/doc:field[@name='value'], ';')[3]"/>
+                            <xsl:value-of select="tokenize(doc:metadata/doc:element[@name='local']/doc:element[@name='contact']/doc:element[@name='person']/doc:element/doc:field[@name='value'][1], ';')[3]"/>
                         </xsl:when>
                         <xsl:otherwise>
                             <xsl:value-of select="fn:logMissing('email',$handle)" />
@@ -251,7 +251,7 @@
             <xsl:when test="$fundingProjectNameCount = $fundingTypeCount  and $fundingProjectNameCount &gt; 0">
                 <ms:resourceCreationInfo>
                         <xsl:choose>
-                            <xsl:when test="not(starts-with(doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#ResourceCreationInfo#FundingInfo#ProjectInfo']/doc:element[@name='projectName']/doc:element/doc:field[@name='value'],'#'))">
+                            <xsl:when test="not(starts-with(doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#ResourceCreationInfo#FundingInfo#ProjectInfo']/doc:element[@name='projectName']/doc:element/doc:field[@name='value'][1],'#'))">
                                 <ms:fundingProject>
                                     <ms:projectName>
                                         <xsl:value-of select="doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#ResourceCreationInfo#FundingInfo#ProjectInfo']/doc:element[@name='projectName']/doc:element/doc:field[@name='value']"/>
@@ -270,7 +270,7 @@
                                         <ms:projectName>
                                             <xsl:value-of select="$projectName" />
                                         </ms:projectName>
-                                            <xsl:variable name="funding" select="substring-after(/doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#ResourceCreationInfo#FundingInfo#ProjectInfo']/doc:element[@name='fundingType']/doc:element/doc:field[@name='value'][starts-with(.,$compId)],'-')"/>
+                                            <xsl:variable name="funding" select="substring-after(/doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#ResourceCreationInfo#FundingInfo#ProjectInfo']/doc:element[@name='fundingType']/doc:element/doc:field[@name='value'][starts-with(.,$compId)][1],'-')"/>
                                             <xsl:call-template name="FundingType">
                                                 <xsl:with-param name="funding" select="$funding"/>
                                             </xsl:call-template>
@@ -456,7 +456,7 @@
 					</xsl:when>
                     <xsl:when
                         test="doc:metadata/doc:element[@name='local']/doc:element[@name='size']/doc:element[@name='info']/doc:element/doc:field[@name='value']">
-                        <xsl:value-of select="tokenize(doc:metadata/doc:element[@name='local']/doc:element[@name='size']/doc:element[@name='info']/doc:element/doc:field[@name='value'], ';')[1]"/>
+                        <xsl:value-of select="tokenize(doc:metadata/doc:element[@name='local']/doc:element[@name='size']/doc:element[@name='info']/doc:element/doc:field[@name='value'][1], ';')[1]"/>
                     </xsl:when>
 					<xsl:otherwise>
                         			<xsl:variable name="iJustWantToLog" select="fn:logMissing('size',$handle)" />
@@ -473,7 +473,7 @@
 					</xsl:when>
                     <xsl:when
                         test="doc:metadata/doc:element[@name='local']/doc:element[@name='size']/doc:element[@name='info']/doc:element/doc:field[@name='value']">
-                        <xsl:value-of select="tokenize(doc:metadata/doc:element[@name='local']/doc:element[@name='size']/doc:element[@name='info']/doc:element/doc:field[@name='value'], ';')[2]"/>
+                        <xsl:value-of select="tokenize(doc:metadata/doc:element[@name='local']/doc:element[@name='size']/doc:element[@name='info']/doc:element/doc:field[@name='value'][1], ';')[2]"/>
                     </xsl:when>
 					<xsl:otherwise>
                         			<xsl:variable name="iJustWantToLog" select="fn:logMissing('size',$handle)" />
