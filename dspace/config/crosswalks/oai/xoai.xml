@@ -97,7 +97,7 @@
 
         <Context baseurl="openaire_data" name="OpenAIRE data Context">
             <!-- <Transformer ref="openaireDataTransformer"/> -->
-            <Filter ref="openaireFilter_clarin"/>
+            <Filter ref="openaireFilter"/>
             <Set ref="openaireDataSet"/>
             <Format ref="oaidc"/>
             <Format ref="oai_datacite"/>
@@ -105,7 +105,6 @@
                 This context exports items following the openaire data archive rules.
             </Description>
         </Context>
-
     </Contexts>
 
 
@@ -115,19 +114,6 @@
             <XSLT>metadataFormats/oai_dc.xsl</XSLT>
             <Namespace>http://www.openarchives.org/OAI/2.0/oai_dc/</Namespace>
             <SchemaLocation>http://www.openarchives.org/OAI/2.0/oai_dc.xsd</SchemaLocation>
-        </Format>
-        <Format id="cmdi">
-            <Prefix>cmdi</Prefix>
-            <XSLT>metadataFormats/lindat_cmdi.xsl</XSLT>
-            <Namespace>http://www.clarin.eu/cmd/</Namespace>
-            <SchemaLocation>http://catalog.clarin.eu/ds/ComponentRegistry/rest/registry/profiles/clarin.eu:cr1:p_1349361150622/xsd</SchemaLocation>
-<!--            <Filter ref="ExcludeItemsInComOrCol"/>-->
-        </Format>
-        <Format id="oai_metasharev2">
-            <Prefix>oai_metasharev2</Prefix>
-            <XSLT>metadataFormats/metasharev2.xsl</XSLT>
-            <Namespace>http://www.ilsp.gr/META-XMLSchema</Namespace>
-            <SchemaLocation>http://metashare.ilsp.gr/META-XMLSchema/v2.0/META-SHARE-Resource.xsd</SchemaLocation>
         </Format>
         <Format id="mets">
             <Prefix>mets</Prefix>
@@ -191,24 +177,12 @@
             <Namespace>http://www.loc.gov/MARC21/slim</Namespace>
             <SchemaLocation>http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd</SchemaLocation>
         </Format>
-        <Format id="olac">
-            <Prefix>olac</Prefix>
-            <XSLT>metadataFormats/olac.xsl</XSLT>
-            <Namespace>http://www.language-archives.org/OLAC/1.1/olac.xsd</Namespace>
-            <SchemaLocation>http://www.language-archives.org/OLAC/1.1/</SchemaLocation>
-        </Format>
         <Format id="uketd_dc">
             <Prefix>uketd_dc</Prefix>
             <XSLT>metadataFormats/uketd_dc.xsl</XSLT>
             <Namespace>http://naca.central.cranfield.ac.uk/ethos-oai/2.0/</Namespace>
             <SchemaLocation>http://naca.central.cranfield.ac.uk/ethos-oai/2.0/uketd_dc.xsd</SchemaLocation>
             <Filter ref="uketdDcFilter"/>
-        </Format>
-        <Format id="bibtex">
-		    <Prefix>bibtex</Prefix>
-		    <XSLT>metadataFormats/bibtex.xsl</XSLT>
-		    <Namespace>http://lindat.mff.cuni.cz/ns/experimental/bibtex</Namespace>
-		    <SchemaLocation>http://lindat.mff.cuni.cz/schemas/experimental/bibtex.xsd</SchemaLocation>
         </Format>
         <Format id="junii2">
             <Prefix>junii2</Prefix>
@@ -225,7 +199,31 @@
             <Namespace>http://namespace.openaire.eu/schema/oaire/</Namespace>
             <SchemaLocation>https://www.openaire.eu/schema/repo-lit/4.0/openaire.xsd</SchemaLocation>
         </Format>
-
+        <Format id="bibtex">
+		    <Prefix>bibtex</Prefix>
+		    <XSLT>metadataFormats/bibtex.xsl</XSLT>
+		    <Namespace>http://lindat.mff.cuni.cz/ns/experimental/bibtex</Namespace>
+		    <SchemaLocation>http://lindat.mff.cuni.cz/schemas/experimental/bibtex.xsd</SchemaLocation>
+        </Format>
+        <Format id="oai_metasharev2">
+            <Prefix>oai_metasharev2</Prefix>
+            <XSLT>metadataFormats/metasharev2.xsl</XSLT>
+            <Namespace>http://www.ilsp.gr/META-XMLSchema</Namespace>
+            <SchemaLocation>http://metashare.ilsp.gr/META-XMLSchema/v2.0/META-SHARE-Resource.xsd</SchemaLocation>
+        </Format>
+        <Format id="cmdi">
+            <Prefix>cmdi</Prefix>
+            <XSLT>metadataFormats/lindat_cmdi.xsl</XSLT>
+            <Namespace>http://www.clarin.eu/cmd/</Namespace>
+            <SchemaLocation>http://catalog.clarin.eu/ds/ComponentRegistry/rest/registry/profiles/clarin.eu:cr1:p_1349361150622/xsd</SchemaLocation>
+            <Filter ref="ExcludeItemsInComOrCol"/>
+        </Format>
+        <Format id="olac">
+            <Prefix>olac</Prefix>
+            <XSLT>metadataFormats/olac.xsl</XSLT>
+            <Namespace>http://www.language-archives.org/OLAC/1.1/olac.xsd</Namespace>
+            <SchemaLocation>http://www.language-archives.org/OLAC/1.1/</SchemaLocation>
+        </Format>
         <Format id="oai_datacite">
             <Prefix>oai_datacite</Prefix>
             <XSLT>metadataFormats/datacite_openaire.xsl</XSLT>
@@ -248,14 +246,21 @@
 
 
     <Filters>
-        <Filter id="openaireFilter_clarin">
+        <Filter id="openaireFilter">
             <Definition>
-                                <Custom ref="openaireRelationCondition"/>
+                <Custom ref="openaireRelationCondition"/>
             </Definition>
         </Filter>
         <Filter id="ExcludeItemsInComOrCol">
             <Definition>
-                <Custom ref="cmdiExcludedComsOrCols"/>
+                <And>
+                    <LeftCondition>
+                        <Custom ref="excludeDhCom"/>
+                    </LeftCondition>
+                    <RightCondition>
+                        <Custom ref="excludeTeachingCom"/>
+                    </RightCondition>
+                </And>
             </Definition>
         </Filter>
 
@@ -267,11 +272,6 @@
                * AND Driver "open access" condition is specified
              This filter is only used in the DRIVER context ([oai]/driver)
         -->
-        <Filter id="ExcludeItemsInComOrCol">
-            <Definition>
-                <Custom ref="cmdiExcludedComsOrCols"/>
-            </Definition>
-        </Filter>
         <Filter id="driverFilter">
             <Definition>
                 <And>
@@ -556,6 +556,59 @@
             </Configuration>
         </CustomCondition>
 
+        <CustomCondition id="hasFilesCondition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">local.has.files</string>
+                <string name="operator">equal</string>
+                <string name="value">yes</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="hasMediaTypeCondition">
+            <Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
+            <Configuration>
+                <string name="field">metashare.ResourceInfo#ContentInfo.mediaType</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="isToolCondition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.type</string>
+                <string name="operator">equal</string>
+                <string name="value">toolService</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="isLanguageResourceCondition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.type</string>
+                <string name="operator">equal</string>
+                <list name="values">
+                    <string>corpus</string>
+                    <string>lexicalConceptualResource</string>
+                    <string>languageDescription</string>
+                    <string>toolService</string>
+                </list>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="excludeDhCom">
+            <Class>org.dspace.xoai.filter.ColComFilter</Class>
+            <Configuration>
+                <string name="handle">20.500.12800/1</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="excludeTeachingCom">
+            <Class>org.dspace.xoai.filter.ColComFilter</Class>
+            <Configuration>
+                <string name="handle">11234/5011</string>
+            </Configuration>
+        </CustomCondition>
+
         <!-- This condition determines if an Item has a "dspace.entity.type" -->
         <CustomCondition id="relationshipTypeExistsCondition">
             <Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
@@ -576,13 +629,6 @@
                     <string>publication</string>
                     <!-- and other alternative names for publications types -->
                 </list>
-            </Configuration>
-        </CustomCondition>
-
-        <CustomCondition id="cmdiExcludedComsOrCols">
-            <Class>org.dspace.xoai.filter.ColComFilter</Class>
-            <Configuration>
-                <string name="handle">XXX</string>
             </Configuration>
         </CustomCondition>
     </Filters>
