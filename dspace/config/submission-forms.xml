@@ -516,7 +516,7 @@
 <!--            </row>-->
             <row>
                 <relation-field>
-                    <relationship-type>isProjectOfPerson</relationship-type>
+                    <relationship-type>isPersonOfProject</relationship-type>
                     <search-configuration>person</search-configuration>
                     <repeatable>true</repeatable>
                     <label>Investigator</label>
