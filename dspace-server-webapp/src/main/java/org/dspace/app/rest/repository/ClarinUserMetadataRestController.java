@@ -32,14 +32,19 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.ClarinUserMetadataRest;
+import org.dspace.app.rest.model.ItemRest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.clarin.ClarinLicense;
 import org.dspace.content.clarin.ClarinLicenseResourceMapping;
 import org.dspace.content.clarin.ClarinLicenseResourceUserAllowance;
 import org.dspace.content.clarin.ClarinUserMetadata;
 import org.dspace.content.clarin.ClarinUserRegistration;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
 import org.dspace.content.service.clarin.ClarinLicenseResourceMappingService;
 import org.dspace.content.service.clarin.ClarinLicenseResourceUserAllowanceService;
 import org.dspace.content.service.clarin.ClarinUserMetadataService;
@@ -76,8 +81,104 @@ public class ClarinUserMetadataRestController {
     ClarinUserRegistrationService clarinUserRegistrationService;
     @Autowired
     BitstreamService bitstreamService;
+
+    @Autowired
+    ItemService itemService;
+
     @Autowired
     ConfigurationService configurationService;
+
+    @RequestMapping(value = "/zip", method = POST, consumes = APPLICATION_JSON)
+    @PreAuthorize("permitAll()")
+    public ResponseEntity manageUserMetadataForZIP(@RequestParam("itemUUID") UUID itemUUID,
+                                             HttpServletRequest request)
+            throws SQLException, ParseException, IOException, AuthorizeException, MessagingException {
+
+        // Get context from the request
+        Context context = obtainContext(request);
+        // Validate parameters
+        if (Objects.isNull(context)) {
+            return null;
+        }
+        if (Objects.isNull(itemUUID)) {
+            return null;
+        }
+
+        // Get current user from the context to find out if the user is signed in
+        EPerson currentUser = context.getCurrentUser();
+        String downloadToken = this.generateToken();
+
+        Item item = itemService.find(context, itemUUID);
+        if (Objects.isNull(item)) {
+            log.error("Cannot find the item with ID: " + itemUUID);
+            throw new NotFoundException("Cannot find the item with ID: " + itemUUID);
+        }
+        // Load the name because it is used in the email, and it must be loaded before the `sendEmailWithDownloadLink`
+        // method otherwise it will throw an exception about Lazy loading.
+        item.getName();
+
+        boolean shouldEmailToken = false;
+        ClarinLicense clarinLicense = null;
+        // Get ClarinUserMetadataRest Array from the request body
+        ClarinUserMetadataRest[] clarinUserMetadataRestArray =
+                new ObjectMapper().readValue(request.getInputStream(), ClarinUserMetadataRest[].class);
+        if (Objects.isNull(clarinUserMetadataRestArray)) {
+            throw new RuntimeException("The clarinUserMetadataRestArray cannot be null. It could be empty, but" +
+                    " not null");
+        }
+
+        // Convert Array to the List
+        List<ClarinUserMetadataRest> clarinUserMetadataRestList = Arrays.asList(clarinUserMetadataRestArray);
+        List<Bundle> bundles = item.getBundles("ORIGINAL");
+        for (Bundle original : bundles) {
+            List<Bitstream> bss = original.getBitstreams();
+            for (Bitstream bitstream : bss) {
+                UUID bitstreamUUID = bitstream.getID();
+                // Get mapping between clarin license and the bitstream
+                ClarinLicenseResourceMapping clarinLicenseResourceMapping =
+                        this.getLicenseResourceMapping(context, bitstreamUUID);
+                if (Objects.isNull(clarinLicenseResourceMapping)) {
+                    throw new NotFoundException("Cannot find the license resource mapping between clarin license" +
+                            " and the bitstream");
+                }
+                if (Objects.isNull(currentUser)) {
+                    // The user is not signed in
+                    this.processNonSignedInUser(context, clarinUserMetadataRestList, clarinLicenseResourceMapping,
+                            downloadToken);
+
+                } else {
+                    // The user is signed in
+                    this.processSignedInUser(context, currentUser, clarinUserMetadataRestList,
+                            clarinLicenseResourceMapping, downloadToken);
+                }
+
+                // Check (only once) if the Clarin License contains the required information to SEND_TOKEN, which means
+                // the item must be downloaded after the user confirms the download with the token sent by email.
+                if (Objects.isNull(clarinLicense)) {
+                    clarinLicense = this.getClarinLicense(clarinLicenseResourceMapping);
+                    shouldEmailToken = this.shouldEmailToken(clarinLicenseResourceMapping);
+                }
+            }
+        }
+
+        context.commit();
+        if (shouldEmailToken) {
+            // If yes - send token to e-mail
+            try {
+                String email = getEmailFromUserMetadata(clarinUserMetadataRestList);
+                this.sendEmailWithDownloadLink(context, item, clarinLicense,
+                        email, downloadToken);
+            } catch (MessagingException e) {
+                log.error("Cannot send the download email because: " + e.getMessage());
+                throw new RuntimeException("Cannot send the download email because: " + e.getMessage());
+            }
+
+            return ResponseEntity.ok().body(CHECK_EMAIL_RESPONSE_CONTENT);
+        } else {
+            // If no - send token in the response to download the bitstream immediately
+            return ResponseEntity.ok().body(downloadToken);
+        }
+    }
 
     @RequestMapping(method = POST, consumes = APPLICATION_JSON)
     @PreAuthorize("permitAll()")
@@ -91,13 +192,24 @@ public class ClarinUserMetadataRestController {
         if (Objects.isNull(context)) {
             return null;
         }
-        if (Objects.isNull(bitstreamUUID)) {
+
+
+        Bitstream bitstream = bitstreamService.find(context, bitstreamUUID);
+        if (Objects.isNull(bitstream)) {
+            log.error("Cannot find the bitstream with ID: " + bitstreamUUID);
             return null;
         }
+        // Load the name because it is used in the email, and it must be loaded before the `sendEmailWithDownloadLink`
+        // method otherwise it will throw an exception about Lazy loading.
+        bitstream.getName();
+
+        // Get current user from the context to find out if the user is signed in
+        EPerson currentUser = context.getCurrentUser();
+        String downloadToken = this.generateToken();
 
         // Get mapping between clarin license and the bitstream
         ClarinLicenseResourceMapping clarinLicenseResourceMapping =
-                this.getLicenseResourceMapping(context, bitstreamUUID);
+                this.getLicenseResourceMapping(context, bitstream.getID());
         if (Objects.isNull(clarinLicenseResourceMapping)) {
             throw new NotFoundException("Cannot find the license resource mapping between clarin license" +
                     " and the bitstream");
@@ -113,28 +225,26 @@ public class ClarinUserMetadataRestController {
 
         // Convert Array to the List
         List<ClarinUserMetadataRest> clarinUserMetadataRestList = Arrays.asList(clarinUserMetadataRestArray);
-
-        // Get current user from the context to find out if the user is signed in
-        EPerson currentUser = context.getCurrentUser();
-        String downloadToken = this.generateToken();
         if (Objects.isNull(currentUser)) {
             // The user is not signed in
             this.processNonSignedInUser(context, clarinUserMetadataRestList, clarinLicenseResourceMapping,
-                    bitstreamUUID, downloadToken);
+                    downloadToken);
 
         } else {
             // The user is signed in
             this.processSignedInUser(context, currentUser, clarinUserMetadataRestList, clarinLicenseResourceMapping,
-                    bitstreamUUID, downloadToken);
+                    downloadToken);
         }
 
-        boolean shouldEmailToken = this.shouldEmailToken(context, bitstreamUUID, clarinLicenseResourceMapping);
+        boolean shouldEmailToken = this.shouldEmailToken(clarinLicenseResourceMapping);
         context.commit();
         if (shouldEmailToken) {
             // If yes - send token to e-mail
             try {
-                this.sendEmailWithDownloadLink(context, bitstreamUUID, clarinLicenseResourceMapping,
-                        clarinUserMetadataRestList, downloadToken);
+                String email = getEmailFromUserMetadata(clarinUserMetadataRestList);
+                ClarinLicense clarinLicense = this.getClarinLicense(clarinLicenseResourceMapping);
+                this.sendEmailWithDownloadLink(context, bitstream, clarinLicense,
+                        email, downloadToken);
             } catch (MessagingException e) {
                 log.error("Cannot send the download email because: " + e.getMessage());
                 throw new RuntimeException("Cannot send the download email because: " + e.getMessage());
@@ -147,30 +257,19 @@ public class ClarinUserMetadataRestController {
         }
     }
 
-    private void sendEmailWithDownloadLink(Context context, UUID bitstreamUUID,
-                                           ClarinLicenseResourceMapping clarinLicenseResourceMapping,
-                                           List<ClarinUserMetadataRest> clarinUserMetadataRestList,
+    private void sendEmailWithDownloadLink(Context context, DSpaceObject dso,
+                                           ClarinLicense clarinLicense,
+                                           String email,
                                            String downloadToken)
             throws IOException, SQLException, MessagingException {
-        // Get the recipient email
-        String email = getEmailFromUserMetadata(clarinUserMetadataRestList);
         if (StringUtils.isBlank(email)) {
             log.error("Cannot send email with download link because the email is empty.");
             throw new BadRequestException("Cannot send email with download link because the email is empty.");
         }
 
-        // Get the file name
-        Bitstream bitstream = bitstreamService.find(context, bitstreamUUID);
-        if (Objects.isNull(bitstream)) {
-            log.error("Cannot find bitstream with ID: " + bitstreamUUID);
-            throw new BadRequestException("Cannot find bitstream with ID: " + bitstreamUUID);
-        }
-
-        // Get Clarin License
-        ClarinLicense clarinLicense = getClarinLicense(context, bitstreamUUID, clarinLicenseResourceMapping);
-        if (Objects.isNull(clarinLicense)) {
-            log.error("Cannot find the clarin license for the bitstream with ID: " + bitstreamUUID);
-            throw new BadRequestException("Cannot find the clarin license for the bitstream with ID: " + bitstreamUUID);
+        if (Objects.isNull(dso)) {
+            log.error("Cannot send email with download link because the DSpaceObject is null.");
+            throw new BadRequestException("Cannot send email with download link because the DSpaceObject is null.");
         }
 
         // Fetch DSpace main cfg info and send it in the email
@@ -185,13 +284,15 @@ public class ClarinUserMetadataRestController {
             throw new RuntimeException("Cannot load the `dspace.ui.url` property from the cfg.");
         }
         // Compose download link
-        String downloadLink = uiUrl + "/" + BitstreamRest.PLURAL_NAME + "/" + bitstream.getID() + "/download?dtoken=" +
-                downloadToken;
+        // Redirect to `/api/bitstreams/{bitstreamId}/download?dtoken={downloadToken}` or
+        // `/api/items/{itemId}/download?dtoken={downloadToken}`
+        String downloadLink = uiUrl + "/"  + (dso instanceof Item ? ItemRest.PLURAL_NAME : BitstreamRest.PLURAL_NAME) +
+                "/" + dso.getID() + "/download?dtoken=" + downloadToken;
 
         try {
             Locale locale = context.getCurrentLocale();
             Email bean = Email.getEmail(I18nUtil.getEmailFilename(locale, "clarin_download_link"));
-            bean.addArgument(bitstream.getName());
+            bean.addArgument(dso.getName());
             bean.addArgument(downloadLink);
             bean.addArgument(clarinLicense.getDefinition());
             bean.addArgument(helpDeskEmail);
@@ -220,7 +321,7 @@ public class ClarinUserMetadataRestController {
     public List<ClarinUserMetadata> processSignedInUser(Context context, EPerson currentUser,
                                               List<ClarinUserMetadataRest> clarinUserMetadataRestList,
                                               ClarinLicenseResourceMapping clarinLicenseResourceMapping,
-                                              UUID bitstreamUUID, String downloadToken)
+                                              String downloadToken)
             throws SQLException {
         // If exists userMetadata records in the table update them or create them in other case
         // Get UserRegistration which has the UserMetadata list
@@ -289,7 +390,6 @@ public class ClarinUserMetadataRestController {
     public List<ClarinUserMetadata> processNonSignedInUser(Context context,
                                                   List<ClarinUserMetadataRest> clarinUserMetadataRestList,
                                                   ClarinLicenseResourceMapping clarinLicenseResourceMapping,
-                                                  UUID bitstreamUUID,
                                                   String downloadToken) throws SQLException {
         // Create ClarinUserMetadataRecord from the ClarinUserMetadataRest List.
         // Add created ClarinUserMetadata to the List.
@@ -343,9 +443,7 @@ public class ClarinUserMetadataRestController {
         return clarinLicenseResourceMapping;
     }
 
-    private ClarinLicense getClarinLicense(Context context, UUID bitstreamUUID,
-                                           ClarinLicenseResourceMapping clarinLicenseResourceMapping)
-            throws SQLException {
+    private ClarinLicense getClarinLicense(ClarinLicenseResourceMapping clarinLicenseResourceMapping) {
         if (Objects.isNull(clarinLicenseResourceMapping)) {
             throw new NullPointerException("The clarinLicenseResourceMapping object is null.");
         }
@@ -359,9 +457,8 @@ public class ClarinUserMetadataRestController {
         return clarinLicense;
     }
 
-    private boolean shouldEmailToken(Context context, UUID bitstreamUUID,
-                                     ClarinLicenseResourceMapping clarinLicenseResourceMapping) throws SQLException {
-        ClarinLicense clarinLicense = this.getClarinLicense(context, bitstreamUUID, clarinLicenseResourceMapping);
+    private boolean shouldEmailToken(ClarinLicenseResourceMapping clarinLicenseResourceMapping) {
+        ClarinLicense clarinLicense = this.getClarinLicense(clarinLicenseResourceMapping);
         if (Objects.isNull(clarinLicense)) {
             throw new NullPointerException("The ClarinLicense is null.");
         }

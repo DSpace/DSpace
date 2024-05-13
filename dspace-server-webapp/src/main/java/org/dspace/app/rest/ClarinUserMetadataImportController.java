@@ -168,12 +168,12 @@ public class ClarinUserMetadataImportController {
                 //create user metadata and license resource user allowance
                 newClarinUserMetadataList = clarinUserMetadataRestController.processSignedInUser(
                         context, ePerson, clarinUserMetadataRestList,
-                        clarinLicenseResourceMapping, bitstreamUUID, token);
+                        clarinLicenseResourceMapping, token);
             } else {
                 // The user not is signed in
                 //create user metadata and license resource user allowance
                 newClarinUserMetadataList = clarinUserMetadataRestController.processNonSignedInUser(
-                        context, clarinUserMetadataRestList, clarinLicenseResourceMapping, bitstreamUUID, token);
+                        context, clarinUserMetadataRestList, clarinLicenseResourceMapping, token);
             }
             //set eperson_id (user registration) in user_metadata
             newClarinUserMetadataList.get(0).setEperson(userRegistration);
