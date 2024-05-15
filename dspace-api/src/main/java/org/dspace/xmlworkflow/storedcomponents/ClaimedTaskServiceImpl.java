@@ -82,8 +82,8 @@ public class ClaimedTaskServiceImpl implements ClaimedTaskService {
     }
 
     @Override
-    public ClaimedTask findByWorkflowIdAndAdmin(Context context, XmlWorkflowItem workflowItem) throws SQLException {
-        return claimedTaskDAO.findByWorkflowItemAndAdmin(context, workflowItem);
+    public ClaimedTask findByFirstWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException {
+        return claimedTaskDAO.findFirstByWorkflowItem(context, workflowItem);
     }
 
     @Override

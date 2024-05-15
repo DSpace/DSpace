@@ -60,7 +60,7 @@ public class ClaimedTaskDAOImpl extends AbstractHibernateDAO<ClaimedTask> implem
     }
 
     @Override
-    public ClaimedTask findByWorkflowItemAndAdmin(Context context, XmlWorkflowItem workflowItem) throws SQLException {
+    public ClaimedTask findFirstByWorkflowItem(Context context, XmlWorkflowItem workflowItem) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ClaimedTask.class);
         Root<ClaimedTask> claimedTaskRoot = criteriaQuery.from(ClaimedTask.class);

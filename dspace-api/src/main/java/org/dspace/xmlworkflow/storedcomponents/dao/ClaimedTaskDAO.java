@@ -48,7 +48,15 @@ public interface ClaimedTaskDAO extends GenericDAO<ClaimedTask> {
     public ClaimedTask findByWorkflowItemAndEPerson(Context context, XmlWorkflowItem workflowItem, EPerson ePerson)
         throws SQLException;
 
-    public ClaimedTask findByWorkflowItemAndAdmin(Context context, XmlWorkflowItem workflowItem)
+    /**
+     * Find the single task for a given workflow item.
+     *
+     * @param context
+     * @param workflowItem find task for this item.
+     * @return the matching task, or null if none.
+     * @throws SQLException if query cannot be created or fails.
+     */
+    public ClaimedTask findFirstByWorkflowItem(Context context, XmlWorkflowItem workflowItem)
         throws SQLException;
 
     public List<ClaimedTask> findByEperson(Context context, EPerson ePerson) throws SQLException;

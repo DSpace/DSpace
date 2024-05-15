@@ -174,9 +174,10 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
                 return null;
             } else {
                 if (authorizeService.isAdmin(context)) {
-                    claimedTask = claimedTaskService.findByWorkflowIdAndAdmin(context, xmlWFI);
+                    claimedTask = claimedTaskService.findByFirstWorkflowItem(context, xmlWFI);
                 } else {
-                    claimedTask = claimedTaskService.findByWorkflowIdAndEPerson(context, xmlWFI, context.getCurrentUser());
+                    claimedTask = claimedTaskService
+                            .findByWorkflowIdAndEPerson(context, xmlWFI, context.getCurrentUser());
                 }
             }
             if (claimedTask == null) {
