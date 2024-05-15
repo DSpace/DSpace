@@ -11,22 +11,21 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import java.util.Objects;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import org.dspace.content.Item;
 import org.dspace.core.ReloadableEntity;
-import org.hibernate.annotations.Type;
+import org.hibernate.Length;
 
 /**
  * Entity that model a record on the ORCID synchronization queue. Each record in
@@ -64,9 +63,7 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
     /**
      * A description of the resource to be synchronized.
      */
-    @Lob
-    @Type(type = "org.hibernate.type.TextType")
-    @Column(name = "description")
+    @Column(name = "description", length = Length.LONG32)
     private String description;
 
     /**
@@ -87,9 +84,7 @@ public class OrcidQueue implements ReloadableEntity<Integer> {
      * The signature of the metadata to be synchronized. This is used when the
      * entity is the owner itself.
      */
-    @Lob
-    @Column(name = "metadata")
-    @Type(type = "org.hibernate.type.TextType")
+    @Column(name = "metadata", length = Length.LONG32)
     private String metadata;
 
     /**

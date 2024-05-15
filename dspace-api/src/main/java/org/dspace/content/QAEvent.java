@@ -14,6 +14,7 @@ import java.util.Date;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.dspace.qaevent.service.dto.CorrectionTypeMessageDTO;
+import org.dspace.qaevent.service.dto.NotifyMessageDTO;
 import org.dspace.qaevent.service.dto.OpenaireMessageDTO;
 import org.dspace.qaevent.service.dto.QAMessageDTO;
 import org.dspace.util.RawJsonDeserializer;
@@ -22,6 +23,7 @@ import org.dspace.util.RawJsonDeserializer;
  * This class represent the Quality Assurance broker data as loaded in our solr
  * qaevent core
  *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 public class QAEvent {
     public static final char[] HEX_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e',
@@ -30,8 +32,9 @@ public class QAEvent {
     public static final String REJECTED = "rejected";
     public static final String DISCARDED = "discarded";
 
-    public static final String OPENAIRE_SOURCE = "OpenAIRE";
+    public static final String OPENAIRE_SOURCE = "openaire";
     public static final String DSPACE_USERS_SOURCE = "DSpaceUsers";
+    public static final String COAR_NOTIFY_SOURCE = "coar-notify";
 
     private String source;
 
@@ -205,6 +208,8 @@ public class QAEvent {
         switch (getSource()) {
             case OPENAIRE_SOURCE:
                 return OpenaireMessageDTO.class;
+            case COAR_NOTIFY_SOURCE:
+                return NotifyMessageDTO.class;
             case DSPACE_USERS_SOURCE:
                 return CorrectionTypeMessageDTO.class;
             default:

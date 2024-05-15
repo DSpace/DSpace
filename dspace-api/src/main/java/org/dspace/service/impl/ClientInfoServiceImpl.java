@@ -10,17 +10,17 @@ package org.dspace.service.impl;
 import static org.apache.commons.lang3.StringUtils.ordinalIndexOf;
 
 import java.net.Inet4Address;
-import javax.servlet.http.HttpServletRequest;
 
 import com.google.common.net.InetAddresses;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Utils;
 import org.dspace.service.ClientInfoService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.statistics.util.IPTable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -32,16 +32,16 @@ public class ClientInfoServiceImpl implements ClientInfoService {
 
     private static final String X_FORWARDED_FOR_HEADER = "X-Forwarded-For";
 
-    private static final Logger log = LoggerFactory.getLogger(ClientInfoServiceImpl.class);
+    private static final Logger log = LogManager.getLogger();
 
     private Boolean useProxiesEnabled;
 
-    private ConfigurationService configurationService;
+    private final ConfigurationService configurationService;
 
     /**
      * Sparse HashTable structure to hold IP address ranges of trusted proxies
      */
-    private IPTable trustedProxies;
+    private final IPTable trustedProxies;
 
     @Autowired(required = true)
     public ClientInfoServiceImpl(ConfigurationService configurationService) {
@@ -84,7 +84,7 @@ public class ClientInfoServiceImpl implements ClientInfoService {
     public boolean isUseProxiesEnabled() {
         if (useProxiesEnabled == null) {
             useProxiesEnabled = configurationService.getBooleanProperty("useProxies", true);
-            log.info("Proxies (useProxies) enabled? " + useProxiesEnabled);
+            log.info("Proxies (useProxies) enabled? {}", useProxiesEnabled);
         }
 
         return useProxiesEnabled;
@@ -163,6 +163,7 @@ public class ClientInfoServiceImpl implements ClientInfoService {
      * @param ipAddress IP address to check for
      * @return true if trusted, false otherwise
      */
+    @Override
     public boolean isRequestFromTrustedProxy(String ipAddress) {
         try {
             return trustedProxies != null && trustedProxies.contains(ipAddress);
@@ -205,15 +206,15 @@ public class ClientInfoServiceImpl implements ClientInfoService {
     }
 
     /**
-     * Anonymize the given IP address by setting the last specified bytes to 0
-     * @param  ipAddress the ip address to be anonymize
+     * Anonymize the given IP address by setting the last specified bytes to 0.
+     * @param  ipAddress the ip address to be anonymized
      * @param  bytes     the number of bytes to be set to 0
      * @return           the modified ip address
      */
     private String anonymizeIpAddress(String ipAddress, int bytes) {
 
         if (bytes > 4) {
-            log.warn("It is not possible to anonymize " + bytes + " bytes of an IPv4 address.");
+            log.warn("It is not possible to anonymize {} bytes of an IPv4 address.", bytes);
             return ipAddress;
         }
 

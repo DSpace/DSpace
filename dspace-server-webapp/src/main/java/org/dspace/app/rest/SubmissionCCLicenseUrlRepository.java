@@ -10,8 +10,8 @@ package org.dspace.app.rest;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import javax.servlet.ServletRequest;
 
+import jakarta.servlet.ServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;

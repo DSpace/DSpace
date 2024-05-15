@@ -25,7 +25,6 @@ public class QASourceRest extends BaseObjectRest<String> {
     public static final String PLURAL_NAME = "qualityassurancesources";
     public static final String CATEGORY = RestAddressableModel.INTEGRATION;
 
-    private String id;
     private Date lastEvent;
     private long totalEvents;
 
@@ -47,14 +46,6 @@ public class QASourceRest extends BaseObjectRest<String> {
     @Override
     public Class getController() {
         return RestResourceController.class;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public Date getLastEvent() {

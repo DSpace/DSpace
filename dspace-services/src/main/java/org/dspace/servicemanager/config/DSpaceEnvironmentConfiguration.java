@@ -12,8 +12,8 @@ import java.util.Map;
 
 import org.apache.commons.configuration2.MapConfiguration;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Bash does not allow environment variables that contain dots in their name.
@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DSpaceEnvironmentConfiguration extends MapConfiguration {
 
-    private static Logger log = LoggerFactory.getLogger(DSpaceEnvironmentConfiguration.class);
+    private static final Logger log = LogManager.getLogger();
 
     /**
      * Create a Configuration based on the environment variables.
@@ -52,12 +52,13 @@ public class DSpaceEnvironmentConfiguration extends MapConfiguration {
             // replace "__D__" with a single dash.
             String lookup = StringUtils.replace(key, "__P__", ".");
             lookup = StringUtils.replace(lookup, "__D__", "-");
-            if (System.getenv(key) != null) {
+            String value = System.getenv(key);
+            if (value != null) {
                 // store the new key with the old value in our new properties map.
-                env.put(lookup, System.getenv(key));
-                log.debug("Found env " + lookup + " = " + System.getenv(key) + ".");
+                env.put(lookup, value);
+                log.debug("Found env {} = {}.", lookup, value);
             } else {
-                log.debug("Didn't found env " + lookup + ".");
+                log.debug("Didn't find env {}.", lookup);
             }
         }
         return env;

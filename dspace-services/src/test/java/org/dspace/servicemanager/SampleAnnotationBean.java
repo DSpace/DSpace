@@ -7,9 +7,8 @@
  */
 package org.dspace.servicemanager;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import org.dspace.servicemanager.example.ConcreteExample;
 import org.dspace.servicemanager.example.ServiceExample;
 import org.springframework.beans.factory.annotation.Autowired;

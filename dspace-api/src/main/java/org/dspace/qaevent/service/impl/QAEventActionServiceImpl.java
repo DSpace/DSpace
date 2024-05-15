@@ -80,12 +80,21 @@ public class QAEventActionServiceImpl implements QAEventActionService {
             if (qaevent.getRelated() != null) {
                 related = itemService.find(context, UUID.fromString(qaevent.getRelated()));
             }
+            if (topicsToActions.get(qaevent.getTopic()) == null) {
+                String msg = "Unable to manage QA Event typed " + qaevent.getTopic()
+                    + ". Managed types are: " + topicsToActions;
+                log.error(msg);
+                throw new RuntimeException(msg);
+            }
+            context.turnOffAuthorisationSystem();
             topicsToActions.get(qaevent.getTopic()).applyCorrection(context, item, related,
                 jsonMapper.readValue(qaevent.getMessage(), qaevent.getMessageDtoClass()));
             qaEventService.deleteEventByEventId(qaevent.getEventId());
             makeAcknowledgement(qaevent.getEventId(), qaevent.getSource(), QAEvent.ACCEPTED);
         } catch (SQLException | JsonProcessingException e) {
             throw new RuntimeException(e);
+        } finally {
+            context.restoreAuthSystemState();
         }
     }
 

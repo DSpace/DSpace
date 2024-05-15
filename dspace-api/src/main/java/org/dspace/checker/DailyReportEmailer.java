@@ -13,8 +13,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import javax.mail.MessagingException;
 
+import jakarta.mail.MessagingException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -63,7 +63,7 @@ public class DailyReportEmailer {
      * @throws MessagingException if message cannot be sent.
      */
     public void sendReport(File attachment, int numberOfBitstreams)
-        throws IOException, javax.mail.MessagingException {
+        throws IOException, jakarta.mail.MessagingException {
         if (numberOfBitstreams > 0) {
             ConfigurationService configurationService
                     = DSpaceServicesFactory.getInstance().getConfigurationService();

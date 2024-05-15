@@ -28,6 +28,12 @@ public class RegexUtils {
         "/{uuid:" + REGEX_UUID + "}";
 
     /**
+     * Regular expression in the request mapping to accept LDN identifiers
+     */
+    public static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_URN_UUID =
+        "/{id:^urn:uuid:" + REGEX_UUID + "}";
+
+    /**
      * Regular expression in the request mapping to accept a string as identifier but not the other kind of
      * identifier (digits or uuid)
      */

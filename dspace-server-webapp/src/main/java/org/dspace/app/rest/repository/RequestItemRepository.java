@@ -17,10 +17,10 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.LogManager;
@@ -247,11 +247,15 @@ public class RequestItemRepository
             message = responseMessageNode.asText();
         }
 
+        JsonNode responseSubjectNode = requestBody.findValue("subject");
+        String subject = null;
+        if (responseSubjectNode != null && !responseSubjectNode.isNull()) {
+            subject = responseSubjectNode.asText();
+        }
         ri.setDecision_date(new Date());
         requestItemService.update(context, ri);
 
         // Send the response email
-        String subject = requestBody.findValue("subject").asText();
         try {
             requestItemEmailNotifier.sendResponse(context, ri, subject, message);
         } catch (IOException ex) {

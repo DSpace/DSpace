@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.login.PostLoggedInAction;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
@@ -27,8 +29,6 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.profile.service.ResearcherProfileService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
@@ -43,7 +43,7 @@ import org.springframework.util.Assert;
  */
 public class ResearcherProfileAutomaticClaim implements PostLoggedInAction {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(ResearcherProfileAutomaticClaim.class);
+    private final static Logger LOGGER = LogManager.getLogger();
 
     @Autowired
     private ResearcherProfileService researcherProfileService;

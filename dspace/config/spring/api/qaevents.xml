@@ -2,10 +2,13 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:util="http://www.springframework.org/schema/util"
     xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
            http://www.springframework.org/schema/context
-           http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
@@ -19,11 +22,30 @@
         <property name="topicsToActions">
             <map>
             	<!--The key are the TOPIC, the value must be a valid implementation of the org.dspace.qaevent.QAEventAction interface -->
-               <entry key="ENRICH/MORE/PROJECT" value-ref="ProjectLinkedEntityAction" />
-               <entry key="ENRICH/MISSING/PROJECT" value-ref="ProjectLinkedEntityAction" />
-               <entry key="ENRICH/MISSING/ABSTRACT" value-ref="AbstractMetadataAction" />
-               <entry key="ENRICH/MORE/PID" value-ref="PIDMetadataAction" />
-               <entry key="ENRICH/MISSING/PID" value-ref="PIDMetadataAction" />
+               <entry value-ref="ProjectLinkedEntityAction">
+                  <key><util:constant static-field="org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MORE_PROJECT"/></key>
+               </entry>
+               <entry value-ref="ProjectLinkedEntityAction">
+                  <key><util:constant static-field="org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_PROJECT"/></key>
+			   </entry>
+               <entry value-ref="AbstractMetadataAction">
+                  <key><util:constant static-field="org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_ABSTRACT"/></key>
+               </entry>
+               <entry value-ref="AddReviewMetadataAction">
+                  <key><util:constant static-field="org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MORE_REVIEW"/></key>
+               </entry>
+               <entry value-ref="AddEndorsedMetadataAction">
+                  <key><util:constant static-field="org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MORE_ENDORSEMENT"/></key>
+               </entry>
+               <entry value-ref="PIDMetadataAction">
+                  <key><util:constant static-field="org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MORE_PID"/></key>
+               </entry>
+               <entry value-ref="PIDMetadataAction">
+                  <key><util:constant static-field="org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MISSING_PID"/></key>
+               </entry>
+               <entry value-ref="RelationMetadataAction">
+                  <key><util:constant static-field="org.dspace.qaevent.QANotifyPatterns.TOPIC_ENRICH_MORE_LINK"/></key>
+               </entry>
                <entry key="REQUEST/WITHDRAWN" value-ref="WithdrawnRequestAction" />
                <entry key="REQUEST/REINSTATE" value-ref="ReinstateRequestAction" />
             </map>
@@ -53,6 +75,13 @@
      <bean id="AbstractMetadataAction" class="org.dspace.qaevent.action.QAOpenaireSimpleMetadataAction">
         <property name="metadata" value="dc.description.abstract" />
      </bean>
+     <bean id="AddReviewMetadataAction" class="org.dspace.qaevent.action.QANotifySimpleMetadataAction">
+        <property name="metadata" value="datacite.relation.isReviewedBy" />
+     </bean>
+
+     <bean id="AddEndorsedMetadataAction" class="org.dspace.qaevent.action.QANotifySimpleMetadataAction">
+        <property name="metadata" value="coar.notify.endorsedBy"/>
+     </bean>
      <!-- Add a new identifier to the given item, using the defined types mapping -->
      <bean id="PIDMetadataAction" class="org.dspace.qaevent.action.QAOpenaireMetadataMapAction">
 	     <property name="types">
@@ -65,7 +94,44 @@
 	         </map>
 	     </property>    
      </bean>
-    
+
+     <bean id="RelationMetadataAction" class="org.dspace.qaevent.action.QANotifyMetadataMapAction">
+	     <property name="types">
+	         <map>
+               <entry key="default" value="datacite.relation.isReferencedBy" />
+               <entry key="http://purl.org/vocab/frbr/core#supplement" value="datacite.relation.isSupplementedBy" />
+	         </map>
+	     </property>
+     </bean>
+
+    <bean id="submitterQASecurity" class="org.dspace.qaevent.security.UserBasedFilterQASecurity">
+        <property name="filterTemplate">
+            <!-- we need to escape the { as it as a special meaning for the message format -->
+            <!-- argument {0} will be replaced with the uuid of the loggedin user -->
+            <value>'{'!join from=search.resourceid to=resource_uuid fromIndex=${solr.multicorePrefix}search}submitter_authority:{0}</value>
+        </property>
+    </bean>
+    <!--
+        To configure rules to automatic process specific qaevent you must provide a qaAutomaticProcessingMap
+        where the keys are the qaevent source provider name and the value is a reference to a
+        AutomaticProcessingEvaluation implementation. Below you can find an example of configuration defining
+        some thresholds rules for the coar-notify generated QAEvent to be approved, rejected and ignored
+     -->
+    <!--
+    <util:map id="qaAutomaticProcessingMap">
+        <entry key="coar-notify" value-ref="qaScoreEvaluation"/>
+    </util:map>
+
+    <bean id="qaScoreEvaluation" class="org.dspace.qaevent.QAScoreAutomaticProcessingEvaluation">
+        <property name="scoreToReject" value="0.3" />
+        <property name="scoreToIgnore" value="0.5" />
+        <property name="scoreToApprove" value="0.8" />
+        <property name="itemFilterToReject" ref="simple-demo_filter" />
+        <property name="itemFilterToIgnore" ref="simple-demo_filter" />
+        <property name="itemFilterToApprove" ref="simple-demo_filter" />
+    </bean>
+	-->
+
     <bean id="WithdrawnRequestAction" class="org.dspace.qaevent.action.QAWithdrawnRequestAction" />
 
     <bean id="ReinstateRequestAction" class="org.dspace.qaevent.action.QAReinstateRequestAction" />
@@ -77,16 +143,17 @@
         <property name="qaSecurityConfiguration">
             <map>
                 <entry key="DSpaceUsers" value-ref="submitterWithdrawnReinstateQASecurity" />
+                <entry key="coar-notify" value-ref="submitterQASecurity" />
             </map>
-        </property>    
+        </property>
     </bean>
-    
+
     <bean id="submitterWithdrawnReinstateQASecurity" class="org.dspace.qaevent.security.UserBasedFilterQASecurity">
         <property name="filterTemplate">
             <!-- we need to escape the { as it as a special meaning for the message format -->
             <!-- argument {0} will be replaced with the uuid of the loggedin user -->
             <value>original_id:{0}</value>
-        </property>    
+        </property>
     </bean>
 
  </beans>

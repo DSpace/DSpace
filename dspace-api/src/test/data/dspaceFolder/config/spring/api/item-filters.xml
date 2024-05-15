@@ -295,8 +295,7 @@
                 <property name="statements">
                     <list>
                         <!-- Has a non-empty title -->
-                        <bean id="has-title_condition"
-                              class="org.dspace.content.logic.condition.MetadataValueMatchCondition">
+                        <bean class="org.dspace.content.logic.condition.MetadataValueMatchCondition">
                             <property name="parameters">
                                 <map>
                                     <entry key="field" value="dc.title" />
@@ -352,8 +351,7 @@
                 <property name="statements">
                     <list>
                         <!-- Has a non-empty title -->
-                        <bean id="has-title_condition"
-                              class="org.dspace.content.logic.condition.MetadataValueMatchCondition">
+                        <bean class="org.dspace.content.logic.condition.MetadataValueMatchCondition">
                             <property name="parameters">
                                 <map>
                                     <entry key="field" value="dc.title" />
@@ -367,4 +365,12 @@
         </property>
     </bean>
 
+    <util:map id="ldnItemFilters" key-type="java.lang.String"
+              value-type="org.dspace.content.logic.LogicalStatement">
+       <entry key="always_true_filter" value-ref="always_true_filter"/>
+       <entry key="in-outfit-collection_condition" value-ref="in-outfit-collection_condition"/>
+       <entry key="demo_filter" value-ref="demo_filter"/>
+       <entry key="doi-filter" value-ref="doi-filter"/>
+       <entry key="type_filter" value-ref="type_filter"/>
+	</util:map>
 </beans>

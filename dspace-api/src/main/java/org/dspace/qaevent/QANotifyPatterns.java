@@ -21,10 +21,10 @@ public class QANotifyPatterns {
     public static final String TOPIC_ENRICH_MORE_ENDORSEMENT = "ENRICH/MORE/ENDORSEMENT";
     public static final String TOPIC_ENRICH_MORE_PID = "ENRICH/MORE/PID";
     public static final String TOPIC_ENRICH_MISSING_PID = "ENRICH/MISSING/PID";
+    public static final String TOPIC_ENRICH_MORE_LINK = "ENRICH/MORE/LINK";
 
     /**
      * Default constructor
      */
     private QANotifyPatterns() { }
-
 }

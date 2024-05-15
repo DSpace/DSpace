@@ -10,8 +10,8 @@ package org.dspace.qaevent.dao.impl;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
-import javax.persistence.Query;
 
+import jakarta.persistence.Query;
 import org.dspace.content.Item;
 import org.dspace.content.QAEventProcessed;
 import org.dspace.core.AbstractHibernateDAO;

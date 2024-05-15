@@ -21,8 +21,6 @@ docker build -t dspace/dspace-dependencies:latest -f Dockerfile.dependencies .
 
 This image is built *automatically* after each commit is made to the `main` branch.
 
-A corresponding image exists for DSpace 4-6.
-
 Admins to our DockerHub repo can manually publish with the following command.
 ```
 docker push dspace/dspace-dependencies:latest
@@ -30,9 +28,9 @@ docker push dspace/dspace-dependencies:latest
 
 ## Dockerfile.test (in root folder)
 
-This Dockerfile builds a DSpace 7 backend image (for testing/development).
+This Dockerfile builds a DSpace REST API backend image (for testing/development).
 This image deploys one webapp to Tomcat running in Docker:
-1. The DSpace 7 REST API (at `http://localhost:8080/server`)
+1. The DSpace REST API (at `http://localhost:8080/server`)
 This image also sets up debugging in Tomcat for development.
 
 ```
@@ -41,8 +39,6 @@ docker build -t dspace/dspace:latest-test -f Dockerfile.test .
 
 This image is built *automatically* after each commit is made to the `main` branch.
 
-A corresponding image exists for DSpace 4-6.
-
 Admins to our DockerHub repo can manually publish with the following command.
 ```
 docker push dspace/dspace:latest-test
@@ -50,17 +46,15 @@ docker push dspace/dspace:latest-test
 
 ## Dockerfile (in root folder)
 
-This Dockerfile builds a DSpace 7 backend image.
+This Dockerfile builds a DSpace REST API backend image.
 This image deploys one DSpace webapp to Tomcat running in Docker:
-1. The DSpace 7 REST API (at `http://localhost:8080/server`)
+1. The DSpace REST API (at `http://localhost:8080/server`)
 
 ```
 docker build -t dspace/dspace:latest -f Dockerfile .
 ```
 
 This image is built *automatically* after each commit is made to the `main` branch.
-
-A corresponding image exists for DSpace 4-6.
 
 Admins to our DockerHub repo can publish with the following command.
 ```
@@ -69,14 +63,12 @@ docker push dspace/dspace:latest
 
 ## Dockerfile.cli (in root folder)
 
-This Dockerfile builds a DSpace 7 CLI (command line interface) image, which can be used to run DSpace's commandline tools via Docker.
+This Dockerfile builds a DSpace CLI (command line interface) image, which can be used to run DSpace's commandline tools via Docker.
 ```
 docker build -t dspace/dspace-cli:latest -f Dockerfile.cli .
 ```
 
 This image is built *automatically* after each commit is made to the `main` branch.
-
-A corresponding image exists for DSpace 6.
 
 Admins to our DockerHub repo can publish with the following command.
 ```
@@ -100,8 +92,6 @@ cd dspace/src/main/docker/dspace-postgres-pgcrypto
 docker build -t dspace/dspace-postgres-pgcrypto:latest --build-arg POSTGRES_VERSION=11 --build-arg POSTGRES_PASSWORD=mypass .
 ```
 
-A copy of this file exists in the DSpace 6 branch.  A specialized version of this file exists for DSpace 4 in DSpace-Docker-Images.
-
 Admins to our DockerHub repo can (manually) publish with the following command.
 ```
 docker push dspace/dspace-postgres-pgcrypto:latest
@@ -122,8 +112,6 @@ docker build -t dspace/dspace-postgres-pgcrypto:latest-loadsql .
 
 Similar to `dspace-postgres-pgcrypto` above, you can also modify the version of PostgreSQL or the PostgreSQL user's password.
 See examples above.
-
-A copy of this file exists in the DSpace 6 branch.
 
 Admins to our DockerHub repo can (manually) publish with the following command.
 ```
@@ -158,14 +146,14 @@ documentation. Or, to just build and/or run Solr:
 
 ```bash
 docker-compose build dspacesolr
-docker-compose -p d7 up -d dspacesolr
+docker-compose -p d8 up -d dspacesolr
 ```
 
 If you're making iterative changes to the DSpace Solr configsets you'll need to rebuild /
 restart the `dspacesolr` container for the changes to be deployed. From DSpace root:
 
 ```bash
-docker-compose -p d7 up --detach --build dspacesolr
+docker-compose -p d8 up --detach --build dspacesolr
 ```
 
 ## ./test/ folder

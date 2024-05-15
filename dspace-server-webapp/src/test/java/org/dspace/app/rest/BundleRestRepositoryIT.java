@@ -22,9 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
@@ -347,7 +347,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
                                                     .withPassword("test")
                                                     .withNameInMetadata("Create", "Bundle").build();
 
-        ResourcePolicy rp1 = ResourcePolicyBuilder.createResourcePolicy(context).withUser(createBundleEperson)
+        ResourcePolicy rp1 = ResourcePolicyBuilder.createResourcePolicy(context, createBundleEperson, null)
                                                   .withAction(Constants.ADD)
                                                   .withDspaceObject(item).build();
         context.restoreAuthSystemState();
@@ -567,7 +567,7 @@ public class BundleRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token)
             .perform(patch("/api/core/bundles/" + bundle1.getID())
             .content(requestBody)
-            .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+            .contentType(jakarta.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(
                  jsonPath("$.metadata",

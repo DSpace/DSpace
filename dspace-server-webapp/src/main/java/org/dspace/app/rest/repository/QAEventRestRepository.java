@@ -12,10 +12,10 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
@@ -91,7 +91,8 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
 
     @SearchRestMethod(name = "findByTopic")
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
-    public Page<QAEventRest> findByTopic(@Parameter(value = "topic", required = true) String topic, Pageable pageable) {
+    public Page<QAEventRest> findByTopic(@Parameter(value = "topic", required = true) String topic,
+        Pageable pageable) {
         Context context = obtainContext();
         String[] topicIdSplitted = topic.split(":", 3);
         if (topicIdSplitted.length < 2) {
@@ -101,19 +102,21 @@ public class QAEventRestRepository extends DSpaceRestRepository<QAEventRest, Str
         String topicName = topicIdSplitted[1].replaceAll("!", "/");
         UUID target = topicIdSplitted.length == 3 ? UUID.fromString(topicIdSplitted[2]) : null;
         List<QAEvent> qaEvents = qaEventService.findEventsByTopicAndTarget(context, sourceName, topicName, target,
-                                                                           pageable.getOffset(),
-                                                                           pageable.getPageSize());
+            pageable.getOffset(), pageable.getPageSize());
         long count = qaEventService.countEventsByTopicAndTarget(context, sourceName, topicName, target);
+        if (qaEvents == null) {
+            return null;
+        }
         return converter.toRestPage(qaEvents, pageable, count, utils.obtainProjection());
     }
 
     @Override
     @PreAuthorize("hasPermission(#id, 'QUALITYASSURANCEEVENT', 'DELETE')")
-    protected void delete(Context context, String eventId) throws AuthorizeException {
-        Item item = findTargetItem(context, eventId);
+    protected void delete(Context context, String id) throws AuthorizeException {
+        Item item = findTargetItem(context, id);
         EPerson eperson = context.getCurrentUser();
-        qaEventService.deleteEventByEventId(eventId);
-        qaEventDao.storeEvent(context, eventId, eperson, item);
+        qaEventService.deleteEventByEventId(id);
+        qaEventDao.storeEvent(context, id, eperson, item);
     }
 
     @Override

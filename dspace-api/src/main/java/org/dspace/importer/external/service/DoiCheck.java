@@ -19,7 +19,16 @@ import java.util.regex.Pattern;
  */
 public class DoiCheck {
 
-    private static final List<String> DOI_PREFIXES = Arrays.asList("http://dx.doi.org/", "https://dx.doi.org/");
+    private static final List<String> DOI_PREFIXES = Arrays.asList(
+            "http://dx.doi.org/",
+            "https://dx.doi.org/",
+            "http://www-dx.doi.org/",
+            "https://www-dx.doi.org/",
+            "http://doi.org/",
+            "https://doi.org/",
+            "www.dx.doi.org/",
+            "dx.doi.org/",
+            "doi:");
 
     private static final Pattern PATTERN = Pattern.compile("10.\\d{4,9}/[-._;()/:A-Z0-9]+" +
                                                                "|10.1002/[^\\s]+" +

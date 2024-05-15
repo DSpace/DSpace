@@ -7,9 +7,8 @@
  */
 package org.dspace.app.rest.repository;
 
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.QAEventRest;
 import org.dspace.app.rest.model.QATopicRest;
 import org.dspace.app.rest.projection.Projection;
@@ -54,7 +53,8 @@ public class QAEventTopicLinkRepository extends AbstractDSpaceRestRepository imp
         }
         String source = qaEvent.getSource();
         String topicName = qaEvent.getTopic();
-        QATopic topic = qaEventService.findTopicBySourceAndNameAndTarget(context, source, topicName, null);
+        QATopic topic = qaEventService
+                .findTopicBySourceAndNameAndTarget(context, source, topicName, null);
         if (topic == null) {
             throw new ResourceNotFoundException("No topic found with source: " + source + " topic: " + topicName);
         }

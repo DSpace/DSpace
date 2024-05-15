@@ -21,6 +21,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.core.Constants;
@@ -168,18 +169,25 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
         return this;
     }
 
-    public BitstreamBuilder withFormat(String format) throws SQLException {
-
-        bitstreamService.addMetadata(context, bitstream, "dc", "format", null, null, format);
-
+    /**
+     * Guess the bitstream format as during the submission via the
+     * {@link BitstreamFormatService#guessFormat(Context, Bitstream)}
+     * 
+     * @return the BitstreamBuilder with the format set according to
+     * {@link BitstreamFormatService#guessFormat(Context, Bitstream)}
+     * @throws SQLException
+     */
+    public BitstreamBuilder guessFormat() throws SQLException {
+        bitstream.setFormat(context, bitstreamFormatService.guessFormat(context, bitstream));
         return this;
     }
 
+    public BitstreamBuilder withFormat(String format) throws SQLException {
+        return withMetadata("dc", "format", null, null, format);
+    }
+
     public BitstreamBuilder withProvenance(String provenance) throws SQLException {
-
-        bitstreamService.addMetadata(context, bitstream, "dc", "description", "provenance", null, provenance);
-
-        return this;
+        return withMetadata("dc", "description", "provenance", null, provenance);
     }
 
 
@@ -189,22 +197,24 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
     }
 
     public BitstreamBuilder withIIIFLabel(String label) throws SQLException {
-        bitstreamService.addMetadata(context, bitstream, "iiif", "label", null, null, label);
-        return this;
+        return withMetadata("iiif", "label", null, null, label);
     }
 
     public BitstreamBuilder withIIIFCanvasWidth(int i) throws SQLException {
-        bitstreamService.addMetadata(context, bitstream, "iiif", "image", "width", null, String.valueOf(i));
-        return this;
+        return withMetadata("iiif", "image", "width", null, String.valueOf(i));
     }
 
     public BitstreamBuilder withIIIFCanvasHeight(int i) throws SQLException {
-        bitstreamService.addMetadata(context, bitstream, "iiif", "image", "height", null, String.valueOf(i));
-        return this;
+        return withMetadata("iiif", "image", "height", null, String.valueOf(i));
     }
 
     public BitstreamBuilder withIIIFToC(String toc) throws SQLException {
-        bitstreamService.addMetadata(context, bitstream, "iiif", "toc", null, null, toc);
+        return withMetadata("iiif", "toc", null, null, toc);
+    }
+
+    public BitstreamBuilder withMetadata(String schema, String element, String qualifier, String lang, String value)
+        throws SQLException {
+        bitstreamService.addMetadata(context, bitstream, schema, element, qualifier, lang, value);
         return this;
     }
 

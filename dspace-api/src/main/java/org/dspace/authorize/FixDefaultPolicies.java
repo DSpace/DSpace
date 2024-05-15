@@ -126,10 +126,9 @@ public class FixDefaultPolicies {
 
         // now create the default policies for submitted items
         ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
-        ResourcePolicy myPolicy = resourcePolicyService.create(c);
+        ResourcePolicy myPolicy = resourcePolicyService.create(c, null, anonymousGroup);
         myPolicy.setdSpaceObject(t);
         myPolicy.setAction(myaction);
-        myPolicy.setGroup(anonymousGroup);
         resourcePolicyService.update(c, myPolicy);
     }
 }

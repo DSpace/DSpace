@@ -20,8 +20,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PreDestroy;
 
+import jakarta.annotation.PreDestroy;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -226,16 +226,11 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
 
         if (applicationContext != null) {
             try {
+                // This both closes the context and destroys all beans related to it
                 applicationContext.close();
             } catch (Exception e) {
                 // keep going anyway
                 log.warn("Exception closing ApplicationContext:  {}", e.getMessage(), e);
-            }
-            try {
-                applicationContext.destroy();
-            } catch (Exception e) {
-                // keep going anyway
-                log.warn("Exception destroying ApplicationContext:  {}", e.getMessage(), e);
             }
             applicationContext = null;
         }
@@ -502,6 +497,21 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
         }
         Collections.sort(beanNames);
         return beanNames;
+    }
+
+    @Override
+    public <T> Map<String, T> getServicesWithNamesByType(Class<T> type) {
+        checkRunning();
+
+        if (type == null) {
+            throw new IllegalArgumentException("type cannot be null");
+        }
+
+        try {
+            return applicationContext.getBeansOfType(type, true, true);
+        } catch (BeansException e) {
+            throw new RuntimeException("Failed to get beans of type (" + type + "): " + e.getMessage(), e);
+        }
     }
 
     @Override

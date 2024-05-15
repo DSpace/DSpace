@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,6 +29,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
@@ -41,23 +44,28 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.FacetParams;
+import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
+import org.dspace.handle.service.HandleService;
+import org.dspace.qaevent.AutomaticProcessingAction;
+import org.dspace.qaevent.QAEventAutomaticProcessingEvaluation;
 import org.dspace.qaevent.QASource;
 import org.dspace.qaevent.QATopic;
 import org.dspace.qaevent.dao.QAEventsDAO;
 import org.dspace.qaevent.dao.impl.QAEventsDAOImpl;
+import org.dspace.qaevent.service.QAEventActionService;
 import org.dspace.qaevent.service.QAEventSecurityService;
 import org.dspace.qaevent.service.QAEventService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+
 
 /**
  * Implementation of {@link QAEventService} that use Solr to store events. When
@@ -70,7 +78,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class QAEventServiceImpl implements QAEventService {
 
-    private static final Logger log = LoggerFactory.getLogger(QAEventServiceImpl.class);
+    private static final Logger log = LogManager.getLogger();
 
     public static final String QAEVENTS_SOURCES = "qaevents.sources";
 
@@ -84,7 +92,17 @@ public class QAEventServiceImpl implements QAEventService {
     protected ItemService itemService;
 
     @Autowired
+    private HandleService handleService;
+
+    @Autowired
     private QAEventsDAOImpl qaEventsDao;
+
+    @Autowired(required = false)
+    @Qualifier("qaAutomaticProcessingMap")
+    private Map<String, QAEventAutomaticProcessingEvaluation> qaAutomaticProcessingMap;
+
+    @Autowired
+    private QAEventActionService qaEventActionService;
 
     private ObjectMapper jsonMapper;
 
@@ -148,7 +166,7 @@ public class QAEventServiceImpl implements QAEventService {
         solrQuery.setFacet(true);
         solrQuery.setFacetMinCount(1);
         solrQuery.addFacetField(TOPIC);
-        solrQuery.addFilterQuery("source:" + sourceName);
+        solrQuery.addFilterQuery(SOURCE + ":\"" + sourceName + "\"");
         QueryResponse response;
         try {
             response = getSolr().query(solrQuery);
@@ -159,15 +177,18 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public QATopic findTopicBySourceAndNameAndTarget(Context context, String sourceName, String topicName,UUID target) {
-        var currentUser = context.getCurrentUser();
-        if (isNotSupportedSource(sourceName) || !qaSecurityService.canSeeSource(context, currentUser, sourceName)) {
+    public QATopic findTopicBySourceAndNameAndTarget(Context context, String sourceName, String topicName,
+                                                     UUID target) {
+        if (isNotSupportedSource(sourceName)
+                || !qaSecurityService.canSeeSource(context, context.getCurrentUser(), sourceName)) {
             return null;
         }
         SolrQuery solrQuery = new SolrQuery();
-        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, sourceName);
         solrQuery.setRows(0);
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context,
+                context.getCurrentUser(), sourceName);
         solrQuery.setQuery(securityQuery.orElse("*:*"));
+
         solrQuery.addFilterQuery(SOURCE + ":\"" + sourceName + "\"");
         solrQuery.addFilterQuery(TOPIC + ":\"" + topicName + "\"");
         if (target != null) {
@@ -249,25 +270,34 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     @Override
-    public List<QATopic> findAllTopicsBySource(Context context, String sourceName, long offset, long count,
-                                                                String orderField, boolean ascending) {
-        var currentUser = context.getCurrentUser();
-        if (isNotSupportedSource(sourceName) || !qaSecurityService.canSeeSource(context, currentUser, sourceName)) {
+    public List<QATopic> findAllTopicsBySource(Context context, String source, long offset,
+        long count, String orderField, boolean ascending) {
+        return findAllTopicsBySourceAndTarget(context, source, null, offset, count, orderField, ascending);
+    }
+
+    @Override
+    public List<QATopic> findAllTopicsBySourceAndTarget(Context context, String source, UUID target, long offset,
+        long pageSize, String orderField, boolean ascending) {
+        if (isNotSupportedSource(source)
+                || !qaSecurityService.canSeeSource(context, context.getCurrentUser(), source)) {
             return List.of();
         }
-
-        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, sourceName);
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setRows(0);
-        solrQuery.setSort(orderField, ascending ? ORDER.asc : ORDER.desc);
-        solrQuery.setFacetSort(FacetParams.FACET_SORT_INDEX);
+        if (orderField != null) {
+            solrQuery.setSort(orderField, ascending ? ORDER.asc : ORDER.desc);
+            solrQuery.setFacetSort(FacetParams.FACET_SORT_INDEX);
+        }
+        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context,
+                context.getCurrentUser(), source);
         solrQuery.setQuery(securityQuery.orElse("*:*"));
         solrQuery.setFacet(true);
         solrQuery.setFacetMinCount(1);
-        solrQuery.setFacetLimit((int) (offset + count));
+        solrQuery.setFacetLimit((int) (offset + pageSize));
         solrQuery.addFacetField(TOPIC);
-        if (sourceName != null) {
-            solrQuery.addFilterQuery(SOURCE + ":" + sourceName);
+        solrQuery.addFilterQuery(SOURCE + ":\"" + source + "\"");
+        if (target != null) {
+            solrQuery.addFilterQuery(RESOURCE_UUID + ":" + target.toString());
         }
         QueryResponse response;
         List<QATopic> topics = new ArrayList<>();
@@ -281,8 +311,9 @@ public class QAEventServiceImpl implements QAEventService {
                     continue;
                 }
                 QATopic topic = new QATopic();
-                topic.setSource(sourceName);
+                topic.setSource(source);
                 topic.setKey(c.getName());
+                topic.setFocus(target);
                 topic.setTotalEvents(c.getCount());
                 topic.setLastEvent(new Date());
                 topics.add(topic);
@@ -317,11 +348,44 @@ public class QAEventServiceImpl implements QAEventService {
                 updateRequest.process(getSolr());
 
                 getSolr().commit();
-                sentEmailToAdminAboutNewRequest(dto);
+
+                performAutomaticProcessingIfNeeded(context, dto);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void performAutomaticProcessingIfNeeded(Context context, QAEvent qaEvent) {
+        if (qaAutomaticProcessingMap == null) {
+            return;
+        }
+        QAEventAutomaticProcessingEvaluation evaluation = qaAutomaticProcessingMap.get(qaEvent.getSource());
+
+        if (evaluation == null) {
+            return;
+        }
+
+        AutomaticProcessingAction action = evaluation.evaluateAutomaticProcessing(context, qaEvent);
+
+        if (action == null) {
+            return;
+        }
+
+        switch (action) {
+            case REJECT:
+                qaEventActionService.reject(context, qaEvent);
+                break;
+            case IGNORE:
+                qaEventActionService.discard(context, qaEvent);
+                break;
+            case ACCEPT:
+                qaEventActionService.accept(context, qaEvent);
+                break;
+            default:
+                throw new IllegalStateException("Unknown automatic action requested " + action);
+        }
+
     }
 
     /**
@@ -341,8 +405,8 @@ public class QAEventServiceImpl implements QAEventService {
             email.addArgument(parsJson(qaEvent.getMessage()));
             email.send();
         } catch (Exception e) {
-            log.warn("Error during sending email of Withdrawn/Reinstate request for item with uuid:"
-                     + qaEvent.getTarget(), e);
+            log.warn("Error during sending email of Withdrawn/Reinstate request for item with uuid:  {}",
+                     qaEvent.getTarget(), e);
         }
     }
 
@@ -352,7 +416,7 @@ public class QAEventServiceImpl implements QAEventService {
             JsonNode jsonNode = objectMapper.readTree(jsonString);
             return jsonNode.get("reason").asText();
         } catch (Exception e) {
-            log.warn("Unable to parse the JSON:" + jsonString);
+            log.warn("Unable to parse the JSON:  {}", jsonString);
             return jsonString;
         }
     }
@@ -488,12 +552,30 @@ public class QAEventServiceImpl implements QAEventService {
     public List<QASource> findAllSources(Context context, long offset, int pageSize) {
         return Arrays.stream(getSupportedSources())
                      .map((sourceName) -> findSource(context, sourceName))
-                     .filter(Objects::nonNull)
+            .filter(Objects::nonNull)
                      .sorted(comparing(QASource::getTotalEvents)
                      .reversed())
                      .skip(offset)
                      .limit(pageSize)
                      .collect(Collectors.toList());
+    }
+
+    @Override
+    public long countSources(Context context) {
+        return Arrays.stream(getSupportedSources())
+                .map((sourceName) -> findSource(context, sourceName))
+                .filter(Objects::nonNull)
+                .filter(source -> source.getTotalEvents() > 0)
+                .count();
+    }
+
+    @Override
+    public long countSourcesByTarget(Context context, UUID target) {
+        return Arrays.stream(getSupportedSources())
+                .map((sourceName) -> findSource(context, sourceName, target))
+                .filter(Objects::nonNull)
+                .filter(source -> source.getTotalEvents() > 0)
+                .count();
     }
 
     @Override
@@ -512,9 +594,41 @@ public class QAEventServiceImpl implements QAEventService {
         doc.addField(TRUST, dto.getTrust());
         doc.addField(MESSAGE, dto.getMessage());
         doc.addField(LAST_UPDATE, new Date());
-        doc.addField(RESOURCE_UUID, dto.getTarget());
+        String resourceUUID = getResourceUUID(context, dto.getOriginalId());
+        if (resourceUUID == null) {
+            resourceUUID = dto.getTarget();
+            /*throw new IllegalArgumentException("Skipped event " + checksum +
+                " related to the oai record " + dto.getOriginalId() + " as the record was not found");*/
+        }
+        doc.addField(RESOURCE_UUID, resourceUUID);
         doc.addField(RELATED_UUID, dto.getRelated());
         return doc;
+    }
+
+    private String getResourceUUID(Context context, String originalId) throws Exception {
+        String id = getHandleFromOriginalId(originalId);
+        if (id != null) {
+            Item item = (Item) handleService.resolveToObject(context, id);
+            if (item != null) {
+                final String itemUuid = item.getID().toString();
+                context.uncacheEntity(item);
+                return itemUuid;
+            } else {
+                return null;
+            }
+        } else {
+            throw new IllegalArgumentException("Malformed originalId " + originalId);
+        }
+    }
+
+    // oai:www.openstarts.units.it:10077/21486
+    private String getHandleFromOriginalId(String originalId) {
+        int startPosition = originalId.lastIndexOf(':');
+        if (startPosition != -1) {
+            return originalId.substring(startPosition + 1, originalId.length());
+        } else {
+            return originalId;
+        }
     }
 
     private QAEvent getQAEventFromSOLR(SolrDocument doc) {
@@ -615,25 +729,8 @@ public class QAEventServiceImpl implements QAEventService {
     }
 
     private String[] getSupportedSources() {
-        return configurationService.getArrayProperty(QAEVENTS_SOURCES, new String[] { QAEvent.OPENAIRE_SOURCE });
-    }
-
-    @Override
-    public long countSources(Context context) {
-        return Arrays.stream(getSupportedSources())
-                     .map((sourceName) -> findSource(context, sourceName))
-                     .filter(Objects::nonNull)
-                     .filter(source -> source.getTotalEvents() > 0)
-                     .count();
-    }
-
-    @Override
-    public long countSourcesByTarget(Context context, UUID target) {
-        return Arrays.stream(getSupportedSources())
-                .map((sourceName) -> findSource(context, sourceName, target))
-                .filter(Objects::nonNull)
-                .filter(source -> source.getTotalEvents() > 0)
-                .count();
+        return configurationService.getArrayProperty(QAEVENTS_SOURCES,
+            new String[] { QAEvent.OPENAIRE_SOURCE, QAEvent.COAR_NOTIFY_SOURCE });
     }
 
     @Override
@@ -671,51 +768,6 @@ public class QAEventServiceImpl implements QAEventService {
                      .skip(offset)
                      .limit(pageSize)
                      .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<QATopic> findAllTopicsBySourceAndTarget(Context context, String source, UUID target, long offset,
-            int pageSize, String orderField, boolean ascending) {
-        var currentUser = context.getCurrentUser();
-        if (isNotSupportedSource(source) || !qaSecurityService.canSeeSource(context, currentUser, source)) {
-            return List.of();
-        }
-        Optional<String> securityQuery = qaSecurityService.generateQAEventFilterQuery(context, currentUser, source);
-        SolrQuery solrQuery = new SolrQuery();
-        solrQuery.setRows(0);
-        solrQuery.setSort(orderField, ascending ? ORDER.asc : ORDER.desc);
-        solrQuery.setQuery(securityQuery.orElse("*:*"));
-        solrQuery.setFacet(true);
-        solrQuery.setFacetMinCount(1);
-        solrQuery.setFacetLimit((int) (offset + pageSize));
-        solrQuery.addFacetField(TOPIC);
-        solrQuery.addFilterQuery(SOURCE + ":\"" + source + "\"");
-        if (target != null) {
-            solrQuery.addFilterQuery(RESOURCE_UUID + ":" + target.toString());
-        }
-        try {
-            List<QATopic> topics = new ArrayList<>();
-            QueryResponse response = getSolr().query(solrQuery);
-            FacetField facetField = response.getFacetField(TOPIC);
-            int idx = 0;
-            for (Count c : facetField.getValues()) {
-                if (idx < offset) {
-                    idx++;
-                    continue;
-                }
-                QATopic topic = new QATopic();
-                topic.setSource(source);
-                topic.setKey(c.getName());
-                topic.setFocus(target);
-                topic.setTotalEvents(c.getCount());
-                topic.setLastEvent(new Date());
-                topics.add(topic);
-                idx++;
-            }
-            return topics;
-        } catch (SolrServerException | IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

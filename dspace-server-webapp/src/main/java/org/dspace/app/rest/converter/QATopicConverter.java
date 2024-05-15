@@ -31,8 +31,9 @@ public class QATopicConverter implements DSpaceConverter<QATopic, QATopicRest> {
     public QATopicRest convert(QATopic modelObject, Projection projection) {
         QATopicRest rest = new QATopicRest();
         rest.setProjection(projection);
-        rest.setId(modelObject.getSource() + ":" + modelObject.getKey().replace("/", "!") +
-                  (modelObject.getFocus() != null ? ":" + modelObject.getFocus().toString() : ""));
+        rest.setId(modelObject.getSource() + ":" +
+                modelObject.getKey().replace("/", "!") +
+                (modelObject.getFocus() != null ? ":" + modelObject.getFocus().toString() : ""));
         rest.setName(modelObject.getKey());
         rest.setLastEvent(modelObject.getLastEvent());
         rest.setTotalEvents(modelObject.getTotalEvents());
