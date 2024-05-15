@@ -31,6 +31,9 @@
     <bean class="org.dspace.authority.AuthorityValueServiceImpl"/>
     <bean class="org.dspace.authority.AuthorityServiceImpl"/>
 
+    <bean class="org.dspace.browse.ItemCounter"/>
+    <bean id="itemCountDAO" class="org.dspace.browse.ItemCountDAOSolr" scope="prototype"/>
+
     <bean class="org.dspace.checker.ChecksumHistoryServiceImpl"/>
     <bean class="org.dspace.checker.ChecksumResultServiceImpl"/>
     <bean class="org.dspace.checker.MostRecentChecksumServiceImpl"/>

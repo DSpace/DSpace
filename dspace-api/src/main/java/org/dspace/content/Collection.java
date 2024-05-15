@@ -29,7 +29,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.browse.ItemCountException;
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -339,18 +338,4 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         }
         return collectionService;
     }
-
-    /**
-     * return count of the collection items
-     *
-     * @return int
-     */
-    public int countArchivedItems() {
-        try {
-            return collectionService.countArchivedItems(this);
-        } catch (ItemCountException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 }
