@@ -552,8 +552,9 @@ public class METSRightsCrosswalk
                                       ex);
                         }
 
-                        //set permissions on policy add to list of policies
+                        //set permissions and type on policy and add to list of policies
                         rp.setAction(parsePermissions(permsElement));
+                        rp.setRpType(ResourcePolicy.TYPE_CUSTOM);
                         policies.add(rp);
                     }
                 } //end if "Context" element
