@@ -26,6 +26,7 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.clarin.ClarinItemService;
 import org.dspace.content.service.clarin.ClarinLicenseResourceMappingService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -66,6 +67,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     protected BitstreamStorageService bitstreamStorageService;
     @Autowired(required = true)
     protected ClarinLicenseResourceMappingService clarinLicenseResourceMappingService;
+    @Autowired(required = true)
+    protected ClarinItemService clarinItemService;
 
     protected BitstreamServiceImpl() {
         super();
@@ -275,6 +278,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         // Remove bitstream itself
         bitstream.setDeleted(true);
         update(context, bitstream);
+        // Update Item's metadata about bitstreams
+        clarinItemService.updateItemFilesMetadata(context, bitstream);
 
         //Remove our bitstream from all our bundles
         final List<Bundle> bundles = bitstream.getBundles();
@@ -286,7 +291,6 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
             }
             bundle.removeBitstream(bitstream);
         }
-
         //Remove all bundles from the bitstream object, clearing the connection in 2 ways
         bundles.clear();
 

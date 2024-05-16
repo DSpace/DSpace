@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
+import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -79,5 +80,14 @@ public interface ClarinItemService {
      * @throws SQLException
      */
     void updateItemFilesMetadata(Context context, Item item, Bundle bundle) throws SQLException;
+
+    /**
+     * Update item's metadata about its files (local.has.files, local.files.size, local.files.count).
+     * The Item and Bundle information is taken from the Bitstream object.
+     * @param context
+     * @param bit
+     * @throws SQLException
+     */
+    void updateItemFilesMetadata(Context context, Bitstream bit) throws SQLException;
 
 }

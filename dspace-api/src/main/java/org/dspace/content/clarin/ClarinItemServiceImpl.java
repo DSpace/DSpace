@@ -175,4 +175,32 @@ public class ClarinItemServiceImpl implements ClarinItemService {
         itemService.addMetadata(context, item,"local", "files", "count", Item.ANY, "" + totalNumberOfFiles);
         itemService.addMetadata(context, item,"local", "files", "size", Item.ANY, "" + totalSizeofFiles);
     }
+
+    @Override
+    public void updateItemFilesMetadata(Context context, Bitstream bit) throws SQLException {
+        // Get the Item the bitstream is associated with
+        Item item = null;
+        Bundle bundle = null;
+        List<Bundle> origs = bit.getBundles();
+        for (Bundle orig : origs) {
+            if (!Constants.CONTENT_BUNDLE_NAME.equals(orig.getName())) {
+                continue;
+            }
+
+            List<Item> items = orig.getItems();
+            if (CollectionUtils.isEmpty(items)) {
+                continue;
+            }
+
+            item = items.get(0);
+            bundle = orig;
+            break;
+        }
+
+        // It could be null when the bundle name is e.g. `LICENSE`
+        if (Objects.isNull(item) || Objects.isNull(bundle)) {
+            return;
+        }
+        this.updateItemFilesMetadata(context, item, bundle);
+    }
 }

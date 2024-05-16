@@ -164,7 +164,6 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         // Ensure that the last modified from the item is triggered !
         Item owningItem = (Item) getParentObject(context, bundle);
         if (owningItem != null) {
-            clarinItemService.updateItemFilesMetadata(context, owningItem, bundle);
             itemService.updateLastModified(context, owningItem);
             itemService.update(context, owningItem);
         }
@@ -219,6 +218,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         }
         bitstreamService.update(context, bitstream);
 
+        clarinItemService.updateItemFilesMetadata(context, owningItem, bundle);
         // Add clarin license to the bitstream and clarin license values to the item metadata
         clarinLicenseService.addClarinLicenseToBitstream(context, owningItem, bundle, bitstream);
     }
@@ -240,9 +240,9 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         //Ensure that the last modified from the item is triggered !
         Item owningItem = (Item) getParentObject(context, bundle);
         if (owningItem != null) {
-            clarinItemService.updateItemFilesMetadata(context, owningItem, bundle);
             itemService.updateLastModified(context, owningItem);
             itemService.update(context, owningItem);
+            clarinItemService.updateItemFilesMetadata(context, owningItem, bundle);
         }
 
         // In the event that the bitstream to remove is actually
@@ -456,10 +456,9 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
             //The order of the bitstreams has changed, ensure that we update the last modified of our item
             Item owningItem = (Item) getParentObject(context, bundle);
             if (owningItem != null) {
-                clarinItemService.updateItemFilesMetadata(context, owningItem, bundle);
                 itemService.updateLastModified(context, owningItem);
                 itemService.update(context, owningItem);
-
+                clarinItemService.updateItemFilesMetadata(context, owningItem, bundle);
             }
         }
     }
