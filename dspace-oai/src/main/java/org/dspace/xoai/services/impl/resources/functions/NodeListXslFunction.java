@@ -8,7 +8,6 @@
 
 package org.dspace.xoai.services.impl.resources.functions;
 
-import static org.apache.logging.log4j.LogManager.getLogger;
 import static org.dspace.xoai.services.impl.resources.functions.StringXSLFunction.BASE;
 
 import java.util.Objects;
@@ -38,12 +37,10 @@ import org.w3c.dom.NodeList;
  */
 public abstract class NodeListXslFunction implements ExtensionFunction {
 
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(NodeListXslFunction.class);
     protected abstract String getFnName();
 
     protected abstract NodeList getNodeList(String param);
-
-    private static final Logger log = getLogger(NodeListXslFunction.class);
-
     @Override
     final public QName getName() {
         return new QName(BASE, getFnName());
@@ -58,7 +55,7 @@ public abstract class NodeListXslFunction implements ExtensionFunction {
     final public SequenceType[] getArgumentTypes() {
         return new SequenceType[]{
                 SequenceType.makeSequenceType(
-                        ItemType.STRING, OccurrenceIndicator.ONE)};
+                        ItemType.STRING, OccurrenceIndicator.ZERO_OR_MORE)};
     }
 
     @Override
@@ -67,7 +64,17 @@ public abstract class NodeListXslFunction implements ExtensionFunction {
             return new XdmAtomicValue("");
         }
 
-        NodeList nodeList = getNodeList(xdmValues[0].itemAt(0).getStringValue());
+        String val;
+        try {
+            val = xdmValues[0].itemAt(0).getStringValue();
+        } catch (Exception e) {
+            // e.g. when no parameter is passed and xdmValues[0] ends with index error
+            log.warn("Empty value in call of function of NodeListXslFunction type");
+            val = "";
+        }
+
+
+        NodeList nodeList = getNodeList(val);
         Node oneNode = nodeList.item(0);
 
         DocumentBuilder db = new Processor(false).newDocumentBuilder();

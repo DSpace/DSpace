@@ -25,6 +25,7 @@ import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.SequenceType;
 import net.sf.saxon.s9api.XdmAtomicValue;
 import net.sf.saxon.s9api.XdmValue;
+import org.apache.logging.log4j.Logger;
 import org.bouncycastle.util.Arrays;
 import org.w3c.dom.Node;
 
@@ -35,6 +36,7 @@ import org.w3c.dom.Node;
  */
 public abstract class NodeXslFunction implements ExtensionFunction {
 
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(NodeXslFunction.class);
     protected abstract String getFnName();
 
     protected abstract Node getNode(String param);
@@ -61,7 +63,16 @@ public abstract class NodeXslFunction implements ExtensionFunction {
         if (Objects.isNull(xdmValues) || Arrays.isNullOrContainsNull(xdmValues)) {
             return new XdmAtomicValue("");
         }
-        Node node = getNode(xdmValues[0].itemAt(0).getStringValue());
+        String val;
+        try {
+            val = xdmValues[0].itemAt(0).getStringValue();
+        } catch (Exception e) {
+            // e.g. when no parameter is passed and xdmValues[0] ends with index error
+            log.warn("Empty value in call of function of NodeXslFunction type");
+            val = "";
+        }
+
+        Node node = getNode(val);
         if (Objects.isNull(node)) {
             try {
                 node = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();

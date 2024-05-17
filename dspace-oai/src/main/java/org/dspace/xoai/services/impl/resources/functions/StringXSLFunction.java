@@ -18,6 +18,7 @@ import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.SequenceType;
 import net.sf.saxon.s9api.XdmAtomicValue;
 import net.sf.saxon.s9api.XdmValue;
+import org.apache.logging.log4j.Logger;
 import org.bouncycastle.util.Arrays;
 
 
@@ -28,6 +29,7 @@ import org.bouncycastle.util.Arrays;
  */
 public abstract class StringXSLFunction implements ExtensionFunction {
 
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(StringXSLFunction.class);
     public static final String BASE = "http://custom.crosswalk.functions";
 
     protected String uncertainString(Object val) {
@@ -63,7 +65,17 @@ public abstract class StringXSLFunction implements ExtensionFunction {
         if (Objects.isNull(xdmValues) || Arrays.isNullOrContainsNull(xdmValues)) {
             return new XdmAtomicValue("");
         }
-        return new XdmAtomicValue(checks(getStringResult(xdmValues[0].itemAt(0).getStringValue())));
+
+        String val;
+        try {
+            val = xdmValues[0].itemAt(0).getStringValue();
+        } catch (Exception e) {
+            // e.g. when no parameter is passed and xdmValues[0] ends with index error
+            log.warn("Empty value in call of function of StringXslFunction type");
+            val = "";
+        }
+
+        return new XdmAtomicValue(checks(getStringResult(val)));
     }
 
     private String checks(String got) {
