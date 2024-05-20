@@ -53,6 +53,7 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
 import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.UUIDUtils;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.xmlworkflow.service.XmlWorkflowService;
@@ -317,11 +318,19 @@ public class ClarinItemImportController {
         context.setCurrentUser(eperson);
         context.turnOffAuthorisationSystem();
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
+        // created item
+        Item item = workspaceItem.getItem();
+        // if the created item has pre-registered PID and the importing Item has handle which must be imported, the
+        // pre-registered PID must be unbound from the created Item, otherwise the Item will have two handles.
+        if (DSpaceServicesFactory.getInstance().getConfigurationService()
+                .getBooleanProperty("identifiers.submission.register", false) &&
+                StringUtils.isNotEmpty(itemRest.getHandle())) {
+            handleService.unbindHandle(context, item);
+        }
+
         context.restoreAuthSystemState();
         context.setCurrentUser(currUser);
 
-        //created item
-        Item item = workspaceItem.getItem();
         item.setOwningCollection(collection);
         //the method set withdraw to true and isArchived to false
         if (itemRest.getWithdrawn()) {

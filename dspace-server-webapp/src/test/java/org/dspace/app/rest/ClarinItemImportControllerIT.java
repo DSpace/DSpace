@@ -41,6 +41,8 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.eperson.EPerson;
+import org.dspace.handle.Handle;
+import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowItemService;
@@ -63,6 +65,8 @@ public class ClarinItemImportControllerIT extends AbstractControllerIntegrationT
     private ItemService itemService;
     @Autowired
     private ConfigurationService configurationService;
+    @Autowired
+    private HandleService handleService;
 
     private Collection col;
     private EPerson submitter;
@@ -227,15 +231,19 @@ public class ClarinItemImportControllerIT extends AbstractControllerIntegrationT
 
     @Test
     public void importArchivedItemTest() throws Exception {
+        boolean preRegisterPID = configurationService.getBooleanProperty("identifiers.submission.register", false);
+        // enable submission's PID to be pre-registered
+        configurationService.setProperty("identifiers.submission.register", true);
         String PROVENANCE_VALUE = "first provenance metadata value";
         String DATE_VALUE = "2014-07-30T21:26:36Z";
-        String IDENTIFIER_VALUE = "some handle url";
+        String IDENTIFIER_VALUE = configurationService.getProperty("handle.canonical.prefix") + "/123456789/99985";
 
         context.turnOffAuthorisationSystem();
         ObjectNode node = jsonNodeFactory.objectNode();
         node.set("withdrawn", jsonNodeFactory.textNode("false"));
         node.set("inArchive", jsonNodeFactory.textNode("true"));
         node.set("discoverable", jsonNodeFactory.textNode("false"));
+        node.set("handle", jsonNodeFactory.textNode(IDENTIFIER_VALUE));
 
         // Metadata which should be kept after installing the new Item.
         ObjectNode metadataNode = jsonNodeFactory.objectNode();
@@ -301,6 +309,10 @@ public class ClarinItemImportControllerIT extends AbstractControllerIntegrationT
         assertEquals(item.getSubmitter().getID(), submitter.getID());
         assertEquals(item.getOwningCollection().getID(), col.getID());
 
+        // When the Item has pre-registered PID - it could have two handles
+        List<Handle> createdHandles = item.getHandles();
+        assertEquals(createdHandles.size(), 1);
+
         // check `dc.description.provenance` - there should be just one value
         List<MetadataValue> provenanceValues =
                 itemService.getMetadata(item, "dc", "description", "provenance", "en_US");
@@ -329,6 +341,7 @@ public class ClarinItemImportControllerIT extends AbstractControllerIntegrationT
         context.turnOffAuthorisationSystem();
         ItemBuilder.deleteItem(uuid);
         context.restoreAuthSystemState();
+        configurationService.setProperty("identifiers.submission.register", preRegisterPID);
     }
 
     // Fix of this issue: https://github.com/dataquest-dev/DSpace/issues/409
