@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -142,8 +143,9 @@ public class MetadataValidation extends AbstractValidation {
                         }
                     }
                     validateMetadataValues(mdv, input, config, isAuthorityControlled, fieldKey, errors);
-                    if ((input.isRequired() && mdv.size() == 0) && input.isVisible(DCInput.SUBMISSION_SCOPE)
-                                                                && !valuesRemoved) {
+                    if (((input.isRequired() && mdv.size() == 0) && input.isVisible(DCInput.SUBMISSION_SCOPE)
+                                                                && !valuesRemoved)
+                            || !isValidComplexDefinitionMetadata(input, mdv)) {
                         // Is the input required for *this* type? In other words, are we looking at a required
                         // input that is also allowed for this document type
                         if (input.isAllowedFor(documentTypeValue)) {
@@ -169,26 +171,76 @@ public class MetadataValidation extends AbstractValidation {
         return errors;
     }
 
+    /**
+     * Check if the metadata values for a complex definition input are valid.
+     * Valid if:
+     * - the complex input field is required and all required nested input fields are filled in.
+     * - the complex input field is not required, if there is a valued in the nested input field - all required nested
+     *      input fields must be filled in.
+     * - the complex input field is not required, and none of the nested input fields are required.
+     */
     private boolean isValidComplexDefinitionMetadata(DCInput input, List<MetadataValue> mdv) {
-        if (input.getInputType().equals("complex")) {
-            int complexDefinitionIndex = 0;
-            Map<String, Map<String, String>> complexDefinitionInputs = input.getComplexDefinition().getInputs();
-            for (String complexDefinitionInputName : complexDefinitionInputs.keySet()) {
-                Map<String, String> complexDefinitionInputValues =
-                        complexDefinitionInputs.get(complexDefinitionInputName);
+        // The input is not a complex definition - do not validate it
+        if (!input.getInputType().equals("complex")) {
+            return true;
+        }
 
-                List<String> filledInputValues = null;
-                String isRequired = complexDefinitionInputValues.get("required");
-                if (StringUtils.equals(BooleanUtils.toStringTrueFalse(true), isRequired)) {
-                    filledInputValues = new ArrayList<>(Arrays.asList(
-                            mdv.get(0).getValue().split(DCInput.ComplexDefinitions.getSeparator(),-1)));
+        // Get the complex definition nested inputs
+        Map<String, Map<String, String>> complexDefinitionInputs = input.getComplexDefinition().getInputs();
 
-                    if (StringUtils.isBlank(filledInputValues.get(complexDefinitionIndex))) {
-                        return false;
-                    }
-                }
-                complexDefinitionIndex++;
+        // Check valid state of the complex definition input when it is required
+        if (input.isRequired()) {
+            // There are no values in the complex input field
+            if (CollectionUtils.isEmpty(mdv)) {
+                return false;
             }
+        } else {
+            // The complex input field is not required
+            if (CollectionUtils.isEmpty(mdv)) {
+                // There are no values in the complex input field
+                return true;
+            }
+        }
+        return checkAllRequiredInputFieldsAreFilledIn(complexDefinitionInputs, mdv);
+    }
+
+    /**
+     * Check if all required nested input fields are filled in.
+     */
+    private boolean checkAllRequiredInputFieldsAreFilledIn(Map<String, Map<String, String>> complexDefinitionInputs,
+                                                        List<MetadataValue> mdv) {
+        // If any of the nested input fields are filled in - all required nested input fields must be filled in
+        int complexDefinitionIndex = -1;
+        // Go through all nested input fields
+        for (String complexDefinitionInputName : complexDefinitionInputs.keySet()) {
+            complexDefinitionIndex++;
+
+            // Get the definition of the nested input field
+            Map<String, String> complexDefinitionInputValues =
+                    complexDefinitionInputs.get(complexDefinitionInputName);
+            // Check if the nested input field is required - if not do not check if it is filled in
+            if (!StringUtils.equals(BooleanUtils.toStringTrueFalse(true),
+                    complexDefinitionInputValues.get("required"))) {
+                continue;
+            }
+
+            // Load filled in values of the nested input field
+            List<String> filledInputValues = new ArrayList<>(Arrays.asList(
+                    mdv.get(0).getValue().split(DCInput.ComplexDefinitions.getSeparator(),-1)));
+
+            // Check if the required nested input field is filled in. It is valid if there is a value in the nested
+            // input.
+            if (!StringUtils.isBlank(filledInputValues.get(complexDefinitionIndex))) {
+                continue;
+            }
+
+            // EU identifier must have `openaire_id` value otherwise the `openaire_id` could be empty.
+            if (StringUtils.equals("openaire_id", complexDefinitionInputName) &&
+                    !StringUtils.equals("euFunds", filledInputValues.get(0))) {
+                continue;
+            }
+            return false;
+
         }
         return true;
     }

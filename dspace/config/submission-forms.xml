@@ -3178,11 +3178,11 @@
         </definition>
 
         <definition name="funding">
-            <input name="type" input-type="dropdown" label="Funding type" value-pairs-name="metashare_funding"/>
-            <input name="code"  input-type="autocomplete" label="Grant no. or funding project code"/>
-            <input name="orgname" input-type="text" label="Funding organization"/>
-            <input name="projname" input-type="autocomplete" label="Funding project name"/>
-            <input name="openaire_id" input-type="text" label="EU Project Identifier (OpenAIRE)" readonly="true" placeholder="Filled out automatically..." mapped-to-if-not-default="dc.relation"/>
+            <input name="type" input-type="dropdown" label="Funding type" value-pairs-name="metashare_funding" required="true"/>
+            <input name="code"  input-type="autocomplete" label="Grant no. or funding project code" required="true"/>
+            <input name="orgname" input-type="text" label="Funding organization" required="true"/>
+            <input name="projname" input-type="autocomplete" label="Funding project name" required="true"/>
+            <input name="openaire_id" input-type="text" label="EU Project Identifier (OpenAIRE)" readonly="true" placeholder="Filled out automatically..." mapped-to-if-not-default="dc.relation" required="true"/>
         </definition>
 
         <definition name="sizeInfo">

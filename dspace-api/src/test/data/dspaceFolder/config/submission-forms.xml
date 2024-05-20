@@ -686,17 +686,17 @@ it, please enter the types and the actual numbers or codes.</hint>
      Uncomment the example row of the complex input type definition to see this input in the submission UI. -->
   <form-complex-definitions>
     <definition name="contact_person">
-      <input name="givenname" input-type="text" label="Given name" required="true"/>
-      <input name="surname" input-type="text" label="Surname" required="true"/>
-      <input name="email" input-type="text" label="Email" regex="[^@]+@[^\.@]+\.[^@]+" required="true"/>
+      <input name="givenname" input-type="text" label="Given name"/>
+      <input name="surname" input-type="text" label="Surname"/>
+      <input name="email" input-type="text" label="Email" regex="[^@]+@[^\.@]+\.[^@]+"/>
       <input name="affiliation" input-type="text" label="Affiliation"/>
     </definition>
 
     <definition name="funding">
-      <input name="type" input-type="dropdown" label="Funding type" required="true" value-pairs-name="metashare_funding"/>
-      <input name="code"  input-type="autocomplete" label="Grant no. or funding project code" required="true"/>
-      <input name="orgname" input-type="text" label="Funding organization" required="true"/>
-      <input name="projname" input-type="autocomplete" label="Funding project name" required="true"/>
+      <input name="type" input-type="dropdown" label="Funding type" value-pairs-name="metashare_funding"/>
+      <input name="code"  input-type="autocomplete" label="Grant no. or funding project code"/>
+      <input name="orgname" input-type="text" label="Funding organization"/>
+      <input name="projname" input-type="autocomplete" label="Funding project name"/>
       <input name="openaire_id" input-type="text" label="EU Project Identifier (OpenAIRE)" readonly="true" placeholder="Filled out automatically..." mapped-to-if-not-default="dc.relation"/>
     </definition>
   </form-complex-definitions>

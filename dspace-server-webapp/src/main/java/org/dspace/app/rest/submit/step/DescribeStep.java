@@ -241,8 +241,6 @@ public class DescribeStep extends AbstractProcessingStep {
         String[] opPathArray = oldOpPathArray.clone();
 
         // metadata field could has more metadata values
-        // TO DO problem je v tom, ze sa volala replace metoda pri add
-        // potrebujem zvlast odchytit ADD metodu a REPLACE
         boolean isNotFirstValue = false;
         boolean removeMetadata = false;
 
@@ -262,6 +260,10 @@ public class DescribeStep extends AbstractProcessingStep {
 
         // Operation has a value wrapped in the JsonValueEvaluator
         JsonValueEvaluator jsonValEvaluator = (JsonValueEvaluator) oldOp.getValue();
+        if (jsonValEvaluator == null) {
+            log.warn("The complex input field is not processed, because the operation doesn't have a value.");
+            return null;
+        }
         Iterator<JsonNode> jsonNodes = jsonValEvaluator.getValueNode().elements();
 
         if (isNotFirstValue) {
@@ -277,10 +279,6 @@ public class DescribeStep extends AbstractProcessingStep {
             }
         }
 
-        if (ObjectUtils.isEmpty(jsonNodeValue) || StringUtils.isBlank(jsonNodeValue.asText())) {
-            throw new UnprocessableEntityException("Cannot load JsonNode value from the operation: " +
-                    oldOp.getPath());
-        }
         // get the value from the old operation as a string
         oldOpValue = jsonNodeValue.asText();
 
