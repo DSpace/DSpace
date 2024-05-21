@@ -216,4 +216,14 @@ public class SearchFilterMatcher {
                 checkOperators()
         );
     }
+
+    public static Matcher<? super Object> clarinDataProviderFacet() {
+        return allOf(
+                hasJsonPath("$.filter", is("dataProvider")),
+                hasJsonPath("$.hasFacets", is(false)),
+                hasJsonPath("$.type", is("text")),
+                hasJsonPath("$.openByDefault", is(false)),
+                checkOperators()
+        );
+    }
 }

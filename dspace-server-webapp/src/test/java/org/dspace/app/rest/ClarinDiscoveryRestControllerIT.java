@@ -1002,7 +1002,8 @@ public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrati
                         SearchFilterMatcher.clarinItemsLanguageFilter(),
                         SearchFilterMatcher.clarinItemsCommunityFilter(),
                         SearchFilterMatcher.clarinItemsTypeFilter(),
-                        SearchFilterMatcher.clarinSubjectFirstValueFilter()
+                        SearchFilterMatcher.clarinSubjectFirstValueFilter(),
+                        SearchFilterMatcher.clarinDataProviderFacet()
                 )))
                 //These sortOptions need to be present as it's the default in the configuration
                 .andExpect(jsonPath("$.sortOptions", contains(
