@@ -23,6 +23,7 @@
             <Format ref="marc"/>
             <Format ref="uketd_dc"/>
             <Format ref="bibtex" />
+            <Format ref="elg" />
             <!--<Format ref="junii2" />-->
             <Description>
                 This is the default context of the DSpace OAI-PMH data provider.
@@ -230,6 +231,13 @@
             <Namespace>http://schema.datacite.org/oai/oai-1.1/</Namespace>
             <SchemaLocation>http://schema.datacite.org/oai/oai-1.1/oai.xsd</SchemaLocation>
         </Format>
+    <Format id="elg">
+        <Prefix>elg</Prefix>
+        <XSLT>metadataFormats/elg.xsl</XSLT>
+        <Namespace>http://w3id.org/meta-share/meta-share/</Namespace>
+        <SchemaLocation>http://w3id.org/meta-share/meta-share/ ../Schema/ELG-SHARE.xsd</SchemaLocation>
+        <Filter ref="elgFilter"/>
+    </Format>
     </Formats>
 
     <Transformers>
@@ -457,6 +465,33 @@
                                 <Custom ref="isPublicationEntityCondition"/>
                             </RightCondition>
                         </Or>
+                    </RightCondition>
+                </And>
+            </Definition>
+        </Filter>
+
+        <Filter id="elgFilter">
+            <Definition>
+                <And>
+                    <LeftCondition>
+                        <Custom ref="isLanguageResourceCondition"/>
+                    </LeftCondition>
+                    <RightCondition>
+                        <And>
+                            <LeftCondition>
+                                <Custom ref="hasFilesCondition"/>
+                            </LeftCondition>
+                            <RightCondition>
+                                <Or>
+                                    <LeftCondition>
+                                        <Custom ref="hasMediaTypeCondition"/>
+                                    </LeftCondition>
+                                    <RightCondition>
+                                        <Custom ref="isToolCondition"/>
+                                    </RightCondition>
+                                </Or>
+                            </RightCondition>
+                        </And>
                     </RightCondition>
                 </And>
             </Definition>

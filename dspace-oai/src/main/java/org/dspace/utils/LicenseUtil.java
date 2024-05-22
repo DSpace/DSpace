@@ -26,8 +26,8 @@ import org.w3c.dom.Element;
  *  https://github.com/ufal/clarin-dspace/blob
  *  * /si-master-origin/dspace-oai/src/main/java/cz/cuni/mff/ufal/utils/LicenseUtil.java) and modified by
  *
- *  @author Marian Berger (marian.berger at dataquest.sk)
- *  @author Milan Majchrak (milan.majchrak at dataquest.sk)
+ *  @author Marian Berger (dspace at dataquest.sk)
+ *  @author Milan Majchrak (dspace at dataquest.sk)
  */
 public class LicenseUtil {
 
