@@ -1,0 +1,16 @@
+<olac-archive type="institutional" currentAsOf="${description.currentAsOf}"
+         xmlns="http://www.language-archives.org/OLAC/1.1/olac-archive"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.language-archives.org/OLAC/1.1/olac-archive
+         http://www.language-archives.org/OLAC/1.1/olac-archive.xsd">
+      <archiveURL>${description.archiveURL}</archiveURL>
+      <participant name="${description.participant.name}"
+         email="${help.mail}" role="repository manager"/>
+      <institution>${description.institution}</institution>
+      <institutionURL>${description.institutionURL}</institutionURL>
+      <shortLocation>${description.shortLocation}</shortLocation>
+      <location>${description.location}</location>
+      <synopsis>${description.synopsis}</synopsis>
+      <access>${description.access}</access>
+      <archivalSubmissionPolicy>${description.archivalSubmissionPolicy}</archivalSubmissionPolicy>
+</olac-archive>
