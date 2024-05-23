@@ -105,6 +105,7 @@ public class ItemCountDAOSolr implements ItemCountDAO {
                                                    DiscoveryConfigurationParameters.SORT.COUNT));
         query.addFilterQueries("search.resourcetype:" + IndexableItem.TYPE);    // count only items
         query.addFilterQueries("NOT(discoverable:false)");  // only discoverable
+        query.addFilterQueries("withdrawn:false");  // only discoverable
         query.setMaxResults(0);
 
         DiscoverResult sResponse;
