@@ -88,7 +88,7 @@ public class ColComFilter extends DSpaceFilter {
     }
 
     private DSpaceObject getDSpaceObject() {
-        if (Objects.isNull(dso)) {
+        if (Objects.nonNull(dso)) {
             return dso;
         }
         if (Objects.nonNull(getConfiguration().get("handle"))) {
