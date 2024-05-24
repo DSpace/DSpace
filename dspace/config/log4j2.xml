@@ -76,15 +76,32 @@
                 <policy type='TimeBasedTriggeringPolicy'>yyyy-MM-dd</policy>
             </policies>
         </Appender>
+
+        <!-- A4 is for Warns and errors -->
+        <Appender name='A4'
+                  filePattern="${log.dir}/warn.log-%d{yyyy-MM-dd}"
+                  type='RollingFile'
+                  fileName='${log.dir}/warn.log'
+        >
+            <!-- NOTE: The %equals patterns are providing a default value of "unknown" if "correlationID" or
+                 "requestID" are not currently set in the ThreadContext. -->
+            <Layout type='PatternLayout'
+                    pattern='%d %-5p %equals{%X{correlationID}}{}{unknown} %equals{%X{requestID}}{}{unknown} %c @ %m%n'/>
+            <policies>
+                <policy type='TimeBasedTriggeringPolicy'>yyyy-MM-dd</policy>
+            </policies>
+        </Appender>
     </Appenders>
 
     <Loggers>
+
 
         <!-- Most parts of DSpace -->
         <Logger name='org.dspace'
                 level='${loglevel.dspace}'
                 additivity='false'>
             <AppenderRef ref='A1'/>
+            <AppenderRef ref="A4" level="WARN"/>
         </Logger>
 
         <!-- The checksum checker -->
@@ -119,6 +136,7 @@
         <!-- Anything not a part of DSpace -->
         <Root level='${loglevel.other}'>
             <AppenderRef ref='A1'/>
+            <AppenderRef ref="A4" level="WARN"/>
         </Root>
     </Loggers>
 </Configuration>
