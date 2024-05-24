@@ -227,7 +227,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     @Override
     public boolean isHierarchical() {
         init();
-        return true;
+        return storeHierarchy;
     }
 
     @Override
