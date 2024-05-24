@@ -244,7 +244,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
 
     @Override
     public boolean isHierarchical() {
-        init();
+        init(null);
         return true;
     }
 
@@ -277,7 +277,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
 
     @Override
     public Integer getPreloadLevel() {
-        init();
+        init(null);
         return preloadLevel;
     }
 
