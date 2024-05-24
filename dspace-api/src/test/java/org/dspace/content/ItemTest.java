@@ -639,7 +639,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     }
 
     /**
-     * Test of addMetadata method, of class Item.
+     * This is the same as testAddMetadata_5args_1 except it is adding a *single* value as a String, not a List.
      */
     @Test
     public void testAddMetadata_5args_2() throws SQLException {
@@ -647,24 +647,18 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String element = "contributor";
         String qualifier = "author";
         String lang = Item.ANY;
-        List<String> values = Arrays.asList("value0", "value1");
-        itemService.addMetadata(context, it, schema, element, qualifier, lang, values);
+        String value = "value0";
+        itemService.addMetadata(context, it, schema, element, qualifier, lang, value);
 
         List<MetadataValue> dc = itemService.getMetadata(it, schema, element, qualifier, lang);
         assertThat("testAddMetadata_5args_2 0", dc, notNullValue());
-        assertTrue("testAddMetadata_5args_2 1", dc.size() == 2);
+        assertTrue("testAddMetadata_5args_2 1", dc.size() == 1);
         assertThat("testAddMetadata_5args_2 2", dc.get(0).getMetadataField().getMetadataSchema().getName(),
                    equalTo(schema));
         assertThat("testAddMetadata_5args_2 3", dc.get(0).getMetadataField().getElement(), equalTo(element));
         assertThat("testAddMetadata_5args_2 4", dc.get(0).getMetadataField().getQualifier(), equalTo(qualifier));
         assertThat("testAddMetadata_5args_2 5", dc.get(0).getLanguage(), equalTo(lang));
-        assertThat("testAddMetadata_5args_2 6", dc.get(0).getValue(), equalTo(values.get(0)));
-        assertThat("testAddMetadata_5args_2 7", dc.get(1).getMetadataField().getMetadataSchema().getName(),
-                   equalTo(schema));
-        assertThat("testAddMetadata_5args_2 8", dc.get(1).getMetadataField().getElement(), equalTo(element));
-        assertThat("testAddMetadata_5args_2 9", dc.get(1).getMetadataField().getQualifier(), equalTo(qualifier));
-        assertThat("testAddMetadata_5args_2 10", dc.get(1).getLanguage(), equalTo(lang));
-        assertThat("testAddMetadata_5args_2 11", dc.get(1).getValue(), equalTo(values.get(1)));
+        assertThat("testAddMetadata_5args_2 6", dc.get(0).getValue(), equalTo(value));
     }
 
     /**
