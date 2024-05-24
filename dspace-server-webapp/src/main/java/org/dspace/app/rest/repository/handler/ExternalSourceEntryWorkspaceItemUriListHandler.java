@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
+import org.dspace.util.UUIDUtils;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,10 +28,16 @@ public class ExternalSourceEntryWorkspaceItemUriListHandler
 
     @Override
     public boolean supports(List<String> uriList, String method, Class clazz) {
-        if (!super.supports(uriList, method, clazz)) {
+        if (clazz != WorkspaceItem.class) {
             return false;
         }
-        if (clazz != WorkspaceItem.class) {
+        for (String possibleUuid : uriList) {
+            String[] possibleUrl = possibleUuid.split("/");
+            if (UUIDUtils.fromString(possibleUuid) != null || UUIDUtils.fromString(possibleUrl[possibleUrl.length - 1]) != null) {
+                return true;
+            }
+        }
+        if (!super.supports(uriList, method, clazz)) {
             return false;
         }
         return true;
