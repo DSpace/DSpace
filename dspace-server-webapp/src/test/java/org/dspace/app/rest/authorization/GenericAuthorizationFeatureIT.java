@@ -151,25 +151,21 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
             .withName("item1AdminGroup")
             .addMember(item1Admin)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, null, item1AdminGroup)
             .withDspaceObject(item1)
             .withAction(Constants.ADMIN)
-            .withGroup(item1AdminGroup)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, communityAWriter, null)
             .withDspaceObject(communityA)
             .withAction(Constants.WRITE)
-            .withUser(communityAWriter)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, collectionXWriter, null)
             .withDspaceObject(collectionX)
             .withAction(Constants.WRITE)
-            .withUser(collectionXWriter)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, item1Writer, null)
             .withDspaceObject(item1)
             .withAction(Constants.WRITE)
-            .withUser(item1Writer)
             .build();
 
         communityB = CommunityBuilder.createCommunity(context)
@@ -671,10 +667,9 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         // grant item 1 admin REMOVE permissions on the item’s owning collection
         // verify item 1 admin has this feature on item 1
         context.turnOffAuthorisationSystem();
-        ResourcePolicy removePermission = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy removePermission = ResourcePolicyBuilder.createResourcePolicy(context, item1Writer, null)
             .withDspaceObject(collectionX)
             .withAction(Constants.REMOVE)
-            .withUser(item1Writer)
             .build();
         context.restoreAuthSystemState();
 
@@ -691,10 +686,9 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
 
         // grant item 1 write REMOVE permissions on the item’s owning collection
         context.turnOffAuthorisationSystem();
-        ResourcePolicy removePermission = ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicy removePermission = ResourcePolicyBuilder.createResourcePolicy(context, item1Writer, null)
             .withDspaceObject(collectionX)
             .withAction(Constants.REMOVE)
-            .withUser(item1Writer)
             .build();
         context.restoreAuthSystemState();
 
@@ -766,10 +760,9 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
             .withEmail("communityAAAdmin@my.edu")
             .withPassword(password)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, communityAAAdmin, null)
             .withDspaceObject(communityAA)
             .withAction(Constants.ADMIN)
-            .withUser(communityAAAdmin)
             .build();
         context.restoreAuthSystemState();
         String communityAAAdminToken = getAuthToken(communityAAAdmin.getEmail(), password);
@@ -924,10 +917,9 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
             .withEmail("communityAAAdmin@my.edu")
             .withPassword(password)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, communityAAAdmin, null)
             .withDspaceObject(communityA)
             .withAction(Constants.REMOVE)
-            .withUser(communityAAAdmin)
             .build();
         context.restoreAuthSystemState();
         String communityAAAdminToken = getAuthToken(communityAAAdmin.getEmail(), password);
@@ -939,10 +931,9 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
 
         // Grant REMOVE permissions on community AA for collection X admin
         context.turnOffAuthorisationSystem();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, collectionXAdmin, null)
             .withDspaceObject(communityAA)
             .withAction(Constants.REMOVE)
-            .withUser(collectionXAdmin)
             .build();
         context.restoreAuthSystemState();
         // verify collection X admin has this feature on collection X
@@ -953,10 +944,9 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
 
         // Grant REMOVE permissions on collection X for item 1 admin
         context.turnOffAuthorisationSystem();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, item1Admin, null)
             .withDspaceObject(collectionX)
             .withAction(Constants.REMOVE)
-            .withUser(item1Admin)
             .build();
         context.restoreAuthSystemState();
         // verify item 1 admin has this feature on item 1
@@ -982,10 +972,9 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
             .withEmail("communityADeleter@my.edu")
             .withPassword(password)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, communityADeleter, null)
             .withDspaceObject(communityA)
             .withAction(Constants.DELETE)
-            .withUser(communityADeleter)
             .build();
         context.restoreAuthSystemState();
         String communityADeleterToken = getAuthToken(communityADeleter.getEmail(), password);
@@ -1008,10 +997,9 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
             .withEmail("communityARemover@my.edu")
             .withPassword(password)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, communityARemover, null)
             .withDspaceObject(communityA)
             .withAction(Constants.REMOVE)
-            .withUser(communityARemover)
             .build();
         context.restoreAuthSystemState();
         String communityARemoverToken = getAuthToken(communityARemover.getEmail(), password);
@@ -1038,10 +1026,9 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
             .withEmail("communityAARemover@my.edu")
             .withPassword(password)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, communityAARemover, null)
             .withDspaceObject(communityAA)
             .withAction(Constants.REMOVE)
-            .withUser(communityAARemover)
             .build();
         context.restoreAuthSystemState();
         String communityAARemoverToken = getAuthToken(communityAARemover.getEmail(), password);
@@ -1068,10 +1055,9 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
             .withEmail("communityXRemover@my.edu")
             .withPassword(password)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, collectionXRemover, null)
             .withDspaceObject(collectionX)
             .withAction(Constants.REMOVE)
-            .withUser(collectionXRemover)
             .build();
         context.restoreAuthSystemState();
         String collectionXRemoverToken = getAuthToken(collectionXRemover.getEmail(), password);
@@ -1088,10 +1074,9 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
             .withEmail("item1Deleter@my.edu")
             .withPassword(password)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, item1Deleter, null)
             .withDspaceObject(item1)
             .withAction(Constants.DELETE)
-            .withUser(item1Deleter)
             .build();
         context.restoreAuthSystemState();
         String item1DeleterToken = getAuthToken(item1Deleter.getEmail(), password);
@@ -1108,15 +1093,13 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
             .withEmail("collectionXDeleter@my.edu")
             .withPassword(password)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, collectionXRemoverItem1Deleter, null)
             .withDspaceObject(collectionX)
             .withAction(Constants.REMOVE)
-            .withUser(collectionXRemoverItem1Deleter)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, collectionXRemoverItem1Deleter, null)
             .withDspaceObject(item1)
             .withAction(Constants.DELETE)
-            .withUser(collectionXRemoverItem1Deleter)
             .build();
         context.restoreAuthSystemState();
         String collectionXRemoverItem1DeleterToken = getAuthToken(collectionXRemoverItem1Deleter.getEmail(), password);
@@ -1143,10 +1126,9 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
             .withEmail("item1Remover@my.edu")
             .withPassword(password)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, item1Remover, null)
             .withDspaceObject(item1)
             .withAction(Constants.REMOVE)
-            .withUser(item1Remover)
             .build();
         context.restoreAuthSystemState();
         String item1RemoverToken = getAuthToken(item1Remover.getEmail(), password);
@@ -1173,10 +1155,9 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
             .withEmail("bundle1Remover@my.edu")
             .withPassword(password)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, bundle1Remover, null)
             .withDspaceObject(bundle1)
             .withAction(Constants.REMOVE)
-            .withUser(bundle1Remover)
             .build();
         context.restoreAuthSystemState();
         String bundle1RemoverToken = getAuthToken(bundle1Remover.getEmail(), password);
@@ -1194,15 +1175,13 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
             .withEmail("bundle1item1Remover@my.edu")
             .withPassword(password)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, bundle1item1Remover, null)
             .withDspaceObject(bundle1)
             .withAction(Constants.REMOVE)
-            .withUser(bundle1item1Remover)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, bundle1item1Remover, null)
             .withDspaceObject(item1)
             .withAction(Constants.REMOVE)
-            .withUser(bundle1item1Remover)
             .build();
         context.restoreAuthSystemState();
         String bundle1item1RemoverToken = getAuthToken(bundle1item1Remover.getEmail(), password);
@@ -1354,10 +1333,9 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
             .withEmail("bundle1Writer@my.edu")
             .withPassword(password)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, bundle1Writer, null)
             .withDspaceObject(bundle1)
             .withAction(Constants.WRITE)
-            .withUser(bundle1Writer)
             .build();
         context.restoreAuthSystemState();
         String bundle1WriterToken = getAuthToken(bundle1Writer.getEmail(), password);
@@ -1374,10 +1352,9 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
             .withEmail("bundle1Adder@my.edu")
             .withPassword(password)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, bundle1Adder, null)
             .withDspaceObject(bundle1)
             .withAction(Constants.ADD)
-            .withUser(bundle1Adder)
             .build();
         context.restoreAuthSystemState();
         String bundle1AdderToken = getAuthToken(bundle1Adder.getEmail(), password);
@@ -1395,25 +1372,21 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
             .withEmail("bundle1WriterAdder@my.edu")
             .withPassword(password)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, bundle1WriterAdder, null)
             .withDspaceObject(bundle1)
             .withAction(Constants.ADD)
-            .withUser(bundle1WriterAdder)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, bundle1WriterAdder, null)
             .withDspaceObject(bundle1)
             .withAction(Constants.WRITE)
-            .withUser(bundle1WriterAdder)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, bundle1WriterAdder, null)
             .withDspaceObject(item1)
             .withAction(Constants.ADD)
-            .withUser(bundle1WriterAdder)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, bundle1WriterAdder, null)
             .withDspaceObject(item1)
             .withAction(Constants.WRITE)
-            .withUser(bundle1WriterAdder)
             .build();
         context.restoreAuthSystemState();
         String bundle1WriterAdderToken = getAuthToken(bundle1WriterAdder.getEmail(), password);
@@ -1461,15 +1434,13 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
             .withEmail("item1AdderWriter@my.edu")
             .withPassword(password)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, item1AdderWriter, null)
             .withDspaceObject(item1)
             .withAction(Constants.ADD)
-            .withUser(item1AdderWriter)
             .build();
-        ResourcePolicyBuilder.createResourcePolicy(context)
+        ResourcePolicyBuilder.createResourcePolicy(context, item1AdderWriter, null)
             .withDspaceObject(item1)
             .withAction(Constants.WRITE)
-            .withUser(item1AdderWriter)
             .build();
         context.restoreAuthSystemState();
         String item1AdderWriterToken = getAuthToken(item1AdderWriter.getEmail(), password);
@@ -1493,3 +1464,4 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
             );
     }
 }
+

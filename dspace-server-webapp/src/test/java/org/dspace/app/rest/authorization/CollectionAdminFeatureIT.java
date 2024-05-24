@@ -175,8 +175,10 @@ public class CollectionAdminFeatureIT extends AbstractControllerIntegrationTest 
         String token = getAuthToken(eperson.getEmail(), password);
 
         // Verify an ePerson in a subgroup of the site administrators has this feature
+        // Filter by "feature" ID because Admins may have >20 features enabled & cause this endpoint to paginate.
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/sites/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/sites/" + siteService.findSite(context).getID()
+            + "&feature=isCollectionAdmin"))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='isCollectionAdmin')]")
@@ -284,8 +286,10 @@ public class CollectionAdminFeatureIT extends AbstractControllerIntegrationTest 
         String token = getAuthToken(eperson.getEmail(), password);
 
         // Verify an ePerson in a sub-subgroup of the site administrators has this feature
+        // Filter by "feature" ID because Admins may have >20 features enabled & cause this endpoint to paginate.
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/sites/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/sites/" + siteService.findSite(context).getID()
+            + "&feature=isCollectionAdmin"))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='isCollectionAdmin')]")

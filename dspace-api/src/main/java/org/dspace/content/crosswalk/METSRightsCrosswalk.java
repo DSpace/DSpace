@@ -432,31 +432,7 @@ public class METSRightsCrosswalk
                     //get what class of context this is
                     String contextClass = element.getAttributeValue("CONTEXTCLASS");
 
-                    ResourcePolicy rp = resourcePolicyService.create(context);
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
-                    // get reference to the <Permissions> element
-                    // Note: we are assuming here that there will only ever be ONE <Permissions>
-                    //  element. Currently there are no known use cases for multiple.
-                    Element permsElement = element.getChild("Permissions", METSRights_NS);
-                    if (permsElement == null) {
-                        log.error("No <Permissions> element was found. Skipping this <Context> element.");
-                        continue;
-                    }
-
-                    if (element.getAttributeValue("rpName") != null) {
-                        rp.setRpName(element.getAttributeValue("rpName"));
-                    }
-                    try {
-                        if (element.getAttributeValue("start-date") != null) {
-                            rp.setStartDate(sdf.parse(element.getAttributeValue("start-date")));
-                        }
-                        if (element.getAttributeValue("end-date") != null) {
-                            rp.setEndDate(sdf.parse(element.getAttributeValue("end-date")));
-                        }
-                    } catch (ParseException ex) {
-                        log.error("Failed to parse embargo date. The date needs to be in the format 'yyyy-MM-dd'.", ex);
-                    }
+                    ResourcePolicy rp = null;
 
                     //Check if this permission pertains to Anonymous users
                     if (ANONYMOUS_CONTEXTCLASS.equals(contextClass)) {
@@ -464,22 +440,23 @@ public class METSRightsCrosswalk
                         Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
                         if (anonGroup == null) {
                             throw new CrosswalkInternalException(
-                                "The DSpace database has not been properly initialized.  The Anonymous Group is " +
-                                    "missing from the database.");
+                                    "The DSpace database has not been properly initialized.  The Anonymous Group is " +
+                                            "missing from the database.");
                         }
 
-                        rp.setGroup(anonGroup);
+                        rp = resourcePolicyService.create(context, null, anonGroup);
                     } else if (ADMIN_CONTEXTCLASS.equals(contextClass)) {
                         // else if this permission declaration pertains to Administrators
                         // get DSpace Administrator group
                         Group adminGroup = groupService.findByName(context, Group.ADMIN);
                         if (adminGroup == null) {
                             throw new CrosswalkInternalException(
-                                "The DSpace database has not been properly initialized.  The Administrator Group is " +
-                                    "missing from the database.");
+                                    "The DSpace database has not been properly initialized.  " +
+                                            "The Administrator Group is " +
+                                            "missing from the database.");
                         }
 
-                        rp.setGroup(adminGroup);
+                        rp = resourcePolicyService.create(context, null, adminGroup);
                     } else if (GROUP_CONTEXTCLASS.equals(contextClass)) {
                         // else if this permission pertains to another DSpace group
                         try {
@@ -498,18 +475,17 @@ public class METSRightsCrosswalk
                             //if not found, throw an error -- user should restore group from the SITE AIP
                             if (group == null) {
                                 throw new CrosswalkInternalException("Cannot restore Group permissions on object ("
-                                                                         + "type=" + Constants.typeText[dso
-                                    .getType()] + ", "
-                                                                         + "handle=" + dso.getHandle() + ", "
-                                                                         + "ID=" + dso.getID()
-                                                                         + "). The Group named '" + groupName + "' is" +
-                                                                         " missing from DSpace. "
-                                                                         + "Please restore this group using the SITE " +
-                                                                         "AIP, or recreate it.");
+                                                                 + "type=" + Constants.typeText[dso.getType()] + ", "
+                                                                 + "handle=" + dso.getHandle() + ", "
+                                                                 + "ID=" + dso.getID()
+                                                                 + "). The Group named '" + groupName + "' is" +
+                                                                 " missing from DSpace. "
+                                                                 + "Please restore this group using the SITE " +
+                                                                 "AIP, or recreate it.");
                             }
 
                             //assign group to policy
-                            rp.setGroup(group);
+                            rp = resourcePolicyService.create(context, null, group);
                         } catch (PackageException pe) {
                             //A PackageException will only be thrown if translateDefaultGroupName() fails
                             //We'll just wrap it as a CrosswalkException and throw it upwards
@@ -535,25 +511,52 @@ public class METSRightsCrosswalk
                         //if not found, throw an error -- user should restore person from the SITE AIP
                         if (person == null) {
                             throw new CrosswalkInternalException("Cannot restore Person permissions on object ("
-                                                                     + "type=" + Constants.typeText[dso
-                                .getType()] + ", "
-                                                                     + "handle=" + dso.getHandle() + ", "
-                                                                     + "ID=" + dso.getID()
-                                                                     + "). The Person with email/netid '" +
-                                                                     personEmail + "' is missing from DSpace. "
-                                                                     + "Please restore this Person object using the " +
-                                                                     "SITE AIP, or recreate it.");
+                                                                 + "type=" + Constants.typeText[dso.getType()] + ", "
+                                                                 + "handle=" + dso.getHandle() + ", "
+                                                                 + "ID=" + dso.getID()
+                                                                 + "). The Person with email/netid '" +
+                                                                 personEmail + "' is missing from DSpace. "
+                                                                 + "Please restore this Person object using the " +
+                                                                 "SITE AIP, or recreate it.");
                         }
 
-                        //assign person to the policy
-                        rp.setEPerson(person);
+                        //create rp with the person
+                        rp = resourcePolicyService.create(context, person, null);
                     } else {
                         log.error("Unrecognized CONTEXTCLASS:  " + contextClass);
                     }
+                    if (rp != null) {
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-                    //set permissions on policy add to list of policies
-                    rp.setAction(parsePermissions(permsElement));
-                    policies.add(rp);
+                        // get reference to the <Permissions> element
+                        // Note: we are assuming here that there will only ever be ONE <Permissions>
+                        //  element. Currently there are no known use cases for multiple.
+                        Element permsElement = element.getChild("Permissions", METSRights_NS);
+                        if (permsElement == null) {
+                            log.error("No <Permissions> element was found. Skipping this <Context> element.");
+                            continue;
+                        }
+
+                        if (element.getAttributeValue("rpName") != null) {
+                            rp.setRpName(element.getAttributeValue("rpName"));
+                        }
+                        try {
+                            if (element.getAttributeValue("start-date") != null) {
+                                rp.setStartDate(sdf.parse(element.getAttributeValue("start-date")));
+                            }
+                            if (element.getAttributeValue("end-date") != null) {
+                                rp.setEndDate(sdf.parse(element.getAttributeValue("end-date")));
+                            }
+                        } catch (ParseException ex) {
+                            log.error("Failed to parse embargo date. The date needs to be in the format 'yyyy-MM-dd'.",
+                                      ex);
+                        }
+
+                        //set permissions and type on policy and add to list of policies
+                        rp.setAction(parsePermissions(permsElement));
+                        rp.setRpType(ResourcePolicy.TYPE_CUSTOM);
+                        policies.add(rp);
+                    }
                 } //end if "Context" element
             } //end for loop
 

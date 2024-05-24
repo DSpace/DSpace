@@ -234,6 +234,9 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                     matchNotifyServicePattern("patternB", null, false)
                 )))
             ));
+
+        // Delete the created service
+        NotifyServiceBuilder.deleteNotifyService(idRef.get());
     }
 
     @Test
@@ -1262,6 +1265,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isBadRequest());
     }
+
 
     @Test
     public void NotifyServiceInboundPatternConstraintRemoveOperationTest() throws Exception {

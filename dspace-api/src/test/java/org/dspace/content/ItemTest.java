@@ -1257,7 +1257,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Test
     public void testReplaceAllItemPolicies() throws Exception {
         List<ResourcePolicy> newpolicies = new ArrayList<ResourcePolicy>();
-        ResourcePolicy pol1 = resourcePolicyService.create(context);
+        ResourcePolicy pol1 = resourcePolicyService.create(context, eperson, null);
         newpolicies.add(pol1);
         itemService.replaceAllItemPolicies(context, it, newpolicies);
 
@@ -1284,9 +1284,9 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         bundleService.addBitstream(context, created, result);
 
         List<ResourcePolicy> newpolicies = new ArrayList<ResourcePolicy>();
-        newpolicies.add(resourcePolicyService.create(context));
-        newpolicies.add(resourcePolicyService.create(context));
-        newpolicies.add(resourcePolicyService.create(context));
+        newpolicies.add(resourcePolicyService.create(context, eperson, null));
+        newpolicies.add(resourcePolicyService.create(context, eperson, null));
+        newpolicies.add(resourcePolicyService.create(context, eperson, null));
         context.restoreAuthSystemState();
 
         itemService.replaceAllBitstreamPolicies(context, it, newpolicies);
@@ -1316,9 +1316,8 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         context.turnOffAuthorisationSystem();
         List<ResourcePolicy> newpolicies = new ArrayList<ResourcePolicy>();
         Group g = groupService.create(context);
-        ResourcePolicy pol1 = resourcePolicyService.create(context);
+        ResourcePolicy pol1 = resourcePolicyService.create(context, null, g);
         newpolicies.add(pol1);
-        pol1.setGroup(g);
         itemService.replaceAllItemPolicies(context, it, newpolicies);
 
         itemService.removeGroupPolicies(context, it, g);

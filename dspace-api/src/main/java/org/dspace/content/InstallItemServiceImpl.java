@@ -28,6 +28,7 @@ import org.dspace.event.Event;
 import org.dspace.identifier.Identifier;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.supervision.SupervisionOrder;
 import org.dspace.supervision.service.SupervisionOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,9 @@ public class InstallItemServiceImpl implements InstallItemService {
     @Autowired(required = false)
 
     Logger log = LogManager.getLogger(InstallItemServiceImpl.class);
+
+    @Autowired
+    protected ConfigurationService configurationService;
 
     protected InstallItemServiceImpl() {
     }
@@ -270,14 +274,20 @@ public class InstallItemServiceImpl implements InstallItemService {
         // Create provenance description
         StringBuffer provmessage = new StringBuffer();
 
-        if (item.getSubmitter() != null) {
+        //behavior to generate provenance message, if set true, personal data (e.g. email) of submitter will be hidden
+        //default value false, personal data of submitter will be shown in provenance message
+        String isProvenancePrivacyActiveProperty =
+                configurationService.getProperty("metadata.privacy.dc.description.provenance", "false");
+        boolean isProvenancePrivacyActive = Boolean.parseBoolean(isProvenancePrivacyActiveProperty);
+
+        if (item.getSubmitter() != null && !isProvenancePrivacyActive) {
             provmessage.append("Submitted by ").append(item.getSubmitter().getFullName())
-                .append(" (").append(item.getSubmitter().getEmail()).append(") on ")
-                .append(now.toString());
+                    .append(" (").append(item.getSubmitter().getEmail()).append(") on ")
+                    .append(now.toString());
         } else {
             // else, null submitter
-            provmessage.append("Submitted by unknown (probably automated) on")
-                .append(now.toString());
+            provmessage.append("Submitted by unknown (probably automated or submitter hidden) on ")
+                    .append(now.toString());
         }
         provmessage.append("\n");
 

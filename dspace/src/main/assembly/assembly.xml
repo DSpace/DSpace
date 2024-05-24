@@ -63,10 +63,6 @@
          <outputDirectory>bin</outputDirectory>
       </fileSet>
       <fileSet>
-         <directory>etc</directory>
-         <outputDirectory>etc</outputDirectory>
-      </fileSet>
-      <fileSet>
          <directory>solr</directory>
          <outputDirectory>solr</outputDirectory>
       </fileSet>
@@ -95,7 +91,7 @@
          <includes>
             <include>org.dspace.modules:*:jar:*</include>
          </includes>
-        <binaries>
+         <binaries>
             <includeDependencies>true</includeDependencies>
             <outputDirectory>lib</outputDirectory>
             <unpack>false</unpack>
@@ -107,6 +103,21 @@
                   </includes>
                </dependencySet>
             </dependencySets>
+         </binaries>
+      </moduleSet>
+
+      <!--
+      Add server-boot.jar to the 'webapps' directory
+      -->
+      <moduleSet>
+         <includes>
+            <include>org.dspace:server-boot</include>
+         </includes>
+         <binaries>
+            <includeDependencies>false</includeDependencies>
+            <outputDirectory>webapps</outputDirectory>
+            <unpack>false</unpack>
+            <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
          </binaries>
       </moduleSet>
 
