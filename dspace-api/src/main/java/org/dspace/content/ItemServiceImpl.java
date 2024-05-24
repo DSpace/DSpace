@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -81,6 +82,7 @@ import org.dspace.orcid.service.OrcidTokenService;
 import org.dspace.profile.service.ResearcherProfileService;
 import org.dspace.qaevent.dao.QAEventsDAO;
 import org.dspace.services.ConfigurationService;
+import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.dspace.versioning.service.VersioningService;
 import org.dspace.workflow.WorkflowItemService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
@@ -113,6 +115,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     protected BundleService bundleService;
     @Autowired(required = true)
     protected BitstreamFormatService bitstreamFormatService;
+    @Autowired(required = true)
+    protected BitstreamStorageService bitstreamStorageService;
     @Autowired(required = true)
     protected MetadataSchemaService metadataSchemaService;
     @Autowired(required = true)
@@ -175,6 +179,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Autowired
     private QAEventsDAO qaEventsDao;
+
+    /**
+     * A set of {@code MetadataFieldName} to be ignored when copying the metadata between items.
+     */
+    private Set<MetadataFieldName> nonCopyableMetadataFields;
 
     protected ItemServiceImpl() {
     }
@@ -281,6 +290,35 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
+    public Item clone(Context context, Item item) throws SQLException, AuthorizeException, IOException {
+        if (item == null) {
+            throw new IllegalArgumentException("Item should not be null.");
+        }
+        return clone(context, item, item.getOwningCollection());
+    }
+
+    @Override
+    public Item clone(Context context, Item nativeItem, Collection collectionTo)
+        throws SQLException, AuthorizeException, IOException {
+        if (nativeItem == null) {
+            throw new IllegalArgumentException("Item should not be null.");
+        }
+
+        Item newItem = createItem(context);
+
+        copy(context, newItem, nativeItem);
+
+        if (collectionTo != null && !collectionTo.equals(nativeItem.getOwningCollection())) {
+            move(context, newItem, nativeItem.getOwningCollection(), collectionTo);
+        }
+
+        log.info(LogHelper.getHeader(context, "clone_item",
+            "source_item_id=" + nativeItem.getID() + ",target_item_id=" + newItem.getID()));
+
+        return newItem;
+    }
+
+    @Override
     public void populateWithTemplateItemMetadata(Context context, Collection collection, boolean template, Item item)
         throws SQLException {
 
@@ -309,14 +347,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         }
 
         if (template && (templateItem != null)) {
-            List<MetadataValue> md = getMetadata(templateItem, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-
-            for (MetadataValue aMd : md) {
-                MetadataField metadataField = aMd.getMetadataField();
-                MetadataSchema metadataSchema = metadataField.getMetadataSchema();
-                addMetadata(context, item, metadataSchema.getName(), metadataField.getElement(),
-                    metadataField.getQualifier(), aMd.getLanguage(), aMd.getValue());
-            }
+            copyMetadata(context, templateItem, item, getNonCopyableMetadataFields());
         }
     }
 
@@ -1859,6 +1890,186 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     @Override
+    public void copy(Context context, Item target, Item source) throws IOException, SQLException, AuthorizeException {
+        copy(context, target, source, getNonCopyableMetadataFields(), true, true, true);
+    }
+
+    @Override
+    public void copy(Context context, Item target, Item source, Set<MetadataFieldName> ignoredMetadataFields,
+                     boolean withRelationships, boolean withBundlesAndBitstreams, boolean withPolicies)
+        throws SQLException, AuthorizeException, IOException {
+        if (CollectionUtils.isNotEmpty(ignoredMetadataFields)) {
+            copyMetadata(context, target, source, ignoredMetadataFields);
+        }
+        if (withRelationships) {
+            copyRelationships(context, source, target);
+        }
+        if (withBundlesAndBitstreams) {
+            createBundlesAndAddBitstreams(context, target, source);
+        }
+        try {
+            identifierService.reserve(context, target);
+        } catch (IdentifierException e) {
+            throw new RuntimeException("Can't create Identifier!", e);
+        }
+
+        if (withPolicies) {
+            // DSpace knows several types of resource policies (see the class
+            // org.dspace.authorize.ResourcePolicy): Submission, Workflow, Custom
+            // and inherited. Submission, Workflow and Inherited policies will be
+            // set automatically as neccessary. We need to copy the custom policies
+            // only to preserve customly set policies and embargos (which are
+            // realized by custom policies with a start date).
+            List<ResourcePolicy> policies =
+                authorizeService.findPoliciesByDSOAndType(context, source, ResourcePolicy.TYPE_CUSTOM);
+            authorizeService.addPolicies(context, policies, target);
+        }
+
+        update(context, target);
+    }
+
+    /**
+     * Copy all relationships of the old item to the new item.
+     * At this point in the lifecycle of the item-version (before archival), only the opposite item receives
+     * "latest" status. On item archival of the item-version, the "latest" status of the relevant relationships
+     * will be updated.
+     * @param context the DSpace context.
+     * @param newItem the new version of the item.
+     * @param oldItem the old version of the item.
+     *
+     * This code was copied from org.dspace.versioning.DefaultItemVersionProvider
+     */
+    protected void copyRelationships(
+        Context context, Item newItem, Item oldItem
+    ) throws SQLException, AuthorizeException {
+        List<Relationship> oldRelationships = relationshipService.findByItem(context, oldItem, -1, -1, false, true);
+        for (Relationship oldRelationship : oldRelationships) {
+            if (oldRelationship.getLeftItem().equals(oldItem)) {
+                // current item is on left side of this relationship
+                relationshipService.create(
+                    context,
+                    newItem,  // new item
+                    oldRelationship.getRightItem(),
+                    oldRelationship.getRelationshipType(),
+                    oldRelationship.getLeftPlace(),
+                    oldRelationship.getRightPlace(),
+                    oldRelationship.getLeftwardValue(),
+                    oldRelationship.getRightwardValue(),
+                    Relationship.LatestVersionStatus.RIGHT_ONLY // only mark the opposite side as "latest" for now
+                );
+            } else if (oldRelationship.getRightItem().equals(oldItem)) {
+                // current item is on right side of this relationship
+                relationshipService.create(
+                    context,
+                    oldRelationship.getLeftItem(),
+                    newItem, // new item
+                    oldRelationship.getRelationshipType(),
+                    oldRelationship.getLeftPlace(),
+                    oldRelationship.getRightPlace(),
+                    oldRelationship.getLeftwardValue(),
+                    oldRelationship.getRightwardValue(),
+                    Relationship.LatestVersionStatus.LEFT_ONLY // only mark the opposite side as "latest" for now
+                );
+            }
+        }
+    }
+
+    /**
+     * Adds existing metadata from one item to another. Set {@code ignoredMetadataFields} to specify metadata that
+     * shouldn't be copied.
+     * @param context
+     * @param itemNew
+     * @param nativeItem
+     * @param ignoredMetadataFields
+     * @throws SQLException
+     *
+     * This code was mostly copied from org.dspace.versioning.AbstractVersionProvider
+     */
+    protected void copyMetadata(Context context, Item itemNew, Item nativeItem,
+                                Set<MetadataFieldName> ignoredMetadataFields) throws SQLException {
+        List<MetadataValue> md = getMetadata(nativeItem, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        for (MetadataValue aMd : md) {
+            MetadataField aMf = aMd.getMetadataField();
+            MetadataSchema aMs = aMf.getMetadataSchema();
+            String unqualifiedMetadataField = aMs.getName() + "." + aMf.getElement();
+
+            if (ignoredMetadataFields.contains(
+                new MetadataFieldName(aMs.getName(), aMf.getElement(), aMf.getQualifier())) ||
+                ignoredMetadataFields.contains(new MetadataFieldName(aMs.getName(), aMf.getElement(), Item.ANY)) ||
+                aMd instanceof RelationshipMetadataValue) {
+                //Skip this metadata field (ignored and/or virtual)
+                continue;
+            }
+
+            addMetadata(
+                context,
+                itemNew,
+                aMf.getMetadataSchema().getName(),
+                aMf.getElement(),
+                aMf.getQualifier(),
+                aMd.getLanguage(),
+                aMd.getValue(),
+                aMd.getAuthority(),
+                aMd.getConfidence(),
+                aMd.getPlace()
+            );
+        }
+    }
+
+    /**
+     *
+     * @param context
+     * @param itemNew
+     * @param nativeItem
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
+     *
+     * This code was copied from org.dspace.versioning.AbstractVersionProvider
+     */
+    protected void createBundlesAndAddBitstreams(Context context, Item itemNew, Item nativeItem)
+        throws SQLException, AuthorizeException, IOException {
+        for (Bundle nativeBundle : nativeItem.getBundles()) {
+            Bundle bundleNew = bundleService.create(context, itemNew, nativeBundle.getName());
+            // DSpace knows several types of resource policies (see the class
+            // org.dspace.authorize.ResourcePolicy): Submission, Workflow, Custom
+            // and inherited. Submission, Workflow and Inherited policies will be
+            // set automatically as neccessary. We need to copy the custom policies
+            // only to preserve customly set policies and embargos (which are
+            // realized by custom policies with a start date).
+            List<ResourcePolicy> bundlePolicies =
+                authorizeService.findPoliciesByDSOAndType(context, nativeBundle, ResourcePolicy.TYPE_CUSTOM);
+            authorizeService.addPolicies(context, bundlePolicies, bundleNew);
+
+            for (Bitstream nativeBitstream : nativeBundle.getBitstreams()) {
+                // Metadata and additional information like internal identifier,
+                // file size, checksum, and checksum algorithm are set by the bitstreamStorageService.clone(...)
+                // and respectively bitstreamService.clone(...) method.
+                Bitstream bitstreamNew =  bitstreamStorageService.clone(context, nativeBitstream);
+
+                bundleService.addBitstream(context, bundleNew, bitstreamNew);
+
+                // NOTE: bundle.addBitstream() causes Bundle policies to be inherited by default.
+                // So, we need to REMOVE any inherited TYPE_CUSTOM policies before copying over the correct ones.
+                authorizeService.removeAllPoliciesByDSOAndType(context, bitstreamNew, ResourcePolicy.TYPE_CUSTOM);
+
+                // Now, we need to copy the TYPE_CUSTOM resource policies from old bitstream
+                // to the new bitstream, like we did above for bundles
+                List<ResourcePolicy> bitstreamPolicies =
+                    authorizeService.findPoliciesByDSOAndType(context, nativeBitstream, ResourcePolicy.TYPE_CUSTOM);
+                authorizeService.addPolicies(context, bitstreamPolicies, bitstreamNew);
+
+                if (nativeBundle.getPrimaryBitstream() != null && nativeBundle.getPrimaryBitstream()
+                    .equals(nativeBitstream)) {
+                    bundleNew.setPrimaryBitstreamID(bitstreamNew);
+                }
+
+                bitstreamService.update(context, bitstreamNew);
+            }
+        }
+    }
+
+    @Override
     public EntityType getEntityType(Context context, Item item) throws SQLException {
         String entityTypeString = getEntityTypeLabel(item);
         if (StringUtils.isBlank(entityTypeString)) {
@@ -1931,4 +2142,11 @@ prevent the generation of resource policy entry values with null dspace_object a
         }
     }
 
+    public Set<MetadataFieldName> getNonCopyableMetadataFields() {
+        return nonCopyableMetadataFields;
+    }
+
+    public void setNonCopyableMetadataFields(Set<MetadataFieldName> nonCopyableMetadataFields) {
+        this.nonCopyableMetadataFields = nonCopyableMetadataFields;
+    }
 }
