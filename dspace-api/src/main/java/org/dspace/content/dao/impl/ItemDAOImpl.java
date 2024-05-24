@@ -401,7 +401,8 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     }
 
     @Override
-    public int countItems(Context context, Collection collection, boolean includeArchived, boolean includeWithdrawn, boolean discoverable)
+    public int countItems(Context context, Collection collection, boolean includeArchived, boolean includeWithdrawn,
+                          boolean discoverable)
         throws SQLException {
         // Build query to select all Items have this "collection" in their list of collections
         // AND also have the inArchive or isWithdrawn set as specified
@@ -426,7 +427,8 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         }
         Query query = createQuery(context, "select count(distinct i) from Item i " +
             "join i.collections collection " +
-            "WHERE collection IN (:collections) AND i.inArchive=:in_archive AND i.withdrawn=:withdrawn AND discoverable=:discoverable");
+            "WHERE collection IN (:collections) AND i.inArchive=:in_archive AND i.withdrawn=:withdrawn AND " +
+                "discoverable=:discoverable");
         query.setParameter("collections", collections);
         query.setParameter("in_archive", includeArchived);
         query.setParameter("withdrawn", includeWithdrawn);
@@ -452,7 +454,8 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     }
 
     @Override
-    public int countItems(Context context, boolean includeArchived, boolean includeWithdrawn, boolean discoverable) throws SQLException {
+    public int countItems(Context context, boolean includeArchived, boolean includeWithdrawn,
+                          boolean discoverable) throws SQLException {
         Query query = createQuery(context,
                 "SELECT count(*) FROM Item i " +
                 "WHERE i.inArchive=:in_archive AND i.withdrawn=:withdrawn AND discoverable=:discoverable");
@@ -463,11 +466,13 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     }
 
     @Override
-    public int countItems(Context context, EPerson submitter, boolean includeArchived, boolean includeWithdrawn, boolean discoverable)
+    public int countItems(Context context, EPerson submitter, boolean includeArchived, boolean includeWithdrawn,
+                          boolean discoverable)
         throws SQLException {
         Query query = createQuery(context,
                 "SELECT count(*) FROM Item i join i.submitter submitter " +
-                "WHERE i.inArchive=:in_archive AND i.withdrawn=:withdrawn AND submitter = :submitter AND discoverable=:discoverable");
+                "WHERE i.inArchive=:in_archive AND i.withdrawn=:withdrawn AND submitter = :submitter AND " +
+                        "discoverable=:discoverable");
         query.setParameter("submitter", submitter);
         query.setParameter("in_archive", includeArchived);
         query.setParameter("withdrawn", includeWithdrawn);
