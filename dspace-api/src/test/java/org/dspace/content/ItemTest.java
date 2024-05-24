@@ -537,6 +537,17 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         assertThat("testAddMetadata_5args_1 11", dc.get(1).getValue(), equalTo(values[1]));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddMetadata_5args_no_values() throws Exception {
+        String schema = "dc";
+        String element = "contributor";
+        String qualifier = "author";
+        String lang = Item.ANY;
+        String[] values = {};
+        itemService.addMetadata(context, it, schema, element, qualifier, lang, Arrays.asList(values));
+        fail("IllegalArgumentException expected");
+    }
+
     /**
      * Test of addMetadata method, of class Item.
      */
@@ -612,6 +623,19 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         assertThat("testAddMetadata_7args_1 13", dc.get(1).getValue(), equalTo(values.get(1)));
         assertThat("testAddMetadata_7args_1 14", dc.get(1).getAuthority(), nullValue());
         assertThat("testAddMetadata_7args_1 15", dc.get(1).getConfidence(), equalTo(-1));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddMetadata_7args_no_values() throws Exception {
+        String schema = "dc";
+        String element = "contributor";
+        String qualifier = "author";
+        String lang = Item.ANY;
+        List<String> values = new ArrayList();
+        List<String> authorities = new ArrayList();
+        List<Integer> confidences = new ArrayList();
+        itemService.addMetadata(context, it, schema, element, qualifier, lang, values, authorities, confidences);
+        fail("IllegalArgumentException expected");
     }
 
     /**
