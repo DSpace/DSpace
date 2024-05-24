@@ -18,14 +18,14 @@ import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.dspace.xoai.data.DSpaceItem;
 import org.dspace.xoai.filter.results.SolrFilterResult;
-import org.dspace.xoai.services.api.HandleResolver;
-import org.dspace.xoai.services.api.HandleResolverException;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Serves as filter in xoai for OAI-PMH interface.
@@ -39,14 +39,11 @@ public class ColComFilter extends DSpaceFilter {
 
     private DSpaceObject dso = null;
 
-    @Autowired
-    private HandleResolver handleResolver;
+    private static HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
-    @Autowired
-    private CommunityService communityService;
+    private static CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
 
-    @Autowired
-    private CollectionService collectionService;
+    private static CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
     @Override
     public SolrFilterResult buildSolrQuery() {
@@ -94,8 +91,8 @@ public class ColComFilter extends DSpaceFilter {
         if (Objects.nonNull(getConfiguration().get("handle"))) {
             String handle = getConfiguration().get("handle").asSimpleType().asString();
             try {
-                dso = handleResolver.resolve(handle);
-            } catch (HandleResolverException e) {
+                dso = handleService.resolveToObject(context, handle);
+            } catch (SQLException e) {
                 log.error(e);
             }
         } else if (Objects.nonNull(getConfiguration().get("name"))) {
