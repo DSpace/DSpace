@@ -1621,13 +1621,13 @@ prevent the generation of resource policy entry values with null dspace_object a
 
     @Override
     public int countItems(Context context, Collection collection) throws SQLException {
-        return itemDAO.countItems(context, collection, true, false);
+        return itemDAO.countItems(context, collection, true, false, true);
     }
 
     @Override
     public int countAllItems(Context context, Collection collection) throws SQLException {
-        return itemDAO.countItems(context, collection, true, false) + itemDAO.countItems(context, collection,
-                                                                                         false, true);
+        return itemDAO.countItems(context, collection, true, false, true) + itemDAO.countItems(context, collection,
+                                                                                         false, true, true);
     }
 
     @Override
@@ -1636,7 +1636,7 @@ prevent the generation of resource policy entry values with null dspace_object a
         List<Collection> collections = communityService.getAllCollections(context, community);
 
         // Now, lets count unique items across that list of collections
-        return itemDAO.countItems(context, collections, true, false);
+        return itemDAO.countItems(context, collections, true, false, true);
     }
 
     @Override
@@ -1645,8 +1645,8 @@ prevent the generation of resource policy entry values with null dspace_object a
         List<Collection> collections = communityService.getAllCollections(context, community);
 
         // Now, lets count unique items across that list of collections
-        return itemDAO.countItems(context, collections, true, false) + itemDAO.countItems(context, collections,
-                                                                                          false, true);
+        return itemDAO.countItems(context, collections, true, false, true) + itemDAO.countItems(context, collections,
+                                                                                          false, false, true);
     }
 
     @Override
@@ -1690,19 +1690,19 @@ prevent the generation of resource policy entry values with null dspace_object a
     @Override
     public int countNotArchivedItems(Context context) throws SQLException {
         // return count of items not in archive and also not withdrawn
-        return itemDAO.countItems(context, false, false);
+        return itemDAO.countItems(context, false, false, true);
     }
 
     @Override
     public int countArchivedItems(Context context) throws SQLException {
         // return count of items in archive and also not withdrawn
-        return itemDAO.countItems(context, true, false);
+        return itemDAO.countItems(context, true, false, true);
     }
 
     @Override
     public int countWithdrawnItems(Context context) throws SQLException {
         // return count of items that are not in archive and withdrawn
-        return itemDAO.countItems(context, false, true);
+        return itemDAO.countItems(context, false, true, true );
     }
 
     @Override

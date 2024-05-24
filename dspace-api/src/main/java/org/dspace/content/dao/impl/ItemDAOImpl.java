@@ -374,30 +374,33 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     }
 
     @Override
-    public int countItems(Context context, Collection collection, boolean includeArchived, boolean includeWithdrawn)
+    public int countItems(Context context, Collection collection, boolean includeArchived, boolean includeWithdrawn, boolean discoverable)
         throws SQLException {
         Query query = createQuery(context,
               "select count(i) from Item i join i.collections c " +
-              "WHERE :collection IN c AND i.inArchive=:in_archive AND i.withdrawn=:withdrawn");
+              "WHERE :collection IN c AND i.inArchive=:in_archive AND i.withdrawn=:withdrawn " +
+                  "AND discoverable=:discoverable");
         query.setParameter("collection", collection);
         query.setParameter("in_archive", includeArchived);
         query.setParameter("withdrawn", includeWithdrawn);
+        query.setParameter("discoverable", discoverable);
 
         return count(query);
     }
 
     @Override
     public int countItems(Context context, List<Collection> collections, boolean includeArchived,
-                          boolean includeWithdrawn) throws SQLException {
+                          boolean includeWithdrawn, boolean discoverable) throws SQLException {
         if (collections.size() == 0) {
             return 0;
         }
         Query query = createQuery(context, "select count(distinct i) from Item i " +
             "join i.collections collection " +
-            "WHERE collection IN (:collections) AND i.inArchive=:in_archive AND i.withdrawn=:withdrawn");
+            "WHERE collection IN (:collections) AND i.inArchive=:in_archive AND i.withdrawn=:withdrawn AND discoverable=:discoverable");
         query.setParameter("collections", collections);
         query.setParameter("in_archive", includeArchived);
         query.setParameter("withdrawn", includeWithdrawn);
+        query.setParameter("discoverable", discoverable);
 
         return count(query);
     }
@@ -417,24 +420,26 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     }
 
     @Override
-    public int countItems(Context context, boolean includeArchived, boolean includeWithdrawn) throws SQLException {
+    public int countItems(Context context, boolean includeArchived, boolean includeWithdrawn, boolean discoverable) throws SQLException {
         Query query = createQuery(context,
                 "SELECT count(*) FROM Item i " +
-                "WHERE i.inArchive=:in_archive AND i.withdrawn=:withdrawn");
+                "WHERE i.inArchive=:in_archive AND i.withdrawn=:withdrawn AND discoverable=:discoverable");
         query.setParameter("in_archive", includeArchived);
         query.setParameter("withdrawn", includeWithdrawn);
+        query.setParameter("discoverable", discoverable);
         return count(query);
     }
 
     @Override
-    public int countItems(Context context, EPerson submitter, boolean includeArchived, boolean includeWithdrawn)
+    public int countItems(Context context, EPerson submitter, boolean includeArchived, boolean includeWithdrawn, boolean discoverable)
         throws SQLException {
         Query query = createQuery(context,
                 "SELECT count(*) FROM Item i join i.submitter submitter " +
-                "WHERE i.inArchive=:in_archive AND i.withdrawn=:withdrawn AND submitter = :submitter");
+                "WHERE i.inArchive=:in_archive AND i.withdrawn=:withdrawn AND submitter = :submitter AND discoverable=:discoverable");
         query.setParameter("submitter", submitter);
         query.setParameter("in_archive", includeArchived);
         query.setParameter("withdrawn", includeWithdrawn);
+        query.setParameter("discoverable", discoverable);
         return count(query);
 
     }
