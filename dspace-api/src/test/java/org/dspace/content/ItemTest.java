@@ -201,6 +201,72 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         assertThat("testCreate 1", created.getName(), nullValue());
     }
 
+    @Test
+    public void testClone() throws Exception {
+        // Allow Collection WRITE perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.ADD);
+
+        Item source = it;
+        Item target = itemService.clone(context, source, collection);
+
+        assertThat("testClone 0", source, notNullValue());
+        assertThat("testClone 1", target, notNullValue());
+        assertThat("testClone 2", target.getMetadata().size() == source.getMetadata().size());
+    }
+
+    @Test
+    public void testCopy() throws Exception {
+        // Allow Collection WRITE perms
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.ADD);
+
+        Item source = it;
+
+        context.turnOffAuthorisationSystem();
+        Item target = createItem();
+        context.restoreAuthSystemState();
+
+        assertThat("testCopy 0", source, notNullValue());
+        assertThat("testCopy 1", target, notNullValue());
+
+        // Set appropriate permissions
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, target, Constants.ADD);
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, target, Constants.WRITE);
+        doNothing().when(authorizeServiceSpy).authorizeAction(context, source, Constants.WRITE);
+
+        // Add new metadata to source item
+        String schema = "dc";
+        String element = "contributor";
+        String qualifier = "author";
+        String lang = Item.ANY;
+        String value = "value0";
+        itemService.addMetadata(context, source, schema, element, qualifier, lang, value);
+
+        // Make sure that only source item has this metadata
+        assertTrue("testCopy 2 - source item metadata=1",
+            itemService.getMetadata(source, schema, element, qualifier, lang).size() == 1);
+        assertTrue("testCopy 3 - target item metadata=0",
+            itemService.getMetadata(target, schema, element, qualifier, lang).isEmpty());
+
+        // Copy one item's properties to another
+        itemService.copy(context, target, source);
+
+        // Metadata check
+        assertTrue("testCopy 4 - source item metadata=1",
+            itemService.getMetadata(source, schema, element, qualifier, lang).size() == 1);
+        assertTrue("testCopy 5 - target item metadata=1",
+            itemService.getMetadata(target, schema, element, qualifier, lang).size() == 1);
+        assertTrue("testCopy 6 - source and target have equal metadata after copy",
+            itemService.getMetadata(it, schema, element, qualifier, lang).equals(
+                itemService.getMetadata(it, schema, element, qualifier, lang)));
+
+        // Finally clear and delete test items
+        context.turnOffAuthorisationSystem();
+        itemService.clearMetadata(context, it, schema, element, qualifier, lang);
+        itemService.clearMetadata(context, source, schema, element, qualifier, lang);
+        itemService.delete(context, target);
+        context.restoreAuthSystemState();
+    }
+
     /**
      * Test of findAll method, of class Item.
      */
