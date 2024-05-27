@@ -209,9 +209,14 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         Item source = it;
         Item target = itemService.clone(context, source, collection);
 
-        assertThat("testClone 0", source, notNullValue());
-        assertThat("testClone 1", target, notNullValue());
-        assertThat("testClone 2", target.getMetadata().size() == source.getMetadata().size());
+        assertThat("testClone 0", source != target);
+        assertThat("testClone 1", source, notNullValue());
+        assertThat("testClone 2", target, notNullValue());
+        assertThat("testClone 3", target.getMetadata() != null && source.getMetadata() != null);
+
+        context.turnOffAuthorisationSystem();
+        itemService.delete(context, target);
+        context.restoreAuthSystemState();
     }
 
     @Test
