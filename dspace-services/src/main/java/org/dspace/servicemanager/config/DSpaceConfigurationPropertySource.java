@@ -26,7 +26,7 @@ import org.springframework.core.env.EnumerablePropertySource;
 
 /**
  * Allow use of Apache Commons Configuration Objects as Spring PropertySources.
- * This class is a copy of the ConfigurationPropertySource class in the Apache Commons Configuration
+ * This class is a temporary copy of the ConfigurationPropertySource class in the Apache Commons Configuration
  * project needed until to fix the issue https://issues.apache.org/jira/browse/CONFIGURATION-846
  */
 public class DSpaceConfigurationPropertySource extends EnumerablePropertySource<Configuration> {
@@ -42,7 +42,13 @@ public class DSpaceConfigurationPropertySource extends EnumerablePropertySource<
     @Override
     public Object getProperty(final String name) {
         final String[] propValue = source.getStringArray(name);
-        return propValue != null && propValue.length == 1 ? propValue[0] : propValue;
+        if (propValue == null || propValue.length == 0) {
+            return null;
+        } else if (propValue.length == 1) {
+            return propValue[0];
+        } else {
+            return propValue;
+        }
     }
 
     @Override
