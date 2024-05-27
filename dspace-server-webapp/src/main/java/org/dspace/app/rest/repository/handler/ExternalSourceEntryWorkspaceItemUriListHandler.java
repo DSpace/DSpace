@@ -33,7 +33,8 @@ public class ExternalSourceEntryWorkspaceItemUriListHandler
         }
         for (String possibleUuid : uriList) {
             String[] possibleUrl = possibleUuid.split("/");
-            if (UUIDUtils.fromString(possibleUuid) != null || UUIDUtils.fromString(possibleUrl[possibleUrl.length - 1]) != null) {
+            if (UUIDUtils.fromString(possibleUuid) != null ||
+                UUIDUtils.fromString(possibleUrl[possibleUrl.length - 1]) != null) {
                 return true;
             }
         }
