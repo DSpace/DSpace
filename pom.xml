@@ -432,6 +432,8 @@
                     <!-- Add some default DSpace exclusions not covered by <useDefaultExcludes>
                          Individual Maven projects may choose to override these defaults. -->
                     <excludes>
+						<!-- temporary copy of a modified apache commons-configuration2 class, see https://issues.apache.org/jira/browse/CONFIGURATION-846 -->
+                        <exclude>**/src/main/java/org/dspace/servicemanager/config/DSpaceConfigurationPropertySource.java</exclude>
                         <exclude>**/src/test/resources/**</exclude>
                         <exclude>**/src/test/data/**</exclude>
                         <exclude>**/src/main/license/**</exclude>
