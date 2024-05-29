@@ -203,9 +203,6 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
     @Test
     public void testClone() throws Exception {
-        // Allow Collection WRITE perms
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, collection, Constants.ADD);
-
         Item source = it;
         Item target = itemService.clone(context, source, collection);
 
@@ -234,9 +231,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         assertThat("testCopy 1", target, notNullValue());
 
         // Set appropriate permissions
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, target, Constants.ADD);
         doNothing().when(authorizeServiceSpy).authorizeAction(context, target, Constants.WRITE);
-        doNothing().when(authorizeServiceSpy).authorizeAction(context, source, Constants.WRITE);
 
         // Add new metadata to source item
         String schema = "dc";

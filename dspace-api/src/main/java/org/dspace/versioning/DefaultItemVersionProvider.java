@@ -102,7 +102,7 @@ public class DefaultItemVersionProvider extends AbstractVersionProvider implemen
     @Override
     public Item updateItemState(Context c, Item itemNew, Item previousItem) {
         try {
-            itemService.copy(c, itemNew, previousItem);
+            itemService.copy(c, itemNew, previousItem, getIgnoredMetadataFields(), true, true, true);
         } catch (IOException | SQLException | AuthorizeException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
