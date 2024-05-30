@@ -4699,36 +4699,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void findItemWithUnknownIssuedDate() throws Exception {
-        context.turnOffAuthorisationSystem();
-
-        //** GIVEN **
-        //1. A community-collection structure with one parent community and one collection
-        parentCommunity = CommunityBuilder.createCommunity(context)
-                .withName("Parent Community")
-                .build();
-        Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection").build();
-
-        //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem = ItemBuilder.createItem(context, col)
-                .withTitle("Public item")
-                .withIssueDate("2021-04-27")
-                .withMetadata("local", "approximateDate", "issued", "unknown")
-                .withAuthor("Smith, Donald").withAuthor("Doe, John")
-                .withSubject("ExtraEntry")
-                .build();
-
-        context.restoreAuthSystemState();
-        Matcher<? super Object> publicItemMatcher = ItemMatcher.matchItemWithTitleAndApproximateDateIssued(publicItem,
-                "Public item", "unknown");
-
-        getClient().perform(get("/api/core/items/" + publicItem.getID()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
-                .andExpect(jsonPath("$", publicItemMatcher));
-    }
-
-    @Test
     public void submitterShouldSeeLocalNoteMetadata() throws Exception {
         // Admin - should see `local.submission.note` and `dc.description.provenance`
         // Submitter - should see `local.submission.note` but not `dc.local.provenance`
@@ -4835,6 +4805,70 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         .andExpect(jsonPath("$._embedded.items", Matchers.containsInRelativeOrder(
                 ItemMatcher.matchItemProperties(publicItem1)
         )));
+    }
+
+    /**
+     * If the local.approximateDate.issued has a value like 'cca 1938 - 1945', then dc.date.issued = 0000.
+     */
+    @Test
+    public void copyApproximateDateIntoDateIssued_whenApproximateDateHasMultipleValues() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        Item publicItem = ItemBuilder.createItem(context, col1)
+                .withTitle("Item with dates")
+                .withIssueDate("2017-10-17")
+                .withMetadata("local", "approximateDate", "issued", "cca 1938 - 1945")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/core/items/" + publicItem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                .andExpect(jsonPath("$.metadata", Matchers.allOf(
+                        matchMetadata("dc.date.issued", "0000"))));
+    }
+
+    /**
+     * If the local.approximateDate.issued has a value like '1938, 1945, 2022', then dc.date.issued = 2022.
+     */
+    @Test
+    public void copyApproximateDateIntoDateIssued_whenApproximateDateHasRangeOfValues() throws Exception {
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        Item publicItem = ItemBuilder.createItem(context, col1)
+                .withTitle("Item with dates")
+                .withIssueDate("2017-10-17")
+                .withMetadata("local", "approximateDate", "issued", "1938, 1945, 2022")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .withSubject("ExtraEntry")
+                .build();
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/core/items/" + publicItem.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
+                .andExpect(jsonPath("$.metadata", Matchers.allOf(
+                        matchMetadata("dc.date.issued", "2022"))));
     }
 
 }

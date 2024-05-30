@@ -8,11 +8,14 @@
 package org.dspace.content.clarin;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -21,6 +24,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.dao.clarin.ClarinItemDAO;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
@@ -38,6 +42,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ClarinItemServiceImpl implements ClarinItemService {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ClarinItemServiceImpl.class);
+    private static final String DELIMETER = ",";
+    private static final String NO_YEAR = "0000";
+
     @Autowired
     ClarinItemDAO clarinItemDAO;
 
@@ -203,4 +210,63 @@ public class ClarinItemServiceImpl implements ClarinItemService {
         }
         this.updateItemFilesMetadata(context, item, bundle);
     }
+
+    @Override
+    public void updateItemDatesMetadata(Context context, Item item) throws SQLException {
+        if (Objects.isNull(context)) {
+            log.error("Cannot update item dates metadata because the context is null.");
+            return;
+        }
+
+        List<MetadataValue> approximatedDates =
+                itemService.getMetadata(item, "local", "approximateDate", "issued", Item.ANY, false);
+
+        if (CollectionUtils.isEmpty(approximatedDates) || StringUtils.isBlank(approximatedDates.get(0).getValue())) {
+            log.warn("Cannot update item dates metadata because the approximate date is empty.");
+            return;
+        }
+
+        // Get the approximate date value from the metadata
+        String approximateDateValue = approximatedDates.get(0).getValue();
+
+        // Split the approximate date value by the delimeter and get the list of years.
+        List<String> listOfYearValues = Arrays.asList(approximateDateValue.split(DELIMETER));
+        // Trim the list of years - remove leading and trailing whitespaces
+        listOfYearValues.replaceAll(String::trim);
+
+        try {
+            // Clear the current `dc.date.issued` metadata
+            itemService.clearMetadata(context, item, "dc", "date", "issued", Item.ANY);
+
+            // Update the `dc.date.issued` metadata with a new value: `0000` or the last year from the sequence
+            if (CollectionUtils.isNotEmpty(listOfYearValues) && isListOfNumbers(listOfYearValues)) {
+                // Take the last year from the list of years and add it to the `dc.date.issued` metadata
+                itemService.addMetadata(context, item, "dc", "date", "issued", Item.ANY,
+                        getLastNumber(listOfYearValues));
+            } else {
+                // Add the `0000` value to the `dc.date.issued` metadata
+                itemService.addMetadata(context, item, "dc", "date", "issued", Item.ANY, NO_YEAR);
+            }
+        } catch (SQLException e) {
+            log.error("Cannot remove `dc.date.issued` metadata because: {}", e.getMessage());
+        }
+    }
+
+    public static boolean isListOfNumbers(List<String> values) {
+        for (String value : values) {
+            if (!NumberUtils.isCreatable(value)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static String getLastNumber(List<String> values) {
+        if (CollectionUtils.isEmpty(values)) {
+            return NO_YEAR;
+        }
+        return values.get(values.size() - 1);
+    }
+
+
 }
