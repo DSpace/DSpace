@@ -10,8 +10,10 @@ package org.dspace.app.rest;
 import static java.util.Arrays.asList;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -191,7 +193,7 @@ public class ClarinRefBoxController {
         Context context = null;
         OAIPMH oaipmh = null;
         // ClarinOutputStream write OAI-PMH data into String instead of bytes.
-        ClarinOutputStream output = new ClarinOutputStream();
+        OutputStream output = new UTF8ClarinOutputStream();
         try {
             request.setCharacterEncoding("UTF-8");
             context = contextService.getContext();
@@ -402,17 +404,17 @@ public class ClarinRefBoxController {
 /**
  * This ClarinOutputStream write the content into the string instead of bytes.
  */
-class ClarinOutputStream extends OutputStream {
-    private StringBuilder string = new StringBuilder();
+class UTF8ClarinOutputStream extends OutputStream {
+    private ByteArrayOutputStream bao = new ByteArrayOutputStream();
 
     @Override
     public void write(int b) throws IOException {
-        this.string.append((char) b );
+        bao.write(b);
     }
 
     @Override
     public String toString() {
-        return this.string.toString();
+        return bao.toString(StandardCharsets.UTF_8);
     }
 }
 
