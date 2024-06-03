@@ -1549,27 +1549,27 @@
             </pair>
             <pair>
                 <displayed-value>Attribution (CC-BY)</displayed-value>
-                <stored-value>http://creativecommons.org/licenses/by/4.0/</stored-value>
+                <stored-value>https://creativecommons.org/licenses/by/4.0/</stored-value>
             </pair>
             <pair>
                 <displayed-value>Attribution, No Derivative Works (CC-BY-ND)</displayed-value>
-                <stored-value>http://creativecommons.org/licenses/by-nd/4.0/</stored-value>
+                <stored-value>https://creativecommons.org/licenses/by-nd/4.0/</stored-value>
             </pair>
             <pair>
                 <displayed-value>Attribution, Share-alike (CC-BY-SA)</displayed-value>
-                <stored-value>http://creativecommons.org/licenses/by-sa/4.0/</stored-value>
+                <stored-value>https://creativecommons.org/licenses/by-sa/4.0/</stored-value>
             </pair>
             <pair>
                 <displayed-value>Attribution, Non-commercial (CC-BY-NC)</displayed-value>
-                <stored-value>http://creativecommons.org/licenses/by-nc/4.0/</stored-value>
+                <stored-value>https://creativecommons.org/licenses/by-nc/4.0/</stored-value>
             </pair>
             <pair>
                 <displayed-value>Attribution, Non-commercial, No Derivative Works (CC-BY-NC-ND)</displayed-value>
-                <stored-value>http://creativecommons.org/licenses/by-nc-nd/4.0/</stored-value>
+                <stored-value>https://creativecommons.org/licenses/by-nc-nd/4.0/</stored-value>
             </pair>
             <pair>
                 <displayed-value>Attribution, Non-commercial, Share-alike (CC-BY-NC-SA)</displayed-value>
-                <stored-value>http://creativecommons.org/licenses/by-nc-sa/4.0/</stored-value>
+                <stored-value>https://creativecommons.org/licenses/by-nc-sa/4.0/</stored-value>
             </pair>
             <!-- Add here other licenses -->
             <pair>
