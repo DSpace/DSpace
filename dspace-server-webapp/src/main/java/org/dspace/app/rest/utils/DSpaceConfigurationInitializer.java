@@ -8,7 +8,7 @@
 package org.dspace.app.rest.utils;
 
 import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.spring.ConfigurationPropertySource;
+import org.dspace.servicemanager.config.DSpaceConfigurationPropertySource;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.slf4j.Logger;
@@ -38,8 +38,8 @@ public class DSpaceConfigurationInitializer implements ApplicationContextInitial
         Configuration configuration = configurationService.getConfiguration();
 
         // Create an Apache Commons Configuration Property Source from our configuration
-        ConfigurationPropertySource apacheCommonsConfigPropertySource =
-            new ConfigurationPropertySource(configuration.getClass().getName(), configuration);
+        DSpaceConfigurationPropertySource apacheCommonsConfigPropertySource =
+            new DSpaceConfigurationPropertySource(configuration.getClass().getName(), configuration);
 
         // Prepend it to the Environment's list of PropertySources
         // NOTE: This is added *first* in the list so that settings in DSpace's ConfigurationService *override*
