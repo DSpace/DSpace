@@ -61,9 +61,30 @@
             <offheap unit="MB">4</offheap>
         </resources>
     </cache-template>
+    <cache-template name="orcid-default">
+        <expiry>
+            <ttl unit="days">1</ttl>
+        </expiry>
+        <listeners>
+            <listener>
+                <class>org.dspace.external.provider.orcid.xml.CacheLogger</class>
+                <event-firing-mode>ASYNCHRONOUS</event-firing-mode>
+                <event-ordering-mode>UNORDERED</event-ordering-mode>
+                <events-to-fire-on>CREATED</events-to-fire-on>
+                <events-to-fire-on>EXPIRED</events-to-fire-on>
+                <events-to-fire-on>REMOVED</events-to-fire-on>
+                <events-to-fire-on>EVICTED</events-to-fire-on>
+            </listener>
+        </listeners>
+        <resources>
+            <heap unit="entries">3000</heap>
+            <offheap unit="MB">10</offheap>
+        </resources>
+    </cache-template>
 
     <cache alias="manifests" uses-template="iiif-default"/>
     <cache alias="canvasdimensions" uses-template="iiif-canvas"/>
     <cache alias="sherpa.searchByJournalISSN" uses-template="sherpa-default"/>
+    <cache alias="orcid-labels" uses-template="orcid-default"/>
 
 </config>

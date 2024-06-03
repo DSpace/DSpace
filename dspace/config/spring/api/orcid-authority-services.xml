@@ -24,7 +24,11 @@
         <property name="orcidRestConnector" ref="orcidRestConnector"/>
     </bean>
  -->
- 
+
+    <bean name="CachingOrcidRestConnector" class="org.dspace.external.CachingOrcidRestConnector">
+        <property name="apiURL" value="${orcid.api-url}"/>
+    </bean>
+
     <bean name="AuthorityTypes" class="org.dspace.authority.AuthorityTypes">
         <property name="types">
             <list>

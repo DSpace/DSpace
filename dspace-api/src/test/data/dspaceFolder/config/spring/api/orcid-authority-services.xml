@@ -17,7 +17,11 @@
 
     <alias name="OrcidSource" alias="AuthoritySource"/>
     <bean name="OrcidSource" class="org.dspace.authority.orcid.MockOrcid" />
- 
+
+    <bean name="CachingOrcidRestConnector" class="org.dspace.external.CachingOrcidRestConnector">
+        <property name="apiURL" value="${orcid.api-url}"/>
+    </bean>
+
     <bean name="AuthorityTypes" class="org.dspace.authority.AuthorityTypes">
         <property name="types">
             <list>
