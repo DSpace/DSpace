@@ -187,7 +187,8 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
     public void init() throws Exception {
         Client client = ClientBuilder.newClient();
         if (baseAddress == null) {
-            baseAddress = configurationService.getProperty("openaire.base.url");
+            baseAddress = configurationService.getProperty("openaire.search.url",
+                                                           "https://api.openaire.eu/search/publications");
         }
         if (queryParam == null) {
             queryParam = "title";
