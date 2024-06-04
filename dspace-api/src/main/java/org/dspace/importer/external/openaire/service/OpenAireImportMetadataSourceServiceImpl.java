@@ -252,10 +252,10 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
                 Document document = saxBuilder.build(new StringReader(responseString));
                 Element root = document.getRootElement();
 
-                XPathExpression<Element> xpath = XPathFactory.instance().compile("/header/total",
+                XPathExpression<Element> xpath = XPathFactory.instance().compile("//header/total",
                     Filters.element(), null);
 
-                Element totalItem = (Element) xpath.evaluateFirst(root);
+                Element totalItem = xpath.evaluateFirst(root);
                 return totalItem != null ? Integer.parseInt(totalItem.getText()) : null;
 
             } else {
