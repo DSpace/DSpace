@@ -7,6 +7,13 @@
  */
 package org.dspace.app.rest.submit.step.validation;
 
+import static org.dspace.app.rest.repository.WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.inject.Inject;
+
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.util.DCInputsReaderException;
@@ -17,14 +24,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.license.CreativeCommonsServiceImpl;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.inject.Inject;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.dspace.app.rest.repository.WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS;
-
 
 /**
  * This class validates that the Creative Commons License has been granted for the
@@ -115,7 +114,10 @@ public class CclicenseValidator extends AbstractValidation {
      */
 
     @Override
-    public List<? extends ErrorRest> validate(SubmissionService submissionService, InProgressSubmission obj, SubmissionStepConfig config) throws DCInputsReaderException, SQLException {
+    public List<? extends ErrorRest> validate(SubmissionService submissionService,
+                                              InProgressSubmission obj,
+                                              SubmissionStepConfig config)
+            throws DCInputsReaderException, SQLException {
         List<ErrorRest> errors = new ArrayList<>();
 
 
