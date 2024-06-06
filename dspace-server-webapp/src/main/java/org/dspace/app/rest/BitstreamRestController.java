@@ -209,7 +209,13 @@ public class BitstreamRestController {
         if (format == null) {
             return false;
         }
-        List<String> formats = List.of((configurationService.getArrayProperty("webui.content_disposition_format")));
+        // Default to always downloading HTML/JavaScript files. These formats can embed JavaScript which would be run
+        // in the user's browser when loaded inline. This could be the basis for an XSS attack.
+        // RTF is also added because most browsers attempt to display it as plain text.
+        String [] defaultFormats = { "text/html", "text/javascript", "text/richtext" };
+
+        List<String> formats = List.of(configurationService.getArrayProperty("webui.content_disposition_format",
+                                                                             defaultFormats));
         boolean download = formats.contains(format.getMIMEType());
         if (!download) {
             for (String ext : format.getExtensions()) {
