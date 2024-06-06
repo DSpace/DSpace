@@ -277,10 +277,10 @@
                     <dc-qualifier></dc-qualifier>
                     <!-- An input-type of tag MUST be marked as repeatable -->
                     <repeatable>true</repeatable>
-                    <label>Subject Keywords</label>
+                    <label>Keywords</label>
                     <input-type>tag</input-type>
                     <hint>Enter appropriate subject keywords or phrases.</hint>
-                    <required></required>
+                    <required>Please enter at least one subject related to your submission</required>
                     <vocabulary>srsc</vocabulary>
                 </field>
             </row>
