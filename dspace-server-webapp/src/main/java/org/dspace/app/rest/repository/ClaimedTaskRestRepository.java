@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- * <p>
+ *
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.repository;
@@ -62,6 +62,7 @@ import org.springframework.stereotype.Component;
  * This is the repository responsible to manage PooledTask Rest object
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
+ * @author Andrei Alesik (andrewalesik at pcgacademia)
  */
 
 @Component(PoolTaskRest.CATEGORY + "." + ClaimedTaskRest.PLURAL_NAME)
