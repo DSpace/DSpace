@@ -2376,6 +2376,22 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                 RelationshipMatcher.matchRelationship(relationship1)
             )))
         ;
+
+        // Perform a GET request to the searchByLabel endpoint, asking for Relationships of type isAuthorOfPublication
+        // With an extra parameter namely DSO which resolves to the publication used by both relationships.
+        // Only the OrgUnit relationship should be returned if we specify the DSO's related entity type
+        getClient().perform(get("/api/core/relationships/search/byLabel")
+                                .param("label", "isAuthorOfPublication")
+                                .param("dso", publication1.getID().toString())
+                                .param("relatedEntityType", "OrgUnit")
+                                .param("projection", "full"))
+
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.page", is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1))))
+            .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
+                RelationshipMatcher.matchRelationship(relationship2)
+            )))
+        ;
     }
 
     @Test
