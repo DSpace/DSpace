@@ -1,0 +1,101 @@
+<cmd:CMD xmlns:cmd="http://www.clarin.eu/cmd/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CMDVersion="1.1"
+         xsi:schemaLocation="http://www.clarin.eu/cmd/ http://catalog.clarin.eu/ds/ComponentRegistry/rest/registry/profiles/clarin.eu:cr1:p_1320657629644/xsd">
+    <cmd:Header>
+        <cmd:MdSelfLink>http://hdl.handle.net/11234/5-CESILKO-URL</cmd:MdSelfLink>
+        <cmd:MdProfile>clarin.eu:cr1:p_1320657629644</cmd:MdProfile>
+    </cmd:Header>
+    <cmd:Resources>
+        <cmd:ResourceProxyList>
+            <cmd:ResourceProxy id="s001">
+                <cmd:ResourceType mimetype="application/vnd.sun.wadl+xml">Resource</cmd:ResourceType>
+                <cmd:ResourceRef>http://lindat.mff.cuni.cz/services/cesilko/cesilko.wadl</cmd:ResourceRef>
+            </cmd:ResourceProxy>
+        </cmd:ResourceProxyList>
+        <cmd:JournalFileProxyList/>
+        <cmd:ResourceRelationList/>
+    </cmd:Resources>
+    <cmd:Components>
+        <cmd:WebLichtWebService>
+            <cmd:Service>
+                <cmd:Name>Cesilko translator (ces-&gt;slk)</cmd:Name>
+                <cmd:Description>Cesilko translator (ces-&gt;slk)</cmd:Description>
+                <cmd:Description type="short">Cesilko translator (ces-&gt;slk)</cmd:Description>
+                <cmd:ApplicationType>webService</cmd:ApplicationType>
+                <cmd:TypeOfWebservice>RESTfull</cmd:TypeOfWebservice>
+                <cmd:url>https://lindat.mff.cuni.cz/services/rest/cesilko/translate</cmd:url>
+                <cmd:LifeCycleStatus>development</cmd:LifeCycleStatus>
+                <cmd:PublicationDate>2014-03-19T18:02:38.963+01:00</cmd:PublicationDate>
+                <cmd:LastUpdate>2014-03-19T18:06:08.390+01:00</cmd:LastUpdate>
+                <cmd:ServiceDescriptionLocation ref="s001"/>
+                <cmd:Contact>
+                    <cmd:Email>misutka@ufal.mff.cuni.cz</cmd:Email>
+                </cmd:Contact>
+                <cmd:Creation>
+                    <cmd:Creators>
+                        <cmd:Creator>
+                            <cmd:Contact>
+                                <cmd:Organisation>Charles University in Prague, UFAL</cmd:Organisation>
+                            </cmd:Contact>
+                        </cmd:Creator>
+                    </cmd:Creators>
+                </cmd:Creation>
+                <cmd:Operations>
+                    <cmd:Operation>
+                        <cmd:Name>Default</cmd:Name>
+                        <cmd:Input>
+                            <cmd:ParameterGroup>
+                                <cmd:Name>Input Parameters</cmd:Name>
+                                <cmd:Parameters>
+                                    <cmd:Parameter>
+                                        <cmd:Name>type</cmd:Name>
+                                        <cmd:WebServiceArgValue/>
+                                        <cmd:AllowManualSelectionFallback>false</cmd:AllowManualSelectionFallback>
+                                        <cmd:Values>
+                                            <cmd:ParameterValue>
+                                                <cmd:Value>text/plain</cmd:Value>
+                                            </cmd:ParameterValue>
+                                        </cmd:Values>
+                                    </cmd:Parameter>
+                                    <cmd:Parameter>
+                                        <cmd:Name>lang</cmd:Name>
+                                        <cmd:WebServiceArgValue/>
+                                        <cmd:AllowManualSelectionFallback>false</cmd:AllowManualSelectionFallback>
+                                        <cmd:Values>
+                                            <cmd:ParameterValue>
+                                                <cmd:Value>cs</cmd:Value>
+                                            </cmd:ParameterValue>
+                                        </cmd:Values>
+                                    </cmd:Parameter>
+                                </cmd:Parameters>
+                            </cmd:ParameterGroup>
+                        </cmd:Input>
+                        <cmd:Output>
+                            <cmd:ParameterGroup>
+                                <cmd:Name>Output Parameters</cmd:Name>
+                                <cmd:ReplacesInput>true</cmd:ReplacesInput>
+                                <cmd:Parameters>
+                                    <cmd:Parameter>
+                                        <cmd:Name>type</cmd:Name>
+                                        <cmd:Values>
+                                            <cmd:ParameterValue>
+                                                <cmd:Value>text/plain</cmd:Value>
+                                            </cmd:ParameterValue>
+                                        </cmd:Values>
+                                    </cmd:Parameter>
+                                    <cmd:Parameter>
+                                        <cmd:Name>lang</cmd:Name>
+                                        <cmd:Values>
+                                            <cmd:ParameterValue>
+                                                <cmd:Value>sk</cmd:Value>
+                                            </cmd:ParameterValue>
+                                        </cmd:Values>
+                                    </cmd:Parameter>
+                                </cmd:Parameters>
+                            </cmd:ParameterGroup>
+                        </cmd:Output>
+                    </cmd:Operation>
+                </cmd:Operations>
+            </cmd:Service>
+        </cmd:WebLichtWebService>
+    </cmd:Components>
+</cmd:CMD>
