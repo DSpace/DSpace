@@ -24,7 +24,6 @@ import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.browse.ItemCountException;
 import org.dspace.browse.ItemCounter;
 import org.dspace.content.dao.CommunityDAO;
 import org.dspace.content.service.BitstreamService;
@@ -78,6 +77,8 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     protected IdentifierService identifierService;
     @Autowired(required = true)
     protected SubscribeService subscribeService;
+    @Autowired
+    protected ItemCounter itemCounter;
 
     protected CommunityServiceImpl() {
         super();
@@ -719,12 +720,12 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
     /**
      * Returns total community archived items
      *
+     * @param context         DSpace context
      * @param community       Community
      * @return                total community archived items
-     * @throws ItemCountException
      */
     @Override
-    public int countArchivedItems(Community community) throws ItemCountException {
-        return ItemCounter.getInstance().getCount(community);
+    public int countArchivedItems(Context context, Community community) {
+        return itemCounter.getCount(context, community);
     }
 }

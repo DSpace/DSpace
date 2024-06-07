@@ -48,8 +48,6 @@ public class UploadStep extends AbstractProcessingStep
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(UploadStep.class);
 
-    public static final String UPLOAD_STEP_METADATA_SECTION = "bitstream-metadata";
-
     @Override
     public DataUpload getData(SubmissionService submissionService, InProgressSubmission obj,
                               SubmissionStepConfig config) throws Exception {

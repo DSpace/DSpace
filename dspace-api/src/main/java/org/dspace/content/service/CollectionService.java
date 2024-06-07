@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.browse.ItemCountException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -487,9 +486,9 @@ public interface CollectionService
     /**
      * Returns total collection archived items
      *
+     * @param context          DSpace context
      * @param collection       Collection
      * @return                 total collection archived items
-     * @throws ItemCountException
      */
-    int countArchivedItems(Collection collection) throws ItemCountException;
+    int countArchivedItems(Context context, Collection collection);
 }

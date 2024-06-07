@@ -401,7 +401,8 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     }
 
     @Override
-    public int countItems(Context context, Collection collection, boolean includeArchived, boolean includeWithdrawn)
+    public int countItems(Context context, Collection collection, boolean includeArchived, boolean includeWithdrawn,
+                          boolean discoverable)
         throws SQLException {
         // Build query to select all Items have this "collection" in their list of collections
         // AND also have the inArchive or isWithdrawn set as specified
@@ -412,6 +413,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         criteriaQuery.where(criteriaBuilder.and(
             criteriaBuilder.equal(itemRoot.get(Item_.inArchive), includeArchived),
             criteriaBuilder.equal(itemRoot.get(Item_.withdrawn), includeWithdrawn),
+            criteriaBuilder.equal(itemRoot.get(Item_.discoverable), discoverable),
             criteriaBuilder.isMember(collection, itemRoot.get(Item_.collections))));
         // Execute and return count
         return count(context, criteriaQuery, criteriaBuilder, itemRoot);
@@ -419,16 +421,18 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
 
     @Override
     public int countItems(Context context, List<Collection> collections, boolean includeArchived,
-                          boolean includeWithdrawn) throws SQLException {
+                          boolean includeWithdrawn, boolean discoverable) throws SQLException {
         if (collections.size() == 0) {
             return 0;
         }
         Query query = createQuery(context, "select count(distinct i) from Item i " +
             "join i.collections collection " +
-            "WHERE collection IN (:collections) AND i.inArchive=:in_archive AND i.withdrawn=:withdrawn");
+            "WHERE collection IN (:collections) AND i.inArchive=:in_archive AND i.withdrawn=:withdrawn AND " +
+                "discoverable=:discoverable");
         query.setParameter("collections", collections);
         query.setParameter("in_archive", includeArchived);
         query.setParameter("withdrawn", includeWithdrawn);
+        query.setParameter("discoverable", discoverable);
 
         return count(query);
     }
@@ -450,24 +454,29 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     }
 
     @Override
-    public int countItems(Context context, boolean includeArchived, boolean includeWithdrawn) throws SQLException {
+    public int countItems(Context context, boolean includeArchived, boolean includeWithdrawn,
+                          boolean discoverable) throws SQLException {
         Query query = createQuery(context,
                 "SELECT count(*) FROM Item i " +
-                "WHERE i.inArchive=:in_archive AND i.withdrawn=:withdrawn");
+                "WHERE i.inArchive=:in_archive AND i.withdrawn=:withdrawn AND discoverable=:discoverable");
         query.setParameter("in_archive", includeArchived);
         query.setParameter("withdrawn", includeWithdrawn);
+        query.setParameter("discoverable", discoverable);
         return count(query);
     }
 
     @Override
-    public int countItems(Context context, EPerson submitter, boolean includeArchived, boolean includeWithdrawn)
+    public int countItems(Context context, EPerson submitter, boolean includeArchived, boolean includeWithdrawn,
+                          boolean discoverable)
         throws SQLException {
         Query query = createQuery(context,
                 "SELECT count(*) FROM Item i join i.submitter submitter " +
-                "WHERE i.inArchive=:in_archive AND i.withdrawn=:withdrawn AND submitter = :submitter");
+                "WHERE i.inArchive=:in_archive AND i.withdrawn=:withdrawn AND submitter = :submitter AND " +
+                        "discoverable=:discoverable");
         query.setParameter("submitter", submitter);
         query.setParameter("in_archive", includeArchived);
         query.setParameter("withdrawn", includeWithdrawn);
+        query.setParameter("discoverable", discoverable);
         return count(query);
 
     }
