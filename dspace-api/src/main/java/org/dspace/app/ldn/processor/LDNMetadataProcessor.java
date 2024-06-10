@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.codec.binary.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpResponseException;
 import org.apache.logging.log4j.LogManager;
@@ -30,6 +31,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -42,6 +44,9 @@ public class LDNMetadataProcessor implements LDNProcessor {
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private ConfigurationService configurationService;
 
     private static final Set<String> OBJECT_SUBJECT_ITEM_TYPES = Set.of(
         "Announce",
@@ -165,7 +170,7 @@ public class LDNMetadataProcessor implements LDNProcessor {
             url = notification.getObject().getId();
         } else if (OBJECT_SUBJECT_ITEM_TYPES.containsAll(notification.getType())) {
             // need to understand if we're sender or receiver
-            if (notification.getOrigin() == null) {
+            if (isTargetCurrent(notification)) {
                 // this means we're sending the notification
                 url = notification.getObject().getAsObject();
                 // use as:object for sender
@@ -181,6 +186,11 @@ public class LDNMetadataProcessor implements LDNProcessor {
         item = resolveItemByUrl(context, url, notification);
 
         return item;
+    }
+
+    private boolean isTargetCurrent(Notification notification) {
+        String localInboxUrl = configurationService.getProperty("ldn.notify.inbox");
+        return StringUtils.equals(notification.getTarget().getInbox(), localInboxUrl);
     }
 
     private Item resolveItemByUrl(Context context, String url, Notification notification)
