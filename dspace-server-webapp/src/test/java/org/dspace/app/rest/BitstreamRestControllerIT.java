@@ -1247,7 +1247,6 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         Mockito.verify(inputStreamSpy, times(1)).close();
     }
 
-
     @Test
     public void checkContentDispositionOfFormats() throws Exception {
         configurationService.setProperty("webui.content_disposition_format", new String[] {
@@ -1283,6 +1282,35 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         verifyBitstreamDownload(txt, "text/plain;charset=UTF-8", true);
         // this format is not configured and should open inline
         verifyBitstreamDownload(html, "text/html;charset=UTF-8", false);
+    }
+
+    @Test
+    public void checkDefaultContentDispositionFormats() throws Exception {
+        // This test is similar to the above test, but it verifies that our *default settings* for
+        // webui.content_disposition_format are protecting us from loading specific formats *inline*.
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+        String content = "Test Content";
+        Bitstream html;
+        Bitstream js;
+        Bitstream xml;
+        try (InputStream is = IOUtils.toInputStream(content, CharEncoding.UTF_8)) {
+            html = BitstreamBuilder.createBitstream(context, item, is)
+                                   .withMimeType("text/html").build();
+            js = BitstreamBuilder.createBitstream(context, item, is)
+                                  .withMimeType("text/javascript").build();
+            xml = BitstreamBuilder.createBitstream(context, item, is)
+                                  .withMimeType("text/xml").build();
+        }
+        context.restoreAuthSystemState();
+
+        // By default, HTML, JS & XML should all download. This protects us from possible XSS attacks, as
+        // each of these formats can embed JavaScript which may execute when the file is loaded *inline*.
+        verifyBitstreamDownload(html, "text/html;charset=UTF-8", true);
+        verifyBitstreamDownload(js, "text/javascript;charset=UTF-8", true);
+        verifyBitstreamDownload(xml, "text/xml;charset=UTF-8", true);
     }
 
     private void verifyBitstreamDownload(Bitstream file, String contentType, boolean shouldDownload) throws Exception {
