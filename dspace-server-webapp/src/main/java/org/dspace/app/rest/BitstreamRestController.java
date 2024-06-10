@@ -204,10 +204,19 @@ public class BitstreamRestController {
             || responseCode.equals(Response.Status.Family.REDIRECTION);
     }
 
+    /**
+     * Check if a Bitstream of the specified format should always be downloaded (i.e. "content-disposition: attachment")
+     * or can be served inline (i.e. "content-disposition: inline").
+     * <P>
+     * NOTE that downloading via "attachment" is more secure, as the user's browser will not attempt to process or
+     * display the file. But, downloading via "inline" may be seen as more user-friendly for common formats.
+     * @param format BitstreamFormat
+     * @return true if always download ("attachment"). false if can be served inline ("inline")
+     */
     private boolean checkFormatForContentDisposition(BitstreamFormat format) {
-        // never automatically download undefined formats
-        if (format == null) {
-            return false;
+        // Undefined or Unknown formats should ALWAYS be downloaded for additional security.
+        if (format == null || format.getSupportLevel() == BitstreamFormat.UNKNOWN) {
+            return true;
         }
         // Default to always downloading HTML/JavaScript/XML files. These formats can embed JavaScript which may be run
         // in the user's browser when loaded inline. This could be the basis for an XSS attack.
