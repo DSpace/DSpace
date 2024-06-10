@@ -29,9 +29,11 @@ import org.dspace.app.rest.model.RelationshipRest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.Relationship;
 import org.dspace.content.RelationshipType;
+import org.dspace.content.service.EntityTypeService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
@@ -59,6 +61,9 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
     private static final String LEFT = "left";
     private static final String RIGHT = "right";
     private static final String CONFIGURED = "configured";
+
+    @Autowired
+    private EntityTypeService entityTypeService;
 
     @Autowired
     private ItemService itemService;
@@ -331,6 +336,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
      *
      * @param label     The label of a RelationshipType which the Relationships must have if they're to be returned
      * @param dsoId     The dsoId of the object that has to be a leftItem or rightItem if this parameter is present
+     * @param relatedEntityType The entity type that the items who have a relationship with the given dso should have
      * @param pageable  The page object
      * @return          A page with all the RelationshipRest objects that correspond to the constraints
      * @throws SQLException If something goes wrong
@@ -338,6 +344,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
     @SearchRestMethod(name = "byLabel")
     public Page<RelationshipRest> findByLabel(@Parameter(value = "label", required = true) String label,
                                               @Parameter(value = "dso", required = false) UUID dsoId,
+                                              @Parameter(value = "relatedEntityType") String relatedEntityType,
                                               Pageable pageable) throws SQLException {
         Context context = obtainContext();
 
@@ -352,14 +359,28 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
             if (item == null) {
                 throw new ResourceNotFoundException("The request DSO with id: " + dsoId + " was not found");
             }
+
+            EntityType dsoEntityType = itemService.getEntityType(context, item);
+
+            if (dsoEntityType == null) {
+                throw new UnprocessableEntityException(String.format(
+                    "The request DSO with id: %s doesn't have an entity type", dsoId));
+            }
+
             for (RelationshipType relationshipType : relationshipTypeList) {
-                boolean isLeft = false;
-                if (relationshipType.getLeftwardType().equalsIgnoreCase(label)) {
-                    isLeft = true;
+                if (relatedEntityType == null ||
+                    relationshipType.getRightType().getLabel().equals(dsoEntityType.getLabel()) &&
+                        relationshipType.getLeftType().getLabel().equals(relatedEntityType) ||
+                    relationshipType.getRightType().getLabel().equals(relatedEntityType) &&
+                        relationshipType.getLeftType().getLabel().equals(dsoEntityType.getLabel())) {
+                    boolean isLeft = relationshipType.getLeftwardType().equalsIgnoreCase(label);
+                    total +=
+                        relationshipService.countByItemAndRelationshipType(context, item, relationshipType, isLeft);
+                    relationships.addAll(
+                        relationshipService.findByItemAndRelationshipType(context, item, relationshipType,
+                                                                          isLeft, pageable.getPageSize(),
+                                                                          Math.toIntExact(pageable.getOffset())));
                 }
-                total += relationshipService.countByItemAndRelationshipType(context, item, relationshipType, isLeft);
-                relationships.addAll(relationshipService.findByItemAndRelationshipType(context, item, relationshipType,
-                        isLeft, pageable.getPageSize(), Math.toIntExact(pageable.getOffset())));
             }
         } else {
             for (RelationshipType relationshipType : relationshipTypeList) {
@@ -377,7 +398,7 @@ public class RelationshipRestRepository extends DSpaceRestRepository<Relationshi
      * of potentially related items we need to know which of these other items
      * are already in a specific relationship with the focus item and,
      * by exclusion which ones are not yet related.
-     * 
+     *
      * @param typeId          The relationship type id to apply as a filter to the returned relationships
      * @param label           The name of the relation as defined from the side of the 'focusItem'
      * @param focusUUID       The uuid of the item to be checked on the side defined by 'relationshipLabel'
