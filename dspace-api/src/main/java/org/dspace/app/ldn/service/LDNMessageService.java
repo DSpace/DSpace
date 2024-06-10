@@ -98,8 +98,9 @@ public interface LDNMessageService {
      * 
      * @return number of messages fixed
      * @param context The DSpace context
+     * @throws SQLException
      */
-    public int checkQueueMessageTimeout(Context context);
+    public int checkQueueMessageTimeout(Context context) throws SQLException;
 
     /**
      * Elaborates the oldest enqueued message

@@ -57,7 +57,7 @@ public class LDNRelationCorrectionAction implements LDNAction {
         QAEvent qaEvent = null;
         if (notification.getObject() != null) {
             NotifyMessageDTO message = new NotifyMessageDTO();
-            message.setHref(notification.getObject().getAsSubject());
+            message.setHref(notification.getObject().getAsObject());
             message.setRelationship(notification.getObject().getAsRelationship());
             if (notification.getOrigin() != null) {
                 message.setServiceId(notification.getOrigin().getId());

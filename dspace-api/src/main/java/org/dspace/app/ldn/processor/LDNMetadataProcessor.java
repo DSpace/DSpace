@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.http.HttpStatus;
@@ -41,6 +42,24 @@ public class LDNMetadataProcessor implements LDNProcessor {
 
     @Autowired
     private ItemService itemService;
+
+    private static final Set<String> OBJECT_SUBJECT_ITEM_TYPES = Set.of(
+        "Announce",
+        "coar-notify:RelationshipAction");
+
+    private static final Set<String> CONTEXT_ID_ITEM_TYPES = Set.of(
+        "Announce",
+        "TentativeReject",
+        "Accept",
+        "coar-notify:ReviewAction",
+        "coar-notify:IngestAction",
+        "coar-notify:EndorsementAction");
+
+    private static final Set<String> OBJECT_ID_ITEM_TYPES = Set.of(
+        "Offer",
+        "coar-notify:ReviewAction",
+        "coar-notify:EndorsementAction",
+        "coar-notify:IngestAction");
 
     @Autowired
     private HandleService handleService;
@@ -138,16 +157,35 @@ public class LDNMetadataProcessor implements LDNProcessor {
      */
     private Item lookupItem(Context context, Notification notification) throws SQLException, HttpResponseException {
         Item item = null;
-
         String url = null;
-        if (notification.getContext() != null) {
+
+        if (CONTEXT_ID_ITEM_TYPES.containsAll(notification.getType())) {
             url = notification.getContext().getId();
-        } else {
+        } else if (OBJECT_ID_ITEM_TYPES.containsAll(notification.getType())) {
             url = notification.getObject().getId();
+        } else if (OBJECT_SUBJECT_ITEM_TYPES.containsAll(notification.getType())) {
+            // need to understand if we're sender or receiver
+            if (notification.getOrigin() == null) {
+                // this means we're sending the notification
+                url = notification.getObject().getAsObject();
+                // use as:object for sender
+            } else {
+                // this means we're receiving the notification
+                url = notification.getObject().getAsSubject();
+                // use as:subject for receiver
+            }
         }
 
         log.info("Looking up item {}", url);
 
+        item = resolveItemByUrl(context, url, notification);
+
+        return item;
+    }
+
+    private Item resolveItemByUrl(Context context, String url, Notification notification)
+        throws SQLException, HttpResponseException {
+        Item item = null;
         if (LDNUtils.hasUUIDInURL(url)) {
             UUID uuid = LDNUtils.getUUIDFromURL(url);
 
@@ -155,32 +193,30 @@ public class LDNMetadataProcessor implements LDNProcessor {
 
             if (Objects.isNull(item)) {
                 throw new HttpResponseException(HttpStatus.SC_NOT_FOUND,
-                        format("Item with uuid %s not found", uuid));
+                    format("Item with uuid %s not found", uuid));
             }
+            return item;
+        }
+        String handle = handleService.resolveUrlToHandle(context, url);
 
-        } else {
-            String handle = handleService.resolveUrlToHandle(context, url);
-
-            if (Objects.isNull(handle)) {
-                throw new HttpResponseException(HttpStatus.SC_NOT_FOUND,
-                        format("Handle not found for %s", url));
-            }
-
-            DSpaceObject object = handleService.resolveToObject(context, handle);
-
-            if (Objects.isNull(object)) {
-                throw new HttpResponseException(HttpStatus.SC_NOT_FOUND,
-                        format("Item with handle %s not found", handle));
-            }
-
-            if (object.getType() == Constants.ITEM) {
-                item = (Item) object;
-            } else {
-                throw new HttpResponseException(HttpStatus.SC_UNPROCESSABLE_ENTITY,
-                        format("Handle %s does not resolve to an item", handle));
-            }
+        if (Objects.isNull(handle)) {
+            throw new HttpResponseException(HttpStatus.SC_NOT_FOUND,
+                format("Handle not found for %s", url));
         }
 
+        DSpaceObject object = handleService.resolveToObject(context, handle);
+
+        if (Objects.isNull(object)) {
+            throw new HttpResponseException(HttpStatus.SC_NOT_FOUND,
+                format("Item with handle %s not found", handle));
+        }
+
+        if (object.getType() == Constants.ITEM) {
+            item = (Item) object;
+        } else {
+            throw new HttpResponseException(HttpStatus.SC_UNPROCESSABLE_ENTITY,
+                format("Handle %s does not resolve to an item", handle));
+        }
         return item;
     }
 
