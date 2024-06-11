@@ -261,9 +261,12 @@ public class LDNMessageServiceImpl implements LDNMessageService {
             LDNMessageEntity msg = msgOpt.get();
             processor = ldnRouter.route(msg);
             try {
-                if (processor == null) {
+                boolean isServiceDisabled = !isServiceEnabled(msg);
+                if (processor == null || isServiceDisabled) {
                     log.warn("No processor found for LDN message " + msg);
-                    msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_UNMAPPED_ACTION);
+                    Integer status = isServiceDisabled ? LDNMessageEntity.QUEUE_STATUS_UNTRUSTED
+                        : LDNMessageEntity.QUEUE_STATUS_UNMAPPED_ACTION;
+                    msg.setQueueStatus(status);
                     msg.setQueueAttempts(msg.getQueueAttempts() + 1);
                     update(context, msg);
                 } else {
@@ -293,6 +296,14 @@ public class LDNMessageServiceImpl implements LDNMessageService {
             msgOpt = getSingleMessageEntity(messages);
         }
         return count;
+    }
+
+    private boolean isServiceEnabled(LDNMessageEntity msg) {
+        String localInboxUrl = configurationService.getProperty("ldn.notify.inbox");
+        if (msg.getTarget() == null || StringUtils.equals(msg.getTarget().getLdnUrl(), localInboxUrl)) {
+            return msg.getOrigin().isEnabled();
+        }
+        return msg.getTarget().isEnabled();
     }
 
     @Override
