@@ -155,4 +155,11 @@ public interface LDNMessageService {
      * @param sourceIp the ip to evaluate
      */
     public boolean isValidIp(NotifyServiceEntity origin, String sourceIp);
+
+    /**
+     * check if the notification is targeting the current system
+     * 
+     * @param notification   the LDN Message entity
+     */
+    boolean isTargetCurrent(Notification notification);
 }

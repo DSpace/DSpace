@@ -105,7 +105,19 @@ public class LDNMessageServiceImpl implements LDNMessageService {
     @Override
     public LDNMessageEntity create(Context context, Notification notification, String sourceIp) throws SQLException {
         LDNMessageEntity ldnMessage = create(context, notification.getId());
-        ldnMessage.setObject(findDspaceObjectByUrl(context, notification.getObject().getId()));
+        DSpaceObject obj = findDspaceObjectByUrl(context, notification.getObject().getId());
+        if (obj == null) {
+            if (isTargetCurrent(notification)) {
+                // this means we're sending the notification
+                obj = findDspaceObjectByUrl(context, notification.getObject().getAsObject());
+                // use as:object for sender
+            } else {
+                // this means we're receiving the notification
+                obj = findDspaceObjectByUrl(context, notification.getObject().getAsSubject());
+                // use as:subject for receiver
+            }
+        }
+        ldnMessage.setObject(obj);
         if (null != notification.getContext()) {
             ldnMessage.setContext(findDspaceObjectByUrl(context, notification.getContext().getId()));
         }
@@ -381,6 +393,12 @@ public class LDNMessageServiceImpl implements LDNMessageService {
 
     public void delete(Context context, LDNMessageEntity ldnMessage) throws SQLException {
         ldnMessageDao.delete(context, ldnMessage);
+    }
+
+    @Override
+    public boolean isTargetCurrent(Notification notification) {
+        String localInboxUrl = configurationService.getProperty("ldn.notify.inbox");
+        return StringUtils.equals(notification.getTarget().getInbox(), localInboxUrl);
     }
 
 }
