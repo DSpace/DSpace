@@ -214,17 +214,17 @@ public class LDNMessageServiceImpl implements LDNMessageService {
     private DSpaceObject findDspaceObjectByUrl(Context context, String url) throws SQLException {
         String dspaceUrl = configurationService.getProperty("dspace.ui.url") + "/handle/";
 
-        if (url.startsWith(dspaceUrl)) {
+        if (StringUtils.startsWith(url, dspaceUrl)) {
             return handleService.resolveToObject(context, url.substring(dspaceUrl.length()));
         }
 
         String handleResolver = configurationService.getProperty("handle.canonical.prefix", "https://hdl.handle.net/");
-        if (url.startsWith(handleResolver)) {
+        if (StringUtils.startsWith(url, handleResolver)) {
             return handleService.resolveToObject(context, url.substring(handleResolver.length()));
         }
 
         dspaceUrl = configurationService.getProperty("dspace.ui.url") + "/items/";
-        if (url.startsWith(dspaceUrl)) {
+        if (StringUtils.startsWith(url, dspaceUrl)) {
             return itemService.find(context, UUID.fromString(url.substring(dspaceUrl.length())));
         }
 
