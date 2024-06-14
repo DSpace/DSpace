@@ -11,9 +11,11 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -103,7 +105,19 @@ public class LDNMessageServiceImpl implements LDNMessageService {
     @Override
     public LDNMessageEntity create(Context context, Notification notification, String sourceIp) throws SQLException {
         LDNMessageEntity ldnMessage = create(context, notification.getId());
-        ldnMessage.setObject(findDspaceObjectByUrl(context, notification.getObject().getId()));
+        DSpaceObject obj = findDspaceObjectByUrl(context, notification.getObject().getId());
+        if (obj == null) {
+            if (isTargetCurrent(notification)) {
+                // this means we're sending the notification
+                obj = findDspaceObjectByUrl(context, notification.getObject().getAsObject());
+                // use as:object for sender
+            } else {
+                // this means we're receiving the notification
+                obj = findDspaceObjectByUrl(context, notification.getObject().getAsSubject());
+                // use as:subject for receiver
+            }
+        }
+        ldnMessage.setObject(obj);
         if (null != notification.getContext()) {
             ldnMessage.setContext(findDspaceObjectByUrl(context, notification.getContext().getId()));
         }
@@ -200,17 +214,17 @@ public class LDNMessageServiceImpl implements LDNMessageService {
     private DSpaceObject findDspaceObjectByUrl(Context context, String url) throws SQLException {
         String dspaceUrl = configurationService.getProperty("dspace.ui.url") + "/handle/";
 
-        if (url.startsWith(dspaceUrl)) {
+        if (StringUtils.startsWith(url, dspaceUrl)) {
             return handleService.resolveToObject(context, url.substring(dspaceUrl.length()));
         }
 
         String handleResolver = configurationService.getProperty("handle.canonical.prefix", "https://hdl.handle.net/");
-        if (url.startsWith(handleResolver)) {
+        if (StringUtils.startsWith(url, handleResolver)) {
             return handleService.resolveToObject(context, url.substring(handleResolver.length()));
         }
 
         dspaceUrl = configurationService.getProperty("dspace.ui.url") + "/items/";
-        if (url.startsWith(dspaceUrl)) {
+        if (StringUtils.startsWith(url, dspaceUrl)) {
             return itemService.find(context, UUID.fromString(url.substring(dspaceUrl.length())));
         }
 
@@ -246,93 +260,77 @@ public class LDNMessageServiceImpl implements LDNMessageService {
 
     @Override
     public int extractAndProcessMessageFromQueue(Context context) throws SQLException {
-        int result = 0;
-        int timeoutInMinutes = configurationService.getIntProperty("ldn.processor.queue.msg.timeout");
-        if (timeoutInMinutes == 0) {
-            timeoutInMinutes = 60;
-        }
-        List<LDNMessageEntity> msgs = new ArrayList<LDNMessageEntity>();
-        try {
-            msgs.addAll(findOldestMessagesToProcess(context));
-            msgs.addAll(findMessagesToBeReprocessed(context));
-            if (msgs != null && msgs.size() > 0) {
-                LDNMessageEntity msg = null;
-                LDNProcessor processor = null;
-                for (int i = 0; processor == null && i < msgs.size() && msgs.get(i) != null; i++) {
-                    processor = ldnRouter.route(msgs.get(i));
-                    msg = msgs.get(i);
-                    if (processor == null) {
-                        log.info(
-                            "No processor found for LDN message " + msgs.get(i));
-                        msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_UNMAPPED_ACTION);
-                        msg.setQueueAttempts(msg.getQueueAttempts() + 1);
-                        update(context, msg);
-                    }
-                }
-                if (processor != null) {
-                    try {
-                        msg.setQueueLastStartTime(new Date());
-                        msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_PROCESSING);
-                        msg.setQueueTimeout(DateUtils.addMinutes(new Date(), timeoutInMinutes));
-                        update(context, msg);
-                        ObjectMapper mapper = new ObjectMapper();
-                        Notification notification = mapper.readValue(msg.getMessage(), Notification.class);
-                        processor.process(context, notification);
-                        msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_PROCESSED);
-                        result = 1;
-                    } catch (JsonSyntaxException jse) {
-                        result = -1;
-                        log.error("Unable to read JSON notification from LdnMessage " + msg, jse);
-                        msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_FAILED);
-                    } catch (Exception e) {
-                        result = -1;
-                        log.error(e);
-                        msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_FAILED);
-                    } finally {
-                        msg.setQueueAttempts(msg.getQueueAttempts() + 1);
-                        update(context, msg);
-                    }
+        int count = 0;
+        int timeoutInMinutes = configurationService.getIntProperty("ldn.processor.queue.msg.timeout", 60);
+
+        List<LDNMessageEntity> messages = findOldestMessagesToProcess(context);
+        messages.addAll(findMessagesToBeReprocessed(context));
+
+        Optional<LDNMessageEntity> msgOpt = getSingleMessageEntity(messages);
+
+        while (msgOpt.isPresent()) {
+            LDNProcessor processor = null;
+            LDNMessageEntity msg = msgOpt.get();
+            processor = ldnRouter.route(msg);
+            try {
+                boolean isServiceDisabled = !isServiceEnabled(msg);
+                if (processor == null || isServiceDisabled) {
+                    log.warn("No processor found for LDN message " + msg);
+                    Integer status = isServiceDisabled ? LDNMessageEntity.QUEUE_STATUS_UNTRUSTED
+                        : LDNMessageEntity.QUEUE_STATUS_UNMAPPED_ACTION;
+                    msg.setQueueStatus(status);
+                    msg.setQueueAttempts(msg.getQueueAttempts() + 1);
+                    update(context, msg);
                 } else {
-                    log.info("Found x" + msgs.size() + " LDN messages but none processor found.");
+                    msg.setQueueLastStartTime(new Date());
+                    msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_PROCESSING);
+                    msg.setQueueTimeout(DateUtils.addMinutes(new Date(), timeoutInMinutes));
+                    update(context, msg);
+                    ObjectMapper mapper = new ObjectMapper();
+                    Notification notification = mapper.readValue(msg.getMessage(), Notification.class);
+                    processor.process(context, notification);
+                    msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_PROCESSED);
+                    count++;
                 }
+            } catch (JsonSyntaxException jse) {
+                log.error("Unable to read JSON notification from LdnMessage " + msg, jse);
+                msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_FAILED);
+            } catch (Exception e) {
+                log.error(e);
+                msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_FAILED);
+            } finally {
+                msg.setQueueAttempts(msg.getQueueAttempts() + 1);
+                update(context, msg);
             }
-        } catch (SQLException e) {
-            result = -1;
-            log.error(e);
+
+            messages = findOldestMessagesToProcess(context);
+            messages.addAll(findMessagesToBeReprocessed(context));
+            msgOpt = getSingleMessageEntity(messages);
         }
-        return result;
+        return count;
+    }
+
+    private boolean isServiceEnabled(LDNMessageEntity msg) {
+        String localInboxUrl = configurationService.getProperty("ldn.notify.inbox");
+        if (msg.getTarget() == null || StringUtils.equals(msg.getTarget().getLdnUrl(), localInboxUrl)) {
+            return msg.getOrigin().isEnabled();
+        }
+        return msg.getTarget().isEnabled();
     }
 
     @Override
-    public int checkQueueMessageTimeout(Context context) {
-        int result = 0;
-        int timeoutInMinutes = configurationService.getIntProperty("ldn.processor.queue.msg.timeout");
-        if (timeoutInMinutes == 0) {
-            timeoutInMinutes = 60;
-        }
-        int maxAttempts = configurationService.getIntProperty("ldn.processor.max.attempts");
-        if (maxAttempts == 0) {
-            maxAttempts = 5;
-        }
-        log.debug("Using parameters: [timeoutInMinutes]=" + timeoutInMinutes + ",[maxAttempts]=" + maxAttempts);
+    public int checkQueueMessageTimeout(Context context) throws SQLException {
+        int count = 0;
+        int maxAttempts = configurationService.getIntProperty("ldn.processor.max.attempts", 5);
         /*
          * put failed on processing messages with timed-out timeout and
          * attempts >= configured_max_attempts put queue on processing messages with
          * timed-out timeout and attempts < configured_max_attempts
          */
-        List<LDNMessageEntity> msgsToCheck = null;
-        try {
-            msgsToCheck = findProcessingTimedoutMessages(context);
-        } catch (SQLException e) {
-            result = -1;
-            log.error("An error occured on searching for timedout LDN messages!", e);
-            return result;
-        }
-        if (msgsToCheck == null || msgsToCheck.isEmpty()) {
-            return result;
-        }
-        for (int i = 0; i < msgsToCheck.size() && msgsToCheck.get(i) != null; i++) {
-            LDNMessageEntity msg = msgsToCheck.get(i);
+        Optional<LDNMessageEntity> msgOpt = getSingleMessageEntity(findProcessingTimedoutMessages(context));
+
+        while (msgOpt.isPresent()) {
+            LDNMessageEntity msg = msgOpt.get();
             try {
                 if (msg.getQueueAttempts() >= maxAttempts) {
                     msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_FAILED);
@@ -340,13 +338,17 @@ public class LDNMessageServiceImpl implements LDNMessageService {
                     msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_QUEUED);
                 }
                 update(context, msg);
-                result++;
+                count++;
             } catch (SQLException e) {
-                log.error("Can't update LDN message " + msg);
-                log.error(e);
+                log.error("Can't update LDN message " + msg, e);
             }
+            msgOpt = getSingleMessageEntity(findProcessingTimedoutMessages(context));
         }
-        return result;
+        return count;
+    }
+
+    public Optional<LDNMessageEntity> getSingleMessageEntity(Collection<LDNMessageEntity> messages) {
+        return messages.stream().findFirst();
     }
 
     @Override
@@ -391,6 +393,12 @@ public class LDNMessageServiceImpl implements LDNMessageService {
 
     public void delete(Context context, LDNMessageEntity ldnMessage) throws SQLException {
         ldnMessageDao.delete(context, ldnMessage);
+    }
+
+    @Override
+    public boolean isTargetCurrent(Notification notification) {
+        String localInboxUrl = configurationService.getProperty("ldn.notify.inbox");
+        return StringUtils.equals(notification.getTarget().getInbox(), localInboxUrl);
     }
 
 }
