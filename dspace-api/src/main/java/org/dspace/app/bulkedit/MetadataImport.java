@@ -825,8 +825,10 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 addRelationships(c, item, element, values);
             } else {
                 itemService.clearMetadata(c, item, schema, element, qualifier, language);
-                itemService.addMetadata(c, item, schema, element, qualifier,
-                                        language, values, authorities, confidences);
+                if (!values.isEmpty()) {
+                    itemService.addMetadata(c, item, schema, element, qualifier,
+                                            language, values, authorities, confidences);
+                }
                 itemService.update(c, item);
             }
         }
@@ -1121,8 +1123,8 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                     .getAuthoritySeparator() + dcv.getConfidence();
             }
 
-            // Add it
-            if ((value != null) && (!"".equals(value))) {
+            // Add it, if value is not blank
+            if (value != null && StringUtils.isNotBlank(value)) {
                 changes.registerAdd(dcv);
             }
         }
