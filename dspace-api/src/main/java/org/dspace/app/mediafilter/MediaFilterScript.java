@@ -116,7 +116,7 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
         }
 
         if (commandLine.hasOption('d')) {
-            fromDate = LocalDate.parse(commandLine.getOptionValue('f'));
+            fromDate = LocalDate.parse(commandLine.getOptionValue('d'));
         }
 
 
