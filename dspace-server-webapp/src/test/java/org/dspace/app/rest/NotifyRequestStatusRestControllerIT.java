@@ -62,6 +62,7 @@ public class NotifyRequestStatusRestControllerIT extends AbstractControllerInteg
                                 .withDescription("service description")
                                 .withUrl("https://review-service.com/inbox/about/")
                                 .withLdnUrl("https://review-service.com/inbox/")
+                                .withStatus(true)
                                 .withScore(BigDecimal.valueOf(0.6d))
                                 .build();
         //SEND OFFER REVIEW
@@ -97,6 +98,41 @@ public class NotifyRequestStatusRestControllerIT extends AbstractControllerInteg
     }
 
     @Test
+    public void oneStatusAnnounceEndorsementTestDisabledService() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).withName("community").build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+        String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
+        NotifyServiceEntity notifyServiceEntity = NotifyServiceBuilder
+                                .createNotifyServiceBuilder(context, "service name")
+                                .withDescription("service description")
+                                .withUrl("https://review-service.com/inbox/about/")
+                                .withLdnUrl("https://review-service.com/inbox/")
+                                .withStatus(false) // service is disabled
+                                .withScore(BigDecimal.valueOf(0.6d))
+                                .build();
+        //SEND OFFER REVIEW
+        InputStream offerReviewStream = getClass().getResourceAsStream("ldn_offer_review3.json");
+        String announceReview = IOUtils.toString(offerReviewStream, Charset.defaultCharset());
+        offerReviewStream.close();
+        String message = announceReview.replaceAll("<<object_handle>>", object);
+        ObjectMapper mapper = new ObjectMapper();
+        Notification notification = mapper.readValue(message, Notification.class);
+        getClient()
+            .perform(post("/ldn/inbox")
+                .contentType("application/ld+json")
+                .content(message))
+            .andExpect(status().isAccepted());
+
+        int processed = ldnMessageService.extractAndProcessMessageFromQueue(context);
+        assertEquals(processed, 0);
+        processed = ldnMessageService.extractAndProcessMessageFromQueue(context);
+        assertEquals(processed, 0);
+
+    }
+
+    @Test
     public void oneStatusRejectedTest() throws Exception {
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).withName("community").build();
@@ -108,6 +144,7 @@ public class NotifyRequestStatusRestControllerIT extends AbstractControllerInteg
                                 .withDescription("service description")
                                 .withUrl("https://review-service.com/inbox/about/")
                                 .withLdnUrl("https://review-service.com/inbox/")
+                                .withStatus(true)
                                 .withScore(BigDecimal.valueOf(0.6d))
                                 .build();
         //SEND OFFER REVIEW
