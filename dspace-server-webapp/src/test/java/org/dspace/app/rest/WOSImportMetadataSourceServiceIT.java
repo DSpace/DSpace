@@ -136,6 +136,7 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         MetadatumDTO subject15 = createMetadatumDTO("dc", "subject", null, "Coding concepts");
         MetadatumDTO subject16 = createMetadatumDTO("dc", "subject", null, "Lesson design");
         MetadatumDTO subject17 = createMetadatumDTO("dc", "subject", null, "Social Sciences");
+        MetadatumDTO publisher = createMetadatumDTO("dc", "publisher", null, "SPRINGER");
         MetadatumDTO other = createMetadatumDTO("dc", "identifier", "other", "WOS:000805105200003");
         metadatums.add(edition);
         metadatums.add(date);
@@ -166,6 +167,7 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         metadatums.add(subject15);
         metadatums.add(subject16);
         metadatums.add(subject17);
+        metadatums.add(publisher);
         metadatums.add(other);
         ImportRecord firstrRecord = new ImportRecord(metadatums);
 
@@ -205,6 +207,7 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         MetadatumDTO subject26 = createMetadatumDTO("dc", "subject", null, "Social Sciences");
         MetadatumDTO subject27 = createMetadatumDTO("dc", "subject", null, "Science & Technology");
         MetadatumDTO subject28 = createMetadatumDTO("dc", "subject", null, "Life Sciences & Biomedicine");
+        MetadatumDTO publisher2 = createMetadatumDTO("dc", "publisher", null, "NATURE PORTFOLIO");
         MetadatumDTO other2 = createMetadatumDTO("dc", "identifier", "other", "WOS:000805100600001");
         MetadatumDTO rid = createMetadatumDTO("person", "identifier", "rid", "C-6334-2011");
         MetadatumDTO rid2 = createMetadatumDTO("person", "identifier", "rid", "B-1251-2008");
@@ -236,6 +239,7 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         metadatums2.add(subject26);
         metadatums2.add(subject27);
         metadatums2.add(subject28);
+        metadatums2.add(publisher2);
         metadatums2.add(other2);
         metadatums2.add(rid);
         metadatums2.add(rid2);
