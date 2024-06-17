@@ -9,6 +9,8 @@ package org.dspace.curate;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -21,6 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.converter.DSpaceRunnableParameterConverter;
 import org.dspace.app.rest.matcher.ProcessMatcher;
 import org.dspace.app.rest.model.ParameterValueRest;
@@ -28,6 +31,7 @@ import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.app.rest.model.ScriptRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
@@ -41,7 +45,9 @@ import org.dspace.content.Site;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.eperson.EPerson;
 import org.dspace.scripts.DSpaceCommandLineParameter;
+import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.scripts.configuration.ScriptConfiguration;
+import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.service.ScriptService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -640,4 +646,65 @@ public class CurationScriptIT extends AbstractControllerIntegrationTest {
             ProcessBuilder.deleteProcess(idItemRef.get());
         }
     }
+
+    @Test
+    public void testURLRedirectCurateTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                // Value not starting with http or https
+                .withMetadata("dc", "identifier", "uri", "demo.dspace.org/home")
+                // MetadataValueLinkChecker uri field with regular link
+                .withMetadata("dc", "description", null, "https://google.com")
+                // MetadataValueLinkChecker uri field with redirect link
+                .withMetadata("dc", "description", "uri", "https://demo7.dspace.org/handle/123456789/1")
+                // MetadataValueLinkChecker uri field with non resolving link
+                .withMetadata("dc", "description", "uri", "https://www.atmire.com/broken-link")
+                .withSubject("ExtraEntry")
+                .build();
+
+        String[] args = new String[] {"curate", "-t", "checklinks", "-i", publicItem1.getHandle()};
+        TestDSpaceRunnableHandler handler = new TestDSpaceRunnableHandler();
+
+        ScriptService scriptService = ScriptServiceFactory.getInstance().getScriptService();
+        ScriptConfiguration scriptConfiguration = scriptService.getScriptConfiguration(args[0]);
+
+        DSpaceRunnable script = null;
+        if (scriptConfiguration != null) {
+            script = scriptService.createDSpaceRunnableForScriptConfiguration(scriptConfiguration);
+        }
+        if (script != null) {
+            script.initialize(args, handler, admin);
+            script.run();
+        }
+
+        // field that should be ignored
+        assertFalse(checkIfInfoTextLoggedByHandler(handler, "demo.dspace.org/home"));
+        // redirect links in field that should not be ignored (https) => expect OK
+        assertTrue(checkIfInfoTextLoggedByHandler(handler, "https://demo7.dspace.org/handle/123456789/1 = 200 - OK"));
+        // regular link in field that should not be ignored (http) => expect OK
+        assertTrue(checkIfInfoTextLoggedByHandler(handler, "https://google.com = 200 - OK"));
+        // nonexistent link in field that should not be ignored => expect 404
+        assertTrue(checkIfInfoTextLoggedByHandler(handler, "https://www.atmire.com/broken-link = 404 - FAILED"));
+    }
+
+    boolean checkIfInfoTextLoggedByHandler(TestDSpaceRunnableHandler handler, String text) {
+        for (String message: handler.getInfoMessages()) {
+            if (StringUtils.containsIgnoreCase(message, text)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
