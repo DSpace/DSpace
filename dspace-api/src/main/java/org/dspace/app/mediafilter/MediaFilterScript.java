@@ -115,7 +115,7 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
             skipIds = commandLine.getOptionValues('s');
         }
 
-        if (commandLine.hasOption('f')) {
+        if (commandLine.hasOption('d')) {
             fromDate = LocalDate.parse(commandLine.getOptionValue('f'));
         }
 
