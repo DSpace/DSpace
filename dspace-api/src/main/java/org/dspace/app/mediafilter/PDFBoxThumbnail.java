@@ -16,9 +16,6 @@ import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.dspace.content.Item;
 
-import org.dspace.content.MetadataSchemaEnum;
-import org.dspace.content.service.ItemService;
-
 /**
  * Create JPEG thumbnails from PDF cover page using PDFBox.
  * Based on JPEGFilter:
