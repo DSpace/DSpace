@@ -333,7 +333,8 @@
         company as well. We have to ensure to use URIs of our prefix
         as primary identifiers only.
     -->
-    <xsl:template match="dspace:field[@mdschema='dc' and @element='identifier' and @qualifier and (contains(., $prefix))]">
+    <!-- Warning: If the metadata field changes for whatever reason, DOIIdentifierProvider needs to reflect this -->
+    <xsl:template match="dspace:field[@mdschema='dc' and @element='identifier' and @qualifier='uri' and (contains(., $prefix))]">
         <identifier identifierType="DOI">
             <xsl:if test="starts-with(string(text()), 'https://doi.org/')">
                 <xsl:value-of select="substring(., 17)"/>

@@ -70,6 +70,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
     static final char SLASH = '/';
 
     // Metadata field name elements
+    // Warning: If this metadata field is changed for whatever reason, DIM2DataCite.xsl's template needs to reflect this
     // TODO: move these to MetadataSchema or some such?
     public static final String MD_SCHEMA = "dc";
     public static final String DOI_ELEMENT = "identifier";
