@@ -154,11 +154,6 @@ public class DCInput {
     private ACL acl = null;
 
     /**
-     * the computed pattern, null if nothing
-     */
-    private Pattern pattern = null;
-
-    /**
      * allowed document types
      */
     private List<String> typeBind = null;

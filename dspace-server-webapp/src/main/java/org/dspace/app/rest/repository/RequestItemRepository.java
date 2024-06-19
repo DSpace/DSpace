@@ -71,7 +71,7 @@ public class RequestItemRepository
     protected RequestItemConverter requestItemConverter;
 
     @Autowired(required = true)
-    protected RequestItemEmailNotifier requestItemEmailNotifier;
+    protected ConfigurationService configurationService;
 
     @Autowired(required = true)
     protected RequestItemEmailNotifier requestItemEmailNotifier;

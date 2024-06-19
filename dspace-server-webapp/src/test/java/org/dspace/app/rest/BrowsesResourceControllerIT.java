@@ -733,7 +733,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
     }
 
     @Test
-    public void findBrowseByTitleItemsWithScope() throws Exception {
+    public void findBrowseByTitleItems() throws Exception {
         context.turnOffAuthorisationSystem();
 
         //** GIVEN **
@@ -763,7 +763,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                       .build();
 
         //3. An item that has been made private
-        Item privateItem = ItemBuilder.createItem(context, col2)
+        Item privateItem = ItemBuilder.createItem(context, col1)
                                       .withTitle("This is a private item")
                                       .withIssueDate("2015-03-12")
                                       .withAuthor("Duck, Donald")
@@ -799,7 +799,6 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         //An anonymous user browses the items in the Browse by item endpoint
         //sorted descending by tile
         getClient().perform(get("/api/discover/browses/title/items")
-                                .param("scope", String.valueOf(col2.getID()))
                                 .param("sort", "title,desc"))
 
                    //** THEN **
@@ -809,14 +808,17 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    .andExpect(content().contentType(contentType))
 
                    .andExpect(jsonPath("$.page.size", is(20)))
-                   .andExpect(jsonPath("$.page.totalElements", is(1)))
+                   .andExpect(jsonPath("$.page.totalElements", is(2)))
                    .andExpect(jsonPath("$.page.totalPages", is(1)))
                    .andExpect(jsonPath("$.page.number", is(0)))
 
                    .andExpect(jsonPath("$._embedded.items",
                                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2,
                                                                                             "Public item 2",
-                                                                                            "2016-02-13"))))
+                                                                                            "2016-02-13"),
+                                                ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
+                                                                                            "Public item 1",
+                                                                                            "2017-10-17"))))
 
                    //The private and internal items must not be present
                    .andExpect(jsonPath("$._embedded.items[*].metadata", Matchers.allOf(

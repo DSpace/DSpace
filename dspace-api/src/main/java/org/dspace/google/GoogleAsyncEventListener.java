@@ -224,7 +224,6 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
             for (int x = 1; x <= context.getEvents().size(); x++) {
                 LOGGER.error("    Context Event " + x + ": " + context.getEvents().get(x));
             }
-            return allowedBundles.stream().anyMatch(bitstreamBundles::contains);
         }
     }
 
