@@ -105,7 +105,7 @@ public class BrowseIndexMatcher {
     public static Matcher<? super Object> publisherBrowseIndex(final String order) {
         return allOf(
                 hasJsonPath("$.metadata", contains("dc.publisher")),
-                hasJsonPath("$.metadataBrowse", Matchers.is(true)),
+                hasJsonPath("$.metadataBrowse", is(true)),
                 hasJsonPath("$.dataType", equalToIgnoringCase("text")),
                 hasJsonPath("$.order", equalToIgnoringCase(order)),
                 hasJsonPath("$.sortOptions[*].name", containsInAnyOrder("title", "dateissued", "dateaccessioned")),
@@ -129,7 +129,7 @@ public class BrowseIndexMatcher {
     public static Matcher<? super Object> itemtypeBrowseIndex(final String order) {
         return allOf(
                 hasJsonPath("$.metadata", contains("dc.type")),
-                hasJsonPath("$.metadataBrowse", Matchers.is(true)),
+                hasJsonPath("$.metadataBrowse", is(true)),
                 hasJsonPath("$.dataType", equalToIgnoringCase("text")),
                 hasJsonPath("$.order", equalToIgnoringCase(order)),
                 hasJsonPath("$.sortOptions[*].name", containsInAnyOrder("title", "dateissued", "dateaccessioned")),
@@ -141,7 +141,7 @@ public class BrowseIndexMatcher {
     public static Matcher<? super Object> rightsBrowseIndex(final String order) {
         return allOf(
                 hasJsonPath("$.metadata", contains("dc.rights.label")),
-                hasJsonPath("$.metadataBrowse", Matchers.is(true)),
+                hasJsonPath("$.metadataBrowse", is(true)),
                 hasJsonPath("$.dataType", equalToIgnoringCase("text")),
                 hasJsonPath("$.order", equalToIgnoringCase(order)),
                 hasJsonPath("$.sortOptions[*].name", containsInAnyOrder("title", "dateissued", "dateaccessioned")),
