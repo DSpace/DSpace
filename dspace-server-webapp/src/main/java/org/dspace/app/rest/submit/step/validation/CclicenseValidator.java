@@ -54,8 +54,6 @@ public class CclicenseValidator extends AbstractValidation {
 
     private String name;
 
-    private Boolean required;
-
     /**
      * Validate the license of the item.
      * @param item The item whose cclicense is to be validated.
@@ -63,7 +61,7 @@ public class CclicenseValidator extends AbstractValidation {
      * @return A list of validation errors.
      */
     private List<ErrorRest> validateLicense(Item item, SubmissionStepConfig config) {
-        List<ErrorRest> errors = new ArrayList<>();
+        List<ErrorRest> errors = new ArrayList<>(1);
 
         String licenseURI = creativeCommonsService.getLicenseURI(item);
         if (licenseURI == null || licenseURI.isBlank()) {
@@ -86,18 +84,7 @@ public class CclicenseValidator extends AbstractValidation {
      * @return true if a Creative Commons License is required setting true for the property cc.license.required.
      */
     public Boolean isRequired() {
-        if (required == null) {
-            return configurationService.getBooleanProperty("cc.license.required", false);
-        }
-        return required;
-    }
-
-    /**
-     * Set whether at least one Creative Commons License is required when submitting a new Item.
-     * @param required true if a Creative Commons License is required.
-     */
-    public void setRequired(Boolean required) {
-        this.required = required;
+        return configurationService.getBooleanProperty("cc.license.required", false);
     }
 
     @Override
@@ -118,14 +105,12 @@ public class CclicenseValidator extends AbstractValidation {
                                               InProgressSubmission obj,
                                               SubmissionStepConfig config)
             throws DCInputsReaderException, SQLException {
-        List<ErrorRest> errors = new ArrayList<>();
-
 
         if (this.isRequired() && obj != null && obj.getItem() != null) {
-            errors.addAll(validateLicense(obj.getItem(), config));
+            return validateLicense(obj.getItem(), config);
+        } else {
+            return List.of();
         }
-
-        return errors;
     }
 
     public void setName(String name) {
