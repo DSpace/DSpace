@@ -10,10 +10,13 @@ package org.dspace.app.rest.utils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Set;
 import java.util.UUID;
 
+import jakarta.xml.bind.DatatypeConverter;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,7 +31,6 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.utils.DSpace;
 import org.springframework.core.io.AbstractResource;
-import org.springframework.util.DigestUtils;
 
 /**
  * This class acts as a {@link AbstractResource} used by Spring's framework to send the data in a proper and
@@ -123,7 +125,7 @@ public class BitstreamResource extends AbstractResource {
             if (shouldGenerateCoverPage) {
                 var coverPage = getCoverpageByteArray(context, bitstream);
 
-                this.document = new BitstreamDocument(etag(coverPage),
+                this.document = new BitstreamDocument(etag(bitstream),
                         coverPage.length,
                         new ByteArrayInputStream(coverPage));
             } else {
@@ -134,14 +136,33 @@ public class BitstreamResource extends AbstractResource {
         } catch (SQLException | AuthorizeException | IOException e) {
             throw new RuntimeException(e);
         }
+
+        LOG.info("fetched document {} {}", shouldGenerateCoverPage, document);
     }
 
-    private String etag(byte[] data) {
-        var builder = new StringBuilder();
-        builder.append("\"0");
-        DigestUtils.appendMd5DigestAsHex(data, builder);
-        builder.append('"');
-        return builder.toString();
+    private String etag(Bitstream bitstream) {
+
+         /* Ideally we would calculate the md5 checksum based on the document with coverpage.
+          However it looks like the coverpage generation is not stable (e.g. if invoked twice it will return
+         different results). This means we cannot use it for etag calculation/comparison!
+
+         Instead we will create the MD5 based off the original checksum plus fixed prefix. This ensures
+         that checksums will differ when coverpage is on/off.
+         However the checksum will _not_ change if the coverpage content changes.
+          */
+
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+
+            var content = "coverpage:" + bitstream.getChecksum();
+            md.update(content.getBytes());
+            md.update(bitstream.getChecksum().getBytes());
+            byte[] digest = md.digest();
+            return DatatypeConverter
+                    .printHexBinary(digest).toUpperCase();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Context initializeContext() throws SQLException {

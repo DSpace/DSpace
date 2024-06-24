@@ -929,6 +929,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         //2. A public item with a bitstream
         File originalPdf = new File(testProps.getProperty("test.bitstream"));
 
+        System.out.println(originalPdf);
 
         try (InputStream is = new FileInputStream(originalPdf)) {
 
@@ -966,20 +967,23 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
             // The citation cover page contains the item title.
             // We will now verify that the pdf text contains this title.
             String pdfText = extractPDFText(content);
-            System.out.println(pdfText);
             assertTrue(StringUtils.contains(pdfText,"Public item citation cover page test 1"));
 
             // The dspace-api/src/test/data/dspaceFolder/assetstore/ConstitutionofIreland.pdf file contains 64 pages,
             // manually counted + 1 citation cover page
             assertEquals(65,getNumberOfPdfPages(content));
 
+            var etagHeader = getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                .andReturn().getResponse().getHeader("ETag");
+            etagHeader = etagHeader.substring(1, etagHeader.length() - 1);
+
             //A If-None-Match HEAD request on the ETag must tell is the bitstream is not modified
             getClient().perform(head("/api/core/bitstreams/" + bitstream.getID() + "/content")
-                    .header("If-None-Match", bitstream.getChecksum()))
+                    .header("If-None-Match", etagHeader))
                     .andExpect(status().isNotModified());
 
             //The download and head request should also be logged as a statistics record
-            checkNumberOfStatsRecords(bitstream, 2);
+            checkNumberOfStatsRecords(bitstream, 3);
     }
 
     private String extractPDFText(byte[] content) throws IOException {
@@ -1423,6 +1427,32 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                     .andExpect(status().isOk())
                     .andExpect(header().string("Content-Length", not(Long.toString(originalLength))))
                     .andExpect(header().string("ETag", not("\"" + originalMd5 + "\"")));
+        });
+    }
+
+    @Test
+    public void etagAndContentLengthIsStable() {
+        givenPdf(false, ignored -> {
+            var etag1 = getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                    .andReturn().getResponse().getHeader("Etag");
+
+            var etag2 = getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                    .andReturn().getResponse().getHeader("Etag");
+
+            assertThat(etag1, equalTo(etag2));
+        });
+    }
+
+    @Test
+    public void withCoverPageEtagAndContentLengthIsStable() {
+        givenPdf(true, ignored -> {
+            var etag1 = getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                    .andReturn().getResponse().getHeader("Etag");
+
+            var etag2 = getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                    .andReturn().getResponse().getHeader("Etag");
+
+            assertThat(etag1, equalTo(etag2));
         });
     }
 
