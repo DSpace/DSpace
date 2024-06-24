@@ -55,7 +55,6 @@ import java.time.Period;
 import java.util.UUID;
 
 import org.apache.commons.codec.digest.DigestUtils;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
 import org.apache.commons.lang3.StringUtils;
@@ -1470,7 +1469,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
             block.accept(originalPdf);
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
