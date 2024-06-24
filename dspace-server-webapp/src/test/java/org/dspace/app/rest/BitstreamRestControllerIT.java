@@ -23,6 +23,7 @@ import static org.dspace.core.Constants.WRITE;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -49,8 +50,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.file.Files;
 import java.time.Period;
 import java.util.UUID;
+
+import org.apache.commons.codec.digest.DigestUtils;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
@@ -91,6 +95,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 /**
  * Integration test to test the /api/core/bitstreams/[id]/* endpoints
@@ -1384,4 +1389,90 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                         header.contains("attachment"));
         }
     }
+
+    @Test
+    public void contentLengthAndEtagUsesOriginalBitstream() throws Exception {
+        givenPdf(false, originalPdf -> {
+            var originalMd5 = md5Checksum(originalPdf);
+            long originalLength = Files.size(originalPdf.toPath());
+
+            assertThat(originalLength, greaterThan(0L));
+
+            getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isOk())
+                    .andExpect(header().longValue("Content-Length", originalLength))
+                    .andExpect(header().string("ETag", "\"" + originalMd5 + "\""));
+        });
+    }
+
+    private static String md5Checksum(File file) throws IOException {
+        final String md5;
+        try (InputStream is = new FileInputStream(file)) {
+            md5 = DigestUtils.md5Hex(is);
+        }
+        return md5;
+    }
+
+    @Test
+    public void withCoverPageContentLengthAndEtagChanges() throws Exception {
+        givenPdf(true, originalPdf -> {
+            var originalMd5 = md5Checksum(originalPdf);
+            long originalLength = Files.size(originalPdf.toPath());
+
+            getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+                    .andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isOk())
+                    .andExpect(header().string("Content-Length", not(Long.toString(originalLength))))
+                    .andExpect(header().string("ETag", not("\"" + originalMd5 + "\"")));
+        });
+    }
+
+    @FunctionalInterface
+    interface ThrowingConsumer<T> {
+        void accept(T t) throws Exception;
+    }
+
+    private void givenPdf(boolean coverPageEnabled, ThrowingConsumer<File> block) {
+        configurationService.setProperty("citation-page.enable_globally", coverPageEnabled);
+
+        try {
+            citationDocumentService.afterPropertiesSet();
+            context.turnOffAuthorisationSystem();
+
+            //** GIVEN **
+            //1. A community-collection structure with one parent community and one collections.
+            parentCommunity = CommunityBuilder.createCommunity(context)
+                    .withName("Parent Community")
+                    .build();
+
+            Collection col1 =
+                    CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+
+            //2. A public item with a bitstream
+            File originalPdf = new File(testProps.getProperty("test.bitstream"));
+
+            try (InputStream is = new FileInputStream(originalPdf)) {
+                Item publicItem1 = ItemBuilder.createItem(context, col1)
+                        .withTitle("Public item citation cover page test 1")
+                        .withIssueDate("2017-10-17")
+                        .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                        .build();
+
+                bitstream = BitstreamBuilder
+                        .createBitstream(context, publicItem1, is)
+                        .withName("Test bitstream")
+                        .withDescription("This is a bitstream to test the citation cover page.")
+                        .withMimeType("application/pdf")
+                        .build();
+            }
+            context.restoreAuthSystemState();
+
+            block.accept(originalPdf);
+
+        }catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
