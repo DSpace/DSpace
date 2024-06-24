@@ -10,13 +10,10 @@ package org.dspace.app.rest.utils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Set;
 import java.util.UUID;
 
-import jakarta.xml.bind.DatatypeConverter;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,6 +28,7 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.utils.DSpace;
 import org.springframework.core.io.AbstractResource;
+import org.springframework.util.DigestUtils;
 
 /**
  * This class acts as a {@link AbstractResource} used by Spring's framework to send the data in a proper and
@@ -137,7 +135,7 @@ public class BitstreamResource extends AbstractResource {
             throw new RuntimeException(e);
         }
 
-        LOG.info("fetched document {} {}", shouldGenerateCoverPage, document);
+        LOG.debug("fetched document {} {}", shouldGenerateCoverPage, document);
     }
 
     private String etag(Bitstream bitstream) {
@@ -151,18 +149,12 @@ public class BitstreamResource extends AbstractResource {
          However the checksum will _not_ change if the coverpage content changes.
           */
 
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
+        var content = "coverpage:" + bitstream.getChecksum();
 
-            var content = "coverpage:" + bitstream.getChecksum();
-            md.update(content.getBytes());
-            md.update(bitstream.getChecksum().getBytes());
-            byte[] digest = md.digest();
-            return DatatypeConverter
-                    .printHexBinary(digest).toUpperCase();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
+        StringBuilder builder = new StringBuilder(37);
+        DigestUtils.appendMd5DigestAsHex(content.getBytes(), builder);
+
+        return builder.toString();
     }
 
     private Context initializeContext() throws SQLException {

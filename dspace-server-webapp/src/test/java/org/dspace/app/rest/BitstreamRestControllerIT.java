@@ -929,8 +929,6 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         //2. A public item with a bitstream
         File originalPdf = new File(testProps.getProperty("test.bitstream"));
 
-        System.out.println(originalPdf);
-
         try (InputStream is = new FileInputStream(originalPdf)) {
 
             Item publicItem1 = ItemBuilder.createItem(context, col1)
@@ -975,7 +973,6 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
 
             var etagHeader = getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
                 .andReturn().getResponse().getHeader("ETag");
-            etagHeader = etagHeader.substring(1, etagHeader.length() - 1);
 
             //A If-None-Match HEAD request on the ETag must tell is the bitstream is not modified
             getClient().perform(head("/api/core/bitstreams/" + bitstream.getID() + "/content")
