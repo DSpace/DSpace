@@ -953,12 +953,11 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                     //** THEN **
                     .andExpect(status().isOk())
 
-                    //The Content Length must match the full length
+                    // exact content-length and etag values are verified in s separate test
                     .andExpect(header().string("Content-Length", not(nullValue())))
+                    .andExpect(header().string("ETag", not(nullValue())))
                     //The server should indicate we support Range requests
                     .andExpect(header().string("Accept-Ranges", "bytes"))
-                    //The ETag has to be based on the checksum
-                    .andExpect(header().string("ETag", "\"" + bitstream.getChecksum() + "\""))
                     //We expect the content type to match the bitstream mime type
                     .andExpect(content().contentType("application/pdf;charset=UTF-8"))
                     //THe bytes of the content must match the original content
