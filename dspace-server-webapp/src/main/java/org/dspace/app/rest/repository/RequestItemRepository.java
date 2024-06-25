@@ -292,7 +292,7 @@ public class RequestItemRepository
      * @throws URISyntaxException passed through.
      * @throws MalformedURLException passed through.
      */
-    private String getLinkTokenEmail(String token)
+    public String getLinkTokenEmail(String token)
             throws URISyntaxException, MalformedURLException {
         final String base = configurationService.getProperty("dspace.ui.url");
         URIBuilder uriBuilder = new URIBuilder(base);
