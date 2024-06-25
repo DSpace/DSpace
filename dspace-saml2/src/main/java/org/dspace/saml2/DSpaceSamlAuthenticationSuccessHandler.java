@@ -51,6 +51,12 @@ public class DSpaceSamlAuthenticationSuccessHandler implements AuthenticationSuc
         String relyingPartyId = principal.getRelyingPartyRegistrationId();
         Map<String, List<Object>> samlAttributes = principal.getAttributes();
 
+        samlAttributes.forEach((attributeName, values) -> {
+            values.forEach(value -> {
+                logger.info("Incoming SAML attribute: {} = {}", attributeName, value);
+            });
+        });
+
         setRequestAttributesFromSamlAttributes(request, relyingPartyId, samlAttributes);
 
         request.setAttribute("org.dspace.saml.RELYING_PARTY_ID", relyingPartyId);
@@ -103,6 +109,8 @@ public class DSpaceSamlAuthenticationSuccessHandler implements AuthenticationSuc
 
                 if (values != null) {
                     request.setAttribute(requestAttributeName, values);
+                } else {
+                    logger.warn("No value found for SAML attribute {} in assertion", samlAttributeName);
                 }
             });
     }
