@@ -21,6 +21,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.LogManager;
@@ -287,19 +288,17 @@ public class RequestItemRepository
      * Generate a link back to DSpace, to act on a request.
      *
      * @param token identifies the request.
-     * @return URL to the item request API, with the token as request parameter
-     *          "token".
+     * @return URL to the item request API, with /request-a-copy/{token} as the last URL segments
      * @throws URISyntaxException passed through.
      * @throws MalformedURLException passed through.
      */
     private String getLinkTokenEmail(String token)
             throws URISyntaxException, MalformedURLException {
         final String base = configurationService.getProperty("dspace.ui.url");
-
-        URI link = new URIBuilder(base)
-                .setPathSegments("request-a-copy", token)
-                .build();
-
-        return link.toURL().toExternalForm();
+        URIBuilder uriBuilder = new URIBuilder(base);
+        // Add request-a-copy/token to the existing path (without breaking /sub/dir dspace URLs)
+        URI uri = uriBuilder.setPath(StringUtils.stripEnd(uriBuilder.getPath(), "")
+                + "/request-a-copy/" + token).build();
+        return uri.toURL().toExternalForm();
     }
 }
