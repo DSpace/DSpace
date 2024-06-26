@@ -74,12 +74,24 @@
         <property name="metadataSource" ref="openaireImportServiceByAuthor"/>
         <property name="sourceIdentifier" value="openaire"/>
         <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+                <value>none</value>
+            </list>
+        </property>
     </bean>
 
     <bean id="openaireLiveImportDataProviderByTitle" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="openaireImportServiceByTitle"/>
         <property name="sourceIdentifier" value="openaireTitle"/>
         <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Publication</value>
+                <value>none</value>
+            </list>
+        </property>
     </bean>
 
     <bean id="pubmedLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
