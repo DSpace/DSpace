@@ -33,7 +33,7 @@ Once you have an account setup, contact @tdonohue (via [Slack](https://wiki.lyra
 ## Help others on mailing lists or Slack
 
 DSpace has our own [Slack](https://wiki.lyrasis.org/display/DSPACE/Slack) community and [Mailing Lists](https://wiki.lyrasis.org/display/DSPACE/Mailing+Lists) where discussions take place and questions are answered.
-Anyone is welcome to join and help others. We just ask you to follow our [Code of Conduct](https://www.lyrasis.org/about/Pages/Code-of-Conduct.aspx) (adopted via LYRASIS).
+Anyone is welcome to join and help others. We just ask you to follow our [Code of Conduct](https://www.lyrasis.org/about/Pages/Code-of-Conduct.aspx) (adopted via Lyrasis).
 
 ## Join a working or interest group
 
@@ -41,5 +41,5 @@ Most of the work in building/improving DSpace comes via [Working Groups](https:/
 
 All working/interest groups are open to anyone to join and participate.  A few key groups to be aware of include:
 
-* [DSpace 7 Working Group](https://wiki.lyrasis.org/display/DSPACE/DSpace+7+Working+Group) - This is the main (mostly volunteer) development team. We meet weekly to review our current development [project board](https://github.com/orgs/DSpace/projects), assigning tickets and/or PRs.
-* [DSpace Community Advisory Team (DCAT)](https://wiki.lyrasis.org/display/cmtygp/DSpace+Community+Advisory+Team) - This is an interest group for repository managers/administrators. We meet monthly to discuss DSpace, share tips & provide feedback back to developers.
+* [DSpace Developer Team](https://wiki.lyrasis.org/display/DSPACE/Developer+Meetings) - This is the primary, volunteer development team. We meet weekly to review our current development [project board](https://github.com/orgs/DSpace/projects), assigning tickets and/or PRs. This is also were discussions of the next release or major issues occur. Anyone is welcome to attend.
+* [DSpace Community Advisory Team (DCAT)](https://wiki.lyrasis.org/display/cmtygp/DSpace+Community+Advisory+Team) - This is an interest group for repository managers/administrators. We meet monthly to discuss DSpace, share tips & provide feedback back to developers. Anyone is welcome to attend.
