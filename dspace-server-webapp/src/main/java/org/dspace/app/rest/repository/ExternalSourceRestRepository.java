@@ -63,22 +63,22 @@ public class ExternalSourceRestRepository extends DSpaceRestRepository<ExternalS
      * param
      * @param externalSourceName The externalSourceName that defines which ExternalDataProvider is used
      * @param query         The query used in the lookup
-     * @param parent        The parent used in the lookup
+     * @param hint          An additional hint to be used for further filtering / query construction (eg. field)
      * @param pageable      The pagination object
      * @return              A paginated list of ExternalSourceEntryResource objects that comply with the params
      */
-    public Page<ExternalSourceEntryRest> getExternalSourceEntries(String externalSourceName, String query,
-                                                                  String parent, Pageable pageable) {
+    public Page<ExternalSourceEntryRest> getExternalSourceEntries(String externalSourceName, String query, String parent,
+                                                                  String hint, Pageable pageable) {
         if (externalDataService.getExternalDataProvider(externalSourceName) == null) {
             throw new ResourceNotFoundException("The externalSource for: " + externalSourceName + " couldn't be found");
         }
         List<ExternalDataObject> externalDataObjects = externalDataService
-            .searchExternalDataObjects(externalSourceName, query, Math.toIntExact(pageable.getOffset()),
+            .searchExternalDataObjects(externalSourceName, query, hint, Math.toIntExact(pageable.getOffset()),
                     pageable.getPageSize());
         int numberOfResults = externalDataService.getNumberOfResults(externalSourceName, query);
 
         return converter.toRestPage(externalDataObjects, pageable, numberOfResults,
-                                    utils.obtainProjection());
+                utils.obtainProjection());
     }
 
     @Override
@@ -112,9 +112,9 @@ public class ExternalSourceRestRepository extends DSpaceRestRepository<ExternalS
     public Page<ExternalSourceRest> findByEntityType(Context context, Pageable pageable,
           @Parameter(required = true, value = "entityType") String entityType) {
         List<ExternalDataProvider> externalSources = externalDataService.getExternalDataProviders()
-                                                                        .stream()
-                                                                        .filter(ep -> ep.supportsEntityType(entityType))
-                                                                        .collect(Collectors.toList());
+                .stream()
+                .filter(ep -> ep.supportsEntityType(entityType))
+                .collect(Collectors.toList());
 
         return converter.toRestPage(externalSources, pageable, utils.obtainProjection());
     }
