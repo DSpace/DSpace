@@ -883,7 +883,19 @@ public class Context implements AutoCloseable {
     }
 
     /**
-     * Remove an entity from the cache. This is necessary when batch processing a large number of items.
+     * Remove all entities from the cache and reload the current user entity. This is useful when batch processing
+     * a large number of entities when the calling code requires the cache to be completely cleared before continuing.
+     *
+     * @throws SQLException if a database error occurs.
+     */
+    public void uncacheEntities() throws SQLException {
+        dbConnection.uncacheEntities();
+        reloadContextBoundEntities();
+    }
+
+    /**
+     * Remove an entity from the cache. This is useful when batch processing a large number of entities
+     * when the calling code needs to retain some items in the cache while removing others.
      *
      * @param entity The entity to reload
      * @param <E>    The class of the entity. The entity must implement the {@link ReloadableEntity} interface.
