@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -412,7 +413,7 @@ public class DataCiteConnector
         }
 
         String metadataDOI = extractDOI(root);
-        if (null == metadataDOI) {
+        if (StringUtils.isBlank(metadataDOI)) {
             // The DOI will be saved as metadata of dso after successful
             // registration. To register a doi it has to be part of the metadata
             // sent to DataCite. So we add it to the XML we'll send to DataCite
