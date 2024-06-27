@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import de.digitalcollections.iiif.model.OtherContent;
 import de.digitalcollections.iiif.model.sharedcanvas.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -217,6 +218,25 @@ public class IIIFUtils {
         mapper.registerModule(iiifModule);
         try {
             return mapper.writeValueAsString(resource);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Serializes a list of resources to a String
+     *
+     * @param resourceList to be serialized
+     * @return
+     */
+    public String otherContentAsJson(List<OtherContent> resourceList) {
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.registerModule(iiifModule);
+        try {
+            if (resourceList.size() == 1) {
+                return asJson(resourceList.get(0));
+            }
+            return mapper.writeValueAsString(resourceList);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
