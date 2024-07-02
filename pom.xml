@@ -458,6 +458,7 @@
                         <exclude>**/.gitignore</exclude>
                         <exclude>**/*.cfg</exclude>
                         <exclude>**/*.conf</exclude>
+                        <exclude>**/*.jrxml</exclude>
                     </excludes>
                     <mapping>
                         <!-- Custom DSpace file extensions which are not recognized by license-maven-plugin:
