@@ -32,7 +32,7 @@ public class JRCoverPageServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        sut = new JRCoverPageService("classpath:test-cover-template.jrxml", new DefaultResourceLoader()) {
+        sut = new JRCoverPageService("classpath:cover-template.jrxml", new DefaultResourceLoader()) {
             @Override
             protected Map<String, Object> prepareParams(Item item) {
                 return params;
