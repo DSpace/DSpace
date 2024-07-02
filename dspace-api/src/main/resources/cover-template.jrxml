@@ -23,7 +23,7 @@
                 <reportElement x="60" y="90" width="140" height="45" uuid="74b88b81-ba76-482e-9111-1c9416732744">
                     <property name="com.jaspersoft.studio.unit.x" value="px"/>
                 </reportElement>
-                <imageExpression><![CDATA["coverpage/428620.png"]]></imageExpression>
+                <imageExpression><![CDATA["coverpage/logo.png"]]></imageExpression>
             </image>
             <textField hyperlinkType="Reference" hyperlinkTarget="Blank">
                 <reportElement x="260" y="105" width="310" height="30" uuid="244256ae-db47-4c0e-a9ce-d1b736e65f4f"/>
