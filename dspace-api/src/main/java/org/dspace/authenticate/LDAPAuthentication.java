@@ -184,7 +184,7 @@ public class LDAPAuthentication implements AuthenticationMethod {
      * @param context
      *  DSpace context, will be modified (ePerson set) upon success.
      *
-     * @param username
+     * @param netid
      *  Username (or email address) when method is explicit. Use null for
      *  implicit method.
      *
@@ -322,7 +322,7 @@ public class LDAPAuthentication implements AuthenticationMethod {
                             log.info(LogHelper.getHeader(context,
                                                           "type=ldap-login", "type=ldap_but_already_email"));
                             context.turnOffAuthorisationSystem();
-                            setEpersonAttributes(context, eperson, ldap, Optional.of(netid));                            
+                            setEpersonAttributes(context, eperson, ldap, Optional.of(netid));
                             ePersonService.update(context, eperson);
                             context.dispatchEvents();
                             context.restoreAuthSystemState();
@@ -380,7 +380,9 @@ public class LDAPAuthentication implements AuthenticationMethod {
     /**
      * Update eperson's attributes
      */
-    private void setEpersonAttributes(Context context, EPerson eperson, SpeakerToLDAP ldap, Optional<String> netid) throws SQLException {
+    private void setEpersonAttributes(Context context, EPerson eperson, SpeakerToLDAP ldap, Optional<String> netid)
+        throws SQLException {
+
         if (StringUtils.isNotEmpty(ldap.ldapEmail)) {
             eperson.setEmail(ldap.ldapEmail);
         }
@@ -389,7 +391,7 @@ public class LDAPAuthentication implements AuthenticationMethod {
         }
         if (StringUtils.isNotEmpty(ldap.ldapSurname)) {
             eperson.setLastName(context, ldap.ldapSurname);
-        }        
+        }
         if (StringUtils.isNotEmpty(ldap.ldapPhone)) {
             ePersonService.setMetadataSingleValue(context, eperson, MD_PHONE, ldap.ldapPhone, null);
         }
