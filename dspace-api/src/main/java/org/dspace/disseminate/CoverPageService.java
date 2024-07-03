@@ -27,42 +27,48 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.dspace.content.Item;
-import org.dspace.core.Context;
-import org.dspace.disseminate.service.CoverPageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
 
 /**
- * This is an alternative implementation of the CoverPageService. It uses a configurable
- * <a href="https://github.com/TIBCOSoftware/jasperreports">JasperReports</a> template
- * to render the coverpage.
+ * This service renders the coverpage for a given PDF. It uses a configurable
+ * <a href="https://github.com/TIBCOSoftware/jasperreports">JasperReports</a> template.
  */
-class JRCoverPageService implements CoverPageService {
+public class CoverPageService {
 
     private static final Logger LOG = LogManager.getLogger(CoverPageService.class);
 
     private final JasperReport jasperReport;
 
-    JRCoverPageService(
+    CoverPageService(
             @Value("${citation-page.cover-template}")
             String coverTemplateLocation,
 
             ResourceLoader resourceLoader
     ) {
+        LOG.info("Loading cover template {}", coverTemplateLocation);
+
         try {
-            try (var coverTemplate = resourceLoader.getResource(coverTemplateLocation).getInputStream()) {
+            var coverTemplate = resourceLoader.getResource(coverTemplateLocation);
+            LOG.info("Using cover template {} loaded from {}", coverTemplate, coverTemplate.getURL());
+            try (var stream = resourceLoader.getResource(coverTemplateLocation).getInputStream()) {
                 jasperReport
-                        = JasperCompileManager.compileReport(coverTemplate);
-            } catch (JRException e) {
-                throw new RuntimeException(e);
+                        = JasperCompileManager.compileReport(stream);
             }
-        } catch (IOException e) {
+        } catch (IOException | JRException e) {
             throw new RuntimeException(e);
         }
     }
 
-    @Override
-    public PDDocument renderCoverDocument(Context context, Item item) {
+    /**
+     * Render a PDF coverpage for the given Item. The implementation may use the context and
+     * any relevant meta data from the Item to populuate dynamic content in the rendered page.
+     *
+     * @param item the current item
+     * @return a PDDocument containing the rendered coverpage.
+     * The caller is responsible to close the PDDocument after use!
+     */
+    public PDDocument renderCoverDocument(Item item) {
 
         var parameters = prepareParams(item);
 

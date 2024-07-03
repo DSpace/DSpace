@@ -30,8 +30,8 @@
                 <textElement textAlignment="Right" markup="none">
                     <font size="16" isBold="true"/>
                 </textElement>
-                <textFieldExpression><![CDATA["https://dspace.lyrasis.org/"]]></textFieldExpression>
-                <hyperlinkReferenceExpression><![CDATA["https://dspace.lyrasis.org/"]]></hyperlinkReferenceExpression>
+                <textFieldExpression><![CDATA["https://dspace.org/"]]></textFieldExpression>
+                <hyperlinkReferenceExpression><![CDATA["https://dspace.org/"]]></hyperlinkReferenceExpression>
             </textField>
         </band>
     </background>

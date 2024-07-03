@@ -34,7 +34,6 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.disseminate.service.CitationDocumentService;
-import org.dspace.disseminate.service.CoverPageService;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.InitializingBean;
@@ -96,7 +95,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     protected HandleService handleService;
 
     @Autowired
-    protected CoverPageService coverPageService;
+    CoverPageService coverPageService;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -255,7 +254,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         ) {
             var item = (Item) bitstreamService.getParentObject(context, bitstream);
 
-            try (var cover = coverPageService.renderCoverDocument(context, item)) {
+            try (var cover = coverPageService.renderCoverDocument(item)) {
                 addCoverPageToDocument(result, source, cover);
 
                 return documentAsBytes(result);

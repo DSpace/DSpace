@@ -16,7 +16,6 @@ import java.util.Map;
 
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.dspace.content.Item;
-import org.dspace.core.Context;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,21 +24,18 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.core.io.DefaultResourceLoader;
 
 @RunWith(MockitoJUnitRunner.class)
-public class JRCoverPageServiceTest {
-
-    @Mock
-    Context context;
+public class CoverPageServiceTest {
 
     @Mock
     Item item;
 
     Map<String, Object> params = new HashMap<>();
 
-    private JRCoverPageService sut;
+    private CoverPageService sut;
 
     @Before
     public void setUp() throws Exception {
-        sut = new JRCoverPageService("classpath:cover-template.jrxml", new DefaultResourceLoader()) {
+        sut = new CoverPageService("classpath:cover-template.jrxml", new DefaultResourceLoader()) {
             @Override
             protected Map<String, Object> prepareParams(Item item) {
                 return params;
@@ -53,12 +49,12 @@ public class JRCoverPageServiceTest {
         params.put("dc_title", "My title");
         params.put("dc_contributor_author", "My author");
 
-        try (var coverPage = sut.renderCoverDocument(context, item)) {
+        try (var coverPage = sut.renderCoverDocument(item)) {
             assertThat(coverPage.getNumberOfPages(), equalTo(1));
 
             var text = new PDFTextStripper().getText(coverPage);
 
-            assertThat(text, containsString("dspace.lyrasis.org"));
+            assertThat(text, containsString("dspace.org"));
             assertThat(text, containsString("My title"));
             assertThat(text, containsString("My author"));
         }
@@ -69,12 +65,12 @@ public class JRCoverPageServiceTest {
 
         params.put("dc_title", "My title");
 
-        try (var coverPage = sut.renderCoverDocument(context, item)) {
+        try (var coverPage = sut.renderCoverDocument(item)) {
             assertThat(coverPage.getNumberOfPages(), equalTo(1));
 
             var text = new PDFTextStripper().getText(coverPage);
 
-            assertThat(text, containsString("dspace.lyrasis.org"));
+            assertThat(text, containsString("dspace.org"));
             assertThat(text, containsString("My title"));
             assertThat(text, containsString("Unknown"));
         }
