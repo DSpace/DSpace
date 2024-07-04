@@ -54,29 +54,29 @@ Documentation for all Dockerfiles used by these compose scripts can be found in 
 
 ## To refresh / pull DSpace images from Dockerhub
 ```
-docker-compose -f docker-compose.yml -f docker-compose-cli.yml pull
+docker compose -f docker-compose.yml -f docker-compose-cli.yml pull
 ```
 
 ## To build DSpace images using code in your branch
 ```
-docker-compose -f docker-compose.yml -f docker-compose-cli.yml build
+docker compose -f docker-compose.yml -f docker-compose-cli.yml build
 ```
 
 OPTIONALLY, you can build DSpace images using a different JDK_VERSION like this:
 ```
-docker-compose -f docker-compose.yml -f docker-compose-cli.yml build --build-arg JDK_VERSION=17
+docker compose -f docker-compose.yml -f docker-compose-cli.yml build --build-arg JDK_VERSION=17
 ```
 Default is Java 11, but other LTS releases (e.g. 17) are also supported.
 
 ## Run DSpace 8 REST from your current branch
 ```
-docker-compose -p d8 up -d
+docker compose -p d8 up -d
 ```
 
 ## Run DSpace 8 REST and Angular from your branch
 
 ```
-docker-compose -p d8 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml up -d
+docker compose -p d8 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml up -d
 ```
 NOTE: This starts the UI in development mode. It will take a few minutes to see the UI as the Angular code needs to be compiled.
 
@@ -94,7 +94,7 @@ That container provides a [Cantaloupe image server](https://cantaloupe-project.g
 which can be used when IIIF support is enabled in DSpace (`iiif.enabled=true`).
 
 ```
-docker-compose -p d8 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-iiif.yml up -d
+docker compose -p d8 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-iiif.yml up -d
 ```
 
 ## Run DSpace 8 REST and Shibboleth SP (in Apache) from your branch
@@ -132,17 +132,17 @@ The remainder of these instructions assume you are using ngrok (though other pro
 3. Build the Shibboleth container (if you haven't built or pulled it before):
    ```
    cd [dspace-src]
-   docker-compose -p d8 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml build
+   docker compose -p d8 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml build
    ```
 
 4. Start all containers, passing your public hostname as the `DSPACE_HOSTNAME` environment variable:
    ```
-   DSPACE_HOSTNAME=[subdomain].ngrok.io docker-compose -p d8 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
+   DSPACE_HOSTNAME=[subdomain].ngrok.io docker compose -p d8 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
    ```
    NOTE: For Windows you MUST either set the environment variable separately, or use the 'env' command provided with Git/Cygwin
    (you may already have this command if you are running Git for Windows). See https://superuser.com/a/1079563
    ```
-   env DSPACE_HOSTNAME=[subdomain].ngrok.io docker-compose -p d8 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
+   env DSPACE_HOSTNAME=[subdomain].ngrok.io docker compose -p d8 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
    ```
 
 5. Finally, for https://samltest.id/, you need to upload your Shibboleth Metadata for the site to "trust" you.
@@ -170,7 +170,7 @@ The remainder of these instructions assume you are using ngrok (though other pro
         ```
       * Spin up the `dspace-angular` container alongside the others, e.g.
         ```
-        DSPACE_HOSTNAME=[subdomain].ngrok.io docker-compose -p d8 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
+        DSPACE_HOSTNAME=[subdomain].ngrok.io docker compose -p d8 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml -f dspace/src/main/docker-compose/docker-compose-shibboleth.yml up -d
         ```
 
 ## Sample Test Data
@@ -185,12 +185,12 @@ Prerequisites
 
 Create an admin account.  By default, the dspace-cli container runs the dspace command.
 ```
-docker-compose -p d8 -f docker-compose-cli.yml run --rm dspace-cli create-administrator -e test@test.edu -f admin -l user -p admin -c en
+docker compose -p d8 -f docker-compose-cli.yml run --rm dspace-cli create-administrator -e test@test.edu -f admin -l user -p admin -c en
 ```
 
 Download a Zip file of AIP content and ingest test data
 ```
-docker-compose -p d8 -f docker-compose-cli.yml -f dspace/src/main/docker-compose/cli.ingest.yml run --rm dspace-cli
+docker compose -p d8 -f docker-compose-cli.yml -f dspace/src/main/docker-compose/cli.ingest.yml run --rm dspace-cli
 ```
 
 ### Ingest Entities Test Data
@@ -204,12 +204,12 @@ Prerequisites
 
 Start DSpace REST with a postgres database dump downloaded from the internet.
 ```
-docker-compose -p d8 -f docker-compose.yml -f dspace/src/main/docker-compose/db.entities.yml up -d
+docker compose -p d8 -f docker-compose.yml -f dspace/src/main/docker-compose/db.entities.yml up -d
 ```
 
 Download an assetstore from a tar file on the internet.
 ```
-docker-compose -p d8 -f docker-compose-cli.yml -f dspace/src/main/docker-compose/cli.assetstore.yml run dspace-cli
+docker compose -p d8 -f docker-compose-cli.yml -f dspace/src/main/docker-compose/cli.assetstore.yml run dspace-cli
 ```
 
 ## Modify DSpace Configuration in Docker
@@ -217,26 +217,26 @@ While your Docker containers are running, you may directly modify any configurat
 `[dspace-src]/dspace/config/`. Those config changes will be synced to the container.
 (This works because our `docker-compose.yml` mounts the `[src]/dspace/config` directory from the host into the running Docker instance.)
 
-Many DSpace configuration settings will reload automatically (after a few seconds).  However, configurations which are cached by DSpace (or by Spring Boot) may require you to quickly reboot the Docker containers by running `docker-compose -p d7 down` followed by `docker-compose -p d7 up -d`.
+Many DSpace configuration settings will reload automatically (after a few seconds).  However, configurations which are cached by DSpace (or by Spring Boot) may require you to quickly reboot the Docker containers by running `docker compose -p d7 down` followed by `docker compose -p d7 up -d`.
 
 ## Running DSpace CLI scripts in Docker
 While the Docker containers are running, you can use the DSpace CLI image to run any DSpace commandline script (i.e. any command that normally can be run by `[dspace]/bin/dspace`).  The general format is:
 
 ```
-docker-compose -p d8 -f docker-compose-cli.yml run --rm dspace-cli [command] [parameters]
+docker compose -p d8 -f docker-compose-cli.yml run --rm dspace-cli [command] [parameters]
 ```
 
 So, for example, to reindex all content in Discovery, normally you'd run `./dspace index-discovery -b` from commandline.  Using our DSpace CLI image, that command becomes:
 
 ```
-docker-compose -p d8 -f docker-compose-cli.yml run --rm dspace-cli index-discovery -b
+docker compose -p d8 -f docker-compose-cli.yml run --rm dspace-cli index-discovery -b
 ```
 
 Similarly, you can see the value of any DSpace configuration (in local.cfg or dspace.cfg) by running:
 
 ```
 # Output the value of `dspace.ui.url` from running Docker instance
-docker-compose -p d8 -f docker-compose-cli.yml run --rm dspace-cli dsprop -p dspace.ui.url
+docker compose -p d8 -f docker-compose-cli.yml run --rm dspace-cli dsprop -p dspace.ui.url
 ```
 
 NOTE: It is also possible to run CLI scripts directly on the "dspace" container (where the backend runs)
@@ -245,7 +245,7 @@ This can be useful if you want to pass environment variables which override DSpa
 # Run the "./dspace database clean" command from the "dspace" container
 # Before doing so, it sets "db.cleanDisabled=false".
 # WARNING: This will delete all your data. It's just an example of how to do so.
-docker-compose -p d8 exec -e "db__P__cleanDisabled=false" dspace /dspace/bin/dspace database clean
+docker compose -p d8 exec -e "db__P__cleanDisabled=false" dspace /dspace/bin/dspace database clean
 ```
 
 ## Upgrading PostgreSQL in Docker
@@ -263,7 +263,7 @@ Here's how to fix those issues by migrating your old Postgres data to the new ve
 1. First, you must start up the older PostgreSQL image (to dump your existing data to a `*.sql` file)
     ```
     # This command assumes you are using the process described above to start all your containers
-    docker-compose -p d8 up -d
+    docker compose -p d8 up -d
     ```
     * If you've already accidentally updated to the new PostgreSQL image, you have a few options:
         * Pull down an older version of the image from Dockerhub (using a tag)
@@ -272,7 +272,7 @@ Here's how to fix those issues by migrating your old Postgres data to the new ve
           # This command will rebuild using PostgreSQL v11 & tag it locally as "latest"
           docker build --build-arg POSTGRES_VERSION=11 -t dspace/dspace-postgres-pgcrypto:latest ./dspace/src/main/docker/dspace-postgres-pgcrypto/
           # Then restart container with that image
-          docker-compose -p d8 up -d
+          docker compose -p d8 up -d
           ```
 2. Dump your entire "dspace" database out of the old "dspacedb" container to a local file named `pgdump.sql`
     ```
@@ -295,7 +295,7 @@ Here's how to fix those issues by migrating your old Postgres data to the new ve
 3. Now, stop all existing containers. This shuts down the old version of PostgreSQL
     ```
     # This command assumes you are using the process described above to start/stop all your containers
-    docker-compose -p d8 down
+    docker compose -p d8 down
     ```
 4. Delete the `pgdata` volume. WARNING: This deletes all your old PostgreSQL data. Make sure you have that `pgdump.sql` file FIRST!
     ```
@@ -304,19 +304,19 @@ Here's how to fix those issues by migrating your old Postgres data to the new ve
     ```
 5. Now, pull down the latest PostgreSQL image with the NEW version of PostgreSQL.
     ```
-    docker-compose -f docker-compose.yml -f docker-compose-cli.yml pull
+    docker compose -f docker-compose.yml -f docker-compose-cli.yml pull
     ```
 6. Start everything up using our `db.restore.yml` script.  This script will recreate the database
 using the local `./pgdump.sql` file. IMPORTANT: If you renamed that "pgdump.sql" file or stored it elsewhere,
 then you MUST change the name/directory in the `db.restore.yml` script.
     ```
     # Restore database from "./pgdump.sql" (this path is hardcoded in db.restore.yml)
-    docker-compose -p d8 -f docker-compose.yml -f dspace/src/main/docker-compose/db.restore.yml up -d
+    docker compose -p d8 -f docker-compose.yml -f dspace/src/main/docker-compose/db.restore.yml up -d
     ```
 7. Finally, reindex all database contents into Solr (just to be sure Solr indexes are current).
     ```
     # Run "./dspace index-discovery -b" using our CLI image
-    docker-compose -p d8 -f docker-compose-cli.yml run --rm dspace-cli index-discovery -b
+    docker compose -p d8 -f docker-compose-cli.yml run --rm dspace-cli index-discovery -b
     ```
 At this point in time, all your old database data should be migrated to the new Postgres
 and running at http://localhost:8080/server/
