@@ -606,10 +606,10 @@ public class RequestItemRepositoryIT
     }
 
     /**
-     * Test that generated links include the correct base URL, even if it has extra URL segments
+     * Test that generated links include the correct base URL, where the UI URL has a subpath like /subdir
      */
     @Test
-    public void testGetLinkTokenEmail() throws MalformedURLException, URISyntaxException {
+    public void testGetLinkTokenEmailWithSubPath() throws MalformedURLException, URISyntaxException {
         RequestItemRepository instance = applicationContext.getBean(
                 RequestItemRest.CATEGORY + '.' + RequestItemRest.PLURAL_NAME,
                 RequestItemRepository.class);
@@ -618,6 +618,22 @@ public class RequestItemRepositoryIT
         // Add a /subdir to the url for this test
         configurationService.setProperty("dspace.ui.url", newDspaceUrl);
         String expectedUrl = newDspaceUrl + "/request-a-copy/token";
+        String generatedLink = instance.getLinkTokenEmail("token");
+        // The URLs should match
+        assertEquals(expectedUrl, generatedLink);
+        configurationService.reloadConfig();
+    }
+
+    /**
+     * Test that generated links include the correct base URL, with NO subpath elements
+     */
+    @Test
+    public void testGetLinkTokenEmailWithoutSubPath() throws MalformedURLException, URISyntaxException {
+        RequestItemRepository instance = applicationContext.getBean(
+                RequestItemRest.CATEGORY + '.' + RequestItemRest.PLURAL_NAME,
+                RequestItemRepository.class);
+        String currentDspaceUrl = configurationService.getProperty("dspace.ui.url");
+        String expectedUrl = currentDspaceUrl + "/request-a-copy/token";
         String generatedLink = instance.getLinkTokenEmail("token");
         // The URLs should match
         assertEquals(expectedUrl, generatedLink);
