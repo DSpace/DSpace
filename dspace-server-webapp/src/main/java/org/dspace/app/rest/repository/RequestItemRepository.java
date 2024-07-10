@@ -297,8 +297,9 @@ public class RequestItemRepository
         final String base = configurationService.getProperty("dspace.ui.url");
         URIBuilder uriBuilder = new URIBuilder(base);
         // Add request-a-copy/token to the existing path (without breaking /sub/dir dspace URLs)
-        URI uri = uriBuilder.setPath(StringUtils.stripEnd(uriBuilder.getPath(), "")
-                + "/request-a-copy/" + token).build();
+        URI uri = uriBuilder.setPath(
+                (uriBuilder.getPath() == null ? "" : StringUtils.stripEnd(uriBuilder.getPath(), ""))
+                        + "/request-a-copy/" + token).build();
         return uri.toURL().toExternalForm();
     }
 }
