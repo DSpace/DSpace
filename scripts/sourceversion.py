@@ -1,9 +1,10 @@
 import subprocess
 import sys
+import pytz
 from datetime import datetime
 
 if __name__ == '__main__':
-    ts = datetime.now()
+    ts = datetime.now().astimezone(pytz.timezone("Europe/Bratislava"))
     print(f"This info was generated on: {ts}")
 
     cmd = 'git log -1 --pretty=format:"Git hash: %H Date of commit: %ai"'
