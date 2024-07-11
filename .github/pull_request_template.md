@@ -19,6 +19,7 @@ List of changes in this PR:
 _This checklist provides a reminder of what we are going to look for when reviewing your PR. You need not complete this checklist prior to creating your PR (draft PRs are always welcome).
 However, reviewers may request that you complete any actions in this list if you have not done so. If you are unsure about an item in the checklist, don't hesitate to ask. We're here to help!_
 
+- [ ] My PR is **created against the `main` branch** of code (unless it is a backport or is fixing an issue specific to an older branch).
 - [ ] My PR is **small in size** (e.g. less than 1,000 lines of code, not including comments & integration tests). Exceptions may be made if previously agreed upon.
 - [ ] My PR **passes Checkstyle** validation based on the [Code Style Guide](https://wiki.lyrasis.org/display/DSPACE/Code+Style+Guide).
 - [ ] My PR **includes Javadoc** for _all new (or modified) public methods and classes_. It also includes Javadoc for large or complex private methods.
