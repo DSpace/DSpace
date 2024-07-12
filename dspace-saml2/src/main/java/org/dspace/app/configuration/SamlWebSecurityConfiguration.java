@@ -7,6 +7,7 @@
  */
 package org.dspace.app.configuration;
 
+import org.dspace.saml2.DSpaceSamlAuthenticationFailureHandler;
 import org.dspace.saml2.DSpaceSamlAuthenticationSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -53,7 +54,8 @@ public class SamlWebSecurityConfiguration {
             .saml2Login(saml -> saml
                 // Accept SAML identity assertions from the IdP at /saml2/assertion-consumer/{registrationId}.
                 .loginProcessingUrl("/saml2/assertion-consumer/{registrationId}")
-                .successHandler(new DSpaceSamlAuthenticationSuccessHandler()))
+                .successHandler(new DSpaceSamlAuthenticationSuccessHandler())
+                .failureHandler(new DSpaceSamlAuthenticationFailureHandler()))
             // Produce SAML relying party metadata at /saml2/service-provider-metadata/{registrationId}.
             .saml2Metadata(Customizer.withDefaults())
             .build();
