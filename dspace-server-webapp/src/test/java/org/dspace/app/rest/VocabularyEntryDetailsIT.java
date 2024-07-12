@@ -23,8 +23,6 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 
 /**
- * 
- * 
  * @author Mykhaylo Boychuk (4science.it)
  */
 public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest {
@@ -33,11 +31,11 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._links",Matchers.allOf(
-                                hasJsonPath("$.vocabularyEntryDetails.href",
-                                         is("http://localhost/api/submission/vocabularyEntryDetails")),
-                                hasJsonPath("$.vocabularyEntryDetails-search.href",
-                                         is("http://localhost/api/submission/vocabularyEntryDetails/search"))
+                        .andExpect(jsonPath("$._links", Matchers.allOf(
+                            hasJsonPath("$.vocabularyEntryDetails.href",
+                                        is("http://localhost/api/submission/vocabularyEntryDetails")),
+                            hasJsonPath("$.vocabularyEntryDetails-search.href",
+                                        is("http://localhost/api/submission/vocabularyEntryDetails/search"))
                         )));
     }
 
@@ -46,7 +44,7 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/submission/vocabularyEntryDetails"))
                             .andExpect(status()
-                            .isMethodNotAllowed());
+                                           .isMethodNotAllowed());
     }
 
     @Test
@@ -64,9 +62,9 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
                         .andExpect(jsonPath("$.otherInformation.parent",
                                 is("HUMANITIES and RELIGION")))
                         .andExpect(jsonPath("$._links.parent.href",
-                                endsWith("api/submission/vocabularyEntryDetails/srsc:SCB110/parent")))
+                                            endsWith("api/submission/vocabularyEntryDetails/srsc:SCB110/parent")))
                         .andExpect(jsonPath("$._links.children.href",
-                                endsWith("api/submission/vocabularyEntryDetails/srsc:SCB110/children")));
+                                            endsWith("api/submission/vocabularyEntryDetails/srsc:SCB110/children")));
     }
 
     @Test
@@ -81,15 +79,15 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
         String idAuthority = "srsc:not-existing";
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(get("/api/submission/vocabularyEntryDetails/" + idAuthority))
-                   .andExpect(status().isNotFound());
+                        .andExpect(status().isNotFound());
 
         // try with a special id missing only the entry-id part
         getClient(token).perform(get("/api/submission/vocabularyEntryDetails/srsc:"))
-                   .andExpect(status().isNotFound());
+                        .andExpect(status().isNotFound());
 
         // try to retrieve the xml root that is not a entry itself
         getClient(token).perform(get("/api/submission/vocabularyEntryDetails/srsc:ResearchSubjectCategories"))
-                   .andExpect(status().isNotFound());
+                        .andExpect(status().isNotFound());
 
     }
 
@@ -249,7 +247,7 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
     public void searchTopBadRequestTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/submission/vocabularyEntryDetails/search/top")
-                             .param("vocabulary", UUID.randomUUID().toString()))
+                                          .param("vocabulary", UUID.randomUUID().toString()))
                              .andExpect(status().isBadRequest());
     }
 
@@ -323,7 +321,7 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
     public void srscSearchByParentWrongIdTest() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/submission/vocabularyEntryDetails/"
-                                                          + UUID.randomUUID() + "/children"))
+                                              + UUID.randomUUID() + "/children"))
                              .andExpect(status().isBadRequest());
     }
 
@@ -453,5 +451,50 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$._links.top.href", Matchers.allOf(
                                  Matchers.containsString("/api/submission/vocabularyEntryDetails/search/top"))));
+    }
+
+    @Test
+    public void testSearchWithApostrophe() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/submission/vocabularies/srsc/entries?filter=Children's&exact=false"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("_embedded.entries[0].display").value("Children's language"));
+    }
+
+    @Test
+    public void testSearchWithQuote() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/submission/vocabularies/srsc/entries?filter=test\"test&exact=false"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("_embedded.entries[0].display").value("test\"test"));
+    }
+
+    @Test
+    public void testSearchWithApostropheAndQuote() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(
+                                 get("/api/submission/vocabularies/srsc/entries?filter=test\"test'example'&exact" +
+                                         "=false"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("_embedded.entries[0].display").value("test\"test'example'"));
+    }
+
+    @Test
+    public void testSearchWithComma() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(
+                                 get("/api/submission/vocabularies/srsc/entries?filter=Human geography, economic " +
+                                         "geography&exact=true"))
+                             .andExpect(status().isOk())
+                             .andExpect(
+                                 jsonPath("_embedded.entries[0].display").value("Human geography, economic geography"));
+    }
+
+    @Test
+    public void testSearchWithColumn() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(get("/api/submission/vocabularies/srsc/entries?filter=test:example&exact=true"))
+                             .andExpect(status().isOk())
+                             .andExpect(jsonPath("_embedded.entries[0].display").value("test:example"));
     }
 }
