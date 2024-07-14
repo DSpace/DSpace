@@ -611,10 +611,45 @@ public class VocabularyEntryDetailsIT extends AbstractControllerIntegrationTest 
     }
 
     @Test
-    public void testSearchWithColumn() throws Exception {
+    public void testSearchWithColon() throws Exception {
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/submission/vocabularies/srsc/entries?filter=test:example&exact=true"))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("_embedded.entries[0].display").value("test:example"));
+    }
+
+    @Test
+    public void testSearchWithApostropheAndQuoteReversed() throws Exception {
+        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        getClient(tokenAdmin).perform(
+                        get("/api/submission/vocabularies/srsc/entries?filter=test2\"test'example\"'\"" +
+                                "&exact==false"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.entries[0].display").value("test2\"test'example\"'\"test"));
+        getClient(tokenAdmin).perform(
+                        get("/api/submission/vocabularies/srsc/entries?filter=test2\"test'exam" +
+                                "&exact==false"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.entries[0].display").value("test2\"test'example\"'\"test"));
+        getClient(tokenAdmin).perform(
+                        get("/api/submission/vocabularies/srsc/entries?filter=test2\"test'exam" +
+                                "&exact==true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.entries[0].display").value("test2\"test'example\"'\"test"));
+        getClient(tokenAdmin).perform(
+                        get("/api/submission/vocabularies/srsc/entries?filter=University's s\"" +
+                                "&exact==false"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.entries[0].display").value("University's s\"P\"apers"));
+        getClient(tokenAdmin).perform(
+                        get("/api/submission/vocabularies/srsc/entries?filter=University's s\"P\"" +
+                                "&exact==false"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.entries[0].display").value("University's s\"P\"apers"));
+        getClient(tokenAdmin).perform(
+                        get("/api/submission/vocabularies/srsc/entries?filter=University's s\"P\"apers" +
+                                "&exact==true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.entries[0].display").value("University's s\"P\"apers"));
     }
 }
