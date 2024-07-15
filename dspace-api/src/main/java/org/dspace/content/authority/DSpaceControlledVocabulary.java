@@ -203,6 +203,15 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
         return new Choices(choices.toArray(new Choice[choices.size()]), 0, choices.size(), Choices.CF_AMBIGUOUS, false);
     }
 
+    /**
+     * - If the string doesn't contain any single quotes, it wraps the string in single quotes.
+     * - If the string contains single quotes but no double quotes, it wraps the string in double quotes.
+     * - If the string contains both single and double quotes,
+     *      it constructs an XPath expression using the concat function.
+     * The goal is to allow the string to be safely used in XPath expressions regardless of the presence of quotes.
+     * @param text
+     * @return
+     */
     private String escapeQuotes(String text) {
         // If we don't have any quote then enquote string in single quote
         if (!text.contains("'")) {
@@ -228,7 +237,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
                 sb.append(",");
             }
 
-            sb.append(String.format("\"%s\",'\"'", text.substring(lastPos, nextPos - lastPos)));
+            sb.append(String.format("\"%s\",'\"'", text.substring(lastPos, nextPos)));
             lastPos = ++nextPos;
 
             // Find next occurrence

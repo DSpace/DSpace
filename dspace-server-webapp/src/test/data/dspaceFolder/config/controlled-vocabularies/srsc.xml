@@ -367,6 +367,12 @@
 								<node id="VR11390777" label="test&quot;test'example'">
 									<hasNote>Datorlingvistik</hasNote>
 								</node>
+								<node id="VR11390777b" label="test2&quot;test'example&quot;'&quot;test">
+									<hasNote>Datorlingvistik</hasNote>
+								</node>
+								<node id="VR11390777b" label="University's s&quot;P&quot;apers">
+									<hasNote>Datorlingvistik</hasNote>
+								</node>
 								<node id="VR11390888" label="test:example">
 									<hasNote>Datorlingvistik</hasNote>
 								</node>
