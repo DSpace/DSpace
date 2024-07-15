@@ -154,7 +154,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
             dSpaceRunnable.initialize(args.toArray(new String[0]), restDSpaceRunnableHandler, context.getCurrentUser());
             if (files != null && !files.isEmpty()) {
                 checkFileNames(dSpaceRunnable, files);
-                processFiles(context, restDSpaceRunnableHandler, files);
+                processFiles(context, restDSpaceRunnableHandler, files, dSpaceRunnable);
             }
             restDSpaceRunnableHandler.schedule(dSpaceRunnable);
         } catch (ParseException e) {
@@ -171,11 +171,12 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
     }
 
     private void processFiles(Context context, RestDSpaceRunnableHandler restDSpaceRunnableHandler,
-                              List<MultipartFile> files)
-        throws IOException, SQLException, AuthorizeException {
+                              List<MultipartFile> files, DSpaceRunnable dspaceRunnable)
+            throws IOException, SQLException, AuthorizeException {
         for (MultipartFile file : files) {
-            restDSpaceRunnableHandler
-                .writeFilestream(context, file.getOriginalFilename(), file.getInputStream(), "inputfile");
+            String type = (String) dspaceRunnable.fileParameterToBitstreamType(file.getName())
+                                                          .orElse("inputfile");
+            restDSpaceRunnableHandler.writeFilestream(context, file.getOriginalFilename(), file.getInputStream(), type);
         }
     }
 

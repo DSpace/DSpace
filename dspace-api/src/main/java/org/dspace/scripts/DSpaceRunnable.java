@@ -10,6 +10,7 @@ package org.dspace.scripts;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
@@ -207,5 +208,9 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
 
     public enum StepResult {
         Continue, Exit;
+    }
+
+    public Optional<String> fileParameterToBitstreamType(String fileParameter) {
+        return Optional.empty();
     }
 }
