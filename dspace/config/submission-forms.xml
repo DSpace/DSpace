@@ -2091,6 +2091,21 @@
             </row>
         </form>
 
+        <form name="note">
+            <row>
+                <field>
+                    <dc-schema>local</dc-schema>
+                    <dc-element>submission</dc-element>
+                    <dc-qualifier>note</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Note</label>
+                    <input-type>textarea</input-type>
+                    <hint>Leave a note for the editors/reviewers</hint>
+                    <required></required>
+                </field>
+            </row>
+        </form>
+
     </form-definitions>
 
 

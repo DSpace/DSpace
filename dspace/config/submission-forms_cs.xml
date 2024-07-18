@@ -1432,6 +1432,21 @@
             </row>
         </form>
 
+        <form name="note">
+            <row>
+                <field>
+                    <dc-schema>local</dc-schema>
+                    <dc-element>submission</dc-element>
+                    <dc-qualifier>note</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Vzkaz</label>
+                    <input-type>textarea</input-type>
+                    <hint>Zde můžete zanechat vzkaz editorům.</hint>
+                    <required></required>
+                </field>
+            </row>
+        </form>
+
     </form-definitions>
 
 
