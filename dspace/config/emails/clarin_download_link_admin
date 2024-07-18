@@ -1,0 +1,35 @@
+## E-mail to admin about a download request
+##
+## Parameters: {0} is expanded to filename
+##             {1} to a download URL
+##             {2} to license url
+##             {3} user name
+##             {4} user email
+##             {5} extra metadata provided
+##
+## See org.dspace.core.Email for information on the format of this file.
+##
+#set($subject = "${config.get('dspace.name.short')}: New File Download Request (CC)")
+
+This is an information for administrators and other configured people about a new download request.
+
+User Details:
+	Name: ${params[3]}
+	Email: ${params[4]}
+	
+Link of the requested file (does not contain the download token):
+	${params[1]}
+  
+The file is distributed under specific license:
+	${params[2]}
+
+Extra information filled by the user:
+	${params[5]}
+
+${config.get('dspace.name.short')} Team
+
+_____________________________________
+${config.get('dspace.name')},
+WWW: ${config.get('dspace.url')}
+Email: ${config.get('help.mail')}
+Tel.: ${config.get('help.phone')}
