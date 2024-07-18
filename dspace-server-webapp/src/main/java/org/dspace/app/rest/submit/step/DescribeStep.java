@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.submit.step;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -35,12 +36,14 @@ import org.dspace.app.rest.submit.AbstractProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.factory.PatchOperationFactory;
 import org.dspace.app.rest.submit.factory.impl.PatchOperation;
+import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.InProgressSubmission;
+import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.RelationshipMetadataService;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -48,6 +51,7 @@ import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -118,6 +122,19 @@ public class DescribeStep extends AbstractProcessingStep {
                 for (String fieldName : fieldsName) {
                     List<MetadataValue> mdv = itemService.getMetadataByMetadataString(obj.getItem(),
                                                                                       fieldName);
+                    // Use default value if the input type is dropdown and has defined a default value
+                    if (CollectionUtils.isEmpty(mdv) && input.isDropdownValue() && input.hasDefaultValue()) {
+                        Context context = ContextUtil.obtainCurrentRequestContext();
+                        try {
+                            MetadataValue mv = itemService.addMetadata(context, obj.getItem(), input.getSchema(),
+                                    input.getElement(), input.getQualifier(), Item.ANY, input.getDefaultValue());
+                            mdv.add(mv);
+                        } catch (SQLException e) {
+                            log.error("Cannot create a metadata value object with the default value, because: " +
+                                    "{}", e.getMessage());
+                            throw new RuntimeException(e);
+                        }
+                    }
                     for (MetadataValue md : mdv) {
                         MetadataValueRest dto = new MetadataValueRest();
                         dto.setAuthority(md.getAuthority());

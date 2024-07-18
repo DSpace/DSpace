@@ -9,7 +9,7 @@
  <!ELEMENT row (field|relation-field)+ >
  <!ATTLIST form name NMTOKEN #REQUIRED>
 
- <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, language?, repeatable?, label, style?, type-bind?, input-type, hint, required?, regex?, vocabulary?, visibility?, readonly?, acl?) >
+ <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, language?, repeatable?, label, style?, type-bind?, input-type, default-value?, hint, required?, regex?, vocabulary?, visibility?, readonly?, acl?) >
  <!ELEMENT definition (input*) >
  <!ATTLIST definition
         name CDATA #REQUIRED
@@ -25,6 +25,7 @@
  <!ELEMENT label (#PCDATA) >
  <!ELEMENT style (#PCDATA) >
  <!ELEMENT input-type (#PCDATA)>
+ <!ELEMENT default-value (#PCDATA)>
 
  <!ELEMENT input (#PCDATA) >
  <!ATTLIST input input-type CDATA #REQUIRED >
@@ -41,6 +42,7 @@
  <!ATTLIST input mapped-to-if-not-default CDATA #IMPLIED >
  <!ATTLIST input value CDATA #IMPLIED >
  <!ATTLIST input required CDATA #IMPLIED >
+ <!ATTLIST input default-value CDATA #IMPLIED >
 
  <!ELEMENT hint (#PCDATA) >
  <!ELEMENT required (#PCDATA)>

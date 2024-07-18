@@ -163,6 +163,11 @@ public class DCInput {
      */
     private ComplexDefinition complexDefinition = null;
 
+    /**
+     * the dropdown input type could have defined a default value
+     */
+    private String defaultValue = "";
+
     private boolean isRelationshipField = false;
     private boolean isMetadataField = false;
     private String relationshipType = null;
@@ -264,6 +269,7 @@ public class DCInput {
                 externalSources.add(StringUtils.trim(source));
             }
         }
+        defaultValue = fieldMap.get("default-value");
 
     }
 
@@ -606,6 +612,24 @@ public class DCInput {
     public ComplexDefinition getComplexDefinition() {
         return this.complexDefinition;
     }
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
+    public boolean hasDefaultValue() {
+        return StringUtils.isNotEmpty(this.getDefaultValue());
+    }
+
+    public boolean isDropdownValue() {
+        return "dropdown".equals(getInputType());
+    }
+
+
 
     /**
      * Convert complex definition HashMap to the ordered JSON string

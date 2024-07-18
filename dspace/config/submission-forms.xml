@@ -2023,7 +2023,9 @@
                     <dc-qualifier/>
                     <repeatable>false</repeatable>
                     <label>The type of the resource</label>
+                    <style>d-none</style>
                     <input-type value-pairs-name="teaching_materials">dropdown</input-type>
+                    <default-value>teachingMaterials</default-value>
                     <hint>This is here to autofill a value. The value should not be changed.</hint>
                     <required>Please select a resource type for your submission.</required>
                 </field>
