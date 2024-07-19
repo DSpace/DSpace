@@ -36,6 +36,10 @@
     <xsl:param name="hostinginstitution"><xsl:value-of select="$publisher" /></xsl:param>
     <!-- Please take a look into the DataCite schema documentation if you want to know how to use these elements.
          http://schema.datacite.org -->
+    <!-- Metadata-field to retrieve DOI from items -->
+    <xsl:param name="mdSchema">dc</xsl:param>
+    <xsl:param name="mdElement">identifier</xsl:param>
+    <xsl:param name="mdQualifier">uri</xsl:param>
 
     <xsl:output method="xml" indent="yes" encoding="utf-8" />
 
@@ -333,16 +337,17 @@
         company as well. We have to ensure to use URIs of our prefix
         as primary identifiers only.
     -->
-    <!-- Warning: If the metadata field changes for whatever reason, DOIIdentifierProvider needs to reflect this -->
-    <xsl:template match="dspace:field[@mdschema='dc' and @element='identifier' and @qualifier='uri' and (contains(., $prefix))]">
-        <identifier identifierType="DOI">
-            <xsl:if test="starts-with(string(text()), 'https://doi.org/')">
-                <xsl:value-of select="substring(., 17)"/>
-            </xsl:if>
-            <xsl:if test="starts-with(string(text()), 'http://dx.doi.org/')">
-                <xsl:value-of select="substring(., 19)"/>
-            </xsl:if>
-        </identifier>
+    <xsl:template match="dspace:field[@mdschema=$mdSchema and @element=$mdElement and (contains(., $prefix))]">
+        <xsl:if test="(($mdQualifier and $mdQualifier != '') and @qualifier=$mdQualifier) or ((not($mdQualifier) or $mdQualifier = '') and not(@qualifier))">
+            <identifier identifierType="DOI">
+                <xsl:if test="starts-with(string(text()), 'https://doi.org/')">
+                    <xsl:value-of select="substring(., 17)"/>
+                </xsl:if>
+                <xsl:if test="starts-with(string(text()), 'http://dx.doi.org/')">
+                    <xsl:value-of select="substring(., 19)"/>
+                </xsl:if>
+            </identifier>
+        </xsl:if>
     </xsl:template>
 
     <!-- DataCite (2) :: Creator -->
