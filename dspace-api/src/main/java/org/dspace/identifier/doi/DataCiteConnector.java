@@ -7,6 +7,10 @@
  */
 package org.dspace.identifier.doi;
 
+import static org.dspace.identifier.DOIIdentifierProvider.DOI_ELEMENT;
+import static org.dspace.identifier.DOIIdentifierProvider.DOI_QUALIFIER;
+import static org.dspace.identifier.DOIIdentifierProvider.MD_SCHEMA;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -384,6 +388,10 @@ public class DataCiteConnector
             parameters.put("hostinginstitution",
                            configurationService.getProperty(CFG_HOSTINGINSTITUTION));
         }
+        parameters.put("mdSchema", MD_SCHEMA);
+        parameters.put("mdElement", DOI_ELEMENT);
+        // Pass an empty string for qualifier if the metadata field doesn't have any
+        parameters.put("mdQualifier", DOI_QUALIFIER);
 
         Element root = null;
         try {
