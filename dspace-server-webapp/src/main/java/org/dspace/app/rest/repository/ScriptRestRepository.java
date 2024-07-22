@@ -174,7 +174,7 @@ public class ScriptRestRepository extends DSpaceRestRepository<ScriptRest, Strin
                               List<MultipartFile> files, DSpaceRunnable dspaceRunnable)
             throws IOException, SQLException, AuthorizeException {
         for (MultipartFile file : files) {
-            String type = (String) dspaceRunnable.fileParameterToBitstreamType(file.getName())
+            String type = (String) dspaceRunnable.fileParameterToBitstreamType(file.getOriginalFilename())
                                                           .orElse("inputfile");
             restDSpaceRunnableHandler.writeFilestream(context, file.getOriginalFilename(), file.getInputStream(), type);
         }
