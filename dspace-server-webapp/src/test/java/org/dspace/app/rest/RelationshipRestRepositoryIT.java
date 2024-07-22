@@ -819,7 +819,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // Make sure we grab the latest instance of the Item from the database
         publication1 = itemService.find(context, publication1.getID());
         // Add a plain text dc.contributor.author value
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text");
         itemService.update(context, publication1);
 
         List<MetadataValue> list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
@@ -885,7 +885,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // Ensure we have the latest instance of the Item from the database
         publication1 = itemService.find(context, publication1.getID());
         // Add a fourth dc.contributor.author mdv
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text two");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text two");
         itemService.update(context, publication1);
 
         context.restoreAuthSystemState();
@@ -954,7 +954,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
         // The following additions of Metadata will perform the same sequence of logic and tests as described above
         publication1 = itemService.find(context, publication1.getID());
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text three");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text three");
         itemService.update(context, publication1);
 
         context.restoreAuthSystemState();
@@ -984,10 +984,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
 
         publication1 = itemService.find(context, publication1.getID());
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text four");
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text five");
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text six");
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text seven");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text four");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text five");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text six");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text seven");
         itemService.update(context, publication1);
 
         context.restoreAuthSystemState();
@@ -1115,7 +1115,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         publication1 = itemService.find(context, publication1.getID());
         // Add a plain text metadatavalue to the publication
         // After this addition, the list of authors should like like "Donald Smith", "plain text"
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text");
         itemService.update(context, publication1);
         context.restoreAuthSystemState();
         List<MetadataValue> list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
@@ -1158,7 +1158,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // Get the publication from the DB again to ensure that we have the latest object
         publication1 = itemService.find(context, publication1.getID());
         // Add a fourth metadata value to the publication
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text two");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text two");
         itemService.update(context, publication1);
         context.restoreAuthSystemState();
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
@@ -1196,7 +1196,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
         publication1 = itemService.find(context, publication1.getID());
         // Create another plain text metadata value on the publication
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text three");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text three");
         itemService.update(context, publication1);
         context.restoreAuthSystemState();
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
@@ -1324,7 +1324,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         publication1 = itemService.find(context, publication1.getID());
         // Add a plain text metadatavalue to the publication
         // After this addition, the list of authors should like like "Donald Smith", "plain text"
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text");
         itemService.update(context, publication1);
         context.restoreAuthSystemState();
         List<MetadataValue> list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
@@ -1368,7 +1368,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         // Get the publication from the DB again to ensure that we have the latest object
         publication1 = itemService.find(context, publication1.getID());
         // Add a fourth metadata value to the publication
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text two");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text two");
         itemService.update(context, publication1);
         context.restoreAuthSystemState();
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
@@ -1406,7 +1406,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         context.turnOffAuthorisationSystem();
         publication1 = itemService.find(context, publication1.getID());
         // Create another plain text metadata value on the publication
-        itemService.addMetadata(context, publication1, "dc", "contributor", "author", Item.ANY, "plain text three");
+        itemService.addMetadata(context, publication1, "dc", "contributor", "author", null, "plain text three");
         itemService.update(context, publication1);
         context.restoreAuthSystemState();
         list = itemService.getMetadata(publication1, "dc", "contributor", "author", Item.ANY);
