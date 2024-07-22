@@ -544,7 +544,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String schema = "dc";
         String element = "contributor";
         String qualifier = "author";
-        String lang = Item.ANY;
+        String lang = null;
         String[] values = {};
         itemService.addMetadata(context, it, schema, element, qualifier, lang, Arrays.asList(values));
         fail("IllegalArgumentException expected");
@@ -632,7 +632,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String schema = "dc";
         String element = "contributor";
         String qualifier = "author";
-        String lang = Item.ANY;
+        String lang = null;
         List<String> values = new ArrayList();
         List<String> authorities = new ArrayList();
         List<Integer> confidences = new ArrayList();
@@ -645,7 +645,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String schema = "dc";
         String element = "contributor";
         String qualifier = "author";
-        String lang = Item.ANY;
+        String lang = null;
         // Create two fake virtual metadata ("virtual::[relationship-id]") values
         List<String> values = new ArrayList<>(Arrays.asList("uuid-1", "uuid-2"));
         List<String> authorities = new ArrayList<>(Arrays.asList(Constants.VIRTUAL_AUTHORITY_PREFIX + "relationship-1",
@@ -674,7 +674,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         assertEquals(1, valuesAdded.size());
 
         // Get metadata and ensure new value is the ONLY ONE for this metadata field
-        List<MetadataValue> dc = itemService.getMetadata(it, schema, element, qualifier, lang);
+        List<MetadataValue> dc = itemService.getMetadata(it, schema, element, qualifier, Item.ANY);
         assertNotNull(dc);
         assertEquals(1, dc.size());
         assertEquals(schema, dc.get(0).getMetadataField().getMetadataSchema().getName());
@@ -693,7 +693,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String schema = "dc";
         String element = "contributor";
         String qualifier = "author";
-        String lang = Item.ANY;
+        String lang = null;
         String value = "value0";
         itemService.addMetadata(context, it, schema, element, qualifier, lang, value);
 
@@ -772,7 +772,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String schema = "dc";
         String element = "contributor";
         String qualifier = "author";
-        String lang = Item.ANY;
+        String lang = null;
         // Create a single fake virtual metadata ("virtual::[relationship-id]") value
         String value = "uuid-1";
         String authority = Constants.VIRTUAL_AUTHORITY_PREFIX + "relationship-1";
@@ -786,7 +786,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         assertNull(valuesAdded);
 
         // Verify this metadata field does NOT exist on the item
-        List<MetadataValue> mv = itemService.getMetadata(it, schema, element, qualifier, lang);
+        List<MetadataValue> mv = itemService.getMetadata(it, schema, element, qualifier, Item.ANY);
         assertNotNull(mv);
         assertTrue(mv.isEmpty());
 
@@ -797,7 +797,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         assertNull(valuesAdded);
 
         // Verify this metadata field does NOT exist on the item
-        mv = itemService.getMetadata(it, schema, element, qualifier, lang);
+        mv = itemService.getMetadata(it, schema, element, qualifier, Item.ANY);
         assertNotNull(mv);
         assertTrue(mv.isEmpty());
     }
