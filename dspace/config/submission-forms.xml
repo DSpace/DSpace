@@ -2091,7 +2091,7 @@
             </row>
         </form>
 
-        <form name="note">
+        <form name="specialFields">
             <row>
                 <field>
                     <dc-schema>local</dc-schema>
@@ -2102,6 +2102,37 @@
                     <input-type>textarea</input-type>
                     <hint>Leave a note for the editors/reviewers</hint>
                     <required></required>
+                </field>
+            </row>
+
+          <row>
+                <!-- DC.Relation.Replaces -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>replaces</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Replaces</label>
+                    <input-type>onebox</input-type>
+                    <hint>URL to a related resource that is supplanted, displaced, or superseded by the described resource. If the replaced resource is in this repository start typing its name or handle and select the resource from the autocomplete popup.</hint>
+                    <required/>
+                </field>
+            </row>
+
+            <row>
+                <!-- DC.Relation.IsReplacedBy -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>isreplacedby</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Is replaced by</label>
+                    <input-type>onebox</input-type>
+                    <hint>A related resource that supplants, displaces, or supersedes the described resource.</hint>
+                    <required/>
+                    <acl>
+                        policy=deny,action=read,grantee-type=user,grantee-id=*
+                    </acl>
                 </field>
             </row>
         </form>

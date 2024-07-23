@@ -1432,7 +1432,7 @@
             </row>
         </form>
 
-        <form name="note">
+        <form name="specialFields">
             <row>
                 <field>
                     <dc-schema>local</dc-schema>
@@ -1443,6 +1443,37 @@
                     <input-type>textarea</input-type>
                     <hint>Zde můžete zanechat vzkaz editorům.</hint>
                     <required></required>
+                </field>
+            </row>
+
+            <row>
+                <!-- DC.Relation.Replaces -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>replaces</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Replaces</label>
+                    <input-type>onebox</input-type>
+                    <hint>URL příbuzného záznamu, který je tímto záznamem nahrazen. Pokud je příbuzný záznam v tomto repozitáři, začněte psát jeho název, nebo handle a vyberte záznam z nabídky.</hint>
+                    <required/>
+                </field>
+            </row>
+
+            <row>
+                <!-- DC.Relation.IsReplacedBy -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>isreplacedby</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Is replaced by</label>
+                    <input-type>onebox</input-type>
+                    <hint>Příbuzný záznam, který nahrazuje tento.</hint>
+                    <required/>
+                    <acl>
+                        policy=deny,action=read,grantee-type=user,grantee-id=*
+                    </acl>
                 </field>
             </row>
         </form>
