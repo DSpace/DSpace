@@ -11,7 +11,8 @@ package org.dspace.xoai.services.impl.resources.functions;
 import static org.dspace.xoai.services.impl.resources.functions.StringXSLFunction.BASE;
 
 import java.util.Objects;
-import javax.xml.transform.dom.DOMSource;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.saxon.s9api.DocumentBuilder;
 import net.sf.saxon.s9api.ExtensionFunction;
@@ -25,8 +26,10 @@ import net.sf.saxon.s9api.XdmAtomicValue;
 import net.sf.saxon.s9api.XdmValue;
 import org.apache.logging.log4j.Logger;
 import org.bouncycastle.util.Arrays;
-import org.w3c.dom.Node;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
 
 
 /**
@@ -48,7 +51,7 @@ public abstract class NodeListXslFunction implements ExtensionFunction {
 
     @Override
     final public SequenceType getResultType() {
-        return SequenceType.makeSequenceType(ItemType.ANY_NODE, OccurrenceIndicator.ZERO_OR_ONE);
+        return SequenceType.makeSequenceType(ItemType.ANY_NODE, OccurrenceIndicator.ZERO_OR_MORE);
     }
 
     @Override
@@ -75,11 +78,36 @@ public abstract class NodeListXslFunction implements ExtensionFunction {
 
 
         NodeList nodeList = getNodeList(val);
-        Node oneNode = nodeList.item(0);
+        // TODO: 2024/07 (mb) Below is attempted fix that does not work yet.
+        // see https://github.com/dataquest-dev/DSpace/issues/709
+//        Node oneNode = nodeList.item(0);
 
-        DocumentBuilder db = new Processor(false).newDocumentBuilder();
-        DOMSource sourceObj = new DOMSource(oneNode);
-        var res = db.wrap(sourceObj);
-        return res;
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        javax.xml.parsers.DocumentBuilder db = null;
+        try {
+            db = dbf.newDocumentBuilder();
+            Document newDoc = db.newDocument();
+            Element rootElement = newDoc.createElement("root");
+            newDoc.appendChild(rootElement);
+
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                try {
+                    rootElement.appendChild(newDoc.importNode(nodeList.item(i), true));
+                } catch (Exception e) {
+                    log.error("Error while importing node", e);
+                }
+
+            }
+            Processor processor = new Processor(false);
+            DocumentBuilder saxonDb = processor.newDocumentBuilder();
+            XdmValue xdmValue = saxonDb.wrap(newDoc);
+
+            return xdmValue;
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+
+
+
     }
 }

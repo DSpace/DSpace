@@ -129,16 +129,27 @@ public class SpecialItemService {
             }
             String[] values = mdValue
                     .split(DCInput.ComplexDefinitions.getSeparator(), -1);
-            // mind the order in input forms, org;code;projname;type
-            Element[] elements = {organization, code, projName, fundsType};
+            // ORIGINAL order of funding was org;code;projname;type
+            // Element[] elements = {organization, code, projName, fundsType};
+
+            // TODO 2024/07 - order was changed to fundsType, code, org, projName
+            Element[] elements = {fundsType, code, organization, projName};
+
             for (int i = 0; i < elements.length; i++) {
                 if (values.length <= i) {
                     elements[i].appendChild(doc.createTextNode(""));
                 } else {
                     elements[i].appendChild(doc.createTextNode(values[i]));
                 }
-                el.appendChild(elements[i]);
+
             }
+            // swap to original order to display correctly
+            Element[] correctOrder = {organization, code, projName, fundsType};
+
+            for (Element e : correctOrder) {
+                el.appendChild(e);
+            }
+
             return doc;
         } catch (ParserConfigurationException e) {
             return null;

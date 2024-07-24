@@ -236,7 +236,7 @@
             <xsl:when test="doc:metadata/doc:element[@name='local']/doc:element[@name='demo']/doc:element[@name='uri']/doc:element/doc:field[@name='value']">
                 <ms:resourceDocumentationInfo>
                     <ms:samplesLocation>
-                        <xsl:value-of select="doc:metadata/doc:element[@name='local']/doc:element[@name='demo']/doc:element[@name='uri']/doc:element/doc:field[@name='value']" />
+                        <xsl:value-of select="doc:metadata/doc:element[@name='local']/doc:element[@name='demo']/doc:element[@name='uri']/doc:element/doc:field[@name='value'][1]" />
                     </ms:samplesLocation>
                 </ms:resourceDocumentationInfo>
             </xsl:when>
@@ -285,10 +285,12 @@
                                 <xsl:for-each select="doc:metadata/doc:element[@name='local']/doc:element[@name='sponsor']/doc:element/doc:field[@name='value']">
                                                 <ms:fundingProject>
                                                     <ms:projectName>
-                                                            <xsl:value-of select="tokenize(., ';')[3]"/>
+                                                    <!-- order of funding complex field was changed-->
+                                                            <xsl:value-of select="tokenize(., ';')[4]"/>
                                                     </ms:projectName>
                                                     <ms:fundingType>
-                                                            <xsl:value-of select="tokenize(., ';')[4]"/>
+                                                    <!-- order of funding complex field was changed-->
+                                                            <xsl:value-of select="tokenize(., ';')[1]"/>
                                                     </ms:fundingType>
                                                 </ms:fundingProject>
                                 </xsl:for-each>

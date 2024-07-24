@@ -36,6 +36,8 @@ import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.core.service.LicenseService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xoai.data.DSpaceItem;
@@ -64,6 +66,9 @@ public class ItemUtils {
 
     private static final AuthorizeService authorizeService
         = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+
+
+    private static final LicenseService licenseService = CoreServiceFactory.getInstance().getLicenseService();
 
     /**
      * Default constructor
@@ -153,6 +158,8 @@ public class ItemUtils {
                 bitstream.getField().add(createValue("checksum", cks));
                 bitstream.getField().add(createValue("checksumAlgorithm", cka));
                 bitstream.getField().add(createValue("sid", bit.getSequenceID() + ""));
+                bitstream.getField().add(createValue("id", bit.getID().toString()));
+
             }
         }
 
@@ -290,6 +297,26 @@ public class ItemUtils {
         other.getField().add(createValue("handle", item.getHandle()));
         other.getField().add(createValue("identifier", DSpaceItem.buildIdentifier(item.getHandle())));
         other.getField().add(createValue("lastModifyDate", item.getLastModified().toString()));
+        // TODO: 2024/07 (mb) this is taken from clarin, but restricted is never set correctly.
+        // see issue https://github.com/dataquest-dev/DSpace/issues/710
+        boolean restricted = false;
+//        if(!restricted){
+//            List<ClarinLicense> lds =
+//            for(LicenseDefinition ld : lds){
+//                if(ld.getRequiredInfo() != null && ld.getRequiredInfo().length() > 0){
+//                    restricted = true;
+//                }
+//                if(restricted){
+//                    break;
+//                }
+//            }
+//        }
+
+        if (restricted) {
+            other.getField().add(createValue("restrictedAccess", "true"));
+        }
+        other.getField().add(createValue("owningCollection", item.getOwningCollection().getName()));
+        other.getField().add(createValue("itemId", item.getID().toString()));
         metadata.getElement().add(other);
 
         // Repository Info
