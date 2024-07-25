@@ -88,6 +88,9 @@ public class ProcessServiceImpl implements ProcessService, InitializingBean {
             log.info("Process with ID {} did not complete before tomcat shutdown, failing it now.", process.getID());
             fail(context, process);
             // But still attach its log to the process.
+            appendLog(process.getID(), process.getName(),
+                      "Process did not complete before tomcat shutdown.",
+                      ProcessLogLevel.ERROR);
             createLogBitstream(context, process);
         }
 
