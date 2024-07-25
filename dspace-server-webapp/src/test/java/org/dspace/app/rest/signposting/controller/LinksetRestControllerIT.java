@@ -748,7 +748,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                     .withMimeType(bitstreamMimeType)
                     .build();
         }
-        bitstreamService.addMetadata(context, bitstream, "dc", "type", null, Item.ANY, "Article");
+        bitstreamService.addMetadata(context, bitstream, "dc", "type", null, null, "Article");
 
         context.restoreAuthSystemState();
 
@@ -836,7 +836,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                 .withTitle("Workspace Item")
                 .build();
         Item item = workspaceItem.getItem();
-        itemService.addMetadata(context, item, "dc", "identifier", "doi", Item.ANY, doi);
+        itemService.addMetadata(context, item, "dc", "identifier", "doi", null, doi);
 
         Bitstream bitstream = null;
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
