@@ -77,24 +77,29 @@ public class ProcessServiceImpl implements ProcessService, InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Context context = new Context();
+        try {
+            Context context = new Context();
 
-        // Processes that were running or scheduled when tomcat crashed, should be cleaned up during startup.
-        List<Process> processesToBeFailed = findByStatusAndCreationTimeOlderThan(
-            context, List.of(ProcessStatus.RUNNING, ProcessStatus.SCHEDULED), new Date());
-        for (Process process : processesToBeFailed) {
-            context.setCurrentUser(process.getEPerson());
-            // Fail the process.
-            log.info("Process with ID {} did not complete before tomcat shutdown, failing it now.", process.getID());
-            fail(context, process);
-            // But still attach its log to the process.
-            appendLog(process.getID(), process.getName(),
-                      "Process did not complete before tomcat shutdown.",
-                      ProcessLogLevel.ERROR);
-            createLogBitstream(context, process);
+            // Processes that were running or scheduled when tomcat crashed, should be cleaned up during startup.
+            List<Process> processesToBeFailed = findByStatusAndCreationTimeOlderThan(
+                context, List.of(ProcessStatus.RUNNING, ProcessStatus.SCHEDULED), new Date());
+            for (Process process : processesToBeFailed) {
+                context.setCurrentUser(process.getEPerson());
+                // Fail the process.
+                log.info("Process with ID {} did not complete before tomcat shutdown, failing it now.",
+                         process.getID());
+                fail(context, process);
+                // But still attach its log to the process.
+                appendLog(process.getID(), process.getName(),
+                          "Process did not complete before tomcat shutdown.",
+                          ProcessLogLevel.ERROR);
+                createLogBitstream(context, process);
+            }
+
+            context.complete();
+        } catch (Exception e) {
+            log.error("Unable to clean up Processes: ", e);
         }
-
-        context.complete();
     }
 
     @Override
