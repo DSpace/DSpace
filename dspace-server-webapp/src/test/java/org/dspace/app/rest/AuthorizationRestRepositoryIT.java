@@ -838,6 +838,133 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
     }
 
     /**
+     * Verify that the findByObject return the 400 Bad Request response for invalid or missing URI (required parameter)
+     *
+     * @throws Exception
+     */
+    public void findByObjectBadRequestSSRTest() throws Exception {
+        Site site = siteService.findSite(context);
+        SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
+        String siteUri = "http://ssr.example.com/api/core/sites/" + siteRest.getId();
+        String[] invalidUris = new String[] {
+            "invalid-uri",
+            "",
+            "http://localhost/api/wrongcategory/wrongmodel/1",
+            "http://localhost/api/core/sites/this-is-not-an-uuid"
+        };
+
+        // disarm the alwaysThrowExceptionFeature
+        configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
+        configurationService.setProperty("dspace.server.ssr.url", "http://ssr.example.com/api");
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+
+        // verify that it works for administrator users
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                .param("uri", siteUri))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.authorizations", Matchers.hasSize(greaterThanOrEqualTo(1))))
+            .andExpect(jsonPath("$._embedded.authorizations", Matchers.everyItem(
+                        Matchers.anyOf(
+                            JsonPathMatchers.hasJsonPath("$.type", is("authorization")),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature",
+                                Matchers.allOf(
+                                    is(alwaysTrue.getName())
+                                )),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature",
+                                Matchers.not(Matchers.anyOf(
+                                        is(alwaysFalse.getName()),
+                                        is(alwaysException.getName()),
+                                        is(trueForTestUsers.getName()),
+                                        is(trueForAdmins.getName())
+                                    )
+                                )),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature.resourcetypes",
+                                Matchers.hasItem(is("authorization"))),
+                            JsonPathMatchers.hasJsonPath("$.id",
+                                Matchers.anyOf(
+                                    Matchers.startsWith(eperson.getID().toString()),
+                                    Matchers.endsWith(siteRest.getUniqueType() + "_" + siteRest.getId()))))
+                    )
+                )
+            )
+            .andExpect(jsonPath("$._links.self.href",
+                Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)));
+
+        // verify that it works for authenticated users
+        getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
+                .param("uri", siteUri))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.authorizations", Matchers.hasSize(greaterThanOrEqualTo(1))))
+            .andExpect(jsonPath("$._embedded.authorizations", Matchers.everyItem(
+                        Matchers.anyOf(
+                            JsonPathMatchers.hasJsonPath("$.type", is("authorization")),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature",
+                                Matchers.allOf(
+                                    is(alwaysTrue.getName())
+                                )),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature",
+                                Matchers.not(Matchers.anyOf(
+                                        is(alwaysFalse.getName()),
+                                        is(alwaysException.getName()),
+                                        is(trueForTestUsers.getName()),
+                                        is(trueForAdmins.getName())
+                                    )
+                                )),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature.resourcetypes",
+                                Matchers.hasItem(is("authorization"))),
+                            JsonPathMatchers.hasJsonPath("$.id",
+                                Matchers.anyOf(
+                                    Matchers.startsWith(eperson.getID().toString()),
+                                    Matchers.endsWith(siteRest.getUniqueType() + "_" + siteRest.getId()))))
+                    )
+                )
+            )
+            .andExpect(jsonPath("$._links.self.href",
+                Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)));
+
+        // verify that it works for anonymous users
+        getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
+                .param("uri", siteUri))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.authorizations", Matchers.hasSize(greaterThanOrEqualTo(1))))
+            .andExpect(jsonPath("$._embedded.authorizations", Matchers.everyItem(
+                        Matchers.anyOf(
+                            JsonPathMatchers.hasJsonPath("$.type", is("authorization")),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature",
+                                Matchers.allOf(
+                                    is(alwaysTrue.getName())
+                                )),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature",
+                                Matchers.not(Matchers.anyOf(
+                                        is(alwaysFalse.getName()),
+                                        is(alwaysException.getName()),
+                                        is(trueForTestUsers.getName()),
+                                        is(trueForAdmins.getName())
+                                    )
+                                )),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature.resourcetypes",
+                                Matchers.hasItem(is("authorization"))),
+                            JsonPathMatchers.hasJsonPath("$.id",
+                                Matchers.anyOf(
+                                    Matchers.startsWith(eperson.getID().toString()),
+                                    Matchers.endsWith(siteRest.getUniqueType() + "_" + siteRest.getId()))))
+                    )
+                )
+            )
+            .andExpect(jsonPath("$._links.self.href",
+                Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)));
+    }
+
+    @Test
+    /**
      * Verify that the findByObject return the 401 Unauthorized response when an eperson is involved
      *
      * @throws Exception
