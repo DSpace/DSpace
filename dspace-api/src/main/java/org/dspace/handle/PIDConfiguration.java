@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -110,16 +111,25 @@ public class PIDConfiguration {
             UUID communityID) {
         instance = getInstance();
 
+        if (MapUtils.isEmpty(pidCommunityConfigurations)) {
+            log.info("The configuration property " + CLARIN_PID_COMMUNITY_CONFIGURATIONS_KEYWORD + " is not defined." +
+                    " Using default configuration of the `handle.prefix`.");
+            return null;
+        }
+
         PIDCommunityConfiguration pidCommunityConfiguration = pidCommunityConfigurations
                 .get(communityID);
+
         if (Objects.isNull(pidCommunityConfiguration)) {
+            // Yes, there is a configuration for the community with ID `null`.
             pidCommunityConfiguration = pidCommunityConfigurations.get(null);
         }
         if (Objects.isNull(pidCommunityConfiguration)) {
-            throw new IllegalStateException("Missing configuration entry in "
-                    + CLARIN_PID_COMMUNITY_CONFIGURATIONS_KEYWORD
-                    + " for community with ID " + communityID);
+            log.info("Missing configuration entry in " + CLARIN_PID_COMMUNITY_CONFIGURATIONS_KEYWORD +
+                    " for community with ID {}. Using default configuration of the `handle.prefix`.", communityID);
+            return null;
         }
+
         return pidCommunityConfiguration;
     }
 
@@ -247,8 +257,10 @@ public class PIDConfiguration {
      * Reload community configuration. It is for testing purposes.
      */
     public void reloadPidCommunityConfigurations() {
-        pidCommunityConfigurations.clear();
-        pidCommunityConfigurations = null;
+        if (Objects.nonNull(pidCommunityConfigurations)) {
+            pidCommunityConfigurations.clear();
+            pidCommunityConfigurations = null;
+        }
         initialize();
     }
 }

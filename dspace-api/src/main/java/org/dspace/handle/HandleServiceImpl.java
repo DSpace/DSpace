@@ -402,6 +402,11 @@ public class HandleServiceImpl implements HandleService {
         // add subprefix for item handle
         PIDCommunityConfiguration pidCommunityConfiguration = PIDConfiguration
                 .getPIDCommunityConfiguration(owningCommunityId);
+
+        if (Objects.isNull(pidCommunityConfiguration)) {
+            return createdId;
+        }
+
         //Which type is pis community configuration?
         if (pidCommunityConfiguration.isEpic()) {
             String handleId;
@@ -426,18 +431,17 @@ public class HandleServiceImpl implements HandleService {
         } else if (pidCommunityConfiguration.isLocal()) {
             String prefix = pidCommunityConfiguration.getPrefix();
             String handleSubprefix = pidCommunityConfiguration.getSubprefix();
-            if (Objects.nonNull(handleSubprefix) && !handleSubprefix.isEmpty()) {
-                // create local handle
-                return prefix + (handlePrefix.endsWith("/") ? "" : "/")
-                        + handleSubprefix + "-" + handleSuffix.toString();
+            String validatedPrefix = prefix + (handlePrefix.endsWith("/") ? "" : "/");
+            if (StringUtils.isEmpty(handleSubprefix)) {
+                // E.g., 13654/5553
+                return validatedPrefix + handleSuffix.toString();
             }
+            // E.g., 13645/1-5553
+            return validatedPrefix + handleSubprefix + "-" + handleSuffix.toString();
         } else {
             throw new IllegalStateException("Unsupported PID type: "
                     + pidCommunityConfiguration.getType());
         }
-
-        //create handle for another type of dspace objects
-        return createdId;
     }
 
     @Override

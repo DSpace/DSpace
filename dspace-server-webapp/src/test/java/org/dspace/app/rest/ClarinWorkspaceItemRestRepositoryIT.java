@@ -836,7 +836,7 @@ public class ClarinWorkspaceItemRestRepositoryIT extends AbstractControllerInteg
         context.restoreAuthSystemState();
 
         Assert.assertNotNull(installedItem);
-        Assert.assertTrue(installedItem.getHandle().startsWith("123456789/2"));
+        Assert.assertTrue(installedItem.getHandle().startsWith("123456789/"));
     }
 
     /**
@@ -884,6 +884,84 @@ public class ClarinWorkspaceItemRestRepositoryIT extends AbstractControllerInteg
         configArrayCommunityConfig.add(restoreSpecificCommunityHandleDef);
         configurationService.setProperty("lr.pid.community.configurations", configArrayCommunityConfig);
 
+        // Reload the set property in the hash map.
+        pidConfiguration.reloadPidCommunityConfigurations();
+        context.restoreAuthSystemState();
+    }
+
+    /**
+     * The `lr.pid.community.configurations` property is null.
+     */
+    @Test
+    public void createItemWhenSpecificHandleIsNotConfigured() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        // Keep the value of the current configuration property
+        String[] currentCommunityConfig = configurationService.getArrayProperty("lr.pid.community.configurations");
+        // Set property in the cfg
+        configurationService.setProperty("lr.pid.community.configurations", null);
+        // Reload the set property in the hash map.
+        PIDConfiguration pidConfiguration = PIDConfiguration.getInstance();
+        pidConfiguration.reloadPidCommunityConfigurations();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection").build();
+        WorkspaceItem wItem = WorkspaceItemBuilder.createWorkspaceItem(context, col)
+                .withTitle("Item with custom handle")
+                .withIssueDate("2017-10-17")
+                .build();
+
+        // Installing the Item assign a new Handle to the Item
+        Item installedItem = installItemService.installItem(context, wItem);
+        // It should not throw an exception
+        Assert.assertNotNull(installedItem);
+
+        // Restore the configuration property
+        configurationService.setProperty("lr.pid.community.configurations", currentCommunityConfig);
+        pidConfiguration.reloadPidCommunityConfigurations();
+        context.restoreAuthSystemState();
+    }
+
+    /**
+     * The `lr.pid.community.configurations` has no subprefix. That means the handle won't contain the `-` character.
+     */
+    @Test
+    public void createItemWhenSpecificHandleHasNoSubprefix() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        // Keep the value of the current configuration property
+        String[] currentCommunityConfig = configurationService.getArrayProperty("lr.pid.community.configurations");
+
+        // Set property in the cfg
+        String specificCommunityHandleDef = "community=*,prefix=LRT," +
+                "type=local,canonical_prefix=http://hdl.handle.net/,subprefix=";
+        configurationService.setProperty("lr.pid.community.configurations", specificCommunityHandleDef);
+        // Reload the set property in the hash map.
+        PIDConfiguration pidConfiguration = PIDConfiguration.getInstance();
+        pidConfiguration.reloadPidCommunityConfigurations();
+
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection").build();
+        WorkspaceItem wItem = WorkspaceItemBuilder.createWorkspaceItem(context, col)
+                .withTitle("Item with custom handle")
+                .withIssueDate("2017-10-17")
+                .build();
+
+        // Installing the Item assign a new Handle to the Item
+        Item installedItem = installItemService.installItem(context, wItem);
+        // It should not throw an exception
+        Assert.assertNotNull(installedItem);
+        Assert.assertTrue(installedItem.getHandle().startsWith("LRT/"));
+        Assert.assertFalse(installedItem.getHandle().contains("-"));
+
+        // Restore the configuration property
+        configurationService.setProperty("lr.pid.community.configurations", currentCommunityConfig);
         // Reload the set property in the hash map.
         pidConfiguration.reloadPidCommunityConfigurations();
         context.restoreAuthSystemState();
