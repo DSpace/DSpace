@@ -79,7 +79,7 @@ public class TikaTextExtractionFilter
             Tika tika = new Tika();
             tika.setMaxStringLength(maxChars); // Tell Tika the maximum number of characters to extract
             IOUtils.setByteArrayMaxOverride(
-                    configurationService.getIntProperty("textextractor.max-array", 1_000_000));
+                    configurationService.getIntProperty("textextractor.max-array", 100_000_000));
             extractedText = tika.parseToString(source);
         } catch (IOException e) {
             System.err.format("Unable to extract text from bitstream in Item %s%n", currentItem.getID().toString());
