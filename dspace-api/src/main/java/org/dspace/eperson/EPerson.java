@@ -25,6 +25,7 @@ import org.dspace.content.CacheableDSpaceObject;
 import org.dspace.content.DSpaceObjectLegacySupport;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.HibernateProxyHelper;
 
 /**
  * Class representing an e-person.
@@ -110,6 +111,45 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
     @Override
     public Integer getLegacyId() {
         return legacyId;
+    }
+
+
+    /**
+     * Return true if this object equals obj, false otherwise.
+     *
+     * @param obj another EPerson.
+     * @return true if EPerson objects are equal in ID, email, and full name
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        Class<?> objClass = HibernateProxyHelper.getClassWithoutInitializingProxy(obj);
+        if (getClass() != objClass) {
+            return false;
+        }
+        final EPerson other = (EPerson) obj;
+        if (!this.getID().equals(other.getID())) {
+            return false;
+        }
+        if (!StringUtils.equals(this.getEmail(), other.getEmail())) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Return a hash code for this object.
+     *
+     * @return int hash of object
+     */
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 89 * hash + this.getID().hashCode();
+        hash = 89 * hash + (this.getEmail() != null ? this.getEmail().hashCode() : 0);
+        return hash;
     }
 
     /**
