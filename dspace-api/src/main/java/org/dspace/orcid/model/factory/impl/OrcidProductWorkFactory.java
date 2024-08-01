@@ -9,35 +9,24 @@ package org.dspace.orcid.model.factory.impl;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.dspace.core.CrisConstants.PLACEHOLDER_PARENT_METADATA_VALUE;
-import static org.orcid.jaxb.model.common.Relationship.FUNDED_BY;
 import static org.orcid.jaxb.model.common.Relationship.SELF;
 
-import java.io.ByteArrayOutputStream;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.EnumUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
-import org.dspace.content.integration.crosswalks.CSLItemDataCrosswalk;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.orcid.model.OrcidEntityType;
 import org.dspace.orcid.model.OrcidProductWorkFieldMapping;
 import org.dspace.orcid.model.factory.OrcidCommonObjectFactory;
 import org.dspace.orcid.model.factory.OrcidEntityFactory;
-import org.dspace.util.UUIDUtils;
-import org.orcid.jaxb.model.common.CitationType;
 import org.orcid.jaxb.model.common.ContributorRole;
 import org.orcid.jaxb.model.common.LanguageCode;
 import org.orcid.jaxb.model.common.Relationship;
@@ -48,7 +37,6 @@ import org.orcid.jaxb.model.v3.release.common.Subtitle;
 import org.orcid.jaxb.model.v3.release.common.Title;
 import org.orcid.jaxb.model.v3.release.common.Url;
 import org.orcid.jaxb.model.v3.release.record.Activity;
-import org.orcid.jaxb.model.v3.release.record.Citation;
 import org.orcid.jaxb.model.v3.release.record.ExternalID;
 import org.orcid.jaxb.model.v3.release.record.ExternalIDs;
 import org.orcid.jaxb.model.v3.release.record.Work;
@@ -90,7 +78,6 @@ public class OrcidProductWorkFactory implements OrcidEntityFactory {
         work.setPublicationDate(getPublicationDate(context, item));
         work.setWorkExternalIdentifiers(getWorkExternalIds(context, item));
         work.setWorkType(getWorkType(context, item));
-        work.setWorkCitation(getWorkCitation(context, item));
         work.setShortDescription(getShortDescription(context, item));
         work.setLanguageCode(getLanguageCode(context, item));
         work.setUrl(getUrl(context, item));
@@ -167,7 +154,6 @@ public class OrcidProductWorkFactory implements OrcidEntityFactory {
     private ExternalIDs getWorkExternalIds(Context context, Item item) {
         ExternalIDs externalIdentifiers = new ExternalIDs();
         externalIdentifiers.getExternalIdentifier().addAll(getWorkSelfExternalIds(context, item));
-        externalIdentifiers.getExternalIdentifier().addAll(getWorkFundedByExternalIds(context, item));
         return externalIdentifiers;
     }
 
@@ -203,67 +189,6 @@ public class OrcidProductWorkFactory implements OrcidEntityFactory {
         Map<String, String> externalIdentifierFields = fieldMapping.getExternalIdentifierFields();
         String metadataField = metadataValue.getMetadataField().toString('.');
         return getExternalId(externalIdentifierFields.get(metadataField), metadataValue.getValue(), SELF);
-    }
-
-    private List<ExternalID> getWorkFundedByExternalIds(Context context, Item item) {
-
-        if (isBlank(fieldMapping.getFundingExternalIdType())) {
-            return Collections.emptyList();
-        }
-
-        return getMetadataValues(context, item, fieldMapping.getFundingField()).stream()
-            .map(metadataValue -> getWorkFundedByExternalId(context, item, metadataValue))
-            .flatMap(Optional::stream)
-            .collect(Collectors.toList());
-    }
-
-    private Optional<ExternalID> getWorkFundedByExternalId(Context context, Item work, MetadataValue fundingMetadata) {
-        return getFundedByExternalIdFromFunding(context, fundingMetadata)
-            .or(() -> getFundedByExternalIdFromWork(context, work, fundingMetadata.getPlace()));
-    }
-
-    private Optional<ExternalID> getFundedByExternalIdFromFunding(Context context, MetadataValue fundingMetadata) {
-
-        if (isAuthoritySet(fundingMetadata.getAuthority())) {
-            return findItemById(context, UUIDUtils.fromString(fundingMetadata.getAuthority()))
-                .map(funding -> getFundingExternalId(context, funding));
-        }
-
-        return Optional.empty();
-    }
-
-    private Optional<ExternalID> getFundedByExternalIdFromWork(Context context, Item work, int fundingPlace) {
-        List<MetadataValue> externalIdValues = getMetadataValues(context, work, fieldMapping.getFundingExternalId());
-
-        if (externalIdValues.size() > fundingPlace && isNotPlaceholder(externalIdValues.get(fundingPlace))) {
-            String value = externalIdValues.get(fundingPlace).getValue();
-            return Optional.of(getExternalId(fieldMapping.getFundingExternalIdType(), value, FUNDED_BY));
-        }
-
-        return Optional.empty();
-    }
-
-    private ExternalID getFundingExternalId(Context context, Item funding) {
-
-        String externalIdValue = getMetadataValue(context, funding, fieldMapping.getFundingEntityExternalId())
-            .map(MetadataValue::getValue)
-            .orElse(null);
-
-        if (externalIdValue == null) {
-            return null;
-        }
-
-        Optional<Url> fundingUrl = getMetadataValue(context, funding, fieldMapping.getFundingUrlField())
-            .map(fundingUrlMetadata -> new Url(fundingUrlMetadata.getValue()))
-            .or(() -> orcidCommonObjectFactory.createUrl(context, funding));
-
-        ExternalID externalId = getExternalId(fieldMapping.getFundingExternalIdType(), externalIdValue, FUNDED_BY);
-        fundingUrl.ifPresent(externalId::setUrl);
-        return externalId;
-    }
-
-    private boolean isAuthoritySet(String authority) {
-        return isNotBlank(authority) && !StringUtils.startsWith(authority, AuthorityValueService.REFERENCE);
     }
 
     /**
@@ -302,27 +227,6 @@ public class OrcidProductWorkFactory implements OrcidEntityFactory {
         }
     }
 
-    private Citation getWorkCitation(Context context, Item item) {
-
-        CSLItemDataCrosswalk citationCrosswalk = getCitationCrosswalk();
-
-        if (citationCrosswalk == null || !citationCrosswalk.canDisseminate(context, item)) {
-            return null;
-        }
-
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            citationCrosswalk.disseminate(context, item, out);
-            return new Citation(out.toString(), fieldMapping.getCitationType());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private CSLItemDataCrosswalk getCitationCrosswalk() {
-        CitationType citationType = fieldMapping.getCitationType();
-        return citationType != null ? fieldMapping.getCitationCrosswalks().get(citationType.value()) : null;
-    }
-
     private String getShortDescription(Context context, Item item) {
         return getMetadataValue(context, item, fieldMapping.getShortDescriptionField())
             .map(MetadataValue::getValue)
@@ -354,30 +258,10 @@ public class OrcidProductWorkFactory implements OrcidEntityFactory {
         return orcidCommonObjectFactory.createUrl(context, item).orElse(null);
     }
 
-    private List<MetadataValue> getMetadataValues(Context context, Item item, String metadataField) {
-        if (isBlank(metadataField)) {
-            return Collections.emptyList();
-        }
-        return itemService.getMetadataByMetadataString(item, metadataField);
-    }
-
-    private boolean isNotPlaceholder(MetadataValue metadata) {
-        return metadata != null && metadata.getValue() != null
-            && !metadata.getValue().equals(PLACEHOLDER_PARENT_METADATA_VALUE);
-    }
-
     private List<MetadataValue> getMetadataValues(Context context, Item item, Collection<String> metadataFields) {
         return metadataFields.stream()
             .flatMap(metadataField -> itemService.getMetadataByMetadataString(item, metadataField).stream())
             .collect(Collectors.toList());
-    }
-
-    private Optional<Item> findItemById(Context context, UUID id) {
-        try {
-            return Optional.ofNullable(itemService.find(context, id));
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private Optional<MetadataValue> getMetadataValue(Context context, Item item, String metadataField) {
