@@ -31,17 +31,19 @@ public class GoogleBitstreamComparator implements Comparator<Bitstream> {
 
     private Context context;
 
-    private BitstreamService bitstreamService;
+    private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
     public GoogleBitstreamComparator(Context context, Map<String, String> googleScholarSettings) {
-        new GoogleBitstreamComparator(context, googleScholarSettings, ContentServiceFactory.getInstance()
-                                                                                           .getBitstreamService());
+        new GoogleBitstreamComparator(context, googleScholarSettings, null);
     }
 
     public GoogleBitstreamComparator(
         Context context, Map<String, String> googleScholarSettings, BitstreamService bitstreamService
     ) {
-        this.bitstreamService = bitstreamService;
+        if (bitstreamService != null) {
+            this.bitstreamService = bitstreamService;
+        }
+
         this.context = context;
         String[] shortDescriptions;
         if (googleScholarSettings.containsKey("citation.prioritized_types")) {

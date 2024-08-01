@@ -8,9 +8,9 @@
 package org.dspace.app.util;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,7 +21,6 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.service.BitstreamService;
-import org.dspace.core.Context;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,10 +74,10 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest {
         bitstreams.add(bitstream3);
         when(bundle.getBitstreams()).thenReturn(bitstreams);
         try {
-            when(bitstreamService.getFormat(any(Context.class), bitstream1)).thenReturn(bitstreamFormat1);
-            when(bitstreamService.getFormat(any(Context.class), bitstream2)).thenReturn(bitstreamFormat2);
-            when(bitstreamService.getFormat(any(Context.class), bitstream3)).thenReturn(bitstreamFormat3);
-        } catch (Exception ex) {
+            when(bitstreamService.getFormat(context, bitstream1)).thenReturn(bitstreamFormat1);
+            when(bitstreamService.getFormat(context, bitstream2)).thenReturn(bitstreamFormat2);
+            when(bitstreamService.getFormat(context, bitstream3)).thenReturn(bitstreamFormat3);
+        } catch (SQLException ex) {
             //will not happen
         }
     }
