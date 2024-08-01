@@ -27,11 +27,13 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.utils.DSpace;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -95,7 +97,7 @@ public class RequestItemHelpdeskStrategyTest
             throws Exception {
         RequestItemHelpdeskStrategy instance = new RequestItemHelpdeskStrategy();
         instance.configurationService = configurationService;
-        instance.ePersonService = epersonService;
+        instance.epersonService = epersonService;
 
         // Check with help desk enabled.
         configurationService.setProperty(RequestItemHelpdeskStrategy.P_HELPDESK_OVERRIDE, "true");

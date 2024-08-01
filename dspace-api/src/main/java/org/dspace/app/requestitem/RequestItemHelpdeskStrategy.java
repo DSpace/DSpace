@@ -39,9 +39,6 @@ public class RequestItemHelpdeskStrategy
     static final String P_MAIL_HELPDESK = "mail.helpdesk";
 
     @Autowired(required = true)
-    protected EPersonService ePersonService;
-
-    @Autowired(required = true)
     protected ConfigurationService configurationService;
 
     public RequestItemHelpdeskStrategy() {
@@ -79,11 +76,14 @@ public class RequestItemHelpdeskStrategy
     public RequestItemAuthor getHelpDeskPerson(Context context, String helpDeskEmail)
             throws SQLException {
         context.turnOffAuthorisationSystem();
-        EPerson helpdeskEPerson = ePersonService.findByEmail(context, helpDeskEmail);
+        EPerson helpdeskEPerson = epersonService.findByEmail(context, helpDeskEmail);
         context.restoreAuthSystemState();
 
         if (helpdeskEPerson != null) {
-            return new RequestItemAuthor(helpdeskEPerson);
+            return new RequestItemAuthor(
+                epersonService.getFullName(helpdeskEPerson),
+                helpdeskEPerson.getEmail()
+            );
         } else {
             String helpdeskName = I18nUtil.getMessage(
                     "org.dspace.app.requestitem.RequestItemHelpdeskStrategy.helpdeskname",

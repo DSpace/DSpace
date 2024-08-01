@@ -18,8 +18,6 @@ import org.dspace.eperson.service.EPersonService;
  * @author Andrea Bollini
  */
 public class RequestItemAuthor {
-    public static final EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
-
     private final String fullName;
     private final String email;
 
@@ -33,17 +31,6 @@ public class RequestItemAuthor {
         super();
         this.fullName = fullName;
         this.email = email;
-    }
-
-    /**
-     * Construct an author from an EPerson's metadata.
-     *
-     * @param ePerson the EPerson.
-     */
-    public RequestItemAuthor(EPerson ePerson) {
-        super();
-        this.fullName = epersonService.getFullName(ePerson);
-        this.email = ePerson.getEmail();
     }
 
     public String getEmail() {

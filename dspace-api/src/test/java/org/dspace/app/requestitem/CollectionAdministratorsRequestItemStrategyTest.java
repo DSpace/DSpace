@@ -11,13 +11,18 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import org.dspace.AbstractUnitTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,12 +30,12 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
-public class CollectionAdministratorsRequestItemStrategyTest {
-    @Autowired
-    EPersonService epersonService;
-
+public class CollectionAdministratorsRequestItemStrategyTest extends AbstractUnitTest {
     private static final String NAME = "John Q. Public";
     private static final String EMAIL = "jqpublic@example.com";
+
+    @Mock
+    EPersonService epersonService;
 
     /**
      * Test of getRequestItemAuthor method, of class CollectionAdministratorsRequestItemStrategy.
@@ -55,9 +60,12 @@ public class CollectionAdministratorsRequestItemStrategyTest {
 
         Item item = Mockito.mock(Item.class);
         Mockito.when(item.getOwningCollection()).thenReturn(collection1);
-        Mockito.when(item.getSubmitter()).thenReturn(eperson1);
+
+        // todo: SUSPICIOUS!
+        // Mockito.when(item.getSubmitter()).thenReturn(eperson1);
 
         CollectionAdministratorsRequestItemStrategy instance = new CollectionAdministratorsRequestItemStrategy();
+        instance.epersonService = epersonService;
         List<RequestItemAuthor> result = instance.getRequestItemAuthor(context,
                 item);
         assertEquals("Should be one author", 1, result.size());
