@@ -1497,17 +1497,17 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.orcidSynchronization.productsPreference", is(ALL.name())));
 
-        operations = asList(new ReplaceOperation("/orcid/products", MINE.name()));
+        operations = asList(new ReplaceOperation("/orcid/products", ALL.name()));
 
         getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId)
                 .content(getPatchContent(operations))
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.orcidSynchronization.productsPreference", is(MINE.name())));
+            .andExpect(jsonPath("$.orcidSynchronization.productsPreference", is(ALL.name())));
 
         getClient(authToken).perform(get("/api/eperson/profiles/{id}", ePersonId))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.orcidSynchronization.productsPreference", is(MINE.name())));
+            .andExpect(jsonPath("$.orcidSynchronization.productsPreference", is(ALL.name())));
 
         operations = asList(new ReplaceOperation("/orcid/products", "INVALID_VALUE"));
 
@@ -1556,17 +1556,17 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.orcidSynchronization.patentsPreference", is(ALL.name())));
 
-        operations = asList(new ReplaceOperation("/orcid/patents", MINE.name()));
+        operations = asList(new ReplaceOperation("/orcid/patents", ALL.name()));
 
         getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId)
                 .content(getPatchContent(operations))
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.orcidSynchronization.patentsPreference", is(MINE.name())));
+            .andExpect(jsonPath("$.orcidSynchronization.patentsPreference", is(ALL.name())));
 
         getClient(authToken).perform(get("/api/eperson/profiles/{id}", ePersonId))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.orcidSynchronization.patentsPreference", is(MINE.name())));
+            .andExpect(jsonPath("$.orcidSynchronization.patentsPreference", is(ALL.name())));
 
         operations = asList(new ReplaceOperation("/orcid/patents", "INVALID_VALUE"));
 
@@ -2527,6 +2527,8 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         EntityType projectType = EntityTypeBuilder.createEntityTypeBuilder(context, "Project").build();
         EntityType personType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
         EntityType orgUnitType = EntityTypeBuilder.createEntityTypeBuilder(context, "OrgUnit").build();
+        EntityType productType = EntityTypeBuilder.createEntityTypeBuilder(context, "Product").build();
+        EntityType patentType = EntityTypeBuilder.createEntityTypeBuilder(context, "Patent").build();
 
         RelationshipType isAuthorOfPublication = createRelationshipTypeBuilder(context, personType, publicationType,
             "isAuthorOfPublication", "isPublicationOfAuthor", 0, null, 0, null).build();
@@ -2536,6 +2538,14 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         RelationshipType isProjectOfPerson = createRelationshipTypeBuilder(context, projectType, personType,
             "isProjectOfPerson", "isPersonOfProject", 0, null, 0, null).build();
+
+        RelationshipType isPatentOfInventor = createRelationshipTypeBuilder(context, patentType, personType,
+            "isPatentOfInventor", "isInventorOfPatent", 0, null, 0, null).build();
+
+        RelationshipType isProductOfCreator = createRelationshipTypeBuilder(context, productType, personType,
+            "isProductOfCreator", "isCreatorOfProduct", 0, null, 0, null).build();
+
+
 
         EPerson ePerson = EPersonBuilder.createEPerson(context)
                                         .withCanLogin(true)
@@ -2557,25 +2567,25 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         Collection publications = createCollection("Publications", "Publication");
 
-        Collection products = createCollection("Products", "Product");
-
         Collection orgUnits = createCollection("OrgUnits", "OrgUnit");
 
-        Item publication = createPublication(publications, "Test publication", profile, isAuthorOfPublication);
-
-        Item product = createProduct(products, "Test product", profile);
-
         Collection projects = createCollection("Projects", "Project");
+
+        Collection patents = createCollection("Patents", "Patent");
+
+        Collection products = createCollection("Products", "Product");
+
+        Item publication = createPublication(publications, "Test publication", profile, isAuthorOfPublication);
 
         Item firstProject = createProject(projects, "First project", profile, isProjectOfPerson);
         Item secondProject = createProject(projects, "Second project", profile, isProjectOfPerson);
 
         createOrgUnit(orgUnits, "OrgUnit", profile, isOrgUnitOfPerson);
 
-        Collection patents = createCollection("Patents", "Patent");
+        Item firstPatent = createPatent(patents, "First patent", profile, isPatentOfInventor);
+        Item secondPatent = createPatent(patents, "Second patent", profile, isPatentOfInventor);
 
-        Item firstPatent = createPatent(patents, "First patent", profile);
-        Item secondPatent = createPatent(patents, "Second patent", profile);
+        Item product = createProduct(products, "Test product", profile, isProductOfCreator);
 
         context.restoreAuthSystemState();
 
@@ -2613,27 +2623,40 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
                             .andExpect(status().isOk());
 
         queueRecords = orcidQueueService.findByProfileItemId(context, profileItemId);
-        assertThat(queueRecords, hasSize(6));
+        assertThat(queueRecords, hasSize(5));
         assertThat(queueRecords, has(orcidQueueRecordWithEntity(publication)));
-        assertThat(queueRecords, has(orcidQueueRecordWithEntity(firstFunding)));
-        assertThat(queueRecords, has(orcidQueueRecordWithEntity(secondFunding)));
-        assertThat(queueRecords, has(orcidQueueRecordWithEntity(product)));
+        assertThat(queueRecords, has(orcidQueueRecordWithEntity(firstProject)));
+        assertThat(queueRecords, has(orcidQueueRecordWithEntity(secondProject)));
         assertThat(queueRecords, has(orcidQueueRecordWithEntity(firstPatent)));
         assertThat(queueRecords, has(orcidQueueRecordWithEntity(secondPatent)));
 
         getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId.toString())
-                .content(getPatchContent(
-                                             asList(new ReplaceOperation("/orcid/products", "ALL"))))
+                                         .content(
+                                            getPatchContent(asList(new ReplaceOperation("/orcid/products", "ALL"))))
+                                         .contentType(MediaType.APPLICATION_JSON_VALUE))
+                            .andExpect(status().isOk());
+
+        queueRecords = orcidQueueService.findByProfileItemId(context, profileItemId);
+        assertThat(queueRecords, hasSize(6));
+        assertThat(queueRecords, has(orcidQueueRecordWithEntity(publication)));
+        assertThat(queueRecords, has(orcidQueueRecordWithEntity(firstProject)));
+        assertThat(queueRecords, has(orcidQueueRecordWithEntity(secondProject)));
+        assertThat(queueRecords, has(orcidQueueRecordWithEntity(firstPatent)));
+        assertThat(queueRecords, has(orcidQueueRecordWithEntity(secondPatent)));
+        assertThat(queueRecords, has(orcidQueueRecordWithEntity(product)));
+
+        getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId.toString())
+                .content(getPatchContent(asList(new ReplaceOperation("/orcid/publications", "DISABLED"))))
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(status().isOk());
+                .andExpect(status().isOk());
 
         queueRecords = orcidQueueService.findByProfileItemId(context, profileItemId);
         assertThat(queueRecords, hasSize(5));
-        assertThat(queueRecords, has(orcidQueueRecordWithEntity(firstFunding)));
-        assertThat(queueRecords, has(orcidQueueRecordWithEntity(secondFunding)));
-        assertThat(queueRecords, has(orcidQueueRecordWithEntity(product)));
+        assertThat(queueRecords, has(orcidQueueRecordWithEntity(firstProject)));
+        assertThat(queueRecords, has(orcidQueueRecordWithEntity(secondProject)));
         assertThat(queueRecords, has(orcidQueueRecordWithEntity(firstPatent)));
         assertThat(queueRecords, has(orcidQueueRecordWithEntity(secondPatent)));
+        assertThat(queueRecords, has(orcidQueueRecordWithEntity(product)));
 
         getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId.toString())
                                          .content(getPatchContent(
@@ -2663,26 +2686,6 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
                                              asList(new ReplaceOperation("/orcid/patents", "DISABLED"))))
                                          .contentType(MediaType.APPLICATION_JSON_VALUE))
                             .andExpect(status().isOk());
-
-        assertThat(orcidQueueService.findByProfileItemId(context, profileItemId), empty());
-
-        configurationService.setProperty("orcid.linkable-metadata-fields.ignore", "crisfund.coinvestigators");
-
-        getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId.toString())
-                                         .content(
-                                             getPatchContent(asList(new ReplaceOperation("/orcid/fundings", "DISABLED"))))
-                                         .contentType(MediaType.APPLICATION_JSON_VALUE))
-                            .andExpect(status().isOk());
-
-        queueRecords = orcidQueueService.findByProfileItemId(context, profileItemId);
-        assertThat(queueRecords, hasSize(1));
-        assertThat(queueRecords, has(orcidQueueRecordWithEntity(product)));
-
-        getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId.toString())
-                .content(
-                                             getPatchContent(asList(new ReplaceOperation("/orcid/products", "DISABLED"))))
-                .contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(status().isOk());
 
         assertThat(orcidQueueService.findByProfileItemId(context, profileItemId), empty());
 
@@ -2928,25 +2931,25 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
     }
 
-    private Item createProduct(Collection collection, String title, Item author) {
-        return ItemBuilder.createItem(context, collection)
+    private Item createProduct(Collection collection, String title, Item person, RelationshipType isCreatorOfProduct) {
+        Item product = ItemBuilder.createItem(context, collection)
             .withTitle(title)
-            .withAuthor(author.getName(), author.getID().toString())
             .build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, product, person, isCreatorOfProduct).build();
+
+        return product;
     }
 
-    private Item createProduct(Collection collection, String title, Item author) {
-        return ItemBuilder.createItem(context, collection)
-            .withTitle(title)
-            .withAuthor(author.getName(), author.getID().toString())
-            .build();
-    }
 
-    private Item createPatent(Collection collection, String title, Item author) {
-        return ItemBuilder.createItem(context, collection)
+    private Item createPatent(Collection collection, String title, Item person, RelationshipType isInventorOfPatent) {
+        Item patent = ItemBuilder.createItem(context, collection)
             .withTitle(title)
-            .withAuthor(author.getName(), author.getID().toString())
             .build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, patent, person, isInventorOfPatent).build();
+
+        return patent;
     }
 
     private Item createOrgUnit(Collection collection, String title, Item person,
@@ -2991,6 +2994,20 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         token.setName("Test User");
         token.setScope(String.join(" ", scopes));
         return token;
+    }
+
+    private Item createFundingWithInvestigator(Collection collection, String title, Item investigator) {
+        return ItemBuilder.createItem(context, collection)
+                .withTitle(title)
+                .withFundingInvestigator(investigator.getName(), investigator.getID().toString())
+                .build();
+    }
+
+    private Item createFundingWithCoInvestigator(Collection collection, String title, Item investigator) {
+        return ItemBuilder.createItem(context, collection)
+                .withTitle(title)
+                .withFundingCoInvestigator(investigator.getName(), investigator.getID().toString())
+                .build();
     }
 
 }

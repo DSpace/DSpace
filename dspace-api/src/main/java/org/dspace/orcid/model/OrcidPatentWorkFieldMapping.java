@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.content.integration.crosswalks.CSLItemDataCrosswalk;
 import org.dspace.util.SimpleMapConverter;
 import org.orcid.jaxb.model.common.CitationType;
 import org.orcid.jaxb.model.common.ContributorRole;
@@ -86,18 +85,6 @@ public class OrcidPatentWorkFieldMapping {
      * The work language converter.
      */
     private SimpleMapConverter languageConverter;
-
-    private Map<String, CSLItemDataCrosswalk> citationCrosswalks;
-
-    private String fundingField;
-
-    private String fundingExternalIdType;
-
-    private String fundingExternalId;
-
-    private String fundingEntityExternalId;
-
-    private String fundingUrlField;
 
     public String convertType(String type) {
         return typeConverter != null ? typeConverter.getValue(type) : type;
@@ -185,54 +172,6 @@ public class OrcidPatentWorkFieldMapping {
 
     public void setSubTitleField(String subTitleField) {
         this.subTitleField = subTitleField;
-    }
-
-    public Map<String, CSLItemDataCrosswalk> getCitationCrosswalks() {
-        return citationCrosswalks;
-    }
-
-    public void setCitationCrosswalks(Map<String, CSLItemDataCrosswalk> citationCrosswalks) {
-        this.citationCrosswalks = citationCrosswalks;
-    }
-
-    public String getFundingField() {
-        return fundingField;
-    }
-
-    public void setFundingField(String fundingField) {
-        this.fundingField = fundingField;
-    }
-
-    public String getFundingExternalIdType() {
-        return fundingExternalIdType;
-    }
-
-    public void setFundingExternalIdType(String fundingExternalIdType) {
-        this.fundingExternalIdType = fundingExternalIdType;
-    }
-
-    public String getFundingExternalId() {
-        return fundingExternalId;
-    }
-
-    public void setFundingExternalId(String fundingExternalId) {
-        this.fundingExternalId = fundingExternalId;
-    }
-
-    public String getFundingEntityExternalId() {
-        return fundingEntityExternalId;
-    }
-
-    public void setFundingEntityExternalId(String fundingEntityExternalId) {
-        this.fundingEntityExternalId = fundingEntityExternalId;
-    }
-
-    public String getFundingUrlField() {
-        return fundingUrlField;
-    }
-
-    public void setFundingUrlField(String fundingUrlField) {
-        this.fundingUrlField = fundingUrlField;
     }
 
     public CitationType getCitationType() {
