@@ -745,7 +745,7 @@
         <dependency>
             <groupId>org.orcid</groupId>
             <artifactId>orcid-model</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.7</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.validation</groupId>

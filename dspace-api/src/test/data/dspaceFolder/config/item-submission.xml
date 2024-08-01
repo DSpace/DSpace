@@ -26,6 +26,8 @@
         <name-map collection-handle="123456789/test-hidden" submission-name="test-hidden"/>
         <name-map collection-handle="123456789/collection-test" submission-name="collectiontest"/>
         <name-map collection-entity-type="CustomEntityType" submission-name="entitytypetest"/>
+        <name-map collection-handle="123456789/test-product" submission-name="producttestform"/>
+        <name-map collection-handle="123456789/test-patent" submission-name="patenttestform"/>
     </submission-map>
 
 
@@ -65,6 +67,16 @@
         </step-definition>
         <step-definition id="traditionalpagetwo" mandatory="true">
             <heading>submit.progressbar.describe.steptwo</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+        <step-definition id="productStep" mandatory="true">
+            <heading>submit.progressbar.describe.product</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+        <step-definition id="patentStep" mandatory="true">
+            <heading>submit.progressbar.describe.patent</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
             <type>submission-form</type>
         </step-definition>
@@ -265,6 +277,24 @@
 
         <submission-process name="entitytypetest">
             <step id="collection"/>
+        </submission-process>
+
+        <submission-process name="producttestform">
+
+            <step id="collection"/>
+            <step id="productStep"/>
+            <step id="upload"/>
+            <step id="license"/>
+
+        </submission-process>
+
+        <submission-process name="patenttestform">
+
+            <step id="collection"/>
+            <step id="patentStep"/>
+            <step id="upload"/>
+            <step id="license"/>
+
         </submission-process>
 
     </submission-definitions>
