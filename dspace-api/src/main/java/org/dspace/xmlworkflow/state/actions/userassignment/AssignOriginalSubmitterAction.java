@@ -19,6 +19,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.xmlworkflow.RoleMembers;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
@@ -44,6 +45,9 @@ public class AssignOriginalSubmitterAction extends UserSelectionAction {
 
     @Autowired(required = true)
     protected WorkflowRequirementsService workflowRequirementsService;
+
+    @Autowired
+    protected EPersonService epersonService;
 
     @Override
     public boolean isFinished(XmlWorkflowItem wfi) {
@@ -81,7 +85,7 @@ public class AssignOriginalSubmitterAction extends UserSelectionAction {
                         //The arguments
                         wfi.getItem().getName(),
                         wfi.getCollection().getName(),
-                        wfi.getSubmitter().getFullName(),
+                        epersonService.getFullName(wfi.getSubmitter()),
                         //TODO: message
                         "New task available.",
                         xmlWorkflowService.getMyDSpaceLink()

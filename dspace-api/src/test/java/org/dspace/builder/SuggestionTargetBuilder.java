@@ -67,7 +67,10 @@ public class SuggestionTargetBuilder extends AbstractBuilder<SuggestionTarget, S
         try {
             ItemBuilder itemBuilder = ItemBuilder.createItem(context, col).withTitle(name);
             if (eperson != null) {
-                itemBuilder = itemBuilder.withDSpaceObjectOwner(eperson.getFullName(), eperson.getID().toString());
+                itemBuilder = itemBuilder.withDSpaceObjectOwner(
+                    ePersonService.getFullName(eperson),
+                    eperson.getID().toString()
+                );
             }
             item = itemBuilder.build();
             context.dispatchEvents();

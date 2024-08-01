@@ -16,6 +16,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 
 /**
@@ -25,8 +27,7 @@ import org.springframework.lang.NonNull;
  *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
-public class CollectionAdministratorsRequestItemStrategy
-        extends RequestItemHelpdeskStrategy {
+public class CollectionAdministratorsRequestItemStrategy extends RequestItemHelpdeskStrategy {
     @Override
     @NonNull
     public List<RequestItemAuthor> getRequestItemAuthor(Context context,

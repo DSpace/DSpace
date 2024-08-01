@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.mail.MessagingException;
 import org.apache.commons.codec.DecoderException;
@@ -293,6 +294,14 @@ public class EPersonTest extends AbstractUnitTest {
             EPerson eperson2 = createEPerson("eperson2@example.com", "John", "Doe");
             EPerson eperson3 = createEPersonAndAddToGroup("eperson3@example.com", "John", "Smith", testGroup);
             EPerson eperson4 = createEPerson("eperson4@example.com", "Doe", "Smith");
+
+            context.commit();
+            testGroup = context.reloadEntity(testGroup);
+            eperson1 = context.reloadEntity(eperson1);
+            eperson2 = context.reloadEntity(eperson2);
+            eperson3 = context.reloadEntity(eperson3);
+            eperson4 = context.reloadEntity(eperson4);
+
             allEPeopleAdded.addAll(Arrays.asList(eperson1, eperson2, eperson3, eperson4));
 
             List<EPerson> allJohns = Arrays.asList(eperson2, eperson3);
@@ -1297,8 +1306,8 @@ public class EPersonTest extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
         EPerson ePerson = ePersonService.create(context);
         ePerson.setEmail(email);
-        ePersonService.setFirstName(context, eperson, firstname);
-        ePersonService.setLastName(context, eperson, lastname);
+        ePersonService.setFirstName(context, ePerson, firstname);
+        ePersonService.setLastName(context, ePerson, lastname);
         ePersonService.update(context, ePerson);
         context.restoreAuthSystemState();
         return ePerson;

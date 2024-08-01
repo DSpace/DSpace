@@ -30,6 +30,7 @@ import org.dspace.embargo.factory.EmbargoServiceFactory;
 import org.dspace.embargo.service.EmbargoService;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.license.CreativeCommonsServiceImpl;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -46,6 +47,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 public class DefaultEmbargoSetter implements EmbargoSetter {
     protected AuthorizeService authorizeService;
     protected ResourcePolicyService resourcePolicyService;
+    protected EPersonService epersonService;
 
     public DefaultEmbargoSetter() {
         super();
@@ -172,7 +174,7 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
                             System.out.println("CHECK WARNING: Item " + item.getHandle() + ", Bundle " + bn
                                     .getName() + " allows READ by " +
                                     ((rp.getEPerson() != null) ? "Group " + rp.getGroup().getName() :
-                                            "EPerson " + rp.getEPerson().getFullName()));
+                                            "EPerson " + getEPersonService().getFullName(rp.getEPerson())));
                         }
                     }
                 }
@@ -184,7 +186,7 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
                             System.out.println("CHECK WARNING: Item " + item.getHandle() + ", Bitstream " + bs
                                     .getName() + " (in Bundle " + bn.getName() + ") allows READ by " +
                                     ((rp.getEPerson() != null) ? "Group " + rp.getGroup().getName() :
-                                            "EPerson " + rp.getEPerson().getFullName()));
+                                            "EPerson " + getEPersonService().getFullName(rp.getEPerson())));
                         }
                     }
                 }
@@ -204,5 +206,12 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
             resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
         }
         return resourcePolicyService;
+    }
+
+    private EPersonService getEPersonService() {
+        if (epersonService == null) {
+            epersonService = EPersonServiceFactory.getInstance().getEPersonService();
+        }
+        return epersonService;
     }
 }

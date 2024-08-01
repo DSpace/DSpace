@@ -16,14 +16,19 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.EPersonService;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
 public class CollectionAdministratorsRequestItemStrategyTest {
+    @Autowired
+    EPersonService epersonService;
+
     private static final String NAME = "John Q. Public";
     private static final String EMAIL = "jqpublic@example.com";
 
@@ -40,7 +45,7 @@ public class CollectionAdministratorsRequestItemStrategyTest {
 
         EPerson eperson1 = Mockito.mock(EPerson.class);
         Mockito.when(eperson1.getEmail()).thenReturn(EMAIL);
-        Mockito.when(eperson1.getFullName()).thenReturn(NAME);
+        Mockito.when(epersonService.getFullName(eperson1)).thenReturn(NAME);
 
         Group group1 = Mockito.mock(Group.class);
         Mockito.when(group1.getMembers()).thenReturn(List.of(eperson1));

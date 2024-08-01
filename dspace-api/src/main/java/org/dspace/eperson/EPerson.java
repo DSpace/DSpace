@@ -26,7 +26,6 @@ import org.dspace.content.DSpaceObjectLegacySupport;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.HibernateProxyHelper;
-import org.dspace.eperson.service.EPersonService;
 
 /**
  * Class representing an e-person.
@@ -114,6 +113,7 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
         return legacyId;
     }
 
+
     /**
      * Return true if this object equals obj, false otherwise.
      *
@@ -136,9 +136,6 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
         if (!StringUtils.equals(this.getEmail(), other.getEmail())) {
             return false;
         }
-        if (!StringUtils.equals(this.getFullName(), other.getFullName())) {
-            return false;
-        }
         return true;
     }
 
@@ -152,7 +149,6 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
         int hash = 5;
         hash = 89 * hash + this.getID().hashCode();
         hash = 89 * hash + (this.getEmail() != null ? this.getEmail().hashCode() : 0);
-        hash = 89 * hash + (this.getFullName() != null ? this.getFullName().hashCode() : 0);
         return hash;
     }
 
@@ -192,49 +188,6 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
     public void setNetid(String netid) {
         this.netid = netid;
         setModified();
-    }
-
-    /**
-     * Get the e-person's full name, combining first and last name in a
-     * displayable string.
-     *
-     * @deprecated  This method is required to keep {@link #equals} and {@link #hashCode} working.
-     *              Please {@link EPersonService#getFullName} instead.
-     * @return their full name (first + last name; if both are NULL, returns email)
-     */
-    public String getFullName() {
-        String f = getFirstName();
-        String l = getLastName();
-
-        if ((l == null) && (f == null)) {
-            return getEmail();
-        } else if (f == null) {
-            return l;
-        } else {
-            return (f + " " + l);
-        }
-    }
-
-    /**
-     * Get the eperson's first name.
-     *
-     * @deprecated  This method is required to keep {@link #equals} and {@link #hashCode} working.
-     *              Please {@link EPersonService#getFirstName} instead.
-     * @return their first name (or null if the column is an SQL NULL)
-     */
-    public String getFirstName() {
-        return getMetadataFirstValue("eperson", "firstname", null);
-    }
-
-    /**
-     * Get the eperson's last name.
-     *
-     * @deprecated  This method is required to keep {@link #equals} and {@link #hashCode} working.
-     *              Please {@link EPersonService#getLastName} instead.
-     * @return their last name (or null if the column is an SQL NULL)
-     */
-    public String getLastName() {
-        return getMetadataFirstValue("eperson", "lastname", null);
     }
 
     /**

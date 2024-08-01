@@ -14,6 +14,8 @@ import java.util.List;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 
 /**
@@ -39,8 +41,7 @@ public class RequestItemSubmitterStrategy implements RequestItemAuthorExtractor 
         EPerson submitter = item.getSubmitter();
         List<RequestItemAuthor> authors = new ArrayList<>(1);
         if (null != submitter) {
-            RequestItemAuthor author = new RequestItemAuthor(
-                submitter.getFullName(), submitter.getEmail());
+            RequestItemAuthor author = new RequestItemAuthor(submitter);
             authors.add(author);
         }
         return authors;

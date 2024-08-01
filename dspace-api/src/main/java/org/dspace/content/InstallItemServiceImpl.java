@@ -24,6 +24,8 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.embargo.service.EmbargoService;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.event.Event;
 import org.dspace.identifier.Identifier;
 import org.dspace.identifier.IdentifierException;
@@ -40,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @version $Revision$
  */
 public class InstallItemServiceImpl implements InstallItemService {
+    public static final Logger log = LogManager.getLogger(InstallItemServiceImpl.class);
 
     @Autowired(required = true)
     protected ContentServiceFactory contentServiceFactory;
@@ -53,9 +56,9 @@ public class InstallItemServiceImpl implements InstallItemService {
     protected ItemService itemService;
     @Autowired(required = true)
     protected SupervisionOrderService supervisionOrderService;
-    @Autowired(required = false)
+    @Autowired
+    EPersonService epersonService;
 
-    Logger log = LogManager.getLogger(InstallItemServiceImpl.class);
 
     @Autowired
     protected ConfigurationService configurationService;
@@ -281,7 +284,7 @@ public class InstallItemServiceImpl implements InstallItemService {
         boolean isProvenancePrivacyActive = Boolean.parseBoolean(isProvenancePrivacyActiveProperty);
 
         if (item.getSubmitter() != null && !isProvenancePrivacyActive) {
-            provmessage.append("Submitted by ").append(item.getSubmitter().getFullName())
+            provmessage.append("Submitted by ").append(epersonService.getFullName(item.getSubmitter()))
                     .append(" (").append(item.getSubmitter().getEmail()).append(") on ")
                     .append(now.toString());
         } else {
