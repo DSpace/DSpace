@@ -8,6 +8,8 @@
 package org.dspace.app.requestitem;
 
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 
 /**
  * Simple DTO to transfer data about the corresponding author for the Request
@@ -16,6 +18,8 @@ import org.dspace.eperson.EPerson;
  * @author Andrea Bollini
  */
 public class RequestItemAuthor {
+    public static final EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
+
     private final String fullName;
     private final String email;
 
@@ -38,7 +42,7 @@ public class RequestItemAuthor {
      */
     public RequestItemAuthor(EPerson ePerson) {
         super();
-        this.fullName = ePerson.getFullName();
+        this.fullName = epersonService.getFullName(ePerson);
         this.email = ePerson.getEmail();
     }
 

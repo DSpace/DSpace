@@ -30,6 +30,7 @@ import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 
@@ -61,6 +62,9 @@ public class RequestItemEmailNotifier {
 
     @Inject
     protected ItemService itemService;
+
+    @Inject
+    protected EPersonService epersonService;
 
     protected final RequestItemAuthorExtractor requestItemAuthorExtractor;
 
@@ -272,8 +276,8 @@ public class RequestItemEmailNotifier {
         message.addArgument(item.getHandle());       // {1} Item handle
         message.addArgument(ri.getToken());          // {2} Request token
         if (approver != null) {
-            message.addArgument(approver.getFullName()); // {3} Approver's name
-            message.addArgument(approver.getEmail());    // {4} Approver's address
+            message.addArgument(epersonService.getFullName(approver));           // {3} Approver's name
+            message.addArgument(approver.getEmail());                            // {4} Approver's address
         } else {
             message.addArgument("anonymous approver");                           // [3] Approver's name
             message.addArgument(configurationService.getProperty("mail.admin")); // [4] Approver's address

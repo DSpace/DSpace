@@ -46,6 +46,8 @@ import org.dspace.builder.OrcidTokenBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.orcid.OrcidHistory;
 import org.dspace.orcid.OrcidOperation;
 import org.dspace.orcid.OrcidQueue;
@@ -84,6 +86,8 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
 
     private OrcidClient orcidClientMock;
 
+    private EPersonService epersonService;
+
     @Before
     public void setup() {
 
@@ -91,6 +95,7 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
         orcidQueueService = OrcidServiceFactory.getInstance().getOrcidQueueService();
 
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        epersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
         context.setCurrentUser(admin);
 
@@ -525,7 +530,7 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
             .withTitle("Test user")
             .withOrcidIdentifier(orcid)
             .withOrcidSynchronizationMode(mode)
-            .withDspaceObjectOwner(owner.getFullName(), owner.getID().toString())
+            .withDspaceObjectOwner(epersonService.getFullName(owner), owner.getID().toString())
             .build();
 
         OrcidTokenBuilder.create(context, owner, "9c913f57-961e-48af-9223-cfad6562c925")

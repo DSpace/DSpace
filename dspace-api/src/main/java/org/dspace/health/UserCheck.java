@@ -50,26 +50,31 @@ public class UserCheck extends Check {
             info.put("Self registered", 0);
 
             for (EPerson e : epersons) {
-                if (e.getEmail() != null && e.getEmail().length() > 0) {
+                if (e.getEmail() != null && !e.getEmail().isEmpty()) {
                     info.put("Have email", info.get("Have email") + 1);
                 }
                 if (e.canLogIn()) {
                     info.put("Can log in (password)",
                              info.get("Can log in (password)") + 1);
                 }
-                if (e.getFirstName() != null && e.getFirstName().length() > 0) {
+
+                String firstName = ePersonService.getFirstName(e);
+                String lastName = ePersonService.getLastName(e);
+                String language = ePersonService.getLanguage(e);
+                if (firstName != null && !firstName.isEmpty()) {
                     info.put("Have 1st name", info.get("Have 1st name") + 1);
                 }
-                if (e.getLastName() != null && e.getLastName().length() > 0) {
+                if (lastName != null && !lastName.isEmpty()) {
                     info.put("Have 2nd name", info.get("Have 2nd name") + 1);
                 }
-                if (ePersonService.getLanguage(e) != null && ePersonService.getLanguage(e).length() > 0) {
+                if (language != null && !language.isEmpty()) {
                     info.put("Have lang", info.get("Have lang") + 1);
                 }
-                if (e.getNetid() != null && e.getNetid().length() > 0) {
+
+                if (e.getNetid() != null && !e.getNetid().isEmpty()) {
                     info.put("Have netid", info.get("Have netid") + 1);
                 }
-                if (e.getNetid() != null && e.getNetid().length() > 0) {
+                if (e.getNetid() != null && !e.getNetid().isEmpty()) {
                     info.put("Self registered", info.get("Self registered") + 1);
                 }
             }

@@ -23,6 +23,8 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 
 /**
  * Utility class to manage generation and storing of the license text that the
@@ -37,6 +39,7 @@ public class LicenseUtils {
     private static final CollectionService collectionService = ContentServiceFactory.getInstance()
                                                                                     .getCollectionService();
     private static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    private static final EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
     /**
      * Default constructor
@@ -79,8 +82,8 @@ public class LicenseUtils {
         // collection, item and eperson object will be also available
         int numArgs = 7 + (additionalInfo != null ? additionalInfo.size() : 0);
         Object[] args = new Object[numArgs];
-        args[0] = eperson.getFirstName();
-        args[1] = eperson.getLastName();
+        args[0] = epersonService.getFirstName(eperson);
+        args[1] = epersonService.getLastName(eperson);
         args[2] = eperson.getEmail();
         args[3] = new java.util.Date();
         args[4] = new FormattableArgument("collection", collection);
@@ -131,7 +134,7 @@ public class LicenseUtils {
                                     String licenseText, String acceptanceDate) throws SQLException, IOException,
         AuthorizeException {
         // Put together text to store
-        // String licenseText = "License granted by " + eperson.getFullName()
+        // String licenseText = "License granted by " + epersonService.getFullName(eperson)
         // + " (" + eperson.getEmail() + ") on "
         // + DCDate.getCurrent().toString() + " (GMT):\n\n" + license;
 
