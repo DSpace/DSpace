@@ -29,6 +29,7 @@ import org.hamcrest.Matcher;
  * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
  */
 public class ItemMatcher {
+    // todo: this may not work in all cases!
     private static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     private ItemMatcher() { }

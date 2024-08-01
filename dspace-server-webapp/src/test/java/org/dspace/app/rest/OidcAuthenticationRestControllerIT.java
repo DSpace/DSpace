@@ -124,7 +124,7 @@ public class OidcAuthenticationRestControllerIT extends AbstractControllerIntegr
         createdEperson = ePersonService.find(context, UUIDUtils.fromString(ePersonId));
         assertThat(createdEperson, notNullValue());
         assertThat(createdEperson.getEmail(), equalTo("test@email.it"));
-        assertThat(epersonService.getFullName(createdEperson), equalTo("Test User"));
+        assertThat(ePersonService.getFullName(createdEperson), equalTo("Test User"));
         assertThat(createdEperson.getNetid(), equalTo("test@email.it"));
         assertThat(createdEperson.canLogIn(), equalTo(true));
 

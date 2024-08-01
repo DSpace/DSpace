@@ -24,6 +24,9 @@ import org.springframework.lang.NonNull;
  * @author Andrea Bollini
  */
 public class RequestItemSubmitterStrategy implements RequestItemAuthorExtractor {
+    @Autowired(required = true)
+    protected EPersonService epersonService;
+
     public RequestItemSubmitterStrategy() {
     }
 
@@ -41,7 +44,10 @@ public class RequestItemSubmitterStrategy implements RequestItemAuthorExtractor 
         EPerson submitter = item.getSubmitter();
         List<RequestItemAuthor> authors = new ArrayList<>(1);
         if (null != submitter) {
-            RequestItemAuthor author = new RequestItemAuthor(submitter);
+            RequestItemAuthor author = new RequestItemAuthor(
+                epersonService.getFullName(submitter),
+                submitter.getEmail()
+            );
             authors.add(author);
         }
         return authors;

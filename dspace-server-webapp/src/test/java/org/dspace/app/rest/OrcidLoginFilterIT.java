@@ -156,7 +156,7 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
         createdEperson = ePersonService.find(context, UUIDUtils.fromString(ePersonId));
         assertThat(createdEperson, notNullValue());
         assertThat(createdEperson.getEmail(), equalTo("test@email.it"));
-        assertThat(createdEperson.getFullName(), equalTo("Test User"));
+        assertThat(ePersonService.getFullName(createdEperson), equalTo("Test User"));
         assertThat(createdEperson.getNetid(), equalTo(ORCID));
         assertThat(createdEperson.canLogIn(), equalTo(true));
         assertThat(createdEperson.getMetadata(), hasItem(with("eperson.orcid", ORCID)));

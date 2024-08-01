@@ -7,7 +7,7 @@
  */
 package org.dspace.disseminate;
 
-import java.awt.*;
+import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
