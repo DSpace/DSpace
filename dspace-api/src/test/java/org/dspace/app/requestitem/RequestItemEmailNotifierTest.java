@@ -29,6 +29,7 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
@@ -59,6 +60,7 @@ public class RequestItemEmailNotifierTest
     private static BitstreamService bitstreamService;
     private static HandleService handleService;
     private static RequestItemService requestItemService;
+    private static ItemService itemService;
 
     public RequestItemEmailNotifierTest() {
         super();
@@ -76,6 +78,8 @@ public class RequestItemEmailNotifierTest
                 = HandleServiceFactory.getInstance().getHandleService();
         requestItemService
                 = RequestItemServiceFactory.getInstance().getRequestItemService();
+        itemService
+                = ContentServiceFactory.getInstance().getItemService();
     }
 
     @AfterClass
@@ -148,6 +152,7 @@ public class RequestItemEmailNotifierTest
         requestItemEmailNotifier.configurationService = configurationService;
         requestItemEmailNotifier.handleService = handleService;
         requestItemEmailNotifier.requestItemService = requestItemService;
+        requestItemEmailNotifier.itemService = itemService;
 
         // Test the unit.  Template supplies the Subject: value
         requestItemEmailNotifier.sendResponse(context, ri, null, TEST_MESSAGE);

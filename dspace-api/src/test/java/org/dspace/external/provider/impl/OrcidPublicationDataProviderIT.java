@@ -210,7 +210,7 @@ public class OrcidPublicationDataProviderIT extends AbstractIntegrationTestWithD
         Item profile = ItemBuilder.createItem(context, persons)
             .withTitle("Profile")
             .withOrcidIdentifier(ORCID)
-            .withDspaceObjectOwner(eperson.getEmail(), eperson.getID().toString())
+            .withDSpaceObjectOwner(eperson)
             .build();
 
         OrcidTokenBuilder.create(context, eperson, accessToken)

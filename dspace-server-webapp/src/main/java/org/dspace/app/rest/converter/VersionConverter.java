@@ -17,6 +17,7 @@ import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
@@ -41,6 +42,9 @@ public class VersionConverter implements DSpaceConverter<Version, VersionRest> {
     @Autowired
     private RequestService requestService;
 
+    @Autowired
+    private EPersonService epersonService;
+
     @Override
     public VersionRest convert(Version modelObject, Projection projection) {
         VersionRest versionRest = new VersionRest();
@@ -64,7 +68,7 @@ public class VersionConverter implements DSpaceConverter<Version, VersionRest> {
                 .getBooleanProperty("versioning.item.history.include.submitter")) {
                 EPerson submitter = modelObject.getEPerson();
                 if (submitter != null) {
-                    versionRest.setSubmitterName(submitterepersonService());
+                    versionRest.setSubmitterName(epersonService.getFullName(submitter));
                 }
             }
         } catch (SQLException e) {

@@ -572,7 +572,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
-                    .param("query", ePerson.getLastName()))
+                    .param("query", ePersonService.getLastName(ePerson)))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(contentType))
                     .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
@@ -585,7 +585,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // it must be case insensitive
         getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
-                .param("query", ePerson.getLastName().toLowerCase()))
+                .param("query", ePersonService.getLastName(ePerson).toLowerCase()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
@@ -629,7 +629,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
-                    .param("query", ePerson.getFirstName()))
+                    .param("query", ePersonService.getFirstName(ePerson)))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(contentType))
                     .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
@@ -642,7 +642,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // it must be case insensitive
         getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
-                .param("query", ePerson.getFirstName().toLowerCase()))
+                .param("query", ePersonService.getFirstName(ePerson).toLowerCase()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
@@ -3406,7 +3406,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String authToken = getAuthToken(admin.getEmail(), password);
         getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
-                 .param("query", ePerson.getFirstName())
+                 .param("query", ePersonService.getFirstName(ePerson))
                  .param("page", "0")
                  .param("size", "2"))
                  .andExpect(status().isOk())
@@ -3421,7 +3421,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                  .andExpect(jsonPath("$.page.totalElements", is(5)));
 
         getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
-                .param("query", ePerson.getFirstName())
+                .param("query", ePersonService.getFirstName(ePerson))
                 .param("page", "1")
                 .param("size", "2"))
                 .andExpect(status().isOk())
@@ -3436,7 +3436,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.page.totalElements", is(5)));
 
         getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
-                .param("query", ePerson.getFirstName())
+                .param("query", ePersonService.getFirstName(ePerson))
                 .param("page", "2")
                 .param("size", "2"))
                 .andExpect(status().isOk())
@@ -3451,7 +3451,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$.page.totalElements", is(5)));
 
         getClient(authToken).perform(get("/api/eperson/epersons/search/byMetadata")
-                .param("query", ePerson.getFirstName())
+                .param("query", ePersonService.getFirstName(ePerson))
                 .param("page", "3")
                 .param("size", "2"))
                 .andExpect(status().isOk())

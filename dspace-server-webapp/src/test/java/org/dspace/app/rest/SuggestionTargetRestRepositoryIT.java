@@ -26,14 +26,19 @@ import org.dspace.builder.SuggestionTargetBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Integration Tests against the /api/integration/suggestiontargets endpoint
  */
 public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrationTest {
+    @Autowired
+    EPersonService epersonService;
+
     private Collection colPeople;
 
     @Override
@@ -429,7 +434,7 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
         SuggestionTarget targetFirstScopus = SuggestionTargetBuilder.createTarget(context, itemFirst)
                 .withSuggestionCount("scopus", 3).build();
         Item itemLast = ItemBuilder.createItem(context, colPeople).withTitle("Lombardi, Corrado")
-                .withDSpaceObjectOwner(eperson.getFullName(), eperson.getID().toString()).build();
+                                   .withDSpaceObjectOwner(eperson).build();
         SuggestionTarget targetLast = SuggestionTargetBuilder.createTarget(context, itemLast)
                 .withSuggestionCount("scopus", 2).build();
         context.restoreAuthSystemState();
@@ -547,7 +552,7 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
         SuggestionTarget targetFirstScopus = SuggestionTargetBuilder.createTarget(context, itemFirst)
                 .withSuggestionCount("scopus", 3).build();
         Item itemLast = ItemBuilder.createItem(context, colPeople).withTitle("Lombardi, Corrado")
-                .withDSpaceObjectOwner(eperson.getFullName(), eperson.getID().toString()).build();
+                                   .withDSpaceObjectOwner(eperson).build();
         SuggestionTarget targetLast = SuggestionTargetBuilder.createTarget(context, itemLast)
                 .withSuggestionCount("scopus", 2).build();
         context.restoreAuthSystemState();
@@ -568,7 +573,7 @@ public class SuggestionTargetRestRepositoryIT extends AbstractControllerIntegrat
         SuggestionTarget targetFirstScopus = SuggestionTargetBuilder.createTarget(context, itemFirst)
                 .withSuggestionCount("scopus", 3).build();
         Item itemLast = ItemBuilder.createItem(context, colPeople).withTitle("Lombardi, Corrado")
-                .withDSpaceObjectOwner(eperson.getFullName(), eperson.getID().toString()).build();
+                                   .withDSpaceObjectOwner(eperson).build();
         SuggestionTarget targetLast = SuggestionTargetBuilder.createTarget(context, itemLast)
                 .withSuggestionCount("scopus", 2).build();
         EPerson anotherEPerson = EPersonBuilder.createEPerson(context).withEmail("another@example.com")

@@ -26,6 +26,7 @@ import org.dspace.content.service.BitstreamService;
 import org.hamcrest.Matcher;
 
 public class BitstreamMatcher {
+    // todo: this may not work in all cases!
     private static final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
     private BitstreamMatcher() { }

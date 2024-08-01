@@ -38,6 +38,7 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.xmlworkflow.storedcomponents.PoolTask;
@@ -57,6 +58,9 @@ public class LoginAsEPersonIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private GroupService groupService;
+
+    @Autowired
+    private EPersonService epersonService;
 
     @Before
     public void setup() {

@@ -16,8 +16,6 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.service.EPersonService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 
 /**
@@ -36,7 +34,10 @@ public class CollectionAdministratorsRequestItemStrategy extends RequestItemHelp
         List<RequestItemAuthor> recipients = new ArrayList<>();
         Collection collection = item.getOwningCollection();
         for (EPerson admin : collection.getAdministrators().getMembers()) {
-            recipients.add(new RequestItemAuthor(admin));
+            recipients.add(new RequestItemAuthor(
+                epersonService.getFullName(admin),
+                admin.getEmail()
+            ));
         }
         if (recipients.isEmpty()) {
             return super.getRequestItemAuthor(context, item);

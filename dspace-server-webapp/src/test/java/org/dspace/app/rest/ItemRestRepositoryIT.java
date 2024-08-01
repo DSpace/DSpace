@@ -91,6 +91,7 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.orcid.OrcidHistory;
 import org.dspace.orcid.OrcidQueue;
 import org.dspace.orcid.service.OrcidHistoryService;
@@ -121,6 +122,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private EPersonService epersonService;
 
     private Item publication1;
     private Item author1;
@@ -3835,7 +3839,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         Item profile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withDspaceObjectOwner(eperson.getFullName(), eperson.getID().toString())
+            .withDSpaceObjectOwner(eperson)
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20", eperson)
             .build();
@@ -3899,7 +3903,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         Item firstProfile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withDspaceObjectOwner(firstOwner.getFullName(), firstOwner.getID().toString())
+            .withDSpaceObjectOwner(firstOwner)
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20", firstOwner)
             .withOrcidSynchronizationPublicationsPreference(ALL)
@@ -3907,14 +3911,14 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         Item secondProfile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withDspaceObjectOwner(secondOwner.getFullName(), secondOwner.getID().toString())
+            .withDSpaceObjectOwner(secondOwner)
             .withOrcidIdentifier("4444-1111-2222-3333")
             .withOrcidAccessToken("bb4d18a0-8d9a-40f1-b601-a417255c8d20", eperson)
             .build();
 
         Item thirdProfile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withDspaceObjectOwner(thirdOwner.getFullName(), thirdOwner.getID().toString())
+            .withDSpaceObjectOwner(thirdOwner)
             .withOrcidIdentifier("5555-1111-2222-3333")
             .withOrcidAccessToken("cb4d18a0-8d9a-40f1-b601-a417255c8d20", thirdOwner)
             .withOrcidSynchronizationPublicationsPreference(ALL)
@@ -3986,7 +3990,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         Item firstProfile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withDspaceObjectOwner(firstOwner.getFullName(), firstOwner.getID().toString())
+            .withDSpaceObjectOwner(firstOwner)
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20", firstOwner)
             .withOrcidSynchronizationFundingsPreference(ALL)
@@ -3994,14 +3998,14 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         Item secondProfile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withDspaceObjectOwner(secondOwner.getFullName(), secondOwner.getID().toString())
+            .withDSpaceObjectOwner(secondOwner)
             .withOrcidIdentifier("4444-1111-2222-3333")
             .withOrcidAccessToken("bb4d18a0-8d9a-40f1-b601-a417255c8d20", secondOwner)
             .build();
 
         Item thirdProfile = ItemBuilder.createItem(context, profileCollection)
             .withTitle("Test User")
-            .withDspaceObjectOwner(thirdOwner.getFullName(), thirdOwner.getID().toString())
+            .withDSpaceObjectOwner(thirdOwner)
             .withOrcidIdentifier("5555-1111-2222-3333")
             .withOrcidAccessToken("cb4d18a0-8d9a-40f1-b601-a417255c8d20", thirdOwner)
             .withOrcidSynchronizationFundingsPreference(ALL)
