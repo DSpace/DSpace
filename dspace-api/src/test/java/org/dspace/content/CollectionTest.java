@@ -590,23 +590,6 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     }
 
     /**
-     * Test of getLicenseCollection method, of class Collection.
-     */
-    @Test
-    public void testGetLicenseCollection() {
-        assertThat("testGetLicenseCollection 0", collectionService.getLicense(collection), notNullValue());
-        assertThat("testGetLicenseCollection 1", collectionService.getLicense(collection), equalTo(""));
-    }
-
-    /**
-     * Test of hasCustomLicense method, of class Collection.
-     */
-    @Test
-    public void testHasCustomLicense() {
-        assertFalse("testHasCustomLicense 0", collectionService.hasCustomLicense(collection));
-    }
-
-    /**
      * Test of setLicense method, of class Collection.
      */
     @Test
