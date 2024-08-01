@@ -23,6 +23,7 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -38,6 +39,9 @@ public class LDNEmailAction implements LDNAction {
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private EPersonService epersonService;
 
     /*
      * Supported for actionSendFilter are:
@@ -87,7 +91,7 @@ public class LDNEmailAction implements LDNAction {
             email.addArgument(notification.getActor().getId());
             email.addArgument(notification.getContext() != null ?
                 notification.getContext().getId() : notification.getObject().getId());
-            email.addArgument(item.getSubmitter().getFullName());
+            email.addArgument(epersonService.getFullName(item.getSubmitter()));
             email.addArgument(date);
             email.addArgument(notification);
             email.addArgument(item);

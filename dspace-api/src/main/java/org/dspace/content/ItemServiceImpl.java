@@ -709,7 +709,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         // Build some provenance data while we're at it.
         StringBuilder prov = new StringBuilder();
 
-        prov.append("Item withdrawn by ").append(e.getFullName()).append(" (")
+        prov.append("Item withdrawn by ").append(epersonService.getFullName(e)).append(" (")
             .append(e.getEmail()).append(") on ").append(timestamp).append("\n")
             .append("Item was in collections:\n");
 

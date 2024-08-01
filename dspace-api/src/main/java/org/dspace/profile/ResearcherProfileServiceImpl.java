@@ -49,6 +49,7 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.indexobject.IndexableCollection;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.orcid.service.OrcidSynchronizationService;
 import org.dspace.profile.service.AfterResearcherProfileCreationAction;
@@ -97,6 +98,9 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
 
     @Autowired(required = false)
     private List<AfterResearcherProfileCreationAction> afterCreationActions;
+
+    @Autowired
+    EPersonService epersonService;
 
     @PostConstruct
     public void postConstruct() {
@@ -276,7 +280,7 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
             throws AuthorizeException, SQLException {
 
         String id = ePerson.getID().toString();
-        String fullName = ePerson.getFullName();
+        String fullName = epersonService.getFullName(ePerson);
 
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, true);
         Item item = workspaceItem.getItem();

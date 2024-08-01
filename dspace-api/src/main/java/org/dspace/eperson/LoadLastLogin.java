@@ -172,12 +172,14 @@ public class LoadLastLogin {
             Date previous = ePerson.getLastActive();
             if ((null == previous) || date.after(previous)) {
                 if (PRETEND) {
-                    System.out.printf("%s\t%s\t%s\t%s\t%s\n",
-                                      ePerson.getID().toString(),
-                                      date,
-                                      ePerson.getEmail(),
-                                      ePerson.getNetid(),
-                                      ePerson.getFullName());
+                    System.out.printf(
+                        "%s\t%s\t%s\t%s\t%s\n",
+                        ePerson.getID().toString(),
+                        date,
+                        ePerson.getEmail(),
+                        ePerson.getNetid(),
+                        ePersonService.getFullName(ePerson)
+                    );
                 } else {
                     ePerson.setLastActive(date);
                     ePersonService.update(ctx, ePerson);

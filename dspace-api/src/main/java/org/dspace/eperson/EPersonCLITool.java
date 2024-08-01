@@ -456,7 +456,9 @@ public class EPersonCLITool {
                                   person.getID().toString(),
                                   person.getEmail(),
                                   person.getNetid(),
-                                  person.getLastName(), person.getFirstName()); // TODO more user details
+                                  ePersonService.getLastName(person),
+                                  ePersonService.getFirstName(person)
+                ); // TODO more user details
             }
         } catch (SQLException ex) {
             System.err.println(ex.getMessage());

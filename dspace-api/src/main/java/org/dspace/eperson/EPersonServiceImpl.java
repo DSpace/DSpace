@@ -715,7 +715,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
     @Override
     public String getName(EPerson dso) {
-        return dso.getEmail();
+        return getFullName(dso);
     }
 
     @Override

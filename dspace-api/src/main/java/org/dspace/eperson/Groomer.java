@@ -137,7 +137,7 @@ public class Groomer {
             System.out.print('\t');
             System.out.print(account.getNetid());
             System.out.print('\t');
-            System.out.print(account.getFullName());
+            System.out.print(ePersonService.getFullName(account));
             System.out.println();
 
             if (delete) {

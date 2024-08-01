@@ -64,7 +64,7 @@ public class VersionConverter implements DSpaceConverter<Version, VersionRest> {
                 .getBooleanProperty("versioning.item.history.include.submitter")) {
                 EPerson submitter = modelObject.getEPerson();
                 if (submitter != null) {
-                    versionRest.setSubmitterName(submitter.getFullName());
+                    versionRest.setSubmitterName(submitterepersonService());
                 }
             }
         } catch (SQLException e) {

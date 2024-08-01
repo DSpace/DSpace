@@ -49,6 +49,7 @@ import org.dspace.core.LogHelper;
 import org.dspace.curate.service.XmlWorkflowCuratorService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.event.Event;
 import org.dspace.handle.service.HandleService;
@@ -128,6 +129,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     protected ConfigurationService configurationService;
     @Autowired(required = true)
     protected XmlWorkflowCuratorService xmlWorkflowCuratorService;
+    @Autowired
+    protected EPersonService epersonService;
 
     protected XmlWorkflowServiceImpl() {
 
@@ -1175,7 +1178,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
     @Override
     public String getEPersonName(EPerson ePerson) {
-        String submitter = ePerson.getFullName();
+        String submitter = epersonService.getFullName(ePerson);
 
         submitter = submitter + " (" + ePerson.getEmail() + ")";
 
@@ -1198,7 +1201,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         boolean isProvenancePrivacyActive = Boolean.parseBoolean(isProvenancePrivacyActiveProperty);
 
         if (myitem.getSubmitter() != null && !isProvenancePrivacyActive) {
-            provmessage.append("Submitted by ").append(myitem.getSubmitter().getFullName())
+            provmessage.append("Submitted by ").append(epersonService.getFullName(myitem.getSubmitter()))
                     .append(" (").append(myitem.getSubmitter().getEmail()).append(") on ")
                     .append(now.toString());
         } else {

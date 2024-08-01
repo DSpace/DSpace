@@ -414,15 +414,17 @@ public class RoleDisseminator implements PackageDisseminator {
             writer.writeEndElement();
         }
 
-        if (eperson.getFirstName() != null) {
+        String firstName = ePersonService.getFirstName(eperson);
+        String lastName = ePersonService.getLastName(eperson);
+        if (firstName != null) {
             writer.writeStartElement(FIRST_NAME);
-            writer.writeCharacters(eperson.getFirstName());
+            writer.writeCharacters(firstName);
             writer.writeEndElement();
         }
 
-        if (eperson.getLastName() != null) {
+        if (lastName != null) {
             writer.writeStartElement(LAST_NAME);
-            writer.writeCharacters(eperson.getLastName());
+            writer.writeCharacters(lastName);
             writer.writeEndElement();
         }
 
