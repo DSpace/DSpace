@@ -1799,7 +1799,7 @@ prevent the generation of resource policy entry values with null dspace_object a
                 //Retrieve the applicable relationship
                 Relationship rs = relationshipService.find(context,
                         ((RelationshipMetadataValue) rr).getRelationshipId());
-                if (rs.getLeftItem() == dso) {
+                if (rs.getLeftItem().equals(dso)) {
                     rs.setLeftPlace(place);
                 } else {
                     rs.setRightPlace(place);
