@@ -206,7 +206,8 @@ public class DuplicateDetectionServiceImpl implements DuplicateDetectionService 
                 configurationService.getArrayProperty("duplicate.preview.metadata.field", new String[]{})));
 
         // Get item metadata and if it's configured for mapping, copy it across to the potential duplicate object
-        List<MetadataValue> metadata = resultItem.getCachedMetadata();
+        List<MetadataValue> metadata
+            = itemService.getMetadata(resultItem, Item.ANY, Item.ANY, Item.ANY, Item.ANY, true);
 
         // Prepare a map of metadata to set on the potential duplicate object
         for (MetadataValue metadatum : metadata) {
