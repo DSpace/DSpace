@@ -16,7 +16,7 @@ For more information, visit http://www.dspace.org/
 
 DSpace consists of both a Java-based backend and an Angular-based frontend.
 
-* Backend (this codebase) provides a REST API, along with other machine-based interfaces (e.g. OAI-PMH, SWORD, etc)
+* Backend (this codebase) provides a REST API, along with other machine-based interfaces (e.g. OAI-PMH, SWORD, etc.)
     * The REST Contract is at https://github.com/DSpace/RestContract
 * Frontend (https://github.com/DSpace/dspace-angular/) is the User Interface built on the REST API
 
@@ -81,15 +81,17 @@ By default, in DSpace, Unit Tests and Integration Tests are disabled. However, t
 run automatically by [GitHub Actions](https://github.com/DSpace/DSpace/actions?query=workflow%3ABuild) for all Pull Requests and code commits.
 
 * How to run both Unit Tests (via `maven-surefire-plugin`) and Integration Tests (via `maven-failsafe-plugin`):
-  ```
+  ```shell
   mvn install -DskipUnitTests=false -DskipIntegrationTests=false
   ```
+  
 * How to run _only_ Unit Tests:
-  ```
+  ```shell
   mvn test -DskipUnitTests=false
   ```
+  
 * How to run a *single* Unit Test
-  ```
+  ```shell
   # Run all tests in a specific test class
   # NOTE: failIfNoTests=false is required to skip tests in other modules
   mvn test -DskipUnitTests=false -Dtest=[full.package.testClassName] -DfailIfNoTests=false
@@ -97,12 +99,14 @@ run automatically by [GitHub Actions](https://github.com/DSpace/DSpace/actions?q
   # Run one test method in a specific test class
   mvn test -DskipUnitTests=false -Dtest=[full.package.testClassName]#[testMethodName] -DfailIfNoTests=false
   ```
+  
 * How to run _only_ Integration Tests
-  ```
+  ```shell
   mvn install -DskipIntegrationTests=false
   ```
+  
 * How to run a *single* Integration Test
-  ```
+  ```shell
   # Run all integration tests in a specific test class
   # NOTE: failIfNoTests=false is required to skip tests in other modules
   mvn install -DskipIntegrationTests=false -Dit.test=[full.package.testClassName] -DfailIfNoTests=false
@@ -110,8 +114,9 @@ run automatically by [GitHub Actions](https://github.com/DSpace/DSpace/actions?q
   # Run one test method in a specific test class
   mvn install -DskipIntegrationTests=false -Dit.test=[full.package.testClassName]#[testMethodName] -DfailIfNoTests=false
   ```
+  
 * How to run only tests of a specific DSpace module
-  ```
+  ```shell
   # Before you can run only one module's tests, other modules may need installing into your ~/.m2
   cd [dspace-src]
   mvn clean install
