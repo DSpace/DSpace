@@ -18,6 +18,7 @@ import org.dspace.content.service.SiteService;
 import org.hamcrest.Matcher;
 
 public class SiteMatcher {
+    // todo: this may not work in all cases!
     private static final SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
 
     private SiteMatcher() { }

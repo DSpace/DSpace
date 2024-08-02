@@ -25,7 +25,6 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.utils.DSpace;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;

@@ -81,7 +81,7 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest {
             //will not happen
         }
     }
-    
+
     private GoogleBitstreamComparator getComparator() {
         GoogleBitstreamComparator comparator = new GoogleBitstreamComparator(context, settings);
         comparator.bitstreamService = bitstreamService;

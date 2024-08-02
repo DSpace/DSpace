@@ -530,7 +530,7 @@ public class OrcidBulkPushIT extends AbstractIntegrationTestWithDatabase {
             .withTitle("Test user")
             .withOrcidIdentifier(orcid)
             .withOrcidSynchronizationMode(mode)
-            .withDspaceObjectOwner(epersonService.getFullName(owner), owner.getID().toString())
+            .withDSpaceObjectOwner(owner)
             .build();
 
         OrcidTokenBuilder.create(context, owner, "9c913f57-961e-48af-9223-cfad6562c925")

@@ -7,10 +7,6 @@
  */
 package org.dspace.app.requestitem;
 
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.eperson.service.EPersonService;
-
 /**
  * Simple DTO to transfer data about the corresponding author for the Request
  * Copy feature.

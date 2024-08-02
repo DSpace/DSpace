@@ -94,7 +94,7 @@ public class ResearcherProfileAutomaticClaim implements PostLoggedInAction {
     private void claimProfile(Context context, EPerson currentUser) throws SQLException, AuthorizeException {
 
         UUID id = currentUser.getID();
-        String fullName = epersonService.getFullName(currentUser);
+        String fullName = ePersonService.getFullName(currentUser);
 
         if (currentUserHasAlreadyResearcherProfile(context)) {
             return;

@@ -16,7 +16,6 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
