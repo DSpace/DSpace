@@ -133,8 +133,34 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
             .map(work -> convertToExternalDataObject(orcid, work));
     }
 
+    /**
+     * To comply with new interface and abstract, the 'hint' is now implemented if not actually
+     * supported in this provider.
+     *
+     * @param orcid The query for the search (ORCID ID)
+     * @param start The start of the search
+     * @param limit The max amount of records to be returned by the search
+     * @return
+     */
     @Override
     public List<ExternalDataObject> searchExternalDataObjects(String orcid, int start, int limit) {
+        return searchExternalDataObjects(orcid, null, start, limit);
+    }
+
+    /**
+     * Search the ORCIDv3 external source for objects based on a query and hint.
+     *
+     * To comply with new interface and abstract, the 'hint' is now implemented if not actually
+     * supported in this provider.
+     *
+     * @param orcid The query for the search (ORCID ID)
+     * @param hint The hint to help construct additional filters or business logic
+     * @param start The start of the search
+     * @param limit The max amount of records to be returned by the search
+     * @return
+     */
+    @Override
+    public List<ExternalDataObject> searchExternalDataObjects(String orcid, String hint, int start, int limit) {
 
         validateOrcidId(orcid);
 

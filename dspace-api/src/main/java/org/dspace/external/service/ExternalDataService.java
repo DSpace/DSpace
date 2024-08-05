@@ -58,6 +58,19 @@ public interface ExternalDataService {
     public List<ExternalDataObject> searchExternalDataObjects(String source, String query, int start, int limit);
 
     /**
+     * This method will return a list of ExternalDataObjects as defined through the source in which they will be
+     * searched for, the given query start and limit parameters
+     * @param source    The source that defines which ExternalDataProvider is to be used
+     * @param query     The query for which the search will be done
+     * @param hint      A hint to help the provider with additional filtering or query construction (e.g. field)
+     * @param start     The start of the search
+     * @param limit     The maximum amount of records to be returned by the search
+     * @return          A list of ExternalDataObjects that obey the rules in the parameters
+     */
+    public List<ExternalDataObject> searchExternalDataObjects(String source, String query, String hint,
+                                                              int start, int limit);
+
+    /**
      * This method wil return the total amount of results that will be found for the given query in the given source
      * @param source    The source in which the query will happen to return the number of results
      * @param query     The query to be ran in this source to retrieve the total amount of results
