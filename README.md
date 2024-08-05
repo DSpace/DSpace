@@ -20,7 +20,7 @@ DSpace consists of both a Java-based backend and an Angular-based frontend.
     * The REST Contract is at https://github.com/DSpace/RestContract
 * Frontend (https://github.com/DSpace/dspace-angular/) is the User Interface built on the REST API
 
-Prior versions of DSpace (v6.x and below) used two different UIs (XMLUI and JSPUI). Those UIs are no longer supported in v7 (and above).
+Prior versions of DSpace (v6.x and below) used two different UIs (XMLUI and JSPUI). Those UIs are no longer supported in v7 and above.
 * A maintenance branch for older versions is still available, see `dspace-6_x` for 6.x maintenance.
 
 ## Downloads
@@ -33,18 +33,18 @@ Prior versions of DSpace (v6.x and below) used two different UIs (XMLUI and JSPU
 Documentation for each release may be viewed online or downloaded via our [Documentation Wiki](https://wiki.lyrasis.org/display/DSDOC/).
 
 The latest DSpace Installation instructions are available at:
-https://wiki.lyrasis.org/display/DSDOC7x/Installing+DSpace
+https://wiki.lyrasis.org/display/DSDOC8x/Installing+DSpace
 
 Please be aware that, as a Java web application, DSpace requires a database (PostgreSQL)
 and a servlet container (usually Tomcat) in order to function.
 More information about these and all other prerequisites can be found in the Installation instructions above.
 
-## Running DSpace 7 in Docker
+## Running DSpace 8 in Docker
 
 NOTE: At this time, we do not have production-ready Docker images for DSpace.
 That said, we do have quick-start Docker Compose scripts for development or testing purposes.
 
-See [Running DSpace 7 with Docker Compose](dspace/src/main/docker-compose/README.md)
+See [Running DSpace 8 with Docker Compose](dspace/src/main/docker-compose/README.md)
 
 ## Contributing
 
@@ -64,7 +64,7 @@ Great Q&A is also available under the [DSpace tag on Stackoverflow](http://stack
 Additional support options are at https://wiki.lyrasis.org/display/DSPACE/Support
 
 DSpace also has an active service provider network. If you'd rather hire a service provider to
-install, upgrade, customize or host DSpace, then we recommend getting in touch with one of our
+install, upgrade, customize, or host DSpace, then we recommend getting in touch with one of our
 [Registered Service Providers](http://www.dspace.org/service-providers).
 
 ## Issue Tracker
@@ -112,7 +112,7 @@ run automatically by [GitHub Actions](https://github.com/DSpace/DSpace/actions?q
   ```
 * How to run only tests of a specific DSpace module
   ```
-  # Before you can run only one module's tests, other modules may need installing into your ~/.m2
+  # Before you can run only one module's tests, other modules may need to be installed into your ~/.m2
   cd [dspace-src]
   mvn clean install
 
