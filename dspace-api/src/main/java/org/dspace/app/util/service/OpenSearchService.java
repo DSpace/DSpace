@@ -89,7 +89,7 @@ public interface OpenSearchService {
      * @throws IOException if IO error
      */
     public String getResultsString(Context context, String format, String query, int totalResults, int start,
-                                   int pageSize, IndexableObject scope, List<IndexableObject> results,)
+                                   int pageSize, IndexableObject scope, List<IndexableObject> results)
         throws IOException;
 
     /**
