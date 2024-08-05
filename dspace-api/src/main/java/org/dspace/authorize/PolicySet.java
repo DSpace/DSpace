@@ -137,7 +137,7 @@ public class PolicySet {
      *                      otherwise add to existing policies
      * @param clearOnly     if non-null, only process bitstreams whose names contain filter
      * @param name          policy name
-     * @param description   policy descrption
+     * @param description   policy description
      * @param startDate     policy start date
      * @param endDate       policy end date
      * @throws SQLException       if database error

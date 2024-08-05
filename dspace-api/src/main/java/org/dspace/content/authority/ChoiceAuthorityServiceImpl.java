@@ -42,7 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Broker for ChoiceAuthority plugins, and for other information configured
  * about the choice aspect of authority control for a metadata field.
  *
- * Configuration keys, per metadata field (e.g. "dc.contributer.author")
+ * Configuration keys, per metadata field (e.g. "dc.contributor.author")
  *
  * {@code
  * # names the ChoiceAuthority plugin called for this field

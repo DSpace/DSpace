@@ -5633,7 +5633,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // auth
         String authToken = getAuthToken(eperson.getEmail(), password);
 
-        // perpare patch body
+        // prepare patch body
         Map<String, String> value = new HashMap<>();
         value.put("name", "openaccess");
         List<Operation> ops = new ArrayList<>();
@@ -8030,7 +8030,7 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                 .contentType(textUriContentType))
                 .andExpect(status().isCreated());
 
-        // Bistream access policies are as expected and there are no duplicates
+        // Bitstream access policies are as expected and there are no duplicates
         getClient(adminToken)
                 .perform(get("/api/authz/resourcepolicies/search/resource")
                 .param("uuid", bitstream.getID().toString()))

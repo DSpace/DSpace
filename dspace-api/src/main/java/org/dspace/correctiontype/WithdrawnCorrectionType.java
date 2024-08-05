@@ -32,7 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementation class for {@link CorrectionType}
- * that will withdrawn target item if it archived and wasn't withdrawn alredy.
+ * that will withdrawn target item if it archived and wasn't withdrawn already.
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  */

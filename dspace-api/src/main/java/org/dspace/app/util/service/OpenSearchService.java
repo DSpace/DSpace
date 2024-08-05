@@ -85,7 +85,7 @@ public interface OpenSearchService {
      * @param start        - start result index
      * @param pageSize     - page size
      * @param scope        - search scope, null or the community/collection
-     * @param results      the retreived DSpace objects satisfying search
+     * @param results      the retrieved DSpace objects satisfying search
      * @param labels       labels to apply - format specific
      * @return formatted search results
      * @throws IOException if IO error
@@ -105,7 +105,7 @@ public interface OpenSearchService {
      * @param start        - start result index
      * @param pageSize     - page size
      * @param scope        - search scope, null or the community/collection
-     * @param results      the retreived DSpace objects satisfying search
+     * @param results      the retrieved DSpace objects satisfying search
      * @param labels       labels to apply - format specific
      * @return formatted search results
      * @throws IOException if IO error

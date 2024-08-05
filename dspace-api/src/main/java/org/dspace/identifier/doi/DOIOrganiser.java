@@ -689,7 +689,7 @@ public class DOIOrganiser {
         DOI doiRow = null;
         String doi = null;
 
-        // detect it identifer is ItemID, handle or DOI.
+        // detect it identifier is ItemID, handle or DOI.
         // try to detect ItemID
         if (identifier
             .matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}")) {
