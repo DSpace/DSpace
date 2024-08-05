@@ -168,6 +168,9 @@ public class SyndicationFeed {
         String defaultTitle = null;
         boolean podcastFeed = false;
         this.request = request;
+        
+        Map<String, String> labels = getLabels();
+        
         // dso is null for the whole site, or a search without scope
         if (dso == null) {
             defaultTitle = configurationService.getProperty("dspace.name");
