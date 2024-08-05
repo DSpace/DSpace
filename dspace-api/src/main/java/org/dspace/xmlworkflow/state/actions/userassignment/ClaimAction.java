@@ -18,6 +18,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xmlworkflow.Role;
@@ -41,6 +43,8 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 public class ClaimAction extends UserSelectionAction {
     private final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    private final EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
     @Override
     public void activate(Context context, XmlWorkflowItem wfItem) throws SQLException, IOException, AuthorizeException {
@@ -83,7 +87,7 @@ public class ClaimAction extends UserSelectionAction {
             EPerson ep = wfi.getSubmitter();
             String submitterName = null;
             if (ep != null) {
-                submitterName = ep.getFullName();
+                submitterName = epersonService.getFullName(ep);
             }
             XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
             xmlWorkflowService.alertUsersOnTaskActivation(c, wfi, "submit_task", roleMembers.getAllUniqueMembers(c),

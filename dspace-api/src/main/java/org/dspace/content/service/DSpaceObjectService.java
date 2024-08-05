@@ -73,6 +73,8 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      */
     public abstract String getName(T dso);
 
+    void setName(Context context, T dso, String name) throws SQLException;
+
     /**
      * Tries to lookup all Identifiers of this DSpaceObject.
      *

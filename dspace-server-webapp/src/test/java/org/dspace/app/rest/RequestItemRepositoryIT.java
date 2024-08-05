@@ -55,6 +55,7 @@ import org.dspace.builder.RequestItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.eperson.service.EPersonService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -80,6 +81,9 @@ public class RequestItemRepositoryIT
 
     @Autowired(required = true)
     RequestItemService requestItemService;
+
+    @Autowired
+    EPersonService epersonService;
 
     private Collection collection;
 
@@ -203,7 +207,7 @@ public class RequestItemRepositoryIT
         rir.setAllfiles(true);
         rir.setItemId(item.getID().toString());
         rir.setRequestEmail(eperson.getEmail());
-        rir.setRequestName(eperson.getFullName());
+        rir.setRequestName(epersonService.getFullName(eperson));
         rir.setRequestMessage(RequestItemBuilder.REQ_MESSAGE);
 
         // Create it and see if it was created correctly.
@@ -225,7 +229,7 @@ public class RequestItemRepositoryIT
                         // Find the created request via the eperson email
                         if (requestItem.getReqEmail().equals(eperson.getEmail())) {
                                 // Verify request data
-                                assertEquals(eperson.getFullName(), requestItem.getReqName());
+                                assertEquals(epersonService.getFullName(eperson), requestItem.getReqName());
                                 assertEquals(item.getID(), requestItem.getItem().getID());
                                 assertEquals(RequestItemBuilder.REQ_MESSAGE, requestItem.getReqMessage());
                                 assertEquals(true, requestItem.isAllfiles());
@@ -309,7 +313,7 @@ public class RequestItemRepositoryIT
         rir.setItemId(item.getID().toString());
         rir.setRequestEmail(eperson.getEmail());
         rir.setRequestMessage(RequestItemBuilder.REQ_MESSAGE);
-        rir.setRequestName(eperson.getFullName());
+        rir.setRequestName(epersonService.getFullName(eperson));
         rir.setAllfiles(false);
 
         // Try to create it, with various malformations.

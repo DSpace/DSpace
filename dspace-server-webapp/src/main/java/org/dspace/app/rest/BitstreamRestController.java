@@ -116,7 +116,7 @@ public class BitstreamRestController {
         }
 
         Long lastModified = bitstreamService.getLastModified(bit);
-        BitstreamFormat format = bit.getFormat(context);
+        BitstreamFormat format = bitstreamService.getFormat(context, bit);
         String mimetype = format.getMIMEType();
         String name = getBitstreamName(bit, format);
 
@@ -281,7 +281,7 @@ public class BitstreamRestController {
             throw new ResourceNotFoundException("Bitstream with id: " + uuid + " not found");
         }
 
-        bitstream.setFormat(context, bitstreamFormat);
+        bitstreamService.setFormat(context, bitstream, bitstreamFormat);
 
         context.commit();
 

@@ -74,8 +74,8 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
     }
 
     public EPersonBuilder withNameInMetadata(String firstName, String lastName) throws SQLException {
-        ePerson.setFirstName(context, firstName);
-        ePerson.setLastName(context, lastName);
+        ePersonService.setFirstName(context, ePerson, firstName);
+        ePersonService.setLastName(context, ePerson, lastName);
         return this;
     }
 
@@ -91,7 +91,7 @@ public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
      * @throws SQLException passed through.
      */
     public EPersonBuilder withLanguage(String lang) throws SQLException {
-        ePerson.setLanguage(context, lang);
+        ePersonService.setLanguage(context, ePerson, lang);
         return this;
     }
 

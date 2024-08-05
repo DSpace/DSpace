@@ -25,6 +25,8 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -61,6 +63,8 @@ public class OREDisseminationCrosswalk
     private static final Namespace DS_NS =
         Namespace.getNamespace("ds", "http://www.dspace.org/objectModel/");
     protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected final BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+    protected final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected final ConfigurationService configurationService = DSpaceServicesFactory.getInstance()
                                                                                      .getConfigurationService();
 
@@ -236,7 +240,7 @@ public class OREDisseminationCrosswalk
                 arLink.setAttribute("href", dsUrl + "/bitstream/handle/" + item.getHandle() + "/" + encodeForURL(
                     bs.getName()) + "?sequence=" + bs.getSequenceID());
                 arLink.setAttribute("title", bs.getName());
-                arLink.setAttribute("type", bs.getFormat(context).getMIMEType());
+                arLink.setAttribute("type", bitstreamService.getFormat(context, bs).getMIMEType());
                 arLink.setAttribute("length", Long.toString(bs.getSizeBytes()));
 
                 aggregation.addContent(arLink);

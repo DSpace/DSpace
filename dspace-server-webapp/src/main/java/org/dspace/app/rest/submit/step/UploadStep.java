@@ -127,12 +127,12 @@ public class UploadStep extends AbstractProcessingStep
                 source = bitstreamService.create(context, bundles.get(0), inputStream);
             }
 
-            source.setName(context, Utils.getFileName(file));
-            source.setSource(context, file.getOriginalFilename());
+            bitstreamService.setName(context, source, Utils.getFileName(file));
+            bitstreamService.setSource(context, source, file.getOriginalFilename());
 
             // Identify the format
             bf = bitstreamFormatService.guessFormat(context, source);
-            source.setFormat(context, bf);
+            bitstreamService.setFormat(context, source, bf);
 
             // Update to DB
             bitstreamService.update(context, source);

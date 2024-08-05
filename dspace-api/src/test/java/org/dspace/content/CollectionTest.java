@@ -427,7 +427,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         int step = 1;
         Group g = groupService.create(context);
         context.restoreAuthSystemState();
-        collection.setWorkflowGroup(context, step, g);
+       collectionService.setWorkflowGroup(context, collection, step, g);
         assertThat("testSetWorkflowGroup 0", collectionService.getWorkflowGroup(context, collection, step),
                 notNullValue());
         assertThat("testSetWorkflowGroup 1", collectionService.getWorkflowGroup(context, collection, step), equalTo(g));
@@ -446,8 +446,8 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         Group g1 = groupService.create(context);
         Group g2 = groupService.create(context);
         context.restoreAuthSystemState();
-        collection.setWorkflowGroup(context, step, g1);
-        collection.setWorkflowGroup(context, step, g2);
+       collectionService.setWorkflowGroup(context, collection, step, g1);
+       collectionService.setWorkflowGroup(context, collection, step, g2);
         assertThat("testSetWorkflowGroup 0", collectionService.getWorkflowGroup(context, collection, step),
                 notNullValue());
         assertThat("testSetWorkflowGroup 1", collectionService.getWorkflowGroup(context, collection, step),
@@ -590,33 +590,16 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     }
 
     /**
-     * Test of getLicenseCollection method, of class Collection.
-     */
-    @Test
-    public void testGetLicenseCollection() {
-        assertThat("testGetLicenseCollection 0", collection.getLicenseCollection(), notNullValue());
-        assertThat("testGetLicenseCollection 1", collection.getLicenseCollection(), equalTo(""));
-    }
-
-    /**
-     * Test of hasCustomLicense method, of class Collection.
-     */
-    @Test
-    public void testHasCustomLicense() {
-        assertFalse("testHasCustomLicense 0", collectionService.hasCustomLicense(collection));
-    }
-
-    /**
      * Test of setLicense method, of class Collection.
      */
     @Test
     public void testSetLicense() throws SQLException {
         String license = "license for test";
-        collection.setLicense(context, license);
+        collectionService.setLicense(context, collection, license);
         assertThat("testSetLicense 0", collectionService.getLicense(collection), notNullValue());
         assertThat("testSetLicense 1", collectionService.getLicense(collection), equalTo(license));
-        assertThat("testSetLicense 2", collection.getLicenseCollection(), notNullValue());
-        assertThat("testSetLicense 3", collection.getLicenseCollection(), equalTo(license));
+        assertThat("testSetLicense 2", collectionService.getLicense(collection), notNullValue());
+        assertThat("testSetLicense 3", collectionService.getLicense(collection), equalTo(license));
     }
 
     /**

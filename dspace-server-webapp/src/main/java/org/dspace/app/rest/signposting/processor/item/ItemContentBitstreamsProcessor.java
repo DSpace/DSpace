@@ -17,6 +17,9 @@ import org.dspace.app.rest.signposting.model.LinksetRelationType;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.util.FrontendUrlService;
@@ -35,6 +38,9 @@ public class ItemContentBitstreamsProcessor extends ItemSignpostingProcessor {
      */
     private static final Logger log = Logger.getLogger(ItemContentBitstreamsProcessor.class);
 
+    public static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    public static final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+
     public ItemContentBitstreamsProcessor(FrontendUrlService frontendUrlService) {
         super(frontendUrlService);
         setRelation(LinksetRelationType.ITEM);
@@ -44,9 +50,9 @@ public class ItemContentBitstreamsProcessor extends ItemSignpostingProcessor {
     public void addLinkSetNodes(Context context, HttpServletRequest request,
                                 Item item, List<LinksetNode> linksetNodes) {
         try {
-            for (Bundle bundle : item.getBundles(Constants.CONTENT_BUNDLE_NAME)) {
+            for (Bundle bundle : itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME)) {
                 for (Bitstream bitstream : bundle.getBitstreams()) {
-                    String mimeType = bitstream.getFormat(context).getMIMEType();
+                    String mimeType = bitstreamService.getFormat(context, bitstream).getMIMEType();
                     String bitstreamUrl = frontendUrlService.generateUrl(bitstream);
                     linksetNodes.add(
                             new LinksetNode(bitstreamUrl, getRelation(), mimeType, buildAnchor(context, item))

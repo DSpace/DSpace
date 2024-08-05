@@ -204,9 +204,9 @@ public class PackageUtils {
         if (bf == null) {
             bf = bitstreamFormatService.guessFormat(context, lbs);
         }
-        lbs.setFormat(context, bf);
-        lbs.setName(context, Constants.LICENSE_BITSTREAM_NAME);
-        lbs.setSource(context, Constants.LICENSE_BITSTREAM_NAME);
+        bitstreamService.setFormat(context, lbs, bf);
+        bitstreamService.setName(context, lbs, Constants.LICENSE_BITSTREAM_NAME);
+        bitstreamService.setSource(context, lbs, Constants.LICENSE_BITSTREAM_NAME);
         bitstreamService.update(context, lbs);
     }
 
@@ -277,7 +277,7 @@ public class PackageUtils {
             List<Bitstream> bitstreams = bundle.getBitstreams();
 
             for (Bitstream bitstream : bitstreams) {
-                if (bitstream.getFormat(context).getID() == fid) {
+                if (bitstreamService.getFormat(context, bitstream).getID() == fid) {
                     return bitstream;
                 }
             }
@@ -415,7 +415,7 @@ public class PackageUtils {
 
             for (Bitstream bitstream : bitstreams) {
                 // The License should have a file format of "License"
-                if (bitstream.getFormat(context).getID() == licenseFormatId) {
+                if (bitstreamService.getFormat(context, bitstream).getID() == licenseFormatId) {
                     //found a bitstream with format "License" -- return it
                     return bitstream;
                 }

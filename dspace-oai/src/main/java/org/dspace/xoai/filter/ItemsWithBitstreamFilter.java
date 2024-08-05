@@ -13,6 +13,8 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.xoai.data.DSpaceItem;
@@ -30,6 +32,8 @@ public class ItemsWithBitstreamFilter extends DSpaceFilter {
 
     private static final HandleService handleService
             = HandleServiceFactory.getInstance().getHandleService();
+    private static final ItemService itemService
+            = ContentServiceFactory.getInstance().getItemService();
 
     @Override
     public SolrFilterResult buildSolrQuery() {
@@ -44,8 +48,8 @@ public class ItemsWithBitstreamFilter extends DSpaceFilter {
                 return false;
             }
             Item dspaceItem = (Item) handleService.resolveToObject(context, handle);
-            for (Bundle b : dspaceItem.getBundles("ORIGINAL")) {
-                if (b.getBitstreams().size() > 0) {
+            for (Bundle b : itemService.getBundles(dspaceItem, "ORIGINAL")) {
+                if (!b.getBitstreams().isEmpty()) {
                     return true;
                 }
             }

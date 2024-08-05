@@ -24,11 +24,13 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 
@@ -57,6 +59,12 @@ public class RequestItemEmailNotifier {
 
     @Inject
     protected RequestItemService requestItemService;
+
+    @Inject
+    protected ItemService itemService;
+
+    @Inject
+    protected EPersonService epersonService;
 
     protected final RequestItemAuthorExtractor requestItemAuthorExtractor;
 
@@ -190,11 +198,11 @@ public class RequestItemEmailNotifier {
             if (ri.isAccept_request()) {
                 if (ri.isAllfiles()) {
                     Item item = ri.getItem();
-                    List<Bundle> bundles = item.getBundles("ORIGINAL");
+                    List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
                     for (Bundle bundle : bundles) {
                         List<Bitstream> bitstreams = bundle.getBitstreams();
                         for (Bitstream bitstream : bitstreams) {
-                            if (!bitstream.getFormat(context).isInternal() &&
+                            if (!bitstreamService.getFormat(context, bitstream).isInternal() &&
                                     requestItemService.isRestricted(context,
                                     bitstream)) {
                                 // #8636 Anyone receiving the email can respond to the
@@ -203,7 +211,7 @@ public class RequestItemEmailNotifier {
                                 email.addAttachment(
                                         bitstreamService.retrieve(context, bitstream),
                                         bitstream.getName(),
-                                        bitstream.getFormat(context).getMIMEType());
+                                        bitstreamService.getFormat(context, bitstream).getMIMEType());
                                 context.restoreAuthSystemState();
                             }
                         }
@@ -214,7 +222,7 @@ public class RequestItemEmailNotifier {
                     context.turnOffAuthorisationSystem();
                     email.addAttachment(bitstreamService.retrieve(context, bitstream),
                             bitstream.getName(),
-                            bitstream.getFormat(context).getMIMEType());
+                            bitstreamService.getFormat(context, bitstream).getMIMEType());
                     context.restoreAuthSystemState();
                 }
                 email.send();
@@ -268,8 +276,8 @@ public class RequestItemEmailNotifier {
         message.addArgument(item.getHandle());       // {1} Item handle
         message.addArgument(ri.getToken());          // {2} Request token
         if (approver != null) {
-            message.addArgument(approver.getFullName()); // {3} Approver's name
-            message.addArgument(approver.getEmail());    // {4} Approver's address
+            message.addArgument(epersonService.getFullName(approver));           // {3} Approver's name
+            message.addArgument(approver.getEmail());                            // {4} Approver's address
         } else {
             message.addArgument("anonymous approver");                           // [3] Approver's name
             message.addArgument(configurationService.getProperty("mail.admin")); // [4] Approver's address

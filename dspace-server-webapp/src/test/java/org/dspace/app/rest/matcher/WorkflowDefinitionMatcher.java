@@ -26,7 +26,7 @@ import org.hamcrest.Matchers;
  * @author Maria Verdonck (Atmire) on 03/01/2020
  */
 public class WorkflowDefinitionMatcher {
-
+    // todo: this may not work in all cases!
     private static XmlWorkflowFactory xmlWorkflowFactory = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
 
     private static final String WORKFLOW_DEFINITIONS_ENDPOINT

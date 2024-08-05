@@ -96,11 +96,11 @@ public class ContextTest extends AbstractUnitTest {
 
         // Create a dummy EPerson to set as current user
         EPerson newUser = ePersonService.create(context);
-        newUser.setFirstName(context, "Jane");
-        newUser.setLastName(context, "Doe");
+        ePersonService.setFirstName(context, newUser, "Jane");
+        ePersonService.setLastName(context, newUser, "Doe");
         newUser.setEmail("jane@email.com");
         newUser.setCanLogIn(true);
-        newUser.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
+        ePersonService.setLanguage(context, newUser, I18nUtil.getDefaultLocale().getLanguage());
 
         context.setCurrentUser(newUser);
 
@@ -281,11 +281,11 @@ public class ContextTest extends AbstractUnitTest {
         // Create a new EPerson (to be committed)
         String createdEmail = "myfakeemail@example.com";
         EPerson newUser = ePersonService.create(instance);
-        newUser.setFirstName(instance, "Tim");
-        newUser.setLastName(instance, "Smith");
+        ePersonService.setFirstName(instance, newUser, "Tim");
+        ePersonService.setLastName(instance, newUser, "Smith");
         newUser.setEmail(createdEmail);
         newUser.setCanLogIn(true);
-        newUser.setLanguage(instance, I18nUtil.getDefaultLocale().getLanguage());
+        ePersonService.setLanguage(instance, newUser, I18nUtil.getDefaultLocale().getLanguage());
 
         // Now, call commit()
         instance.commit();
@@ -330,11 +330,11 @@ public class ContextTest extends AbstractUnitTest {
         // Create a new EPerson (DO NOT COMMIT IT)
         String createdEmail = "susie@email.com";
         EPerson newUser = ePersonService.create(instance);
-        newUser.setFirstName(instance, "Susan");
-        newUser.setLastName(instance, "Doe");
+        ePersonService.setFirstName(instance, newUser,"Susan");
+        ePersonService.setLastName(instance, newUser,"Doe");
         newUser.setEmail(createdEmail);
         newUser.setCanLogIn(true);
-        newUser.setLanguage(instance, I18nUtil.getDefaultLocale().getLanguage());
+        ePersonService.setLanguage(instance, newUser,I18nUtil.getDefaultLocale().getLanguage());
 
         // Abort our context
         instance.abort();
@@ -365,11 +365,11 @@ public class ContextTest extends AbstractUnitTest {
 
             // Create a new EPerson (DO NOT COMMIT IT)
             EPerson newUser = ePersonService.create(instance);
-            newUser.setFirstName(instance, "Susan");
-            newUser.setLastName(instance, "Doe");
+            ePersonService.setFirstName(instance, newUser,"Susan");
+            ePersonService.setLastName(instance, newUser,"Doe");
             newUser.setEmail(createdEmail);
             newUser.setCanLogIn(true);
-            newUser.setLanguage(instance, I18nUtil.getDefaultLocale().getLanguage());
+            ePersonService.setLanguage(instance, newUser,I18nUtil.getDefaultLocale().getLanguage());
         }
 
         // Open a new context, let's make sure that EPerson isn't there

@@ -206,12 +206,12 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
 
             String firstName = getAttributeAsString(userInfo, getFirstNameAttribute());
             if (firstName != null) {
-                eperson.setFirstName(context, firstName);
+                ePersonService.setFirstName(context, eperson, firstName);
             }
 
             String lastName = getAttributeAsString(userInfo, getLastNameAttribute());
             if (lastName != null) {
-                eperson.setLastName(context, lastName);
+                ePersonService.setLastName(context, eperson, lastName);
             }
 
             eperson.setCanLogIn(true);

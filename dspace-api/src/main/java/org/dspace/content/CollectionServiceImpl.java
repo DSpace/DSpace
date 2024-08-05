@@ -576,9 +576,13 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         return license;
     }
 
+    public void setLicense(Context context, Collection collection, String license) throws SQLException {
+        setMetadataSingleValue(context, collection, MD_LICENSE, null, license);
+    }
+
     @Override
     public boolean hasCustomLicense(Collection collection) {
-        String license = collection.getLicenseCollection();
+        String license = getLicense(collection);
         return StringUtils.isNotBlank(license);
     }
 

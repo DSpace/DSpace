@@ -346,4 +346,63 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      *                      access error or other errors.
      */
     EPerson findByProfileItem(Context context, Item profile) throws SQLException;
+
+    /**
+     * Get the e-person's full name, combining first and last name in a
+     * displayable string.
+     *
+     * @return their full name (first + last name; if both are NULL, returns email)
+     */
+    String getFullName(EPerson eperson);
+
+    /**
+     * Get the eperson's first name.
+     *
+     * @return their first name (or null if the column is an SQL NULL)
+     */
+    String getFirstName(EPerson eperson);
+
+    /**
+     * Set the eperson's first name
+     *
+     * @param context   The relevant DSpace Context.
+     * @param firstname the person's first name
+     * @throws SQLException An exception that provides information on a database access error or other errors.
+     */
+    void setFirstName(Context context, EPerson eperson, String firstname) throws SQLException;
+
+    /**
+     * Get the eperson's last name.
+     *
+     * @return their last name (or null if the column is an SQL NULL)
+     */
+    String getLastName(EPerson eperson);
+
+    /**
+     * Set the eperson's last name
+     *
+     * @param context  The relevant DSpace Context.
+     * @param lastname the person's last name
+     * @throws SQLException An exception that provides information on a database access error or other errors.
+     */
+    void setLastName(Context context, EPerson eperson, String lastname) throws SQLException;
+
+    /**
+     * Get the e-person's language
+     *
+     * @return language code (or null if the column is an SQL NULL)
+     */
+    String getLanguage(EPerson eperson);
+
+
+    /**
+     * Set the EPerson's language.  Value is expected to be a Unix/POSIX
+     * Locale specification of the form {language} or {language}_{territory},
+     * e.g. "en", "en_US", "pt_BR" (the latter is Brazilian Portugese).
+     *
+     * @param context  The relevant DSpace Context.
+     * @param language language code
+     * @throws SQLException An exception that provides information on a database access error or other errors.
+     */
+    void setLanguage(Context context, EPerson eperson, String language) throws SQLException;
 }

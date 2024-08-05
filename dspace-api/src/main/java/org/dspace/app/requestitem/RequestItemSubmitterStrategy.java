@@ -14,6 +14,8 @@ import java.util.List;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 
 /**
@@ -22,6 +24,9 @@ import org.springframework.lang.NonNull;
  * @author Andrea Bollini
  */
 public class RequestItemSubmitterStrategy implements RequestItemAuthorExtractor {
+    @Autowired(required = true)
+    protected EPersonService epersonService;
+
     public RequestItemSubmitterStrategy() {
     }
 
@@ -40,7 +45,9 @@ public class RequestItemSubmitterStrategy implements RequestItemAuthorExtractor 
         List<RequestItemAuthor> authors = new ArrayList<>(1);
         if (null != submitter) {
             RequestItemAuthor author = new RequestItemAuthor(
-                submitter.getFullName(), submitter.getEmail());
+                epersonService.getFullName(submitter),
+                submitter.getEmail()
+            );
             authors.add(author);
         }
         return authors;

@@ -33,6 +33,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.iiif.IIIFApiQueryService;
 import org.dspace.iiif.util.IIIFSharedUtils;
@@ -82,6 +83,9 @@ public class IIIFUtils {
     protected SimpleModule iiifModule = ObjectMapperFactory.getIiifModule();
     // Use the object mapper subclass.
     protected ObjectMapper mapper = ObjectMapperFactory.getIiifObjectMapper();
+
+    @Autowired
+    protected ItemService itemService;
 
     @Autowired
     protected BitstreamService bitstreamService;
@@ -152,7 +156,7 @@ public class IIIFUtils {
      */
     public String getBitstreamMimeType(Bitstream bitstream, Context context) {
         try {
-            BitstreamFormat bitstreamFormat = bitstream.getFormat(context);
+            BitstreamFormat bitstreamFormat = bitstreamService.getFormat(context, bitstream);
             return bitstreamFormat.getMIMEType();
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
@@ -244,7 +248,7 @@ public class IIIFUtils {
      */
     public List<Bitstream> getSeeAlsoBitstreams(Item item) {
         List<Bitstream> seeAlsoBitstreams = new ArrayList<>();
-        List<Bundle> bundles = item.getBundles(OTHER_CONTENT_BUNDLE);
+        List<Bundle> bundles = itemService.getBundles(item, OTHER_CONTENT_BUNDLE);
         if (bundles.size() > 0) {
             for (Bundle bundle : bundles) {
                 List<Bitstream> bitstreams = bundle.getBitstreams();

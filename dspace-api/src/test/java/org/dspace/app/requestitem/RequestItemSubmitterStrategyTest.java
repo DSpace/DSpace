@@ -23,6 +23,8 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -39,6 +41,8 @@ public class RequestItemSubmitterStrategyTest
     private static EPerson johnDoe;
 
     private Item item;
+
+    private static EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
     @BeforeClass
     public static void setUpClass()
@@ -83,6 +87,7 @@ public class RequestItemSubmitterStrategyTest
     public void testGetRequestItemAuthor()
             throws Exception {
         RequestItemSubmitterStrategy instance = new RequestItemSubmitterStrategy();
+        instance.epersonService = epersonService;
         List<RequestItemAuthor> author = instance.getRequestItemAuthor(context, item);
         assertEquals("Wrong author address", AUTHOR_ADDRESS, author.get(0).getEmail());
     }

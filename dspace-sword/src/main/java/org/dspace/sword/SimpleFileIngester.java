@@ -101,14 +101,14 @@ public class SimpleFileIngester implements SWORDIngester {
             }
 
             String fn = swordService.getFilename(context, deposit, false);
-            bs.setName(context, fn);
+            bitstreamService.setName(context, bs, fn);
 
             swordService.message("File created in item with filename " + fn);
 
             BitstreamFormat bf = bitstreamFormatService.findByMIMEType(
                 context, deposit.getContentType());
             if (bf != null) {
-                bs.setFormat(context, bf);
+                bitstreamService.setFormat(context, bs, bf);
             }
 
             // to do the updates, we need to ignore authorisation in the context

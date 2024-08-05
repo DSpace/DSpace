@@ -18,6 +18,8 @@ import static org.hamcrest.Matchers.notNullValue;
 import java.util.UUID;
 
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.hamcrest.Matcher;
 
 /**
@@ -27,6 +29,8 @@ import org.hamcrest.Matcher;
  * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
  */
 public class ItemMatcher {
+    // todo: this may not work in all cases!
+    private static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     private ItemMatcher() { }
 
@@ -83,7 +87,7 @@ public class ItemMatcher {
     public static Matcher<? super Object> matchItemProperties(Item item) {
         return allOf(
             hasJsonPath("$.uuid", is(item.getID().toString())),
-            hasJsonPath("$.name", is(item.getName())),
+            hasJsonPath("$.name", is(itemService.getName(item))),
             hasJsonPath("$.handle", is(item.getHandle())),
             hasJsonPath("$.inArchive", is(item.isArchived())),
             hasJsonPath("$.discoverable", is(item.isDiscoverable())),

@@ -135,9 +135,9 @@ public class ItemUtils {
 
                 String cks = bit.getChecksum();
                 String cka = bit.getChecksumAlgorithm();
-                String oname = bit.getSource();
+                String oname = bitstreamService.getSource(bit);
                 String name = bit.getName();
-                String description = bit.getDescription();
+                String description = bitstreamService.getDescription(bit);
 
                 if (name != null) {
                     bitstream.getField().add(createValue("name", name));
@@ -151,7 +151,7 @@ public class ItemUtils {
                 // Add bitstream embargo information (READ policy present, for Anonymous group with a start date)
                 addResourcePolicyInformation(context, bit, bitstream);
 
-                bitstream.getField().add(createValue("format", bit.getFormat(context).getMIMEType()));
+                bitstream.getField().add(createValue("format", bitstreamService.getFormat(context, bit).getMIMEType()));
                 bitstream.getField().add(createValue("size", "" + bit.getSizeBytes()));
                 bitstream.getField().add(createValue("url", url));
                 bitstream.getField().add(createValue("checksum", cks));

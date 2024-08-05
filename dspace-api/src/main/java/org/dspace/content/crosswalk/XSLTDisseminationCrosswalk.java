@@ -38,6 +38,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
@@ -105,6 +106,8 @@ public class XSLTDisseminationCrosswalk
             = ContentServiceFactory.getInstance().getItemService();
     protected static final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
+    protected static final SiteService siteService
+            = ContentServiceFactory.getInstance().getSiteService();
 
     private static final String aliases[] = makeAliases(DIRECTION);
 
@@ -399,8 +402,8 @@ public class XSLTDisseminationCrosswalk
                 Site site = (Site) dso;
 
                 String identifier_uri = "hdl:" + site.getHandle();
-                String title = site.getName();
-                String url = site.getURL();
+                String title = siteService.getName(site);
+                String url = siteService.getURL(site);
 
                 //FIXME: adding two URIs for now (site handle and URL), in case site isn't using handles
                 dim.addContent(createField("dc", "identifier", "uri", null, identifier_uri));

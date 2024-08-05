@@ -129,23 +129,23 @@ public class RoleIngester implements PackageIngester {
 
             data = user.getElementsByTagName(RoleDisseminator.FIRST_NAME);
             if (data.getLength() > 0) {
-                eperson.setFirstName(context, data.item(0).getTextContent());
+                ePersonService.setFirstName(context, eperson, data.item(0).getTextContent());
             } else {
-                eperson.setFirstName(context, null);
+                ePersonService.setFirstName(context, eperson, null);
             }
 
             data = user.getElementsByTagName(RoleDisseminator.LAST_NAME);
             if (data.getLength() > 0) {
-                eperson.setLastName(context, data.item(0).getTextContent());
+                ePersonService.setLastName(context, eperson, data.item(0).getTextContent());
             } else {
-                eperson.setLastName(context, null);
+                ePersonService.setLastName(context, eperson, null);
             }
 
             data = user.getElementsByTagName(RoleDisseminator.LANGUAGE);
             if (data.getLength() > 0) {
-                eperson.setLanguage(context, data.item(0).getTextContent());
+                ePersonService.setLanguage(context, eperson, data.item(0).getTextContent());
             } else {
-                eperson.setLanguage(context, null);
+                ePersonService.setLanguage(context, eperson, null);
             }
 
             data = user.getElementsByTagName(RoleDisseminator.CAN_LOGIN);

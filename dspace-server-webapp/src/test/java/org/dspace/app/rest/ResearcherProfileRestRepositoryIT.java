@@ -74,6 +74,7 @@ import org.dspace.content.RelationshipType;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.orcid.OrcidQueue;
 import org.dspace.orcid.OrcidToken;
 import org.dspace.orcid.client.OrcidClient;
@@ -114,6 +115,9 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
     @Autowired
     private OrcidClient orcidClient;
+
+    @Autowired
+    private EPersonService epersonService;
 
     private OrcidClient orcidClientMock = mock(OrcidClient.class);
 
@@ -178,14 +182,14 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     public void testFindById() throws Exception {
 
         UUID id = user.getID();
-        String name = user.getFullName();
+        String name = epersonService.getFullName(user);
 
         String authToken = getAuthToken(user.getEmail(), password);
 
         context.turnOffAuthorisationSystem();
 
         ItemBuilder.createItem(context, personCollection)
-            .withDspaceObjectOwner(name, id.toString())
+            .withDSpaceObjectOwner(name, id.toString())
             .build();
 
         context.restoreAuthSystemState();
@@ -220,14 +224,14 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     public void testFindByIdWithAdmin() throws Exception {
 
         UUID id = user.getID();
-        String name = user.getFullName();
+        String name = epersonService.getFullName(user);
 
         String authToken = getAuthToken(admin.getEmail(), password);
 
         context.turnOffAuthorisationSystem();
 
         ItemBuilder.createItem(context, personCollection)
-            .withDspaceObjectOwner(name, id.toString())
+            .withDSpaceObjectOwner(name, id.toString())
             .build();
 
         context.restoreAuthSystemState();
@@ -261,14 +265,14 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     public void testFindByIdWithoutOwnerUser() throws Exception {
 
         UUID id = user.getID();
-        String name = user.getFullName();
+        String name = epersonService.getFullName(user);
 
         String authToken = getAuthToken(anotherUser.getEmail(), password);
 
         context.turnOffAuthorisationSystem();
 
         ItemBuilder.createItem(context, personCollection)
-            .withDspaceObjectOwner(name, id.toString())
+            .withDSpaceObjectOwner(name, id.toString())
             .build();
 
         context.restoreAuthSystemState();
@@ -603,7 +607,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         context.turnOffAuthorisationSystem();
 
         Item profileItem = ItemBuilder.createItem(context, personCollection)
-            .withDspaceObjectOwner(user.getEmail(), user.getID().toString())
+            .withDSpaceObjectOwner(user)
             .withOrcidIdentifier("0000-1111-2222-3333")
             .withOrcidAccessToken("access-token", eperson)
             .withOrcidAuthenticated("authenticated")
@@ -1101,7 +1105,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         ItemBuilder.createItem(context, personCollection)
             .withTitle("Admin User")
             .withPersonEmail("test@email.it")
-            .withDspaceObjectOwner("Admin User", admin.getID().toString())
+            .withDSpaceObjectOwner("Admin User", admin.getID().toString())
             .build();
 
         context.restoreAuthSystemState();
