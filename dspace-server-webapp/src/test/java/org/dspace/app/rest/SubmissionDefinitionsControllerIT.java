@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.dspace.app.rest.matcher.SubmissionDefinitionsMatcher.matchSubmissionConfig;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -17,8 +18,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
+
 import org.dspace.app.rest.matcher.SubmissionDefinitionsMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.app.util.SubmissionConfig;
+import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.content.Collection;
@@ -239,13 +244,17 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
 
     @Test
     public void findAllPaginationTest() throws Exception {
+        List<SubmissionConfig> definitions = new SubmissionConfigReader().getAllSubmissionConfigs(100, 0);
+        int totalCount = definitions.size();
+
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
+
         getClient(tokenAdmin).perform(get("/api/config/submissiondefinitions")
                 .param("size", "1")
                 .param("page", "0"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.submissiondefinitions[0].id", is("traditional")))
+                .andExpect(jsonPath("$._embedded.submissiondefinitions[0]", matchSubmissionConfig(definitions.get(0))))
                 .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
                         Matchers.containsString("/api/config/submissiondefinitions?"),
                         Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
@@ -259,8 +268,8 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                         Matchers.containsString("/api/config/submissiondefinitions?"),
                         Matchers.containsString("page=6"), Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$.page.size", is(1)))
-                .andExpect(jsonPath("$.page.totalElements", is(7)))
-                .andExpect(jsonPath("$.page.totalPages", is(7)))
+                .andExpect(jsonPath("$.page.totalElements", is(totalCount)))
+                .andExpect(jsonPath("$.page.totalPages", is(totalCount)))
                 .andExpect(jsonPath("$.page.number", is(0)));
 
         getClient(tokenAdmin).perform(get("/api/config/submissiondefinitions")
@@ -268,7 +277,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                 .param("page", "1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.submissiondefinitions[0].id", is("test-hidden")))
+                .andExpect(jsonPath("$._embedded.submissiondefinitions[0]", matchSubmissionConfig(definitions.get(1))))
                 .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
                         Matchers.containsString("/api/config/submissiondefinitions?"),
                         Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
@@ -285,8 +294,8 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                         Matchers.containsString("/api/config/submissiondefinitions?"),
                         Matchers.containsString("page="), Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$.page.size", is(1)))
-                .andExpect(jsonPath("$.page.totalElements", is(7)))
-                .andExpect(jsonPath("$.page.totalPages", is(7)))
+                .andExpect(jsonPath("$.page.totalElements", is(totalCount)))
+                .andExpect(jsonPath("$.page.totalPages", is(totalCount)))
                 .andExpect(jsonPath("$.page.number", is(1)));
 
         getClient(tokenAdmin).perform(get("/api/config/submissiondefinitions")
@@ -294,7 +303,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                 .param("page", "2"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.submissiondefinitions[0].id", is("accessConditionNotDiscoverable")))
+                .andExpect(jsonPath("$._embedded.submissiondefinitions[0]", matchSubmissionConfig(definitions.get(2))))
                 .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
                     Matchers.containsString("/api/config/submissiondefinitions?"),
                     Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
@@ -311,8 +320,8 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                     Matchers.containsString("/api/config/submissiondefinitions?"),
                     Matchers.containsString("page=6"), Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$.page.size", is(1)))
-                .andExpect(jsonPath("$.page.totalElements", is(7)))
-                .andExpect(jsonPath("$.page.totalPages", is(7)))
+                .andExpect(jsonPath("$.page.totalElements", is(totalCount)))
+                .andExpect(jsonPath("$.page.totalPages", is(totalCount)))
                 .andExpect(jsonPath("$.page.number", is(2)));
 
         getClient(tokenAdmin).perform(get("/api/config/submissiondefinitions")
@@ -320,7 +329,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                 .param("page", "3"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.submissiondefinitions[0].id", is("languagetestprocess")))
+                .andExpect(jsonPath("$._embedded.submissiondefinitions[0]", matchSubmissionConfig(definitions.get(3))))
                 .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
                     Matchers.containsString("/api/config/submissiondefinitions?"),
                     Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
@@ -337,8 +346,8 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                     Matchers.containsString("/api/config/submissiondefinitions?"),
                     Matchers.containsString("page=6"), Matchers.containsString("size=1"))))
                 .andExpect(jsonPath("$.page.size", is(1)))
-                .andExpect(jsonPath("$.page.totalElements", is(7)))
-                .andExpect(jsonPath("$.page.totalPages", is(7)))
+                .andExpect(jsonPath("$.page.totalElements", is(totalCount)))
+                .andExpect(jsonPath("$.page.totalPages", is(totalCount)))
                 .andExpect(jsonPath("$.page.number", is(3)));
 
         getClient(tokenAdmin).perform(get("/api/config/submissiondefinitions")
@@ -346,7 +355,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
             .param("page", "4"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
-            .andExpect(jsonPath("$._embedded.submissiondefinitions[0].id", is("qualdroptest")))
+            .andExpect(jsonPath("$._embedded.submissiondefinitions[0]", matchSubmissionConfig(definitions.get(4))))
             .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
                 Matchers.containsString("/api/config/submissiondefinitions?"),
                 Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
@@ -363,8 +372,8 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                 Matchers.containsString("/api/config/submissiondefinitions?"),
                 Matchers.containsString("page=6"), Matchers.containsString("size=1"))))
             .andExpect(jsonPath("$.page.size", is(1)))
-            .andExpect(jsonPath("$.page.totalElements", is(7)))
-            .andExpect(jsonPath("$.page.totalPages", is(7)))
+            .andExpect(jsonPath("$.page.totalElements", is(totalCount)))
+            .andExpect(jsonPath("$.page.totalPages", is(totalCount)))
             .andExpect(jsonPath("$.page.number", is(4)));
 
         getClient(tokenAdmin).perform(get("/api/config/submissiondefinitions")
@@ -372,7 +381,7 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
             .param("page", "5"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
-            .andExpect(jsonPath("$._embedded.submissiondefinitions[0].id", is("extractiontestprocess")))
+            .andExpect(jsonPath("$._embedded.submissiondefinitions[0]", matchSubmissionConfig(definitions.get(5))))
             .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
                 Matchers.containsString("/api/config/submissiondefinitions?"),
                 Matchers.containsString("page=0"), Matchers.containsString("size=1"))))
@@ -389,8 +398,8 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
                 Matchers.containsString("/api/config/submissiondefinitions?"),
                 Matchers.containsString("page=6"), Matchers.containsString("size=1"))))
             .andExpect(jsonPath("$.page.size", is(1)))
-            .andExpect(jsonPath("$.page.totalElements", is(7)))
-            .andExpect(jsonPath("$.page.totalPages", is(7)))
+            .andExpect(jsonPath("$.page.totalElements", is(totalCount)))
+            .andExpect(jsonPath("$.page.totalPages", is(totalCount)))
             .andExpect(jsonPath("$.page.number", is(5)));
     }
 
