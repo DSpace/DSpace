@@ -154,9 +154,15 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
         doc.addField("latestVersion", isLatestVersion(context, item));
 
         EPerson submitter = item.getSubmitter();
-        if (submitter != null) {
-            addFacetIndex(doc, "submitter", submitter.getID().toString(),
-                    submitter.getFullName());
+        if (submitter != null && DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty(
+            "discovery.index.item.submitter.enabled", true)) {
+            String submittername = DSpaceServicesFactory.getInstance().getConfigurationService()
+                .getProperty("discovery.index.item.submitter.name", null);
+            if (submittername != null) {
+                addFacetIndex(doc, "submitter", submitter.getID().toString(), submittername);
+            } else {
+                addFacetIndex(doc, "submitter", submitter.getID().toString(), submitter.getFullName());
+            }
         }
 
         // Add the item metadata
