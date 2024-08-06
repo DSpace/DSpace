@@ -23,6 +23,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.RelationshipUtils;
@@ -738,10 +739,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             if (value == null || !value.contains(csv.getAuthoritySeparator())) {
                 simplyCopyValue(value, dcv);
             } else {
-                String[] parts = value.split(csv.getAuthoritySeparator());
-                dcv.setValue(parts[0]);
-                dcv.setAuthority(parts[1]);
-                dcv.setConfidence((parts.length > 2 ? Integer.valueOf(parts[2]) : Choices.CF_ACCEPTED));
+                resolveValueAndAuthority(value, dcv);
             }
 
             // fromAuthority==null: with the current implementation metadata values from external authority sources
@@ -1156,10 +1154,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         } else if (value == null || !value.contains(csv.getAuthoritySeparator())) {
             simplyCopyValue(value, dcv);
         } else {
-            String[] parts = value.split(csv.getEscapedAuthoritySeparator());
-            dcv.setValue(parts[0]);
-            dcv.setAuthority(parts[1]);
-            dcv.setConfidence((parts.length > 2 ? Integer.valueOf(parts[2]) : Choices.CF_ACCEPTED));
+            resolveValueAndAuthority(value, dcv);
         }
         return dcv;
     }
@@ -1168,6 +1163,27 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         dcv.setValue(value);
         dcv.setAuthority(null);
         dcv.setConfidence(Choices.CF_UNSET);
+    }
+
+    private void resolveValueAndAuthority(String value, BulkEditMetadataValue dcv) {
+        String[] parts = value.split(csv.getEscapedAuthoritySeparator());
+
+        try {
+            // If an authority value is present, require a confidence value to be present as well
+            int confidence = Integer.parseInt(parts[parts.length - 1]);
+            String authority = parts[parts.length - 2];
+            String plainValue = String.join(
+                csv.getAuthoritySeparator(),
+                ArrayUtils.subarray(parts, 0, parts.length - 2)
+            );
+
+            dcv.setValue(plainValue);
+            dcv.setAuthority(authority);
+            dcv.setConfidence(confidence);
+        } catch (NumberFormatException e) {
+            // Otherwise assume the whole string is the value
+            dcv.setValue(value);
+        }
     }
 
     /**
@@ -1365,7 +1381,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
     private static boolean isAuthorityControlledField(String md) {
         String mdf = StringUtils.substringAfter(md, ":");
         mdf = StringUtils.substringBefore(mdf, "[");
-        return authorityControlled.contains(mdf);
+        return authorityControlled.contains(mdf) || authorityControlled.contains(md);
     }
 
     /**
@@ -1796,5 +1812,4 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                                                    String targetType, String originType, String originTypeName) {
         return RelationshipUtils.matchRelationshipType(relTypes, targetType, originType, originTypeName);
     }
-
 }
