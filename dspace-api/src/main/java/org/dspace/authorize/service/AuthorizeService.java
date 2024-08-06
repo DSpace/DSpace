@@ -133,7 +133,7 @@ public interface AuthorizeService {
     public boolean authorizeActionBoolean(Context c, DSpaceObject o, int a, boolean useInheritance) throws SQLException;
 
     /**
-     * same authorize with a specif eperson (not the current user), returns boolean for those who don't want to deal
+     * same authorize with a specific eperson (not the current user), returns boolean for those who don't want to deal
      * with
      * catching exceptions.
      *
@@ -235,7 +235,7 @@ public interface AuthorizeService {
      * @param o        DSpaceObject to add policy to
      * @param actionID ID of action from <code>org.dspace.core.Constants</code>
      * @param e        eperson who can perform the action
-     * @param type     policy type, deafult types are declared in the ResourcePolicy class
+     * @param type     policy type, default types are declared in the ResourcePolicy class
      * @throws SQLException       if database error
      * @throws AuthorizeException if current user in context is not authorized to add policies
      */
@@ -261,7 +261,7 @@ public interface AuthorizeService {
      * @param o        object to add policy for
      * @param actionID ID of action from <code>org.dspace.core.Constants</code>
      * @param g        group to add policy for
-     * @param type     policy type, deafult types are declared in the ResourcePolicy class
+     * @param type     policy type, default types are declared in the ResourcePolicy class
      * @throws SQLException       if there's a database problem
      * @throws AuthorizeException if the current user is not authorized to add this policy
      */

@@ -90,7 +90,7 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC
             // add the metadata to the item
             this.addMetadataToItem(context, deposit, item);
 
-            // update the item metadata to inclue the current time as
+            // update the item metadata to include the current time as
             // the updated date
             this.setUpdatedDate(context, item, verboseDescription);
 
@@ -237,7 +237,7 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC
             // add the metadata to the item
             this.addMetadataToItem(context, deposit, item);
 
-            // update the item metadata to inclue the current time as
+            // update the item metadata to include the current time as
             // the updated date
             this.setUpdatedDate(context, item, verboseDescription);
 

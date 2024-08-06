@@ -1382,7 +1382,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/items/" + publicItem.getID()))
                    .andExpect(status().isOk());
 
-        // Check publicItem bitstream creation (shuold be stored in bundle)
+        // Check publicItem bitstream creation (should be stored in bundle)
         getClient().perform(get("/api/core/items/" + publicItem.getID() + "/bundles"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -1453,7 +1453,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/items/" + publicItem.getID()))
             .andExpect(status().isOk());
 
-        // Check publicItem bitstream creation (shuold be stored in bundle)
+        // Check publicItem bitstream creation (should be stored in bundle)
         getClient().perform(get("/api/core/items/" + publicItem.getID() + "/bundles"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
@@ -1831,7 +1831,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                 )));
 
 
-        //Admin users are allowed to acceess undiscoverable items
+        //Admin users are allowed to access undiscoverable items
         String token1 = getAuthToken(admin.getEmail(), password);
         getClient(token1).perform(get("/api/core/items/" + unDiscoverableYetAccessibleItem1.getID()))
                 .andExpect(status().isOk())
@@ -4165,7 +4165,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                              .andExpect(jsonPath("$", CollectionMatcher.matchCollectionEntryFullProjection(
                                         col1.getName(), col1.getID(), col1.getHandle())));
 
-        // try to spoof information as a logged in eperson using embedding, verify that no embedds are included
+        // try to spoof information as a logged in eperson using embedding, verify that no embeds are included
         getClient(tokenEperson).perform(get("/api/core/items/" + item.getID())
                  .param("projection", "full"))
                  .andExpect(status().isOk())
@@ -4198,7 +4198,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(tokenEperson).perform(get("/api/core/items/" + item.getID() + "/owningCollection"))
                                .andExpect(status().isForbidden());
 
-        // try to spoof information as anonymous user using embedding, verify that no embedds are included
+        // try to spoof information as anonymous user using embedding, verify that no embeds are included
         getClient().perform(get("/api/core/items/" + item.getID())
                    .param("projection", "full"))
                    .andExpect(status().isOk())

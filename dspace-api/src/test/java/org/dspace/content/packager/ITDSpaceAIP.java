@@ -146,7 +146,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
             InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
 
             log.info("setUpClass() - CREATE TEST HIERARCHY");
-            // Create a hierachy of sub-Communities and Collections and Items,
+            // Create a hierarchy of sub-Communities and Collections and Items,
             // which looks like this:
             //  "Top Community"
             //      - "Child Community"

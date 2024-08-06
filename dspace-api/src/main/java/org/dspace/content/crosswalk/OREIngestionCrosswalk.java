@@ -173,7 +173,7 @@ public class OREIngestionCrosswalk
                 try {
                     // Make sure the url string escapes all the oddball characters
                     String processedURL = encodeForURL(href);
-                    // Generate a requeset for the aggregated resource
+                    // Generate a request for the aggregated resource
                     ARurl = new URL(processedURL);
                     in = ARurl.openStream();
                 } catch (FileNotFoundException fe) {

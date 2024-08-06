@@ -2304,7 +2304,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         ;
 
         // Perform a GET request to the searchByLabel endpoint, asking for Relationships of type isOrgUnitOfPerson
-        // We do not specificy a DSO param, which means ALL relationships of type isOrgUnitOfPerson should be returned
+        // We do not specify a DSO param, which means ALL relationships of type isOrgUnitOfPerson should be returned
         // Which is what we're checking for, both the first relationship and the one with a different author
         // should be returned
         getClient().perform(get("/api/core/relationships/search/byLabel")
