@@ -16,6 +16,7 @@ import org.dspace.app.rest.RootRestResourceController;
  */
 public class RootRest extends RestAddressableModel {
     public static final String NAME = "root";
+    public static final String PLURAL_NAME = NAME;
     public static final String CATEGORY = RestModel.ROOT;
     private String dspaceUI;
     private String dspaceName;
@@ -28,6 +29,14 @@ public class RootRest extends RestAddressableModel {
 
     public String getType() {
         return NAME;
+    }
+
+    /**
+     * The plural name is the same as the singular name
+     */
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     public Class getController() {

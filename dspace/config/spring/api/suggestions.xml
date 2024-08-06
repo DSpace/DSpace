@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd
+           http://www.springframework.org/schema/util 
+           http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+    <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+
+    <!-- This is defined in the solr-services.xml
+	<bean id="org.dspace.app.nbevent.service.NBEventService" 
+	   class="org.dspace.app.nbevent.service.impl.NBEventServiceImpl" /> -->
+ 
+	 <util:map id="suggestionProviders" map-class="java.util.HashMap" 
+	          key-type="java.lang.String" value-type="org.dspace.app.suggestion.SuggestionProvider">
+	    <entry key="openaire" value-ref="OpenairePublicationLoader" />
+	</util:map>
+
+    <bean id="OpenairePublicationLoader" class="org.dspace.app.suggestion.openaire.PublicationLoader">
+        <property name="sourceName" value="openaire" />
+        <property name="primaryProvider" ref="openaireLiveImportDataProviderByAuthor" />
+        <property name="otherProviders">
+            <list>
+                <ref bean="openaireLiveImportDataProviderByTitle"/>
+            </list>
+        </property>
+        <property name="names">
+            <list>
+                <value>dc.title</value>
+            </list>
+        </property>
+        <property name="pipeline">
+            <list>
+                <bean
+                    class="org.dspace.app.suggestion.openaire.AuthorNamesScorer">
+                    <property name="contributorMetadata">
+                        <list>
+                            <value>dc.contributor.author</value>
+                        </list>
+                    </property>
+                    <property name="names">
+                        <list>
+                            <value>dc.title</value>
+                        </list>
+                    </property>
+                </bean>
+                <bean
+                    class="org.dspace.app.suggestion.openaire.DateScorer">
+                    <property name="birthDateMetadata" value="person.birthDate" />
+                    <property name="publicationDateMetadata" value="dc.date.issued" />
+                </bean>    
+            </list>
+        </property>
+    </bean>
+
+ </beans>

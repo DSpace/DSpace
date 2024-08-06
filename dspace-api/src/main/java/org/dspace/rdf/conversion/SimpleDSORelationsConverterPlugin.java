@@ -14,11 +14,11 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.util.FileManager;
-import com.hp.hpl.jena.util.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.util.FileManager;
+import org.apache.jena.util.FileUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.Util;
 import org.dspace.content.Bitstream;

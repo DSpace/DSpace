@@ -163,7 +163,7 @@
                     <input-type value-pairs-name="common_types">dropdown</input-type>
                     <hint>Select the type of content of the item.
                     </hint>
-                    <required></required>
+                    <required>You must choose at least one type.</required>
                 </field>
             </row>
             <row>
@@ -366,7 +366,7 @@
                     <hint>Select the type(s) of content of the item. To select more than one value in the list, you may
                         have to hold down the "CTRL" or "Shift" key.
                     </hint>
-                    <required></required>
+                    <required>You must choose at least one type.</required>
                 </field>
             </row>
             <row>
@@ -516,7 +516,7 @@
 <!--            </row>-->
             <row>
                 <relation-field>
-                    <relationship-type>isProjectOfPerson</relationship-type>
+                    <relationship-type>isPersonOfProject</relationship-type>
                     <search-configuration>person</search-configuration>
                     <repeatable>true</repeatable>
                     <label>Investigator</label>
@@ -531,18 +531,18 @@
             </row>
             <row>
                 <relation-field>
-                    <relationship-type>isProjectOfOrgUnit</relationship-type>
+                    <relationship-type>isOrgUnitOfProject</relationship-type>
                     <search-configuration>orgunit</search-configuration>
                     <repeatable>false</repeatable>
                     <label>Organization</label>
                     <hint>Enter the organization's name</hint>
                     <linked-metadata-field>
-                        <dc-schema>project</dc-schema>
-                        <dc-element>funder</dc-element>
-                        <dc-qualifier>name</dc-qualifier>
+                        <dc-schema>dc</dc-schema>
+                        <dc-element>contributor</dc-element>
+                        <dc-qualifier>other</dc-qualifier>
                         <input-type>onebox</input-type>
                     </linked-metadata-field>
-                    <externalsources/>
+                    <externalsources>ror</externalsources>
                 </relation-field>
             </row>
             <row>
@@ -819,9 +819,9 @@
 
         </form>
 
-        <!-- OpenAIRE specific forms -->
+        <!-- Openaire specific forms -->
 
-        <form name="openAIREPublicationPageoneForm">
+        <form name="openairePublicationPageoneForm">
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
@@ -1041,7 +1041,7 @@
                     <hint>Select the type(s) of content of the item. To select more than one value in the list, you may
                         have to hold down the "CTRL" or "Shift" key.
                     </hint>
-                    <required></required>
+                    <required>You must choose at least one type.</required>
                 </field>
             </row>
             <row>
@@ -1071,7 +1071,7 @@
             </row>
         </form>
 
-        <form name="openAIREPublicationPagetwoForm">
+        <form name="openairePublicationPagetwoForm">
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
@@ -1129,7 +1129,7 @@
                         <dc-element>relation</dc-element>
                         <input-type>onebox</input-type>
                     </linked-metadata-field>
-                    <externalsources>openAIREFunding</externalsources>
+                    <externalsources>openaireFunding</externalsources>
                     <required></required>
                 </relation-field>
             </row>
@@ -1182,7 +1182,7 @@
             </row>
         </form>
 
-        <form name="openAIREPersonForm">
+        <form name="openairePersonForm">
             <row>
                 <field>
                     <dc-schema>person</dc-schema>
@@ -1246,7 +1246,7 @@
             </row>
         </form>
 
-        <form name="openAIREProjectForm">
+        <form name="openaireProjectForm">
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
@@ -1269,7 +1269,7 @@
             <row>
                 <relation-field>
                     <relationship-type>isFundingAgencyOfProject</relationship-type>
-                    <search-configuration>openAIREFundingAgency</search-configuration>
+                    <search-configuration>openaireFundingAgency</search-configuration>
                     <repeatable>false</repeatable>
                     <name-variants>false</name-variants>
                     <label>Funding Agency</label>
@@ -1302,7 +1302,7 @@
             </row>
         </form>
 
-        <form name="openAIREOrganizationForm">
+        <form name="openaireOrganizationForm">
             <row>
                 <field>
                     <dc-schema>organization</dc-schema>
@@ -1537,7 +1537,7 @@
             </pair>
         </value-pairs>
 
-        <!-- OpenAIRE specific value pairs -->
+        <!-- Openaire specific value pairs -->
 
         <value-pairs value-pairs-name="openaire_license_types" dc-term="license">
 
@@ -1549,27 +1549,27 @@
             </pair>
             <pair>
                 <displayed-value>Attribution (CC-BY)</displayed-value>
-                <stored-value>http://creativecommons.org/licenses/by/4.0/</stored-value>
+                <stored-value>https://creativecommons.org/licenses/by/4.0/</stored-value>
             </pair>
             <pair>
                 <displayed-value>Attribution, No Derivative Works (CC-BY-ND)</displayed-value>
-                <stored-value>http://creativecommons.org/licenses/by-nd/4.0/</stored-value>
+                <stored-value>https://creativecommons.org/licenses/by-nd/4.0/</stored-value>
             </pair>
             <pair>
                 <displayed-value>Attribution, Share-alike (CC-BY-SA)</displayed-value>
-                <stored-value>http://creativecommons.org/licenses/by-sa/4.0/</stored-value>
+                <stored-value>https://creativecommons.org/licenses/by-sa/4.0/</stored-value>
             </pair>
             <pair>
                 <displayed-value>Attribution, Non-commercial (CC-BY-NC)</displayed-value>
-                <stored-value>http://creativecommons.org/licenses/by-nc/4.0/</stored-value>
+                <stored-value>https://creativecommons.org/licenses/by-nc/4.0/</stored-value>
             </pair>
             <pair>
                 <displayed-value>Attribution, Non-commercial, No Derivative Works (CC-BY-NC-ND)</displayed-value>
-                <stored-value>http://creativecommons.org/licenses/by-nc-nd/4.0/</stored-value>
+                <stored-value>https://creativecommons.org/licenses/by-nc-nd/4.0/</stored-value>
             </pair>
             <pair>
                 <displayed-value>Attribution, Non-commercial, Share-alike (CC-BY-NC-SA)</displayed-value>
-                <stored-value>http://creativecommons.org/licenses/by-nc-sa/4.0/</stored-value>
+                <stored-value>https://creativecommons.org/licenses/by-nc-sa/4.0/</stored-value>
             </pair>
             <!-- Add here other licenses -->
             <pair>
@@ -1579,7 +1579,7 @@
 
         </value-pairs>
 
-        <!-- OpenAIRE document types
+        <!-- Openaire document types
              https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_publicationtype.html
              Based on COAR Vocabularies -> Controlled Vocabulary for Resource Type Genres (Version 2.0):
              http://vocabularies.coar-repositories.org/documentation/resource_types/

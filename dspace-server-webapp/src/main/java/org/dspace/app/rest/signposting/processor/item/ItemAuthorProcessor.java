@@ -14,8 +14,8 @@ import static org.dspace.content.Item.ANY;
 
 import java.text.MessageFormat;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.signposting.model.LinksetNode;
 import org.dspace.app.rest.signposting.model.LinksetRelationType;

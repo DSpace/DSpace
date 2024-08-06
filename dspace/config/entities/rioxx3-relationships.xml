@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE relationships SYSTEM "relationship-types.dtd">
+<!-- Note that these relationships are the same as those for openaire4
+ 	They are used to map to relevant fields within the Rioxx profile. See docs below. -->
+<relationships>
+
+	<!-- https://www.rioxx.net/profiles/v3-0-final/#rioxxterms:creator
+		The relation between a Publication and a Person regarding the authorship -->
+	<type>
+		<leftType>Publication</leftType>
+		<rightType>Person</rightType>
+		<leftwardType>isAuthorOfPublication</leftwardType>
+		<rightwardType>isPublicationOfAuthor</rightwardType>
+		<leftCardinality>
+			<min>0</min>
+		</leftCardinality>
+		<rightCardinality>
+			<min>0</min>
+		</rightCardinality>
+	</type>
+	<!-- https://www.rioxx.net/profiles/v3-0-final/#rioxxterms:creator
+		The relation between a Publication and an Organization regarding the authorship -->
+	<type>
+		<leftType>Publication</leftType>
+		<rightType>OrgUnit</rightType>
+		<leftwardType>isAuthorOfPublication</leftwardType>
+		<rightwardType>isPublicationOfAuthor</rightwardType>
+		<leftCardinality>
+			<min>0</min>
+		</leftCardinality>
+		<rightCardinality>
+			<min>0</min>
+		</rightCardinality>
+	</type>
+	<!-- https://www.rioxx.net/profiles/v3-0-final/#rioxxterms:contributor
+		The relation between a Publication and a Person regarding the contribution -->
+	<type>
+		<leftType>Publication</leftType>
+		<rightType>Person</rightType>
+		<leftwardType>isContributorOfPublication</leftwardType>
+		<rightwardType>isPublicationOfContributor</rightwardType>
+		<leftCardinality>
+			<min>0</min>
+		</leftCardinality>
+		<rightCardinality>
+			<min>0</min>
+		</rightCardinality>
+	</type>
+	<!-- https://www.rioxx.net/profiles/v3-0-final/#rioxxterms:contributor
+		The relation between a Publication and an Organization regarding the contribution -->
+	<type>
+		<leftType>Publication</leftType>
+		<rightType>OrgUnit</rightType>
+		<leftwardType>isContributorOfPublication</leftwardType>
+		<rightwardType>isPublicationOfContributor</rightwardType>
+		<leftCardinality>
+			<min>0</min>
+		</leftCardinality>
+		<rightCardinality>
+			<min>0</min>
+		</rightCardinality>
+	</type>
+	<!--https://www.rioxx.net/profiles/v3-0-final/#rioxxterms:project
+		The relation between a Publication and an Organization regarding the Funder to populate rioxxterms:project -->
+	<type>
+		<leftType>Publication</leftType>
+		<rightType>Project</rightType>
+		<leftwardType>isProjectOfPublication</leftwardType>
+		<rightwardType>isPublicationOfProject</rightwardType>
+		<leftCardinality>
+			<min>0</min>
+		</leftCardinality>
+		<rightCardinality>
+			<min>0</min>
+		</rightCardinality>
+	</type>
+	<!-- https://www.rioxx.net/profiles/v3-0-final/#rioxxterms:grant
+		The relation between a Funded Project and an Organization regarding the Funder to populate rioxxterms:grant -->
+	<type>
+		<leftType>Project</leftType>
+		<rightType>OrgUnit</rightType>
+		<leftwardType>isFundingAgencyOfProject</leftwardType>
+		<rightwardType>isProjectOfFundingAgency</rightwardType>
+		<leftCardinality>
+			<min>0</min>
+		</leftCardinality>
+		<rightCardinality>
+			<min>0</min>
+		</rightCardinality>
+	</type>
+
+</relationships>

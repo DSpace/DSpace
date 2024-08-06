@@ -9,8 +9,8 @@ package org.dspace.app.util;
 
 import java.sql.SQLException;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authorize.AuthorizeConfiguration;
@@ -628,10 +628,21 @@ public class AuthorizeUtil {
             // actually expected to be returning true.
             // For example the LDAP canSelfRegister will return true due to auto-register, while that
             // does not imply a new user can register explicitly
-            return AuthenticateServiceFactory.getInstance().getAuthenticationService()
-                                             .allowSetPassword(context, request, null);
+            return authorizePasswordChange(context, request);
         }
         return false;
+    }
+
+    /**
+     * This method will return a boolean indicating whether the current user is allowed to reset the password
+     * or not
+     *
+     * @return          A boolean indicating whether the current user can reset its password or not
+     * @throws SQLException If something goes wrong
+     */
+    public static boolean authorizeForgotPassword() {
+        return DSpaceServicesFactory.getInstance().getConfigurationService()
+                             .getBooleanProperty("user.forgot-password", true);
     }
 
     /**
@@ -647,13 +658,25 @@ public class AuthorizeUtil {
             if (eperson != null && eperson.canLogIn()) {
                 HttpServletRequest request = new DSpace().getRequestService().getCurrentRequest()
                                                          .getHttpServletRequest();
-                return AuthenticateServiceFactory.getInstance().getAuthenticationService()
-                                                 .allowSetPassword(context, request, null);
+                return authorizePasswordChange(context, request);
             }
         } catch (SQLException e) {
             log.error("Something went wrong trying to retrieve EPerson for email: " + email, e);
         }
         return false;
+    }
+
+    /**
+     * Checks if the current configuration has at least one password based authentication method
+     *
+     * @param context Dspace Context
+     * @param request Current Request
+     * @return True if the password change is enabled
+     * @throws SQLException
+     */
+    protected static boolean authorizePasswordChange(Context context, HttpServletRequest request) throws SQLException {
+        return AuthenticateServiceFactory.getInstance().getAuthenticationService()
+                                         .allowSetPassword(context, request, null);
     }
 
     /**

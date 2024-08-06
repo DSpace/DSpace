@@ -102,8 +102,9 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
                 }
             }
             String vocabulariesPath = DSpaceServicesFactory.getInstance().getConfigurationService()
-                                                           .getProperty(
-                                                               "dspace.dir") + "/config/controlled-vocabularies/";
+                                                           .getProperty("dspace.dir") +
+                                                           File.separator + "config" +
+                                                           File.separator + "controlled-vocabularies";
             String[] xmlFiles = (new File(vocabulariesPath)).list(new xmlFilter());
             List<String> names = new ArrayList<String>();
             for (String filename : xmlFiles) {
@@ -120,7 +121,8 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
 
             log.info("Initializing " + this.getClass().getName());
             vocabularyName = this.getPluginInstanceName();
-            String vocabulariesPath = config.getProperty("dspace.dir") + "/config/controlled-vocabularies/";
+            String vocabulariesPath = config.getProperty("dspace.dir") + File.separator + "config" +
+                File.separator + "controlled-vocabularies" + File.separator;
             String configurationPrefix = "vocabulary.plugin." + vocabularyName;
             storeHierarchy = config.getBooleanProperty(configurationPrefix + ".hierarchy.store", storeHierarchy);
             suggestHierarchy = config.getBooleanProperty(configurationPrefix + ".hierarchy.suggest", suggestHierarchy);
@@ -224,6 +226,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
 
     @Override
     public boolean isHierarchical() {
+        init();
         return true;
     }
 
@@ -256,6 +259,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
 
     @Override
     public Integer getPreloadLevel() {
+        init();
         return preloadLevel;
     }
 

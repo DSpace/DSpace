@@ -12,15 +12,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.ScopeResolver;
@@ -285,7 +285,6 @@ public class OpenSearchController {
         labelMap.put(SyndicationFeed.MSG_UNTITLED, "notitle");
         labelMap.put(SyndicationFeed.MSG_LOGO_TITLE, "logo.title");
         labelMap.put(SyndicationFeed.MSG_FEED_DESCRIPTION, "general-feed.description");
-        labelMap.put(SyndicationFeed.MSG_UITYPE, SyndicationFeed.UITYPE_JSPUI);
         for (String selector : SyndicationFeed.getDescriptionSelectors()) {
             labelMap.put("metadata." + selector, selector);
         }

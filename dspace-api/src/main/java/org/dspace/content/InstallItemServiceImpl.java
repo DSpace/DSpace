@@ -28,6 +28,7 @@ import org.dspace.event.Event;
 import org.dspace.identifier.Identifier;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.IdentifierService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.supervision.SupervisionOrder;
 import org.dspace.supervision.service.SupervisionOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,9 @@ public class InstallItemServiceImpl implements InstallItemService {
     @Autowired(required = false)
 
     Logger log = LogManager.getLogger(InstallItemServiceImpl.class);
+
+    @Autowired
+    protected ConfigurationService configurationService;
 
     protected InstallItemServiceImpl() {
     }
@@ -93,7 +97,7 @@ public class InstallItemServiceImpl implements InstallItemService {
         // As this is a BRAND NEW item, as a final step we need to remove the
         // submitter item policies created during deposit and replace them with
         // the default policies from the collection.
-        itemService.inheritCollectionDefaultPolicies(c, item, collection);
+        itemService.inheritCollectionDefaultPolicies(c, item, collection, false);
 
         return item;
     }
@@ -150,22 +154,12 @@ public class InstallItemServiceImpl implements InstallItemService {
         return finishItem(c, item, is);
     }
 
-
     protected void populateMetadata(Context c, Item item)
         throws SQLException, AuthorizeException {
         // create accession date
         DCDate now = DCDate.getCurrent();
         itemService.addMetadata(c, item, MetadataSchemaEnum.DC.getName(),
                                 "date", "accessioned", null, now.toString());
-
-        // add date available if not under embargo, otherwise it will
-        // be set when the embargo is lifted.
-        // this will flush out fatal embargo metadata
-        // problems before we set inArchive.
-        if (embargoService.getEmbargoTermsAsDate(c, item) == null) {
-            itemService.addMetadata(c, item, MetadataSchemaEnum.DC.getName(),
-                                    "date", "available", null, now.toString());
-        }
 
         // If issue date is set as "today" (literal string), then set it to current date
         // In the below loop, we temporarily clear all issued dates and re-add, one-by-one,
@@ -270,5 +264,35 @@ public class InstallItemServiceImpl implements InstallItemService {
         }
 
         return myMessage.toString();
+    }
+
+    @Override
+    public String getSubmittedByProvenanceMessage(Context context, Item item) throws SQLException {
+        // get date
+        DCDate now = DCDate.getCurrent();
+
+        // Create provenance description
+        StringBuffer provmessage = new StringBuffer();
+
+        //behavior to generate provenance message, if set true, personal data (e.g. email) of submitter will be hidden
+        //default value false, personal data of submitter will be shown in provenance message
+        String isProvenancePrivacyActiveProperty =
+                configurationService.getProperty("metadata.privacy.dc.description.provenance", "false");
+        boolean isProvenancePrivacyActive = Boolean.parseBoolean(isProvenancePrivacyActiveProperty);
+
+        if (item.getSubmitter() != null && !isProvenancePrivacyActive) {
+            provmessage.append("Submitted by ").append(item.getSubmitter().getFullName())
+                    .append(" (").append(item.getSubmitter().getEmail()).append(") on ")
+                    .append(now.toString());
+        } else {
+            // else, null submitter
+            provmessage.append("Submitted by unknown (probably automated or submitter hidden) on ")
+                    .append(now.toString());
+        }
+        provmessage.append("\n");
+
+        // add sizes and checksums of bitstreams
+        provmessage.append(getBitstreamProvenanceMessage(context, item));
+        return provmessage.toString();
     }
 }

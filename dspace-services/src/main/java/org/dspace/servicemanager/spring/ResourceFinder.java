@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -26,13 +26,13 @@ import org.springframework.core.io.Resource;
  * things (file/IS/resource).
  * This also allows us to look on a relative or absolute path and will
  * automatically check the typical places one might expect to put DSpace
- * config files.
+ * configuration files.
  *
  * @author Aaron Zeckoski (aaron@caret.cam.ac.uk)
  */
 public class ResourceFinder {
 
-    private static Logger log = LoggerFactory.getLogger(ResourceFinder.class);
+    private static final Logger log = LogManager.getLogger();
 
     public static final String relativePath = DSpaceConfigurationService.DSPACE + "/";
     public static final String environmentPathVariable = DSpaceConfigurationService.DSPACE_HOME;
@@ -43,7 +43,7 @@ public class ResourceFinder {
     private ResourceFinder() { }
 
     private static List<Resource> makeResources(List<String> paths) {
-        List<Resource> rs = new ArrayList<Resource>();
+        List<Resource> rs = new ArrayList<>();
         if (paths != null && !paths.isEmpty()) {
             for (String path : paths) {
                 try {
@@ -51,7 +51,7 @@ public class ResourceFinder {
                     rs.add(r);
                 } catch (IllegalArgumentException e) {
                     // do not add if not found, just skip
-                    log.error(e.getMessage() + ", continuing...");
+                    log.error("{}, continuing...", e::getMessage);
                 }
             }
         }

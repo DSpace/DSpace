@@ -8,9 +8,9 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.SupervisionOrderRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.projection.Projection;
@@ -30,7 +30,8 @@ import org.springframework.stereotype.Component;
  *
  * @author Mohamed Eskander (mohamed.eskander at 4science dot it)
  */
-@Component(WorkspaceItemRest.CATEGORY + "." + WorkspaceItemRest.NAME + "." + WorkspaceItemRest.SUPERVISION_ORDERS)
+@Component(WorkspaceItemRest.CATEGORY + "." + WorkspaceItemRest.PLURAL_NAME + "." +
+    WorkspaceItemRest.SUPERVISION_ORDERS)
 public class WorkspaceItemSupervisionOrdersLinkRepository
     extends AbstractDSpaceRestRepository implements LinkRestRepository {
 

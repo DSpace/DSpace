@@ -10,8 +10,10 @@ package org.dspace.app.rest.submit.step;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
+import java.util.Objects;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.ErrorRest;
@@ -46,8 +48,6 @@ public class UploadStep extends AbstractProcessingStep
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(UploadStep.class);
 
-    public static final String UPLOAD_STEP_METADATA_SECTION = "bitstream-metadata";
-
     @Override
     public DataUpload getData(SubmissionService submissionService, InProgressSubmission obj,
                               SubmissionStepConfig config) throws Exception {
@@ -56,8 +56,12 @@ public class UploadStep extends AbstractProcessingStep
         List<Bundle> bundles = itemService.getBundles(obj.getItem(), Constants.CONTENT_BUNDLE_NAME);
         for (Bundle bundle : bundles) {
             for (Bitstream source : bundle.getBitstreams()) {
+                Bitstream primaryBitstream = bundle.getPrimaryBitstream();
                 UploadBitstreamRest b = submissionService.buildUploadBitstream(configurationService, source);
                 result.getFiles().add(b);
+                if (Objects.nonNull(primaryBitstream)) {
+                    result.setPrimary(primaryBitstream.getID());
+                }
             }
         }
         return result;
@@ -73,6 +77,8 @@ public class UploadStep extends AbstractProcessingStep
                 instance = UPLOAD_STEP_METADATA_OPERATION_ENTRY;
             } else if (op.getPath().contains(UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY)) {
                 instance = stepConf.getType() + "." + UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY;
+            } else if (op.getPath().contains(PRIMARY_FLAG_ENTRY)) {
+                instance = PRIMARY_FLAG_ENTRY;
             } else {
                 instance = UPLOAD_STEP_REMOVE_OPERATION_ENTRY;
             }
@@ -87,9 +93,11 @@ public class UploadStep extends AbstractProcessingStep
                 instance = stepConf.getType() + "." + UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY;
             } else if (op.getPath().contains(UPLOAD_STEP_METADATA_PATH)) {
                 instance = UPLOAD_STEP_METADATA_OPERATION_ENTRY;
+            } else if (op.getPath().contains(PRIMARY_FLAG_ENTRY)) {
+                instance = PRIMARY_FLAG_ENTRY;
             }
         }
-        if (instance == null) {
+        if (StringUtils.isBlank(instance)) {
             throw new UnprocessableEntityException("The path " + op.getPath() + " is not supported by the operation "
                                                                               + op.getOp());
         }

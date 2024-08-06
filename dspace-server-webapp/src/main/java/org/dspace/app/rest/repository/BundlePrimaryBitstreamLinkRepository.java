@@ -9,9 +9,9 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.UUID;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.BitstreamRest;
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "primaryBitstream" subresource of an individual bundle.
  */
-@Component(BundleRest.CATEGORY + "." + BundleRest.NAME + "." + BundleRest.PRIMARY_BITSTREAM)
+@Component(BundleRest.CATEGORY + "." + BundleRest.PLURAL_NAME + "." + BundleRest.PRIMARY_BITSTREAM)
 public class BundlePrimaryBitstreamLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

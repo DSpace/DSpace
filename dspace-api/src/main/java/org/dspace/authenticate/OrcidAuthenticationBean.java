@@ -18,11 +18,13 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -39,8 +41,6 @@ import org.dspace.profile.service.ResearcherProfileService;
 import org.dspace.services.ConfigurationService;
 import org.orcid.jaxb.model.v3.release.record.Email;
 import org.orcid.jaxb.model.v3.release.record.Person;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -53,7 +53,7 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
 
     public static final String ORCID_AUTH_ATTRIBUTE = "orcid-authentication";
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(OrcidAuthenticationBean.class);
+    private final static Logger LOGGER = LogManager.getLogger();
 
     private final static String LOGIN_PAGE_URL_FORMAT = "%s?client_id=%s&response_type=code&scope=%s&redirect_uri=%s";
 
@@ -282,7 +282,8 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
         try {
             return orcidClient.getPerson(token.getAccessToken(), token.getOrcid());
         } catch (Exception ex) {
-            LOGGER.error("An error occurs retriving the ORCID record with id " + token.getOrcid(), ex);
+            LOGGER.error("An error occurs retriving the ORCID record with id {}",
+                    token.getOrcid(), ex);
             return null;
         }
     }

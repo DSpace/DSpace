@@ -73,17 +73,22 @@ public class IndexEventConsumer implements Consumer {
 
         int st = event.getSubjectType();
         if (!(st == Constants.ITEM || st == Constants.BUNDLE
-            || st == Constants.COLLECTION || st == Constants.COMMUNITY || st == Constants.SITE)) {
+            || st == Constants.COLLECTION || st == Constants.COMMUNITY || st == Constants.SITE
+            || st == Constants.LDN_MESSAGE)) {
             log
                 .warn("IndexConsumer should not have been given this kind of Subject in an event, skipping: "
                           + event.toString());
             return;
         }
 
-        DSpaceObject subject = event.getSubject(ctx);
-
-        DSpaceObject object = event.getObject(ctx);
-
+        DSpaceObject subject = null;
+        DSpaceObject object = null;
+        try {
+            subject = event.getSubject(ctx);
+            object = event.getObject(ctx);
+        } catch (Exception e) {
+            log.warn("Could not find the related DSpace Object for event subject: " + st);
+        }
 
         // If event subject is a Bundle and event was Add or Remove,
         // transform the event to be a Modify on the owning Item.
@@ -110,7 +115,7 @@ public class IndexEventConsumer implements Consumer {
             case Event.MODIFY:
             case Event.MODIFY_METADATA:
                 if (subject == null) {
-                    if (st == Constants.SITE) {
+                    if (st == Constants.SITE || st == Constants.LDN_MESSAGE) {
                         // Update the indexable objects of type in event.detail of objects with ids in event.identifiers
                         for (String id : event.getIdentifiers()) {
                             IndexFactory indexableObjectService = IndexObjectFactoryFactory.getInstance().
@@ -154,7 +159,11 @@ public class IndexEventConsumer implements Consumer {
 
             case Event.REMOVE:
             case Event.ADD:
-                if (object == null) {
+                // At this time, ADD and REMOVE actions are ignored on SITE object. They are only triggered for
+                // top-level communities. No action is necessary as Community itself is indexed (or deleted) separately.
+                if (event.getSubjectType() == Constants.SITE) {
+                    log.debug(event.getEventTypeAsString() + " event triggered for Site object. Skipping it.");
+                } else if (object == null) {
                     log.warn(event.getEventTypeAsString() + " event, could not get object for "
                                  + event.getObjectTypeAsString() + " id="
                                  + event.getObjectID()
@@ -201,6 +210,10 @@ public class IndexEventConsumer implements Consumer {
     @Override
     public void end(Context ctx) throws Exception {
 
+        // Change the mode to readonly to improve performance
+        Context.Mode originalMode = ctx.getCurrentMode();
+        ctx.setMode(Context.Mode.READ_ONLY);
+
         try {
             for (String uid : uniqueIdsToDelete) {
                 try {
@@ -230,6 +243,8 @@ public class IndexEventConsumer implements Consumer {
                 uniqueIdsToDelete.clear();
                 createdItemsToUpdate.clear();
             }
+
+            ctx.setMode(originalMode);
         }
     }
 

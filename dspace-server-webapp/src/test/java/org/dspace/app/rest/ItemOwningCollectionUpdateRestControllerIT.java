@@ -55,7 +55,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
         context.restoreAuthSystemState();
         //When we call this owningCollection/move endpoint
         getClient().perform(
-                put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
+                put("/api/core/items/" + publicItem1.getID() + "/owningCollection")
                         .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                         .content(
                                 "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()
@@ -91,7 +91,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
 
         //When we call this owningCollection/move endpoint
         getClient(token)
-                .perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
+                .perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection")
                         .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                         .content(
                                 "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()
@@ -131,13 +131,13 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
         EPerson itemMoveEperson = EPersonBuilder.createEPerson(context).withEmail("item@move.org").withPassword("test")
                                                 .withNameInMetadata("Item", "Move").build();
 
-        ResourcePolicy rp1 = ResourcePolicyBuilder.createResourcePolicy(context).withUser(itemMoveEperson)
+        ResourcePolicy rp1 = ResourcePolicyBuilder.createResourcePolicy(context, itemMoveEperson, null)
                                                   .withAction(Constants.ADMIN)
                                                   .withDspaceObject(col1).build();
-        ResourcePolicy rp2 = ResourcePolicyBuilder.createResourcePolicy(context).withUser(itemMoveEperson)
+        ResourcePolicy rp2 = ResourcePolicyBuilder.createResourcePolicy(context, itemMoveEperson, null)
                                                   .withAction(Constants.WRITE)
                                                   .withDspaceObject(publicItem1).build();
-        ResourcePolicy rp3 = ResourcePolicyBuilder.createResourcePolicy(context).withUser(itemMoveEperson)
+        ResourcePolicy rp3 = ResourcePolicyBuilder.createResourcePolicy(context, itemMoveEperson, null)
                                                   .withAction(Constants.ADD)
                                                   .withDspaceObject(col2).build();
 
@@ -145,7 +145,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
         String token = getAuthToken(itemMoveEperson.getEmail(), "test");
 
         getClient(token)
-                .perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
+                .perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection")
                         .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                         .content(
                                 "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()
@@ -181,17 +181,17 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
         EPerson itemMoveEperson = EPersonBuilder.createEPerson(context).withEmail("item@move.org").withPassword("test")
                                                 .withNameInMetadata("Item", "Move").build();
 
-        ResourcePolicy rp1 = ResourcePolicyBuilder.createResourcePolicy(context).withUser(itemMoveEperson)
+        ResourcePolicy rp1 = ResourcePolicyBuilder.createResourcePolicy(context, itemMoveEperson, null)
                                                   .withAction(Constants.ADMIN)
                                                   .withDspaceObject(col1).build();
-        ResourcePolicy rp2 = ResourcePolicyBuilder.createResourcePolicy(context).withUser(itemMoveEperson)
+        ResourcePolicy rp2 = ResourcePolicyBuilder.createResourcePolicy(context, itemMoveEperson, null)
                                                   .withAction(Constants.WRITE)
                                                   .withDspaceObject(publicItem1).build();
 
         context.restoreAuthSystemState();
         String token = getAuthToken(itemMoveEperson.getEmail(), "test");
 
-        getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
+        getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection")
                 .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                 .content(
                         "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()
@@ -222,17 +222,17 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
         EPerson itemMoveEperson = EPersonBuilder.createEPerson(context).withEmail("item@move.org").withPassword("test")
                                                 .withNameInMetadata("Item", "Move").build();
 
-        ResourcePolicy rp2 = ResourcePolicyBuilder.createResourcePolicy(context).withUser(itemMoveEperson)
+        ResourcePolicy rp2 = ResourcePolicyBuilder.createResourcePolicy(context, itemMoveEperson, null)
                                                   .withAction(Constants.WRITE)
                                                   .withDspaceObject(publicItem1).build();
-        ResourcePolicy rp3 = ResourcePolicyBuilder.createResourcePolicy(context).withUser(itemMoveEperson)
+        ResourcePolicy rp3 = ResourcePolicyBuilder.createResourcePolicy(context, itemMoveEperson, null)
                                                   .withAction(Constants.ADD)
                                                   .withDspaceObject(col2).build();
 
         context.restoreAuthSystemState();
         String token = getAuthToken(itemMoveEperson.getEmail(), "test");
 
-        getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
+        getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection")
                 .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                 .content(
                         "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()
@@ -263,17 +263,17 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
         EPerson itemMoveEperson = EPersonBuilder.createEPerson(context).withEmail("item@move.org").withPassword("test")
                                                 .withNameInMetadata("Item", "Move").build();
 
-        ResourcePolicy rp1 = ResourcePolicyBuilder.createResourcePolicy(context).withUser(itemMoveEperson)
+        ResourcePolicy rp1 = ResourcePolicyBuilder.createResourcePolicy(context, itemMoveEperson, null)
                                                   .withAction(Constants.ADMIN)
                                                   .withDspaceObject(col1).build();
-        ResourcePolicy rp3 = ResourcePolicyBuilder.createResourcePolicy(context).withUser(itemMoveEperson)
+        ResourcePolicy rp3 = ResourcePolicyBuilder.createResourcePolicy(context, itemMoveEperson, null)
                                                   .withAction(Constants.ADD)
                                                   .withDspaceObject(col2).build();
 
         context.restoreAuthSystemState();
         String token = getAuthToken(itemMoveEperson.getEmail(), "test");
 
-        getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
+        getClient(token).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection")
                 .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                 .content(
                         "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()
@@ -310,7 +310,7 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
 
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
 
-        getClient(tokenEPerson).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection/")
+        getClient(tokenEPerson).perform(put("/api/core/items/" + publicItem1.getID() + "/owningCollection")
                                .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                                .content("https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()))
                                .andExpect(status().isForbidden());

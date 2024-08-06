@@ -10,7 +10,7 @@ This webapp uses the following technologies:
 We don't use Spring Data REST as we haven't a spring data layer and we want to provide clear separation between the persistence representation and the REST representation
 
 ## How to contribute
-Check the infomation available on the DSpace Official Wiki page for the [DSpace 7 Working Group](https://wiki.duraspace.org/display/DSPACE/DSpace+7+UI+Working+Group)
+Check the information available on the DSpace Official Wiki page for the [DSpace 7 Working Group](https://wiki.duraspace.org/display/DSPACE/DSpace+7+UI+Working+Group)
 
 [DSpace 7 REST: Coding DSpace Objects](https://wiki.duraspace.org/display/DSPACE/DSpace+7+REST%3A+Coding+DSpace+Objects)
 

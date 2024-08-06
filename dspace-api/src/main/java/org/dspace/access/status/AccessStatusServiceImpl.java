@@ -8,6 +8,8 @@
 package org.dspace.access.status;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 
 import org.dspace.access.status.service.AccessStatusService;
@@ -15,7 +17,6 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
-import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -55,12 +56,20 @@ public class AccessStatusServiceImpl implements AccessStatusService {
             int month = configurationService.getIntProperty("access.status.embargo.forever.month");
             int day = configurationService.getIntProperty("access.status.embargo.forever.day");
 
-            forever_date = new LocalDate(year, month, day).toDate();
+            forever_date = Date.from(LocalDate.of(year, month, day)
+                    .atStartOfDay()
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant());
         }
     }
 
     @Override
     public String getAccessStatus(Context context, Item item) throws SQLException {
         return helper.getAccessStatusFromItem(context, item, forever_date);
+    }
+
+    @Override
+    public String getEmbargoFromItem(Context context, Item item) throws SQLException {
+        return helper.getEmbargoFromItem(context, item, forever_date);
     }
 }

@@ -9,9 +9,9 @@ package org.dspace.authenticate;
 
 import java.sql.SQLException;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -152,6 +152,22 @@ public interface AuthenticationMethod {
      */
     public List<Group> getSpecialGroups(Context context, HttpServletRequest request)
         throws SQLException;
+
+    /**
+     * Returns true if the special groups returned by
+     * {@link org.dspace.authenticate.AuthenticationMethod#getSpecialGroups(Context, HttpServletRequest)}
+     * should be implicitly be added to the groups related to the current user. By
+     * default this is true if the authentication method is the actual
+     * authentication mechanism used by the user.
+     * @param  context A valid DSpace context.
+     * @param  request The request that started this operation, or null if not
+     *                 applicable.
+     * @return         true is the special groups must be considered, false
+     *                 otherwise
+     */
+    public default boolean areSpecialGroupsApplicable(Context context, HttpServletRequest request) {
+        return getName().equals(context.getAuthenticationMethod());
+    }
 
     /**
      * Authenticate the given or implicit credentials.

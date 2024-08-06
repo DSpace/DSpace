@@ -194,7 +194,6 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
                 List<Group> defaultBitstreamReadGroups =
                         authorizeService.getAuthorizedGroups(context, owningCollection,
                                 Constants.DEFAULT_BITSTREAM_READ);
-                log.info(defaultBitstreamReadGroups.size());
                 // If this collection is configured with a DEFAULT_BITSTREAM_READ group, overwrite the READ policy
                 // inherited from the bundle with this policy.
                 if (!defaultBitstreamReadGroups.isEmpty()) {
@@ -563,10 +562,15 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
 
     @Override
     public Bundle findByIdOrLegacyId(Context context, String id) throws SQLException {
-        if (StringUtils.isNumeric(id)) {
-            return findByLegacyId(context, Integer.parseInt(id));
-        } else {
-            return find(context, UUID.fromString(id));
+        try {
+            if (StringUtils.isNumeric(id)) {
+                return findByLegacyId(context, Integer.parseInt(id));
+            } else {
+                return find(context, UUID.fromString(id));
+            }
+        } catch (IllegalArgumentException e) {
+            // Not a valid legacy ID or valid UUID
+            return null;
         }
     }
 

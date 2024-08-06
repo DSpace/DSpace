@@ -10,6 +10,7 @@ package org.dspace.content.authority.service;
 import java.util.List;
 import java.util.Set;
 
+import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.content.Collection;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.Choice;
@@ -174,7 +175,7 @@ public interface ChoiceAuthorityService {
     /**
      * This method has been created to have a way of clearing the cache kept inside the service
      */
-    public void clearCache();
+    public void clearCache() throws SubmissionConfigReaderException;
 
     /**
      * Should we store the authority key (if any) for such field key and collection?

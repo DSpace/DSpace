@@ -16,6 +16,7 @@ import java.net.ConnectException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -683,15 +684,11 @@ public class OAIHarvester {
      * @return null or the handle to be used.
      */
     protected String extractHandle(Item item) {
-        String[] acceptedHandleServers = configurationService.getArrayProperty("oai.harvester.acceptedHandleServer");
-        if (acceptedHandleServers == null) {
-            acceptedHandleServers = new String[] {"hdl.handle.net"};
-        }
+        String[] acceptedHandleServers = configurationService
+            .getArrayProperty("oai.harvester.acceptedHandleServer", new String[] {"hdl.handle.net"});
 
-        String[] rejectedHandlePrefixes = configurationService.getArrayProperty("oai.harvester.rejectedHandlePrefix");
-        if (rejectedHandlePrefixes == null) {
-            rejectedHandlePrefixes = new String[] {"123456789"};
-        }
+        String[] rejectedHandlePrefixes = configurationService
+            .getArrayProperty("oai.harvester.rejectedHandlePrefix", new String[] {"123456789"});
 
         List<MetadataValue> values = itemService.getMetadata(item, "dc", "identifier", Item.ANY, Item.ANY);
 
@@ -706,12 +703,9 @@ public class OAIHarvester {
 
                 for (String server : acceptedHandleServers) {
                     if (urlPieces[2].equals(server)) {
-                        for (String prefix : rejectedHandlePrefixes) {
-                            if (!urlPieces[3].equals(prefix)) {
-                                return urlPieces[3] + "/" + urlPieces[4];
-                            }
+                        if (Arrays.stream(rejectedHandlePrefixes).noneMatch(prefix -> prefix.equals(urlPieces[3]))) {
+                            return urlPieces[3] + "/" + urlPieces[4];
                         }
-
                     }
                 }
             }

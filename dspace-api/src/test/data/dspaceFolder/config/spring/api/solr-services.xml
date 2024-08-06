@@ -38,8 +38,6 @@
     <!--<bean class="org.dspace.discovery.SolrServiceIndexOutputPlugin"
           id="solrServiceIndexOutputPlugin"/>-->
 
-    <!-- Statistics services are both lazy loaded (by name), as you are likely
-          just using ONE of them and not both -->
     <bean id="solrLoggerService"
           class="org.dspace.statistics.MockSolrLoggerServiceImpl"
           lazy-init="true"/>
@@ -47,7 +45,20 @@
     <bean id="org.dspace.statistics.SolrStatisticsCore"
           class="org.dspace.statistics.MockSolrStatisticsCore"
           autowire-candidate="true"/>
+    
+    <!-- qa events -->
+    <bean class="org.dspace.qaevent.MockQAEventService"
+          id="org.dspace.qaevent.service.QAEventService" />
           
     <bean class="org.dspace.statistics.GeoIpService" autowire-candidate="true"/>
+          
+    <!-- suggestion service for solr providers -->
+    <bean id="org.dspace.app.suggestion.SolrSuggestionStorageService" class="org.dspace.app.suggestion.MockSolrSuggestionStorageService" />
+
+    <bean id='EmbeddedSolrClientFactory'
+          class='org.dspace.statistics.EmbeddedSolrClientFactory'
+          autowire-candidate='true'>
+        <description>Connection to an embedded Solr instance.</description>
+    </bean>
 
 </beans>

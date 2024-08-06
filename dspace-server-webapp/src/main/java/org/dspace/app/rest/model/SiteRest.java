@@ -17,6 +17,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public class SiteRest extends DSpaceObjectRest {
     public static final String NAME = "site";
+    public static final String PLURAL_NAME = "sites";
     public static final String CATEGORY = RestAddressableModel.CORE;
 
     @Override
@@ -27,6 +28,11 @@ public class SiteRest extends DSpaceObjectRest {
     @Override
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     @Override

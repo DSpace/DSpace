@@ -11,11 +11,13 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -28,8 +30,6 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.UUIDUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -47,21 +47,24 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
  */
 public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
 
-    private static final Logger log = LoggerFactory.getLogger(StatelessAuthenticationFilter.class);
+    private static final Logger log = LogManager.getLogger();
 
     private static final String ON_BEHALF_OF_REQUEST_PARAM = "X-On-Behalf-Of";
 
-    private RestAuthenticationService restAuthenticationService;
+    private final RestAuthenticationService restAuthenticationService;
 
-    private EPersonRestAuthenticationProvider authenticationProvider;
+    private final EPersonRestAuthenticationProvider authenticationProvider;
 
-    private RequestService requestService;
+    private final RequestService requestService;
 
-    private AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    private final AuthorizeService authorizeService
+            = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
-    private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    private final EPersonService ePersonService
+            = EPersonServiceFactory.getInstance().getEPersonService();
 
-    private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     public StatelessAuthenticationFilter(AuthenticationManager authenticationManager,
                                          RestAuthenticationService restAuthenticationService,
@@ -124,7 +127,7 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
             // parse the token.
             EPerson eperson = restAuthenticationService.getAuthenticatedEPerson(request, res, context);
             if (eperson != null) {
-                log.debug("Found authentication data in request for EPerson {}", eperson.getEmail());
+                log.debug("Found authentication data in request for EPerson {}", eperson::getEmail);
                 //Pass the eperson ID to the request service
                 requestService.setCurrentUserId(eperson.getID());
 
@@ -174,7 +177,7 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
             requestService.setCurrentUserId(epersonUuid);
             context.switchContextUser(onBehalfOfEPerson);
             log.debug("Found 'on-behalf-of' authentication data in request for EPerson {}",
-                      onBehalfOfEPerson.getEmail());
+                    onBehalfOfEPerson::getEmail);
             return new DSpaceAuthentication(onBehalfOfEPerson,
                                             authenticationProvider.getGrantedAuthorities(context));
         } else {

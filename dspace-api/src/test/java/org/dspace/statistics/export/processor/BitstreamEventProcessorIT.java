@@ -10,13 +10,14 @@ package org.dspace.statistics.export.processor;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.CharEncoding;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.BitstreamBuilder;
@@ -63,6 +64,7 @@ public class BitstreamEventProcessorIT extends AbstractIntegrationTestWithDataba
      */
     public void testAddObectSpecificData() throws Exception {
         HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRemoteAddr()).thenReturn("127.0.0.1");
 
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).build();

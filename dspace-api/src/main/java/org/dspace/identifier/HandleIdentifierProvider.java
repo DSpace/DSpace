@@ -27,7 +27,6 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * The old DSpace handle identifier service, used to create handles or retrieve objects based on their handle
@@ -36,7 +35,6 @@ import org.springframework.stereotype.Component;
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
  */
-@Component
 public class HandleIdentifierProvider extends IdentifierProvider {
     /**
      * log4j category
@@ -68,10 +66,9 @@ public class HandleIdentifierProvider extends IdentifierProvider {
         try {
             String id = mint(context, dso);
 
-            // move canonical to point the latest version
+            // Populate metadata
             if (dso instanceof Item || dso instanceof Collection || dso instanceof Community) {
-                Item item = (Item) dso;
-                populateHandleMetadata(context, item, id);
+                populateHandleMetadata(context, dso, id);
             }
 
             return id;
@@ -88,8 +85,7 @@ public class HandleIdentifierProvider extends IdentifierProvider {
         try {
             handleService.createHandle(context, dso, identifier);
             if (dso instanceof Item || dso instanceof Collection || dso instanceof Community) {
-                Item item = (Item) dso;
-                populateHandleMetadata(context, item, identifier);
+                populateHandleMetadata(context, dso, identifier);
             }
         } catch (IOException | IllegalStateException | SQLException | AuthorizeException e) {
             log.error(LogHelper.getHeader(context,

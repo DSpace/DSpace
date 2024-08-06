@@ -10,9 +10,9 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.UUID;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.access.status.service.AccessStatusService;
 import org.dspace.app.rest.model.AccessStatusRest;
 import org.dspace.app.rest.model.ItemRest;
@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for calculating the access status of an Item
  */
-@Component(ItemRest.CATEGORY + "." + ItemRest.NAME + "." + ItemRest.ACCESS_STATUS)
+@Component(ItemRest.CATEGORY + "." + ItemRest.PLURAL_NAME + "." + ItemRest.ACCESS_STATUS)
 public class ItemAccessStatusLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
 

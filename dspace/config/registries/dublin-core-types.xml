@@ -265,6 +265,7 @@
     <schema>dc</schema>
     <element>identifier</element>
     <qualifier>doi</qualifier>
+    <scope_note>The doi identifier minted by this repository.</scope_note>
   </dc-type>
   
   <dc-type>

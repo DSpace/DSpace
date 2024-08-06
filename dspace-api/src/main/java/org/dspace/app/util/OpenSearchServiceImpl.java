@@ -155,7 +155,7 @@ public class OpenSearchServiceImpl implements OpenSearchService {
             format = "atom_1.0";
         }
 
-        SyndicationFeed feed = new SyndicationFeed(labels.get(SyndicationFeed.MSG_UITYPE));
+        SyndicationFeed feed = new SyndicationFeed();
         feed.populate(null, context, scope, results, labels);
         feed.setType(format);
         feed.addModule(openSearchMarkup(query, totalResults, start, pageSize));

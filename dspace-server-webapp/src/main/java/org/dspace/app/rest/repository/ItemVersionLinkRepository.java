@@ -9,9 +9,9 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.UUID;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.VersionRest;
 import org.dspace.app.rest.projection.Projection;
@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 /**
  * This is the Repository that will take care of fetching the Version for a given Item
  */
-@Component(ItemRest.CATEGORY + "." + ItemRest.NAME + "." + ItemRest.VERSION)
+@Component(ItemRest.CATEGORY + "." + ItemRest.PLURAL_NAME + "." + ItemRest.VERSION)
 public class ItemVersionLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
 

@@ -96,7 +96,12 @@ public class OpenSearchControllerIT extends AbstractControllerIntegrationTest {
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                            .withName("Sub Community")
                                            .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        // Add a fake logo to the Collection
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                                           .withName("Collection 1")
+                                           .withLogo("logo_collection")
+                                           .build();
+        String colLogoUuid = col1.getLogo().getID().toString();
 
         Item publicItem1 = ItemBuilder.createItem(context, col1)
                                           .withTitle("Boars at Yellowstone")
@@ -118,10 +123,24 @@ public class OpenSearchControllerIT extends AbstractControllerIntegrationTest {
                    .andExpect(xpath("feed/Query/@searchTerms").string("Yellowstone"))
                    .andExpect(xpath("feed/totalResults").string("2"))
         ;
+
+        // When we search at the Collection level (scope = Collection UUID)
+        getClient().perform(get("/opensearch/search")
+                                .param("scope", col1.getID().toString())
+                                .param("query", "Yellowstone"))
+                   //The status has to be 200 OK
+                   .andExpect(status().isOk())
+                   // We expect the content type to be "application/atom+xml;charset=UTF-8"
+                   .andExpect(content().contentType("application/atom+xml;charset=UTF-8"))
+                   .andExpect(xpath("feed/Query/@searchTerms").string("Yellowstone"))
+                   .andExpect(xpath("feed/totalResults").string("2"))
+                   // We expect feed will have the Collection logo
+                   .andExpect(xpath("feed/logo")
+                                  .string("http://localhost:4000/bitstreams/" + colLogoUuid + "/download"))
+        ;
     }
 
     // This test does not find the record, so there are obviously issues with special chars
-    @Ignore
     @Test
     public void findResultWithSpecialCharsTest() throws Exception {
         //Turn off the authorization system, otherwise we can't make the objects
@@ -144,12 +163,12 @@ public class OpenSearchControllerIT extends AbstractControllerIntegrationTest {
                                           .build();
         //When we call the root endpoint
         getClient().perform(get("/opensearch/search")
-                                .param("query", "Bär"))
+                                .param("query", "Bären"))
                    //The status has to be 200 OK
                    .andExpect(status().isOk())
                    //We expect the content type to be "application/atom+xml;charset=UTF-8"
                    .andExpect(content().contentType("application/atom+xml;charset=UTF-8"))
-                   .andExpect(xpath("feed/Query/@searchTerms").string("B%C3%A4r"))
+                   .andExpect(xpath("feed/Query/@searchTerms").string("B%C3%A4ren"))
                    .andExpect(xpath("feed/totalResults").string("1"))
         ;
     }
@@ -268,5 +287,33 @@ public class OpenSearchControllerIT extends AbstractControllerIntegrationTest {
                    .param("query", "*"))
                    .andExpect(status().isOk())
                    .andExpect(xpath("rss/channel/description").string("No Description"));
+    }
+
+    @Test
+    public void scopeNotCommunityOrCollectionUUIDTest() throws Exception {
+        // Tests that a OpenSearch response with 1 result (equivalent to an
+        // unscoped request) is returned if the "scope" UUID is a
+        // validly-formatted UUID, but not a community or collection UUID.
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                                          .withName("Parent Community")
+                                          .build();
+        Collection collection1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                                           .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, collection1)
+                                           .withTitle("Boars at Yellowstone")
+                                           .withIssueDate("2017-10-17")
+                                           .withAuthor("Ballini, Andreas").withAuthor("Moriarti, Susan")
+                                           .build();
+
+        // UUID is valid, but not a community or collection UUID
+        String testUUID = "b68f0d1c-7316-41dc-835d-46b79b35642e";
+
+        getClient().perform(get("/opensearch/search")
+                   .param("scope", testUUID)
+                   .param("query", "*"))
+                   .andExpect(status().isOk())
+                   .andExpect(xpath("feed/totalResults").string("1"));
     }
 }

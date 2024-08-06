@@ -13,8 +13,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -22,8 +24,6 @@ import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -49,15 +49,14 @@ import org.springframework.beans.factory.annotation.Autowired;
  * specified first (in the configuration) thus getting highest priority.
  *
  * @author Larry Stone
- * @version $Revision$
  * @see AuthenticationMethod
  */
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     /**
-     * SLF4J logging category
+     * Logging category
      */
-    private final Logger log = (Logger) LoggerFactory.getLogger(AuthenticationServiceImpl.class);
+    private final Logger log = LogManager.getLogger();
 
     @Autowired(required = true)
     protected EPersonService ePersonService;
@@ -121,6 +120,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return bestRet;
     }
 
+    @Override
     public void updateLastActiveDate(Context context) {
         EPerson me = context.getCurrentUser();
         if (me != null) {
@@ -179,10 +179,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         int totalLen = 0;
 
         for (AuthenticationMethod method : getAuthenticationMethodStack()) {
-            List<Group> gl = method.getSpecialGroups(context, request);
-            if (gl.size() > 0) {
-                result.addAll(gl);
-                totalLen += gl.size();
+
+            if (method.areSpecialGroupsApplicable(context, request)) {
+
+                List<Group> gl = method.getSpecialGroups(context, request);
+                if (gl.size() > 0) {
+                    result.addAll(gl);
+                    totalLen += gl.size();
+                }
+
             }
         }
 

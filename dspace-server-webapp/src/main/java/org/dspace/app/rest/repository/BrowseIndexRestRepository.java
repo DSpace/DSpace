@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-@Component(BrowseIndexRest.CATEGORY + "." + BrowseIndexRest.NAME)
+@Component(BrowseIndexRest.CATEGORY + "." + BrowseIndexRest.PLURAL_NAME)
 public class BrowseIndexRestRepository extends DSpaceRestRepository<BrowseIndexRest, String> {
 
     @Autowired

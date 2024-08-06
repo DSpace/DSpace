@@ -12,9 +12,9 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/beans/spring-beans.xsd
            http://www.springframework.org/schema/context
-           http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+           http://www.springframework.org/schema/context/spring-context.xsd"
        default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
@@ -25,13 +25,31 @@
 
     <alias name="org.dspace.discovery.SearchService" alias="org.dspace.discovery.IndexingService"/>
 
-    <!--<bean class="org.dspace.discovery.SolrServiceIndexOutputPlugin" id="solrServiceIndexOutputPlugin"/>-->
+    <bean id="solrLoggerService"
+          class="org.dspace.statistics.SolrLoggerServiceImpl"
+          lazy-init="true">
+        <description>Store and access DSpace usage statistics records in Solr.</description>
+    </bean>
 
-    <!-- Statistics services are both lazy loaded (by name), as you are likely just using ONE of them and not both -->
-    <bean id="solrLoggerService" class="org.dspace.statistics.SolrLoggerServiceImpl" lazy-init="true"/>
+    <bean id='SolrStatisticsCore'
+	  class='org.dspace.statistics.SolrStatisticsCore'
+	  autowire-candidate='true'>
+        <description>
+          Store and access DSpace usage statistics records in Solr.
+        </description>
+    </bean>
 
-    <bean class="org.dspace.statistics.SolrStatisticsCore" autowire-candidate="true"/>
+    <bean id='HttpSolrClientFactory'
+          class='org.dspace.statistics.HttpSolrClientFactory'>
+        <description>HTTP connection to a Solr instance.</description>
+    </bean>
+    
+    <!-- quality assurance broker service -->
+    <bean id="org.dspace.qaevent.service.QAEventService" class="org.dspace.qaevent.service.impl.QAEventServiceImpl" />
     
     <bean class="org.dspace.statistics.GeoIpService" autowire-candidate="true"/>
-
+    
+    <!-- suggestion service for solr providers -->     
+    <bean id="org.dspace.app.suggestion.SolrSuggestionStorageService" class="org.dspace.app.suggestion.SolrSuggestionStorageServiceImpl" />
+   
 </beans>

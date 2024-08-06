@@ -31,7 +31,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-@Component(StatisticsSupportRest.CATEGORY + "." + UsageReportRest.NAME)
+@Component(StatisticsSupportRest.CATEGORY + "." + UsageReportRest.PLURAL_NAME)
 public class StatisticsRestRepository extends DSpaceRestRepository<UsageReportRest, String> {
 
     @Autowired

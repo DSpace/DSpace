@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
-import javax.el.MethodNotFoundException;
 
+import jakarta.el.MethodNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpException;
 import org.apache.http.client.ClientProtocolException;

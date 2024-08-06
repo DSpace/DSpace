@@ -10,10 +10,10 @@ package org.dspace.core;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -83,13 +83,14 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
         if (CollectionUtils.isNotEmpty(metadataFields) || StringUtils.isNotBlank(additionalWhere)) {
             //Add the where query on metadata
             query.append(" WHERE ");
+            // Group the 'OR' clauses below in outer parentheses, e.g. "WHERE (clause1 OR clause2 OR clause3)".
+            // Grouping these 'OR' clauses allows for later code to append 'AND' clauses without unexpected behaviors
+            query.append("(");
             for (int i = 0; i < metadataFields.size(); i++) {
                 MetadataField metadataField = metadataFields.get(i);
                 if (StringUtils.isNotBlank(operator)) {
-                    query.append(" (");
                     query.append("lower(STR(" + metadataField.toString()).append(".value)) ").append(operator)
                          .append(" lower(:queryParam)");
-                    query.append(")");
                     if (i < metadataFields.size() - 1) {
                         query.append(" OR ");
                     }
@@ -102,6 +103,7 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
                 }
                 query.append(additionalWhere);
             }
+            query.append(")");
 
         }
     }

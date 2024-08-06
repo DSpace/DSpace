@@ -18,9 +18,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.UUID;
-import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -221,6 +221,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                 //Get our next step, if none is found, archive our item
                 firstStep = wf.getNextStep(context, wfi, firstStep, ActionResult.OUTCOME_COMPLETE);
                 if (firstStep == null) {
+                    // record the submitted provenance message
+                    recordStart(context, wfi.getItem(),null);
                     archive(context, wfi);
                 } else {
                     activateFirstStep(context, wf, firstStep, wfi);
@@ -1175,7 +1177,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     public String getEPersonName(EPerson ePerson) {
         String submitter = ePerson.getFullName();
 
-        submitter = submitter + "(" + ePerson.getEmail() + ")";
+        submitter = submitter + " (" + ePerson.getEmail() + ")";
 
         return submitter;
     }
@@ -1187,25 +1189,36 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         DCDate now = DCDate.getCurrent();
 
         // Create provenance description
-        String provmessage = "";
+        StringBuffer provmessage = new StringBuffer();
 
-        if (myitem.getSubmitter() != null) {
-            provmessage = "Submitted by " + myitem.getSubmitter().getFullName()
-                + " (" + myitem.getSubmitter().getEmail() + ") on "
-                + now.toString() + " workflow start=" + action.getProvenanceStartId() + "\n";
+        //behavior to generate provenance message, if set true, personal data (e.g. email) of submitter will be hidden
+        //default value false, personal data of submitter will be shown in provenance message
+        String isProvenancePrivacyActiveProperty =
+                configurationService.getProperty("metadata.privacy.dc.description.provenance", "false");
+        boolean isProvenancePrivacyActive = Boolean.parseBoolean(isProvenancePrivacyActiveProperty);
+
+        if (myitem.getSubmitter() != null && !isProvenancePrivacyActive) {
+            provmessage.append("Submitted by ").append(myitem.getSubmitter().getFullName())
+                    .append(" (").append(myitem.getSubmitter().getEmail()).append(") on ")
+                    .append(now.toString());
         } else {
             // else, null submitter
-            provmessage = "Submitted by unknown (probably automated) on"
-                + now.toString() + " workflow start=" + action.getProvenanceStartId() + "\n";
+            provmessage.append("Submitted by unknown (probably automated or submitter hidden) on ")
+                    .append(now.toString());
+        }
+        if (action != null) {
+            provmessage.append(" workflow start=").append(action.getProvenanceStartId()).append("\n");
+        } else {
+            provmessage.append("\n");
         }
 
         // add sizes and checksums of bitstreams
-        provmessage += installItemService.getBitstreamProvenanceMessage(context, myitem);
+        provmessage.append(installItemService.getBitstreamProvenanceMessage(context, myitem));
 
         // Add message to the DC
         itemService
             .addMetadata(context, myitem, MetadataSchemaEnum.DC.getName(),
-                         "description", "provenance", "en", provmessage);
+                         "description", "provenance", "en", provmessage.toString());
         itemService.update(context, myitem);
     }
 

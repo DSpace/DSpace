@@ -21,11 +21,10 @@ import org.dspace.app.rest.RestResourceController;
 @LinksRest(links = {
     @LinkRest(name = "bitstream", method = "getUuid"),
     @LinkRest(name = "item", method = "getUuid")
-    })
-public class RequestItemRest
-        extends BaseObjectRest<Integer> {
+})
+public class RequestItemRest extends BaseObjectRest<Integer> {
     public static final String NAME = "itemrequest";
-    public static final String PLURAL_NAME = NAME + "s";
+    public static final String PLURAL_NAME = "itemrequests";
 
     public static final String CATEGORY = RestAddressableModel.TOOLS;
 
@@ -230,6 +229,6 @@ public class RequestItemRest
 
     @Override
     public String getTypePlural() {
-        return super.getTypePlural();
+        return PLURAL_NAME;
     }
 }

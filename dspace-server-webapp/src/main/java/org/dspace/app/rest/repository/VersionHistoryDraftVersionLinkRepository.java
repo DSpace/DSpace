@@ -8,9 +8,9 @@
 package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 import java.util.Objects;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.AInprogressSubmissionRest;
 import org.dspace.app.rest.model.VersionHistoryRest;
@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.it)
  */
-@Component(VersionHistoryRest.CATEGORY + "." + VersionHistoryRest.NAME + "." + VersionHistoryRest.DRAFT_VERSION)
+@Component(VersionHistoryRest.CATEGORY + "." + VersionHistoryRest.PLURAL_NAME + "." + VersionHistoryRest.DRAFT_VERSION)
 public class VersionHistoryDraftVersionLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

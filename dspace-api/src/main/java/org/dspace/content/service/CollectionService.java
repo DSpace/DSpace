@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.browse.ItemCountException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -418,6 +417,34 @@ public interface CollectionService
         int offset, int limit) throws SQLException, SearchServiceException;
 
     /**
+     * Retrieve the first collection in the community or its descending that support
+     * the provided entityType
+     *
+     * @param  context    the DSpace context
+     * @param  community  the root from where the search start
+     * @param  entityType the requested entity type
+     * @return            the first collection in the community or its descending
+     *                    that support the provided entityType
+     */
+    public Collection retrieveCollectionWithSubmitByCommunityAndEntityType(Context context, Community community,
+        String entityType);
+
+    /**
+     * Retrieve the close collection to the item for which the current user has
+     * 'submit' privileges that support the provided entityType. Close mean the
+     * collection that can be reach with the minimum steps starting from the item
+     * (owningCollection, brothers collections, etc)
+     *
+     * @param  context    the DSpace context
+     * @param  item       the item from where the search start
+     * @param  entityType the requested entity type
+     * @return            the first collection in the community or its descending
+     *                    that support the provided entityType
+     */
+    public Collection retrieveCollectionWithSubmitByEntityType(Context context, Item item, String entityType)
+        throws SQLException;
+
+    /**
      * Counts the number of Collection for which the current user has 'submit' privileges.
      * NOTE: for better performance, this method retrieves its results from an index (cache)
      *       and does not query the database directly.
@@ -457,26 +484,11 @@ public interface CollectionService
         throws SQLException, SearchServiceException;
 
     /**
-     * Returns a list of all collections for a specific entity type.
-     * NOTE: for better performance, this method retrieves its results from an index (cache)
-     *       and does not query the database directly.
-     *       This means that results may be stale or outdated until
-     *       https://github.com/DSpace/DSpace/issues/2853 is resolved."
-     *
-     * @param context          DSpace Context
-     * @param entityType       limit the returned collection to those related to given entity type
-     * @return                 list of collections found
-     * @throws SearchServiceException    if search error
-     */
-    public List<Collection> findAllCollectionsByEntityType(Context context, String entityType)
-        throws SearchServiceException;
-
-    /**
      * Returns total collection archived items
      *
+     * @param context          DSpace context
      * @param collection       Collection
      * @return                 total collection archived items
-     * @throws ItemCountException
      */
-    int countArchivedItems(Collection collection) throws ItemCountException;
+    int countArchivedItems(Context context, Collection collection);
 }

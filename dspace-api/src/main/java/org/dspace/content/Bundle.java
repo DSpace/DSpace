@@ -10,22 +10,22 @@ package org.dspace.content;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.OrderColumn;
-import javax.persistence.Table;
-import javax.persistence.Transient;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.OrderColumn;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BundleService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.hibernate.proxy.HibernateProxyHelper;
+import org.dspace.core.HibernateProxyHelper;
 
 /**
  * Class representing bundles of bitstreams stored in the DSpace system
@@ -126,7 +126,7 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport {
      * Unset the primary bitstream ID of the bundle
      */
     public void unsetPrimaryBitstreamID() {
-        primaryBitstream = null;
+        setPrimaryBitstreamID(null);
     }
 
     /**

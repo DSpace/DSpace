@@ -8,8 +8,8 @@
 package org.dspace.discovery;
 
 import java.io.IOException;
-import javax.inject.Named;
 
+import jakarta.inject.Named;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

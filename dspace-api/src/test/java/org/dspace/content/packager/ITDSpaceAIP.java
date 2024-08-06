@@ -386,9 +386,8 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
 
         // Create a custom resource policy for this community
         List<ResourcePolicy> policies = new ArrayList<>();
-        ResourcePolicy policy = resourcePolicyService.create(context);
+        ResourcePolicy policy = resourcePolicyService.create(context, null, group);
         policy.setRpName("Special Read Only");
-        policy.setGroup(group);
         policy.setAction(Constants.READ);
         policies.add(policy);
 
@@ -600,9 +599,8 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
 
         // Create a custom resource policy for this Collection
         List<ResourcePolicy> policies = new ArrayList<>();
-        ResourcePolicy policy = resourcePolicyService.create(context);
+        ResourcePolicy policy = resourcePolicyService.create(context, null, group);
         policy.setRpName("Special Read Only");
-        policy.setGroup(group);
         policy.setAction(Constants.READ);
         policies.add(policy);
 
@@ -822,10 +820,9 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
 
         // Create a custom resource policy for this Item
         List<ResourcePolicy> policies = new ArrayList<>();
-        ResourcePolicy admin_policy = resourcePolicyService.create(context);
-        admin_policy.setRpName("Admin Read-Only");
         Group adminGroup = groupService.findByName(context, Group.ADMIN);
-        admin_policy.setGroup(adminGroup);
+        ResourcePolicy admin_policy = resourcePolicyService.create(context, null, adminGroup);
+        admin_policy.setRpName("Admin Read-Only");
         admin_policy.setAction(Constants.READ);
         policies.add(admin_policy);
         itemService.replaceAllItemPolicies(context, item, policies);

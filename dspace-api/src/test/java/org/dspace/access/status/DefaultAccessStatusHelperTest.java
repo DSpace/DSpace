@@ -14,6 +14,8 @@ import static org.junit.Assert.fail;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -42,7 +44,6 @@ import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
-import org.joda.time.LocalDate;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -129,7 +130,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
             fail("SQL Error in init: " + ex.getMessage());
         }
         helper = new DefaultAccessStatusHelper();
-        threshold = new LocalDate(10000, 1, 1).toDate();
+        threshold = dateFrom(10000, 1, 1);
     }
 
     /**
@@ -261,18 +262,19 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         bitstream.setName(context, "primary");
         bundle.setPrimaryBitstreamID(bitstream);
         List<ResourcePolicy> policies = new ArrayList<>();
-        ResourcePolicy policy = resourcePolicyService.create(context);
-        policy.setRpName("Embargo");
         Group group = groupService.findByName(context, Group.ANONYMOUS);
-        policy.setGroup(group);
+        ResourcePolicy policy = resourcePolicyService.create(context, null, group);
+        policy.setRpName("Embargo");
         policy.setAction(Constants.READ);
-        policy.setStartDate(new LocalDate(9999, 12, 31).toDate());
+        policy.setStartDate(dateFrom(9999, 12, 31));
         policies.add(policy);
         authorizeService.removeAllPolicies(context, bitstream);
         authorizeService.addPolicies(context, policies, bitstream);
         context.restoreAuthSystemState();
         String status = helper.getAccessStatusFromItem(context, itemWithEmbargo, threshold);
         assertThat("testWithEmbargo 0", status, equalTo(DefaultAccessStatusHelper.EMBARGO));
+        String embargoDate = helper.getEmbargoFromItem(context, itemWithEmbargo, threshold);
+        assertThat("testWithEmbargo 1", embargoDate, equalTo(policy.getStartDate().toString()));
     }
 
     /**
@@ -288,12 +290,11 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         bitstream.setName(context, "primary");
         bundle.setPrimaryBitstreamID(bitstream);
         List<ResourcePolicy> policies = new ArrayList<>();
-        ResourcePolicy policy = resourcePolicyService.create(context);
-        policy.setRpName("Restriction");
         Group group = groupService.findByName(context, Group.ANONYMOUS);
-        policy.setGroup(group);
+        ResourcePolicy policy = resourcePolicyService.create(context, null, group);
+        policy.setRpName("Restriction");
         policy.setAction(Constants.READ);
-        policy.setStartDate(new LocalDate(10000, 1, 1).toDate());
+        policy.setStartDate(dateFrom(10000, 1, 1));
         policies.add(policy);
         authorizeService.removeAllPolicies(context, bitstream);
         authorizeService.addPolicies(context, policies, bitstream);
@@ -315,10 +316,9 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         bitstream.setName(context, "primary");
         bundle.setPrimaryBitstreamID(bitstream);
         List<ResourcePolicy> policies = new ArrayList<>();
-        ResourcePolicy policy = resourcePolicyService.create(context);
-        policy.setRpName("Restriction");
         Group group = groupService.findByName(context, Group.ADMIN);
-        policy.setGroup(group);
+        ResourcePolicy policy = resourcePolicyService.create(context, null, group);
+        policy.setRpName("Restriction");
         policy.setAction(Constants.READ);
         policies.add(policy);
         authorizeService.removeAllPolicies(context, bitstream);
@@ -378,18 +378,19 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
                 new ByteArrayInputStream("1".getBytes(StandardCharsets.UTF_8)));
         bundle.setPrimaryBitstreamID(primaryBitstream);
         List<ResourcePolicy> policies = new ArrayList<>();
-        ResourcePolicy policy = resourcePolicyService.create(context);
-        policy.setRpName("Embargo");
         Group group = groupService.findByName(context, Group.ANONYMOUS);
-        policy.setGroup(group);
+        ResourcePolicy policy = resourcePolicyService.create(context, null, group);
+        policy.setRpName("Embargo");
         policy.setAction(Constants.READ);
-        policy.setStartDate(new LocalDate(9999, 12, 31).toDate());
+        policy.setStartDate(dateFrom(9999, 12, 31));
         policies.add(policy);
         authorizeService.removeAllPolicies(context, primaryBitstream);
         authorizeService.addPolicies(context, policies, primaryBitstream);
         context.restoreAuthSystemState();
         String status = helper.getAccessStatusFromItem(context, itemWithPrimaryAndMultipleBitstreams, threshold);
         assertThat("testWithPrimaryAndMultipleBitstreams 0", status, equalTo(DefaultAccessStatusHelper.EMBARGO));
+        String embargoDate = helper.getEmbargoFromItem(context, itemWithPrimaryAndMultipleBitstreams, threshold);
+        assertThat("testWithPrimaryAndMultipleBitstreams 1", embargoDate, equalTo(policy.getStartDate().toString()));
     }
 
     /**
@@ -407,17 +408,33 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         Bitstream anotherBitstream = bitstreamService.create(context, bundle,
                 new ByteArrayInputStream("1".getBytes(StandardCharsets.UTF_8)));
         List<ResourcePolicy> policies = new ArrayList<>();
-        ResourcePolicy policy = resourcePolicyService.create(context);
-        policy.setRpName("Embargo");
         Group group = groupService.findByName(context, Group.ANONYMOUS);
-        policy.setGroup(group);
+        ResourcePolicy policy = resourcePolicyService.create(context, null, group);
+        policy.setRpName("Embargo");
         policy.setAction(Constants.READ);
-        policy.setStartDate(new LocalDate(9999, 12, 31).toDate());
+        policy.setStartDate(dateFrom(9999, 12, 31));
         policies.add(policy);
         authorizeService.removeAllPolicies(context, anotherBitstream);
         authorizeService.addPolicies(context, policies, anotherBitstream);
         context.restoreAuthSystemState();
         String status = helper.getAccessStatusFromItem(context, itemWithoutPrimaryAndMultipleBitstreams, threshold);
         assertThat("testWithNoPrimaryAndMultipleBitstreams 0", status, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+        String embargoDate = helper.getEmbargoFromItem(context, itemWithEmbargo, threshold);
+        assertThat("testWithNoPrimaryAndMultipleBitstreams 1", embargoDate, equalTo(null));
+    }
+
+    /**
+     * Create a Date from local year, month, day.
+     *
+     * @param year the year.
+     * @param month the month.
+     * @param day the day.
+     * @return the assembled date.
+     */
+    private Date dateFrom(int year, int month, int day) {
+        return Date.from(LocalDate.of(year, month, day)
+                .atStartOfDay()
+                .atZone(ZoneId.systemDefault())
+                .toInstant());
     }
 }

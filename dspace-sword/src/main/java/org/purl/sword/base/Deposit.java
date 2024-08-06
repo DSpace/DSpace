@@ -10,8 +10,8 @@ package org.purl.sword.base;
 import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.Logger;
 
 /**

@@ -18,6 +18,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.authorization.Authorization;
@@ -34,8 +36,6 @@ import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,10 +49,10 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
-@Component(AuthorizationRest.CATEGORY + "." + AuthorizationRest.NAME)
+@Component(AuthorizationRest.CATEGORY + "." + AuthorizationRest.PLURAL_NAME)
 public class AuthorizationRestRepository extends DSpaceRestRepository<AuthorizationRest, String> {
 
-    private static final Logger log = LoggerFactory.getLogger(AuthorizationRestRepository.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private AuthorizationFeatureService authorizationFeatureService;
@@ -79,7 +79,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
         try {
             featureName = authorizationRestUtil.getFeatureName(id);
         } catch (IllegalArgumentException e) {
-            log.warn(e.getMessage(), e);
+            log.warn(e::getMessage, e);
             return null;
         }
         try {
@@ -87,7 +87,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
             try {
                 object = authorizationRestUtil.getObject(context, id);
             } catch (IllegalArgumentException e) {
-                log.warn("Object informations not found in the specified id " + id, e);
+                log.warn("Object informations not found in the specified id {}", id, e);
                 return null;
             }
 
@@ -104,7 +104,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
             try {
                 user = authorizationRestUtil.getEperson(context, id);
             } catch (IllegalArgumentException e) {
-                log.warn("Invalid eperson informations in the specified id " + id, e);
+                log.warn("Invalid eperson informations in the specified id {}", id, e);
                 return null;
             }
             EPerson currUser = context.getCurrentUser();
@@ -136,7 +136,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
     /**
      * It returns the list of matching available authorizations granted to the specified eperson or to the anonymous
      * user. Only administrators and the user identified by the epersonUuid parameter can access this method
-     * 
+     *
      * @param uri
      *            the uri of the object to check the authorization against
      * @param epersonUuid
@@ -283,7 +283,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
 
     /**
      * Return the user specified in the request parameter if valid
-     * 
+     *
      * @param context
      * @param epersonUuid
      * @return

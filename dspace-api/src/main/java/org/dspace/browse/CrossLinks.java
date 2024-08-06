@@ -108,7 +108,7 @@ public class CrossLinks {
             } else {
                 // Exact match, if the key field has no .* wildcard
                 if (links.containsKey(metadata)) {
-                    return links.get(key);
+                    return links.get(metadata);
                 }
             }
         }

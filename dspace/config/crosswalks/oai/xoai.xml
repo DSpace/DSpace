@@ -19,6 +19,7 @@
             <Format ref="qdc"/>
             <Format ref="marc"/>
             <Format ref="uketd_dc"/>
+            <Format ref="rioxx"/>
             <!--<Format ref="junii2" />-->
             <Description>
                 This is the default context of the DSpace OAI-PMH data provider.
@@ -47,7 +48,7 @@
         </Context>
 
         <!--
-            OpenAIRE Guidelines 3.0:
+            Openaire Guidelines 3.0:
 
             - https://guidelines.openaire.eu/
 
@@ -55,10 +56,10 @@
 
             - Predefined DSpace fields don't allow to set this up with a default.
          -->
-        <Context baseurl="openaire" name="OpenAIRE Context">
+        <Context baseurl="openaire" name="Openaire Context">
             <!-- Date format, field prefixes, etc are ensured by the transformer -->
             <Transformer ref="openaireTransformer"/>
-            <!-- OpenAIRE filter -->
+            <!-- Openaire filter -->
             <Filter ref="openAireFilter"/>
             <!-- Just an alias, in fact it returns all items within the driver context -->
             <Set ref="openaireSet"/>
@@ -66,12 +67,12 @@
             <Format ref="oaidc"/>
             <Format ref="mets"/>
             <Description>
-                This contexts complies with OpenAIRE Guidelines for Literature Repositories v3.0.
+                This context complies with OpenAIRE Guidelines for Literature Repositories v3.0.
             </Description>
         </Context>
 
         <!--
-            OpenAIRE Guidelines 4.0:
+            Openaire Guidelines 4.0:
 
             - https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/
 
@@ -79,15 +80,32 @@
 
             - Predefined DSpace fields don't allow to set this up with a default.
          -->
-        <Context baseurl="openaire4" name="OpenAIRE 4 Context">
+        <Context baseurl="openaire4" name="Openaire 4 Context">
             <!-- Date format, field prefixes, etc are ensured by the transformer -->
             <Transformer ref="openaire4Transformer"/>
-            <!-- OpenAIRE filter -->
-            <Filter ref="openAIRE4Filter"/>
+            <!-- Openaire filter -->
+            <Filter ref="openaire4Filter"/>
             <!-- Metadata Formats -->
             <Format ref="oaiopenaire"/>
             <Description>
-                This contexts complies with OpenAIRE Guidelines for Literature Repositories v4.0.
+                This contexts complies with Openaire Guidelines for Literature Repositories v4.0.
+            </Description>
+        </Context>
+        <!--
+            Rioxx Guidelines v3.0 Final:
+            - https://www.rioxx.net/profiles/v3-0-final
+
+         -->
+        <Context baseurl="rioxx" name="Rioxx Context">
+            <!-- Date format, field prefixes, etc are ensured by the transformer -->
+            <Transformer ref="rioxxTransformer"/>
+            <Filter ref="rioxxFilter"/>
+            <!-- Metadata Formats -->
+            <Format ref="oaidc"/>
+            <Format ref="rioxx"/>
+            <Format ref="qdc"/>
+            <Description>
+                This context complies with the Rioxx metadata profile version 3
             </Description>
         </Context>
 
@@ -176,7 +194,7 @@
             <Namespace>http://irdb.nii.ac.jp/oai</Namespace>
             <SchemaLocation>http://irdb.nii.ac.jp/oai/junii2-3-1.xsd</SchemaLocation>
         </Format>
-        <!-- Metadata format based on the OpenAIRE 4.0 guidelines
+        <!-- Metadata format based on the Openaire 4.0 guidelines
              https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/use_of_oai_pmh.html
         -->
         <Format id="oaiopenaire">
@@ -185,17 +203,34 @@
             <Namespace>http://namespace.openaire.eu/schema/oaire/</Namespace>
             <SchemaLocation>https://www.openaire.eu/schema/repo-lit/4.0/openaire.xsd</SchemaLocation>
         </Format>
+        <!-- Metadata format based on the Rioxx Application Profile Version 3.0 Final
+             - https://www.rioxx.net/profiles/v3-0-final
+        -->
+        <Format id="rioxx">
+            <Prefix>rioxx</Prefix>
+            <XSLT>metadataFormats/rioxx.xsl</XSLT>
+            <Namespace>http://www.rioxx.net/schema/v3.0/rioxx/</Namespace>
+            <SchemaLocation>http://www.rioxx.net/schema/v3.0/rioxx/ http://www.rioxx.net/schema/v3.0/rioxx/rioxx.xsd</SchemaLocation>
+            <Filter ref="rioxxFilter"/>
+        </Format>
     </Formats>
 
     <Transformers>
         <Transformer id="driverTransformer">
             <XSLT>transformers/driver.xsl</XSLT>
+            <Description>Driver context transformer</Description>
         </Transformer>
         <Transformer id="openaireTransformer">
             <XSLT>transformers/openaire.xsl</XSLT>
+            <Description>OpenAire context transformer</Description>
         </Transformer>
         <Transformer id="openaire4Transformer">
             <XSLT>transformers/openaire4.xsl</XSLT>
+            <Description>OpenAire v4 context transformer</Description>
+        </Transformer>
+        <Transformer id="rioxxTransformer">
+            <XSLT>transformers/rioxx.xsl</XSLT>
+            <Description>Rioxx context transformer</Description>
         </Transformer>
     </Transformers>
 
@@ -250,13 +285,13 @@
             </Definition>
         </Filter>
 
-        <!-- OpenAIRE filter for records returned by OAI-PMH.
+        <!-- Openaire filter for records returned by OAI-PMH.
              By default, return an Item record:
                * If a Title & Author field both exist
                * AND a valid DRIVER Document Type exists
                * AND Item is either publicly accessible OR Withdrawn (for tombstones)
-               * AND the OpenAIRE "dc.relation" is specified
-             This filter is only used in the OpenAIRE context ([oai]/openaire).
+               * AND the Openaire "dc.relation" is specified
+             This filter is only used in the Openaire context ([oai]/openaire).
         -->
         <Filter id="openAireFilter">
             <Definition>
@@ -319,7 +354,7 @@
             </Definition>
         </Filter>
 
-        <!-- OpenAIRE4 filter for records returned by OAI-PMH.
+        <!-- Openaire4 filter for records returned by OAI-PMH.
              By default, return an Item record:
                 * If it is publicly accessible
                 * * OR it has been withdrawn (in order to display a tombstone record).
@@ -328,7 +363,7 @@
                 * limiting the results only to Publications as expected
              This filter is used by the default context ([oai]/request).
         -->
-        <Filter id="openAIRE4Filter">
+        <Filter id="openaire4Filter">
             <Definition>
                 <And>
                     <LeftCondition>
@@ -357,6 +392,67 @@
                     </RightCondition>
                 </And>
             </Definition>
+        </Filter>
+
+        <!-- Rioxx v3.0 Final filter for records returned by OAI-PMH.
+             By default, return an Item record:
+                * If it is publicly accessible
+                * * OR it has been withdrawn (in order to display a tombstone record).
+                * AND it does have the following elements
+                * * title
+                * * Authors
+                * * dc.type is present OR dspace.entity.type is Publication
+                * * dateAccepted
+                * * language
+             This filter is only used in the Rioxx context ([oai]/rioxx).
+        -->
+        <Filter id="rioxxFilter">
+            <Definition>
+                <And>
+                    <LeftCondition>
+                        <Or>
+                            <LeftCondition>
+                                <Custom ref="itemAccessCondition"/>
+                            </LeftCondition>
+                            <RightCondition>
+                                <Custom ref="itemWithdrawnCondition"/>
+                            </RightCondition>
+                        </Or>
+                    </LeftCondition>
+                    <RightCondition>
+                        <And>
+                            <LeftCondition>
+                                <And>
+                                    <LeftCondition>
+                                        <Custom ref="titleExistsCondition"/>
+                                    </LeftCondition>
+                                    <RightCondition>
+                                        <Custom ref="authorExistsCondition"/>
+                                    </RightCondition>
+                                </And>
+                            </LeftCondition>
+                            <RightCondition>
+                                <And>
+                                    <LeftCondition>
+                                        <Custom ref="rioxxLangExistsCondition"/>
+                                    </LeftCondition>
+                                    <RightCondition>
+                                        <Or>
+                                            <LeftCondition>
+                                                <Custom ref="rioxxTypeExistsCondition"/>
+                                            </LeftCondition>
+                                            <RightCondition>
+                                                <Custom ref="isPublicationEntityCondition"/>
+                                            </RightCondition>
+                                        </Or>
+                                    </RightCondition>
+                                </And>
+                            </RightCondition>
+                        </And>
+                    </RightCondition>
+                </And>
+            </Definition>
+
         </Filter>
 
         <!-- Default filter for records returned by OAI-PMH.
@@ -410,6 +506,30 @@
             </Configuration>
         </CustomCondition>
 
+        <!-- Rioxx specific custom conditions -->
+        <CustomCondition id="rioxxTypeExistsCondition">
+            <Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
+            <Configuration>
+                <list name="fields">
+                    <string name="field">dc.type</string>
+                </list>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="rioxxLangExistsCondition">
+            <Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
+            <Configuration>
+                <list name="fields">
+                    <string name="field">dc.language.iso</string>
+                </list>
+            </Configuration>
+        </CustomCondition>
+
+        <!-- This condition determines if an item has any files in the bundle ORIGINAL -->
+        <CustomCondition id="itemsWithBitstreamsFilter">
+            <Class>org.dspace.xoai.filter.ItemsWithBitstreamFilter</Class>
+        </CustomCondition>
+
         <!-- This condition determines if an Item has a "dc.contributor.author" -->
         <CustomCondition id="authorExistsCondition">
             <Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
@@ -457,7 +577,7 @@
 
         <!-- This condition determines if an Item has a "dc.rights" field
              specifying "open access", which is required for DRIVER
-             OR "openAccess", which is required by OpenAIRE. -->
+             OR "openAccess", which is required by Openaire. -->
         <CustomCondition id="driverAccessCondition">
             <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>
@@ -483,7 +603,7 @@
         </CustomCondition>
 
         <!-- This condition determines if an Item has a "dc.relation" field
-             which specifies the openAIRE project ID. -->
+             which specifies the openaire project ID. -->
         <CustomCondition id="openaireRelationCondition">
             <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>
@@ -527,6 +647,11 @@
         <Set id="openaireSet">
             <Spec>openaire</Spec>
             <Name>OpenAIRE</Name>
+            <!-- Just an alias -->
+        </Set>
+        <Set id="rioxxSet">
+            <Spec>rioxx</Spec>
+            <Name>Rioxx set</Name>
             <!-- Just an alias -->
         </Set>
     </Sets>

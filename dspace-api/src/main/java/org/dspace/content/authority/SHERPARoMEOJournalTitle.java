@@ -59,7 +59,37 @@ public class SHERPARoMEOJournalTitle implements ChoiceAuthority {
 
     @Override
     public Choices getBestMatch(String text, String locale) {
-        return getMatches(text, 0, 1, locale);
+        // punt if there is no query text
+        if (text == null || text.trim().length() == 0) {
+            return new Choices(true);
+        }
+        int limit = 10;
+        SHERPAService sherpaService = new DSpace().getSingletonService(SHERPAService.class);
+        SHERPAResponse sherpaResponse = sherpaService.performRequest("publication", "title",
+            "equals", text, 0, limit);
+        Choices result;
+        if (CollectionUtils.isNotEmpty(sherpaResponse.getJournals())) {
+            List<Choice> list = sherpaResponse
+                .getJournals().stream()
+                .map(sherpaJournal -> new Choice(sherpaJournal.getIssns().get(0),
+                    sherpaJournal.getTitles().get(0), sherpaJournal.getTitles().get(0)))
+                .collect(Collectors.toList());
+            int total = sherpaResponse.getJournals().size();
+
+            int confidence;
+            if (list.isEmpty()) {
+                confidence = Choices.CF_NOTFOUND;
+            } else if (list.size() == 1) {
+                confidence = Choices.CF_UNCERTAIN;
+            } else {
+                confidence = Choices.CF_AMBIGUOUS;
+            }
+            result = new Choices(list.toArray(new Choice[list.size()]), 0, total, confidence,
+                total > limit);
+        } else {
+            result = new Choices(false);
+        }
+        return result;
     }
 
     @Override

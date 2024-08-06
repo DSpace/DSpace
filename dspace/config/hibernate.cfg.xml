@@ -31,7 +31,7 @@
         <!-- hibernate.javax.cache.uri is defined in
                   config/spring/api/core-hibernate.xml so that we can use
                   property substitution. -->
-        <property name="javax.persistence.sharedCache.mode">ENABLE_SELECTIVE</property>
+        <property name="jakarta.persistence.sharedCache.mode">ENABLE_SELECTIVE</property>
 
         <!-- Entities to be loaded by hibernate -->
         <mapping class="org.dspace.app.util.WebApp"/>
@@ -61,6 +61,8 @@
         <mapping class="org.dspace.content.MetadataValue"/>
         <mapping class="org.dspace.content.Site"/>
         <mapping class="org.dspace.content.WorkspaceItem"/>
+
+        <mapping class="org.dspace.content.QAEventProcessed" />
 
         <mapping class="org.dspace.eperson.EPerson"/>
         <mapping class="org.dspace.eperson.Group"/>
@@ -95,6 +97,12 @@
         <mapping class="org.dspace.orcid.OrcidToken"/>
 
         <mapping class="org.dspace.supervision.SupervisionOrder"/>
+
+        <mapping class="org.dspace.app.ldn.NotifyServiceEntity"/>
+        <mapping class="org.dspace.app.ldn.NotifyServiceInboundPattern"/>
+
+        <mapping class="org.dspace.app.ldn.LDNMessageEntity"/>
+        <mapping class="org.dspace.app.ldn.NotifyPatternToTrigger"/>
 
     </session-factory>
 </hibernate-configuration>

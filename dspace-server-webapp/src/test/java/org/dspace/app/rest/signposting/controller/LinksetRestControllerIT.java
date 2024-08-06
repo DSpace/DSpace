@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
+import java.time.Period;
 import java.util.Date;
 
 import org.apache.commons.codec.CharEncoding;
@@ -40,15 +41,12 @@ import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.RelationshipType;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.authority.Choices;
-import org.dspace.content.authority.service.ChoiceAuthorityService;
-import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.SimpleMapConverter;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -66,12 +64,6 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private ConfigurationService configurationService;
-
-    @Autowired
-    private MetadataAuthorityService metadataAuthorityService;
-
-    @Autowired
-    private ChoiceAuthorityService choiceAuthorityService;
 
     @Autowired
     private ItemService itemService;
@@ -466,7 +458,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                 .withTitle("Withdrawn Item")
                 .withMetadata("dc", "identifier", "doi", doi)
                 .withIssueDate("2017-11-18")
-                .withEmbargoPeriod("2 week")
+                .withEmbargoPeriod(Period.ofWeeks(2))
                 .build();
         context.restoreAuthSystemState();
 
@@ -735,10 +727,6 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                 .andExpect(jsonPath("$[?(@.href == '" + uiUrl + "/signposting/linksets/" + item.getID() + "/json" +
                         "' && @.rel == 'linkset' " +
                         "&& @.type == 'application/linkset+json')]").exists());
-
-        DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
-        metadataAuthorityService.clearCache();
-        choiceAuthorityService.clearCache();
     }
 
     @Test
@@ -760,7 +748,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                     .withMimeType(bitstreamMimeType)
                     .build();
         }
-        bitstreamService.addMetadata(context, bitstream, "dc", "type", null, Item.ANY, "Article");
+        bitstreamService.addMetadata(context, bitstream, "dc", "type", null, null, "Article");
 
         context.restoreAuthSystemState();
 
@@ -780,10 +768,6 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                         "&& @.type == 'application/linkset+json')]").exists())
                 .andExpect(jsonPath("$[?(@.href == 'https://schema.org/ScholarlyArticle' " +
                         "&& @.rel == 'type')]").exists());
-
-        DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
-        metadataAuthorityService.clearCache();
-        choiceAuthorityService.clearCache();
     }
 
     @Test
@@ -813,10 +797,6 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
 
         getClient().perform(get("/signposting/links/" + bitstream.getID()))
                 .andExpect(status().isUnauthorized());
-
-        DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
-        metadataAuthorityService.clearCache();
-        choiceAuthorityService.clearCache();
     }
 
     @Test
@@ -837,17 +817,13 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                     .withName("Bitstream")
                     .withDescription("description")
                     .withMimeType(bitstreamMimeType)
-                    .withEmbargoPeriod("6 months")
+                    .withEmbargoPeriod(Period.ofMonths(6))
                     .build();
         }
         context.restoreAuthSystemState();
 
         getClient().perform(get("/signposting/links/" + bitstream.getID()))
                 .andExpect(status().isUnauthorized());
-
-        DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
-        metadataAuthorityService.clearCache();
-        choiceAuthorityService.clearCache();
     }
 
     @Test
@@ -860,7 +836,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                 .withTitle("Workspace Item")
                 .build();
         Item item = workspaceItem.getItem();
-        itemService.addMetadata(context, item, "dc", "identifier", "doi", Item.ANY, doi);
+        itemService.addMetadata(context, item, "dc", "identifier", "doi", null, doi);
 
         Bitstream bitstream = null;
         try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
@@ -874,10 +850,6 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
 
         getClient().perform(get("/signposting/links/" + bitstream.getID()))
                 .andExpect(status().isUnauthorized());
-
-        DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
-        metadataAuthorityService.clearCache();
-        choiceAuthorityService.clearCache();
     }
 
     @Test
@@ -890,10 +862,6 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
 
         getClient().perform(get("/signposting/links/" + item.getID()))
                 .andExpect(status().isUnauthorized());
-
-        DSpaceServicesFactory.getInstance().getConfigurationService().reloadConfig();
-        metadataAuthorityService.clearCache();
-        choiceAuthorityService.clearCache();
     }
 
     @Test
@@ -949,7 +917,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
                 .withTitle("Withdrawn Item")
                 .withMetadata("dc", "identifier", "doi", doi)
                 .withIssueDate("2017-11-18")
-                .withEmbargoPeriod("2 week")
+                .withEmbargoPeriod(Period.ofWeeks(2))
                 .build();
         context.restoreAuthSystemState();
 

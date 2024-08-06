@@ -21,7 +21,7 @@ import org.dspace.app.rest.RestResourceController;
 public class RegistrationRest extends RestAddressableModel {
 
     public static final String NAME = "registration";
-    public static final String NAME_PLURAL = "registrations";
+    public static final String PLURAL_NAME = "registrations";
     public static final String CATEGORY = EPERSON;
 
     private String email;
@@ -73,5 +73,10 @@ public class RegistrationRest extends RestAddressableModel {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 }
