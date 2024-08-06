@@ -9,8 +9,11 @@ package org.dspace.app.mediafilter;
 
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -93,6 +96,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     protected boolean isVerbose = false;
     protected boolean isQuiet = false;
     protected boolean isForce = false; // default to not forced
+    protected LocalDate fromDate = null;
 
     protected MediaFilterServiceImpl() {
 
@@ -119,6 +123,15 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
 
             for (Community topLevelCommunity : topLevelCommunities) {
                 applyFiltersCommunity(context, topLevelCommunity);
+            }
+        } else if (fromDate != null) {
+            Iterator<Item> itemIterator =
+                    itemService.findByLastModifiedSince(
+                            context,
+                            Date.from(fromDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
+                    );
+            while (itemIterator.hasNext() && processed < max2Process) {
+                applyFiltersItem(context, itemIterator.next());
             }
         } else {
             //otherwise, just find every item and process
@@ -587,5 +600,10 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     @Override
     public void setLogHandler(DSpaceRunnableHandler handler) {
         this.handler = handler;
+    }
+
+    @Override
+    public void setFromDate(LocalDate fromDate) {
+        this.fromDate = fromDate;
     }
 }
