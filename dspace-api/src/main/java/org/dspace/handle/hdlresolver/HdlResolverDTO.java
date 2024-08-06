@@ -57,7 +57,7 @@ public class HdlResolverDTO {
     }
 
     /**
-     * Returns the splitted String of the resource-path
+     * Returns the split String of the resource-path
      * 
      * @return
      */

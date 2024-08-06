@@ -131,7 +131,7 @@ public interface ChoiceAuthority extends NameAwarePlugin {
      * Build the preferred choice associated with the authKey. The default
      * implementation delegate the creato to the {@link #getLabel(String, String)}
      * {@link #getValue(String, String)} and {@link #getExtra(String, String)}
-     * methods but can be directly overriden for better efficiency or special
+     * methods but can be directly overridden for better efficiency or special
      * scenario
      * 
      * @param authKey authority key known to this authority.

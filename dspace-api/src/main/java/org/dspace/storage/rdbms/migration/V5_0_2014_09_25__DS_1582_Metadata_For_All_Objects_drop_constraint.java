@@ -25,7 +25,7 @@ import org.flywaydb.core.api.migration.Context;
  * since unit tests require H2 and the syntax for H2 is different from Postgres).
  * <P>
  * NOTE: This migration class is very simple because it is meant to be used
- * in conjuction with the corresponding SQL script:
+ * in conjunction with the corresponding SQL script:
  * ./etc/migrations/[db-type]/V5.0_2014_09_26__DS-1582_Metadata_For_All_Objects.sql
  * <P>
  * Also note that this migration is dated as 2014_09_25 so that it will run

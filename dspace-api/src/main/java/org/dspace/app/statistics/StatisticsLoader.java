@@ -291,7 +291,7 @@ public class StatisticsLoader {
      * by the formatter provided, then we return null.
      *
      * @param thisFile    file
-     * @param thisPattern patter
+     * @param thisPattern pattern
      * @param sdf         date format
      * @return StatsFile
      */

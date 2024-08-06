@@ -943,7 +943,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         //request a new token
         token = getAuthToken(eperson.getEmail(), password);
 
-        //Check if we succesfully authenticated again
+        //Check if we successfully authenticated again
         getClient(token).perform(get("/api/authn/status"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.okay", is(true)))

@@ -475,7 +475,7 @@ public class DSpaceCSV implements Serializable {
                 key = key + "." + metadataField.getQualifier();
             }
 
-            // Add the language if there is one (schema.element.qualifier[langauge])
+            // Add the language if there is one (schema.element.qualifier[language])
             //if ((value.language != null) && (!"".equals(value.language)))
             if (value.getLanguage() != null) {
                 key = key + "[" + value.getLanguage() + "]";

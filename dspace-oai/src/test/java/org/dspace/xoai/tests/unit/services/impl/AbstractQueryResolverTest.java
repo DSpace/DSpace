@@ -38,7 +38,7 @@ public abstract class AbstractQueryResolverTest {
 
     @After
     public void tearDown() {
-        //Nullify all resoruces so that JUnit cleans them up
+        //Nullify all resources so that JUnit cleans them up
         applicationContext = null;
         handleResolver = null;
         collectionsService = null;

@@ -195,7 +195,7 @@ public class BrowseIndex {
                                 }
                             }
 
-                            // for backward compatability we ignore the keywords
+                            // for backward compatibility we ignore the keywords
                             // single and full here
                             if (!sortName.equalsIgnoreCase("single")
                                 && !sortName.equalsIgnoreCase("full")
@@ -597,7 +597,7 @@ public class BrowseIndex {
     /**
      * Is the browse index of display type single?
      *
-     * @return true if singe, false if not
+     * @return true if single, false if not
      */
     public boolean isMetadataIndex() {
         return displayType != null && displayType.startsWith("metadata");

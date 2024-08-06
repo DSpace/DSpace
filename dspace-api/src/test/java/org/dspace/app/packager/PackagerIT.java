@@ -171,7 +171,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     private String getID() throws IOException, MetadataValidationException {
-        //this method gets the UUID from the mets file thats stored in the attribute element
+        //this method gets the UUID from the mets file that's stored in the attribute element
         METSManifest manifest = null;
         ZipFile zip = new ZipFile(tempFile);
         ZipEntry manifestEntry = zip.getEntry(METSManifest.MANIFEST_FILE);
