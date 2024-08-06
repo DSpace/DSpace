@@ -9,6 +9,7 @@
             <map>
                 <entry key="0" value-ref="localStore"/>
                 <entry key="1" value-ref="s3Store"/>
+                <entry key="2" value-ref="jcloudStore"/>
             </map>
         </property>
     </bean>
@@ -34,6 +35,23 @@
         <!-- Subfolder to organize assets within the bucket, in case this bucket is shared  -->
         <!-- Optional, default is root level of bucket -->
         <property name="subfolder" value="${assetstore.s3.subfolder}"/>
+    </bean>
+
+    <!-- Define JCloudStoreService bean -->
+    <bean name="jcloudStore" class="org.dspace.storage.bitstore.JCloudBitStoreService" scope="singleton" lazy-init="true">
+        <property name="enabled" value="${assetstore.s3.generic.enabled:false}"/>
+        <property name="useRelativePath" value="${assetstore.s3.generic.useRelativePath:false}"/>
+        <property name="container" value="${assetstore.s3.generic.container}"/>
+        <property name="endpoint" value="${assetstore.s3.endpoint}"/>
+
+        <property name="proivderOrApi" value="aws-s3"/>
+        <property name="identity" value="${assetstore.s3.generic.awsAccessKey}"/>
+        <property name="credentials" value="${assetstore.s3.generic.awsSecretKey}"/>
+        <property name="maxCounter" value="${assetstore.s3.maxCounter:100}"/>
+
+        <!-- Subfolder to organize assets within the bucket, in case this bucket is shared  -->
+        <!-- Optional, default is root level of bucket -->
+        <property name="subFolder" value="${assetstore.s3.generic.subfolder}"/>
     </bean>
 
     <!-- <bean name="localStore2 ... -->
