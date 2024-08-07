@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" default-lazy-init="true">
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd"
+       default-lazy-init="true">
 
     <bean name="org.dspace.storage.bitstore.BitstreamStorageService" class="org.dspace.storage.bitstore.BitstreamStorageServiceImpl">
         <property name="incoming" value="${assetstore.index.primary}"/>
@@ -37,6 +38,9 @@
         <property name="subfolder" value="${assetstore.s3.subfolder}"/>
     </bean>
 
+    <util:constant static-field="org.jclouds.filesystem.reference.FilesystemConstants.PROPERTY_BASEDIR"
+                   id="propertyBaseDir"/>
+
     <!-- Define JCloudStoreService bean -->
     <bean name="jcloudStore" class="org.dspace.storage.bitstore.JCloudBitStoreService" scope="singleton" lazy-init="true">
         <property name="enabled" value="${assetstore.s3.generic.enabled:false}"/>
@@ -44,10 +48,16 @@
         <property name="container" value="${assetstore.s3.generic.container}"/>
         <property name="endpoint" value="${assetstore.s3.endpoint}"/>
 
-        <property name="proivderOrApi" value="aws-s3"/>
+        <property name="providerOrApi" value="aws-s3"/>
         <property name="identity" value="${assetstore.s3.generic.awsAccessKey}"/>
         <property name="credentials" value="${assetstore.s3.generic.awsSecretKey}"/>
         <property name="maxCounter" value="${assetstore.s3.maxCounter:100}"/>
+
+        <property name="overrides">
+            <props>
+                <prop key="#{propertyBaseDir}">./local/filesystemstorage</prop>
+            </props>
+        </property>
 
         <!-- Subfolder to organize assets within the bucket, in case this bucket is shared  -->
         <!-- Optional, default is root level of bucket -->
