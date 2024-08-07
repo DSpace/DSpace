@@ -35,6 +35,7 @@ import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.content.service.PreviewContentService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.SiteService;
@@ -132,6 +133,7 @@ public abstract class AbstractBuilder<T, S> {
     static ClarinUserMetadataService clarinUserMetadataService;
     static ClarinLicenseResourceUserAllowanceService clarinLicenseResourceUserAllowanceService;
     static CreativeCommonsService creativeCommonsService;
+    static PreviewContentService previewContentService;
 
 
 
@@ -184,6 +186,7 @@ public abstract class AbstractBuilder<T, S> {
         requestItemService = RequestItemServiceFactory.getInstance().getRequestItemService();
         versioningService = DSpaceServicesFactory.getInstance().getServiceManager()
                                  .getServiceByName(VersioningService.class.getName(), VersioningService.class);
+        previewContentService = ContentServiceFactory.getInstance().getPreviewContentService();
 
         // Temporarily disabled
         claimedTaskService = XmlWorkflowServiceFactory.getInstance().getClaimedTaskService();
@@ -259,6 +262,7 @@ public abstract class AbstractBuilder<T, S> {
         subscribeService = null;
         supervisionOrderService = null;
         submissionConfigService = null;
+        previewContentService = null;
 
     }
 

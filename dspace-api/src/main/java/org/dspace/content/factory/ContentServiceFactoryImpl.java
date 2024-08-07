@@ -26,6 +26,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.MetadataValueService;
+import org.dspace.content.service.PreviewContentService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.SiteService;
@@ -83,6 +84,8 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     private EntityTypeService entityTypeService;
     @Autowired(required = true)
     private EntityService entityService;
+    @Autowired(required = true)
+    private PreviewContentService previewContentService;
 
     @Autowired(required = true)
     private DspaceObjectClarinService dspaceObjectClarinService;
@@ -163,6 +166,11 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     @Override
     public SubscribeService getSubscribeService() {
         return subscribeService ;
+    }
+
+    @Override
+    public PreviewContentService getPreviewContentService() {
+        return previewContentService;
     }
 
     @Override

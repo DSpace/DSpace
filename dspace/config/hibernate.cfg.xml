@@ -49,6 +49,7 @@
         <mapping class="org.dspace.content.Collection"/>
         <mapping class="org.dspace.content.Community"/>
         <mapping class="org.dspace.content.Item"/>
+        <mapping class="org.dspace.content.PreviewContent"/>
         <mapping class="org.dspace.content.Relationship"/>
         <mapping class="org.dspace.content.RelationshipType"/>
         <mapping class="org.dspace.content.EntityType"/>

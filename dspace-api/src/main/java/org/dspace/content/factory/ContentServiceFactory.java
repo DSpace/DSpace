@@ -29,6 +29,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.MetadataValueService;
+import org.dspace.content.service.PreviewContentService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.RelationshipTypeService;
 import org.dspace.content.service.SiteService;
@@ -76,6 +77,7 @@ public abstract class ContentServiceFactory {
     public abstract SiteService getSiteService();
 
     public abstract SubscribeService getSubscribeService();
+    public abstract PreviewContentService getPreviewContentService();
 
     /**
      * Return the implementation of the RelationshipTypeService interface

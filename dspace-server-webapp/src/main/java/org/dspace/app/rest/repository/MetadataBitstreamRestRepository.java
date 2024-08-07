@@ -20,9 +20,12 @@ import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
@@ -51,9 +54,11 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.PreviewContent;
 import org.dspace.content.Thumbnail;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.PreviewContentService;
 import org.dspace.content.service.clarin.ClarinLicenseResourceMappingService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -104,6 +109,9 @@ public class MetadataBitstreamRestRepository extends DSpaceRestRepository<Metada
 
     @Autowired
     ConfigurationService configurationService;
+
+    @Autowired
+    PreviewContentService previewContentService;
 
     // Configured ZIP file preview limit (default: 1000) - if the ZIP file contains more files, it will be truncated
     @Value("${file.preview.zip.limit.length:1000}")
@@ -157,7 +165,20 @@ public class MetadataBitstreamRestRepository extends DSpaceRestRepository<Metada
                 List<FileInfo> fileInfos = new ArrayList<>();
                 boolean canPreview = findOutCanPreview(context, bitstream);
                 if (canPreview) {
-                    fileInfos = getFilePreviewContent(context, bitstream, fileInfos);
+                    List<PreviewContent> prContents = previewContentService.findRootByBitstream(context,
+                            bitstream.getID());
+                    // Generate new content if we didn't find any
+                    if (prContents.isEmpty()) {
+                        fileInfos = getFilePreviewContent(context, bitstream, fileInfos);
+                        for (FileInfo fi : fileInfos) {
+                            createPreviewContent(context, bitstream, fi);
+                        }
+                        context.commit();
+                    } else {
+                        for (PreviewContent pc : prContents) {
+                            fileInfos.add(createFileInfo(pc));
+                        }
+                    }
                 }
                 MetadataBitstreamWrapper bts = new MetadataBitstreamWrapper(bitstream, fileInfos,
                         bitstream.getFormat(context).getMIMEType(),
@@ -221,6 +242,58 @@ public class MetadataBitstreamRestRepository extends DSpaceRestRepository<Metada
     }
 
     /**
+     * Define the hierarchy organization for preview content and file info.
+     * The hierarchy is established by the sub map.
+     * If a content item contains a sub map, it is considered a directory; if not, it is a file.
+     * @param sourceMap  sub map that is used as a pattern
+     * @param creator    creator function
+     * @return           created sub map
+     */
+    private <T, U> Hashtable<String, T> createSubMap(Map<String, U> sourceMap, Function<U, T> creator) {
+        if (sourceMap == null) {
+            return null;
+        }
+
+        Hashtable<String, T> sub = new Hashtable<>();
+        for (Map.Entry<String, U> entry : sourceMap.entrySet()) {
+            sub.put(entry.getKey(), creator.apply(entry.getValue()));
+        }
+        return sub;
+    }
+
+    /**
+     * Create file info from preview content.
+     * @param pc  preview content
+     * @return    created file info
+     */
+    private FileInfo createFileInfo(PreviewContent pc) {
+        Hashtable<String, FileInfo> sub = createSubMap(pc.sub, this::createFileInfo);
+        return new FileInfo(pc.name, pc.content, pc.size, pc.isDirectory, sub);
+    }
+
+    /**
+     * Create preview content from file info for bitstream.
+     * @param context   DSpace context object
+     * @param bitstream bitstream
+     * @param fi        file info
+     * @return          created preview content
+     * @throws SQLException If database error is occurred
+     */
+    private PreviewContent createPreviewContent(Context context, Bitstream bitstream, FileInfo fi) throws SQLException {
+        Hashtable<String, PreviewContent> sub = createSubMap(fi.sub, value -> {
+            try {
+                return createPreviewContent(context, bitstream, value);
+            } catch (SQLException e) {
+                String msg = "Database error occurred while creating new preview content " +
+                        "for bitstream with ID = " + bitstream.getID() + " Error msg: " + e.getMessage();
+                log.error(msg, e);
+                throw new RuntimeException(msg, e);
+            }
+        });
+        return previewContentService.create(context, bitstream, fi.name, fi.content, fi.isDirectory, fi.size, sub);
+    }
+
+    /**
      * Convert InputStream of the ZIP file into FileInfo classes.
      *
      * @param context DSpace context object
@@ -243,10 +316,10 @@ public class MetadataBitstreamRestRepository extends DSpaceRestRepository<Metada
             fileInfos.add(new FileInfo(data, false));
         } else {
             String data = "";
-            if (bitstream.getFormat(context).getExtensions().contains("zip")) {
+            if (bitstream.getFormat(context).getMIMEType().equals("application/zip")) {
                 data = extractFile(inputStream, "zip");
                 fileInfos = FileTreeViewGenerator.parse(data);
-            } else if (bitstream.getFormat(context).getExtensions().contains("tar")) {
+            } else if (bitstream.getFormat(context).getMIMEType().equals("application/x-tar")) {
                 ArchiveInputStream is = new ArchiveStreamFactory().createArchiveInputStream(ArchiveStreamFactory.TAR,
                         inputStream);
                 data = extractFile(is, "tar");
