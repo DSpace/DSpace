@@ -193,7 +193,7 @@ public class ClarinLicenseServiceImpl implements ClarinLicenseService {
     public void delete(Context context, ClarinLicense clarinLicense) throws SQLException, AuthorizeException {
         if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
-                    "You must be an admin to create an CLARIN License");
+                    "You must be an admin to delete an CLARIN License");
         }
 
         clarinLicenseDAO.delete(context, clarinLicense);
@@ -203,7 +203,7 @@ public class ClarinLicenseServiceImpl implements ClarinLicenseService {
     public void update(Context context, ClarinLicense newClarinLicense) throws SQLException, AuthorizeException {
         if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
-                    "You must be an admin to create an CLARIN License");
+                    "You must be an admin to update an CLARIN License");
         }
 
         if (Objects.isNull(newClarinLicense)) {
