@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -17,10 +18,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
-import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
 import org.dspace.app.rest.matcher.EPersonMatcher;
@@ -32,6 +32,7 @@ import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.EPersonBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.PoolTaskBuilder;
+import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -49,7 +50,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.RestMediaTypes;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
 
 public class LoginAsEPersonIT extends AbstractControllerIntegrationTest {
 
@@ -59,11 +59,10 @@ public class LoginAsEPersonIT extends AbstractControllerIntegrationTest {
     @Autowired
     private GroupService groupService;
 
-    @Autowired
-    private EPersonService epersonService;
-
     @Before
-    public void setup() {
+    public void setUp() throws Exception {
+        super.setUp();
+
         configurationService.setProperty("webui.user.assumelogin", true);
     }
 
@@ -79,6 +78,7 @@ public class LoginAsEPersonIT extends AbstractControllerIntegrationTest {
 
 
     }
+
     @Test
     public void loggedInAsOtherUserRetrievalTest() throws Exception {
 
@@ -151,11 +151,12 @@ public class LoginAsEPersonIT extends AbstractControllerIntegrationTest {
     public void loggedInUserOtherAdminTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        EPerson testEperson = EPersonBuilder.createEPerson(context).withEmail("loginasuseradmin@test.com").build();
-
-
         Group adminGroup = groupService.findByName(context, Group.ADMIN);
-        groupService.addMember(context, adminGroup, testEperson);
+        EPerson testEperson = EPersonBuilder.createEPerson(context)
+                                            .withEmail("loginasuseradmin@test.com")
+                                            .withGroupMembership(adminGroup)
+                                            .build();
+
         context.restoreAuthSystemState();
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -192,26 +193,27 @@ public class LoginAsEPersonIT extends AbstractControllerIntegrationTest {
 
         String authToken = getAuthToken(admin.getEmail(), password);
 
-        // create a workspaceitem explicitly in the col1
-        MvcResult mvcResult = getClient(authToken).perform(post("/api/submission/workspaceitems")
-                                                               .param("owningCollection", col1.getID().toString())
-                                                               .param("embed", "collection")
-                                                               .header("X-On-Behalf-Of", eperson.getID())
-                                                               .contentType(org.springframework
-                                                                                .http.MediaType.APPLICATION_JSON))
-                                                  .andExpect(status().isCreated())
-                                                  .andExpect(jsonPath("$._embedded.collection.id",
-                                                                      is(col1.getID().toString()))).andReturn();
+        AtomicReference<Integer> wsi = new AtomicReference<>();
 
-        ObjectMapper mapper = new ObjectMapper();
+        try {
+            // create a workspaceitem explicitly in the col1
+            getClient(authToken).perform(post("/api/submission/workspaceitems")
+                                             .param("owningCollection", col1.getID().toString())
+                                             .param("embed", "collection")
+                                             .header("X-On-Behalf-Of", eperson.getID())
+                                             .contentType(org.springframework.http.MediaType.APPLICATION_JSON))
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$._embedded.collection.id", is(col1.getID().toString())))
+                                .andDo(result -> wsi.set(read(result.getResponse().getContentAsString(), "$.id")));
 
-        String content = mvcResult.getResponse().getContentAsString();
-        Map<String,Object> map = mapper.readValue(content, Map.class);
-        String workspaceItemId = String.valueOf(map.get("id"));
+            getClient(authToken).perform(get("/api/submission/workspaceitems/" + wsi.get())
+                                            .param("embed", "submitter"))
+                                .andExpect(jsonPath("$._embedded.submitter",
+                                                    EPersonMatcher.matchEPersonOnEmail(eperson.getEmail())));
 
-        getClient(authToken).perform(get("/api/submission/workspaceitems/" + workspaceItemId)
-                                        .param("embed", "submitter"))
-                            .andExpect(jsonPath("$._embedded.submitter", EPersonMatcher.matchProperties(eperson)));
+        } finally {
+            WorkspaceItemBuilder.deleteWorkspaceItem(wsi.get());
+        }
     }
 
     @Test
