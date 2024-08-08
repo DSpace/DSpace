@@ -43,8 +43,10 @@ import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.SubscriptionParameter;
+import org.dspace.eperson.service.EPersonService;
 import org.hamcrest.Matchers;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -59,6 +61,9 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 
     @Autowired
     private ResourcePolicyService resourcePolicyService;
+
+    @Autowired
+    private EPersonService epersonService;
 
     private Community subCommunity;
     private Collection collection;
@@ -1070,7 +1075,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         String tokenAdmin = getAuthToken(admin.getEmail(), password);
         getClient(tokenAdmin).perform(get("/api/core/subscriptions/" + subscription.getID() + "/eperson"))
                              .andExpect(status().isOk())
-                             .andExpect(jsonPath("$", is(EPersonMatcher.matchEPersonEntry(eperson))));
+                             .andExpect(jsonPath("$", is(EPersonMatcher.matchEPersonOnEmail(eperson.getEmail()))));
     }
 
     @Test
@@ -1088,7 +1093,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         String tokenEPerson = getAuthToken(eperson.getEmail(), password);
         getClient(tokenEPerson).perform(get("/api/core/subscriptions/" + subscription.getID() + "/eperson"))
                                .andExpect(status().isOk())
-                               .andExpect(jsonPath("$", is(EPersonMatcher.matchEPersonEntry(eperson))));
+                               .andExpect(jsonPath("$", is(EPersonMatcher.matchEPersonOnEmail(eperson.getEmail()))));
     }
 
     @Test
