@@ -725,19 +725,19 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
      */
     protected void rethinkGroupCache(Context context, boolean flushQueries) throws SQLException {
         // current cache in the database
-        var oldCache = group2GroupCacheDAO.getCache(context);
+        Set<Pair<UUID, UUID>> oldCache = group2GroupCacheDAO.getCache(context);
 
         // correct cache, computed from the Group table
-        var newCache = computeNewCache(context, flushQueries);
+        Set<Pair<UUID, UUID>> newCache = computeNewCache(context, flushQueries);
 
-        var toDelete = SetUtils.difference(oldCache, newCache);
-        var toCreate = SetUtils.difference(newCache, oldCache);
+        SetUtils.SetView<Pair<UUID, UUID>> toDelete = SetUtils.difference(oldCache, newCache);
+        SetUtils.SetView<Pair<UUID, UUID>> toCreate = SetUtils.difference(newCache, oldCache);
 
-        for (var pair : toDelete ) {
+        for (Pair<UUID, UUID> pair : toDelete ) {
             group2GroupCacheDAO.deleteFromCache(context, pair.getLeft(), pair.getRight());
         }
 
-        for (var pair : toCreate ) {
+        for (Pair<UUID, UUID> pair : toCreate ) {
             group2GroupCacheDAO.addToCache(context, pair.getLeft(), pair.getRight());
         }
     }
