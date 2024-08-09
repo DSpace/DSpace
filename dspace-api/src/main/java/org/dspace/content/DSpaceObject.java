@@ -143,8 +143,6 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
         return id;
     }
 
-    public abstract String getName();
-
     /**
      * Get the Handle of the object. This may return <code>null</code>
      *

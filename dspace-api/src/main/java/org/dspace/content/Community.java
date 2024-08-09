@@ -22,8 +22,10 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.content.comparator.NameAscendingComparator;
+import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.HibernateProxyHelper;
@@ -42,6 +44,9 @@ import org.dspace.eperson.Group;
 @Entity
 @Table(name = "community")
 public class Community extends CacheableDSpaceObject implements DSpaceObjectLegacySupport {
+    @Transient
+    private CommunityService communityService;
+
     @Column(name = "community_id", insertable = false, updatable = false)
     private Integer legacyId;
 
@@ -241,8 +246,7 @@ public class Community extends CacheableDSpaceObject implements DSpaceObjectLega
 
     @Override
     public String getName() {
-        String value = getMetadataFirstValue(MetadataSchemaEnum.DC.getName(), "title", null);
-        return value == null ? "" : value;
+        return communityService.getName(this);
     }
 
     @Override

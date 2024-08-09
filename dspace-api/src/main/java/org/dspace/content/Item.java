@@ -29,6 +29,7 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.persistence.Transient;
 import org.dspace.content.comparator.NameAscendingComparator;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.HibernateProxyHelper;
@@ -51,6 +52,9 @@ import org.dspace.eperson.EPerson;
 @Entity
 @Table(name = "item")
 public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
+    @Transient
+    ItemService itemService;
+
     /**
      * Wild card for Dublin Core metadata qualifiers/languages
      */
@@ -348,7 +352,7 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
      */
     @Override
     public String getName() {
-        return getMetadataFirstValue(MetadataSchemaEnum.DC.getName(), "title", null);
+        return itemService.getName(this);
     }
 
     @Override

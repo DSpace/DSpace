@@ -20,6 +20,8 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.HibernateProxyHelper;
@@ -36,6 +38,9 @@ import org.dspace.core.HibernateProxyHelper;
 @Entity
 @Table(name = "bitstream")
 public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport {
+    @Transient
+    BitstreamService bitreamService;
+
     @Column(name = "bitstream_id", insertable = false, updatable = false)
     private Integer legacyId;
 
@@ -122,7 +127,7 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     @Override
     public String getName() {
-        return getMetadataFirstValue(MetadataSchemaEnum.DC.getName(), "title", null);
+        return bitreamService.getName(this);
     }
 
     /**

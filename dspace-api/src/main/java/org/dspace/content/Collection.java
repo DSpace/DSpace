@@ -23,7 +23,9 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import org.dspace.content.comparator.NameAscendingComparator;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.HibernateProxyHelper;
@@ -45,6 +47,8 @@ import org.dspace.eperson.Group;
 @Entity
 @Table(name = "collection")
 public class Collection extends CacheableDSpaceObject implements DSpaceObjectLegacySupport {
+    @Transient
+    CollectionService collectionService;
 
     @Column(name = "collection_id", insertable = false, updatable = false)
     private Integer legacyId;
@@ -103,8 +107,7 @@ public class Collection extends CacheableDSpaceObject implements DSpaceObjectLeg
 
     @Override
     public String getName() {
-        String value = getMetadataFirstValue(MetadataSchemaEnum.DC.getName(), "title", null);
-        return value == null ? "" : value;
+        return collectionService.getName(this);
     }
 
     /**

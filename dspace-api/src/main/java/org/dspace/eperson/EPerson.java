@@ -26,6 +26,7 @@ import org.dspace.content.DSpaceObjectLegacySupport;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.HibernateProxyHelper;
+import org.dspace.eperson.service.EPersonService;
 
 /**
  * Class representing an e-person.
@@ -35,6 +36,9 @@ import org.dspace.core.HibernateProxyHelper;
 @Entity
 @Table(name = "eperson")
 public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacySupport {
+    @Transient
+    EPersonService epersonService;
+
     @Column(name = "eperson_id", insertable = false, updatable = false)
     private Integer legacyId;
 
@@ -276,7 +280,7 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
 
     @Override
     public String getName() {
-        return getEmail();
+        return epersonService.getName(this);
     }
 
     String getDigestAlgorithm() {
