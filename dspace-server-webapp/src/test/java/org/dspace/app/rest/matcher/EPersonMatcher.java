@@ -24,7 +24,6 @@ import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
-import org.hibernate.LazyInitializationException;
 
 public class EPersonMatcher {
     // todo: this may not work in all cases!
