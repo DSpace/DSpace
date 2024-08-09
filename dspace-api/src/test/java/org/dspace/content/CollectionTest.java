@@ -153,7 +153,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         assertThat("testCollectionFind 0", found, notNullValue());
         assertThat("testCollectionFind 1", found.getID(), equalTo(id));
         //the community created by default has no name
-        assertThat("testCollectionFind 2", found.getName(), equalTo(""));
+        assertThat("testCollectionFind 2", collectionService.getName(found), equalTo(""));
     }
 
     /**
@@ -167,7 +167,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
 
         Collection created = collectionService.create(context, owningCommunity);
         assertThat("testCreate 0", created, notNullValue());
-        assertThat("testCreate 1", created.getName(), equalTo(""));
+        assertThat("testCreate 1", collectionService.getName(created), equalTo(""));
     }
 
     /**
@@ -341,7 +341,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     @Override
     public void testGetName() {
         //by default is empty
-        assertThat("testGetName 0", collection.getName(), equalTo(""));
+        assertThat("testGetName 0", collectionService.getName(collection), equalTo(""));
     }
 
     /**
@@ -1013,9 +1013,12 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
         context.restoreAuthSystemState();
         assertTrue("testGetCommunities 0", collection.getCommunities().size() == 4);
         //Communities should be sorted by name
-        assertTrue("testGetCommunities 1", collection.getCommunities().get(1).getName().equals("community 1"));
-        assertTrue("testGetCommunities 1", collection.getCommunities().get(2).getName().equals("community 2"));
-        assertTrue("testGetCommunities 1", collection.getCommunities().get(3).getName().equals("community 3"));
+        Community community3 = collection.getCommunities().get(1);
+        assertTrue("testGetCommunities 1", communityService.getName(community3).equals("community 1"));
+        Community community2 = collection.getCommunities().get(2);
+        assertTrue("testGetCommunities 1", communityService.getName(community2).equals("community 2"));
+        Community community1 = collection.getCommunities().get(3);
+        assertTrue("testGetCommunities 1", communityService.getName(community1).equals("community 3"));
     }
 
     /**

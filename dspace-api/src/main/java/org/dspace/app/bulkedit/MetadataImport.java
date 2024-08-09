@@ -1274,7 +1274,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 Collection c = change.getNewOwningCollection();
                 if (c != null) {
                     String cHandle = c.getHandle();
-                    String cName = c.getName();
+                    String cName = collectionService.getName(c);
                     if (!changed) {
                         handler.logInfo(" + New owning collection (" + cHandle + "): ");
                     } else {
@@ -1286,7 +1286,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 c = change.getOldOwningCollection();
                 if (c != null) {
                     String cHandle = c.getHandle();
-                    String cName = c.getName();
+                    String cName = collectionService.getName(c);
                     if (!changed) {
                         handler.logInfo(" + Old owning collection (" + cHandle + "): ");
                     } else {
@@ -1299,7 +1299,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             // Show new mapped collections
             for (Collection c : newCollections) {
                 String cHandle = c.getHandle();
-                String cName = c.getName();
+                String cName = collectionService.getName(c);
                 if (!changed) {
                     handler.logInfo(" + Map to collection (" + cHandle + "): ");
                 } else {
@@ -1311,7 +1311,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
             // Show old mapped collections
             for (Collection c : oldCollections) {
                 String cHandle = c.getHandle();
-                String cName = c.getName();
+                String cName = collectionService.getName(c);
                 if (!changed) {
                     handler.logInfo(" + Un-map from collection (" + cHandle + "): ");
                 } else {

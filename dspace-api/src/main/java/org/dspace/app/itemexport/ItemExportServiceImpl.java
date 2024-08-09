@@ -403,10 +403,10 @@ public class ItemExportServiceImpl implements ItemExportService {
                 // bundles can have multiple bitstreams now...
                 List<Bitstream> bitstreams = bundle.getBitstreams();
 
-                String bundleName = bundle.getName();
+                String bundleName = bundleService.getName(bundle);
 
                 for (Bitstream bitstream : bitstreams) {
-                    String myName = bitstream.getName();
+                    String myName = bitstreamService.getName(bitstream);
                     String oldName = myName;
 
                     String description = bitstreamService.getDescription(bitstream);

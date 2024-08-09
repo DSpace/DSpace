@@ -488,7 +488,7 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator {
             return true; //all bundles should be disseminated
         } else {
             //Check if bundle name is in our list of filtered bundles
-            boolean inList = filterBundles.contains(bundle.getName());
+            boolean inList = filterBundles.contains(bundleService.getName(bundle));
             //Based on whether this is an inclusion or exclusion filter,
             //return whether this bundle should be included.
             return this.excludeBundles ? !inList : inList;

@@ -69,10 +69,10 @@ public class CollectionDropDown {
         StringBuffer name = new StringBuffer("");
         getCom = communityService.getAllParents(context, col); // all communities containing given collection
         for (Community com : getCom) {
-            name.insert(0, com.getName() + separator);
+            name.insert(0, communityService.getName(com) + separator);
         }
 
-        name.append(col.getName());
+        name.append(collectionService.getName(col));
 
         if (maxchars != 0) {
             int len = name.length();

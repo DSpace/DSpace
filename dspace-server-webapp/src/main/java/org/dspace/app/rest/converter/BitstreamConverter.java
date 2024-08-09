@@ -38,7 +38,8 @@ public class BitstreamConverter extends DSpaceObjectConverter<Bitstream, Bitstre
             e1.printStackTrace();
         }
         if (bundles != null && bundles.size() > 0) {
-            b.setBundleName(bundles.get(0).getName());
+            Bundle bundle = bundles.get(0);
+            b.setBundleName(bundleService.getName(bundle));
         }
         CheckSumRest checksum = new CheckSumRest();
         checksum.setCheckSumAlgorithm(obj.getChecksumAlgorithm());

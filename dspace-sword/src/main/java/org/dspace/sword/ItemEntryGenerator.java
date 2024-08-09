@@ -109,7 +109,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry {
                         Content con = new Content();
                         List<Bundle> bundles = item.getBundles();
                         for (Bundle bundle : bundles) {
-                            if (swordBundle.equals(bundle.getName())) {
+                            if (swordBundle.equals(bundleService.getName(bundle))) {
                                 List<Bitstream> bss = bundle
                                     .getBitstreams();
                                 for (Bitstream bs : bss) {
@@ -199,7 +199,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry {
             // link to all the files in the item
             List<Bundle> bundles = item.getBundles();
             for (Bundle bundle : bundles) {
-                if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName())) {
+                if (Constants.CONTENT_BUNDLE_NAME.equals(bundleService.getName(bundle))) {
                     List<Bitstream> bss = bundle.getBitstreams();
                     for (Bitstream bs : bss) {
                         Link link = new Link();
@@ -268,7 +268,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry {
         StringBuilder rightsString = new StringBuilder();
         List<Bundle> bundles = item.getBundles();
         for (Bundle bundle : bundles) {
-            if (Constants.LICENSE_BUNDLE_NAME.equals(bundle.getName())) {
+            if (Constants.LICENSE_BUNDLE_NAME.equals(bundleService.getName(bundle))) {
                 List<Bitstream> bss = bundle.getBitstreams();
                 for (Bitstream bs : bss) {
                     String url = urlManager.getBitstreamUrl(bs);

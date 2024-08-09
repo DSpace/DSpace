@@ -92,7 +92,7 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
         DCDate liftDate = EmbargoServiceFactory.getInstance().getEmbargoService().getEmbargoTermsAsDate(context, item);
         for (Bundle bn : item.getBundles()) {
             // Skip the LICENSE and METADATA bundles, they stay world-readable
-            String bnn = bn.getName();
+            String bnn = bundleService.getName(bn);
             if (!(bnn.equals(Constants.LICENSE_BUNDLE_NAME) || bnn.equals(Constants.METADATA_BUNDLE_NAME) || bnn
                 .equals(CreativeCommonsServiceImpl.CC_BUNDLE_NAME))) {
                 //AuthorizeManager.removePoliciesActionFilter(context, bn, Constants.READ);
@@ -161,7 +161,7 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
         throws SQLException, AuthorizeException, IOException {
         for (Bundle bn : item.getBundles()) {
             // Skip the LICENSE and METADATA bundles, they stay world-readable
-            String bnn = bn.getName();
+            String bnn = bundleService.getName(bn);
             if (!(bnn.equals(Constants.LICENSE_BUNDLE_NAME) || bnn.equals(Constants.METADATA_BUNDLE_NAME) || bnn
                 .equals(CreativeCommonsServiceImpl.CC_BUNDLE_NAME))) {
                 // don't report on "TEXT" or "THUMBNAIL" bundles; those
@@ -171,8 +171,8 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
                     for (ResourcePolicy rp : getAuthorizeService()
                         .getPoliciesActionFilter(context, bn, Constants.READ)) {
                         if (rp.getStartDate() == null) {
-                            System.out.println("CHECK WARNING: Item " + item.getHandle() + ", Bundle " + bn
-                                    .getName() + " allows READ by " +
+                            System.out.println("CHECK WARNING: Item " + item.getHandle() + ", Bundle " + bn.bundleService.getName(
+                                bn) + " allows READ by " +
                                     ((rp.getEPerson() != null) ? "Group " + rp.getGroup().getName() :
                                             "EPerson " + getEPersonService().getFullName(rp.getEPerson())));
                         }
@@ -183,8 +183,8 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
                     for (ResourcePolicy rp : getAuthorizeService()
                         .getPoliciesActionFilter(context, bs, Constants.READ)) {
                         if (rp.getStartDate() == null) {
-                            System.out.println("CHECK WARNING: Item " + item.getHandle() + ", Bitstream " + bs
-                                    .getName() + " (in Bundle " + bn.getName() + ") allows READ by " +
+                            System.out.println("CHECK WARNING: Item " + item.getHandle() + ", Bitstream " + bs.bitreamService.getName(
+                                bs) + " (in Bundle " + bundleService.getName(bn) + ") allows READ by " +
                                     ((rp.getEPerson() != null) ? "Group " + rp.getGroup().getName() :
                                             "EPerson " + getEPersonService().getFullName(rp.getEPerson())));
                         }

@@ -113,6 +113,6 @@ public class AnnotationListService extends AbstractResourceService {
 
         return new ExternalLinksGenerator(identifier)
                 .setFormat(mimetype)
-                .setLabel(bitstream.getName());
+                .setLabel(bitstreamService.getName(bitstream));
     }
 }

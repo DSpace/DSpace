@@ -44,7 +44,7 @@ public class BitstreamFilterByBundleName extends BitstreamFilter {
         try {
             List<Bundle> bundles = bitstream.getBundles();
             for (Bundle b : bundles) {
-                if (b.getName().equals(bundleName)) {
+                if (bundleService.getName(b).equals(bundleName)) {
                     return true;
                 }
             }

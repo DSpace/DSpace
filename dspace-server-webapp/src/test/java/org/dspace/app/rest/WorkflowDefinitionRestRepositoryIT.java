@@ -316,7 +316,8 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
                 .andExpect(jsonPath("$.page.number", is(0)))
                 //Contains only the first non-mapped collection
                 .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
-                    WorkflowDefinitionMatcher.matchCollectionEntry(firstNonMappedCollection.getName(),
+                    WorkflowDefinitionMatcher.matchCollectionEntry(
+                        collectionService.getName(firstNonMappedCollection),
                         firstNonMappedCollection.getID(), firstNonMappedCollection.getHandle())
                 )));
         }
@@ -374,7 +375,8 @@ public class WorkflowDefinitionRestRepositoryIT extends AbstractControllerIntegr
                     .andExpect(jsonPath("$.page.number", is(0)))
                     //Contains only the first mapped collection
                     .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
-                        WorkflowDefinitionMatcher.matchCollectionEntry(firstMappedCollection.getName(),
+                        WorkflowDefinitionMatcher.matchCollectionEntry(
+                            collectionService.getName(firstMappedCollection),
                             firstMappedCollection.getID(), firstMappedCollection.getHandle())
                     )));
             } else {

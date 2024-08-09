@@ -127,8 +127,9 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
         // We should have title, uuid, owning collection name set and metadata value list instantiated to empty
         assertEquals("UUID should match item1 uuid", item1.getID(), potentialDuplicate.getUuid());
         assertEquals("Title should match item1 title", item1Title, potentialDuplicate.getTitle());
+        Collection collection = item1.getOwningCollection();
         assertEquals("Owning collection should match item1 owning collection",
-                item1.getOwningCollection().getName(), potentialDuplicate.getOwningCollectionName());
+                     collectionService.getName(collection), potentialDuplicate.getOwningCollectionName());
         assertEquals("Metadata value list size should be 0",
                 0, potentialDuplicate.getMetadataValueList().size());
     }

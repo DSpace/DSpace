@@ -124,7 +124,7 @@ public class TestLogicRunner {
                     while (itemIterator.hasNext()) {
                         Item i = itemIterator.next();
                         System.out.println(
-                            "Testing '" + filter + "' on item " + i.getHandle() + " ('" + i.getName() + "')"
+                            "Testing '" + filter + "' on item " + i.getHandle() + " ('" + itemService.getName(i) + "')"
                         );
                         System.out.println(filter.getResult(c, i));
 

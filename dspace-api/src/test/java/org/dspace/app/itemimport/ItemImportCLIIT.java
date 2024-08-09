@@ -552,7 +552,7 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
      */
     private void checkMetadata() throws Exception {
         Item item = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next();
-        assertEquals(item.getName(), publicationTitle);
+        assertEquals(itemService.getName(item), publicationTitle);
         assertEquals(itemService.getMetadata(item, "dc.date.issued"), "1990");
         assertEquals(itemService.getMetadata(item, "dc.title.alternative"), "J'aime les Printemps");
     }
@@ -563,7 +563,7 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
      */
     private void checkMetadataWithAnotherSchema() throws Exception {
         Item item = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next();
-        assertEquals(item.getName(), publicationTitle);
+        assertEquals(itemService.getName(item), publicationTitle);
         assertEquals(itemService.getMetadata(item, "dcterms.title"), publicationTitle);
     }
 
@@ -574,7 +574,7 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
     private void checkBitstream() throws Exception {
         Item item = itemService.findByMetadataField(context, "dc", "title", null, publicationTitle).next();
         Bitstream bitstream = itemService.getBundles(item, "ORIGINAL").get(0).getBitstreams().get(0);
-        assertEquals(bitstream.getName(), "file1.txt");
+        assertEquals(bitstreamService.getName(bitstream), "file1.txt");
     }
 
     /**

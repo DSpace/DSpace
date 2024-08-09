@@ -1151,7 +1151,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         getClient(tokenAdmin).perform(get("/api/core/subscriptions/" + subscription.getID() + "/resource"))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.uuid", Matchers.is(collection.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(collection.getName())))
+                             .andExpect(jsonPath("$.name", Matchers.is(collectionService.getName(collection))))
                              .andExpect(jsonPath("$.type", Matchers.is("collection")));
     }
 
@@ -1171,7 +1171,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         getClient(tokenAdmin).perform(get("/api/core/subscriptions/" + subscription.getID() + "/resource"))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.uuid", Matchers.is(collection.getID().toString())))
-                             .andExpect(jsonPath("$.name", Matchers.is(collection.getName())))
+                             .andExpect(jsonPath("$.name", Matchers.is(collectionService.getName(collection))))
                              .andExpect(jsonPath("$.type", Matchers.is("collection")));
     }
 
@@ -1230,7 +1230,7 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
         getClient(tokenEPerson).perform(get("/api/core/subscriptions/" + subscription.getID() + "/resource"))
                                .andExpect(status().isOk())
                                .andExpect(jsonPath("$.uuid", Matchers.is(col1.getID().toString())))
-                               .andExpect(jsonPath("$.name", Matchers.is(col1.getName())))
+                               .andExpect(jsonPath("$.name", Matchers.is(collectionService.getName(col1))))
                                .andExpect(jsonPath("$.type", Matchers.is("collection")));
 
         context.turnOffAuthorisationSystem();

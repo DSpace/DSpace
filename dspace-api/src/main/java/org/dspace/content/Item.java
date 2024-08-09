@@ -52,9 +52,6 @@ import org.dspace.eperson.EPerson;
 @Entity
 @Table(name = "item")
 public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
-    @Transient
-    ItemService itemService;
-
     /**
      * Wild card for Dublin Core metadata qualifiers/languages
      */
@@ -345,14 +342,6 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport {
     @Override
     public int getType() {
         return Constants.ITEM;
-    }
-
-    /**
-     * @deprecated use {@link org.dspace.content.service.ItemService#getName} instead.
-     */
-    @Override
-    public String getName() {
-        return itemService.getName(this);
     }
 
     @Override

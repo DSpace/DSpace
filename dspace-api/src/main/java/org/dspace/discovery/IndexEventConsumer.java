@@ -97,7 +97,7 @@ public class IndexEventConsumer implements Consumer {
         int et = event.getEventType();
         if (st == Constants.BUNDLE) {
             if ((et == Event.ADD || et == Event.REMOVE) && subject != null
-                && ((Bundle) subject).getName().equals("TEXT")) {
+                && ((Bundle) subject).bundleService.getName(((Bundle) subject)).equals("TEXT")) {
                 st = Constants.ITEM;
                 et = Event.MODIFY;
                 subject = ((Bundle) subject).getItems().get(0);

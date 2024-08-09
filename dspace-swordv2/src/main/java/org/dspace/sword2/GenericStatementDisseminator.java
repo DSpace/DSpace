@@ -79,7 +79,7 @@ public abstract class GenericStatementDisseminator
             // an original deposit is everything in the SWORD bundle
             List<Bundle> bundles = item.getBundles();
             for (Bundle bundle : bundles) {
-                if (swordBundle.equals(bundle.getName())) {
+                if (swordBundle.equals(bundleService.getName(bundle))) {
                     List<Bitstream> bitstreams = bundle
                         .getBitstreams();
                     for (Bitstream bitstream : bitstreams) {
@@ -134,7 +134,7 @@ public abstract class GenericStatementDisseminator
             for (String bundleName : includeBundles) {
                 List<Bundle> bundles = item.getBundles();
                 for (Bundle bundle : bundles) {
-                    if (bundleName.equals(bundle.getName())) {
+                    if (bundleName.equals(bundleService.getName(bundle))) {
                         List<Bitstream> bitstreams = bundle
                             .getBitstreams();
                         for (Bitstream bitstream : bitstreams) {

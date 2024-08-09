@@ -94,7 +94,7 @@ public class ResultsLogger implements ChecksumResultsCollector {
         LOG.info(msg("bitstream-found") + ": " + info.isBitstreamFound());
         LOG.info(msg("to-be-processed") + ": " + info.isToBeProcessed());
         LOG.info(msg("internal-id") + ": " + bitstream.getInternalId());
-        LOG.info(msg("name") + ": " + bitstream.getName());
+        LOG.info(msg("name") + ": " + bitstreamService.getName(bitstream));
         LOG.info(msg("store-number") + ": " + bitstream.getStoreNumber());
         LOG.info(msg("size") + ": " + bitstream.getSizeBytes());
         LOG.info(msg("bitstream-format") + ": " + (bitstreamService.getFormat(context, bitstream) != null

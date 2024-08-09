@@ -209,7 +209,7 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry {
             StringBuilder rightsString = new StringBuilder();
             List<Bundle> lbundles = item.getBundles();
             for (Bundle lbundle : lbundles) {
-                if (!Constants.LICENSE_BUNDLE_NAME.equals(lbundle.getName())) {
+                if (!Constants.LICENSE_BUNDLE_NAME.equals(bundleService.getName(lbundle))) {
                     // skip non-license bundles
                     continue;
                 }
@@ -245,7 +245,7 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry {
     @Override
     protected void addTitle() {
         Title title = new Title();
-        title.setContent(bitstream.getName());
+        title.setContent(bitstreamService.getName(bitstream));
         title.setType(ContentType.TEXT);
         entry.setTitle(title);
         log.debug("Added title to entry");

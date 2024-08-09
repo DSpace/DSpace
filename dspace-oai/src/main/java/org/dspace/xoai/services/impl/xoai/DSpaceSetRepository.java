@@ -85,7 +85,8 @@ public class DSpaceSetRepository implements SetRepository {
             for (Community community : communityList) {
                 array.add(DSpaceSet.newDSpaceCommunitySet(
                     community.getHandle(),
-                    community.getName()));
+                    communityService.getName(community)
+                ));
             }
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
@@ -110,7 +111,8 @@ public class DSpaceSetRepository implements SetRepository {
             for (Collection collection : collectionList) {
                 array.add(DSpaceSet.newDSpaceCollectionSet(
                     collection.getHandle(),
-                    collection.getName()));
+                    collectionService.getName(collection)
+                ));
             }
         } catch (SQLException e) {
             log.error(e.getMessage(), e);

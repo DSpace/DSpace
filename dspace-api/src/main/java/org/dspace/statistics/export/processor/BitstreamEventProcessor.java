@@ -57,7 +57,8 @@ public class BitstreamEventProcessor extends ExportEventProcessor {
         if (0 < bitstream.getBundles().size()) {
             if (!SpiderDetector.isSpider(request)) {
                 Bundle bundle = bitstream.getBundles().get(0);
-                if (bundle.getName() == null || !bundle.getName().equals("ORIGINAL")) {
+                if (bundleService.getName(bundle) == null || !bundleService.getName(bundle)
+                                                                                         .equals("ORIGINAL")) {
                     return null;
                 }
 

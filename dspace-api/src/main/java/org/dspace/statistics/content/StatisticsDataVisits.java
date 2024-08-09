@@ -539,7 +539,7 @@ public class StatisticsDataVisits extends StatisticsData {
                         if (bit == null) {
                             break;
                         }
-                        return bit.getName() + legacyNote;
+                        return bitstreamService.getName(bit) + legacyNote;
                     case Constants.ITEM:
                         Item item = itemService.findByIdOrLegacyId(context, dsoId);
                         if (item == null) {
@@ -565,7 +565,7 @@ public class StatisticsDataVisits extends StatisticsData {
                         if (coll == null) {
                             break;
                         }
-                        name = coll.getName();
+                        name = collectionService.getName(coll);
 
                         if (dsoLength != -1 && name.length() > dsoLength) {
                             //Cut it off at the first space
@@ -581,7 +581,7 @@ public class StatisticsDataVisits extends StatisticsData {
                         if (comm == null) {
                             break;
                         }
-                        name = comm.getName();
+                        name = communityService.getName(comm);
 
                         if (dsoLength != -1 && name.length() > dsoLength) {
                             //Cut it off at the first space
@@ -657,8 +657,8 @@ public class StatisticsDataVisits extends StatisticsData {
 
                     // If we can put the pretty name of the bitstream on the end of the URL
                     try {
-                        if (bit.getName() != null) {
-                            url += Util.encodeBitstreamName(bit.getName(), "UTF-8");
+                        if (bitstreamService.getName(bit) != null) {
+                            url += Util.encodeBitstreamName(bitstreamService.getName(bit), "UTF-8");
                         }
                     } catch (UnsupportedEncodingException uee) {
                         // Just ignore it:  we don't have to have a pretty

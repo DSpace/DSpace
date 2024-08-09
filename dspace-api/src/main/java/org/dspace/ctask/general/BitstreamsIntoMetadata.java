@@ -60,17 +60,19 @@ public class BitstreamsIntoMetadata extends AbstractCurationTask {
                 Item item = (Item) dso;
                 itemService.clearMetadata(Curator.curationContext(), item, "dc", "format", Item.ANY, Item.ANY);
                 for (Bundle bundle : item.getBundles()) {
-                    if ("ORIGINAL".equals(bundle.getName())) {
+                    if ("ORIGINAL".equals(bundleService.getName(bundle))) {
                         for (Bitstream bitstream : bundle.getBitstreams()) {
                             // Add the metadata and update the item
                             addMetadata(item, bitstream, "original");
                             changed = true;
                         }
-                    } else if ("THUMBNAIL".equals(bundle.getName())) {
-                        for (Bitstream bitstream : bundle.getBitstreams()) {
-                            // Add the metadata and update the item
-                            addMetadata(item, bitstream, "thumbnail");
-                            changed = true;
+                    } else {
+                        if ("THUMBNAIL".equals(bundleService.getName(bundle))) {
+                            for (Bitstream bitstream : bundle.getBitstreams()) {
+                                // Add the metadata and update the item
+                                addMetadata(item, bitstream, "thumbnail");
+                                changed = true;
+                            }
                         }
                     }
 
@@ -119,7 +121,7 @@ public class BitstreamsIntoMetadata extends AbstractCurationTask {
      */
     protected void addMetadata(Item item, Bitstream bitstream, String type) throws SQLException {
         String value = bitstreamService.getFormat(Curator.curationContext(), bitstream).getMIMEType() + "##";
-        value += bitstream.getName() + "##";
+        value += bitstreamService.getName(bitstream) + "##";
         value += bitstream.getSizeBytes() + "##";
         value += item.getHandle() + "##";
         value += bitstream.getSequenceID() + "##";

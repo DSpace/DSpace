@@ -39,9 +39,6 @@ import org.dspace.core.HibernateProxyHelper;
 @Entity
 @Table(name = "bundle")
 public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport {
-    @Transient
-    BundleService bundleService;
-
     @Column(name = "bundle_id", insertable = false, updatable = false)
     private Integer legacyId;
 
@@ -76,16 +73,6 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport {
     @Override
     public Integer getLegacyId() {
         return legacyId;
-    }
-
-    /**
-     * Get the name of the bundle
-     *
-     * @return name of the bundle (ORIGINAL, TEXT, THUMBNAIL) or NULL if not set
-     */
-    @Override
-    public String getName() {
-        return bundleService.getName(this);
     }
 
     /**

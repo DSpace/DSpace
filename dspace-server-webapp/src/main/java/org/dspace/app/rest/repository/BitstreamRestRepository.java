@@ -207,7 +207,7 @@ public class BitstreamRestRepository extends DSpaceObjectRestRepository<Bitstrea
         }
         if (StringUtils.isNotBlank(filename)) {
             for (Bitstream bitstream : bitstreams) {
-                if (StringUtils.equals(bitstream.getName(), filename)) {
+                if (StringUtils.equals(bitstreamService.getName(bitstream), filename)) {
                     return bitstream;
                 }
             }

@@ -42,7 +42,7 @@ public class BitstreamFilterByFilename extends BitstreamFilter {
             pattern = Pattern.compile(filenameRegex);
         }
 
-        Matcher m = pattern.matcher(bitstream.getName());
+        Matcher m = pattern.matcher(bitstreamService.getName(bitstream));
         return m.matches();
     }
 

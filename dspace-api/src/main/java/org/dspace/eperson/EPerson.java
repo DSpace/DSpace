@@ -36,9 +36,6 @@ import org.dspace.eperson.service.EPersonService;
 @Entity
 @Table(name = "eperson")
 public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacySupport {
-    @Transient
-    EPersonService epersonService;
-
     @Column(name = "eperson_id", insertable = false, updatable = false)
     private Integer legacyId;
 
@@ -276,11 +273,6 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
     @Override
     public int getType() {
         return Constants.EPERSON;
-    }
-
-    @Override
-    public String getName() {
-        return epersonService.getName(this);
     }
 
     String getDigestAlgorithm() {

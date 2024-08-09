@@ -44,9 +44,6 @@ import org.dspace.eperson.Group;
 @Entity
 @Table(name = "community")
 public class Community extends CacheableDSpaceObject implements DSpaceObjectLegacySupport {
-    @Transient
-    private CommunityService communityService;
-
     @Column(name = "community_id", insertable = false, updatable = false)
     private Integer legacyId;
 
@@ -242,11 +239,6 @@ public class Community extends CacheableDSpaceObject implements DSpaceObjectLega
     @Override
     public int getType() {
         return Constants.COMMUNITY;
-    }
-
-    @Override
-    public String getName() {
-        return communityService.getName(this);
     }
 
     @Override

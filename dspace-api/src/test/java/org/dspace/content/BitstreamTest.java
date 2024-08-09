@@ -128,7 +128,7 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
             bitstreamService.getFormat(context, found).getMIMEType(),
             equalTo("application/octet-stream")
         );
-        assertThat("testBSFind 2", found.getName(), nullValue());
+        assertThat("testBSFind 2", bitstreamService.getName(found), nullValue());
         assertThat("testBSFind 3", found.getID(), equalTo(id));
     }
 
@@ -166,7 +166,7 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
             bitstreamService.getFormat(context, created).getMIMEType(),
             equalTo("application/octet-stream")
         );
-        assertThat("testCreate 1", created.getName(), nullValue());
+        assertThat("testCreate 1", bitstreamService.getName(created), nullValue());
     }
 
     /**
@@ -187,7 +187,7 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
             bitstreamService.getFormat(context, registered).getMIMEType(),
             equalTo("application/octet-stream")
         );
-        assertThat("testRegister 1", registered.getName(), nullValue());
+        assertThat("testRegister 1", bitstreamService.getName(registered), nullValue());
     }
 
     /**
@@ -240,7 +240,7 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     @Test
     public void testGetName() {
         //name is null when not set
-        assertThat("testGetName 0", bs.getName(), nullValue());
+        assertThat("testGetName 0", bitstreamService.getName(bs), nullValue());
     }
 
     /**
@@ -250,9 +250,9 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     public void testSetName() throws SQLException {
         String name = "new name";
         bitstreamService.setName(context, bs, name);
-        assertThat("testGetName 0", bs.getName(), notNullValue());
-        assertThat("testGetName 1", bs.getName(), not(equalTo("")));
-        assertThat("testGetName 2", bs.getName(), equalTo(name));
+        assertThat("testGetName 0", bitstreamService.getName(bs), notNullValue());
+        assertThat("testGetName 1", bitstreamService.getName(bs), not(equalTo("")));
+        assertThat("testGetName 2", bitstreamService.getName(bs), equalTo(name));
     }
 
     /**

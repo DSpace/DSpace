@@ -87,7 +87,7 @@ public class LDNEmailAction implements LDNAction {
             String date = new SimpleDateFormat(DATE_PATTERN).format(Calendar.getInstance().getTime());
 
             email.addArgument(notification.getActor().getName());
-            email.addArgument(item.getName());
+            email.addArgument(itemService.getName(item));
             email.addArgument(notification.getActor().getId());
             email.addArgument(notification.getContext() != null ?
                 notification.getContext().getId() : notification.getObject().getId());

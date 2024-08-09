@@ -113,12 +113,13 @@ public class CommunityCollectionItemParentIT extends AbstractControllerIntegrati
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/core/items/" + itemAA1.getID() + "/owningCollection"))
-                        .andExpect(jsonPath("$", is(CollectionMatcher.matchCollectionEntry(colAA1.getName(),
-                                                                                           colAA1.getID(),
-                                                                                           colAA1.getHandle()))))
+                        .andExpect(jsonPath("$", is(CollectionMatcher.matchCollectionEntry(
+                            collectionService.getName(colAA1),
+                            colAA1.getID(),
+                            colAA1.getHandle()))))
                         .andExpect(jsonPath("$", Matchers
                             .not(is(CollectionMatcher
-                                        .matchCollectionEntry(colAA2.getName(), colAA2.getID(), colAA2.getHandle())))));
+                                        .matchCollectionEntry(collectionService.getName(colAA2), colAA2.getID(), colAA2.getHandle())))));
 
     }
 
@@ -127,12 +128,13 @@ public class CommunityCollectionItemParentIT extends AbstractControllerIntegrati
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/core/items/" + itemAA1MappedInAA2.getID() + "/owningCollection"))
-                        .andExpect(jsonPath("$", is(CollectionMatcher.matchCollectionEntry(colAA1.getName(),
-                                                                                           colAA1.getID(),
-                                                                                           colAA1.getHandle()))))
+                        .andExpect(jsonPath("$", is(CollectionMatcher.matchCollectionEntry(
+                            collectionService.getName(colAA1),
+                            colAA1.getID(),
+                            colAA1.getHandle()))))
                         .andExpect(jsonPath("$", Matchers
                             .not(is(CollectionMatcher
-                                        .matchCollectionEntry(colAA2.getName(), colAA2.getID(), colAA2.getHandle())))));
+                                        .matchCollectionEntry(collectionService.getName(colAA2), colAA2.getID(), colAA2.getHandle())))));
     }
 
     @Test
@@ -140,12 +142,13 @@ public class CommunityCollectionItemParentIT extends AbstractControllerIntegrati
 
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/core/items/" + itemAA2.getID() + "/owningCollection"))
-                        .andExpect(jsonPath("$", is(CollectionMatcher.matchCollectionEntry(colAA2.getName(),
-                                                                                           colAA2.getID(),
-                                                                                           colAA2.getHandle()))))
+                        .andExpect(jsonPath("$", is(CollectionMatcher.matchCollectionEntry(
+                            collectionService.getName(colAA2),
+                            colAA2.getID(),
+                            colAA2.getHandle()))))
                         .andExpect(jsonPath("$", Matchers
                             .not(is(CollectionMatcher
-                                        .matchCollectionEntry(colAA1.getName(), colAA1.getID(), colAA1.getHandle())))));
+                                        .matchCollectionEntry(collectionService.getName(colAA1), colAA1.getID(), colAA1.getHandle())))));
 
     }
 
@@ -155,14 +158,17 @@ public class CommunityCollectionItemParentIT extends AbstractControllerIntegrati
         String token = getAuthToken(admin.getEmail(), password);
         getClient(token).perform(get("/api/core/collections/" + colAA1.getID() + "/parentCommunity"))
                         .andExpect(jsonPath("$", is(CommunityMatcher
-                                                        .matchCommunityEntry(communityAA.getName(), communityAA.getID(),
-                                                                             communityAA.getHandle()))))
-                        .andExpect(jsonPath("$", not(is(CommunityMatcher.matchCommunityEntry(communityA.getName(),
-                                                                                             communityA.getID(),
-                                                                                             communityA.getHandle())))))
-                        .andExpect(jsonPath("$", not(is(CommunityMatcher.matchCommunityEntry(communityAB.getName(),
-                                                                                             communityAB.getID(),
-                                                                                             communityAB
+                                                        .matchCommunityEntry(
+                                                            communityService.getName(communityAA), communityAA.getID(),
+                                                            communityAA.getHandle()))))
+                        .andExpect(jsonPath("$", not(is(CommunityMatcher.matchCommunityEntry(
+                            communityService.getName(communityA),
+                            communityA.getID(),
+                            communityA.getHandle())))))
+                        .andExpect(jsonPath("$", not(is(CommunityMatcher.matchCommunityEntry(
+                            communityService.getName(communityAB),
+                            communityAB.getID(),
+                            communityAB
                                                                                                  .getHandle())))));
 
     }

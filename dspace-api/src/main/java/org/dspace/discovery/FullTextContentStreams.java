@@ -73,7 +73,7 @@ public class FullTextContentStreams extends ContentStreamBase {
         List<Bundle> myBundles = parentItem.getBundles();
 
         for (Bundle myBundle : emptyIfNull(myBundles)) {
-            if (StringUtils.equals(FULLTEXT_BUNDLE, myBundle.getName())) {
+            if (StringUtils.equals(FULLTEXT_BUNDLE, bundleService.getName(myBundle))) {
                 // a-ha! grab the text out of the bitstreams
                 List<Bitstream> bitstreams = myBundle.getBitstreams();
                 log.debug("Processing full-text bitstreams. Item handle: " + sourceInfo);
@@ -85,7 +85,7 @@ public class FullTextContentStreams extends ContentStreamBase {
                         log.debug("Added BitStream: "
                                 + fulltextBitstream.getStoreNumber() + " "
                                 + fulltextBitstream.getSequenceID() + " "
-                                + fulltextBitstream.getName());
+                                + bitstreamService.getName(fulltextBitstream));
                     } else {
                         log.error("Found a NULL bitstream when processing full-text files: item handle:" + sourceInfo);
                     }
@@ -168,7 +168,7 @@ public class FullTextContentStreams extends ContentStreamBase {
         }
 
         public String getFileName() {
-            return bitstream != null ? StringUtils.trimToEmpty(bitstream.getName()) : null;
+            return bitstream != null ? StringUtils.trimToEmpty(bitstreamService.getName(bitstream)) : null;
         }
 
         public long getSize() {

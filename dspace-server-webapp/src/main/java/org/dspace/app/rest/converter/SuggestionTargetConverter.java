@@ -10,6 +10,7 @@ package org.dspace.app.rest.converter;
 import org.dspace.app.rest.model.SuggestionTargetRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.suggestion.SuggestionTarget;
+import org.dspace.content.Item;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,7 +29,8 @@ public class SuggestionTargetConverter
         targetRest.setProjection(projection);
         targetRest.setId(target.getID());
         if (target != null && target.getTarget() != null) {
-            targetRest.setDisplay(target.getTarget().getName());
+            Item item = target.getTarget();
+            targetRest.setDisplay(itemService.getName(item));
         }
         targetRest.setTotal(target.getTotal());
         targetRest.setSource(target.getSource());

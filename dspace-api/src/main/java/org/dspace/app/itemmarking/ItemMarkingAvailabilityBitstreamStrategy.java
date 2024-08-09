@@ -67,7 +67,7 @@ public class ItemMarkingAvailabilityBitstreamStrategy implements ItemMarkingExtr
 
                 ItemMarkingInfo signInfo = new ItemMarkingInfo();
                 signInfo.setImageName(availableImageName);
-                signInfo.setTooltip(bitstream.getName());
+                signInfo.setTooltip(bitstreamService.getName(bitstream));
 
 
                 String bsLink = "";
@@ -77,7 +77,7 @@ public class ItemMarkingAvailabilityBitstreamStrategy implements ItemMarkingExtr
                     + bitstream.getSequenceID() + "/";
 
                 try {
-                    bsLink = bsLink + Util.encodeBitstreamName(bitstream.getName(), Constants.DEFAULT_ENCODING);
+                    bsLink = bsLink + Util.encodeBitstreamName(bitstreamService.getName(bitstream), Constants.DEFAULT_ENCODING);
                 } catch (UnsupportedEncodingException e) {
                     LOG.warn("DSpace uses an unsupported encoding", e);
                 }

@@ -52,16 +52,22 @@ public class SolrServiceFileInfoPlugin implements SolrServiceIndexPlugin {
             List<Bundle> bundles = item.getBundles();
             if (bundles != null) {
                 for (Bundle bundle : bundles) {
-                    String bundleName = bundle.getName();
+                    String bundleName = bundleService.getName(bundle);
                     if ((bundleName != null) && bundleName.equals(BUNDLE_NAME)) {
                         List<Bitstream> bitstreams = bundle.getBitstreams();
                         if (bitstreams != null) {
                             for (Bitstream bitstream : bitstreams) {
-                                document.addField(SOLR_FIELD_NAME_FOR_FILENAMES, bitstream.getName());
+                                document.addField(SOLR_FIELD_NAME_FOR_FILENAMES,
+                                                  bitstreamService.getName(bitstream)
+                                );
                                 // Add _keyword and _filter fields which are necessary to support filtering and faceting
                                 // for the file names
-                                document.addField(SOLR_FIELD_NAME_FOR_FILENAMES + "_keyword", bitstream.getName());
-                                document.addField(SOLR_FIELD_NAME_FOR_FILENAMES + "_filter", bitstream.getName());
+                                document.addField(SOLR_FIELD_NAME_FOR_FILENAMES + "_keyword",
+                                                  bitstreamService.getName(bitstream)
+                                );
+                                document.addField(SOLR_FIELD_NAME_FOR_FILENAMES + "_filter",
+                                                  bitstreamService.getName(bitstream)
+                                );
 
                                 String description = bitstreamService.getDescription(bitstream);
                                 if ((description != null) && !description.isEmpty()) {

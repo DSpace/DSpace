@@ -268,7 +268,7 @@ public class DSpaceSwordAPI {
                 List<Bundle> bundles = item.getBundles();
                 Bundle swordBundle = null;
                 for (Bundle bundle : bundles) {
-                    if (bundleName.equals(bundle.getName())) {
+                    if (bundleName.equals(bundleService.getName(bundle))) {
                         swordBundle = bundle;
                         break;
                     }

@@ -229,7 +229,7 @@ public class OREDisseminationCrosswalk
         List<Bitstream> bitstreams;
         for (Bundle bundle : bundles) {
             // Omit the special "ORE" bitstream
-            if (bundle.getName().equals("ORE")) {
+            if (bundleService.getName(bundle).equals("ORE")) {
                 continue;
             }
 
@@ -238,8 +238,8 @@ public class OREDisseminationCrosswalk
                 arLink = new Element("link", ATOM_NS);
                 arLink.setAttribute("rel", ORE_NS.getURI() + "aggregates");
                 arLink.setAttribute("href", dsUrl + "/bitstream/handle/" + item.getHandle() + "/" + encodeForURL(
-                    bs.getName()) + "?sequence=" + bs.getSequenceID());
-                arLink.setAttribute("title", bs.getName());
+                    bitstreamService.getName(bs)) + "?sequence=" + bs.getSequenceID());
+                arLink.setAttribute("title", bitstreamService.getName(bs));
                 arLink.setAttribute("type", bitstreamService.getFormat(context, bs).getMIMEType());
                 arLink.setAttribute("length", Long.toString(bs.getSizeBytes()));
 
@@ -249,12 +249,12 @@ public class OREDisseminationCrosswalk
                 rdfDescription = new Element("Description", RDF_NS);
                 rdfDescription.setAttribute("about",
                                             dsUrl + "/bitstream/handle/" + item.getHandle() + "/" + encodeForURL(
-                                                bs.getName()) + "?sequence=" + bs.getSequenceID(), RDF_NS);
+                                                bitstreamService.getName(bs)) + "?sequence=" + bs.getSequenceID(), RDF_NS);
 
                 rdfType = new Element("type", RDF_NS);
                 rdfType.setAttribute("resource", DS_NS.getURI() + "DSpaceBitstream", RDF_NS);
                 dcDesc = new Element("description", DCTERMS_NS);
-                dcDesc.addContent(bundle.getName());
+                dcDesc.addContent(bundleService.getName(bundle));
 
                 rdfDescription.addContent(rdfType);
                 rdfDescription.addContent(dcDesc);

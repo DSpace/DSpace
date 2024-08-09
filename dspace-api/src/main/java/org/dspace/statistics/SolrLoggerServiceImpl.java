@@ -243,7 +243,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 Bitstream bit = (Bitstream) dspaceObject;
                 List<Bundle> bundles = bit.getBundles();
                 for (Bundle bundle : bundles) {
-                    doc1.addField("bundleName", bundle.getName());
+                    doc1.addField("bundleName", bundleService.getName(bundle));
                 }
             }
 
@@ -290,7 +290,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 Bitstream bit = (Bitstream) dspaceObject;
                 List<Bundle> bundles = bit.getBundles();
                 for (Bundle bundle : bundles) {
-                    doc1.addField("bundleName", bundle.getName());
+                    doc1.addField("bundleName", bundleService.getName(bundle));
                 }
             }
 
@@ -1404,7 +1404,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                             List<Bundle> bundles = bitstream.getBundles();
                             if (bundles != null && 0 < bundles.size()) {
                                 Bundle bundle = bundles.get(0);
-                                bundleName = bundle.getName();
+                                bundleName = bundleService.getName(bundle);
                             } else {
                                 //No bundle found, we are either a collection or a community logo, check for it !
                                 DSpaceObject parentObject = bitstreamService.getParentObject(context, bitstream);

@@ -259,7 +259,7 @@ public class InstallItemServiceImpl implements InstallItemService {
 
         // Add sizes and checksums of bitstreams
         for (Bitstream bitstream : bitstreams) {
-            myMessage.append(bitstream.getName()).append(": ")
+            myMessage.append(bitstreamService.getName(bitstream)).append(": ")
                      .append(bitstream.getSizeBytes()).append(" bytes, checksum: ")
                      .append(bitstream.getChecksum()).append(" (")
                      .append(bitstream.getChecksumAlgorithm()).append(")\n");

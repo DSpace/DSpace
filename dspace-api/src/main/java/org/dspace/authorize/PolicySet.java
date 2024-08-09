@@ -292,7 +292,7 @@ public class PolicySet {
 
                         for (Bitstream bitstream : bitstreams) {
                             if (filter == null ||
-                                bitstream.getName().indexOf(filter) != -1) {
+                                bitstreamService.getName(bitstream).indexOf(filter) != -1) {
                                 // is this a replace? delete policies first
                                 if (isReplace || clearOnly) {
                                     authorizeService.removeAllPolicies(c, bitstream);

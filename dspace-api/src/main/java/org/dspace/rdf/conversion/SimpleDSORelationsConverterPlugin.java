@@ -432,7 +432,7 @@ public class SimpleDSORelationsConverterPlugin
             // TODO: Discuss if LICENSEs, THUMBNAILs and/or extracted TEXTs
             // should be linked/exported as well (and if sutch a feature should
             // be configurable).
-            if (bundle.getName().equals("ORIGINAL")) {
+            if (bundleService.getName(bundle).equals("ORIGINAL")) {
                 for (Bitstream bs : bundle.getBitstreams()) {
                     if (RDFUtil.isPublicBoolean(context, bs)) {
                         String url = bitstreamURI(context, bs);
@@ -481,7 +481,7 @@ public class SimpleDSORelationsConverterPlugin
             // the link to the bitstream in the UI
             link = dspaceURL + "/bitstream/" + parent.getHandle() + "/"
                 + bitstream.getSequenceID() + "/"
-                + Util.encodeBitstreamName(bitstream.getName(), Constants.DEFAULT_ENCODING);
+                + Util.encodeBitstreamName(bitstreamService.getName(bitstream), Constants.DEFAULT_ENCODING);
         } catch (UnsupportedEncodingException ex) {
             throw new RuntimeException("DSpace's default encoding is not supported.", ex);
         }

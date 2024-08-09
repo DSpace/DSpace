@@ -306,7 +306,7 @@ public class SimpleReporterServiceImpl implements SimpleReporterService {
                 info.getChecksumAlgorithm()).append("\n");
             buf.append(msg("internal-id")).append(" = ").append(
                 info.getInternalId()).append("\n");
-            buf.append(msg("name")).append(" = ").append(info.getName())
+            buf.append(msg("name")).append(" = ").append(bitstreamService.getName(info))
                .append("\n");
             buf.append(msg("size")).append(" = ").append(info.getSizeBytes())
                .append("\n");

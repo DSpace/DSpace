@@ -59,10 +59,10 @@ public class SimpleZipContentDisseminator implements SwordContentDisseminator {
 
             List<Bundle> bundles = item.getBundles();
             for (Bundle bundle : bundles) {
-                if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName())) {
+                if (Constants.CONTENT_BUNDLE_NAME.equals(bundleService.getName(bundle))) {
                     List<Bitstream> bss = bundle.getBitstreams();
                     for (Bitstream bitstream : bss) {
-                        ZipEntry ze = new ZipEntry(bitstream.getName());
+                        ZipEntry ze = new ZipEntry(bitstreamService.getName(bitstream));
                         zip.putNextEntry(ze);
                         InputStream is = bitstreamService
                             .retrieve(context, bitstream);

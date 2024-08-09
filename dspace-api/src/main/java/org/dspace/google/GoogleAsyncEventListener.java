@@ -23,7 +23,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -193,7 +192,7 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
             List<String> bitstreamBundles;
             try {
                 bitstreamBundles = ((Bitstream) usageEvent.getObject())
-                    .getBundles().stream().map(Bundle::getName).collect(Collectors.toList());
+                    .getBundles().stream().map(bundle -> bundleService.getName(bundle)).collect(Collectors.toList());
             } catch (SQLException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }

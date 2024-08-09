@@ -473,7 +473,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
         getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID() + "/collection"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers
-                        .is(CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle()))));
+                        .is(CollectionMatcher.matchCollectionEntry(collectionService.getName(col1), col1.getID(), col1.getHandle()))));
 
         getClient(authToken).perform(get("/api/workflow/workflowitems/" + witem.getID() + "/item"))
                 .andExpect(status().isOk())

@@ -159,9 +159,11 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
                 for (Bundle b : bundles) {
                     List<Bitstream> bitstreams = b.getBitstreams();
                     for (Bitstream bsm : bitstreams) {
-                        if (bsm.getName().equals(ce.filename)) {
+                        if (bitstreamService.getName(bsm).equals(ce.filename)) {
                             throw new IllegalArgumentException("Duplicate bundle + filename cannot be added: "
-                                                                   + b.getName() + " + " + bsm.getName());
+                                                                   + b.bundleService.getName(
+                                b) + " + " + bsm.bitreamService.getName(
+                                bsm));
                         }
                     }
                 }
@@ -199,7 +201,7 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
             if (!suppressUndo) {
                 itarch.addUndoDeleteContents(bs.getID());
             }
-            return targetBundle.getName();
+            return bundleService.getName(targetBundle);
         }
         return "";
     }

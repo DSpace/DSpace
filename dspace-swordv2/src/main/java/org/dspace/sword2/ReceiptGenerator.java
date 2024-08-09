@@ -160,7 +160,7 @@ public class ReceiptGenerator {
         StringBuilder rightsString = new StringBuilder();
         List<Bundle> bundles = result.getItem().getBundles();
         for (Bundle bundle : bundles) {
-            if (!Constants.LICENSE_BUNDLE_NAME.equals(bundle.getName())) {
+            if (!Constants.LICENSE_BUNDLE_NAME.equals(bundleService.getName(bundle))) {
                 continue;
             }
             List<Bitstream> bss = bundle.getBitstreams();
@@ -223,7 +223,7 @@ public class ReceiptGenerator {
         StringBuilder rightsString = new StringBuilder();
         List<Bundle> bundles = item.getBundles();
         for (Bundle bundle : bundles) {
-            if (!Constants.LICENSE_BUNDLE_NAME.equals(bundle.getName())) {
+            if (!Constants.LICENSE_BUNDLE_NAME.equals(bundleService.getName(bundle))) {
                 continue;
             }
             List<Bitstream> bss = bundle.getBitstreams();

@@ -64,12 +64,12 @@ public class ContentReportServiceImpl implements ContentReportService {
             for (Collection collection : collections) {
                 FilteredCollection coll = new FilteredCollection();
                 coll.setHandle(collection.getHandle());
-                coll.setLabel(collection.getName());
+                coll.setLabel(collectionService.getName(collection));
                 Community community = collection.getCommunities().stream()
                         .findFirst()
                         .orElse(null);
                 if (community != null) {
-                    coll.setCommunityLabel(community.getName());
+                    coll.setCommunityLabel(communityService.getName(community));
                     coll.setCommunityHandle(community.getHandle());
                 }
                 colls.add(coll);

@@ -78,7 +78,7 @@ public class SimpleFileIngester implements SWORDIngester {
             List<Bundle> bundles = item.getBundles();
             Bundle original = null;
             for (Bundle bundle : bundles) {
-                if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName())) {
+                if (Constants.CONTENT_BUNDLE_NAME.equals(bundleService.getName(bundle))) {
                     original = bundle;
                     break;
                 }

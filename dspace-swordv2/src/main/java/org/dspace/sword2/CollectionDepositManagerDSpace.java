@@ -289,7 +289,7 @@ public class CollectionDepositManagerDSpace extends DSpaceSwordAPI
         this.verboseDescription
             .append("Location resolves to collection with handle: " +
                         collection.getHandle() +
-                        " and name: " + collection.getName());
+                        " and name: " + collectionService.getName(collection));
 
         return collection;
     }

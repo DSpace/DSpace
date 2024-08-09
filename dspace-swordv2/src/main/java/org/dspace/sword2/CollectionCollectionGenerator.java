@@ -68,7 +68,7 @@ public class CollectionCollectionGenerator implements AtomCollectionGenerator {
         String location = urlManager.getDepositLocation(col);
 
         // collection title is just its name
-        String title = col.getName();
+        String title = collectionService.getName(col);
 
         // the collection policy is the licence to which the collection adheres
         String collectionPolicy = collectionService.getLicense(col);

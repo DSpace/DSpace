@@ -34,10 +34,10 @@ public class DSpaceSet extends Set {
     }
 
     public DSpaceSet(Community c) {
-        super("com_" + c.getHandle().replace('/', '_'), checkName(c.getName()));
+        super("com_" + c.getHandle().replace('/', '_'), checkName(communityService.getName(c)));
     }
 
     public DSpaceSet(Collection c) {
-        super("col_" + c.getHandle().replace('/', '_'), checkName(c.getName()));
+        super("col_" + c.getHandle().replace('/', '_'), checkName(collectionService.getName(c)));
     }
 }

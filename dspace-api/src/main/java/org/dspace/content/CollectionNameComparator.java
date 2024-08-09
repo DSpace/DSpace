@@ -17,6 +17,7 @@ public class CollectionNameComparator
     implements Comparator<Collection>, Serializable {
     @Override
     public int compare(Collection collection1, Collection collection2) {
-        return collection1.getName().compareTo(collection2.getName());
+        return collectionService.getName(collection1)
+                                            .compareTo(collectionService.getName(collection2));
     }
 }

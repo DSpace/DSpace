@@ -183,7 +183,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
         assertThat("testCreate 0", created, notNullValue());
         assertTrue("testCreate 1", created.getID() != null);
         assertTrue("testCreate 2", created.getBitstreams().size() == 0);
-        assertThat("testCreate 3", created.getName(), equalTo("testCreateBundle"));
+        assertThat("testCreate 3", bundleService.getName(created), equalTo("testCreateBundle"));
     }
 
     /**
@@ -207,7 +207,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
     @Test
     public void testGetName() {
         //created bundle has no name
-        assertThat("testGetName 0", b.getName(), equalTo("TESTBUNDLE"));
+        assertThat("testGetName 0", bundleService.getName(b), equalTo("TESTBUNDLE"));
     }
 
     /**
@@ -217,9 +217,9 @@ public class BundleTest extends AbstractDSpaceObjectTest {
     public void testSetName() throws SQLException {
         String name = "new name";
         bundleService.setName(context, b, name);
-        assertThat("testSetName 0", b.getName(), notNullValue());
-        assertThat("testSetName 1", b.getName(), not(equalTo("")));
-        assertThat("testSetName 2", b.getName(), equalTo(name));
+        assertThat("testSetName 0", bundleService.getName(b), notNullValue());
+        assertThat("testSetName 1", bundleService.getName(b), not(equalTo("")));
+        assertThat("testSetName 2", bundleService.getName(b), equalTo(name));
     }
 
     /**
@@ -311,7 +311,8 @@ public class BundleTest extends AbstractDSpaceObjectTest {
 
         assertThat("testGetHandle 1", bundleService.getBitstreamByName(b, name), notNullValue());
         assertThat("testGetHandle 2", bundleService.getBitstreamByName(b, name), equalTo(bs));
-        assertThat("testGetHandle 3", bundleService.getBitstreamByName(b, name).getName(), equalTo(name));
+        Bitstream bitstream = bundleService.getBitstreamByName(b, name);
+        assertThat("testGetHandle 3", bitstreamService.getName(bitstream), equalTo(name));
     }
 
     /**
@@ -340,7 +341,8 @@ public class BundleTest extends AbstractDSpaceObjectTest {
 
         assertThat("testGetBitstreams 2", b.getBitstreams(), notNullValue());
         assertThat("testGetBitstreams 3", b.getBitstreams().size(), equalTo(1));
-        assertThat("testGetBitstreams 4", b.getBitstreams().get(0).getName(), equalTo(name));
+        Bitstream bitstream = b.getBitstreams().get(0);
+        assertThat("testGetBitstreams 4", bitstreamService.getName(bitstream), equalTo(name));
     }
 
     /**
@@ -386,7 +388,8 @@ public class BundleTest extends AbstractDSpaceObjectTest {
         bitstreamService.setName(context, bs, name);
         assertThat("testCreateBitstreamAuth 0", bundleService.getBitstreamByName(b, name), notNullValue());
         assertThat("testCreateBitstreamAuth 1", bundleService.getBitstreamByName(b, name), equalTo(bs));
-        assertThat("testCreateBitstreamAuth 2", bundleService.getBitstreamByName(b, name).getName(), equalTo(name));
+        Bitstream bitstream = bundleService.getBitstreamByName(b, name);
+        assertThat("testCreateBitstreamAuth 2", bitstreamService.getName(bitstream), equalTo(name));
     }
 
     /**
@@ -423,7 +426,8 @@ public class BundleTest extends AbstractDSpaceObjectTest {
         bitstreamService.setName(context, bs, name);
         assertThat("testRegisterBitstream 0", bundleService.getBitstreamByName(b, name), notNullValue());
         assertThat("testRegisterBitstream 1", bundleService.getBitstreamByName(b, name), equalTo(bs));
-        assertThat("testRegisterBitstream 2", bundleService.getBitstreamByName(b, name).getName(), equalTo(name));
+        Bitstream bitstream = bundleService.getBitstreamByName(b, name);
+        assertThat("testRegisterBitstream 2", bitstreamService.getName(bitstream), equalTo(name));
     }
 
     /**
@@ -459,10 +463,11 @@ public class BundleTest extends AbstractDSpaceObjectTest {
         Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
         bitstreamService.setName(context, bs, "name");
         bundleService.addBitstream(context, b, bs);
-        assertThat("testAddBitstreamAuth 0", bundleService.getBitstreamByName(b, bs.getName()), notNullValue());
-        assertThat("testAddBitstreamAuth 1", bundleService.getBitstreamByName(b, bs.getName()), equalTo(bs));
-        assertThat("testAddBitstreamAuth 2", bundleService.getBitstreamByName(b, bs.getName()).getName(),
-                   equalTo(bs.getName()));
+        assertThat("testAddBitstreamAuth 0", bundleService.getBitstreamByName(b, bitstreamService.getName(bs)), notNullValue());
+        assertThat("testAddBitstreamAuth 1", bundleService.getBitstreamByName(b, bitstreamService.getName(bs)), equalTo(bs));
+        Bitstream bitstream = bundleService.getBitstreamByName(b, bitstreamService.getName(bs));
+        assertThat("testAddBitstreamAuth 2", bitstreamService.getName(bitstream),
+                   equalTo(bitstreamService.getName(bs)));
     }
 
     /**
@@ -509,7 +514,7 @@ public class BundleTest extends AbstractDSpaceObjectTest {
         context.restoreAuthSystemState();
 
         bundleService.removeBitstream(context, b, bs);
-        assertThat("testRemoveBitstreamAuth 0", bundleService.getBitstreamByName(b, bs.getName()), nullValue());
+        assertThat("testRemoveBitstreamAuth 0", bundleService.getBitstreamByName(b, bitstreamService.getName(bs)), nullValue());
     }
 
 
@@ -708,9 +713,12 @@ public class BundleTest extends AbstractDSpaceObjectTest {
         // Assert Bitstreams are in the order added
         Bitstream[] bitstreams = b.getBitstreams().toArray(new Bitstream[b.getBitstreams().size()]);
         assertTrue("testSetOrder: starting count correct", bitstreams.length == 3);
-        assertThat("testSetOrder: Bitstream 1 is first", bitstreams[0].getName(), equalTo(bs.getName()));
-        assertThat("testSetOrder: Bitstream 2 is second", bitstreams[1].getName(), equalTo(bs2.getName()));
-        assertThat("testSetOrder: Bitstream 3 is third", bitstreams[2].getName(), equalTo(bs3.getName()));
+        assertThat("testSetOrder: Bitstream 1 is first", bitstreamService.getName(bitstreams[0]), equalTo(
+            bitstreamService.getName(bs)));
+        assertThat("testSetOrder: Bitstream 2 is second", bitstreamService.getName(bitstreams[1]), equalTo(
+            bitstreamService.getName(bs2)));
+        assertThat("testSetOrder: Bitstream 3 is third", bitstreamService.getName(bitstreams[2]), equalTo(
+            bitstreamService.getName(bs3)));
 
         UUID bsID1 = bs.getID();
         UUID bsID2 = bs2.getID();
@@ -723,9 +731,12 @@ public class BundleTest extends AbstractDSpaceObjectTest {
         // Assert Bitstreams are in the new order
         bitstreams = b.getBitstreams().toArray(new Bitstream[b.getBitstreams().size()]);
         assertTrue("testSetOrder: new count correct", bitstreams.length == 3);
-        assertThat("testSetOrder: Bitstream 3 is now first", bitstreams[0].getName(), equalTo(bs3.getName()));
-        assertThat("testSetOrder: Bitstream 1 is now second", bitstreams[1].getName(), equalTo(bs.getName()));
-        assertThat("testSetOrder: Bitstream 2 is now third", bitstreams[2].getName(), equalTo(bs2.getName()));
+        assertThat("testSetOrder: Bitstream 3 is now first", bitstreamService.getName(bitstreams[0]), equalTo(
+            bitstreamService.getName(bs3)));
+        assertThat("testSetOrder: Bitstream 1 is now second", bitstreamService.getName(bitstreams[1]), equalTo(
+            bitstreamService.getName(bs)));
+        assertThat("testSetOrder: Bitstream 2 is now third", bitstreamService.getName(bitstreams[2]), equalTo(
+            bitstreamService.getName(bs2)));
 
         // Now give only a partial list of bitstreams
         newBitstreamOrder = new UUID[] {bsID1, bsID2};

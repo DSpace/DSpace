@@ -334,7 +334,7 @@ public class ManifestService extends AbstractResourceService {
                     String id = BITSTREAM_PATH_PREFIX + "/" + bitstream.getID() + "/content";
                     manifestGenerator.addRendering(
                         new ExternalLinksGenerator(id)
-                            .setLabel(utils.getIIIFLabel(bitstream, bitstream.getName()))
+                            .setLabel(utils.getIIIFLabel(bitstream, bitstreamService.getName(bitstream)))
                             .setFormat(mimeType)
                     );
                 }

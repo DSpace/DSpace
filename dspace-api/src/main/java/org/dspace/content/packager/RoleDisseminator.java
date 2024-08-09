@@ -313,8 +313,8 @@ public class RoleDisseminator implements PackageDisseminator {
             for (EPerson member : group.getMembers()) {
                 writer.writeEmptyElement(MEMBER);
                 writer.writeAttribute(ID, String.valueOf(member.getID()));
-                if (null != member.getName()) {
-                    writer.writeAttribute(NAME, member.getName());
+                if (null != epersonService.getName(member)) {
+                    writer.writeAttribute(NAME, epersonService.getName(member));
                 }
             }
             writer.writeEndElement();

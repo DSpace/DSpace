@@ -227,7 +227,7 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public Bitstream getBitstreamByName(Context context, Process process, String bitstreamName) {
         for (Bitstream bitstream : getBitstreams(context, process)) {
-            if (StringUtils.equals(bitstream.getName(), bitstreamName)) {
+            if (StringUtils.equals(bitstreamService.getName(bitstream), bitstreamName)) {
                 return bitstream;
             }
         }

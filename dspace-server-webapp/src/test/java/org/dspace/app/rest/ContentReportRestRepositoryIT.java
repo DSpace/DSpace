@@ -66,13 +66,13 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
         String token = getAuthToken(admin.getEmail(), password);
 
         Map<Filter, Integer> valuesCol1 = Map.of(Filter.IS_DISCOVERABLE, 1);
-        FilteredCollection fcol1 = FilteredCollection.of(col1.getName(), col1.getHandle(),
-                parentCommunity.getName(), parentCommunity.getHandle(),
-                1, 1, valuesCol1, true);
+        FilteredCollection fcol1 = FilteredCollection.of(collectionService.getName(col1), col1.getHandle(),
+                                                         communityService.getName(parentCommunity), parentCommunity.getHandle(),
+                                                         1, 1, valuesCol1, true);
         Map<Filter, Integer> valuesCol2 = Map.of(Filter.IS_DISCOVERABLE, 2);
-        FilteredCollection fcol2 = FilteredCollection.of(col2.getName(), col2.getHandle(),
-                parentCommunity.getName(), parentCommunity.getHandle(),
-                2, 2, valuesCol2, true);
+        FilteredCollection fcol2 = FilteredCollection.of(collectionService.getName(col2), col2.getHandle(),
+                                                         communityService.getName(parentCommunity), parentCommunity.getHandle(),
+                                                         2, 2, valuesCol2, true);
 
         FilteredCollectionsQuery query = FilteredCollectionsQuery.of(Set.of(Filter.IS_DISCOVERABLE));
 
@@ -190,7 +190,7 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
     private static Matcher<? super Object> matchItemProperties(Item item) {
         return allOf(
             hasJsonPath("$.uuid", is(item.getID().toString())),
-            hasJsonPath("$.name", is(item.getName())),
+            hasJsonPath("$.name", is(itemService.getName(item))),
             hasJsonPath("$.handle", is(item.getHandle())),
             hasJsonPath("$.inArchive", is(item.isArchived())),
             hasJsonPath("$.discoverable", is(item.isDiscoverable())),

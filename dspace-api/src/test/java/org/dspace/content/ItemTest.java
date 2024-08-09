@@ -185,7 +185,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         Item found = itemService.find(context, id);
         assertThat("testItemFind 0", found, notNullValue());
         assertThat("testItemFind 1", found.getID(), equalTo(id));
-        assertThat("testItemFind 2", found.getName(), nullValue());
+        assertThat("testItemFind 2", itemService.getName(found), nullValue());
     }
 
     /**
@@ -198,7 +198,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
         Item created = createItem();
         assertThat("testCreate 0", created, notNullValue());
-        assertThat("testCreate 1", created.getName(), nullValue());
+        assertThat("testCreate 1", itemService.getName(created), nullValue());
     }
 
     /**
@@ -868,8 +868,10 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         context.restoreAuthSystemState();
         assertThat("testGetCollections 0", it.getCollections(), notNullValue());
         assertTrue("testGetCollections 1", it.getCollections().size() == 3);
-        assertTrue("testGetCollections 2", it.getCollections().get(1).getName().equals("collection A"));
-        assertTrue("testGetCollections 3", it.getCollections().get(2).getName().equals("collection B"));
+        Collection collection2 = it.getCollections().get(1);
+        assertTrue("testGetCollections 2", collectionService.getName(collection2).equals("collection A"));
+        Collection collection1 = it.getCollections().get(2);
+        assertTrue("testGetCollections 3", collectionService.getName(collection1).equals("collection B"));
     }
 
     /**
@@ -911,7 +913,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         String name = "bundle";
         Bundle created = bundleService.create(context, it, name);
         assertThat("testCreateBundleAuth 0", created, notNullValue());
-        assertThat("testCreateBundleAuth 1", created.getName(), equalTo(name));
+        assertThat("testCreateBundleAuth 1", bundleService.getName(created), equalTo(name));
         assertThat("testCreateBundleAuth 2", itemService.getBundles(it, name), notNullValue());
         assertTrue("testCreateBundleAuth 3", itemService.getBundles(it, name).size() == 1);
     }
@@ -1753,7 +1755,7 @@ public class ItemTest extends AbstractDSpaceObjectTest {
     @Override
     @Test
     public void testGetName() {
-        assertThat("testGetName 0", it.getName(), nullValue());
+        assertThat("testGetName 0", itemService.getName(it), nullValue());
     }
 
     /**

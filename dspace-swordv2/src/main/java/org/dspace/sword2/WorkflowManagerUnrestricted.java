@@ -80,7 +80,7 @@ public class WorkflowManagerUnrestricted implements WorkflowManager {
             for (Bundle bundle : bundles) {
                 // is the bitstream in the ORIGINAL bundle?  If not, it can't be worked on
                 if (!Constants.CONTENT_BUNDLE_NAME
-                    .equals(bundle.getName())) {
+                    .equals(bundleService.getName(bundle))) {
                     throw new SwordError(UriRegistry.ERROR_METHOD_NOT_ALLOWED,
                                          "The file is not in a bundle which can be modified");
                 }
@@ -103,7 +103,7 @@ public class WorkflowManagerUnrestricted implements WorkflowManager {
             for (Bundle bundle : bundles) {
                 // is the bitstream in the ORIGINAL bundle?  If not, it can't be worked on
                 if (!Constants.CONTENT_BUNDLE_NAME
-                    .equals(bundle.getName())) {
+                    .equals(bundleService.getName(bundle))) {
                     throw new SwordError(UriRegistry.ERROR_METHOD_NOT_ALLOWED,
                                          "The file is not in a bundle which can be modified");
                 }

@@ -135,7 +135,7 @@ public class CollectionMatcher {
 
     public static Matcher<? super Object> matchCollection(Collection collection) {
         return allOf(hasJsonPath("$.uuid", is(collection.getID().toString())),
-                hasJsonPath("$.name", is(collection.getName())),
+                hasJsonPath("$.name", is(collectionService.getName(collection))),
                 hasJsonPath("$.type", is("collection")),
                 hasJsonPath("$.handle", is(collection.getHandle())));
     }

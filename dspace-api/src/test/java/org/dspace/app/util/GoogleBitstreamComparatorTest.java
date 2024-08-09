@@ -64,9 +64,9 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest {
     @Override
     public void init() {
         super.init();
-        when(bitstream1.getName()).thenReturn("bitstream1");
-        when(bitstream2.getName()).thenReturn("bitstream2");
-        when(bitstream3.getName()).thenReturn("bitstream3");
+        when(bitstreamService.getName(bitstream1)).thenReturn("bitstream1");
+        when(bitstreamService.getName(bitstream2)).thenReturn("bitstream2");
+        when(bitstreamService.getName(bitstream3)).thenReturn("bitstream3");
         settings.put("citation.prioritized_types", "Adobe PDF, Microsoft Word, RTF, Postscript");
         List<Bitstream> bitstreams = new ArrayList<>();
         bitstreams.add(bitstream1);
@@ -104,9 +104,12 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest {
 
         List<Bitstream> toSort = bundle.getBitstreams();
         Collections.sort(toSort, getComparator());
-        assertEquals("bitstream3", toSort.get(0).getName());
-        assertEquals("bitstream2", toSort.get(1).getName());
-        assertEquals("bitstream1", toSort.get(2).getName());
+        Bitstream bitstream5 = toSort.get(0);
+        assertEquals("bitstream3", bitstreamService.getName(bitstream5));
+        Bitstream bitstream4 = toSort.get(1);
+        assertEquals("bitstream2", bitstreamService.getName(bitstream4));
+        Bitstream bitstream = toSort.get(2);
+        assertEquals("bitstream1", bitstreamService.getName(bitstream));
     }
 
     /**
@@ -122,11 +125,18 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest {
 
         List<Bitstream> toSort = bundle.getBitstreams();
         Collections.sort(toSort, getComparator());
+        Bitstream bitstream5 = toSort.get(0);
         assertEquals("WORD should be first as its type has the highest priority", "bitstream2",
-                     toSort.get(0).getName());
+                     bitstreamService.getName(bitstream5)
+        );
+        Bitstream bitstream4 = toSort.get(1);
         assertEquals("RTF should be second as its type priority is right after Word", "bitstream1",
-                     toSort.get(1).getName());
-        assertEquals("PS should be last as it has the lowest type priority", "bitstream3", toSort.get(2).getName());
+                     bitstreamService.getName(bitstream4)
+        );
+        Bitstream bitstream = toSort.get(2);
+        assertEquals("PS should be last as it has the lowest type priority", "bitstream3",
+                     bitstreamService.getName(bitstream)
+        );
     }
 
     /**
@@ -145,9 +155,12 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest {
 
         List<Bitstream> toSort = bundle.getBitstreams();
         Collections.sort(toSort, getComparator());
-        assertEquals("bitstream2", toSort.get(0).getName());
-        assertEquals("bitstream1", toSort.get(1).getName());
-        assertEquals("bitstream3", toSort.get(2).getName());
+        Bitstream bitstream5 = toSort.get(0);
+        assertEquals("bitstream2", bitstreamService.getName(bitstream5));
+        Bitstream bitstream4 = toSort.get(1);
+        assertEquals("bitstream1", bitstreamService.getName(bitstream4));
+        Bitstream bitstream = toSort.get(2);
+        assertEquals("bitstream3", bitstreamService.getName(bitstream));
     }
 
     /**
@@ -169,12 +182,18 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest {
         GoogleBitstreamComparator comparator = getComparator();
 
         Collections.sort(toSort, comparator);
+        Bitstream bitstream5 = toSort.get(0);
         assertEquals("Bitstreams have same size and type, so order should remain unchanged", "bitstream1",
-                     toSort.get(0).getName());
+                     bitstreamService.getName(bitstream5)
+        );
+        Bitstream bitstream4 = toSort.get(1);
         assertEquals("Bitstreams have same size and type, so order should remain unchanged", "bitstream2",
-                     toSort.get(1).getName());
+                     bitstreamService.getName(bitstream4)
+        );
+        Bitstream bitstream = toSort.get(2);
         assertEquals("Bitstreams have same size and type, so order should remain unchanged", "bitstream3",
-                     toSort.get(2).getName());
+                     bitstreamService.getName(bitstream)
+        );
 
         // Also, verify all bitstreams are considered equal (comparison returns 0)
         assertEquals(0, comparator.compare(bitstream1, bitstream2));
@@ -197,10 +216,14 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest {
 
         List<Bitstream> toSort = bundle.getBitstreams();
         Collections.sort(toSort, getComparator());
-        assertEquals("bitstream3", toSort.get(0).getName());
-        assertEquals("bitstream2", toSort.get(1).getName());
+        Bitstream bitstream5 = toSort.get(0);
+        assertEquals("bitstream3", bitstreamService.getName(bitstream5));
+        Bitstream bitstream4 = toSort.get(1);
+        assertEquals("bitstream2", bitstreamService.getName(bitstream4));
+        Bitstream bitstream = toSort.get(2);
         assertEquals("Unknown mime-types should always have the lowest priority", "bitstream1",
-                     toSort.get(2).getName());
+                     bitstreamService.getName(bitstream)
+        );
     }
 
     /**
@@ -219,12 +242,18 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest {
 
         List<Bitstream> toSort = bundle.getBitstreams();
         Collections.sort(toSort, getComparator());
+        Bitstream bitstream5 = toSort.get(0);
         assertEquals("bitstream2 should come first as it is the largest and all types are equal", "bitstream2",
-                     toSort.get(0).getName());
+                     bitstreamService.getName(bitstream5)
+        );
+        Bitstream bitstream4 = toSort.get(1);
         assertEquals("bitstream1 should come second as it is the second largest and all types are equal", "bitstream1",
-                     toSort.get(1).getName());
+                     bitstreamService.getName(bitstream4)
+        );
+        Bitstream bitstream = toSort.get(2);
         assertEquals("bitstream3 should come last as it is the smallest and all types are equal", "bitstream3",
-                     toSort.get(2).getName());
+                     bitstreamService.getName(bitstream)
+        );
     }
 
     /**
@@ -239,12 +268,18 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest {
 
         List<Bitstream> toSort = bundle.getBitstreams();
         Collections.sort(toSort, getComparator());
+        Bitstream bitstream5 = toSort.get(0);
         assertEquals("According to the updated type prioritization, PS should be first", "bitstream3",
-                     toSort.get(0).getName());
+                     bitstreamService.getName(bitstream5)
+        );
+        Bitstream bitstream4 = toSort.get(1);
         assertEquals("According to the updated type prioritization, RTF should come second", "bitstream1",
-                     toSort.get(1).getName());
+                     bitstreamService.getName(bitstream4)
+        );
+        Bitstream bitstream = toSort.get(2);
         assertEquals("According to the updated type prioritization, Word has to be last", "bitstream2",
-                     toSort.get(2).getName());
+                     bitstreamService.getName(bitstream)
+        );
     }
 
     /**
@@ -258,12 +293,18 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest {
 
         List<Bitstream> toSort = bundle.getBitstreams();
         Collections.sort(toSort, getComparator());
+        Bitstream bitstream5 = toSort.get(0);
         assertEquals("bitstream2 should come first as it is the largest and there are no types", "bitstream2",
-                     toSort.get(0).getName());
+                     bitstreamService.getName(bitstream5)
+        );
+        Bitstream bitstream4 = toSort.get(1);
         assertEquals("bitstream1 should come second as it is the second largest and there are no types", "bitstream1",
-                     toSort.get(1).getName());
+                     bitstreamService.getName(bitstream4)
+        );
+        Bitstream bitstream = toSort.get(2);
         assertEquals("bitstream3 should come last as it is the smallest and there are no types", "bitstream3",
-                     toSort.get(2).getName());
+                     bitstreamService.getName(bitstream)
+        );
     }
 
     /**
@@ -279,9 +320,12 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest {
 
         List<Bitstream> toSort = bundle.getBitstreams();
         Collections.sort(toSort, getComparator());
-        assertEquals("bitstream1", toSort.get(0).getName());
-        assertEquals("bitstream2", toSort.get(1).getName());
-        assertEquals("bitstream3", toSort.get(2).getName());
+        Bitstream bitstream5 = toSort.get(0);
+        assertEquals("bitstream1", bitstreamService.getName(bitstream5));
+        Bitstream bitstream4 = toSort.get(1);
+        assertEquals("bitstream2", bitstreamService.getName(bitstream4));
+        Bitstream bitstream = toSort.get(2);
+        assertEquals("bitstream3", bitstreamService.getName(bitstream));
     }
 
     /**
@@ -291,9 +335,12 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest {
     public void testNoMimeTypeNoSize() throws Exception {
         List<Bitstream> toSort = bundle.getBitstreams();
         Collections.sort(toSort, getComparator());
-        assertEquals("bitstream1", toSort.get(0).getName());
-        assertEquals("bitstream2", toSort.get(1).getName());
-        assertEquals("bitstream3", toSort.get(2).getName());
+        Bitstream bitstream5 = toSort.get(0);
+        assertEquals("bitstream1", bitstreamService.getName(bitstream5));
+        Bitstream bitstream4 = toSort.get(1);
+        assertEquals("bitstream2", bitstreamService.getName(bitstream4));
+        Bitstream bitstream = toSort.get(2);
+        assertEquals("bitstream3", bitstreamService.getName(bitstream));
     }
 
     /**
@@ -311,12 +358,18 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest {
 
         List<Bitstream> toSort = bundle.getBitstreams();
         Collections.sort(toSort, getComparator());
+        Bitstream bitstream5 = toSort.get(0);
         assertEquals("PS should be first because it is the largest one and there is no type prioritization",
-                     "bitstream3", toSort.get(0).getName());
+                     "bitstream3", bitstreamService.getName(bitstream5)
+        );
+        Bitstream bitstream4 = toSort.get(1);
         assertEquals("RTF should come second because it is the second largest and there is no type prioritization",
-                     "bitstream2", toSort.get(1).getName());
+                     "bitstream2", bitstreamService.getName(bitstream4)
+        );
+        Bitstream bitstream = toSort.get(2);
         assertEquals("Word has to be last (third) as it is the smallest one and there is no type prioritization",
-                     "bitstream1", toSort.get(2).getName());
+                     "bitstream1", bitstreamService.getName(bitstream)
+        );
     }
 
     /**
@@ -334,13 +387,19 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest {
 
         List<Bitstream> toSort = bundle.getBitstreams();
         Collections.sort(toSort, getComparator());
+        Bitstream bitstream5 = toSort.get(0);
         assertEquals("bitstream3 should come first as it is the largest and there is no type prioritization configured",
-                     "bitstream3", toSort.get(0).getName());
+                     "bitstream3", bitstreamService.getName(bitstream5)
+        );
+        Bitstream bitstream4 = toSort.get(1);
         assertEquals(
             "bitstream2 should come second as it is the second largest and there is no type prioritization configured",
-            "bitstream2", toSort.get(1).getName());
+            "bitstream2", bitstreamService.getName(bitstream4)
+        );
+        Bitstream bitstream = toSort.get(2);
         assertEquals("bitstream1 should come last as it is the smallest and there is no type prioritization configured",
-                     "bitstream1", toSort.get(2).getName());
+                     "bitstream1", bitstreamService.getName(bitstream)
+        );
     }
 
     /**
@@ -355,9 +414,12 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest {
 
         List<Bitstream> toSort = bundle.getBitstreams();
         Collections.sort(toSort, getComparator());
-        assertEquals("bitstream3", toSort.get(0).getName());
-        assertEquals("bitstream1", toSort.get(1).getName());
-        assertEquals("bitstream2", toSort.get(2).getName());
+        Bitstream bitstream5 = toSort.get(0);
+        assertEquals("bitstream3", bitstreamService.getName(bitstream5));
+        Bitstream bitstream4 = toSort.get(1);
+        assertEquals("bitstream1", bitstreamService.getName(bitstream4));
+        Bitstream bitstream = toSort.get(2);
+        assertEquals("bitstream2", bitstreamService.getName(bitstream));
     }
 
     /**
@@ -372,15 +434,21 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest {
 
         List<Bitstream> toSort = bundle.getBitstreams();
         Collections.sort(toSort, getComparator());
+        Bitstream bitstream5 = toSort.get(0);
         assertEquals("bitstream3 has the type with the highest priority (thus ignoring its size) and should come first",
-                     "bitstream3", toSort.get(0).getName());
+                     "bitstream3", bitstreamService.getName(bitstream5)
+        );
+        Bitstream bitstream4 = toSort.get(1);
         assertEquals(
             "bitstream2 has a type with a priority higher than bitstream1 (size is ignored) and should come second",
-            "bitstream2", toSort.get(1).getName());
+            "bitstream2", bitstreamService.getName(bitstream4)
+        );
+        Bitstream bitstream = toSort.get(2);
         assertEquals(
-            "bitstream1 has a type with the lowest priority in this bundle even though it is the largest bitstream" +
+            "bitstream1 has a type with the lowest priority in this bundle eventhough it is the largest bitstream" +
                 " and should come last",
-            "bitstream1", toSort.get(2).getName());
+            "bitstream1", bitstreamService.getName(bitstream)
+        );
     }
 
     @After

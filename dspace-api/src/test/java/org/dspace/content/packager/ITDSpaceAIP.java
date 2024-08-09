@@ -516,7 +516,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
         Community topCommunity = (Community) handleService.resolveToObject(context, topCommunityHandle);
 
         // Get its current name / title
-        String oldName = topCommunity.getName();
+        String oldName = communityService.getName(topCommunity);
 
         // Export only community AIP
         log.info("testReplaceCommunityOnly() - CREATE Community AIP");
@@ -529,13 +529,13 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
                                      "title", null, null, newName);
 
         // Ensure name is changed
-        assertEquals("testReplaceCommunityOnly() new name", topCommunity.getName(), newName);
+        assertEquals("testReplaceCommunityOnly() new name", communityService.getName(topCommunity), newName);
 
         // Now, replace our Community from AIP (non-recursive)
         replaceFromAIP(topCommunity, aipFile, null, false);
 
         // Check if name reverted to previous value
-        assertEquals("testReplaceCommunityOnly() old name", topCommunity.getName(), oldName);
+        assertEquals("testReplaceCommunityOnly() old name", communityService.getName(topCommunity), oldName);
     }
 
     /**
@@ -711,7 +711,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
         Collection testCollection = (Collection) handleService.resolveToObject(context, testCollectionHandle);
 
         // Get its current name / title
-        String oldName = testCollection.getName();
+        String oldName = collectionService.getName(testCollection);
 
         // Export only collection AIP
         log.info("testReplaceCollectionOnly() - CREATE Collection AIP");
@@ -725,13 +725,13 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
                                       "title", null, null, newName);
 
         // Ensure name is changed
-        assertEquals("testReplaceCollectionOnly() new name", testCollection.getName(), newName);
+        assertEquals("testReplaceCollectionOnly() new name", collectionService.getName(testCollection), newName);
 
         // Now, replace our Collection from AIP (non-recursive)
         replaceFromAIP(testCollection, aipFile, null, false);
 
         // Check if name reverted to previous value
-        assertEquals("testReplaceCollectionOnly() old name", testCollection.getName(), oldName);
+        assertEquals("testReplaceCollectionOnly() old name", collectionService.getName(testCollection), oldName);
     }
 
 
@@ -755,7 +755,8 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
             List<Bitstream> bitstreams = bundles.get(0).getBitstreams();
             bitstreamCount = bitstreams.size();
             if (bitstreamCount > 0) {
-                bitstreamName = bitstreams.get(0).getName();
+                Bitstream bitstream = bitstreams.get(0);
+                bitstreamName = bitstreamService.getName(bitstream);
                 bitstreamCheckSum = bitstreams.get(0).getChecksum();
             }
         }
@@ -932,7 +933,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
         Item testItem = (Item) handleService.resolveToObject(context, testItemHandle);
 
         // Get its current name / title
-        String oldName = testItem.getName();
+        String oldName = itemService.getName(testItem);
 
         // Export item AIP
         log.info("testReplaceItem() - CREATE Item AIP");
@@ -944,13 +945,13 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
         itemService.addMetadata(context, testItem, MetadataSchemaEnum.DC.getName(), "title", null, null, newName);
 
         // Ensure name is changed
-        assertEquals("testReplaceItem() new name", testItem.getName(), newName);
+        assertEquals("testReplaceItem() new name", itemService.getName(testItem), newName);
 
         // Now, replace our Item from AIP (non-recursive)
         replaceFromAIP(testItem, aipFile, null, false);
 
         // Check if name reverted to previous value
-        assertEquals("testReplaceItem() old name", testItem.getName(), oldName);
+        assertEquals("testReplaceItem() old name", itemService.getName(testItem), oldName);
     }
 
     /**
@@ -1136,7 +1137,9 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
             // Save this Community's info to the infoMap
             Community community = (Community) dso;
             infoMap.put(community.getHandle(),
-                        communityService.getTypeText(community) + valueseparator + community.getName());
+                        communityService.getTypeText(community) + valueseparator + community.communityService.getName(
+                            community)
+            );
 
             // Recursively call method for each SubCommunity
             List<Community> subCommunities = community.getSubcommunities();
@@ -1153,7 +1156,9 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
             // Save this Collection's info to the infoMap
             Collection collection = (Collection) dso;
             infoMap.put(collection.getHandle(),
-                        collectionService.getTypeText(collection) + valueseparator + collection.getName());
+                        collectionService.getTypeText(collection) + valueseparator + collection.collectionService.getName(
+                            collection)
+            );
 
             // Recursively call method for each Item in Collection
             Iterator<Item> items = itemService.findByCollection(context, collection);
@@ -1164,7 +1169,8 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
         } else if (dso instanceof Item) {
             // Save this Item's info to the infoMap
             Item item = (Item) dso;
-            infoMap.put(item.getHandle(), itemService.getTypeText(item) + valueseparator + item.getName());
+            infoMap.put(item.getHandle(), itemService.getTypeText(item) + valueseparator + item.itemService.getName(
+                item));
         }
     }
 

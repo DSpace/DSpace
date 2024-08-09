@@ -130,15 +130,16 @@ public class PREMISCrosswalk
                         String b_md = bitstream.getChecksum();
                         if (StringUtils.equals(alg, b_alg)) {
                             if (StringUtils.equals(md, b_md)) {
-                                log.debug("Bitstream checksum agrees with PREMIS: " + bitstream.getName());
+                                log.debug("Bitstream checksum agrees with PREMIS: " + bitstream.bitreamService.getName(
+                                    bitstream));
                             } else {
                                 throw new MetadataValidationException(
                                     "Bitstream " + alg + " Checksum does not match value in PREMIS (" + b_md + " != "
-                                        + md + "), for bitstream: " + bitstream
-                                        .getName());
+                                        + md + "), for bitstream: " + bitstreamService.getName(bitstream));
                             }
                         } else {
-                            log.warn("Cannot test checksum on bitstream=" + bitstream.getName() +
+                            log.warn("Cannot test checksum on bitstream=" + bitstream.bitreamService.getName(
+                                bitstream) +
                                          ", algorithm in PREMIS is different: " + alg);
                         }
                     }
@@ -234,7 +235,7 @@ public class PREMISCrosswalk
             }
         }
         // get or make up name for bitstream:
-        String bsName = bitstream.getName();
+        String bsName = bitstreamService.getName(bitstream);
         if (bsName == null) {
             List<String> ext = bitstreamService.getFormat(context, bitstream).getExtensions();
             bsName = "bitstream_" + sid + (ext.size() > 0 ? ext.get(0) : "");
@@ -295,7 +296,7 @@ public class PREMISCrosswalk
         ochar.addContent(format);
 
         // originalName <- name (or source if none)
-        String oname = bitstream.getName();
+        String oname = bitstreamService.getName(bitstream);
         if (oname == null) {
             oname = bitstreamService.getSource(bitstream);
         }

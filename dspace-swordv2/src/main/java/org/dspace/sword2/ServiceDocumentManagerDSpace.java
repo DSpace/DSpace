@@ -162,7 +162,7 @@ public class ServiceDocumentManagerDSpace implements ServiceDocumentManager {
             if (dso instanceof Community) {
                 Community community = (Community) dso;
                 SwordWorkspace workspace = new SwordWorkspace();
-                workspace.setTitle(community.getName());
+                workspace.setTitle(communityService.getName(community));
 
                 List<Collection> collections = swordAuth
                     .getAllowedCollections(context, community);

@@ -46,7 +46,7 @@ public class VersionManager {
         Iterator<Bundle> bundles = item.getBundles().iterator();
         while (bundles.hasNext()) {
             Bundle b = bundles.next();
-            if (name.equals(b.getName())) {
+            if (name.equals(bundleService.getName(b))) {
                 bundles.remove();
                 this.removeBundle(context, item, b, keep);
             }
@@ -131,7 +131,7 @@ public class VersionManager {
         List<Bundle> bundles = item.getBundles();
         Bundle archive = null;
         for (Bundle bundle : bundles) {
-            if (swordBundle.equals(bundle.getName())) {
+            if (swordBundle.equals(bundleService.getName(bundle))) {
                 archive = bundle;
                 break;
             }
@@ -169,7 +169,7 @@ public class VersionManager {
         String nName = name + "." + Integer.toString(number);
         List<Bundle> bundles = item.getBundles();
         for (Bundle bundle : bundles) {
-            if (nName.equals(bundle.getName())) {
+            if (nName.equals(bundleService.getName(bundle))) {
                 return this.getNumberedName(item, name, number + 1);
             }
         }

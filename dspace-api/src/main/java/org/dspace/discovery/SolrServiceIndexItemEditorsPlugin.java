@@ -67,7 +67,7 @@ public class SolrServiceIndexItemEditorsPlugin implements SolrServiceIndexPlugin
                     }
                 } catch (SQLException e) {
                     log.error(LogHelper.getHeader(context, "Error while indexing resource policies",
-                        "Item: (id " + item.getID() + " name " + item.getName() + ")" ));
+                        "Item: (id " + item.getID() + " name " + itemService.getName(item) + ")" ));
                 }
             }
         }

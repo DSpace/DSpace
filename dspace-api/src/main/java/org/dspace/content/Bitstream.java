@@ -38,9 +38,6 @@ import org.dspace.core.HibernateProxyHelper;
 @Entity
 @Table(name = "bitstream")
 public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport {
-    @Transient
-    BitstreamService bitreamService;
-
     @Column(name = "bitstream_id", insertable = false, updatable = false)
     private Integer legacyId;
 
@@ -117,17 +114,6 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
         sequenceId = sid;
         setMetadataModified();
         addDetails("SequenceID");
-    }
-
-    /**
-     * Get the name of this bitstream - typically the filename, without any path
-     * information
-     *
-     * @return the name of the bitstream
-     */
-    @Override
-    public String getName() {
-        return bitreamService.getName(this);
     }
 
     /**

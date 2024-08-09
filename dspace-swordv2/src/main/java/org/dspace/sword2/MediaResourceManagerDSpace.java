@@ -686,7 +686,7 @@ public class MediaResourceManagerDSpace extends DSpaceSwordAPI
             Iterator<Bundle> bundles = item.getBundles().iterator();
             while (bundles.hasNext()) {
                 Bundle bundle = bundles.next();
-                if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName())) {
+                if (Constants.CONTENT_BUNDLE_NAME.equals(bundleService.getName(bundle))) {
                     bundles.remove();
                     vm.removeBundle(swordContext.getContext(), item, bundle);
                 }

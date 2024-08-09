@@ -47,9 +47,6 @@ import org.dspace.eperson.Group;
 @Entity
 @Table(name = "collection")
 public class Collection extends CacheableDSpaceObject implements DSpaceObjectLegacySupport {
-    @Transient
-    CollectionService collectionService;
-
     @Column(name = "collection_id", insertable = false, updatable = false)
     private Integer legacyId;
 
@@ -103,11 +100,6 @@ public class Collection extends CacheableDSpaceObject implements DSpaceObjectLeg
      */
     protected Collection(UUID uuid) {
         this.predefinedUUID = uuid;
-    }
-
-    @Override
-    public String getName() {
-        return collectionService.getName(this);
     }
 
     /**

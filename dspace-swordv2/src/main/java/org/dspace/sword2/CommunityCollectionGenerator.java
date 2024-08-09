@@ -58,7 +58,7 @@ public class CommunityCollectionGenerator implements AtomCollectionGenerator {
         scol.setLocation(location);
 
         // collection title is just the community name
-        String title = com.getName();
+        String title = communityService.getName(com);
         if (StringUtils.isNotBlank(title)) {
             scol.setTitle(title);
         }

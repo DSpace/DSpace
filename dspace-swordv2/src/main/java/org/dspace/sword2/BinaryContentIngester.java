@@ -123,7 +123,7 @@ public class BinaryContentIngester extends AbstractSwordContentIngester {
             List<Bundle> originals = item.getBundles();
             Bundle original = null;
             for (Bundle bundle : originals) {
-                if (StringUtils.equals(Constants.CONTENT_BUNDLE_NAME, bundle.getName())) {
+                if (StringUtils.equals(Constants.CONTENT_BUNDLE_NAME, bundleService.getName(bundle))) {
                     original = bundle;
                 }
             }

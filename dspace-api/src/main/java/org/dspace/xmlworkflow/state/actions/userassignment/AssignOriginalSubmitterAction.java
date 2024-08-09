@@ -16,6 +16,8 @@ import java.util.List;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
@@ -81,10 +83,12 @@ public class AssignOriginalSubmitterAction extends UserSelectionAction {
         if (wfi.getSubmitter() != null) {
             try {
                 XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
+                Collection collection = wfi.getCollection();
+                Item item = wfi.getItem();
                 xmlWorkflowService.alertUsersOnTaskActivation(c, wfi, "submit_task", Arrays.asList(wfi.getSubmitter()),
                         //The arguments
-                        wfi.getItem().getName(),
-                        wfi.getCollection().getName(),
+                                                              itemService.getName(item),
+                                                              collectionService.getName(collection),
                         epersonService.getFullName(wfi.getSubmitter()),
                         //TODO: message
                         "New task available.",

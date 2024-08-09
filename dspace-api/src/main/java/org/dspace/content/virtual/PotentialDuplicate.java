@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 
@@ -68,12 +69,13 @@ public class PotentialDuplicate {
         // Instantiate metadata value list
         this.metadataValueList = new LinkedList<>();
         // Set title
-        this.title = item.getName();
+        this.title = itemService.getName(item);
         // Set UUID
         this.uuid = item.getID();
         // Set owning collection name
         if (item.getOwningCollection() != null) {
-            this.owningCollectionName = item.getOwningCollection().getName();
+            Collection collection = item.getOwningCollection();
+            this.owningCollectionName = collectionService.getName(collection);
         }
     }
 

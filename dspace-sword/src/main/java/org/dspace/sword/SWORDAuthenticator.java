@@ -813,7 +813,7 @@ public class SWORDAuthenticator {
                     boolean add = false;
                     for (Bundle bundle : bundles) {
                         if (Constants.CONTENT_BUNDLE_NAME
-                            .equals(bundle.getName())) {
+                            .equals(bundleService.getName(bundle))) {
                             add = authorizeService.authorizeActionBoolean(
                                 swordContext.getAuthenticatorContext(),
                                 bundle, Constants.ADD);
@@ -836,7 +836,7 @@ public class SWORDAuthenticator {
                     boolean add = false;
                     for (Bundle bundle : bundles) {
                         if (Constants.CONTENT_BUNDLE_NAME
-                            .equals(bundle.getName())) {
+                            .equals(bundleService.getName(bundle))) {
                             add = authorizeService.authorizeActionBoolean(
                                 swordContext.getOnBehalfOfContext(), bundle,
                                 Constants.ADD);
@@ -984,7 +984,7 @@ public class SWORDAuthenticator {
 
                 boolean add = false;
                 for (Bundle bundle : bundles) {
-                    if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName())) {
+                    if (Constants.CONTENT_BUNDLE_NAME.equals(bundleService.getName(bundle))) {
                         add = authorizeService.authorizeActionBoolean(
                             swordContext.getAuthenticatorContext(), bundle,
                             Constants.ADD);
@@ -1006,7 +1006,7 @@ public class SWORDAuthenticator {
 
                 boolean add = false;
                 for (Bundle bundle : bundles) {
-                    if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName())) {
+                    if (Constants.CONTENT_BUNDLE_NAME.equals(bundleService.getName(bundle))) {
                         add = authorizeService.authorizeActionBoolean(
                             swordContext.getOnBehalfOfContext(), bundle,
                             Constants.ADD);

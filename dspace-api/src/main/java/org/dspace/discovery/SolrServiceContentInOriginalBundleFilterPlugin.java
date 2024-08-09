@@ -63,7 +63,7 @@ public class SolrServiceContentInOriginalBundleFilterPlugin implements SolrServi
         bundles = item.getBundles();
         if (bundles != null) {
             for (Bundle curBundle : bundles) {
-                String bName = curBundle.getName();
+                String bName = bundleService.getName(curBundle);
                 if ((bName != null) && bName.equals("ORIGINAL")) {
                     List<Bitstream> bitstreams = curBundle.getBitstreams();
                     if (bitstreams != null && bitstreams.size() > 0) {

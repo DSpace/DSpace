@@ -41,7 +41,7 @@ public class ContentReportMatcher {
 
     public static Matcher<? super Object> matchFilteredItemProperties(Item item) {
         return allOf(
-                hasJsonPath("$.name", is(item.getName())),
+                hasJsonPath("$.name", is(itemService.getName(item))),
                 hasJsonPath("$.inArchive", is(item.isArchived())),
                 hasJsonPath("$.discoverable", is(item.isDiscoverable())),
                 hasJsonPath("$.withdrawn", is(item.isWithdrawn())),

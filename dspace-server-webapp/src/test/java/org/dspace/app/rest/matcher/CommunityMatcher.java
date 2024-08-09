@@ -135,7 +135,7 @@ public class CommunityMatcher {
             matchProperties(name, uuid, handle),
             hasJsonPath("$._embedded.collections._embedded.collections[0]",
                         CollectionMatcher
-                            .matchCollectionEntry(col.getName(), col.getID(), col.getHandle(), col.getLogo())),
+                            .matchCollectionEntry(collectionService.getName(col), col.getID(), col.getHandle(), col.getLogo())),
             hasJsonPath("$._embedded.logo", Matchers.not(Matchers.empty())),
             matchLinks(uuid)
         );
@@ -147,7 +147,7 @@ public class CommunityMatcher {
 
     public static Matcher<? super Object> matchCommunity(Community community) {
         return allOf(hasJsonPath("$.uuid", is(community.getID().toString())),
-                hasJsonPath("$.name", is(community.getName())),
+                hasJsonPath("$.name", is(communityService.getName(community))),
                 hasJsonPath("$.type", is("community")),
                 hasJsonPath("$.handle", is(community.getHandle())));
     }

@@ -427,12 +427,11 @@ public abstract class AbstractMETSDisseminator
                                                                  bundle, Constants.READ)) {
                         if (unauth != null &&
                             (unauth.equalsIgnoreCase("skip"))) {
-                            log.warn("Skipping Bundle[\"" + bundle
-                                .getName() + "\"] because you are not authorized to read it.");
+                            log.warn("Skipping Bundle[\"" + bundleService.getName(bundle) + "\"] because you are not authorized to read it.");
                             continue;
                         } else {
                             throw new AuthorizeException(
-                                "Not authorized to read Bundle named \"" + bundle.getName() + "\"");
+                                "Not authorized to read Bundle named \"" + bundleService.getName(bundle) + "\"");
                         }
                     }
                     List<Bitstream> bitstreams = bundle.getBitstreams();
@@ -854,7 +853,7 @@ public abstract class AbstractMETSDisseminator
                         continue;
                     } else {
                         throw new AuthorizeException(
-                            "Not authorized to read Bundle named \"" + bundle.getName() + "\"");
+                            "Not authorized to read Bundle named \"" + bundleService.getName(bundle) + "\"");
                     }
                 }
 
@@ -862,7 +861,7 @@ public abstract class AbstractMETSDisseminator
 
                 // Create a fileGrp, USE = permuted Bundle name
                 FileGrp fileGrp = new FileGrp();
-                String bName = bundle.getName();
+                String bName = bundleService.getName(bundle);
                 if ((bName != null) && !bName.equals("")) {
                     fileGrp.setUSE(bundleToFileGrp(bName));
                 }
@@ -924,16 +923,19 @@ public abstract class AbstractMETSDisseminator
                      * out which bitstream to be in the same group as
                      */
                     String groupID = "GROUP_" + bitstreamIDstart + uuid;
-                    if ((bundle.getName() != null)
-                        && (bundle.getName().equals("THUMBNAIL") ||
-                        bundle.getName().startsWith("TEXT"))) {
-                        // Try and find the original bitstream, and chuck the
-                        // derived bitstream in the same group
-                        Bitstream original = findOriginalBitstream(item,
-                                                                   bitstream);
-                        if (original != null) {
-                            groupID = "GROUP_" + bitstreamIDstart
-                                + String.valueOf(original.getID());
+                    if ((bundleService.getName(bundle) != null)) {
+                        if (bundleService.getName(bundle).equals("THUMBNAIL") ||
+                        bundleService.getName(bundle).startsWith("TEXT")) {
+                            // Try and find the original bitstream, and chuck the
+                            // derived bitstream in the same group
+                            Bitstream original = findOriginalBitstream(
+                                item,
+                                bitstream
+                            );
+                            if (original != null) {
+                                groupID = "GROUP_" + bitstreamIDstart
+                                    + String.valueOf(original.getID());
+                            }
                         }
                     }
                     file.setGROUPID(groupID);
@@ -1207,19 +1209,21 @@ public abstract class AbstractMETSDisseminator
 
         // Filename of original will be filename of the derived bitstream
         // minus the extension (last 4 chars - .jpg or .txt)
-        String originalFilename = derived.getName().substring(0,
-                                                              derived.getName().length() - 4);
+        String originalFilename = bitstreamService.getName(derived).substring(0,
+                                                                                    derived.bitreamService.getName(
+                                                                                        derived).length() - 4);
 
         // First find "original" bundle
         for (Bundle bundle : bundles) {
-            if ((bundle.getName() != null)
-                && bundle.getName().equals("ORIGINAL")) {
-                // Now find the corresponding bitstream
-                List<Bitstream> bitstreams = bundle.getBitstreams();
+            if ((bundleService.getName(bundle) != null)) {
+                if (bundleService.getName(bundle).equals("ORIGINAL")) {
+                    // Now find the corresponding bitstream
+                    List<Bitstream> bitstreams = bundle.getBitstreams();
 
-                for (Bitstream bitstream : bitstreams) {
-                    if (bitstream.getName().equals(originalFilename)) {
-                        return bitstream;
+                    for (Bitstream bitstream : bitstreams) {
+                        if (bitstreamService.getName(bitstream).equals(originalFilename)) {
+                            return bitstream;
+                        }
                     }
                 }
             }
@@ -1424,7 +1428,7 @@ public abstract class AbstractMETSDisseminator
 
             // We should only get here if we failed to build a nice URL above
             // so, by default, we're just going to return the bitstream name.
-            return bitstream.getName();
+            return bitstreamService.getName(bitstream);
         } else {
             String base = "bitstream_" + String.valueOf(bitstream.getID());
             List<String> ext = bitstreamService.getFormat(context, bitstream).getExtensions();

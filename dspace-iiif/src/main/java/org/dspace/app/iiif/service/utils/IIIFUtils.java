@@ -354,10 +354,12 @@ public class IIIFUtils {
      */
     private String getToCBundleLabel(Bundle bundle) {
         String[] iiifAlternate = configurationService.getArrayProperty("iiif.exclude.toc.bundle");
-        if (Arrays.stream(iiifAlternate).anyMatch(x -> x.contentEquals(bundle.getName()))) {
+        if (Arrays.stream(iiifAlternate).anyMatch(x -> {
+            return x.contentEquals(bundleService.getName(bundle));
+        })) {
             return null;
         }
-        return bundle.getName();
+        return bundleService.getName(bundle);
     }
 
     /**

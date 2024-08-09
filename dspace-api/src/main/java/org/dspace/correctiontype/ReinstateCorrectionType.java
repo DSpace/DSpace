@@ -85,7 +85,7 @@ public class ReinstateCorrectionType implements CorrectionType, InitializingBean
         QAEvent qaEvent = new QAEvent(DSPACE_USERS_SOURCE,
                                       context.getCurrentUser().getID().toString(),
                                       targetItem.getID().toString(),
-                                      targetItem.getName(),
+                                      itemService.getName(targetItem),
                                       this.getTopic(),
                                       1.0,
                                       reasonJson.toString(),

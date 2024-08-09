@@ -194,10 +194,10 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
 
     @Override
     public boolean preProcessBitstream(Context c, Item item, Bitstream source, boolean verbose) throws Exception {
-        String nsrc = source.getName();
+        String nsrc = bitstreamService.getName(source);
         for (Bundle b : itemService.getBundles(item, "THUMBNAIL")) {
             for (Bitstream bit : b.getBitstreams()) {
-                String n = bit.getName();
+                String n = bitstreamService.getName(bit);
                 if (n != null) {
                     if (nsrc != null) {
                         if (!n.startsWith(nsrc)) {

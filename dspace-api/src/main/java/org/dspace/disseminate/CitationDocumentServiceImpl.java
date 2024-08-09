@@ -471,7 +471,8 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         try {
             List<Community> comms = itemService.getCommunities(context, item);
             if (comms.size() > 0) {
-                return comms.get(0).getName();
+                Community community = comms.get(0);
+                return communityService.getName(community);
             } else {
                 return " ";
             }
@@ -484,7 +485,8 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
     @Override
     public String getOwningCollection(Item item) {
-        return item.getOwningCollection().getName();
+        Collection collection = item.getOwningCollection();
+        return collectionService.getName(collection);
     }
 
     @Override

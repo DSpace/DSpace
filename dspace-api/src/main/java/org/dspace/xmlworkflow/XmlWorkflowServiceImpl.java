@@ -679,7 +679,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
                 email.addRecipient(ep.getEmail());
                 email.addArgument(title);
-                email.addArgument(coll.getName());
+                email.addArgument(collectionService.getName(coll));
                 email.addArgument(handleService.getCanonicalForm(handle));
 
                 email.send();
@@ -709,7 +709,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                 Locale supportedLocale = I18nUtil.getEPersonLocale(epa);
                 Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "flowtask_notify"));
                 email.addArgument(title);
-                email.addArgument(coll.getName());
+                email.addArgument(collectionService.getName(coll));
                 email.addArgument(submitter);
                 email.addArgument(taskName);
                 email.addArgument(message);
@@ -1233,7 +1233,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             EPerson eperson = wi.getSubmitter();
             if (eperson != null) {
                 // Get the item title
-                String title = wi.getItem().getName();
+                Item item = wi.getItem();
+                String title = itemService.getName(item);
 
                 // Get the collection
                 Collection coll = wi.getCollection();
@@ -1245,7 +1246,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
                 email.addRecipient(eperson.getEmail());
                 email.addArgument(title);
-                email.addArgument(coll.getName());
+                email.addArgument(collectionService.getName(coll));
                 email.addArgument(rejector);
                 email.addArgument(reason);
                 email.addArgument(configurationService.getProperty("dspace.ui.url") + "/mydspace");

@@ -911,7 +911,7 @@ public class GoogleMetadata {
                 }
 
                 path.append("/");
-                path.append(Util.encodeBitstreamName(bitstream.getName(), Constants.DEFAULT_ENCODING));
+                path.append(Util.encodeBitstreamName(bitstreamService.getName(bitstream), Constants.DEFAULT_ENCODING));
                 return path.toString();
             }
         } catch (UnsupportedEncodingException ex) {

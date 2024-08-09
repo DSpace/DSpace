@@ -39,7 +39,7 @@ public class OriginalWithDerivativesBitstreamFilter extends BitstreamFilter {
             List<Bundle> bundles = bitstream.getBundles();
             for (Bundle b : bundles) {
                 for (String bn : bundlesToEmpty) {
-                    if (b.getName().equals(bn)) {
+                    if (bundleService.getName(b).equals(bn)) {
                         return true;
                     }
                 }

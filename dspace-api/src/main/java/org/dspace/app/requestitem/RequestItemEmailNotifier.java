@@ -100,12 +100,14 @@ public class RequestItemEmailNotifier {
 
         email.addArgument(ri.getReqEmail()); // {1} Requester's address
 
+        Bitstream bitstream1 = ri.getBitstream();
         email.addArgument(ri.isAllfiles() // {2} All bitstreams or just one?
-            ? I18nUtil.getMessage("itemRequest.all") : ri.getBitstream().getName());
+            ? I18nUtil.getMessage("itemRequest.all") : bitstreamService.getName(bitstream1));
 
         email.addArgument(handleService.getCanonicalForm(ri.getItem().getHandle())); // {3}
 
-        email.addArgument(ri.getItem().getName()); // {4} requested item's title
+        Item item = ri.getItem();
+        email.addArgument(itemService.getName(item)); // {4} requested item's title
 
         email.addArgument(ri.getReqMessage()); // {5} message from requester
 
@@ -187,7 +189,8 @@ public class RequestItemEmailNotifier {
                 ri.isAccept_request() ? "request_item.granted" : "request_item.rejected"));
         email.addArgument(ri.getReqName()); // {0} requestor's name
         email.addArgument(handleService.getCanonicalForm(ri.getItem().getHandle())); // {1} URL of the requested Item
-        email.addArgument(ri.getItem().getName()); // {2} title of the requested Item
+        Item item1 = ri.getItem();
+        email.addArgument(itemService.getName(item1)); // {2} title of the requested Item
         email.addArgument(grantorName);     // {3} name of the grantor
         email.addArgument(grantorAddress);  // {4} email of the grantor
         email.addArgument(message); //         {5} grantor's optional message
@@ -210,7 +213,7 @@ public class RequestItemEmailNotifier {
                                 context.turnOffAuthorisationSystem();
                                 email.addAttachment(
                                         bitstreamService.retrieve(context, bitstream),
-                                        bitstream.getName(),
+                                        bitstreamService.getName(bitstream),
                                         bitstreamService.getFormat(context, bitstream).getMIMEType());
                                 context.restoreAuthSystemState();
                             }
@@ -221,7 +224,7 @@ public class RequestItemEmailNotifier {
                     // #8636 Anyone receiving the email can respond to the request without authenticating into DSpace
                     context.turnOffAuthorisationSystem();
                     email.addAttachment(bitstreamService.retrieve(context, bitstream),
-                            bitstream.getName(),
+                                        bitstreamService.getName(bitstream),
                             bitstreamService.getFormat(context, bitstream).getMIMEType());
                     context.restoreAuthSystemState();
                 }
@@ -262,7 +265,7 @@ public class RequestItemEmailNotifier {
         Bitstream bitstream = ri.getBitstream();
         String bitstreamName;
         if (bitstream != null) {
-            bitstreamName = bitstream.getName();
+            bitstreamName = bitstreamService.getName(bitstream);
         } else {
             bitstreamName = "all"; // TODO localize
         }

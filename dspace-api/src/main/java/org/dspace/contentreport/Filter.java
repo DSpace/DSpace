@@ -277,7 +277,9 @@ public enum Filter {
     @JsonProperty("has_restricted_original")
     HAS_RESTRICTED_ORIGINAL(FilterCategory.PERMISSION, (context, item) -> {
         return item.getBundles().stream()
-                .filter(bundle -> bundle.getName().equals(BundleName.ORIGINAL.name()))
+                .filter(bundle -> {
+                    return bundleService.getName(bundle).equals(BundleName.ORIGINAL.name());
+                })
                 .map(Bundle::getBitstreams)
                 .flatMap(List::stream)
                 .anyMatch(bit -> {
@@ -298,7 +300,9 @@ public enum Filter {
     @JsonProperty("has_restricted_thumbnail")
     HAS_RESTRICTED_THUMBNAIL(FilterCategory.PERMISSION, (context, item) -> {
         return item.getBundles().stream()
-                .filter(bundle -> bundle.getName().equals(BundleName.THUMBNAIL.name()))
+                .filter(bundle -> {
+                    return bundleService.getName(bundle).equals(BundleName.THUMBNAIL.name());
+                })
                 .map(Bundle::getBitstreams)
                 .flatMap(List::stream)
                 .anyMatch(bit -> {

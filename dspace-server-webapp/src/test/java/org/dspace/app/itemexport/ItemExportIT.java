@@ -348,11 +348,11 @@ public class ItemExportIT extends AbstractControllerIntegrationTest {
         assertEquals(2, process.getBitstreams().size());
         assertEquals(1,
                 process.getBitstreams().stream()
-                .filter(b -> StringUtils.contains(b.getName(), ".log"))
+                .filter(b -> StringUtils.contains(bitstreamService.getName(b), ".log"))
                 .count());
         assertEquals(1,
                 process.getBitstreams().stream()
-                .filter(b -> StringUtils.contains(b.getName(), ".zip"))
+                .filter(b -> StringUtils.contains(bitstreamService.getName(b), ".zip"))
                 .count());
     }
 }

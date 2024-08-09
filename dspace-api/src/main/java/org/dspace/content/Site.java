@@ -13,8 +13,6 @@ import jakarta.persistence.Transient;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Represents the root of the DSpace Archive.
@@ -23,9 +21,6 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 @Entity
 @Table(name = "site")
 public class Site extends CacheableDSpaceObject {
-    @Transient
-    SiteService siteService;
-
     /**
      * Protected constructor, create object using:
      * {@link org.dspace.content.service.SiteService#createSite(Context)}
@@ -43,10 +38,4 @@ public class Site extends CacheableDSpaceObject {
         return Constants.SITE;
     }
 
-    /**
-     * @deprecated use {@link org.dspace.content.service.SiteService#getName} instead.
-     */
-    public String getName() {
-        return siteService.getName(this);
-    }
 }

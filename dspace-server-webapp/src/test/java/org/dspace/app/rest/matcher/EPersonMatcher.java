@@ -87,7 +87,7 @@ public class EPersonMatcher {
     public static Matcher<? super Object> matchProperties(EPerson ePerson) {
         return allOf(
                 hasJsonPath("$.uuid", is(ePerson.getID().toString())),
-                hasJsonPath("$.name", is(ePerson.getName())),
+                hasJsonPath("$.name", is(epersonService.getName(ePerson))),
                 hasJsonPath("$.type", is("eperson")),
                 hasJsonPath("$.canLogIn", not(empty())),
                 hasJsonPath("$.metadata", Matchers.allOf(

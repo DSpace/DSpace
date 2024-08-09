@@ -244,7 +244,7 @@ public class PackageUtils {
             List<Bitstream> bitstreams = bundle.getBitstreams();
 
             for (Bitstream bitstream : bitstreams) {
-                if (bsName.equals(bitstream.getName())) {
+                if (bsName.equals(bitstreamService.getName(bitstream))) {
                     return bitstream;
                 }
             }
@@ -295,9 +295,11 @@ public class PackageUtils {
      * @return true if this bundle name indicates it is a meta-info bundle.
      */
     public static boolean isMetaInfoBundle(Bundle bn) {
-        return (bn.getName().equals(Constants.LICENSE_BUNDLE_NAME) ||
-            bn.getName().equals(CreativeCommonsService.CC_BUNDLE_NAME) ||
-            bn.getName().equals(Constants.METADATA_BUNDLE_NAME));
+        if (bundleService.getName(bn).equals(Constants.LICENSE_BUNDLE_NAME) ||
+            bundleService.getName(bn).equals(CreativeCommonsService.CC_BUNDLE_NAME)) {
+            return true;
+        }
+        return (bundleService.getName(bn).equals(Constants.METADATA_BUNDLE_NAME));
     }
 
     /**

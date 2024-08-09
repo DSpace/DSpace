@@ -49,7 +49,7 @@ public class FeedContentDisseminator extends AbstractSimpleDC
 
             List<Bundle> bundles = item.getBundles();
             for (Bundle bundle : bundles) {
-                if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName())) {
+                if (Constants.CONTENT_BUNDLE_NAME.equals(bundleService.getName(bundle))) {
                     List<Bitstream> bitstreams = bundle
                         .getBitstreams();
                     for (Bitstream bitstream : bitstreams) {
@@ -112,10 +112,10 @@ public class FeedContentDisseminator extends AbstractSimpleDC
         String bsUrl = urlManager.getBitstreamUrl(bitstream);
 
         entry.setId(bsUrl);
-        entry.setTitle(bitstream.getName());
+        entry.setTitle(bitstreamService.getName(bitstream));
         String desc = bitstreamService.getDescription(bitstream);
         if ("".equals(desc) || desc == null) {
-            desc = bitstream.getName();
+            desc = bitstreamService.getName(bitstream);
         }
         entry.setSummary(desc);
         entry.setUpdated(new Date()); // required, though content is spurious

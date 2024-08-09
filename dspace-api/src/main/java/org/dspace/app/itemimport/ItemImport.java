@@ -201,7 +201,8 @@ public class ItemImport extends DSpaceRunnable<ItemImportScriptConfiguration> {
                 mycollections.add(collection);
 
                 // print progress info
-                handler.logInfo((i == 0 ? "Owning " : "") + "Collection: " + collection.getName());
+                handler.logInfo((i == 0 ? "Owning " : "") + "Collection: " + collection.collectionService.getName(
+                    collection));
             }
         }
         // end validation

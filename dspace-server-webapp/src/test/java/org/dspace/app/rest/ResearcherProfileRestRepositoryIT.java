@@ -297,7 +297,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     public void testCreateAndReturn() throws Exception {
 
         String id = user.getID().toString();
-        String name = user.getName();
+        String name = epersonService.getName(user);
 
         String authToken = getAuthToken(user.getEmail(), password);
 
@@ -365,7 +365,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     public void testCreateAndReturnWithAdmin() throws Exception {
 
         String id = user.getID().toString();
-        String name = user.getName();
+        String name = epersonService.getName(user);
 
         configurationService.setProperty("researcher-profile.collection.uuid", null);
 
@@ -1122,7 +1122,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
     @Test
     public void researcherProfileClaim() throws Exception {
         String id = user.getID().toString();
-        String name = user.getName();
+        String name = epersonService.getName(user);
 
         context.turnOffAuthorisationSystem();
 
@@ -2729,7 +2729,7 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
 
         Item publication = ItemBuilder.createItem(context, collection)
             .withTitle(title)
-            .withAuthor(author.getName())
+            .withAuthor(itemService.getName(author))
             .build();
 
         RelationshipBuilder.createRelationshipBuilder(context, author, publication, isAuthorOfPublication).build();

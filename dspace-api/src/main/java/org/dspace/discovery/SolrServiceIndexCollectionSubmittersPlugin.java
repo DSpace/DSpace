@@ -61,7 +61,7 @@ public class SolrServiceIndexCollectionSubmittersPlugin implements SolrServiceIn
                     }
                 } catch (SQLException e) {
                     log.error(LogHelper.getHeader(context, "Error while indexing resource policies",
-                             "Collection: (id " + col.getID() + " type " + col.getName() + ")" ));
+                             "Collection: (id " + col.getID() + " type " + collectionService.getName(col) + ")" ));
                 }
             }
         }

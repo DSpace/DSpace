@@ -114,7 +114,7 @@ public class MostRecentChecksumServiceImpl implements MostRecentChecksumService 
 
         List<Bitstream> unknownBitstreams = bitstreamService.findBitstreamsWithNoRecentChecksum(context);
         for (Bitstream bitstream : unknownBitstreams) {
-            log.info(bitstream + " " + bitstream.getID().toString() + " " + bitstream.getName());
+            log.info(bitstream + " " + bitstream.getID().toString() + " " + bitstreamService.getName(bitstream));
 
             MostRecentChecksum mostRecentChecksum = new MostRecentChecksum();
             mostRecentChecksum.setBitstream(bitstream);

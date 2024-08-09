@@ -252,15 +252,15 @@ public class ItemImportIT extends AbstractEntityIntegrationTest {
         assertNotNull(process.getBitstreams());
         assertEquals(3, process.getBitstreams().size());
         assertEquals(1, process.getBitstreams().stream()
-                .filter(b -> StringUtils.equals(b.getName(), ItemImport.MAPFILE_FILENAME))
+                .filter(b -> StringUtils.equals(bitstreamService.getName(b), ItemImport.MAPFILE_FILENAME))
                 .count());
         assertEquals(1,
                 process.getBitstreams().stream()
-                .filter(b -> StringUtils.contains(b.getName(), ".log"))
+                .filter(b -> StringUtils.contains(bitstreamService.getName(b), ".log"))
                 .count());
         assertEquals(1,
                 process.getBitstreams().stream()
-                .filter(b -> StringUtils.contains(b.getName(), ".zip"))
+                .filter(b -> StringUtils.contains(bitstreamService.getName(b), ".zip"))
                 .count());
     }
 }

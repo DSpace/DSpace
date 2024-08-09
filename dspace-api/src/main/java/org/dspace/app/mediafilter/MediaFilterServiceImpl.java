@@ -329,7 +329,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         boolean overWrite = isForce;
 
         // get bitstream filename, calculate destination filename
-        String newName = formatFilter.getFilteredName(source.getName());
+        String newName = formatFilter.getFilteredName(bitstreamService.getName(source));
 
         // check if destination bitstream exists
         Bundle existingBundle = null;
@@ -342,7 +342,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                 List<Bitstream> bitstreams = bundle.getBitstreams();
 
                 for (Bitstream bitstream : bitstreams) {
-                    if (bitstream.getName().trim().equals(newName.trim())) {
+                    if (bitstreamService.getName(bitstream).trim().equals(newName.trim())) {
                         existingBundle = bundle;
                         existingBitstreams.add(bitstream);
                     }
@@ -456,14 +456,14 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     private List<Bitstream> findDerivativeBitstreams(Item item, Bitstream source, FormatFilter formatFilter)
         throws SQLException {
 
-        String bitstreamName = formatFilter.getFilteredName(source.getName());
+        String bitstreamName = formatFilter.getFilteredName(bitstreamService.getName(source));
         List<Bundle> bundles = itemService.getBundles(item, formatFilter.getBundleName());
 
         return bundles.stream()
                       .flatMap(bundle ->
                           bundle.getBitstreams().stream())
                       .filter(bitstream ->
-                          StringUtils.equals(bitstream.getName().trim(), bitstreamName.trim()))
+                                  StringUtils.equals(bitstreamService.getName(bitstream).trim(), bitstreamName.trim()))
                       .collect(Collectors.toList());
     }
 
@@ -532,7 +532,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         StringBuilder sb = new StringBuilder("ERROR filtering, skipping bitstream:\n");
         sb.append("\tItem Handle: ").append(itemHandle);
         for (Bundle bundle : bundles) {
-            sb.append("\tBundle Name: ").append(bundle.getName());
+            sb.append("\tBundle Name: ").append(bundleService.getName(bundle));
         }
         sb.append("\tFile Size: ").append(bitstream.getSizeBytes());
         sb.append("\tChecksum: ").append(bitstream.getChecksum())

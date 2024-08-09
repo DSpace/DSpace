@@ -342,7 +342,7 @@ public class QASourceRestRepositoryIT extends AbstractControllerIntegrationTest 
         return QAEventBuilder.createTarget(context, item)
             .withSource(source)
             .withTopic(topic)
-            .withTitle(item.getName())
+            .withTitle(itemService.getName(item))
             .build();
     }
 

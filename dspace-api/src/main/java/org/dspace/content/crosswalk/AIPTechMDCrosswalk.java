@@ -234,7 +234,7 @@ public class AIPTechMDCrosswalk implements IngestionCrosswalk, DisseminationCros
             }
         } else if (dso.getType() == Constants.BITSTREAM) {
             Bitstream bitstream = (Bitstream) dso;
-            String bsName = bitstream.getName();
+            String bsName = bitstreamService.getName(bitstream);
             if (bsName != null) {
                 dc.add(makeDC("title", null, bsName));
             }

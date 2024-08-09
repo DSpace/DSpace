@@ -219,7 +219,7 @@ public class ResearcherProfileServiceImpl implements ResearcherProfileService {
 
         context.turnOffAuthorisationSystem();
         itemService.addMetadata(context, item, "dspace", "object", "owner", null,
-                                ePerson.getName(), ePerson.getID().toString(), CF_ACCEPTED);
+                                epersonService.getName(ePerson), ePerson.getID().toString(), CF_ACCEPTED);
         context.restoreAuthSystemState();
 
         return new ResearcherProfile(item);

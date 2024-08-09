@@ -162,7 +162,7 @@ public class LicenseCleanup {
             .create(context, bundle, new ByteArrayInputStream(buffer.toString()
                                                                     .getBytes(StandardCharsets.UTF_8)));
 
-        bitstreamService.setName(context, newBitstream, bitstream.getName());
+        bitstreamService.setName(context, newBitstream, bitstreamService.getName(bitstream));
         bitstreamService.setDescription(context, newBitstream, bitstreamService.getDescription(bitstream));
         bitstreamService.setFormat(context, newBitstream, bitstreamService.getFormat(context, bitstream));
         bitstreamService.setSource(context, newBitstream, bitstreamService.getSource(bitstream));

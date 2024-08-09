@@ -18,6 +18,7 @@ import org.dspace.checker.ChecksumResultCode;
 import org.dspace.checker.ChecksumResultsCollector;
 import org.dspace.checker.MostRecentChecksum;
 import org.dspace.checker.SimpleDispatcher;
+import org.dspace.content.Bitstream;
 import org.dspace.core.Context;
 
 /**
@@ -57,9 +58,10 @@ public class ChecksumCheck extends Check {
             for (MostRecentChecksum bi : collector.arr) {
                 if (!ChecksumResultCode.CHECKSUM_MATCH.equals(bi
                                                                   .getChecksumResult().getResultCode())) {
+                    Bitstream bitstream = bi.getBitstream();
                     ret += String
                         .format("md5 checksum FAILED (%s): %s id: %s bitstream-id: %s\n was: %s\n  is: %s\n",
-                                bi.getChecksumResult(), bi.getBitstream().getName(),
+                                bi.getChecksumResult(), bitstreamService.getName(bitstream),
                                 bi.getBitstream().getInternalId(), bi.getBitstream().getID(),
                                 bi.getExpectedChecksum(),
                                 bi.getCurrentChecksum());
