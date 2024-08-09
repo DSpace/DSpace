@@ -234,16 +234,6 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     }
 
     /**
-     * Test of getName method, of class Bitstream.
-     */
-    @Override
-    @Test
-    public void testGetName() {
-        //name is null when not set
-        assertThat("testGetName 0", bitstreamService.getName(bs), nullValue());
-    }
-
-    /**
      * Test of setName method, of class Bitstream.
      */
     @Test

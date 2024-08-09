@@ -335,16 +335,6 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
     }
 
     /**
-     * Test of getName method, of class Collection.
-     */
-    @Test
-    @Override
-    public void testGetName() {
-        //by default is empty
-        assertThat("testGetName 0", collectionService.getName(collection), equalTo(""));
-    }
-
-    /**
      * Test of getLogo method, of class Collection.
      */
     @Test

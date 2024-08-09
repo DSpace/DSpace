@@ -1154,8 +1154,9 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
         } else if (dso instanceof Collection) {
             // Save this Collection's info to the infoMap
             Collection collection = (Collection) dso;
-            infoMap.put(collection.getHandle(),
-                        collectionService.getTypeText(collection) + valueseparator + collectionService.getName(collection)
+            infoMap.put(
+                collection.getHandle(),
+                collectionService.getTypeText(collection) + valueseparator + collectionService.getName(collection)
             );
 
             // Recursively call method for each Item in Collection

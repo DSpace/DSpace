@@ -188,21 +188,24 @@ public class MediaFilterIT extends AbstractIntegrationTestWithDatabase {
 
     private void checkItemHasBeenNotProcessed(Item item) throws IOException, SQLException, AuthorizeException {
         List<Bundle> textBundles = itemService.getBundles(item, "TEXT");
-        assertTrue("The item " + itemService.getName(item) + " should NOT have the TEXT bundle", textBundles.size() == 0);
+        assertTrue(
+            "The item " + itemService.getName(item) + " should NOT have the TEXT bundle", textBundles.isEmpty()
+        );
     }
 
     private void checkItemHasBeenProcessed(Item item) throws IOException, SQLException, AuthorizeException {
-        String expectedFileName = StringUtils.endsWith(itemService.getName(item), "_a") ? "test.csv.txt" : "test.txt.txt";
-        String expectedContent = StringUtils.endsWith(itemService.getName(item), "_a") ? "data3,3" : "quick brown fox";
+        String itemName = itemService.getName(item);
+        String expectedFileName = StringUtils.endsWith(itemName, "_a") ? "test.csv.txt" : "test.txt.txt";
+        String expectedContent = StringUtils.endsWith(itemName, "_a") ? "data3,3" : "quick brown fox";
         List<Bundle> textBundles = itemService.getBundles(item, "TEXT");
-        assertTrue("The item " + itemService.getName(item) + " has NOT the TEXT bundle", textBundles.size() == 1);
+        assertTrue("The item " + itemName + " has NOT the TEXT bundle", textBundles.size() == 1);
         List<Bitstream> bitstreams = textBundles.get(0).getBitstreams();
-        assertTrue("The item " + itemService.getName(item) + " has NOT exactly 1 bitstream in the TEXT bundle",
+        assertTrue("The item " + itemName + " has NOT exactly 1 bitstream in the TEXT bundle",
                 bitstreams.size() == 1);
         Bitstream bitstream = bitstreams.get(0);
-        assertTrue("The text bitstream in the " + itemService.getName(item) + " is NOT named properly [" + expectedFileName + "]",
+        assertTrue("The text bitstream in the " + itemName + " is NOT named properly [" + expectedFileName + "]",
                 StringUtils.equals(bitstreamService.getName(bitstream), expectedFileName));
-        assertTrue("The text bitstream in the " + itemService.getName(item) + " doesn't contain the proper content ["
+        assertTrue("The text bitstream in the " + itemName + " doesn't contain the proper content ["
                 + expectedContent + "]", StringUtils.contains(getContent(bitstreams.get(0)), expectedContent));
     }
 

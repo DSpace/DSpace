@@ -12,7 +12,6 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.content.Community;
 import org.dspace.content.service.CommunityService;
-import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.discovery.IndexableObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

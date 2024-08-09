@@ -497,8 +497,10 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         log.info(LogHelper.getHeader(context, "remove_bundle", "item_id="
             + item.getID() + ",bundle_id=" + bundle.getID()));
 
-        context.addEvent(new Event(Event.REMOVE, Constants.ITEM, item.getID(),
-                                   Constants.BUNDLE, bundle.getID(), bundleService.getName(bundle), getIdentifiers(context, item)));
+        context.addEvent(new Event(
+            Event.REMOVE, Constants.ITEM, item.getID(), Constants.BUNDLE, bundle.getID(),
+            bundleService.getName(bundle), getIdentifiers(context, item))
+        );
 
         bundleService.delete(context, bundle);
     }

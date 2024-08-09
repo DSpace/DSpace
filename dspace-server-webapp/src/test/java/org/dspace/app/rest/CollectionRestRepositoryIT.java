@@ -651,8 +651,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                  .andExpect(status().isOk())
                  .andExpect(content().contentType(contentType))
                  .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                         CollectionMatcher.matchProperties(collectionService.getName(col1), col1.getID(), col1.getHandle()),
-                         CollectionMatcher.matchProperties(collectionService.getName(col3), col3.getID(), col3.getHandle())
+                         CollectionMatcher.matchProperties(
+                             collectionService.getName(col1), col1.getID(), col1.getHandle()),
+                         CollectionMatcher.matchProperties(
+                             collectionService.getName(col3), col3.getID(), col3.getHandle())
                          )))
                  .andExpect(jsonPath("$.page.totalElements", is(2)));
 
@@ -660,7 +662,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                  .andExpect(status().isOk())
                  .andExpect(content().contentType(contentType))
                  .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
-                            CollectionMatcher.matchProperties(collectionService.getName(col1), col1.getID(), col1.getHandle())
+                            CollectionMatcher.matchProperties(
+                                collectionService.getName(col1), col1.getID(), col1.getHandle())
                             )))
                  .andExpect(jsonPath("$.page.totalElements", is(1)));
 
@@ -669,9 +672,12 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                  .andExpect(status().isOk())
                  .andExpect(content().contentType(contentType))
                  .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                         CollectionMatcher.matchProperties(collectionService.getName(col1), col1.getID(), col1.getHandle()),
-                         CollectionMatcher.matchProperties(collectionService.getName(col2), col2.getID(), col2.getHandle()),
-                         CollectionMatcher.matchProperties(collectionService.getName(col3), col3.getID(), col3.getHandle())
+                         CollectionMatcher.matchProperties(
+                             collectionService.getName(col1), col1.getID(), col1.getHandle()),
+                         CollectionMatcher.matchProperties(
+                             collectionService.getName(col2), col2.getID(), col2.getHandle()),
+                         CollectionMatcher.matchProperties(
+                             collectionService.getName(col3), col3.getID(), col3.getHandle())
                          )))
                  .andExpect(jsonPath("$.page.totalElements", is(3)));
     }
@@ -717,8 +723,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                  .param("query", "collection"))
                  .andExpect(status().isOk())
                  .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                         CollectionMatcher.matchProperties(collectionService.getName(col1), col1.getID(), col1.getHandle()),
-                         CollectionMatcher.matchProperties(collectionService.getName(col3), col3.getID(), col3.getHandle())
+                         CollectionMatcher.matchProperties(
+                             collectionService.getName(col1), col1.getID(), col1.getHandle()),
+                         CollectionMatcher.matchProperties(
+                             collectionService.getName(col3), col3.getID(), col3.getHandle())
                          )))
                  .andExpect(jsonPath("$.page.totalElements", is(2)));
 
@@ -726,8 +734,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                  .param("query", "COLLECTION"))
                  .andExpect(status().isOk())
                  .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                        CollectionMatcher.matchProperties(collectionService.getName(col1), col1.getID(), col1.getHandle()),
-                        CollectionMatcher.matchProperties(collectionService.getName(col3), col3.getID(), col3.getHandle())
+                        CollectionMatcher.matchProperties(
+                            collectionService.getName(col1), col1.getID(), col1.getHandle()),
+                        CollectionMatcher.matchProperties(
+                            collectionService.getName(col3), col3.getID(), col3.getHandle())
                         )))
                  .andExpect(jsonPath("$.page.totalElements", is(2)));
 
@@ -746,8 +756,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .param("query", "auto"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
-                           CollectionMatcher.matchProperties(collectionService.getName(col4), col4.getID(), col4.getHandle())
-                           )))
+                           CollectionMatcher.matchProperties(
+                               collectionService.getName(col4), col4.getID(), col4.getHandle()))))
                 .andExpect(jsonPath("$.page.totalElements", is(1)));
 
         getClient(tokenEPerson2).perform(get("/api/core/collections/search/findSubmitAuthorized")
@@ -760,8 +770,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                  .param("query", "sample"))
                  .andExpect(status().isOk())
                  .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                           CollectionMatcher.matchProperties(collectionService.getName(col1), col1.getID(), col1.getHandle()),
-                           CollectionMatcher.matchProperties(collectionService.getName(col3), col3.getID(), col3.getHandle())
+                           CollectionMatcher.matchProperties(
+                               collectionService.getName(col1), col1.getID(), col1.getHandle()),
+                           CollectionMatcher.matchProperties(
+                               collectionService.getName(col3), col3.getID(), col3.getHandle())
                            )))
                  .andExpect(jsonPath("$.page.totalElements", is(2)));
 
@@ -769,7 +781,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .param("query", "items sample"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
-                           CollectionMatcher.matchProperties(collectionService.getName(col3), col3.getID(), col3.getHandle())
+                           CollectionMatcher.matchProperties(
+                               collectionService.getName(col3), col3.getID(), col3.getHandle())
                            )))
                 .andExpect(jsonPath("$.page.totalElements", is(1)));
 
@@ -777,8 +790,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                  .param("query", "test"))
                  .andExpect(status().isOk())
                  .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                         CollectionMatcher.matchProperties(collectionService.getName(col2), col2.getID(), col2.getHandle()),
-                         CollectionMatcher.matchProperties(collectionService.getName(col4), col4.getID(), col4.getHandle())
+                         CollectionMatcher.matchProperties(
+                             collectionService.getName(col2), col2.getID(), col2.getHandle()),
+                         CollectionMatcher.matchProperties(
+                             collectionService.getName(col4), col4.getID(), col4.getHandle())
                          )))
                  .andExpect(jsonPath("$.page.totalElements", is(2)));
     }
@@ -820,8 +835,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                  .andExpect(status().isOk())
                  .andExpect(content().contentType(contentType))
                  .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                         CollectionMatcher.matchProperties(collectionService.getName(col1), col1.getID(), col1.getHandle()),
-                         CollectionMatcher.matchProperties(collectionService.getName(col3), col3.getID(), col3.getHandle())
+                         CollectionMatcher.matchProperties(
+                             collectionService.getName(col1), col1.getID(), col1.getHandle()),
+                         CollectionMatcher.matchProperties(
+                             collectionService.getName(col3), col3.getID(), col3.getHandle())
                          )))
                  .andExpect(jsonPath("$.page.totalElements", is(2)));
 
@@ -831,7 +848,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
-                           CollectionMatcher.matchProperties(collectionService.getName(col3), col3.getID(), col3.getHandle())
+                           CollectionMatcher.matchProperties(
+                               collectionService.getName(col3), col3.getID(), col3.getHandle())
                            )))
                 .andExpect(jsonPath("$.page.totalElements", is(1)));
     }
@@ -881,7 +899,9 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity).withName("Sub Community Two")
                           .build();
 
-        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 2").build();
+        Collection col2 = CollectionBuilder.createCollection(context, parentCommunity)
+                                           .withName("Collection 2")
+                                           .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col3 = CollectionBuilder.createCollection(context, child2).withName("Collection 3").build();
 
@@ -893,9 +913,12 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                  .andExpect(status().isOk())
                  .andExpect(content().contentType(contentType))
                  .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                         CollectionMatcher.matchProperties(collectionService.getName(col1), col1.getID(), col1.getHandle()),
-                         CollectionMatcher.matchProperties(collectionService.getName(col2), col2.getID(), col2.getHandle()),
-                         CollectionMatcher.matchProperties(collectionService.getName(col3), col3.getID(), col3.getHandle())
+                         CollectionMatcher.matchProperties(
+                             collectionService.getName(col1), col1.getID(), col1.getHandle()),
+                         CollectionMatcher.matchProperties(
+                             collectionService.getName(col2), col2.getID(), col2.getHandle()),
+                         CollectionMatcher.matchProperties(
+                             collectionService.getName(col3), col3.getID(), col3.getHandle())
                          )))
                  .andExpect(jsonPath("$.page.totalElements", is(3)));
 
@@ -904,7 +927,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                  .andExpect(status().isOk())
                  .andExpect(content().contentType(contentType))
                  .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
-                            CollectionMatcher.matchProperties(collectionService.getName(col1), col1.getID(), col1.getHandle())
+                            CollectionMatcher.matchProperties(
+                                collectionService.getName(col1), col1.getID(), col1.getHandle())
                             )))
                  .andExpect(jsonPath("$.page.totalElements", is(1)));
 
@@ -914,9 +938,12 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                  .andExpect(status().isOk())
                  .andExpect(content().contentType(contentType))
                  .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                         CollectionMatcher.matchProperties(collectionService.getName(col1), col1.getID(), col1.getHandle()),
-                         CollectionMatcher.matchProperties(collectionService.getName(col2), col2.getID(), col2.getHandle()),
-                         CollectionMatcher.matchProperties(collectionService.getName(col3), col3.getID(), col3.getHandle())
+                         CollectionMatcher.matchProperties(
+                             collectionService.getName(col1), col1.getID(), col1.getHandle()),
+                         CollectionMatcher.matchProperties(
+                             collectionService.getName(col2), col2.getID(), col2.getHandle()),
+                         CollectionMatcher.matchProperties(
+                             collectionService.getName(col3), col3.getID(), col3.getHandle())
                          )))
                  .andExpect(jsonPath("$.page.totalElements", is(3)));
     }
@@ -1963,8 +1990,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                  .andExpect(status().isOk())
                  .andExpect(content().contentType(contentType))
                  .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                            CollectionMatcher.matchProperties(collectionService.getName(col1), col1.getID(), col1.getHandle()),
-                            CollectionMatcher.matchProperties(collectionService.getName(col2), col2.getID(), col2.getHandle())
+                            CollectionMatcher.matchProperties(
+                                collectionService.getName(col1), col1.getID(), col1.getHandle()),
+                            CollectionMatcher.matchProperties(
+                                collectionService.getName(col2), col2.getID(), col2.getHandle())
                             )))
                  .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(2)))
                  .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
@@ -1990,8 +2019,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                           CollectionMatcher.matchProperties(collectionService.getName(col3), col3.getID(), col3.getHandle()),
-                           CollectionMatcher.matchProperties(collectionService.getName(col4), col4.getID(), col4.getHandle())
+                           CollectionMatcher.matchProperties(
+                               collectionService.getName(col3), col3.getID(), col3.getHandle()),
+                           CollectionMatcher.matchProperties(
+                               collectionService.getName(col4), col4.getID(), col4.getHandle())
                            )))
                 .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(2)))
                 .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
@@ -2020,8 +2051,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                           CollectionMatcher.matchProperties(collectionService.getName(col5), col5.getID(), col5.getHandle()),
-                           CollectionMatcher.matchProperties(collectionService.getName(col6), col6.getID(), col6.getHandle())
+                           CollectionMatcher.matchProperties(
+                               collectionService.getName(col5), col5.getID(), col5.getHandle()),
+                           CollectionMatcher.matchProperties(
+                               collectionService.getName(col6), col6.getID(), col6.getHandle())
                            )))
                 .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(2)))
                 .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
@@ -2050,9 +2083,12 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                           CollectionMatcher.matchProperties(collectionService.getName(col4), col4.getID(), col4.getHandle()),
-                           CollectionMatcher.matchProperties(collectionService.getName(col5), col5.getID(), col5.getHandle()),
-                           CollectionMatcher.matchProperties(collectionService.getName(col6), col6.getID(), col6.getHandle())
+                           CollectionMatcher.matchProperties(
+                               collectionService.getName(col4), col4.getID(), col4.getHandle()),
+                           CollectionMatcher.matchProperties(
+                               collectionService.getName(col5), col5.getID(), col5.getHandle()),
+                           CollectionMatcher.matchProperties(
+                               collectionService.getName(col6), col6.getID(), col6.getHandle())
                            )))
                 .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(3)))
                 .andExpect(jsonPath("$._links.first.href", Matchers.allOf(
@@ -2247,8 +2283,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                  .andExpect(status().isOk())
                  .andExpect(content().contentType(contentType))
                  .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                            CollectionMatcher.matchProperties(collectionService.getName(col1), col1.getID(), col1.getHandle()),
-                            CollectionMatcher.matchProperties(collectionService.getName(col2), col2.getID(), col2.getHandle())
+                            CollectionMatcher.matchProperties(
+                                collectionService.getName(col1), col1.getID(), col1.getHandle()),
+                            CollectionMatcher.matchProperties(
+                                collectionService.getName(col2), col2.getID(), col2.getHandle())
                             )))
                  .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(2)))
                  .andExpect(jsonPath("$.page.size", is(2)))
@@ -2263,8 +2301,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                           CollectionMatcher.matchProperties(collectionService.getName(col3), col3.getID(), col3.getHandle()),
-                           CollectionMatcher.matchProperties(collectionService.getName(col4), col4.getID(), col4.getHandle())
+                           CollectionMatcher.matchProperties(
+                               collectionService.getName(col3), col3.getID(), col3.getHandle()),
+                           CollectionMatcher.matchProperties(
+                               collectionService.getName(col4), col4.getID(), col4.getHandle())
                            )))
                 .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(2)))
                 .andExpect(jsonPath("$.page.size", is(2)))
@@ -2279,7 +2319,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                           CollectionMatcher.matchProperties(collectionService.getName(col5), col5.getID(), col5.getHandle())
+                           CollectionMatcher.matchProperties(
+                               collectionService.getName(col5), col5.getID(), col5.getHandle())
                            )))
                 .andExpect(jsonPath("$._embedded.collections").value(Matchers.hasSize(1)))
                 .andExpect(jsonPath("$.page.size", is(2)))
@@ -2665,9 +2706,12 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                CollectionMatcher.matchProperties(collectionService.getName(collectionA), collectionA.getID(), collectionA.getHandle()),
-                CollectionMatcher.matchProperties(collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle()),
-                CollectionMatcher.matchProperties(collectionService.getName(collectionC), collectionC.getID(), collectionC.getHandle())
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionA), collectionA.getID(), collectionA.getHandle()),
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle()),
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionC), collectionC.getID(), collectionC.getHandle())
             )));
 
         // Verify the search only shows dso's which according to the query
@@ -2675,7 +2719,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
             .param("query", collectionService.getName(collectionB)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                CollectionMatcher.matchProperties(collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
             )));
     }
 
@@ -2715,8 +2760,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                CollectionMatcher.matchProperties(collectionService.getName(collectionA), collectionA.getID(), collectionA.getHandle()),
-                CollectionMatcher.matchProperties(collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionA), collectionA.getID(), collectionA.getHandle()),
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
             )));
 
         // Verify the search only shows dso's which according to the query
@@ -2724,7 +2771,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
             .param("query", collectionService.getName(collectionB)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                CollectionMatcher.matchProperties(collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
             )));
 
         // Verify that a query doesn't show dso's which the user doesn't have rights for
@@ -2760,8 +2808,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                CollectionMatcher.matchProperties(collectionService.getName(collectionA), collectionA.getID(), collectionA.getHandle()),
-                CollectionMatcher.matchProperties(collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionA), collectionA.getID(), collectionA.getHandle()),
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
             )));
 
         // Verify the search only shows dso's which according to the query
@@ -2769,7 +2819,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
             .param("query", collectionService.getName(collectionB)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                CollectionMatcher.matchProperties(collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
             )));
 
         // Verify that a query doesn't show dso's which the user doesn't have rights for
@@ -2806,8 +2857,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                CollectionMatcher.matchProperties(collectionService.getName(collectionA), collectionA.getID(), collectionA.getHandle()),
-                CollectionMatcher.matchProperties(collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionA), collectionA.getID(), collectionA.getHandle()),
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
             )));
 
         // Verify the search only shows dso's which according to the query
@@ -2815,7 +2868,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
             .param("query", collectionService.getName(collectionB)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                CollectionMatcher.matchProperties(collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
             )));
 
         // Verify that a query doesn't show dso's which the user doesn't have rights for
@@ -2896,9 +2950,12 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                CollectionMatcher.matchProperties(collectionService.getName(collectionA), collectionA.getID(), collectionA.getHandle()),
-                CollectionMatcher.matchProperties(collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle()),
-                CollectionMatcher.matchProperties(collectionService.getName(collectionC), collectionC.getID(), collectionC.getHandle())
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionA), collectionA.getID(), collectionA.getHandle()),
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle()),
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionC), collectionC.getID(), collectionC.getHandle())
             )));
 
         // Verify the search only shows dso's which according to the query
@@ -2906,7 +2963,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
             .param("query", collectionService.getName(collectionB)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                CollectionMatcher.matchProperties(collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
             )));
     }
 
@@ -2944,8 +3002,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                CollectionMatcher.matchProperties(collectionService.getName(collectionA), collectionA.getID(), collectionA.getHandle()),
-                CollectionMatcher.matchProperties(collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionA), collectionA.getID(), collectionA.getHandle()),
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
             )));
 
         // Verify the search only shows dso's which according to the query
@@ -2953,7 +3013,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
             .param("query", collectionService.getName(collectionB)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                CollectionMatcher.matchProperties(collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
             )));
 
         // Verify that a query doesn't show dso's which the user doesn't have rights for
@@ -2999,8 +3060,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                CollectionMatcher.matchProperties(collectionService.getName(collectionA), collectionA.getID(), collectionA.getHandle()),
-                CollectionMatcher.matchProperties(collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionA), collectionA.getID(), collectionA.getHandle()),
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
             )));
 
         // Verify the search only shows dso's which according to the query
@@ -3008,7 +3071,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
             .param("query", collectionService.getName(collectionB)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                CollectionMatcher.matchProperties(collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
             )));
 
         // Verify that a query doesn't show dso's which the user doesn't have rights for
@@ -3054,8 +3118,10 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient(token).perform(get("/api/core/collections/search/findAdminAuthorized"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                CollectionMatcher.matchProperties(collectionService.getName(collectionA), collectionA.getID(), collectionA.getHandle()),
-                CollectionMatcher.matchProperties(collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionA), collectionA.getID(), collectionA.getHandle()),
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
             )));
 
         // Verify the search only shows dso's which according to the query
@@ -3063,7 +3129,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
             .param("query", collectionService.getName(collectionB)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.collections", Matchers.containsInAnyOrder(
-                CollectionMatcher.matchProperties(collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
+                CollectionMatcher.matchProperties(
+                    collectionService.getName(collectionB), collectionB.getID(), collectionB.getHandle())
             )));
 
         // Verify that a query doesn't show dso's which the user doesn't have rights for
@@ -3268,7 +3335,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                .param("query", "MyTest"))
                                .andExpect(status().isOk())
                                .andExpect(jsonPath("$._embedded.collections", Matchers.contains(CollectionMatcher
-                                          .matchProperties(collectionService.getName(col1), col1.getID(), col1.getHandle())
+                                          .matchProperties(
+                                              collectionService.getName(col1), col1.getID(), col1.getHandle())
                                           )))
                                .andExpect(jsonPath("$.page.totalElements", is(1)));
 
@@ -3326,7 +3394,8 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                                .param("query", "MyTest"))
                                .andExpect(status().isOk())
                                .andExpect(jsonPath("$._embedded.collections", Matchers.contains(CollectionMatcher
-                                          .matchProperties(collectionService.getName(col1), col1.getID(), col1.getHandle())
+                                          .matchProperties(
+                                              collectionService.getName(col1), col1.getID(), col1.getHandle())
                                           )))
                                .andExpect(jsonPath("$.page.totalElements", is(1)));
     }

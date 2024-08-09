@@ -100,12 +100,19 @@ public class IIIFSharedUtils {
      * @return true if the bundle can contain bitstreams to use as IIIF resources
      */
     public static boolean isIIIFBundle(Bundle b) {
-        return !StringUtils.equalsAnyIgnoreCase(bundleService.getName(b), Constants.LICENSE_BUNDLE_NAME,
-                                                Constants.METADATA_BUNDLE_NAME, CreativeCommonsServiceImpl.CC_BUNDLE_NAME, "THUMBNAIL",
-                                                "BRANDED_PREVIEW", "TEXT", OTHER_CONTENT_BUNDLE)
-            && b.getMetadata().stream()
-                .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
-                .noneMatch(m -> m.getValue().equalsIgnoreCase("false") || m.getValue().equalsIgnoreCase("no"));
+        return !StringUtils.equalsAnyIgnoreCase(
+            bundleService.getName(b),
+            Constants.LICENSE_BUNDLE_NAME,
+            Constants.METADATA_BUNDLE_NAME,
+            CreativeCommonsServiceImpl.CC_BUNDLE_NAME,
+            "THUMBNAIL",
+            "BRANDED_PREVIEW",
+            "TEXT",
+            OTHER_CONTENT_BUNDLE
+        ) && b.getMetadata().
+              stream()
+              .filter(m -> m.getMetadataField().toString('.').contentEquals(METADATA_IIIF_ENABLED))
+              .noneMatch(m -> m.getValue().equalsIgnoreCase("false") || m.getValue().equalsIgnoreCase("no"));
     }
 
     /**

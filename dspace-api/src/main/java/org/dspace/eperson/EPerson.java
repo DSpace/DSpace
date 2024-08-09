@@ -26,7 +26,6 @@ import org.dspace.content.DSpaceObjectLegacySupport;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.HibernateProxyHelper;
-import org.dspace.eperson.service.EPersonService;
 
 /**
  * Class representing an e-person.

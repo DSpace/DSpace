@@ -241,10 +241,16 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
         setters to the item object
     */
 
+    /**
+     * @deprecated this should become a {@link BitstreamFormatService} method!
+     */
     public void setShortDescription(Context context, String s) throws SQLException {
         getBitstreamFormatService().setShortDescription(context, this, s);
     }
 
+    /**
+     * @deprecated this should become a {@link BitstreamFormatService} method!
+     */
     public void setSupportLevel(int sl) {
         getBitstreamFormatService().setSupportLevel(this, sl);
     }

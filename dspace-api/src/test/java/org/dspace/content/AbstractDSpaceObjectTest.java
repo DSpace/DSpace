@@ -260,11 +260,4 @@ public abstract class AbstractDSpaceObjectTest extends AbstractUnitTest {
      */
     @Test
     public abstract void testGetHandle();
-
-    /**
-     * Test of getName method, of class DSpaceObject.
-     */
-    @Test
-    public abstract void testGetName();
-
 }

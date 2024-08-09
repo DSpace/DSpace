@@ -87,7 +87,7 @@ public class FullTextContentStreams extends ContentStreamBase {
                         log.debug("Added BitStream: "
                                 + fulltextBitstream.getStoreNumber() + " "
                                 + fulltextBitstream.getSequenceID() + " "
-                                + bitstreamService.getName(fulltextBitstream));
+                                + getBitstreamService().getName(fulltextBitstream));
                     } else {
                         log.error("Found a NULL bitstream when processing full-text files: item handle:" + sourceInfo);
                     }
@@ -171,12 +171,12 @@ public class FullTextContentStreams extends ContentStreamBase {
         }
 
         public String getContentType(final Context context) throws SQLException {
-            BitstreamFormat format = bitstream != null ? bitstreamService.getFormat(context, bitstream) : null;
+            BitstreamFormat format = bitstream != null ? getBitstreamService().getFormat(context, bitstream) : null;
             return format == null ? null : StringUtils.trimToEmpty(format.getMIMEType());
         }
 
         public String getFileName() {
-            return bitstream != null ? StringUtils.trimToEmpty(bitstreamService.getName(bitstream)) : null;
+            return bitstream != null ? StringUtils.trimToEmpty(getBitstreamService().getName(bitstream)) : null;
         }
 
         public long getSize() {

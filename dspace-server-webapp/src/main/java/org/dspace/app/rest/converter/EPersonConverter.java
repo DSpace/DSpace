@@ -9,7 +9,6 @@ package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -9,7 +9,6 @@ package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.projection.Projection;
-import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;

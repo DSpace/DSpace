@@ -88,6 +88,7 @@ public class FullTextContentStreamsTest {
             .thenReturn(new ByteArrayInputStream("This is text 3".getBytes(StandardCharsets.UTF_8)));
 
         streams.bitstreamService = bitstreamService;
+        streams.bundleService = bundleService;
     }
 
     @Test

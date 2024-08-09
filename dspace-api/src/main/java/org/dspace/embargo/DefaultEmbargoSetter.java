@@ -97,7 +97,7 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
         DCDate liftDate = EmbargoServiceFactory.getInstance().getEmbargoService().getEmbargoTermsAsDate(context, item);
         for (Bundle bn : item.getBundles()) {
             // Skip the LICENSE and METADATA bundles, they stay world-readable
-            String bnn = bundleService.getName(bn);
+            String bnn = getBundleService().getName(bn);
             if (!(bnn.equals(Constants.LICENSE_BUNDLE_NAME) || bnn.equals(Constants.METADATA_BUNDLE_NAME) || bnn
                 .equals(CreativeCommonsServiceImpl.CC_BUNDLE_NAME))) {
                 //AuthorizeManager.removePoliciesActionFilter(context, bn, Constants.READ);
@@ -166,7 +166,7 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
         throws SQLException, AuthorizeException, IOException {
         for (Bundle bn : item.getBundles()) {
             // Skip the LICENSE and METADATA bundles, they stay world-readable
-            String bnn = bundleService.getName(bn);
+            String bnn = getBundleService().getName(bn);
             if (!(bnn.equals(Constants.LICENSE_BUNDLE_NAME) || bnn.equals(Constants.METADATA_BUNDLE_NAME) || bnn
                 .equals(CreativeCommonsServiceImpl.CC_BUNDLE_NAME))) {
                 // don't report on "TEXT" or "THUMBNAIL" bundles; those
@@ -193,7 +193,7 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
                             System.out.println(
                                 "CHECK WARNING: Item " + item.getHandle() +
                                     ", Bitstream " + getBitstreamService().getName(bs)
-                                    + " (in Bundle " + bundleService.getName(bn)
+                                    + " (in Bundle " + getBundleService().getName(bn)
                                     + ") allows READ by " + ((rp.getEPerson() != null)
                                     ? "Group " + rp.getGroup().getName()
                                     : "EPerson " + getEPersonService().getFullName(rp.getEPerson())));

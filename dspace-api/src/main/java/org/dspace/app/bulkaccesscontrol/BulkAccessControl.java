@@ -404,9 +404,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         return searchService.search(context, discoverQuery)
                             .getIndexableObjects()
                             .stream()
-                            .map(indexableObject ->
-                                ((IndexableItem) indexableObject).getIndexedObject())
-                            .collect(Collectors.toList())
+                            .map(indexableObject -> ((IndexableItem) indexableObject).getIndexedObject())
                             .iterator();
     }
 
@@ -641,7 +639,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
                .append(mode.equals(ADD_MODE) ? " with " : " to ")
                .append("access conditions:");
 
-        AppendAccessConditionsInfo(message, accessConditions);
+        appendAccessConditionsInfo(message, accessConditions);
 
         handler.logInfo(message.toString());
 
@@ -650,7 +648,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         }
     }
 
-    private void AppendAccessConditionsInfo(StringBuilder message, List<AccessCondition> accessConditions) {
+    private void appendAccessConditionsInfo(StringBuilder message, List<AccessCondition> accessConditions) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         message.append("{");
 

@@ -17,7 +17,6 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
-import org.dspace.content.service.DSpaceObjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

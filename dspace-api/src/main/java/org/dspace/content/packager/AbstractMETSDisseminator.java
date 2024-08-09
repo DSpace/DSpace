@@ -429,7 +429,9 @@ public abstract class AbstractMETSDisseminator
                                                                  bundle, Constants.READ)) {
                         if (unauth != null &&
                             (unauth.equalsIgnoreCase("skip"))) {
-                            log.warn("Skipping Bundle[\"" + bundleService.getName(bundle) + "\"] because you are not authorized to read it.");
+                            log.warn(
+                                "Skipping Bundle[\"" + bundleService.getName(bundle)
+                                    + "\"] because you are not authorized to read it.");
                             continue;
                         } else {
                             throw new AuthorizeException(
@@ -925,9 +927,9 @@ public abstract class AbstractMETSDisseminator
                      * out which bitstream to be in the same group as
                      */
                     String groupID = "GROUP_" + bitstreamIDstart + uuid;
-                    if ((bundleService.getName(bundle) != null)) {
-                        if (bundleService.getName(bundle).equals("THUMBNAIL") ||
-                        bundleService.getName(bundle).startsWith("TEXT")) {
+                    String bundleName = bundleService.getName(bundle);
+                    if (bundleName != null) {
+                        if (List.of("THUMBNAIL", "TEXT").contains(bundleName)) {
                             // Try and find the original bitstream, and chuck the
                             // derived bitstream in the same group
                             Bitstream original = findOriginalBitstream(

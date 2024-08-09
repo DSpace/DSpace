@@ -105,8 +105,8 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
                 .andExpect(status().isOk());
         getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/owningCollection"))
                    .andExpect(jsonPath("$",
-                                       is(CollectionMatcher
-                                                  .matchCollectionEntry(collectionService.getName(col2), col2.getID(), col2.getHandle())
+                                       is(CollectionMatcher.matchCollectionEntry(
+                                           collectionService.getName(col2), col2.getID(), col2.getHandle())
                                        )));
     }
 
@@ -159,8 +159,8 @@ public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControll
                 .andExpect(status().isOk());
         getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/owningCollection"))
                    .andExpect(jsonPath("$",
-                                       is(CollectionMatcher
-                                                  .matchCollectionEntry(collectionService.getName(col2), col2.getID(), col2.getHandle())
+                                       is(CollectionMatcher.matchCollectionEntry(
+                                           collectionService.getName(col2), col2.getID(), col2.getHandle())
                                        )));
 
 

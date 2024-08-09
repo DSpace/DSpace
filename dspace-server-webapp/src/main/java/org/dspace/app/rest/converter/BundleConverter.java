@@ -10,7 +10,6 @@ package org.dspace.app.rest.converter;
 import org.dspace.app.rest.model.BundleRest;
 import org.dspace.content.Bundle;
 import org.dspace.content.service.BundleService;
-import org.dspace.content.service.DSpaceObjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

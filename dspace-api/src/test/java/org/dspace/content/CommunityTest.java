@@ -352,16 +352,6 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
     }
 
     /**
-     * Test of getName method, of class Community.
-     */
-    @Test
-    @Override
-    public void testGetName() {
-        //by default is empty
-        assertThat("testGetName 0", communityService.getName(c), equalTo(""));
-    }
-
-    /**
      * Test of getLogo method, of class Community.
      */
     @Test

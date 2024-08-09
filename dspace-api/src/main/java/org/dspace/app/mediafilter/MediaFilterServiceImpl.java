@@ -194,7 +194,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             // clear item objects from context cache and internal cache
             c.uncacheEntity(currentItem);
             // commit after each item to release DB resources
-            c.commit();
+            c.commit();// todo: Item disappears from Solr here!
             currentItem = null;
         }
     }
@@ -456,14 +456,14 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     private List<Bitstream> findDerivativeBitstreams(Item item, Bitstream source, FormatFilter formatFilter)
         throws SQLException {
 
-        String bitstreamName = formatFilter.getFilteredName(bitstreamService.getName(source));
+        String sourceName = formatFilter.getFilteredName(bitstreamService.getName(source));
         List<Bundle> bundles = itemService.getBundles(item, formatFilter.getBundleName());
 
         return bundles.stream()
                       .flatMap(bundle ->
                           bundle.getBitstreams().stream())
                       .filter(bitstream ->
-                                  StringUtils.equals(bitstreamService.getName(bitstream).trim(), bitstreamName.trim()))
+                                  StringUtils.equals(bitstreamService.getName(bitstream).trim(), sourceName.trim()))
                       .collect(Collectors.toList());
     }
 

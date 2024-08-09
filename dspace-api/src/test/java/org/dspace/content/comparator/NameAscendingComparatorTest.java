@@ -54,8 +54,8 @@ public class NameAscendingComparatorTest {
 
     @Test
     public void testCompareGreaterThan() throws Exception {
-        when(dsoService.getName(dso1)).thenReturn("a");
-        when(dsoService.getName(dso2)).thenReturn("b");
+        when(dsoService.getName(dso1)).thenReturn("b");
+        when(dsoService.getName(dso2)).thenReturn("a");
 
         assertTrue(comparator.compare(dso1, dso2) > 0);
     }

@@ -366,6 +366,7 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
         //indexingService.commit();
         context.restoreAuthSystemState();
         context.setCurrentUser(admin);
+
         List<PotentialDuplicate> potentialDuplicates =
                 duplicateDetectionService.getPotentialDuplicates(context, workflowItem1.getItem());
 

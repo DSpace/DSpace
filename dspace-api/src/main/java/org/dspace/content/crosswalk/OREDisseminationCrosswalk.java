@@ -247,9 +247,10 @@ public class OREDisseminationCrosswalk
 
                 // metadata about the bitstream
                 rdfDescription = new Element("Description", RDF_NS);
-                rdfDescription.setAttribute("about",
-                                            dsUrl + "/bitstream/handle/" + item.getHandle() + "/" + encodeForURL(
-                                                bitstreamService.getName(bs)) + "?sequence=" + bs.getSequenceID(), RDF_NS);
+                rdfDescription.setAttribute(
+                    "about", dsUrl + "/bitstream/handle/" + item.getHandle() + "/" + encodeForURL(
+                        bitstreamService.getName(bs)) + "?sequence=" + bs.getSequenceID(), RDF_NS
+                );
 
                 rdfType = new Element("type", RDF_NS);
                 rdfType.setAttribute("resource", DS_NS.getURI() + "DSpaceBitstream", RDF_NS);

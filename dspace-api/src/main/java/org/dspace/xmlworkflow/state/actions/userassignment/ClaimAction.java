@@ -17,16 +17,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xmlworkflow.Role;
 import org.dspace.xmlworkflow.RoleMembers;
 import org.dspace.xmlworkflow.WorkflowConfigurationException;
@@ -35,6 +32,7 @@ import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.actions.ActionResult;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Processing class for an action where x number of users
@@ -46,13 +44,17 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  * @author Mark Diggory (markd at atmire dot com)
  */
 public class ClaimAction extends UserSelectionAction {
-    private final ConfigurationService configurationService
-            = DSpaceServicesFactory.getInstance().getConfigurationService();
+    @Autowired
+    protected ConfigurationService configurationService;
 
-    private final EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    @Autowired
+    protected EPersonService epersonService;
 
-    private final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-    private final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    @Autowired
+    protected CollectionService collectionService;
+
+    @Autowired
+    protected ItemService itemService;
 
     @Override
     public void activate(Context context, XmlWorkflowItem wfItem) throws SQLException, IOException, AuthorizeException {
@@ -102,8 +104,8 @@ public class ClaimAction extends UserSelectionAction {
             Item item = wfi.getItem();
             xmlWorkflowService.alertUsersOnTaskActivation(c, wfi, "submit_task", roleMembers.getAllUniqueMembers(c),
                     //The arguments
-                                                          itemService.getName(item),
-                                                          collectionService.getName(collection),
+                    itemService.getName(item),
+                    collectionService.getName(collection),
                     submitterName,
                     //TODO: message
                     "New task available.",

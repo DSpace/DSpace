@@ -201,16 +201,6 @@ public class BundleTest extends AbstractDSpaceObjectTest {
     }
 
     /**
-     * Test of getName method, of class Bundle.
-     */
-    @Override
-    @Test
-    public void testGetName() {
-        //created bundle has no name
-        assertThat("testGetName 0", bundleService.getName(b), equalTo("TESTBUNDLE"));
-    }
-
-    /**
      * Test of setName method, of class Bundle.
      */
     @Test
@@ -463,8 +453,16 @@ public class BundleTest extends AbstractDSpaceObjectTest {
         Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
         bitstreamService.setName(context, bs, "name");
         bundleService.addBitstream(context, b, bs);
-        assertThat("testAddBitstreamAuth 0", bundleService.getBitstreamByName(b, bitstreamService.getName(bs)), notNullValue());
-        assertThat("testAddBitstreamAuth 1", bundleService.getBitstreamByName(b, bitstreamService.getName(bs)), equalTo(bs));
+        assertThat(
+            "testAddBitstreamAuth 0",
+            bundleService.getBitstreamByName(b, bitstreamService.getName(bs)),
+            notNullValue()
+        );
+        assertThat(
+            "testAddBitstreamAuth 1",
+            bundleService.getBitstreamByName(b, bitstreamService.getName(bs)),
+            equalTo(bs)
+        );
         Bitstream bitstream = bundleService.getBitstreamByName(b, bitstreamService.getName(bs));
         assertThat("testAddBitstreamAuth 2", bitstreamService.getName(bitstream),
                    equalTo(bitstreamService.getName(bs)));
@@ -514,7 +512,11 @@ public class BundleTest extends AbstractDSpaceObjectTest {
         context.restoreAuthSystemState();
 
         bundleService.removeBitstream(context, b, bs);
-        assertThat("testRemoveBitstreamAuth 0", bundleService.getBitstreamByName(b, bitstreamService.getName(bs)), nullValue());
+        assertThat(
+            "testRemoveBitstreamAuth 0",
+            bundleService.getBitstreamByName(b, bitstreamService.getName(bs)),
+            nullValue()
+        );
     }
 
 

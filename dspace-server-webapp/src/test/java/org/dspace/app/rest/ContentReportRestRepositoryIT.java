@@ -76,13 +76,15 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
         String token = getAuthToken(admin.getEmail(), password);
 
         Map<Filter, Integer> valuesCol1 = Map.of(Filter.IS_DISCOVERABLE, 1);
-        FilteredCollection fcol1 = FilteredCollection.of(collectionService.getName(col1), col1.getHandle(),
-                                                         communityService.getName(parentCommunity), parentCommunity.getHandle(),
-                                                         1, 1, valuesCol1, true);
+        FilteredCollection fcol1 = FilteredCollection.of(
+            collectionService.getName(col1), col1.getHandle(),
+            communityService.getName(parentCommunity), parentCommunity.getHandle(),
+            1, 1, valuesCol1, true);
         Map<Filter, Integer> valuesCol2 = Map.of(Filter.IS_DISCOVERABLE, 2);
-        FilteredCollection fcol2 = FilteredCollection.of(collectionService.getName(col2), col2.getHandle(),
-                                                         communityService.getName(parentCommunity), parentCommunity.getHandle(),
-                                                         2, 2, valuesCol2, true);
+        FilteredCollection fcol2 = FilteredCollection.of(
+            collectionService.getName(col2), col2.getHandle(),
+            communityService.getName(parentCommunity), parentCommunity.getHandle(),
+            2, 2, valuesCol2, true);
 
         FilteredCollectionsQuery query = FilteredCollectionsQuery.of(Set.of(Filter.IS_DISCOVERABLE));
 

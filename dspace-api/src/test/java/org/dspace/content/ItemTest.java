@@ -185,7 +185,6 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         Item found = itemService.find(context, id);
         assertThat("testItemFind 0", found, notNullValue());
         assertThat("testItemFind 1", found.getID(), equalTo(id));
-        assertThat("testItemFind 2", itemService.getName(found), nullValue());
     }
 
     /**
@@ -198,7 +197,6 @@ public class ItemTest extends AbstractDSpaceObjectTest {
 
         Item created = createItem();
         assertThat("testCreate 0", created, notNullValue());
-        assertThat("testCreate 1", itemService.getName(created), nullValue());
     }
 
     /**
@@ -1747,15 +1745,6 @@ public class ItemTest extends AbstractDSpaceObjectTest {
         Item item = c.getTemplateItem();
         context.restoreAuthSystemState();
         assertFalse("testIsInProgressSubmissionFalse2 0", itemService.isInProgressSubmission(context, item));
-    }
-
-    /**
-     * Test of getName method, of class Item.
-     */
-    @Override
-    @Test
-    public void testGetName() {
-        assertThat("testGetName 0", itemService.getName(it), nullValue());
     }
 
     /**

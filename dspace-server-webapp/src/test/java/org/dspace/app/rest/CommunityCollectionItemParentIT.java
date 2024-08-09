@@ -118,8 +118,8 @@ public class CommunityCollectionItemParentIT extends AbstractControllerIntegrati
                             colAA1.getID(),
                             colAA1.getHandle()))))
                         .andExpect(jsonPath("$", Matchers
-                            .not(is(CollectionMatcher
-                                        .matchCollectionEntry(collectionService.getName(colAA2), colAA2.getID(), colAA2.getHandle())))));
+                            .not(is(CollectionMatcher.matchCollectionEntry(
+                                collectionService.getName(colAA2), colAA2.getID(), colAA2.getHandle())))));
 
     }
 
@@ -133,8 +133,8 @@ public class CommunityCollectionItemParentIT extends AbstractControllerIntegrati
                             colAA1.getID(),
                             colAA1.getHandle()))))
                         .andExpect(jsonPath("$", Matchers
-                            .not(is(CollectionMatcher
-                                        .matchCollectionEntry(collectionService.getName(colAA2), colAA2.getID(), colAA2.getHandle())))));
+                            .not(is(CollectionMatcher.matchCollectionEntry(
+                                collectionService.getName(colAA2), colAA2.getID(), colAA2.getHandle())))));
     }
 
     @Test
@@ -147,8 +147,8 @@ public class CommunityCollectionItemParentIT extends AbstractControllerIntegrati
                             colAA2.getID(),
                             colAA2.getHandle()))))
                         .andExpect(jsonPath("$", Matchers
-                            .not(is(CollectionMatcher
-                                        .matchCollectionEntry(collectionService.getName(colAA1), colAA1.getID(), colAA1.getHandle())))));
+                            .not(is(CollectionMatcher.matchCollectionEntry(
+                                collectionService.getName(colAA1), colAA1.getID(), colAA1.getHandle())))));
 
     }
 

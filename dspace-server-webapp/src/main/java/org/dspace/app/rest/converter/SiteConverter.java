@@ -10,7 +10,6 @@ package org.dspace.app.rest.converter;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Site;
-import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.SiteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
