@@ -123,8 +123,7 @@ public class OptimizeSelectCollection {
         System.out.println("This user is permitted to submit to the following collections.");
 
         for (Collection collection : collections) {
-            System.out.println(" - " + collection.getHandle() + " -- " + collection.collectionService.getName(
-                collection));
+            System.out.println(" - " + collection.getHandle() + " -- " + collectionService.getName(collection));
         }
         System.out.println("Total: " + collections.size());
     }

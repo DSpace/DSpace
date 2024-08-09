@@ -16,6 +16,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BundleService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -27,6 +29,7 @@ import org.dspace.statistics.util.SpiderDetector;
 public class BitstreamEventProcessor extends ExportEventProcessor {
 
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
 
 
     private Item item;

@@ -26,6 +26,8 @@ import org.dspace.content.DCDate;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
@@ -42,6 +44,8 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
                                                                                    .getBitstreamFormatService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
+    protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
     public AddBitstreamsAction() {
         //empty
@@ -160,10 +164,10 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
                     List<Bitstream> bitstreams = b.getBitstreams();
                     for (Bitstream bsm : bitstreams) {
                         if (bitstreamService.getName(bsm).equals(ce.filename)) {
-                            throw new IllegalArgumentException("Duplicate bundle + filename cannot be added: "
-                                                                   + b.bundleService.getName(
-                                b) + " + " + bsm.bitreamService.getName(
-                                bsm));
+                            throw new IllegalArgumentException(
+                                "Duplicate bundle + filename cannot be added: "
+                                    + bundleService.getName(b) + " + " + bitstreamService.getName(bsm)
+                            );
                         }
                     }
                 }

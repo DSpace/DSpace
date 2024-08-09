@@ -46,6 +46,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.ProcessStatus;
 import org.dspace.content.Relationship;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.scripts.DSpaceCommandLineParameter;
@@ -73,6 +74,8 @@ public class ItemImportIT extends AbstractEntityIntegrationTest {
 
     @Autowired
     private ItemService itemService;
+    @Autowired
+    private BitstreamService bitstreamService;
     @Autowired
     private RelationshipService relationshipService;
     @Autowired

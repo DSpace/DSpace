@@ -24,6 +24,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.Site;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.service.HandleService;
@@ -48,6 +49,9 @@ public class UsageReportUtils {
 
     @Autowired
     private HandleService handleService;
+
+    @Autowired
+    private ContentServiceFactory contentServiceFactory;
 
     public static final String TOTAL_VISITS_REPORT_ID = "TotalVisits";
     public static final String TOTAL_VISITS_PER_MONTH_REPORT_ID = "TotalVisitsPerMonth";
@@ -156,7 +160,9 @@ public class UsageReportUtils {
                 if (handle != null) {
                     DSpaceObject dso = handleService.resolveToObject(context, handle);
                     totalVisitPoint.setId(dso != null ? dso.getID().toString() : urlOfItem);
-                    totalVisitPoint.setLabel(dso != null ? dso.getName() : urlOfItem);
+                    totalVisitPoint.setLabel(dso != null
+                                                 ? contentServiceFactory.getDSpaceObjectService(dso).getName(dso)
+                                                 : urlOfItem);
                     totalVisitPoint.addValue("views", Integer.valueOf(dataset.getMatrix()[0][i]));
                     usageReportRest.addPoint(totalVisitPoint);
                 }
@@ -183,10 +189,10 @@ public class UsageReportUtils {
         totalVisitPoint.setType(StringUtils.substringAfterLast(dso.getClass().getName().toLowerCase(), "."));
         totalVisitPoint.setId(dso.getID().toString());
         if (dataset.getColLabels().size() > 0) {
-            totalVisitPoint.setLabel(dso.getName());
+            totalVisitPoint.setLabel(contentServiceFactory.getDSpaceObjectService(dso).getName(dso));
             totalVisitPoint.addValue("views", Integer.valueOf(dataset.getMatrix()[0][0]));
         } else {
-            totalVisitPoint.setLabel(dso.getName());
+            totalVisitPoint.setLabel(contentServiceFactory.getDSpaceObjectService(dso).getName(dso));
             totalVisitPoint.addValue("views", 0);
         }
 

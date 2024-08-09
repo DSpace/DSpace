@@ -14,6 +14,8 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BundleService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
@@ -30,6 +32,8 @@ import org.swordapp.server.UriRegistry;
 public class WorkflowManagerDefault implements WorkflowManager {
     private final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private final BundleService bundleService
+            = ContentServiceFactory.getInstance().getBundleService();
 
     @Override
     public void retrieveServiceDoc(Context context) throws SwordError {

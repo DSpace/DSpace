@@ -35,6 +35,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.core.Context;
 
 /**
@@ -47,6 +48,7 @@ public class FullTextContentStreams extends ContentStreamBase {
 
     protected final Context context;
     protected List<FullTextBitstream> fullTextStreams;
+    protected BundleService bundleService;
     protected BitstreamService bitstreamService;
 
     public FullTextContentStreams(Context context, Item parentItem) throws SQLException {
@@ -73,7 +75,7 @@ public class FullTextContentStreams extends ContentStreamBase {
         List<Bundle> myBundles = parentItem.getBundles();
 
         for (Bundle myBundle : emptyIfNull(myBundles)) {
-            if (StringUtils.equals(FULLTEXT_BUNDLE, bundleService.getName(myBundle))) {
+            if (StringUtils.equals(FULLTEXT_BUNDLE, getBundleService().getName(myBundle))) {
                 // a-ha! grab the text out of the bitstreams
                 List<Bitstream> bitstreams = myBundle.getBitstreams();
                 log.debug("Processing full-text bitstreams. Item handle: " + sourceInfo);
@@ -146,6 +148,12 @@ public class FullTextContentStreams extends ContentStreamBase {
         return CollectionUtils.isEmpty(fullTextStreams);
     }
 
+    private BundleService getBundleService() {
+        if (bundleService == null) {
+            bundleService = ContentServiceFactory.getInstance().getBundleService();
+        }
+        return bundleService;
+    }
     private BitstreamService getBitstreamService() {
         if (bitstreamService == null) {
             bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();

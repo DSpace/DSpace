@@ -34,12 +34,15 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.xoai.data.DSpaceItem;
@@ -56,6 +59,12 @@ public class ItemUtils {
 
     private static final ItemService itemService
             = ContentServiceFactory.getInstance().getItemService();
+
+    public static final BundleService bundleService
+            = ContentServiceFactory.getInstance().getBundleService();
+
+    public static final EPersonService epersonService
+            = EPersonServiceFactory.getInstance().getEPersonService();
 
     private static final RelationshipService relationshipService
             = ContentServiceFactory.getInstance().getRelationshipService();

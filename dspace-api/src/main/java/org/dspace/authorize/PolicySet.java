@@ -21,6 +21,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
@@ -42,6 +43,7 @@ public class PolicySet {
     private static final ResourcePolicyService resourcePolicyService =
         AuthorizeServiceFactory.getInstance().getResourcePolicyService();
     private static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    private static final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     private static final CollectionService collectionService =
         ContentServiceFactory.getInstance().getCollectionService();
     private static final GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();

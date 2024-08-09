@@ -1635,7 +1635,7 @@ prevent the generation of resource policy entry values with null dspace_object a
                     return true;
                 }
             }
-            log.debug("item(" + item.getID() + ") " + itemService.getName(item) + " is unlisted.");
+            log.debug("item(" + item.getID() + ") " + getName(item) + " is unlisted.");
             return false;
         } catch (SQLException e) {
             log.error(e.getMessage());

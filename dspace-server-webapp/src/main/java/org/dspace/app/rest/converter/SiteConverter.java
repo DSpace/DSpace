@@ -10,6 +10,9 @@ package org.dspace.app.rest.converter;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Site;
+import org.dspace.content.service.DSpaceObjectService;
+import org.dspace.content.service.SiteService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,6 +23,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SiteConverter extends DSpaceObjectConverter<Site, SiteRest> {
+    @Autowired
+    SiteService siteService;
 
     @Override
     public SiteRest convert(Site obj, Projection projection) {
@@ -34,5 +39,11 @@ public class SiteConverter extends DSpaceObjectConverter<Site, SiteRest> {
     @Override
     public Class<Site> getModelClass() {
         return Site.class;
+    }
+
+
+    @Override
+    protected SiteService getDSOService() {
+        return siteService;
     }
 }

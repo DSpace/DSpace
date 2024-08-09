@@ -85,7 +85,8 @@ public class ClamScan extends AbstractCurationTask {
     @Override
     public int perform(DSpaceObject dso) throws IOException {
         status = Curator.CURATE_SKIP;
-        logDebugMessage("The target dso is " + dso.getName());
+        logDebugMessage("The target dso is "
+                            + ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getName(dso));
         if (dso instanceof Item) {
             status = Curator.CURATE_SUCCESS;
             Item item = (Item) dso;

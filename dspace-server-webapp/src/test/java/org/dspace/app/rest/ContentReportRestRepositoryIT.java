@@ -33,6 +33,10 @@ import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
 import org.dspace.contentreport.Filter;
 import org.dspace.contentreport.FilteredCollection;
 import org.dspace.contentreport.QueryOperator;
@@ -51,6 +55,12 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private CommunityService communityService;
+
+    @Autowired
+    private CollectionService collectionService;
 
     @Test
     public void testFilteredCollections() throws Exception {
@@ -188,6 +198,8 @@ public class ContentReportRestRepositoryIT extends AbstractControllerIntegration
 
     // Need for a specific filtered item type...
     private static Matcher<? super Object> matchItemProperties(Item item) {
+        ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
         return allOf(
             hasJsonPath("$.uuid", is(item.getID().toString())),
             hasJsonPath("$.name", is(itemService.getName(item))),

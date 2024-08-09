@@ -17,6 +17,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
@@ -47,6 +50,9 @@ public class ClaimAction extends UserSelectionAction {
             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private final EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
+
+    private final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    private final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     @Override
     public void activate(Context context, XmlWorkflowItem wfItem) throws SQLException, IOException, AuthorizeException {

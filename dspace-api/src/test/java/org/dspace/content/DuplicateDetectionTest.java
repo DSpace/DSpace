@@ -25,6 +25,7 @@ import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.DuplicateDetectionService;
 import org.dspace.content.virtual.PotentialDuplicate;
 import org.dspace.discovery.SearchServiceException;
@@ -44,6 +45,8 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
     private DuplicateDetectionService duplicateDetectionService = ContentServiceFactory.getInstance()
             .getDuplicateDetectionService();
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+    private CollectionService collectionService
+        = ContentServiceFactory.getInstance().getCollectionService();
     private Collection col;
     private Collection workflowCol;
     private Item item1;

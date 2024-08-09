@@ -26,6 +26,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
+import org.dspace.content.service.ItemService;
 import org.dspace.services.ConfigurationService;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +42,9 @@ public class QASourceRestRepositoryIT extends AbstractControllerIntegrationTest 
 
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private ItemService itemService;
 
     private Item target;
 

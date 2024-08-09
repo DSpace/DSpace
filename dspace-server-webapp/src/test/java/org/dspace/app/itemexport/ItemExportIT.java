@@ -43,6 +43,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.ProcessStatus;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.scripts.DSpaceCommandLineParameter;
@@ -68,6 +69,8 @@ public class ItemExportIT extends AbstractControllerIntegrationTest {
 
     @Autowired
     private ItemService itemService;
+    @Autowired
+    private BitstreamService bitstreamService;
     @Autowired
     private CollectionService collectionService;
     @Autowired

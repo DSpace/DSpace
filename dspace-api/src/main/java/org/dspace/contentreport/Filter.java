@@ -25,6 +25,8 @@ import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BundleService;
 import org.dspace.contentreport.ItemFilterUtil.BundleName;
 import org.dspace.core.Context;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -277,9 +279,7 @@ public enum Filter {
     @JsonProperty("has_restricted_original")
     HAS_RESTRICTED_ORIGINAL(FilterCategory.PERMISSION, (context, item) -> {
         return item.getBundles().stream()
-                .filter(bundle -> {
-                    return bundleService.getName(bundle).equals(BundleName.ORIGINAL.name());
-                })
+                .filter(bundle -> getBundleService().getName(bundle).equals(BundleName.ORIGINAL.name()))
                 .map(Bundle::getBitstreams)
                 .flatMap(List::stream)
                 .anyMatch(bit -> {
@@ -300,9 +300,7 @@ public enum Filter {
     @JsonProperty("has_restricted_thumbnail")
     HAS_RESTRICTED_THUMBNAIL(FilterCategory.PERMISSION, (context, item) -> {
         return item.getBundles().stream()
-                .filter(bundle -> {
-                    return bundleService.getName(bundle).equals(BundleName.THUMBNAIL.name());
-                })
+                .filter(bundle -> getBundleService().getName(bundle).equals(BundleName.THUMBNAIL.name()))
                 .map(Bundle::getBitstreams)
                 .flatMap(List::stream)
                 .anyMatch(bit -> {
@@ -333,6 +331,7 @@ public enum Filter {
 
     private static final Logger log = LogManager.getLogger();
     private static AuthorizeService authorizeService;
+    private static BundleService bundleService;
     private static Context anonymousContext;
 
     private String id;
@@ -371,6 +370,13 @@ public enum Filter {
             authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         }
         return authorizeService;
+    }
+
+    private static BundleService getBundleService() {
+        if (bundleService == null) {
+            bundleService = ContentServiceFactory.getInstance().getBundleService();
+        }
+        return bundleService;
     }
 
     private static Context getAnonymousContext() {

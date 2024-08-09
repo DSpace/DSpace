@@ -36,6 +36,7 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -136,6 +137,9 @@ public class GoogleMetadata {
 
     private final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    private final BitstreamService bitstreamService
+            = ContentServiceFactory.getInstance().getBitstreamService();
 
     /**
      * Load configured fields from google-metadata.properties.

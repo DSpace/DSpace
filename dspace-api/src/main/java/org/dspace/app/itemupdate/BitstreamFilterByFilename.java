@@ -11,11 +11,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.dspace.content.Bitstream;
+import org.dspace.content.BundleServiceImpl;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 
 /**
  * BitstreamFilter implementation to filter by filename pattern
  */
 public class BitstreamFilterByFilename extends BitstreamFilter {
+    protected final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
     protected Pattern pattern;
     protected String filenameRegex;

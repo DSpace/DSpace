@@ -24,6 +24,9 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.embargo.factory.EmbargoServiceFactory;
@@ -48,6 +51,8 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
     protected AuthorizeService authorizeService;
     protected ResourcePolicyService resourcePolicyService;
     protected EPersonService epersonService;
+    protected BundleService bundleService;
+    protected BitstreamService bitstreamService;
 
     public DefaultEmbargoSetter() {
         super();
@@ -171,10 +176,12 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
                     for (ResourcePolicy rp : getAuthorizeService()
                         .getPoliciesActionFilter(context, bn, Constants.READ)) {
                         if (rp.getStartDate() == null) {
-                            System.out.println("CHECK WARNING: Item " + item.getHandle() + ", Bundle " + bn.bundleService.getName(
-                                bn) + " allows READ by " +
-                                    ((rp.getEPerson() != null) ? "Group " + rp.getGroup().getName() :
-                                            "EPerson " + getEPersonService().getFullName(rp.getEPerson())));
+                            System.out.println(
+                                "CHECK WARNING: Item " + item.getHandle() +
+                                    ", Bundle " + getBundleService().getName(bn)
+                                    + " allows READ by " + ((rp.getEPerson() != null)
+                                    ? "Group " + rp.getGroup().getName()
+                                    : "EPerson " + getEPersonService().getFullName(rp.getEPerson())));
                         }
                     }
                 }
@@ -183,10 +190,13 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
                     for (ResourcePolicy rp : getAuthorizeService()
                         .getPoliciesActionFilter(context, bs, Constants.READ)) {
                         if (rp.getStartDate() == null) {
-                            System.out.println("CHECK WARNING: Item " + item.getHandle() + ", Bitstream " + bs.bitreamService.getName(
-                                bs) + " (in Bundle " + bundleService.getName(bn) + ") allows READ by " +
-                                    ((rp.getEPerson() != null) ? "Group " + rp.getGroup().getName() :
-                                            "EPerson " + getEPersonService().getFullName(rp.getEPerson())));
+                            System.out.println(
+                                "CHECK WARNING: Item " + item.getHandle() +
+                                    ", Bitstream " + getBitstreamService().getName(bs)
+                                    + " (in Bundle " + bundleService.getName(bn)
+                                    + ") allows READ by " + ((rp.getEPerson() != null)
+                                    ? "Group " + rp.getGroup().getName()
+                                    : "EPerson " + getEPersonService().getFullName(rp.getEPerson())));
                         }
                     }
                 }
@@ -213,5 +223,19 @@ public class DefaultEmbargoSetter implements EmbargoSetter {
             epersonService = EPersonServiceFactory.getInstance().getEPersonService();
         }
         return epersonService;
+    }
+
+    private BundleService getBundleService() {
+        if (bundleService == null) {
+            bundleService = ContentServiceFactory.getInstance().getBundleService();
+        }
+        return bundleService;
+    }
+
+    private BitstreamService getBitstreamService() {
+        if (bitstreamService == null) {
+            bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+        }
+        return bitstreamService;
     }
 }

@@ -38,6 +38,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
@@ -131,6 +132,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     protected XmlWorkflowCuratorService xmlWorkflowCuratorService;
     @Autowired
     protected EPersonService epersonService;
+    @Autowired
+    protected CollectionService collectionService;
 
     protected XmlWorkflowServiceImpl() {
 

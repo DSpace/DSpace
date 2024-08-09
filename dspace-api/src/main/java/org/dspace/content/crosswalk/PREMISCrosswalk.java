@@ -26,6 +26,7 @@ import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
@@ -60,6 +61,8 @@ public class PREMISCrosswalk
 
     private static final Namespace namespaces[] = {PREMIS_NS};
 
+    protected BundleService bundleService
+            = ContentServiceFactory.getInstance().getBundleService();
     protected BitstreamService bitstreamService
             = ContentServiceFactory.getInstance().getBitstreamService();
     protected BitstreamFormatService bitstreamFormatService
@@ -128,19 +131,19 @@ public class PREMISCrosswalk
                         String md = fixity.getChildTextTrim("messageDigest", PREMIS_NS);
                         String b_alg = bitstream.getChecksumAlgorithm();
                         String b_md = bitstream.getChecksum();
+                        String name = bitstreamService.getName(bitstream);
+
                         if (StringUtils.equals(alg, b_alg)) {
                             if (StringUtils.equals(md, b_md)) {
-                                log.debug("Bitstream checksum agrees with PREMIS: " + bitstream.bitreamService.getName(
-                                    bitstream));
+                                log.debug("Bitstream checksum agrees with PREMIS: " + name);
                             } else {
                                 throw new MetadataValidationException(
                                     "Bitstream " + alg + " Checksum does not match value in PREMIS (" + b_md + " != "
-                                        + md + "), for bitstream: " + bitstreamService.getName(bitstream));
+                                        + md + "), for bitstream: " + name);
                             }
                         } else {
-                            log.warn("Cannot test checksum on bitstream=" + bitstream.bitreamService.getName(
-                                bitstream) +
-                                         ", algorithm in PREMIS is different: " + alg);
+                            log.warn("Cannot test checksum on bitstream=" + name
+                                         + ", algorithm in PREMIS is different: " + alg);
                         }
                     }
 

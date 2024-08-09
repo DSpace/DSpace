@@ -15,6 +15,7 @@ import java.util.Objects;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
@@ -27,6 +28,8 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 public class CollectionDropDown {
 
     private static final CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+    public static final CollectionService collectionService
+        = ContentServiceFactory.getInstance().getCollectionService();
 
     /**
      * Default constructor

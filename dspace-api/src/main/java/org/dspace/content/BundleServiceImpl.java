@@ -59,6 +59,8 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
     @Autowired(required = true)
     protected BitstreamService bitstreamService;
     @Autowired(required = true)
+    protected BundleService bundleService;
+    @Autowired(required = true)
     protected ItemService itemService;
     @Autowired(required = true)
     protected AuthorizeService authorizeService;

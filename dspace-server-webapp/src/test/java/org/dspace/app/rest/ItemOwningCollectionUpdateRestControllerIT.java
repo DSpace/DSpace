@@ -25,11 +25,15 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.ResourcePolicyBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class ItemOwningCollectionUpdateRestControllerIT extends AbstractControllerIntegrationTest {
+    @Autowired
+    CollectionService collectionService;
 
     @Test
     public void moveItemTestByAnonymous() throws Exception {

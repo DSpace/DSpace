@@ -18,6 +18,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 
@@ -38,6 +39,7 @@ public class BitstreamsIntoMetadata extends AbstractCurationTask {
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BitstreamsIntoMetadata.class);
 
     private final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    private final BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
 
 
     /**
@@ -54,7 +56,9 @@ public class BitstreamsIntoMetadata extends AbstractCurationTask {
         // Unless this is an item, we'll skip this item
         status = Curator.CURATE_SKIP;
         boolean changed = false;
-        logDebugMessage("The target dso is " + dso.getName());
+        logDebugMessage(
+            "The target dso is " + ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getName(dso)
+        );
         if (dso instanceof Item) {
             try {
                 Item item = (Item) dso;

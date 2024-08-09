@@ -17,10 +17,14 @@ import java.util.UUID;
 
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
 public class CollectionMatcher {
+    public static final CollectionService collectionService
+        = ContentServiceFactory.getInstance().getCollectionService();
 
     private CollectionMatcher() {
     }

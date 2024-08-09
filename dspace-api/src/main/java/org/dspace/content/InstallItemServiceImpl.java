@@ -18,6 +18,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.logic.Filter;
 import org.dspace.content.logic.FilterUtils;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
@@ -53,6 +54,8 @@ public class InstallItemServiceImpl implements InstallItemService {
     protected IdentifierService identifierService;
     @Autowired(required = true)
     protected ItemService itemService;
+    @Autowired(required = true)
+    protected BitstreamService bitstreamService;
     @Autowired(required = true)
     protected SupervisionOrderService supervisionOrderService;
     @Autowired

@@ -24,6 +24,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -37,6 +38,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 public class ItemFilterUtil {
 
     protected static ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected static BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
     protected static BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     private static final Logger log = LogManager.getLogger(ItemFilterUtil.class);
     public static final String[] MIMES_PDF = {"application/pdf"};
@@ -88,9 +90,7 @@ public class ItemFilterUtil {
      */
     static int countBitstream(BundleName bundleName, Item item) {
         return item.getBundles().stream()
-                .filter(bundle -> {
-                    return bundleService.getName(bundle).equals(bundleName.name());
-                })
+                .filter(bundle -> bundleService.getName(bundle).equals(bundleName.name()))
                 .mapToInt(bundle -> bundle.getBitstreams().size())
                 .sum();
     }
@@ -103,9 +103,7 @@ public class ItemFilterUtil {
      */
     static List<String> getBitstreamNames(BundleName bundleName, Item item) {
         return item.getBundles().stream()
-                .filter(bundle -> {
-                    return bundleService.getName(bundle).equals(bundleName.name());
-                })
+                .filter(bundle -> bundleService.getName(bundle).equals(bundleName.name()))
                 .map(Bundle::getBitstreams)
                 .flatMap(List::stream)
                 .map(bitstream -> bitstreamService.getName(bitstream))

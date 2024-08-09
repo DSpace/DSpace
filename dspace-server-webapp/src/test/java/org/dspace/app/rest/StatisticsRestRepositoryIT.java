@@ -53,6 +53,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.Site;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
@@ -76,6 +77,8 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
     ConfigurationService configurationService;
     @Autowired
     protected AuthorizeService authorizeService;
+    @Autowired
+    protected ContentServiceFactory contentServiceFactory;
 
     private Community communityNotVisited;
     private Community communityVisited;
@@ -1556,7 +1559,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         point.addValue("views", views);
         point.setType(StringUtils.lowerCase(Constants.typeText[dso.getType()]));
         point.setId(dso.getID().toString());
-        point.setLabel(dso.getName());
+        point.setLabel(contentServiceFactory.getDSpaceObjectService(dso).getName(dso));
 
         return point;
     }

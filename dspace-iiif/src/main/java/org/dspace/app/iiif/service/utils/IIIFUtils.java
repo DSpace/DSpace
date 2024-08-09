@@ -33,6 +33,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.iiif.IIIFApiQueryService;
@@ -86,6 +87,9 @@ public class IIIFUtils {
 
     @Autowired
     protected ItemService itemService;
+
+    @Autowired
+    protected BundleService bundleService;
 
     @Autowired
     protected BitstreamService bitstreamService;

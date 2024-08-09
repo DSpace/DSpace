@@ -18,6 +18,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
@@ -36,6 +37,9 @@ public class SolrServiceIndexCollectionSubmittersPlugin implements SolrServiceIn
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
+
+    @Autowired
+    protected CollectionService collectionService;
 
     @Override
     public void additionalIndex(Context context, IndexableObject idxObj, SolrInputDocument document) {

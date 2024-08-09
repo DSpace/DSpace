@@ -14,6 +14,9 @@ import java.util.UUID;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.ItemService;
 
 /**
  * Model of potential duplicate item. Provides as little data as possible, but enough to be useful
@@ -24,6 +27,11 @@ import org.dspace.content.MetadataValue;
  * @author Kim Shepherd
  */
 public class PotentialDuplicate {
+    private static final CollectionService collectionService =
+        ContentServiceFactory.getInstance().getCollectionService();
+    private static final ItemService itemService
+        = ContentServiceFactory.getInstance().getItemService();
+
     /**
      * Title of duplicate object
      */

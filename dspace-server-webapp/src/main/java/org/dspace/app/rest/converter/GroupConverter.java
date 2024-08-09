@@ -9,7 +9,10 @@ package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.projection.Projection;
+import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,6 +23,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class GroupConverter extends DSpaceObjectConverter<Group, GroupRest> {
+    @Autowired
+    GroupService groupService;
 
     @Override
     public GroupRest convert(Group obj, Projection projection) {
@@ -38,4 +43,8 @@ public class GroupConverter extends DSpaceObjectConverter<Group, GroupRest> {
         return Group.class;
     }
 
+    @Override
+    protected GroupService getDSOService() {
+        return groupService;
+    }
 }

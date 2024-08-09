@@ -14,6 +14,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,9 @@ public class SolrServiceFileInfoPlugin implements SolrServiceIndexPlugin {
     private static final String BUNDLE_NAME = "ORIGINAL";
     private static final String SOLR_FIELD_NAME_FOR_FILENAMES = "original_bundle_filenames";
     private static final String SOLR_FIELD_NAME_FOR_DESCRIPTIONS = "original_bundle_descriptions";
+
+    @Autowired
+    BundleService bundleService;
 
     @Autowired
     BitstreamService bitstreamService;

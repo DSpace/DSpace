@@ -12,6 +12,8 @@ import java.util.List;
 
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BundleService;
 
 /**
  * Filter all bitstreams in the ORIGINAL bundle
@@ -19,6 +21,8 @@ import org.dspace.content.Bundle;
  * all bitstreams in the TEXT and THUMBNAIL bundles
  */
 public class OriginalWithDerivativesBitstreamFilter extends BitstreamFilter {
+    public static final BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+
     protected String[] bundlesToEmpty = {"ORIGINAL", "TEXT", "THUMBNAIL"};
 
     public OriginalWithDerivativesBitstreamFilter() {

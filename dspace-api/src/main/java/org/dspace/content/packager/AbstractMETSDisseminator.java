@@ -70,6 +70,7 @@ import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -130,6 +131,7 @@ public abstract class AbstractMETSDisseminator
 
     protected final AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    protected final BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
     protected final SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
     protected final CreativeCommonsService creativeCommonsService = LicenseServiceFactory.getInstance()
                                                                                          .getCreativeCommonsService();
@@ -1207,11 +1209,11 @@ public abstract class AbstractMETSDisseminator
         throws SQLException {
         List<Bundle> bundles = item.getBundles();
 
+        String name = bitstreamService.getName(derived);
+
         // Filename of original will be filename of the derived bitstream
         // minus the extension (last 4 chars - .jpg or .txt)
-        String originalFilename = bitstreamService.getName(derived).substring(0,
-                                                                                    derived.bitreamService.getName(
-                                                                                        derived).length() - 4);
+        String originalFilename = name.substring(0, name.length() - 4);
 
         // First find "original" bundle
         for (Bundle bundle : bundles) {

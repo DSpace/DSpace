@@ -19,12 +19,15 @@ import org.dspace.checker.ChecksumResultsCollector;
 import org.dspace.checker.MostRecentChecksum;
 import org.dspace.checker.SimpleDispatcher;
 import org.dspace.content.Bitstream;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 
 /**
  * @author LINDAT/CLARIN dev team
  */
 public class ChecksumCheck extends Check {
+    private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
     @Override
     public String run(ReportInfo ri) {

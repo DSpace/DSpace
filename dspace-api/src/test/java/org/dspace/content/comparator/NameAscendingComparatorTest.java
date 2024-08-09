@@ -11,6 +11,9 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DSpaceObjectService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -19,7 +22,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class NameAscendingComparatorTest {
 
-    private NameAscendingComparator comparator = new NameAscendingComparator();
+    private NameAscendingComparator comparator;
 
     @Mock
     private DSpaceObject dso1;
@@ -27,27 +30,40 @@ public class NameAscendingComparatorTest {
     @Mock
     private DSpaceObject dso2;
 
+    @Mock
+    private ContentServiceFactory contentServiceFactory;
+
+    @Mock
+    private DSpaceObjectService<DSpaceObject> dsoService;
+
+    @Before
+    public void setup() {
+        when(contentServiceFactory.getDSpaceObjectService(dso1)).thenReturn(dsoService);
+        when(contentServiceFactory.getDSpaceObjectService(dso2)).thenReturn(dsoService);
+
+        comparator = new NameAscendingComparator(contentServiceFactory);
+    }
 
     @Test
     public void testCompareLessThan() throws Exception {
-        when(dso1.getName()).thenReturn("a");
-        when(dso2.getName()).thenReturn("b");
+        when(dsoService.getName(dso1)).thenReturn("a");
+        when(dsoService.getName(dso2)).thenReturn("b");
 
         assertTrue(comparator.compare(dso1, dso2) < 0);
     }
 
     @Test
     public void testCompareGreaterThan() throws Exception {
-        when(dso1.getName()).thenReturn("b");
-        when(dso2.getName()).thenReturn("a");
+        when(dsoService.getName(dso1)).thenReturn("a");
+        when(dsoService.getName(dso2)).thenReturn("b");
 
         assertTrue(comparator.compare(dso1, dso2) > 0);
     }
 
     @Test
     public void testCompareEqual() throws Exception {
-        when(dso1.getName()).thenReturn("b");
-        when(dso2.getName()).thenReturn("b");
+        when(dsoService.getName(dso1)).thenReturn("b");
+        when(dsoService.getName(dso2)).thenReturn("b");
 
         assertTrue(comparator.compare(dso1, dso2) == 0);
     }
@@ -71,24 +87,24 @@ public class NameAscendingComparatorTest {
 
     @Test
     public void testCompareNameNull() throws Exception {
-        when(dso1.getName()).thenReturn(null);
-        when(dso2.getName()).thenReturn("b");
+        when(dsoService.getName(dso1)).thenReturn(null);
+        when(dsoService.getName(dso2)).thenReturn("b");
 
         assertTrue(comparator.compare(dso1, dso2) < 0);
     }
 
     @Test
     public void testCompareCaseInsensitive() throws Exception {
-        when(dso1.getName()).thenReturn("a");
-        when(dso2.getName()).thenReturn("B");
+        when(dsoService.getName(dso1)).thenReturn("a");
+        when(dsoService.getName(dso2)).thenReturn("B");
 
         assertTrue(comparator.compare(dso1, dso2) < 0);
     }
 
     @Test
     public void testCompareCaseTrimmed() throws Exception {
-        when(dso1.getName()).thenReturn("a");
-        when(dso2.getName()).thenReturn(" b ");
+        when(dsoService.getName(dso1)).thenReturn("a");
+        when(dsoService.getName(dso2)).thenReturn(" b ");
 
         assertTrue(comparator.compare(dso1, dso2) < 0);
     }

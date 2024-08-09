@@ -64,16 +64,20 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
             }
 
             if (dso.getType() == Constants.ITEM) {
-                handler.logInfo("Exporting item '" + dso.getName() + "' (" + identifier + ")");
+                handler.logInfo("Exporting item '" + itemService.getName((Item) dso) + "' (" + identifier + ")");
                 List<Item> item = new ArrayList<>();
                 item.add((Item) dso);
                 toExport = item.iterator();
             } else if (dso.getType() == Constants.COLLECTION) {
-                handler.logInfo("Exporting collection '" + dso.getName() + "' (" + identifier + ")");
+                handler.logInfo(
+                    "Exporting collection '" + collectionService.getName((Collection) dso) + "' (" + identifier + ")"
+                );
                 Collection collection = (Collection) dso;
                 toExport = itemService.findByCollection(context, collection);
             } else if (dso.getType() == Constants.COMMUNITY) {
-                handler.logInfo("Exporting community '" + dso.getName() + "' (" + identifier + ")");
+                handler.logInfo(
+                    "Exporting community '" + communityService.getName((Community) dso) + "' (" + identifier + ")"
+                );
                 toExport = buildFromCommunity(context, (Community) dso);
             } else {
                 throw new IllegalArgumentException(

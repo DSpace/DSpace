@@ -27,6 +27,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.swordapp.server.SwordError;
@@ -35,6 +36,8 @@ import org.swordapp.server.SwordServerException;
 public class FeedContentDisseminator extends AbstractSimpleDC
     implements SwordContentDisseminator {
 
+    protected BundleService bundleService = ContentServiceFactory.getInstance()
+                                                                 .getBundleService();
     protected BitstreamService bitstreamService = ContentServiceFactory.getInstance()
                                                                        .getBitstreamService();
 

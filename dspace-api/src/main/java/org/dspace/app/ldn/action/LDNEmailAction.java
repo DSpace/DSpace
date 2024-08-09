@@ -20,6 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.model.Notification;
 import org.dspace.content.Item;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
@@ -42,6 +43,9 @@ public class LDNEmailAction implements LDNAction {
 
     @Autowired
     private EPersonService epersonService;
+
+    @Autowired
+    private ItemService itemService;
 
     /*
      * Supported for actionSendFilter are:

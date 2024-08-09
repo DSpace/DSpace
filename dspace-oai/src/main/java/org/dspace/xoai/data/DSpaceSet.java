@@ -10,11 +10,19 @@ package org.dspace.xoai.data;
 import com.lyncode.xoai.dataprovider.core.Set;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 
 /**
  * @author Lyncode Development Team (dspace at lyncode dot com)
  */
 public class DSpaceSet extends Set {
+    public static final CommunityService communityService
+        = ContentServiceFactory.getInstance().getCommunityService();
+    public static final CollectionService collectionService
+        = ContentServiceFactory.getInstance().getCollectionService();
+
     private static final String DefaultName = "undefined";
 
     public static String checkName(String name) {

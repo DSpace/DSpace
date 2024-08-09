@@ -24,6 +24,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,6 +43,9 @@ public class FullTextContentStreamsTest {
 
     @Mock
     private BitstreamService bitstreamService;
+
+    @Mock
+    private BundleService bundleService;
 
     @Mock
     private Item item;

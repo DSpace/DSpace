@@ -20,6 +20,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
@@ -50,6 +51,8 @@ public class ReinstateCorrectionType implements CorrectionType, InitializingBean
     private AuthorizeService authorizeService;
     @Autowired
     private ConfigurationService configurationService;
+    @Autowired
+    private ItemService itemService;
 
     @Override
     public boolean isAllowed(Context context, Item targetItem) throws SQLException {

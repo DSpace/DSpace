@@ -10,6 +10,7 @@ package org.dspace.content.license;
 import java.util.Formatter;
 
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.factory.ContentServiceFactory;
 
 /**
  * This is a simple implementation of the LicenseArgumentFormatter for a
@@ -26,7 +27,7 @@ public class SimpleDSpaceObjectLicenseFormatter implements
             formatter.format("sample " + type);
         } else {
             DSpaceObject dso = (DSpaceObject) object;
-            String name = dso.getName();
+            String name = ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getName(dso);
             if (name != null) {
                 formatter.format(name);
             } else {

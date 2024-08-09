@@ -18,10 +18,18 @@ import java.util.UUID;
 
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
 public class CommunityMatcher {
+    public static final CommunityService communityService
+        = ContentServiceFactory.getInstance().getCommunityService();
+    public static final CollectionService collectionService
+        = ContentServiceFactory.getInstance().getCollectionService();
+
 
     private CommunityMatcher() { }
 

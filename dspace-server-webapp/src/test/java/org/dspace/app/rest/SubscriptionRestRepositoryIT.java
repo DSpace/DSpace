@@ -40,6 +40,7 @@ import org.dspace.builder.SubscribeBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.service.CollectionService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Subscription;
 import org.dspace.eperson.SubscriptionParameter;
@@ -63,6 +64,9 @@ public class SubscriptionRestRepositoryIT extends AbstractControllerIntegrationT
 
     @Autowired
     private EPersonService epersonService;
+
+    @Autowired
+    CollectionService collectionService;
 
     private Community subCommunity;
     private Collection collection;

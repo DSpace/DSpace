@@ -24,7 +24,11 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.logging.log4j.Logger;
+import org.dspace.content.Bitstream;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Constants;
 import org.dspace.service.ClientInfoService;
 import org.dspace.services.ConfigurationService;
@@ -177,10 +181,11 @@ public class GoogleRecorderEventListener extends AbstractUsageEventListener {
             if (ue.getObject().getType() == Constants.BITSTREAM) {
                 // For a bitstream download we really want to know the title of the owning item rather than the
                 // bitstream name.
-                return contentServiceFactory.getDSpaceObjectService(ue.getObject())
-                                            .getParentObject(ue.getContext(), ue.getObject()).getName();
+                DSpaceObject parent = contentServiceFactory.getDSpaceObjectService(ue.getObject())
+                                                           .getParentObject(ue.getContext(), ue.getObject());
+                return contentServiceFactory.getDSpaceObjectService(parent).getName(parent);
             } else {
-                return ue.getObject().getName();
+                return contentServiceFactory.getDSpaceObjectService(ue.getObject()).getName(ue.getObject());
             }
         } catch (SQLException e) {
             // This shouldn't merit interrupting the user's transaction so log the error and continue.

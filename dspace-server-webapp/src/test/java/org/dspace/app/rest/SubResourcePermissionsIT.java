@@ -29,6 +29,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.service.BundleService;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,9 @@ public class SubResourcePermissionsIT extends AbstractControllerIntegrationTest 
 
     @Autowired
     private AuthorizeService authorizeService;
+
+    @Autowired
+    private BundleService bundleService;
 
     @Test
     public void itemBundlePrivateItemPermissionTest() throws Exception {
@@ -86,13 +90,12 @@ public class SubResourcePermissionsIT extends AbstractControllerIntegrationTest 
         // should succeed
         getClient(token).perform(get("/api/core/items/" + privateItem1.getID() + "/bundles"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._embedded.bundles", Matchers.hasItem(BundleMatcher
-                                                                                        .matchProperties(
-                                                                                            bundle.bundleService.getName(
-                                                                                                bundle),
-                                                                                            bundle.getID(),
-                                                                                            bundle.getHandle(),
-                                                                                            bundle.getType()))));
+                        .andExpect(jsonPath("$._embedded.bundles", Matchers.hasItem(
+                            BundleMatcher.matchProperties(
+                                bundleService.getName(bundle),
+                                bundle.getID(),
+                                bundle.getHandle(),
+                                bundle.getType()))));
 
         token = getAuthToken(eperson.getEmail(), password);
 
@@ -196,13 +199,12 @@ public class SubResourcePermissionsIT extends AbstractControllerIntegrationTest 
         // Should succeed
         getClient(token).perform(get("/api/core/items/" + publicItem1.getID() + "/bundles"))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$._embedded.bundles", Matchers.hasItem(BundleMatcher
-                                                                                        .matchProperties(
-                                                                                            bundle.bundleService.getName(
-                                                                                                bundle),
-                                                                                            bundle.getID(),
-                                                                                            bundle.getHandle(),
-                                                                                            bundle.getType()))));
+                        .andExpect(jsonPath("$._embedded.bundles", Matchers.hasItem(
+                            BundleMatcher.matchProperties(
+                                bundleService.getName(bundle),
+                                bundle.getID(),
+                                bundle.getHandle(),
+                                bundle.getType()))));
 
         token = getAuthToken(eperson.getEmail(), password);
 

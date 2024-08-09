@@ -46,6 +46,7 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
@@ -97,6 +98,8 @@ public class ItemExportServiceImpl implements ItemExportService {
     protected EPersonService ePersonService;
     @Autowired(required = true)
     protected ItemService itemService;
+    @Autowired(required = true)
+    protected BundleService bundleService;
     @Autowired(required = true)
     protected HandleService handleService;
     @Autowired(required = true)

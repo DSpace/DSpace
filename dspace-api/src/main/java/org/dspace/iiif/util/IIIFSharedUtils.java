@@ -15,6 +15,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BundleService;
 import org.dspace.core.Constants;
 import org.dspace.license.CreativeCommonsServiceImpl;
 import org.dspace.services.ConfigurationService;
@@ -44,6 +46,8 @@ public class IIIFSharedUtils {
 
     protected static final ConfigurationService configurationService
         = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    public static final BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
 
 
     private IIIFSharedUtils() {}

@@ -1137,8 +1137,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
             // Save this Community's info to the infoMap
             Community community = (Community) dso;
             infoMap.put(community.getHandle(),
-                        communityService.getTypeText(community) + valueseparator + community.communityService.getName(
-                            community)
+                        communityService.getTypeText(community) + valueseparator + communityService.getName(community)
             );
 
             // Recursively call method for each SubCommunity
@@ -1156,8 +1155,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
             // Save this Collection's info to the infoMap
             Collection collection = (Collection) dso;
             infoMap.put(collection.getHandle(),
-                        collectionService.getTypeText(collection) + valueseparator + collection.collectionService.getName(
-                            collection)
+                        collectionService.getTypeText(collection) + valueseparator + collectionService.getName(collection)
             );
 
             // Recursively call method for each Item in Collection
@@ -1169,8 +1167,7 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
         } else if (dso instanceof Item) {
             // Save this Item's info to the infoMap
             Item item = (Item) dso;
-            infoMap.put(item.getHandle(), itemService.getTypeText(item) + valueseparator + item.itemService.getName(
-                item));
+            infoMap.put(item.getHandle(), itemService.getTypeText(item) + valueseparator + itemService.getName(item));
         }
     }
 
@@ -1205,7 +1202,8 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
             // Also assert type and name are correct
             assertEquals("assertObjectsExist object " + key + " type",
                          ContentServiceFactory.getInstance().getDSpaceObjectService(obj).getTypeText(obj), typeText);
-            assertEquals("assertObjectsExist object " + key + " name", obj.getName(), name);
+            assertEquals("assertObjectsExist object " + key + " name",
+                         ContentServiceFactory.getInstance().getDSpaceObjectService(obj).getName(obj), name);
         }
 
     }

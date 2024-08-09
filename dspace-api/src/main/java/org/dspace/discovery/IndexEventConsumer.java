@@ -15,6 +15,8 @@ import java.util.Set;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BundleService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.factory.IndexFactory;
@@ -49,6 +51,8 @@ public class IndexEventConsumer implements Consumer {
                                                                      IndexingService.class);
 
     IndexObjectFactoryFactory indexObjectServiceFactory = IndexObjectFactoryFactory.getInstance();
+
+    BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
 
     @Override
     public void initialize() throws Exception {
@@ -97,7 +101,7 @@ public class IndexEventConsumer implements Consumer {
         int et = event.getEventType();
         if (st == Constants.BUNDLE) {
             if ((et == Event.ADD || et == Event.REMOVE) && subject != null
-                && ((Bundle) subject).bundleService.getName(((Bundle) subject)).equals("TEXT")) {
+                && bundleService.getName(((Bundle) subject)).equals("TEXT")) {
                 st = Constants.ITEM;
                 et = Event.MODIFY;
                 subject = ((Bundle) subject).getItems().get(0);

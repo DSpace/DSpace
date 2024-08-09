@@ -12,8 +12,18 @@ import java.util.Comparator;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.factory.ContentServiceFactory;
 
 public class NameAscendingComparator implements Comparator<DSpaceObject> {
+    private ContentServiceFactory contentServiceFactory;
+
+    public NameAscendingComparator() {
+        this.contentServiceFactory = ContentServiceFactory.getInstance();
+    }
+
+    public NameAscendingComparator(ContentServiceFactory contentServiceFactory) {
+        this.contentServiceFactory = contentServiceFactory;
+    }
 
     @Override
     public int compare(DSpaceObject dso1, DSpaceObject dso2) {
@@ -24,8 +34,8 @@ public class NameAscendingComparator implements Comparator<DSpaceObject> {
         } else if (dso2 == null) {
             return 1;
         } else {
-            String name1 = StringUtils.trimToEmpty(dso1.getName());
-            String name2 = StringUtils.trimToEmpty(dso2.getName());
+            String name1 = StringUtils.trimToEmpty(contentServiceFactory.getDSpaceObjectService(dso1).getName(dso1));
+            String name2 = StringUtils.trimToEmpty(contentServiceFactory.getDSpaceObjectService(dso2).getName(dso2));
 
             //When two DSO's have the same name, use their UUID to put them in an order
             if (name1.equals(name2)) {

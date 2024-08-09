@@ -11,6 +11,8 @@ import org.dspace.app.rest.model.SuggestionTargetRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.suggestion.SuggestionTarget;
 import org.dspace.content.Item;
+import org.dspace.content.service.ItemService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,8 +22,10 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-public class SuggestionTargetConverter
-        implements DSpaceConverter<SuggestionTarget, SuggestionTargetRest> {
+public class SuggestionTargetConverter implements DSpaceConverter<SuggestionTarget, SuggestionTargetRest> {
+    @Autowired
+    ItemService itemService;
+
 
     @Override
     public SuggestionTargetRest convert(SuggestionTarget target, Projection projection) {

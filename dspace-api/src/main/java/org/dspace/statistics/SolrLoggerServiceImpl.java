@@ -91,6 +91,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -133,6 +134,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     private static final String IP_V4_REGEX = "^((?:\\d{1,3}\\.){3})\\d{1,3}$";
     private static final String IP_V6_REGEX = "^(.*):.*:.*$";
 
+    @Autowired(required = true)
+    protected BundleService bundleService;
     @Autowired(required = true)
     protected BitstreamService bitstreamService;
     @Autowired(required = true)

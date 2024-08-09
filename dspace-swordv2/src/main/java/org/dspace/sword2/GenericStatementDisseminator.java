@@ -22,6 +22,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -36,6 +37,8 @@ public abstract class GenericStatementDisseminator
     protected ItemService itemService = ContentServiceFactory.getInstance()
                                                              .getItemService();
 
+    protected BundleService bundleService = ContentServiceFactory.getInstance()
+                                                                 .getBundleService();
     protected BitstreamService bitstreamService = ContentServiceFactory.getInstance()
                                                                        .getBitstreamService();
 
