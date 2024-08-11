@@ -8,7 +8,6 @@
 package org.dspace.content;
 
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,8 +23,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.core.Context;
 import org.dspace.core.HibernateProxyHelper;
 import org.dspace.core.ReloadableEntity;
@@ -80,9 +77,6 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
     @Column(name = "extension")
     @Cascade( {org.hibernate.annotations.CascadeType.ALL, org.hibernate.annotations.CascadeType.DELETE_ORPHAN})
     private List<String> fileExtensions;
-
-    @Transient
-    private transient BitstreamFormatService bitstreamFormatService;
 
     /**
      * The "unknown" support level - for bitstream formats that are unknown to
@@ -240,27 +234,6 @@ public class BitstreamFormat implements Serializable, ReloadableEntity<Integer> 
         Getters & setters which should be removed on the long run, they are just here to provide all getters &
         setters to the item object
     */
-
-    /**
-     * @deprecated this should become a {@link BitstreamFormatService} method!
-     */
-    public void setShortDescription(Context context, String s) throws SQLException {
-        getBitstreamFormatService().setShortDescription(context, this, s);
-    }
-
-    /**
-     * @deprecated this should become a {@link BitstreamFormatService} method!
-     */
-    public void setSupportLevel(int sl) {
-        getBitstreamFormatService().setSupportLevel(this, sl);
-    }
-
-    private BitstreamFormatService getBitstreamFormatService() {
-        if (bitstreamFormatService == null) {
-            bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
-        }
-        return bitstreamFormatService;
-    }
 
     /**
      * Return <code>true</code> if <code>other</code> is the same Collection

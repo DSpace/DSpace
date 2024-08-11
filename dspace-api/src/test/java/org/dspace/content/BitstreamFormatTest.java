@@ -265,7 +265,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
     @Test
     public void testSetShortDescription() throws SQLException {
         String desc = "short";
-        bf.setShortDescription(context, desc);
+        bitstreamFormatService.setShortDescription(context, bf, desc);
 
         assertThat("testSetShortDescription 0", bf.getShortDescription(),
                    notNullValue());
@@ -367,7 +367,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
      */
     @Test(expected = IllegalArgumentException.class)
     public void testSetSupportLevelInvalidValue() {
-        bf.setSupportLevel(5);
+        bitstreamFormatService.setSupportLevel(bf, 5);
         fail("Exception should be thrown");
     }
 
@@ -376,7 +376,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
      */
     @Test(expected = IllegalArgumentException.class)
     public void testSetSupportLevelNegativeValue() {
-        bf.setSupportLevel(-1);
+        bitstreamFormatService.setSupportLevel(bf, -1);
         fail("Exception should be thrown");
     }
 
@@ -385,11 +385,11 @@ public class BitstreamFormatTest extends AbstractUnitTest {
      */
     @Test
     public void testSetSupportLevelValidValues() {
-        bf.setSupportLevel(BitstreamFormat.UNKNOWN);
+        bitstreamFormatService.setSupportLevel(bf, BitstreamFormat.UNKNOWN);
         assertThat("testSetSupportLevelValidValues 0", bf.getSupportLevel(), equalTo(BitstreamFormat.UNKNOWN));
-        bf.setSupportLevel(BitstreamFormat.KNOWN);
+        bitstreamFormatService.setSupportLevel(bf, BitstreamFormat.KNOWN);
         assertThat("testSetSupportLevelValidValues 1", bf.getSupportLevel(), equalTo(BitstreamFormat.KNOWN));
-        bf.setSupportLevel(BitstreamFormat.SUPPORTED);
+        bitstreamFormatService.setSupportLevel(bf, BitstreamFormat.SUPPORTED);
         assertThat("testSetSupportLevelValidValues 2", bf.getSupportLevel(), equalTo(BitstreamFormat.SUPPORTED));
     }
 

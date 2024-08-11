@@ -380,10 +380,10 @@ public class PackageUtils {
         // not found, try to create one
         if (bsf == null) {
             bsf = bitstreamFormatService.create(context);
-            bsf.setShortDescription(context, shortDesc);
+            bitstreamFormatService.setShortDescription(context, bsf, shortDesc);
             bsf.setMIMEType(MIMEType);
             bsf.setDescription(desc);
-            bsf.setSupportLevel(supportLevel);
+            bitstreamFormatService.setSupportLevel(bsf, supportLevel);
             bsf.setInternal(internal);
             bitstreamFormatService.update(context, bsf);
         }
