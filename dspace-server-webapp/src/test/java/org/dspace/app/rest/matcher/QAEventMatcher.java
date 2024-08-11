@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.model.QAEventRest;
 import org.dspace.app.rest.model.hateoas.QAEventResource;
 import org.dspace.content.QAEvent;
 import org.dspace.qaevent.service.dto.NotifyMessageDTO;
@@ -80,7 +81,7 @@ public class QAEventMatcher {
             return allOf(hasJsonPath("$.id", is(event.getEventId())),
                     hasJsonPath("$.originalId", is(event.getOriginalId())),
                     hasJsonPath("$.title", is(event.getTitle())),
-                    hasJsonPath("$.trust", is(new DecimalFormat("0.000").format(event.getTrust()))),
+                    hasJsonPath("$.trust", is(QAEventRest.TRUST_FMT.format(event.getTrust()))),
                     hasJsonPath("$.status", Matchers.equalToIgnoringCase(event.getStatus())),
                     hasJsonPath("$.message",
                             matchMessage(event.getTopic(), jsonMapper.readValue(event.getMessage(),
