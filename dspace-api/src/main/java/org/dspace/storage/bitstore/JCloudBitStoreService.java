@@ -72,6 +72,11 @@ public class JCloudBitStoreService extends BaseBitStoreService {
         this.providerOrApi = providerOrApi;
     }
 
+    protected JCloudBitStoreService(BlobStoreContext blobStoreContext, String providerOrApi) {
+        this.blobStoreContext = blobStoreContext;
+        this.providerOrApi = providerOrApi;
+    }
+
     public void setUseRelativePath(boolean useRelativePath) {
         this.useRelativePath = useRelativePath;
     }
@@ -359,7 +364,7 @@ public class JCloudBitStoreService extends BaseBitStoreService {
 
     private String getContainer() {
         if (container == null) {
-            container = new DSpace().getConfigurationService().getProperty("dspace.hostname");
+            container = new DSpace().getConfigurationService().getProperty("dspace.name");
         }
         return container;
     }

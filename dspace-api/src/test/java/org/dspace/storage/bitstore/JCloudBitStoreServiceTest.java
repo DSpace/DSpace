@@ -9,16 +9,29 @@ package org.dspace.storage.bitstore;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
+import com.google.common.io.ByteSource;
 import org.dspace.AbstractUnitTest;
 import org.dspace.content.Bitstream;
 import org.hamcrest.Matchers;
+import org.jclouds.blobstore.BlobStore;
+import org.jclouds.blobstore.BlobStoreContext;
+import org.jclouds.blobstore.domain.Blob;
+import org.jclouds.blobstore.domain.BlobBuilder;
+import org.jclouds.blobstore.domain.BlobBuilder.PayloadBlobBuilder;
+import org.jclouds.io.Payload;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 
 /**
  * @author Nathan Buckingham
@@ -30,11 +43,64 @@ public class JCloudBitStoreServiceTest extends AbstractUnitTest {
     private JCloudBitStoreService jCloudBitStoreService;
 
     @Mock
+    private BlobStoreContext blobStoreContext;
+
+    @Mock
+    private BlobStore blobStore;
+
+    @Mock
     private Bitstream bitstream;
 
     @Before
     public void setUp() throws Exception {
-        this.jCloudBitStoreService = new JCloudBitStoreService("filesystem");
+        this.jCloudBitStoreService = new JCloudBitStoreService(blobStoreContext, "filesystem");
+    }
+
+    @Test
+    public void getBitstreamTest() throws Exception {
+        Blob blob = Mockito.mock(Blob.class);
+        Payload payload = Mockito.mock(Payload.class);
+        InputStream inputStream = Mockito.mock(InputStream.class);
+        when(blob.getPayload()).thenReturn(payload);
+        when(payload.openStream()).thenReturn(inputStream);
+        when(blobStoreContext.getBlobStore()).thenReturn(blobStore);
+        when(blobStore.getBlob(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(blob);
+        when(blobStore.blobExists(ArgumentMatchers.any(), any())).thenReturn(true);
+        assertThat(this.jCloudBitStoreService.get(bitstream), Matchers.equalTo(inputStream));
+    }
+
+    @Test
+    public void removeBitstreamTest() throws Exception {
+        String bitStreamId = "BitStreamId";
+        when(bitstream.getInternalId()).thenReturn(bitStreamId);
+        when(blobStoreContext.getBlobStore()).thenReturn(blobStore);
+        try {
+            this.jCloudBitStoreService.remove(bitstream);
+        } catch (Exception e) {
+            // will fail due to trying to remove files
+        }
+        verify(this.blobStore, Mockito.times(1)).removeBlob(ArgumentMatchers.any(), ArgumentMatchers.any());
+    }
+
+    @Test
+    public void replaceBitStreamTest() throws Exception {
+        Blob blob = Mockito.mock(Blob.class);
+        File file = Mockito.mock(File.class);
+        BlobBuilder blobBuilder = Mockito.mock(BlobBuilder.class);
+        PayloadBlobBuilder payloadBlobBuilder = Mockito.mock(PayloadBlobBuilder.class);
+
+        when(blobStoreContext.getBlobStore()).thenReturn(blobStore);
+        when(blobStore.blobBuilder(ArgumentMatchers.any())).thenReturn(blobBuilder);
+        when(blobBuilder.payload(ArgumentMatchers.any(ByteSource.class))).thenReturn(payloadBlobBuilder);
+        when(payloadBlobBuilder.contentDisposition(ArgumentMatchers.any())).thenReturn(payloadBlobBuilder);
+        when(payloadBlobBuilder.contentLength(ArgumentMatchers.any(long.class))).thenReturn(payloadBlobBuilder);
+        when(payloadBlobBuilder.contentType(ArgumentMatchers.any(String.class))).thenReturn(payloadBlobBuilder);
+        when(payloadBlobBuilder.build()).thenReturn(blob);
+        ByteSource byteSource = Mockito.mock(ByteSource.class);
+        String mockedTag = "1a7771d5fdd7bfdfc84033c70b1ba555";
+        this.jCloudBitStoreService.put(byteSource, bitstream);
+        verify(blobStore, Mockito.times(1)).putBlob(ArgumentMatchers.any(),
+                ArgumentMatchers.any(), ArgumentMatchers.any());
     }
 
 
