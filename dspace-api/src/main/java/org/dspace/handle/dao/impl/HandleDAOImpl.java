@@ -90,8 +90,6 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
 
     @Override
     public long countHandlesByPrefix(Session session, String prefix) throws SQLException {
-
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(session);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Handle.class);
 
