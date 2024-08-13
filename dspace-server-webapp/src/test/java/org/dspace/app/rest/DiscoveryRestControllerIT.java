@@ -10,6 +10,8 @@ package org.dspace.app.rest;
 import static com.google.common.net.UrlEscapers.urlPathSegmentEscaper;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.matcher.FacetEntryMatcher.defaultFacetMatchers;
+import static org.dspace.app.rest.matcher.FacetEntryMatcher.notifyIncomingFacetMatchers;
+import static org.dspace.app.rest.matcher.FacetEntryMatcher.notifyOutgoingFacetMatchers;
 import static org.dspace.app.rest.matcher.FacetEntryMatcher.supervisionFacetMatchers;
 import static org.dspace.app.rest.matcher.FacetEntryMatcher.workflowAdminFacetMatchers;
 import static org.dspace.app.rest.matcher.FacetEntryMatcher.workflowFacetMatchers;
@@ -4088,14 +4090,6 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         //** WHEN **
         // An anonymous user, the submitter and the admin that browse this endpoint to find the public objects in the
         // system should not retrieve the in progress submissions and related objects
-        List<Matcher<? super Object>> allExpectedSidebarFacets = new ArrayList<>(customSidebarFacets);
-        allExpectedSidebarFacets.addAll(List.of(
-            FacetEntryMatcher.authorFacet(false),
-            FacetEntryMatcher.subjectFacet(false),
-            FacetEntryMatcher.dateIssuedFacet(false),
-            FacetEntryMatcher.hasContentInOriginalBundleFacet(false),
-            FacetEntryMatcher.entityTypeFacet(false)
-        ));
         String[] tokens = new String[] {
             null,
             getAuthToken(eperson.getEmail(), password),
@@ -6631,15 +6625,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
             .andExpect(jsonPath("$._embedded.searchResult.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
             )))
-            .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                FacetEntryMatcher.relatedItemFacet(false),
-                FacetEntryMatcher.originFacet(false),
-                FacetEntryMatcher.targetFacet(false),
-                FacetEntryMatcher.queueStatusFacet(false),
-                FacetEntryMatcher.activityStreamTypeFacet(false),
-                FacetEntryMatcher.coarNotifyTypeFacet(false),
-                FacetEntryMatcher.notificationTypeFacet(false)
-            )))
+            .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(notifyIncomingFacetMatchers)))
             //There always needs to be a self link
             .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
     }
@@ -6695,15 +6681,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
             .andExpect(jsonPath("$._embedded.searchResult.page", is(
                 PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1)
             )))
-            .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
-                FacetEntryMatcher.relatedItemFacet(false),
-                FacetEntryMatcher.originFacet(false),
-                FacetEntryMatcher.targetFacet(false),
-                FacetEntryMatcher.queueStatusFacet(false),
-                FacetEntryMatcher.activityStreamTypeFacet(false),
-                FacetEntryMatcher.coarNotifyTypeFacet(false),
-                FacetEntryMatcher.notificationTypeFacet(false)
-            )))
+            .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(notifyOutgoingFacetMatchers)))
             //There always needs to be a self link
             .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")));
     }
