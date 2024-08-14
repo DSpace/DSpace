@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import javax.el.MethodNotFoundException;
 
+import jakarta.el.MethodNotFoundException;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -47,6 +47,24 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
 
     @Autowired
     private CrossRefImportMetadataSourceServiceImpl crossRefServiceImpl;
+
+    @Test
+    public void crossRefImportMetadataGetNoRecordsTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
+        CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
+        try {
+            liveImportClientImpl.setHttpClient(httpClient);
+            CloseableHttpResponse response = mockResponse("" , 404, "Not Found");
+            when(httpClient.execute(ArgumentMatchers.any())).thenReturn(response);
+
+            context.restoreAuthSystemState();
+            Collection<ImportRecord> recordsImported = crossRefServiceImpl.getRecords("test query", 0, 2);
+            assertEquals(0, recordsImported.size());
+        } finally {
+            liveImportClientImpl.setHttpClient(originalHttpClient);
+        }
+    }
 
     @Test
     public void crossRefImportMetadataGetRecordsTest() throws Exception {

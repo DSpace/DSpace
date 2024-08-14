@@ -10,7 +10,6 @@ package org.dspace.app.rest.model.hateoas;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
-import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.RestResourceController;
 import org.dspace.app.rest.model.BrowseIndexRest;
 import org.dspace.app.rest.model.VocabularyRest;
@@ -47,13 +46,13 @@ public class BrowseIndexResource extends DSpaceResource<BrowseIndexRest> {
         }
         if (bix.getBrowseType().equals(BrowseIndexRest.BROWSE_TYPE_HIERARCHICAL)) {
             ChoiceAuthorityService choiceAuthorityService =
-                    ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
+                ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
             ChoiceAuthority source = choiceAuthorityService.getChoiceAuthorityByAuthorityName(bix.getVocabulary());
             UriComponentsBuilder baseLink = linkTo(
-                    methodOn(RestResourceController.class, VocabularyRest.AUTHENTICATION).findRel(null,
-                            null, VocabularyRest.CATEGORY,
-                            English.plural(VocabularyRest.NAME), source.getPluginInstanceName(),
-                            "", null, null)).toUriComponentsBuilder();
+                methodOn(RestResourceController.class, VocabularyRest.AUTHENTICATION).findRel(
+                    null, null, VocabularyRest.CATEGORY, VocabularyRest.PLURAL_NAME,
+                    source.getPluginInstanceName(), "", null, null)
+            ).toUriComponentsBuilder();
 
             add(Link.of(baseLink.build().encode().toUriString(), BrowseIndexRest.LINK_VOCABULARY));
         }

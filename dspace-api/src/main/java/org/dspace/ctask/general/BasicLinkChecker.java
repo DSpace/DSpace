@@ -145,7 +145,7 @@ public class BasicLinkChecker extends AbstractCurationTask {
     }
 
     /**
-     * Internal utitity method to get a description of the handle
+     * Internal utility method to get a description of the handle
      *
      * @param item The item to get a description of
      * @return The handle, or in workflow

@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
 import com.nimbusds.jose.CompressionAlgorithm;
 import com.nimbusds.jose.EncryptionMethod;
@@ -31,16 +30,17 @@ import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.jwt.util.DateUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.service.ClientInfoService;
 import org.dspace.services.ConfigurationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.keygen.BytesKeyGenerator;
@@ -59,7 +59,7 @@ public abstract class JWTTokenHandler {
     private static final int MAX_CLOCK_SKEW_SECONDS = 60;
     private static final String AUTHORIZATION_TOKEN_PARAMETER = "authentication-token";
 
-    private static final Logger log = LoggerFactory.getLogger(JWTTokenHandler.class);
+    private static final Logger log = LogManager.getLogger();
 
     @Autowired
     private List<JWTClaimProvider> jwtClaimProviders;
@@ -135,7 +135,7 @@ public abstract class JWTTokenHandler {
         // As long as the JWT is valid, parse all claims and return the EPerson
         if (isValidToken(request, signedJWT, jwtClaimsSet, ePerson)) {
 
-            log.debug("Received valid token for username: " + ePerson.getEmail());
+            log.debug("Received valid token for username: {}", ePerson::getEmail);
 
             for (JWTClaimProvider jwtClaimProvider : jwtClaimProviders) {
                 jwtClaimProvider.parseClaim(context, request, jwtClaimsSet);
@@ -143,7 +143,7 @@ public abstract class JWTTokenHandler {
 
             return ePerson;
         } else {
-            log.warn(getIpAddress(request) + " tried to use an expired or non-valid token");
+            log.warn("{} tried to use an expired or non-valid token", getIpAddress(request));
             return null;
         }
     }
@@ -155,7 +155,8 @@ public abstract class JWTTokenHandler {
      * @param request current Request
      * @param previousLoginDate date of last login (before this one)
      * @return string version of signed JWT
-     * @throws JOSEException
+     * @throws JOSEException passed through.
+     * @throws SQLException passed through.
      */
     public String createTokenForEPerson(Context context, HttpServletRequest request, Date previousLoginDate)
         throws JOSEException, SQLException {

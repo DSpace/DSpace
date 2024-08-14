@@ -133,7 +133,7 @@ public class SwordUrlManager {
 
             String iid = location.substring(cBaseUrl.length());
             if (iid.endsWith(".atom")) {
-                // this is the atom url, so we need to strip that to ge tthe item id
+                // this is the atom url, so we need to strip that to ge the item id
                 iid = iid.substring(0, iid.length() - ".atom".length());
             } else if (iid.endsWith(".rdf")) {
                 // this is the rdf url so we need to strip that to get the item id
@@ -458,10 +458,9 @@ public class SwordUrlManager {
         throws DSpaceSwordException {
         WorkflowTools wft = new WorkflowTools();
 
-        // if the item is in the workspace, we need to give it it's own special identifier
+        // if the item is in the workspace, we need to give it its own special identifier
         if (wft.isItemInWorkspace(context, item)) {
-            String urlTemplate = configurationService
-                .getProperty("swordv2-server", "workspace.url-template");
+            String urlTemplate = configurationService.getProperty("swordv2-server.workspace.url-template");
             if (urlTemplate != null) {
                 return urlTemplate.replace("#wsid#", Integer.toString(
                     wft.getWorkspaceItem(context, item).getID()));

@@ -12,28 +12,26 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import javax.persistence.Cacheable;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.dspace.browse.ItemCountException;
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.HibernateProxyHelper;
 import org.dspace.eperson.Group;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.proxy.HibernateProxyHelper;
+
 
 /**
  * Class representing a community
@@ -46,9 +44,7 @@ import org.hibernate.proxy.HibernateProxyHelper;
  */
 @Entity
 @Table(name = "community")
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
-public class Community extends DSpaceObject implements DSpaceObjectLegacySupport {
+public class Community extends CacheableDSpaceObject implements DSpaceObjectLegacySupport {
     @Column(name = "community_id", insertable = false, updatable = false)
     private Integer legacyId;
 
@@ -123,6 +119,9 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
 
     void setLogo(Bitstream logo) {
         this.logo = logo;
+        if (logo != null) {
+            logo.setCommunity(this);
+        }
         setModified();
     }
 
@@ -263,18 +262,5 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
             communityService = ContentServiceFactory.getInstance().getCommunityService();
         }
         return communityService;
-    }
-
-    /**
-     * return count of the community items
-     *
-     * @return int
-     */
-    public int countArchivedItems() {
-        try {
-            return communityService.countArchivedItems(this);
-        } catch (ItemCountException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

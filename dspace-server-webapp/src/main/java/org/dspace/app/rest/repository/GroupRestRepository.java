@@ -13,9 +13,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.MetadataConverter;
@@ -42,7 +42,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
-@Component(GroupRest.CATEGORY + "." + GroupRest.NAME)
+@Component(GroupRest.CATEGORY + "." + GroupRest.PLURAL_NAME)
 public class GroupRestRepository extends DSpaceObjectRestRepository<Group, GroupRest> {
     @Autowired
     GroupService gs;
@@ -142,6 +142,35 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
             long total = gs.searchResultCount(context, query);
             List<Group> groups = gs.search(context, query, Math.toIntExact(pageable.getOffset()),
                                                            Math.toIntExact(pageable.getPageSize()));
+            return converter.toRestPage(groups, pageable, total, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Find the Groups matching the query parameter which are NOT a member of the given parent Group.
+     * The search is delegated to the
+     * {@link GroupService#searchNonMembers(Context, String, Group, int, int)} method
+     *
+     * @param groupUUID the parent group UUID
+     * @param query    is the *required* query string
+     * @param pageable contains the pagination information
+     * @return a Page of GroupRest instances matching the user query
+     */
+    @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('MANAGE_ACCESS_GROUP')")
+    @SearchRestMethod(name = "isNotMemberOf")
+    public Page<GroupRest> findIsNotMemberOf(@Parameter(value = "group", required = true) UUID groupUUID,
+                                             @Parameter(value = "query", required = true) String query,
+                                             Pageable pageable) {
+
+        try {
+            Context context = obtainContext();
+            Group excludeParentGroup = gs.find(context, groupUUID);
+            long total = gs.searchNonMembersCount(context, query, excludeParentGroup);
+            List<Group> groups = gs.searchNonMembers(context, query, excludeParentGroup,
+                                                     Math.toIntExact(pageable.getOffset()),
+                                                     Math.toIntExact(pageable.getPageSize()));
             return converter.toRestPage(groups, pageable, total, utils.obtainProjection());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);

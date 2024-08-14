@@ -15,8 +15,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.ExternalSourceRest;
@@ -106,7 +106,7 @@ public abstract class ExternalSourceEntryItemUriListHandler<T> implements UriLis
             Collection collection = collectionService.find(context, UUID.fromString(owningCollectionUuid));
             return externalDataService.createWorkspaceItemFromExternalDataObject(context, dataObject, collection);
         } catch (AuthorizeException | SQLException e) {
-            log.error("An error occured when trying to create item in collection with uuid: " + owningCollectionUuid,
+            log.error("An error occurred when trying to create item in collection with uuid: " + owningCollectionUuid,
                       e);
             throw e;
         }

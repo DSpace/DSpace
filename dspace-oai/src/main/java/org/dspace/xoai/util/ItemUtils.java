@@ -11,6 +11,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
@@ -21,6 +23,9 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
@@ -59,6 +64,10 @@ public class ItemUtils {
 
     private static final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    private static final AuthorizeService authorizeService
+            = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+
     /**
      * Default constructor
      */
@@ -103,23 +112,26 @@ public class ItemUtils {
             bundle.getElement().add(bitstreams);
             List<Bitstream> bits = b.getBitstreams();
             for (Bitstream bit : bits) {
+                // Check if bitstream is null and log the error
+                if (bit == null) {
+                    log.error("Null bitstream found, check item uuid: " + item.getID());
+                    break;
+                }
+                boolean primary = false;
+                // Check if current bitstream is in original bundle + 1 of the 2 following
+                // Bitstream = primary bitstream in bundle -> true
+                // No primary bitstream found in bundle-> only the first one gets flagged as "primary"
+                if (b.getName() != null && b.getName().equals("ORIGINAL") && (b.getPrimaryBitstream() != null
+                        && b.getPrimaryBitstream().getID() == bit.getID()
+                        || b.getPrimaryBitstream() == null && bit.getID() == bits.get(0).getID())) {
+                    primary = true;
+                }
+
                 Element bitstream = create("bitstream");
                 bitstreams.getElement().add(bitstream);
-                String url = "";
-                String bsName = bit.getName();
-                String sid = String.valueOf(bit.getSequenceID());
+
                 String baseUrl = configurationService.getProperty("oai.bitstream.baseUrl");
-                String handle = null;
-                // get handle of parent Item of this bitstream, if there
-                // is one:
-                List<Bundle> bn = bit.getBundles();
-                if (!bn.isEmpty()) {
-                    List<Item> bi = bn.get(0).getItems();
-                    if (!bi.isEmpty()) {
-                        handle = bi.get(0).getHandle();
-                    }
-                }
-                url = baseUrl + "/bitstreams/" + bit.getID().toString() + "/download";
+                String url = baseUrl + "/bitstreams/" + bit.getID().toString() + "/download";
 
                 String cks = bit.getChecksum();
                 String cka = bit.getChecksumAlgorithm();
@@ -136,16 +148,63 @@ public class ItemUtils {
                 if (description != null) {
                     bitstream.getField().add(createValue("description", description));
                 }
+                // Add bitstream embargo information (READ policy present, for Anonymous group with a start date)
+                addResourcePolicyInformation(context, bit, bitstream);
+
                 bitstream.getField().add(createValue("format", bit.getFormat(context).getMIMEType()));
                 bitstream.getField().add(createValue("size", "" + bit.getSizeBytes()));
                 bitstream.getField().add(createValue("url", url));
                 bitstream.getField().add(createValue("checksum", cks));
                 bitstream.getField().add(createValue("checksumAlgorithm", cka));
                 bitstream.getField().add(createValue("sid", bit.getSequenceID() + ""));
+                // Add primary bitstream field to allow locating easily the primary bitstream information
+                bitstream.getField().add(createValue("primary", primary + ""));
             }
         }
 
         return bundles;
+    }
+
+    /**
+     * This method will add metadata information about associated resource policies for a give bitstream.
+     * It will parse of relevant policies and add metadata information
+     * @param context
+     * @param bitstream the bitstream object
+     * @param bitstreamEl the bitstream metadata object to add resource policy information to
+     * @throws SQLException
+     */
+    private static void addResourcePolicyInformation(Context context, Bitstream bitstream, Element bitstreamEl)
+            throws SQLException {
+        // Pre-filter access policies by DSO (bitstream) and Action (READ)
+        List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, bitstream, Constants.READ);
+
+        // Create resourcePolicies container
+        Element resourcePolicies = create("resourcePolicies");
+
+        for (ResourcePolicy policy : policies) {
+            String groupName = policy.getGroup() != null ? policy.getGroup().getName() : null;
+            String user = policy.getEPerson() != null ? policy.getEPerson().getName() : null;
+            String action = Constants.actionText[policy.getAction()];
+            Date startDate = policy.getStartDate();
+            Date endDate = policy.getEndDate();
+
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+
+            Element resourcePolicyEl = create("resourcePolicy");
+            resourcePolicyEl.getField().add(createValue("group", groupName));
+            resourcePolicyEl.getField().add(createValue("user", user));
+            resourcePolicyEl.getField().add(createValue("action", action));
+            if (startDate != null) {
+                resourcePolicyEl.getField().add(createValue("start-date", formatter.format(startDate)));
+            }
+            if (endDate != null) {
+                resourcePolicyEl.getField().add(createValue("end-date", formatter.format(endDate)));
+            }
+            // Add resourcePolicy to list of resourcePolicies
+            resourcePolicies.getElement().add(resourcePolicyEl);
+        }
+        // Add list of resource policies to the corresponding Bitstream XML Element
+        bitstreamEl.getElement().add(resourcePolicies);
     }
 
     private static Element createLicenseElement(Context context, Item item)
@@ -158,13 +217,17 @@ public class ItemUtils {
             List<Bitstream> licBits = licBundle.getBitstreams();
             if (!licBits.isEmpty()) {
                 Bitstream licBit = licBits.get(0);
-                InputStream in;
+                if (authorizeService.authorizeActionBoolean(context, licBit, Constants.READ)) {
+                    InputStream in;
 
-                in = bitstreamService.retrieve(context, licBit);
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                Utils.bufferedCopy(in, out);
-                license.getField().add(createValue("bin", Base64Utils.encode(out.toString())));
-
+                    in = bitstreamService.retrieve(context, licBit);
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    Utils.bufferedCopy(in, out);
+                    license.getField().add(createValue("bin", Base64Utils.encode(out.toString())));
+                } else {
+                    log.info("Missing READ rights for license bitstream. Did not include license bitstream for item: "
+                            + item.getID() + ".");
+                }
             }
         }
         return license;

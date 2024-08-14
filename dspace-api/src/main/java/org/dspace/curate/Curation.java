@@ -152,17 +152,10 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
                 super.handler.logInfo("Curating id: " + entry.getObjectId());
             }
             curator.clear();
-            // does entry relate to a DSO or workflow object?
-            if (entry.getObjectId().indexOf('/') > 0) {
-                for (String taskName : entry.getTaskNames()) {
-                    curator.addTask(taskName);
-                }
-                curator.curate(context, entry.getObjectId());
-            } else {
-                // TODO: Remove this exception once curation tasks are supported by configurable workflow
-                // e.g. see https://github.com/DSpace/DSpace/pull/3157
-                throw new IllegalArgumentException("curation for workflow items is no longer supported");
+            for (String taskName : entry.getTaskNames()) {
+                curator.addTask(taskName);
             }
+            curator.curate(context, entry.getObjectId());
         }
         queue.release(this.queue, ticket, true);
         return ticket;

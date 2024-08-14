@@ -25,8 +25,8 @@ public class EntityTypeRest extends BaseObjectRest<Integer> {
     private static final long serialVersionUID = 8166078961459192770L;
 
     public static final String NAME = "entitytype";
-    public static final String NAME_PLURAL = "entitytypes";
-    public static final String CATEGORY = "core";
+    public static final String PLURAL_NAME = "entitytypes";
+    public static final String CATEGORY = RestModel.CORE;
     public static final String RELATION_SHIP_TYPES = "relationshiptypes";
 
     public String getCategory() {
@@ -39,6 +39,11 @@ public class EntityTypeRest extends BaseObjectRest<Integer> {
 
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     private String label;

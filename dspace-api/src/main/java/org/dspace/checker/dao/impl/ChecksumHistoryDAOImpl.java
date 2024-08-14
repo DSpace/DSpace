@@ -9,9 +9,9 @@ package org.dspace.checker.dao.impl;
 
 import java.sql.SQLException;
 import java.util.Date;
-import javax.persistence.Query;
-import javax.persistence.TemporalType;
 
+import jakarta.persistence.Query;
+import jakarta.persistence.TemporalType;
 import org.dspace.checker.ChecksumHistory;
 import org.dspace.checker.ChecksumResultCode;
 import org.dspace.checker.dao.ChecksumHistoryDAO;

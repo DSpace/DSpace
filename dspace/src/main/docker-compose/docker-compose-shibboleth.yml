@@ -10,9 +10,12 @@
 # Test environment for DSpace + Shibboleth (running via mod_shib in Apache). See README for instructions.
 # This should NEVER be used in production scenarios.
 #
-version: '3.7'
 networks:
-  dspacenet:
+  # Default to using network named 'dspacenet' from docker-compose.yml.
+  # Its full name will be prepended with the project name (e.g. "-p d7" means it will be named "d7_dspacenet")
+  default:
+    name: ${COMPOSE_PROJECT_NAME}_dspacenet
+    external: true
 services:
   dspace-shibboleth:
     container_name: dspace-shibboleth
@@ -22,8 +25,6 @@ services:
     build:
       # Must be relative to root, so that it can be built alongside [src]/docker-compose.yml
       context: ./dspace/src/main/docker/dspace-shibboleth
-    networks:
-      dspacenet:
     ports:
       - published: 80
         target: 80

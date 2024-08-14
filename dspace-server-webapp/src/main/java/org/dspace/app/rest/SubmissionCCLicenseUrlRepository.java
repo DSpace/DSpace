@@ -10,8 +10,8 @@ package org.dspace.app.rest;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import javax.servlet.ServletRequest;
 
+import jakarta.servlet.ServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
  * It only supports a search method
  */
 
-@Component(SubmissionCCLicenseUrlRest.CATEGORY + "." + SubmissionCCLicenseUrlRest.NAME)
+@Component(SubmissionCCLicenseUrlRest.CATEGORY + "." + SubmissionCCLicenseUrlRest.PLURAL_NAME)
 public class SubmissionCCLicenseUrlRepository extends DSpaceRestRepository<SubmissionCCLicenseUrlRest, String>
                                               implements InitializingBean {
 
@@ -133,8 +133,8 @@ public class SubmissionCCLicenseUrlRepository extends DSpaceRestRepository<Submi
     public void afterPropertiesSet() {
         discoverableEndpointsService.register(this, Arrays.asList(
                 Link.of("/api/" + SubmissionCCLicenseUrlRest.CATEGORY + "/" +
-                        SubmissionCCLicenseUrlRest.PLURAL + "/search",
-                        SubmissionCCLicenseUrlRest.PLURAL + "-search")));
+                        SubmissionCCLicenseUrlRest.PLURAL_NAME + "/search",
+                        SubmissionCCLicenseUrlRest.PLURAL_NAME + "-search")));
     }
 
 }

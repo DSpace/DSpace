@@ -169,4 +169,75 @@ public class FacetEntryMatcher {
             hasJsonPath("$._links", matchNextLink(hasNext, "api/discover/facets/entityType"))
         );
     }
+
+    public static Matcher<? super Object> relatedItemFacet(boolean b) {
+        return allOf(
+            hasJsonPath("$.name", is("relateditem")),
+            hasJsonPath("$.facetType", is("text")),
+            hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$._links.self.href", containsString("api/discover/facets/relateditem")),
+            hasJsonPath("$._links", matchNextLink(b, "api/discover/facets/relateditem"))
+        );
+    }
+
+    public static Matcher<? super Object> originFacet(boolean b) {
+        return allOf(
+            hasJsonPath("$.name", is("origin")),
+            hasJsonPath("$.facetType", is("text")),
+            hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$._links.self.href", containsString("api/discover/facets/origin")),
+            hasJsonPath("$._links", matchNextLink(b, "api/discover/facets/origin"))
+        );
+    }
+
+    public static Matcher<? super Object> targetFacet(boolean b) {
+        return allOf(
+            hasJsonPath("$.name", is("target")),
+            hasJsonPath("$.facetType", is("text")),
+            hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$._links.self.href", containsString("api/discover/facets/target")),
+            hasJsonPath("$._links", matchNextLink(b, "api/discover/facets/target"))
+        );
+    }
+
+    public static Matcher<? super Object> queueStatusFacet(boolean b) {
+        return allOf(
+            hasJsonPath("$.name", is("queue_status")),
+            hasJsonPath("$.facetType", is("text")),
+            hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$._links.self.href", containsString("api/discover/facets/queue_status")),
+            hasJsonPath("$._links", matchNextLink(b, "api/discover/facets/queue_status"))
+        );
+    }
+
+    public static Matcher<? super Object> activityStreamTypeFacet(boolean b) {
+        return allOf(
+            hasJsonPath("$.name", is("activity_stream_type")),
+            hasJsonPath("$.facetType", is("text")),
+            hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$._links.self.href", containsString("api/discover/facets/activity_stream_type")),
+            hasJsonPath("$._links", matchNextLink(b, "api/discover/facets/activity_stream_type"))
+        );
+    }
+
+    public static Matcher<? super Object> coarNotifyTypeFacet(boolean b) {
+        return allOf(
+            hasJsonPath("$.name", is("coar_notify_type")),
+            hasJsonPath("$.facetType", is("text")),
+            hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$._links.self.href", containsString("api/discover/facets/coar_notify_type")),
+            hasJsonPath("$._links", matchNextLink(b, "api/discover/facets/coar_notify_type"))
+        );
+    }
+
+    public static Matcher<? super Object> notificationTypeFacet(boolean b) {
+        return allOf(
+            hasJsonPath("$.name", is("notification_type")),
+            hasJsonPath("$.facetType", is("text")),
+            hasJsonPath("$.facetLimit", any(Integer.class)),
+            hasJsonPath("$._links.self.href", containsString("api/discover/facets/notification_type")),
+            hasJsonPath("$._links", matchNextLink(b, "api/discover/facets/notification_type"))
+        );
+    }
+
 }

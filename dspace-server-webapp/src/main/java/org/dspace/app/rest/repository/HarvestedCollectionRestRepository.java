@@ -13,10 +13,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.converter.HarvestedCollectionConverter;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.HarvestTypeEnum;
@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Jelle Pelgrims (jelle.pelgrims at atmire.com)
  */
-@Component(HarvestedCollectionRest.CATEGORY + "." + HarvestedCollectionRest.NAME)
+@Component(HarvestedCollectionRest.CATEGORY + "." + HarvestedCollectionRest.PLURAL_NAME)
 public class HarvestedCollectionRestRepository extends AbstractDSpaceRestRepository {
 
     @Autowired
@@ -148,7 +148,7 @@ public class HarvestedCollectionRestRepository extends AbstractDSpaceRestReposit
 
     /**
      * Function used to verify that the harvest settings work
-     * @param harvestedCollectionRest    A object containg the harvest settings to be tested
+     * @param harvestedCollectionRest    A object containing the harvest settings to be tested
      * @return
      */
     private List<String> testHarvestSettings(HarvestedCollectionRest harvestedCollectionRest) {

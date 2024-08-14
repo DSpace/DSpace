@@ -159,7 +159,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         performExportScript(article.getHandle(), tempFile);
         UUID id = article.getID();
         itemService.delete(context, article);
-        WorkspaceItem workspaceItem = workspaceItemService.create(context, col1, id, false);
+        WorkspaceItem workspaceItem = workspaceItemService.create(context, col1, id, false, false);
         installItemService.installItem(context, workspaceItem, "123456789/0100");
         performImportNoForceScript(tempFile);
         Iterator<Item> items = itemService.findByCollection(context, col1);
@@ -171,7 +171,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
     }
 
     private String getID() throws IOException, MetadataValidationException {
-        //this method gets the UUID from the mets file thats stored in the attribute element
+        //this method gets the UUID from the mets file that's stored in the attribute element
         METSManifest manifest = null;
         ZipFile zip = new ZipFile(tempFile);
         ZipEntry manifestEntry = zip.getEntry(METSManifest.MANIFEST_FILE);
