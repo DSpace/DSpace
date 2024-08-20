@@ -53,6 +53,7 @@ public class ClarinLicense implements ReloadableEntity<Integer> {
      * Required info key word.
      */
     public static final String SEND_TOKEN = "SEND_TOKEN";
+    public static final String EXTRA_EMAIL = "EXTRA_EMAIL";
 
     @Id
     @Column(name = "license_id")
