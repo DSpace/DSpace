@@ -95,7 +95,7 @@ public final class Utils {
     private static final SimpleDateFormat outFmtSecond
             = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ssZ");
 
-    // output format with millsecond precision
+    // output format with millisecond precision
     private static final SimpleDateFormat outFmtMillisec
             = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss.SSSZ");
 

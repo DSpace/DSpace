@@ -725,7 +725,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                         try {
                             emailErrorMessage(eperson, e1.getMessage());
                         } catch (Exception e) {
-                            // wont throw here
+                            // won't throw here
                         }
                         throw new IllegalStateException(e1);
                     } finally {

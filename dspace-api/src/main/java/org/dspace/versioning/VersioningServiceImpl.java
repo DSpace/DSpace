@@ -247,7 +247,7 @@ public class VersioningServiceImpl implements VersioningService {
     protected int getNextVersionNumer(Context c, VersionHistory vh) throws SQLException {
         int next = versionDAO.getNextVersionNumber(c, vh);
 
-        // check if we have uncommited versions in DSpace's cache
+        // check if we have uncommitted versions in DSpace's cache
         if (versionHistoryService.getLatestVersion(c, vh) != null
             && versionHistoryService.getLatestVersion(c, vh).getVersionNumber() >= next) {
             next = versionHistoryService.getLatestVersion(c, vh).getVersionNumber() + 1;

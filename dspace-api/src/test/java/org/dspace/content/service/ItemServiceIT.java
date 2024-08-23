@@ -198,7 +198,7 @@ public class ItemServiceIT extends AbstractIntegrationTestWithDatabase {
 
         // now just add one metadata to be the last
         itemService.addMetadata(
-            context, item, dcSchema, contributorElement, authorQualifier, Item.ANY, "test, latest", null, 0
+            context, item, dcSchema, contributorElement, authorQualifier, null, "test, latest", null, 0
         );
         // now just remove first metadata
         itemService.removeMetadataValues(context, item, List.of(placeZero));

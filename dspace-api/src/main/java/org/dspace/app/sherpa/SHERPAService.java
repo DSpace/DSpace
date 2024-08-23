@@ -78,7 +78,7 @@ public class SHERPAService {
     @SuppressWarnings("unused")
     @PostConstruct
     private void init() {
-        // Get endoint and API key from configuration
+        // Get endpoint and API key from configuration
         endpoint = configurationService.getProperty("sherpa.romeo.url",
             "https://v2.sherpa.ac.uk/cgi/retrieve");
         apiKey = configurationService.getProperty("sherpa.romeo.apikey");
@@ -156,7 +156,7 @@ public class SHERPAService {
 
                 // If the response body is valid, pass to SHERPAResponse for parsing as JSON
                 if (null != responseBody) {
-                    log.debug("Non-null SHERPA resonse received for query of " + value);
+                    log.debug("Non-null SHERPA response received for query of " + value);
                     InputStream content = null;
                     try {
                         content = responseBody.getContent();
@@ -259,7 +259,7 @@ public class SHERPAService {
 
                 // If the response body is valid, pass to SHERPAResponse for parsing as JSON
                 if (null != responseBody) {
-                    log.debug("Non-null SHERPA resonse received for query of " + value);
+                    log.debug("Non-null SHERPA response received for query of " + value);
                     InputStream content = null;
                     try {
                         content = responseBody.getContent();

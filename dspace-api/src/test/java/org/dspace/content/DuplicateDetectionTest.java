@@ -421,7 +421,7 @@ public class DuplicateDetectionTest extends AbstractIntegrationTestWithDatabase 
         assertEquals("Potential duplicates of item10 (title + author) should have size " + size,
                 size, potentialDuplicates.size());
 
-        // The only member should be item 11 since item 12 has a different author (but hte same title
+        // The only member should be item 11 since item 12 has a different author (but the same title
         assertEquals("Item 11 should be be the detected duplicate",
                 item11.getID(), potentialDuplicates.get(0).getUuid());
 

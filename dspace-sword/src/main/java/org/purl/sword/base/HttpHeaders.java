@@ -48,7 +48,7 @@ public interface HttpHeaders {
     public static final String X_NO_OP = "X-No-Op";
 
     /**
-     * An HTTP Header label that the server should not epect, and thus
+     * An HTTP Header label that the server should not expect, and thus
      * created a corrupt header.
      */
     public static final String X_CORRUPT = "X-wibble";

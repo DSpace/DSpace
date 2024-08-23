@@ -802,7 +802,7 @@ public class StructBuilder {
 
             // default the short description to the empty string
             collectionService.setMetadataSingleValue(context, collection,
-                    MD_SHORT_DESCRIPTION, Item.ANY, " ");
+                    MD_SHORT_DESCRIPTION, null, " ");
 
             // import the rest of the metadata
             for (Map.Entry<String, MetadataFieldName> entry : collectionMap.entrySet()) {

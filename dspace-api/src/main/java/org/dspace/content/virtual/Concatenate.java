@@ -62,16 +62,16 @@ public class Concatenate implements VirtualMetadataConfiguration {
     }
 
     /**
-     * Generic getter for the seperator
-     * @return the seperator to be used by this bean
+     * Generic getter for the separator
+     * @return the separator to be used by this bean
      */
     public String getSeparator() {
         return separator;
     }
 
     /**
-     * Generic setter for the seperator property
-     * @param separator The String seperator value to which this seperator value will be set to
+     * Generic setter for the separator property
+     * @param separator The String separator value to which this separator value will be set to
      */
     public void setSeparator(String separator) {
         this.separator = separator;

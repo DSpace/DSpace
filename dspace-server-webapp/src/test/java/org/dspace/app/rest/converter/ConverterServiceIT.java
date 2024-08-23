@@ -113,7 +113,7 @@ public class ConverterServiceIT extends AbstractControllerIntegrationTest {
     /**
      * When calling {@code toRest} with the default projection, the converter should run and no changes should be made.
      * This converter.toRest will now also check permissions through the PreAuthorize annotation on the
-     * Repository's findOne method. Therefor a repository has been added for this MockObjectRest namely
+     * Repository's findOne method. Therefore a repository has been added for this MockObjectRest namely
      * {@link org.dspace.app.rest.repository.MockObjectRestRepository} and added PreAuthorize annotations
      * on the methods of this Repository
      */

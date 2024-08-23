@@ -429,7 +429,7 @@ public class RelationshipServiceImplPlaceTest extends AbstractUnitTest {
 
         context.turnOffAuthorisationSystem();
 
-        // Create a relationship with this item with a spcific place
+        // Create a relationship with this item with a specific place
         Relationship relationship = relationshipService.create(context, item, authorItem, isAuthorOfPublication, 1, -1);
 
         context.restoreAuthSystemState();

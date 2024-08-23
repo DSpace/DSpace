@@ -18,7 +18,7 @@ import org.dspace.core.Context;
  * Configuration properties: (with examples)
  * {@code
  * # values for the forever embargo date threshold
- * # This threshold date is used in the default access status helper to dermine if an item is
+ * # This threshold date is used in the default access status helper to determine if an item is
  * # restricted or embargoed based on the start date of the primary (or first) file policies.
  * # In this case, if the policy start date is inferior to the threshold date, the status will
  * # be embargo, else it will be restricted.

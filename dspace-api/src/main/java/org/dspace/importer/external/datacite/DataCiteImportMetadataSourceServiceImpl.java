@@ -36,7 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Implements a data source for querying Datacite
  * Mainly copied from CrossRefImportMetadataSourceServiceImpl.
  *
- * optional Affiliation informations are not part of the API request.
+ * optional Affiliation information are not part of the API request.
  * https://support.datacite.org/docs/can-i-see-more-detailed-affiliation-information-in-the-rest-api
  *
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)

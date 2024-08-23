@@ -391,7 +391,7 @@ public class DataCiteConnector
             log.error("Caught an AuthorizeException while disseminating DSO"
                     + " with type {} and ID {}. Giving up to reserve DOI {}.",
                     dso.getType(), dso.getID(), doi, ae);
-            throw new DOIIdentifierException("AuthorizeException occured while "
+            throw new DOIIdentifierException("AuthorizeException occurred while "
                                                  + "converting " + dSpaceObjectService.getTypeText(dso) + "/" + dso
                 .getID()
                                                  + " using crosswalk " + this.CROSSWALK_NAME + ".", ae,
@@ -400,7 +400,7 @@ public class DataCiteConnector
             log.error("Caught a CrosswalkException while reserving a DOI ({})"
                     + " for DSO with type {} and ID {}. Won't reserve the doi.",
                     doi, dso.getType(), dso.getID(), ce);
-            throw new DOIIdentifierException("CrosswalkException occured while "
+            throw new DOIIdentifierException("CrosswalkException occurred while "
                                                  + "converting " + dSpaceObjectService.getTypeText(dso) + "/" + dso
                 .getID()
                                                  + " using crosswalk " + this.CROSSWALK_NAME + ".", ce,
@@ -421,7 +421,7 @@ public class DataCiteConnector
                           + "crosswalk to generate the metadata used another DOI than "
                           + "the DOI we're reserving. Cannot reserve DOI {} for {} {}.",
                     doi, dSpaceObjectService.getTypeText(dso), dso.getID());
-            throw new IllegalStateException("An internal error occured while "
+            throw new IllegalStateException("An internal error occurred while "
                                                 + "generating the metadata. Unable to reserve doi, see logs "
                                                 + "for further information.");
         }

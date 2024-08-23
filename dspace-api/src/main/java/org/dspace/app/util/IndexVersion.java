@@ -62,7 +62,7 @@ public class IndexVersion {
         // First argument is the Index path. Determine its version
         String indexVersion = getIndexVersion(argv[0]);
 
-        // Second argumet is an optional version number to compare to
+        // Second argument is an optional version number to compare to
         String compareToVersion = argv.length > 1 ? argv[1] : null;
 
         // If indexVersion comes back as null, then it is not a valid index directory.

@@ -126,7 +126,7 @@ public class SWORDMETSIngester implements SWORDIngester {
             // get reference to item so that we can report on it
             Item installedItem = (Item) ingestedObject;
 
-            // update the item metadata to inclue the current time as
+            // update the item metadata to include the current time as
             // the updated date
             this.setUpdatedDate(context, installedItem);
 

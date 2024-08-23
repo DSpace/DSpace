@@ -24,7 +24,7 @@ import org.flywaydb.core.api.migration.Context;
  * since unit tests require H2 and the syntax for H2 is different from Postgres).
  * <P>
  * NOTE: This migration class is very simple because it is meant to be used
- * in conjuction with the corresponding SQL script:
+ * in conjunction with the corresponding SQL script:
  * ./etc/migrations/[db-type]/V1.4__Upgrade_to_DSpace_1.4_schema.sql
  * <P>
  * Also note that this migration is "hackingly" versioned "1.3.9" as it needs to

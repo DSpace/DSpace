@@ -884,7 +884,7 @@ public class CommunityTest extends AbstractDSpaceObjectTest {
         context.turnOffAuthorisationSystem();
         Community parent = communityService.create(null, context);
 
-        // Create a hierachy of sub-Communities and Collections and Items.
+        // Create a hierarchy of sub-Communities and Collections and Items.
         Community child = communityService.createSubcommunity(context, parent);
         Community grandchild = communityService.createSubcommunity(context, child);
         Collection childCol = collectionService.create(context, child);

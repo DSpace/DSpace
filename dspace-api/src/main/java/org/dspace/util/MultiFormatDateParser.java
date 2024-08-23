@@ -70,7 +70,7 @@ public class MultiFormatDateParser {
             try {
                 pattern = Pattern.compile(rule.getKey(), Pattern.CASE_INSENSITIVE);
             } catch (PatternSyntaxException ex) {
-                log.error("Skipping format with unparseable pattern '{}'",
+                log.error("Skipping format with unparsable pattern '{}'",
                         rule::getKey);
                 continue;
             }

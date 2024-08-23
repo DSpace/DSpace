@@ -76,7 +76,7 @@ public class SolrAuthority implements ChoiceAuthority {
                 Integer.parseInt(locale);
                 locale = null;
             } catch (NumberFormatException e) {
-                //Everything is allright
+                //Everything is alright
             }
             if (locale != null && !"".equals(locale)) {
                 localSearchField = searchField + "_" + locale;

@@ -181,7 +181,7 @@ public interface CommunityService extends DSpaceObjectService<Community>, DSpace
 
 
     /**
-     * Add an exisiting collection to the community
+     * Add an existing collection to the community
      *
      * @param context    context
      * @param community  community

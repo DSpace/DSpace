@@ -158,7 +158,7 @@ public class SubmissionConfigReader {
      * <li>Hashmap of Collection to Submission definition mappings -
      * defines which Submission process a particular collection uses
      * <li>Hashmap of all Submission definitions.  List of all valid
-     * Submision Processes by name.
+     * Submission Processes by name.
      * </ul>
      */
     private void buildInputs(String fileName) throws SubmissionConfigReaderException {
@@ -358,7 +358,7 @@ public class SubmissionConfigReader {
         throws SubmissionConfigReaderException {
         // We should already have the step definitions loaded
         if (stepDefns != null) {
-            // retreive step info
+            // retrieve step info
             Map<String, String> stepInfo = stepDefns.get(stepID);
 
             if (stepInfo != null) {

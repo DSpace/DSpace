@@ -387,7 +387,7 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
                                 BitstreamMatcher.matchBitstreamEntry(UUID.fromString(bitstreamId), file.getSize()))));
     }
 
-    // TODO This test doesn't work either as it seems that only the first file is ever transfered into the request
+    // TODO This test doesn't work either as it seems that only the first file is ever transferred into the request
     // Thus we cannot check for this and we have no way of knowing how many files we gave to the request
     @Test
     @Ignore

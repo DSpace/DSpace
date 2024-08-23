@@ -30,7 +30,7 @@ import org.dspace.core.SelfNamedPlugin;
  * configurable submission.
  *
  * Configuration:
- * This MUST be configured aas a self-named plugin, e.g.:
+ * This MUST be configured as a self-named plugin, e.g.:
  * {@code
  * plugin.selfnamed.org.dspace.content.authority.ChoiceAuthority = \
  * org.dspace.content.authority.DCInputAuthority
