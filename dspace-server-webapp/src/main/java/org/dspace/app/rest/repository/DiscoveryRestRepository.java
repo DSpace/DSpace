@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -26,7 +27,9 @@ import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.rest.utils.RestDiscoverQueryBuilder;
 import org.dspace.app.rest.utils.ScopeResolver;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
+import org.dspace.core.Constants;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.IndexableObject;
@@ -78,6 +81,9 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
 
     @Autowired
     private DiscoverFacetsConverter discoverFacetsConverter;
+    
+    @Autowired
+    private AuthorizeService authorizeService;
 
     public SearchConfigurationRest getSearchConfiguration(final String dsoScope, final String configuration) {
         Context context = obtainContext();
@@ -104,9 +110,13 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         try {
             discoverQuery = queryBuilder
                 .buildQuery(context, scopeObject, discoveryConfiguration, query, searchFilters, dsoTypes, page);
-            searchResult = searchService.search(context, scopeObject, discoverQuery);
-
-        } catch (SearchServiceException e) {
+            if(dsoTypes.size() == 1 && (dsoTypes.get(0).equals(Constants.typeText[Constants.COLLECTION]) || 
+            		dsoTypes.get(0).equals(Constants.typeText[Constants.COMMUNITY]))) {
+            	searchResult = authorizeService.retrieveObjectWithAdmin(context, discoverQuery, null, null, query);
+            } else {
+            	searchResult = searchService.search(context, scopeObject, discoverQuery);
+            }
+        } catch (SearchServiceException | SQLException e) {
             log.error("Error while searching with Discovery", e);
             throw new IllegalArgumentException("Error while searching with Discovery: " + e.getMessage());
         }
