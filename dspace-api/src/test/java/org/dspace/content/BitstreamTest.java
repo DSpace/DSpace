@@ -58,7 +58,7 @@ public class BitstreamTest extends AbstractDSpaceObjectTest {
     /**
      * BitStream instance for the tests
      */
-    private Bitstream bs;
+    protected Bitstream bs;
 
     /**
      * Spy of AuthorizeService to use for tests

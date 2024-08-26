@@ -842,13 +842,27 @@
         </dependency>
 
         <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.jclouds</groupId>
             <artifactId>jclouds-core</artifactId>
             <version>2.5.0</version>
             <exclusions>
-                <exclusion>
+               <exclusion>
                     <groupId>com.google.code.gson</groupId>
                     <artifactId>gson</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.inject</groupId>
+                    <artifactId>guice</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>com.sun.xml.bind</groupId>

@@ -10,7 +10,6 @@ package org.dspace.storage.bitstore;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Properties;
@@ -19,6 +18,7 @@ import com.google.common.hash.HashCode;
 import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
 import com.google.common.net.MediaType;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,7 +28,6 @@ import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.storage.bitstore.factory.StorageServiceFactory;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
-import org.dspace.utils.DSpace;
 import org.jclouds.ContextBuilder;
 import org.jclouds.blobstore.BlobStore;
 import org.jclouds.blobstore.BlobStoreContext;
@@ -52,8 +51,17 @@ public class JCloudBitStoreService extends BaseBitStoreService {
     private String providerOrApi;
     private ContextBuilder builder;
     private BlobStoreContext blobStoreContext;
+
+    /**
+     * container for all the assets
+     */
     private String container;
-    private String subFolder;
+
+    /**
+     * (Optional) subfolder within bucket where objects are stored
+     */
+    private String subfolder = null;
+
     private String identity;
     private String credential;
     private String endpoint;
@@ -89,8 +97,12 @@ public class JCloudBitStoreService extends BaseBitStoreService {
         this.container = container;
     }
 
-    public void setSubFolder(String subFolder) {
-        this.subFolder = subFolder;
+    public String getSubfolder() {
+        return subfolder;
+    }
+
+    public void setSubfolder(String subfolder) {
+        this.subfolder = subfolder;
     }
 
     public void setIdentity(String identity) {
@@ -132,10 +144,16 @@ public class JCloudBitStoreService extends BaseBitStoreService {
             if (endpoint != null) {
                 this.builder = this.builder.endpoint(endpoint);
             }
-            blobStoreContext = this.builder.overrides(properties)
-                    .credentials(identity, credential).buildView(BlobStoreContext.class);
+            if (properties != null && !properties.isEmpty()) {
+                this.builder = this.builder.overrides(properties);
+            }
+            if (identity != null && credential != null) {
+                this.builder = this.builder.credentials(identity, credential);
+            }
+            blobStoreContext = this.builder.buildView(BlobStoreContext.class);
             this.initialized = true;
         } catch (Exception e) {
+            log.error(e.getMessage(),e);
             this.initialized = false;
         }
     }
@@ -146,8 +164,7 @@ public class JCloudBitStoreService extends BaseBitStoreService {
         if (counter == maxCounter) {
             counter = 0;
             blobStoreContext.close();
-            blobStoreContext = this.builder.overrides(properties)
-                    .credentials(identity, credential).buildView(BlobStoreContext.class);
+            blobStoreContext = this.builder.buildView(BlobStoreContext.class);
         }
     }
 
@@ -188,8 +205,8 @@ public class JCloudBitStoreService extends BaseBitStoreService {
      */
     public String getFullKey(String id) {
         StringBuilder bufFilename = new StringBuilder();
-        if (StringUtils.isNotEmpty(this.subFolder)) {
-            bufFilename.append(this.subFolder);
+        if (StringUtils.isNotEmpty(this.subfolder)) {
+            bufFilename.append(this.subfolder);
             appendSeparator(bufFilename);
         }
 
@@ -200,7 +217,7 @@ public class JCloudBitStoreService extends BaseBitStoreService {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("S3 filepath for " + id + " is "
+            log.debug("Container filepath for " + id + " is "
                     + bufFilename.toString());
         }
 
@@ -253,7 +270,7 @@ public class JCloudBitStoreService extends BaseBitStoreService {
 
     public void put(ByteSource byteSource, Bitstream bitstream)  throws IOException {
 
-        final File file = getFile(bitstream);
+        String key = getFullKey(bitstream.getInternalId());
 
         /* set type to sane default */
         String type = MediaType.OCTET_STREAM.toString();
@@ -270,9 +287,9 @@ public class JCloudBitStoreService extends BaseBitStoreService {
             blobStore.createContainerInLocation(null, container);
         }
 
-        Blob blob = blobStore.blobBuilder(file.toString())
+        Blob blob = blobStore.blobBuilder(key)
                 .payload(byteSource)
-                .contentDisposition(file.toString())
+                .contentDisposition(key)
                 .contentLength(byteSource.size())
                 .contentType(type)
                 .build();
@@ -281,18 +298,42 @@ public class JCloudBitStoreService extends BaseBitStoreService {
         blobStore.putBlob(container, blob, Builder.multipart());
     }
 
+    /**
+     * Store a stream of bits.
+     *
+     * <p>
+     * If this method returns successfully, the bits have been stored.
+     * If an exception is thrown, the bits have not been stored.
+     * </p>
+     *
+     * @param in The stream of bits to store
+     * @throws java.io.IOException If a problem occurs while storing the bits
+     */
     @Override
     public void put(Bitstream bitstream, InputStream in) throws IOException {
-        File tmp = File.createTempFile("jclouds", "cache");
+        String key = getFullKey(bitstream.getInternalId());
+        //Copy istream to temp file, and send the file, with some metadata
+        File scratchFile = File.createTempFile(bitstream.getInternalId(), "s3bs");
         try {
-            // Inefficient caching strategy, however allows for use of JClouds store directly without CachingStore.
-            // Make sure there is sufficient storage in temp directory.
-            Files.asByteSink(tmp).writeFrom(in);
-            in.close();
-            put(Files.asByteSource(tmp), bitstream);
+
+            FileUtils.copyInputStreamToFile(in, scratchFile);
+            long contentLength = scratchFile.length();
+            // The ETag may or may not be and MD5 digest of the object data.
+            // Therefore, we precalculate before uploading
+            String localChecksum = org.dspace.curate.Utils.checksum(scratchFile, CSA);
+
+            put(Files.asByteSource(scratchFile), bitstream);
+
+            bitstream.setSizeBytes(contentLength);
+            bitstream.setChecksum(localChecksum);
+            bitstream.setChecksumAlgorithm(CSA);
+
+        } catch (Exception e) {
+            log.error("put(" + bitstream.getInternalId() + ", is)", e);
+            throw new IOException(e);
         } finally {
-            if (!tmp.delete()) {
-                tmp.deleteOnExit();
+            if (!scratchFile.delete()) {
+                scratchFile.deleteOnExit();
             }
         }
     }
@@ -347,25 +388,7 @@ public class JCloudBitStoreService extends BaseBitStoreService {
         return new File(id);
     }
 
-    /**
-     * Gets the URI of the content within the store.
-     *
-     * @param id the bitstream internal id.
-     * @return the URI, which is a relative path to the content.
-     */
-    @SuppressWarnings("unused") // used by AVS2
-    public URI getStoredURI(String id) {
-        String tempID = getFullKey(id);
-        if (log.isDebugEnabled()) {
-            log.debug("Local URI for " + id + " is " + tempID);
-        }
-        return URI.create(id);
-    }
-
     private String getContainer() {
-        if (container == null) {
-            container = new DSpace().getConfigurationService().getProperty("dspace.name");
-        }
         return container;
     }
 }
