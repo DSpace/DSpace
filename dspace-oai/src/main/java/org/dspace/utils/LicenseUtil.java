@@ -12,14 +12,12 @@ package org.dspace.utils;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  *  Class is copied from the LINDAT/CLARIAH-CZ (This class is taken from UFAL-clarin.
@@ -200,28 +198,15 @@ public class LicenseUtil {
         return "available-restrictedUse";
     }
 
-    public static org.w3c.dom.NodeList uriToRestrictions(String uri)
+    public static List<String> uriToRestrictions(String uri)
             throws ParserConfigurationException {
-
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        javax.xml.parsers.DocumentBuilder builder;
-        builder = factory.newDocumentBuilder();
-
-        Document doc = builder.newDocument();
-        Element root = doc.createElement("restrictions");
-
         String restrictions = _uri2restrictions.get(uri);
         if (Objects.isNull(restrictions)) {
             restrictions = "other";
         }
-
-        for (String restriction : restrictions.split(",")) {
-            Element res = doc.createElement("restriction");
-            res.appendChild(doc.createTextNode(restriction));
-            root.appendChild(res);
-        }
-
-        return root.getElementsByTagName("restriction");
+        List<String> ret = new LinkedList<>();
+        Collections.addAll(ret, restrictions.split(","));
+        return ret;
     }
 
     public static void main(String[] args) throws Exception {

@@ -8,9 +8,11 @@
 
 package org.dspace.xoai.services.impl.resources.functions;
 
+import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.dspace.utils.LicenseUtil;
+
 
 /**
  * Serves as proxy for call from XSL engine. Calls LicenseUtil
@@ -23,7 +25,7 @@ public class UriToRestrictionsFn extends NodeListXslFunction {
     }
 
     @Override
-    protected org.w3c.dom.NodeList getNodeList(String param) {
+    protected List<String> getList(String param) {
         try {
             return LicenseUtil.uriToRestrictions(param);
         } catch (ParserConfigurationException e) {
