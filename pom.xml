@@ -40,6 +40,7 @@
         <!-- NOTE: Jetty needed for Solr, Handle Server & tests -->
         <jetty.version>9.4.57.v20241219</jetty.version>
         <log4j.version>2.24.3</log4j.version>
+        <openpdf-version>2.0.3</openpdf-version> <!-- 2.x for Java 17, 1.4.x for Java 11 -->
         <pdfbox-version>2.0.33</pdfbox-version>
         <rome.version>1.19.0</rome.version>
         <!-- SLF4J is not used, but specified for dependency convergence issues between many dependencies -->
@@ -1609,6 +1610,12 @@
                 <version>${log4j.version}</version>
             </dependency>
 
+            <!-- Template-based cover page -->
+            <dependency>
+                <groupId>com.github.librepdf</groupId>
+                <artifactId>openpdf</artifactId>
+                <version>${openpdf-version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.pdfbox</groupId>
                 <artifactId>pdfbox</artifactId>

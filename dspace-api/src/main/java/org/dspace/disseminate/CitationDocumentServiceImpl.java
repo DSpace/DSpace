@@ -10,15 +10,24 @@ package org.dspace.disseminate;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import com.lowagie.text.pdf.AcroFields;
+import com.lowagie.text.pdf.PdfContentByte;
+import com.lowagie.text.pdf.PdfImportedPage;
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.PdfStamper;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
@@ -53,7 +62,19 @@ import org.springframework.beans.factory.annotation.Autowired;
  * In this case we append the descriptive metadata to the end (configurable) of the document. i.e. last page of PDF.
  * So instead of getting the original PDF, you get a cPDF (with citation information added).
  *
+ * Template-based implementation (method addCoverPageBytes, formerly part of a class "CoverPageStamper") uses
+ * PDFStamper from OpenPDF libray to add extra page to existing pdfs on the fly. It is configured in citation-page.cfg
+ * by adding a file path to citation-page.template_path. Path must point to a PDF form that works as the cover page.
+ * Metadata fields are compared to the field names found in the PDF form based on the following rules:
+ *  - community or collection are used as special names to insert owning community or collection name
+ *  - "|" can be used as separator to provide multiple source fields (values from first nonempty one are used)
+ *  - otherwise, field names with typical schema.element.qualifier format use used
+ * Matching fields are populated with the metadata value. If there are multiple occurrences of the same field
+ * "; " is used as a separator. Finally, the form is prepended to the original pdf. Encrypted PDFs will be skipped.
+ *
  * @author Peter Dietz (peter@longsight.com)
+ * @author Joonas Kesäniemi (original template-based implementation)
+ * @author Miika Nurminen
  */
 public class CitationDocumentServiceImpl implements CitationDocumentService, InitializingBean {
     /**
@@ -96,6 +117,17 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
      * Citation page format
      */
     protected PDRectangle citationPageFormat = PDRectangle.LETTER;
+
+    /**
+     * Path to CoverPage template
+     */
+    protected String coverPagePath;
+
+    /**
+     * Field names (if any) that need to be escaped for HTML code (assuming that output is PDF is text only)
+     */
+    protected List<String> htmlfields;
+
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
@@ -208,6 +240,9 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             }
         }
 
+        // Fields related to configuration of pdf template-based implementation
+        coverPagePath = configurationService.getProperty("citation-page.template_path");
+        htmlfields = Arrays.asList(configurationService.getArrayProperty("citation-page.htmlfields"));
     }
 
 
@@ -282,34 +317,144 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         return VALID_TYPES.contains(bitstream.getFormat(context).getMIMEType());
     }
 
+    protected byte[] addCoverPageBytes(InputStream orig, Item item) throws IOException {
+        ByteArrayOutputStream bout = null;
+        ByteArrayOutputStream coverStream = null;
+        try {
+            PdfReader originalReader = new PdfReader(orig);
+
+            if (originalReader.isEncrypted()) {
+                throw new IOException("Could not add coverpage to an encrypted pdf. Item handle:" + item.getHandle());
+            }
+
+            bout = new ByteArrayOutputStream();
+            PdfStamper originalStamper = new PdfStamper(originalReader, bout);
+
+            // load the template
+            File templateFile = new File(coverPagePath);
+            if (!templateFile.exists()) {
+                originalStamper.close();
+                throw new IOException("Could not find cover page template file using path " + coverPagePath);
+            }
+
+            PdfReader coverTemplateReader = new PdfReader(new FileInputStream(templateFile));
+            coverStream = new ByteArrayOutputStream();
+
+            PdfStamper coverStamper = new PdfStamper(coverTemplateReader,
+                    coverStream);
+            AcroFields fields = coverStamper.getAcroFields();
+
+            Map<String, com.lowagie.text.pdf.AcroFields.Item> fieldMap = fields.getAllFields();
+            Iterator<String> i = fieldMap.keySet().iterator();
+            String key;
+            java.util.List<MetadataValue> values;
+
+            while (i.hasNext()) {
+                key = i.next();
+                // special handling to insert community or collection name
+                if (key.equals("community")) {
+                    fields.setField(key, getOwningCommunity(null, item));
+                    continue;
+                } else if (key.equals("collection")) {
+                    fields.setField(key, getOwningCollection(item));
+                    continue;
+                } else {
+                    // "|" can be used as separator to provide multiple source fields.
+                    String[] token = key.split("\\|");
+                    // First existing and nonempty value will be used
+                    boolean fieldAdded = false;
+                    for (String fieldname : token) {
+                        try {
+                            if (fieldAdded) {
+                                break;
+                            }
+                            values = itemService.getMetadataByMetadataString(item, fieldname.strip());
+                            if (values != null && values.size() > 0) {
+                                String text = "";
+                                int numOfValues = values.size();
+                                for (int k = 0; k < numOfValues; k++) {
+                                    String textToAdd = "";
+                                    // skip empty, whitespace, or null values
+                                    // removing html tags if field is in htmlfields list
+                                    if (htmlfields.contains(fieldname)) {
+                                        textToAdd = StringEscapeUtils
+                                                .unescapeHtml(values.get(k).getValue().replaceAll("<[^ ][^>]*>", ""));
+                                    } else {
+                                        textToAdd = StringEscapeUtils.unescapeHtml(values.get(k).getValue());
+                                    }
+                                    if (StringUtils.isBlank(textToAdd)) {
+                                        continue;
+                                    } else {
+                                        text = text + textToAdd;
+                                        fieldAdded = true;
+                                    }
+                                    // if multiple occurrences (e.g. dc.contributor.author), separate by "; "
+                                    if (k < (numOfValues - 1)) {
+                                        text = text + "; ";
+                                    }
+                                }
+                                fields.setField(key, text);
+                                break;
+                            }
+                        } catch (Exception e) {
+                            // e.g. invalid name (getMetadataByMetadataString assumes schema.element.qualifier format)
+                            log.error("Error in processing field " + fieldname + " for item " + item.getHandle());
+                        }
+                    }
+                }
+            }
+            coverStamper.setFormFlattening(true);
+            // cover page is ready
+            coverStamper.close();
+            coverTemplateReader.close();
+
+            coverStream.flush();
+            PdfReader coverReader = new PdfReader(coverStream.toByteArray());
+
+            originalStamper.insertPage(1, coverReader.getPageSize(1));
+            PdfImportedPage importedCoverpage = originalStamper
+                    .getImportedPage(coverReader, 1);
+
+            PdfContentByte cb = originalStamper.getUnderContent(1);
+            cb.addTemplate(importedCoverpage, 0, 0);
+
+            originalStamper.close();
+            bout.flush();
+
+            return bout.toByteArray();
+
+        } finally {
+
+            if (coverStream != null) {
+                try {
+                    coverStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (bout != null) {
+                try {
+                    bout.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     @Override
     public Pair<byte[], Long> makeCitedDocument(Context context, Bitstream bitstream)
             throws IOException, SQLException, AuthorizeException {
-        PDDocument document = new PDDocument();
-        PDDocument sourceDocument = new PDDocument();
+        InputStream inputStream = null;
         try {
             Item item = (Item) bitstreamService.getParentObject(context, bitstream);
-            final InputStream inputStream = bitstreamService.retrieve(context, bitstream);
-            try {
-                sourceDocument = sourceDocument.load(inputStream);
-            } finally {
+            inputStream = bitstreamService.retrieve(context, bitstream);
+            byte[] data = addCoverPageBytes(inputStream, item);
+            return Pair.of(data, Long.valueOf(data.length));
+        } finally {
+            if (inputStream != null) {
                 inputStream.close();
             }
-            PDPage coverPage = new PDPage(citationPageFormat);
-            generateCoverPage(context, document, coverPage, item);
-            addCoverPageToDocument(document, sourceDocument, coverPage);
-
-            //We already have the full PDF in memory, so keep it there
-            try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-                document.save(out);
-
-                byte[] data = out.toByteArray();
-                return Pair.of(data, Long.valueOf(data.length));
-            }
-
-        } finally {
-            sourceDocument.close();
-            document.close();
         }
     }
 
