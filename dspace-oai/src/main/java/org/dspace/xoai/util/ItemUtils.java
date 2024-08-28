@@ -29,10 +29,13 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.clarin.ClarinLicenseResourceMapping;
+import org.dspace.content.factory.ClarinServiceFactory;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.RelationshipService;
+import org.dspace.content.service.clarin.ClarinLicenseResourceMappingService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
@@ -47,6 +50,10 @@ import org.dspace.xoai.data.DSpaceItem;
  */
 @SuppressWarnings("deprecation")
 public class ItemUtils {
+
+
+    private static final ClarinLicenseResourceMappingService clarinLicenseResourceMappingService
+            = ClarinServiceFactory.getInstance().getClarinLicenseResourceMappingService();
     private static final Logger log = LogManager.getLogger(ItemUtils.class);
 
     private static final MetadataExposureService metadataExposureService
@@ -284,9 +291,102 @@ public class ItemUtils {
 
         // Done! Metadata has been read!
         // Now adding bitstream info
+
+        //indicate restricted bitstreams -> restricted access
+        boolean restricted = false;
+
         try {
             Element bundles = createBundlesElement(context, item);
             metadata.getElement().add(bundles);
+            List<Bundle> bs;
+
+            bs = item.getBundles();
+            for (Bundle b : bs) {
+                Element bundle = create("bundle");
+                bundles.getElement().add(bundle);
+                bundle.getField()
+                        .add(createValue("name", b.getName()));
+
+                Element bitstreams = create("bitstreams");
+                bundle.getElement().add(bitstreams);
+                List<Bitstream> bits = b.getBitstreams();
+                for (Bitstream bit : bits) {
+                    Element bitstream = create("bitstream");
+                    bitstreams.getElement().add(bitstream);
+                    String url = "";
+                    String bsName = bit.getName();
+                    String sid = String.valueOf(bit.getSequenceID());
+                    String baseUrl = configurationService.getProperty("oai", "bitstream.baseUrl");
+                    String handle = null;
+                    // get handle of parent Item of this bitstream, if there
+                    // is one:
+                    List<Bundle> bn = bit.getBundles();
+                    if (bn.size() > 0) {
+                        List<Item> bi = bn.get(0).getItems();
+                        if (bi.size() > 0) {
+                            handle = bi.get(0).getHandle();
+                        }
+                    }
+                    if (bsName == null) {
+                        List<String> ext = bit.getFormat(context).getExtensions();
+                        bsName = "bitstream_" + sid
+                                + (ext.size() > 0 ? ext.get(0) : "");
+                    }
+                    if (handle != null && baseUrl != null) {
+                        url = baseUrl + "/bitstream/"
+                                + handle + "/"
+                                + sid + "/"
+                                + URLUtils.encode(bsName);
+                    } else {
+                        url = URLUtils.encode(bsName);
+                    }
+
+                    String cks = bit.getChecksum();
+                    String cka = bit.getChecksumAlgorithm();
+                    String oname = bit.getSource();
+                    String name = bit.getName();
+                    String description = bit.getDescription();
+
+                    if (name != null) {
+                        bitstream.getField().add(
+                                createValue("name", name));
+                    }
+                    if (oname != null) {
+                        bitstream.getField().add(
+                                createValue("originalName", name));
+                    }
+                    if (description != null) {
+                        bitstream.getField().add(
+                                createValue("description", description));
+                    }
+                    bitstream.getField().add(
+                            createValue("format", bit.getFormat(context)
+                                    .getMIMEType()));
+                    bitstream.getField().add(
+                            createValue("size", "" + bit.getSizeBytes()));
+                    bitstream.getField().add(createValue("url", url));
+                    bitstream.getField().add(
+                            createValue("checksum", cks));
+                    bitstream.getField().add(
+                            createValue("checksumAlgorithm", cka));
+                    bitstream.getField().add(
+                            createValue("sid", bit.getSequenceID()
+                                    + ""));
+                    bitstream.getField().add(
+                            createValue("id", bit.getID() + ""));
+                    if (!restricted) {
+                        List<ClarinLicenseResourceMapping> clarinLicenseResourceMappingList =
+                                clarinLicenseResourceMappingService.findByBitstreamUUID(context, bit.getID());
+                        for (ClarinLicenseResourceMapping clrm : clarinLicenseResourceMappingList) {
+                            if (clrm.getLicense().getRequiredInfo() != null
+                                    && clrm.getLicense().getRequiredInfo().length() > 0) {
+                                restricted = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
         } catch (SQLException e) {
             log.warn(e.getMessage(), e);
         }
@@ -297,20 +397,6 @@ public class ItemUtils {
         other.getField().add(createValue("handle", item.getHandle()));
         other.getField().add(createValue("identifier", DSpaceItem.buildIdentifier(item.getHandle())));
         other.getField().add(createValue("lastModifyDate", item.getLastModified().toString()));
-        // TODO: 2024/07 (mb) this is taken from clarin, but restricted is never set correctly.
-        // see issue https://github.com/dataquest-dev/DSpace/issues/710
-        boolean restricted = false;
-//        if(!restricted){
-//            List<ClarinLicense> lds =
-//            for(LicenseDefinition ld : lds){
-//                if(ld.getRequiredInfo() != null && ld.getRequiredInfo().length() > 0){
-//                    restricted = true;
-//                }
-//                if(restricted){
-//                    break;
-//                }
-//            }
-//        }
 
         if (restricted) {
             other.getField().add(createValue("restrictedAccess", "true"));
