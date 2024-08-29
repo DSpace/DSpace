@@ -20,7 +20,7 @@ import org.dspace.app.rest.model.IdentifierRest;
 public class DataIdentifiers implements SectionData {
     // Map of identifier types and values
     List<IdentifierRest> identifiers;
-    // Types to display, a hint for te UI
+    // Types to display, a hint for the UI
     List<String> displayTypes;
 
     public DataIdentifiers() {

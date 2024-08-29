@@ -217,7 +217,7 @@ public class ItemArchive {
         throws SQLException, Exception {
         DtoMetadata dtom = getMetadataField("dc.identifier.uri");
         if (dtom == null) {
-            throw new Exception("No dc.identier.uri field found for handle");
+            throw new Exception("No dc.identifier.uri field found for handle");
         }
 
         this.addUndoMetadataField(dtom);  //seed the undo list with the uri

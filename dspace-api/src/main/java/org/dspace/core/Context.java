@@ -713,7 +713,7 @@ public class Context implements AutoCloseable {
     public void switchContextUser(EPerson newUser) {
         if (currentUserPreviousState != null) {
             throw new IllegalStateException(
-                    "A previous user is already set, you can only switch back and foreward one time");
+                    "A previous user is already set, you can only switch back and forward one time");
         }
 
         currentUserPreviousState = currentUser;

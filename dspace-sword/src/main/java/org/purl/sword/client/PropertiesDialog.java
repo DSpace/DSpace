@@ -94,7 +94,7 @@ public class PropertiesDialog {
                                                   null);
 
         // cancel any edit in the table. If there is a cell editing, the getEditingColumn will
-        // return a non-negative column number. This can be used to retreive the cell editor.
+        // return a non-negative column number. This can be used to retrieve the cell editor.
         // The code then gets the default editor and calls the stopCellEditing. If custom
         // editors are used, an additional check must be made to get the cell editor
         // for a specific cell.

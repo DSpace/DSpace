@@ -1230,7 +1230,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         } catch (IOException | SQLException | SolrServerException e) {
             // Any acception that we get ignore it.
             // We do NOT want any crashed to shown by the user
-            log.error(LogHelper.getHeader(context, "Error while quering solr", "Query: " + query), e);
+            log.error(LogHelper.getHeader(context, "Error while querying solr", "Query: " + query), e);
             return new ArrayList<>(0);
         }
     }
@@ -1359,7 +1359,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      * Gets the solr field that contains the facet value split on each word break to the end, so can be searched
      * on each word in the value, see {@link org.dspace.discovery.indexobject.ItemIndexFactoryImpl
      * #saveFacetPrefixParts(SolrInputDocument, DiscoverySearchFilter, String, String)}
-     * Ony applicable to facets of type {@link DiscoveryConfigurationParameters.TYPE_TEXT}, otherwise uses the regular
+     * Only applicable to facets of type {@link DiscoveryConfigurationParameters.TYPE_TEXT}, otherwise uses the regular
      * facet filter field
      */
     protected String transformPrefixFacetField(DiscoverFacetField facetFieldConfig, String field,

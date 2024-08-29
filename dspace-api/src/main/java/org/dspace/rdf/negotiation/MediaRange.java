@@ -28,11 +28,11 @@ public class MediaRange {
 
     // SEPARATOR: ( ) < > @ , ; : \ " / [ ] ? = { } <space> <tabulator>
     // the separators can be used in as class inside square brackets. To be able
-    // to negate the class, the spearators necessary square brackets are not
+    // to negate the class, the separators necessary square brackets are not
     // included in the string.
     public static final String separators = "()<>@,;:\\\\\"/\\[\\]?={} \\t";
 
-    // TOKEN: ANY US ASCII except ctl an separtor
+    // TOKEN: ANY US ASCII except ctl an separator
     public static final String token = "[\\040-\\0176" + "&&[^" + separators + "]]+";
 
     // "\" followed by any US ASCII character (octets 0 - 177)
@@ -57,8 +57,8 @@ public class MediaRange {
     // group 5 contains the value of the last parameter before the quality parameter if any
     // group 6 contains the quality value if any
     // group 7 contains all parameters after the quality parameter if any
-    // group 8 contains the name of the last parameter after the quality paremeter if any
-    // group 9 contains the value of the laster parameter after the quality paremeter if any
+    // group 8 contains the name of the last parameter after the quality parameter if any
+    // group 9 contains the value of the laster parameter after the quality parameter if any
     public static final String mediaRangeRegex = "(?:(" + token + ")/(" + token + "?)"
         + "(" + nonQualityParam + "*)" + qualityParam + "?(" + nonQualityParam + "*))";
 
@@ -101,7 +101,7 @@ public class MediaRange {
             throw new IllegalArgumentException("A media range's type cannot "
                                                    + "be wildcarded if its subtype isn't as well.");
         }
-        // initalize with defualt value, parse later
+        // initialize with default value, parse later
         double qvalue = DEFAULT_QVALUE;
         // initialize empty lists, parse parameters later
         List<String> parameterNames = new ArrayList<>();
@@ -142,7 +142,7 @@ public class MediaRange {
                               + unparsedParameters + "') of a previously parsed media "
                               + "range!");
                 throw new IllegalStateException("Run into problems while parsing "
-                                                    + "a substring of a previuosly succesfully parsed string.");
+                                                    + "a substring of a previuosly successfully parsed string.");
             }
             while (m.find()) {
                 if (!StringUtils.isEmpty(m.group(1))) {

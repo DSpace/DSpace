@@ -159,7 +159,7 @@ public class MetadataRDFMapping {
     }
 
     public void convert(String value, String lang, String dsoIRI, Model m) {
-        log.debug("Using convertion for field " + name + " on value: " + value
+        log.debug("Using conversion for field " + name + " on value: " + value
                       + " for " + dsoIRI + ".");
         // run over all results
         for (Iterator<Resource> iter = this.results.iterator(); iter.hasNext(); ) {
@@ -282,7 +282,7 @@ public class MetadataRDFMapping {
         String uri = predicate.getURI();
         if (uri == null) {
             log.debug("A result predicate is blank node, but not a "
-                          + "ResourceGenerator. Ingoring this result.");
+                          + "ResourceGenerator. Ignoring this result.");
             return null;
         }
         return m.createProperty(uri);
@@ -447,7 +447,7 @@ public class MetadataRDFMapping {
 
             if (!modifierNode.isResource()) {
                 log.error("The modifier of a result is a Literal not an Resource! "
-                              + "Ingoring this result.");
+                              + "Ignoring this result.");
                 return null;
             }
             Resource modifier = modifierNode.asResource();

@@ -45,7 +45,7 @@ public class SimpleJsonPathMetadataContributor implements MetadataContributor<St
      * Initialize SimpleJsonPathMetadataContributor with a query, prefixToNamespaceMapping and MetadataFieldConfig
      *
      * @param query The JSonPath query
-     * @param field the matadata field to map the result of the Json path query
+     * @param field the metadata field to map the result of the Json path query
      * <a href="https://github.com/DSpace/DSpace/tree/master/dspace-api/src/main/java/org/dspace/importer/external#metadata-mapping-">MetadataFieldConfig</a>
      */
     public SimpleJsonPathMetadataContributor(String query, MetadataFieldConfig field) {

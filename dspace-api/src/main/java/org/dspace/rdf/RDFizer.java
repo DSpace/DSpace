@@ -205,7 +205,7 @@ public class RDFizer {
         }
 
         if (dso.getType() == Constants.SITE) {
-            // we don't need to iterate over all objects, use a shorctut:
+            // we don't need to iterate over all objects, use a shortcut:
             this.deleteAll();
         }
         Callback callback = new Callback() {
@@ -352,11 +352,11 @@ public class RDFizer {
         }
         markProcessed(dso);
         // this is useful to debug depth first search, but it is really noisy.
-        //log.debug("Procesing " + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + " " + dso
+        //log.debug("Processing " + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + " " + dso
         // .getID() + ":" + dso.getHandle() + ".");
 
         // if this method is used for conversion we should check if we have the
-        // permissions to read a DSO before converting all of it decendents
+        // permissions to read a DSO before converting all of it descendants
         // (e.g. check read permission on a community before converting all of
         // its subcommunties and collections).
         // just skip items with missing permissions and report them.
@@ -700,11 +700,11 @@ public class RDFizer {
         options.addOption("o", "stdout", false, "Print all converted data to " +
             "stdout using turtle as serialization.");
         options.addOption("n", "dry-run", false, "Don't send any data or commands " +
-            "to the triplestore. Usefull for debugging or in conjunction " +
+            "to the triplestore. Useful for debugging or in conjunction " +
             "with --stdout.");
         options.addOption("c", "convert-all", false, "Convert all DSpace Objects" +
             " that are readable for an anonymous user. This may take a long time" +
-            "depending on the number of stored communties, collections and " +
+            "depending on the number of stored communities, collections and " +
             "items. Existing information in the triple store will be updated.");
 
         Option optIdentifiers = Option.builder("i")

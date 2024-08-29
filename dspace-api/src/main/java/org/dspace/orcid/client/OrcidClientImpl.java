@@ -261,7 +261,7 @@ public class OrcidClientImpl implements OrcidClient {
      *                              OrcidClientException
      * @param  clazz                the class to be used for the content unmarshall
      * @return                      the response body
-     * @throws OrcidClientException if the incoming response is not successfull
+     * @throws OrcidClientException if the incoming response is not successful
      */
     private <T> T executeAndUnmarshall(HttpUriRequest httpUriRequest, boolean handleNotFoundAsNull, Class<T> clazz) {
 

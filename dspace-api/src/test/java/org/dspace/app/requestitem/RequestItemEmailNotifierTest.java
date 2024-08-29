@@ -161,7 +161,7 @@ public class RequestItemEmailNotifierTest
         assertThat("To: should be an Internet address",
                 myAddresses[0], instanceOf(InternetAddress.class));
         String address = ((InternetAddress)myAddresses[0]).getAddress();
-        assertEquals("To: address should match requestor.",
+        assertEquals("To: address should match requester.",
                 ri.getReqEmail(), address);
 
         // Check the message body.
@@ -246,7 +246,7 @@ public class RequestItemEmailNotifierTest
         assertThat("To: should be an Internet address",
                 myAddresses[0], instanceOf(InternetAddress.class));
         String address = ((InternetAddress)myAddresses[0]).getAddress();
-        assertEquals("To: address should match requestor.",
+        assertEquals("To: address should match requester.",
                 ri.getReqEmail(), address);
 
         // Check the message body.

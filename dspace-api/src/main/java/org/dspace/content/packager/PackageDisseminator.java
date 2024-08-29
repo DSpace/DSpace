@@ -38,7 +38,7 @@ import org.dspace.core.Context;
  * format output by <code>disseminate</code> may be affected by
  * parameters, it is given to the <code>getMIMEType</code> method as well.
  * The parameters list is a generalized mechanism to pass parameters
- * from the package requestor to the packager, since different packagers will
+ * from the package requester to the packager, since different packagers will
  * understand different sets of parameters.
  *
  * @author Larry Stone

@@ -482,7 +482,7 @@ public class DSpaceConfigurationServiceTest {
         DSpaceConfigurationService dscs = new DSpaceConfigurationService();
         int size = dscs.getProperties().size();
 
-        // Add two new Sytem properties
+        // Add two new System properties
         System.setProperty("Hello", "World");
         System.setProperty("Tim", "Donohue");
 

@@ -131,7 +131,7 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport {
 
     /**
      * Get a copy of the bitstream list of this bundle
-     * Note that this is a copy and if you wish to manipulate the bistream list, you should use
+     * Note that this is a copy and if you wish to manipulate the bitstream list, you should use
      * {@ref Bundle.addBitstream}, {@ref Bundle.removeBitstream} or {@ref Bundle.clearBitstreams}
      *
      * @return the bitstreams

@@ -135,7 +135,7 @@ public class ItemComparatorTest extends AbstractUnitTest {
         int result;
         ItemComparator ic;
 
-        //one of the tiems has no value
+        //one of the items has no value
         ic = new ItemComparator("test", "one", Item.ANY, true);
         result = ic.compare(one, two);
         assertTrue("testCompare 0", result == 0);

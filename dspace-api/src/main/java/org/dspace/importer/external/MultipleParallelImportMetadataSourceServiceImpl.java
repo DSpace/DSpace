@@ -27,7 +27,7 @@ import org.dspace.importer.external.service.components.QuerySource;
 /**
  * Implements a data source for querying multiple external data sources in parallel
  *
- * optional Affiliation informations are not part of the API request.
+ * optional Affiliation information are not part of the API request.
  *
  * @author Johanna Staudinger (johanna.staudinger@uni-bamberg.de)
  *

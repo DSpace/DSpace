@@ -47,12 +47,12 @@ public class SubscriptionDsoMetadataForEmailCompose implements StreamDisseminati
             Item item = (Item) dso;
             PrintStream printStream = new PrintStream(out);
             for (String actualMetadata : metadata) {
-                String[] splitted = actualMetadata.split("\\.");
+                String[] split = actualMetadata.split("\\.");
                 String qualifier = null;
-                if (splitted.length == 3) {
-                    qualifier = splitted[2];
+                if (split.length == 3) {
+                    qualifier = split[2];
                 }
-                var metadataValue = itemService.getMetadataFirstValue(item, splitted[0], splitted[1], qualifier, ANY);
+                var metadataValue = itemService.getMetadataFirstValue(item, split[0], split[1], qualifier, ANY);
                 printStream.print(metadataValue + " ");
             }
             String itemURL = HandleServiceFactory.getInstance()

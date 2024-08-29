@@ -74,7 +74,7 @@ public class FilterUtils {
         Map<Class<? extends Identifier>, Filter> filters = new HashMap<>();
         // Put DOI 'can we create DOI on install / workspace?' filter
         Filter filter = FilterUtils.getFilterFromConfiguration("identifiers.submission.filter." + configurationSuffix);
-        // A null filter should be handled safely by the identifier provier (default, or "always true")
+        // A null filter should be handled safely by the identifier provider (default, or "always true")
         filters.put(DOI.class, filter);
         // This won't have an affect until handle providers implement filtering, but is an example of
         // how the filters can be used for other types

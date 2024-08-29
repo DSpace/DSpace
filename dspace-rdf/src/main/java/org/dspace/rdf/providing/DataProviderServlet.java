@@ -159,7 +159,7 @@ public class DataProviderServlet extends HttpServlet {
     }
 
     protected String detectContentType(HttpServletRequest request, String lang) {
-        // It is usefull to be able to overwrite the content type, to see the
+        // It is useful to be able to overwrite the content type, to see the
         // request result directly in the browser. If a parameter "text" is part
         // of the request, we send the result with the content type "text/plain".
         if (request.getParameter("text") != null) {

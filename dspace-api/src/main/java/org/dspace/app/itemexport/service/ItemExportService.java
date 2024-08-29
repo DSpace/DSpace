@@ -69,7 +69,7 @@ public interface ItemExportService {
                             boolean excludeBitstreams) throws Exception;
 
     /**
-     * Convenience methot to create export a single Community, Collection, or
+     * Convenience method to create export a single Community, Collection, or
      * Item
      *
      * @param dso     - the dspace object to export
@@ -93,7 +93,7 @@ public interface ItemExportService {
                                          Context context, boolean migrate) throws Exception;
 
     /**
-     * Convenience methot to create export a single Community, Collection, or
+     * Convenience method to create export a single Community, Collection, or
      * Item
      *
      * @param dso             - the dspace object to export
@@ -156,7 +156,7 @@ public interface ItemExportService {
     public String getExportWorkDirectory() throws Exception;
 
     /**
-     * Used to read the export archived. Inteded for download.
+     * Used to read the export archived. Intended for download.
      *
      * @param fileName the name of the file to download
      * @param eperson  the eperson requesting the download
@@ -233,7 +233,7 @@ public interface ItemExportService {
 
     /**
      * Since the archive is created in a new thread we are unable to communicate
-     * with calling method about success or failure. We accomplis this
+     * with calling method about success or failure. We accomplish this
      * communication with email instead. Send a success email once the export
      * archive is complete and ready for download
      *
@@ -248,7 +248,7 @@ public interface ItemExportService {
 
     /**
      * Since the archive is created in a new thread we are unable to communicate
-     * with calling method about success or failure. We accomplis this
+     * with calling method about success or failure. We accomplish this
      * communication with email instead. Send an error email if the export
      * archive fails
      *

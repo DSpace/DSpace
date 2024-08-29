@@ -352,7 +352,7 @@ public class ReportGenerator {
         report.setEndDate(endDate);
         report.setMainTitle(name, serverName);
 
-        // define our standard variables for re-use
+        // define our standard variables for reuse
         // FIXME: we probably don't need these once we've finished re-factoring
         Iterator<String> keys = null;
         int i = 0;
@@ -518,7 +518,7 @@ public class ReportGenerator {
 
     /**
      * a standard stats block preparation method for use when an aggregator
-     * has to be put out in its entirity.  This method will not be able to
+     * has to be put out in its entirety.  This method will not be able to
      * deal with complex cases, although it will perform sorting by value and
      * translations as per the map file if requested
      *
@@ -783,7 +783,7 @@ public class ReportGenerator {
             return null;
         }
 
-        // build the referece
+        // build the reference
         // FIXME: here we have blurred the line between content and presentation
         // and it should probably be un-blurred
         List<MetadataValue> title = itemService.getMetadata(item, MetadataSchemaEnum.DC.getName(),

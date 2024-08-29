@@ -523,7 +523,7 @@ public class SyndicationFeed {
      */
     protected String resolveURL(HttpServletRequest request, DSpaceObject dso) {
         // If no object given then just link to the whole repository,
-        // since no offical handle exists so we have to use local resolution.
+        // since no official handle exists so we have to use local resolution.
         if (dso == null) {
             if (baseURL == null) {
                 if (request == null) {

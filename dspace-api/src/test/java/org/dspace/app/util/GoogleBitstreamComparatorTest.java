@@ -368,8 +368,8 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest {
             "bitstream2 has a type with a priority higher than bitstream1 (size is ignored) and should come second",
             "bitstream2", toSort.get(1).getName());
         assertEquals(
-            "bitstream1 has a type with the lowest priority in this bundle eventhough it is the largest bitstream and" +
-                " should come last",
+            "bitstream1 has a type with the lowest priority in this bundle even though it is the largest bitstream" +
+                " and should come last",
             "bitstream1", toSort.get(2).getName());
     }
 

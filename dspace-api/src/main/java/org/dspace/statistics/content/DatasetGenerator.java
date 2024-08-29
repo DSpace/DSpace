@@ -19,7 +19,7 @@ package org.dspace.statistics.content;
 public abstract class DatasetGenerator {
 
     /**
-     * The type of generator can either be CATEGORY or SERIE
+     * The type of generator can either be CATEGORY or SERIES
      **/
     protected int datasetType;
 

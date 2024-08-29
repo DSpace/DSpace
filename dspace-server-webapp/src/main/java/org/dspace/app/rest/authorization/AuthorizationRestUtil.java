@@ -143,7 +143,7 @@ public class AuthorizationRestUtil {
             objId = idParts[2];
         } else {
             throw new IllegalArgumentException(
-                    "the authoization id is invalid, it must have the form " +
+                    "the authorization id is invalid, it must have the form " +
                     "[eperson-uuid_]feature-id_object-type_object-id");
         }
         return new String[] { eperson, feature, objType, objId };

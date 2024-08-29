@@ -152,7 +152,7 @@ public class LDNMetadataProcessor implements LDNProcessor {
     }
 
     /**
-     * Lookup associated item to the notification context. If UUID in URL, lookup bu
+     * Lookup associated item to the notification context. If UUID in URL, lookup by
      * UUID, else lookup by handle.
      *
      * @param context      current context

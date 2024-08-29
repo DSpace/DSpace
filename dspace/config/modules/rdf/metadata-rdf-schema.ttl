@@ -74,7 +74,7 @@
 :creates
     a rdf:Property ;
     rdfs:label "Result" ;
-    rdfs:comment "Specifies the RDF to generate for a specified matadata." ;
+    rdfs:comment "Specifies the RDF to generate for a specified metadata." ;
     rdfs:domain :DSpaceMetadataRDFMapping ;
     rdfs:range  :Result ;
     .

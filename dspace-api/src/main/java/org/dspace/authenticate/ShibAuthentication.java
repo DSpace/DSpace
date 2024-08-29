@@ -287,7 +287,7 @@ public class ShibAuthentication implements AuthenticationMethod {
     @Override
     public List<Group> getSpecialGroups(Context context, HttpServletRequest request) {
         try {
-            // User has not successfuly authenticated via shibboleth.
+            // User has not successfully authenticated via shibboleth.
             if (request == null ||
                 context.getCurrentUser() == null) {
                 return Collections.EMPTY_LIST;
@@ -309,7 +309,7 @@ public class ShibAuthentication implements AuthenticationMethod {
             if (ignoreScope && ignoreValue) {
                 throw new IllegalStateException(
                     "Both config parameters for ignoring an roll attributes scope and value are turned on, this is " +
-                        "not a permissable configuration. (Note: ignore-scope defaults to true) The configuration " +
+                        "not a permissible configuration. (Note: ignore-scope defaults to true) The configuration " +
                         "parameters are: 'authentication.shib.role-header.ignore-scope' and 'authentication.shib" +
                         ".role-header.ignore-value'");
             }
@@ -391,7 +391,7 @@ public class ShibAuthentication implements AuthenticationMethod {
             return new ArrayList<>(groups);
 
         } catch (Throwable t) {
-            log.error("Unable to validate any sepcial groups this user may belong too because of an exception.", t);
+            log.error("Unable to validate any special groups this user may belong too because of an exception.", t);
             return Collections.EMPTY_LIST;
         }
     }
@@ -546,7 +546,7 @@ public class ShibAuthentication implements AuthenticationMethod {
 
     /**
      * Identify an existing EPerson based upon the shibboleth attributes provided on
-     * the request object. There are three cases where this can occurr, each as
+     * the request object. There are three cases where this can occur, each as
      * a fallback for the previous method.
      *
      * 1) NetID from Shibboleth Header (best)
@@ -671,7 +671,7 @@ public class ShibAuthentication implements AuthenticationMethod {
         if (!foundNetID && !foundEmail && !foundRemoteUser) {
             log.error(
                 "Shibboleth authentication was not able to find a NetId, Email, or Tomcat Remote user for which to " +
-                    "indentify a user from.");
+                    "identify a user from.");
         }
 
 
@@ -931,7 +931,7 @@ public class ShibAuthentication implements AuthenticationMethod {
                          "compatibility mode.");
             return SUCCESS;
         } else {
-            // Passsword failure
+            // Password failure
             log.error(
                 "Shibboleth-based password authentication failed for user " + username + " because a bad password was" +
                     " supplied.");
@@ -944,7 +944,7 @@ public class ShibAuthentication implements AuthenticationMethod {
     /**
      * Initialize Shibboleth Authentication.
      *
-     * During initalization the mapping of additional eperson metadata will be loaded from the DSpace.cfg
+     * During initialization the mapping of additional eperson metadata will be loaded from the DSpace.cfg
      * and cached. While loading the metadata mapping this method will check the EPerson object to see
      * if it supports the metadata field. If the field is not supported and autocreate is turned on then
      * the field will be automatically created.
@@ -985,7 +985,7 @@ public class ShibAuthentication implements AuthenticationMethod {
             String[] metadataParts = metadataString.split("=>");
 
             if (metadataParts.length != 2) {
-                log.error("Unable to parse metadat mapping string: '" + metadataString + "'");
+                log.error("Unable to parse metadata mapping string: '" + metadataString + "'");
                 continue;
             }
 

@@ -241,7 +241,7 @@ public class RDFConsumer implements Consumer {
             }
 
             DSOIdentifier id = new DSOIdentifier(dso, ctx);
-            // If an item gets withdrawn, a MODIFIY event is fired. We have to
+            // If an item gets withdrawn, a MODIFY event is fired. We have to
             // delete the item from the triple store instead of converting it.
             // we don't have to take care for reinstantions of items as they can
             // be processed as normal modify events.

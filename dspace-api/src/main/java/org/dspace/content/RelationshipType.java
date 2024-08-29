@@ -98,7 +98,7 @@ public class RelationshipType implements ReloadableEntity<Integer> {
     private Integer rightMinCardinality;
 
     /**
-     * Tha maximum amount of relations for the rightItem that can be present at all times
+     * The maximum amount of relations for the rightItem that can be present at all times
      */
     @Column(name = "right_max_cardinality")
     private Integer rightMaxCardinality;

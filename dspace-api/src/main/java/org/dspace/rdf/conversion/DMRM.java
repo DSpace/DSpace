@@ -88,7 +88,7 @@ public class DMRM {
     public static final Resource DSpaceValue = m_model.createResource(NS + "DSpaceValue");
 
     /**
-     * <p>Specifies the RDF to generate for a specified matadata.</p>
+     * <p>Specifies the RDF to generate for a specified metadata.</p>
      */
     public static final Property creates = m_model.createProperty(NS + "creates");
 
