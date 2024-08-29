@@ -346,7 +346,7 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
 
     /**
      * This method will return the count of items for this query as an integer
-     * This query needs to already be in a formate that'll return one record that contains the amount
+     * This query needs to already be in a format that'll return one record that contains the amount
      *
      * @param query
      *         The query for which the amount of results will be returned.

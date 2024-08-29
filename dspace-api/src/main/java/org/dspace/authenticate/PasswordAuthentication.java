@@ -82,7 +82,7 @@ public class PasswordAuthentication
             // No conditions set, so must be able to self register
             return true;
         } else {
-            // Itterate through all domains
+            // Iterate through all domains
             String check;
             email = email.trim().toLowerCase();
             for (int i = 0; i < domains.length; i++) {

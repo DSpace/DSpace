@@ -108,7 +108,7 @@ public class MigrationUtils {
 
         // As long as we have a constraint name, drop it
         if (constraintName != null && !constraintName.isEmpty()) {
-            // This drop constaint SQL should be the same in all databases
+            // This drop constraint SQL should be the same in all databases
             String dropConstraintSQL = "ALTER TABLE " + tableName + " DROP CONSTRAINT " + constraintName;
             if (cascade) {
                 dropConstraintSQL += " CASCADE";

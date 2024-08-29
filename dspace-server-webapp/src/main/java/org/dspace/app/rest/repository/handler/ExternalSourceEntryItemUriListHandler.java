@@ -106,7 +106,7 @@ public abstract class ExternalSourceEntryItemUriListHandler<T> implements UriLis
             Collection collection = collectionService.find(context, UUID.fromString(owningCollectionUuid));
             return externalDataService.createWorkspaceItemFromExternalDataObject(context, dataObject, collection);
         } catch (AuthorizeException | SQLException e) {
-            log.error("An error occured when trying to create item in collection with uuid: " + owningCollectionUuid,
+            log.error("An error occurred when trying to create item in collection with uuid: " + owningCollectionUuid,
                       e);
             throw e;
         }

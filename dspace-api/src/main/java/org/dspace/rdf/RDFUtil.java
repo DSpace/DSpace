@@ -90,7 +90,7 @@ public class RDFUtil {
 
     /**
      * Loads converted data of a DSpaceObject identified by the URI provided
-     * as {@code identifier}. This method uses the RDFStorage configurated in
+     * as {@code identifier}. This method uses the RDFStorage configured in
      * the DSpace configuration.  Close the model
      * ({@link com.hp.hpl.jena.rdf.model.Model#close() Model.close()}) as soon
      * as possible to free system resources.
@@ -200,7 +200,7 @@ public class RDFUtil {
             if (!found) {
                 log.warn("Configuration of DSpaceObjects of type "
                              + Constants.typeText[dso.getType()]
-                             + " prohibitted by configuration.");
+                             + " prohibited by configuration.");
                 return null;
             }
         }

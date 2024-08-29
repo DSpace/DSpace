@@ -74,7 +74,7 @@ public class InitializeEntities {
     private static void checkHelpEntered(Options options, CommandLine line) {
         if (line.hasOption("h")) {
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("Intialize Entities", options);
+            formatter.printHelp("Initialize Entities", options);
             System.exit(0);
         }
     }

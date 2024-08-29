@@ -39,7 +39,7 @@ public class SubmissionFormFieldMatcher {
      * @param typeBind
      *            the expected type-bind field(s)
      * @param mandatoryMessage
-     *            the expected mandatoryMessage, can be null. If not empty the fiedl is expected to be flagged as
+     *            the expected mandatoryMessage, can be null. If not empty the field is expected to be flagged as
      *            mandatory
      * @param repeatable
      *            the expected repeatable flag

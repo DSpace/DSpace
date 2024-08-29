@@ -113,7 +113,7 @@ public class DOIIdentifierException extends IdentifierException {
             case DOI_IS_DELETED:
                 return "DELETED";
             default:
-                return "UNKOWN";
+                return "UNKNOWN";
         }
     }
 

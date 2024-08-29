@@ -73,7 +73,7 @@ public class ExternalSourceEntryArchivedItemUriListHandler extends ExternalSourc
             WorkspaceItem workspaceItem = super.createWorkspaceItem(context, request, uriList);
             return installItemService.installItem(context, workspaceItem);
         } catch (AuthorizeException | SQLException e) {
-            log.error("An error occured when trying to create item in collection with uuid: " + owningCollectionUuid,
+            log.error("An error occurred when trying to create item in collection with uuid: " + owningCollectionUuid,
                       e);
             throw e;
         }

@@ -100,7 +100,7 @@ public class CrossLinks {
         // Resolve wildcards properly, eg. dc.subject.other matches a configuration for dc.subject.*
         for (String key : links.keySet()) {
             if (null != key && key.endsWith(".*")) {
-                // A substring of length-1, also substracting the wildcard should work as a "startsWith"
+                // A substring of length-1, also subtracting the wildcard should work as a "startsWith"
                 // check for the field eg. dc.subject.* -> dc.subject is the start of dc.subject.other
                 if (null != metadata && metadata.startsWith(key.substring(0, key.length() - 1 - ".*".length()))) {
                     return links.get(key);

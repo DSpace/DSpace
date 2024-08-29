@@ -88,7 +88,7 @@ public abstract class UserSelectionAction extends Action {
         throws WorkflowConfigurationException, SQLException;
 
     /**
-     * A boolean indicating wether or not the task pool is used for this type of user selection
+     * A boolean indicating whether or not the task pool is used for this type of user selection
      *
      * @return a boolean
      */

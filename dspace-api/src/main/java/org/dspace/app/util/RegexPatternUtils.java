@@ -36,7 +36,7 @@ public class RegexPatternUtils {
      * Computes a pattern starting from a regex definition with flags that
      * uses the standard format: <code>/{regex}/{flags}</code> (ECMAScript format).
      * This method can transform an ECMAScript regex into a java {@code Pattern} object
-     * wich can be used to validate strings.
+     * which can be used to validate strings.
      * <br/>
      * If regex is null, empty or blank a null {@code Pattern} will be retrieved
      * If it's a valid regex, then a non-null {@code Pattern} will be retrieved,

@@ -360,7 +360,7 @@ public class PDFPackager
              *   CreationDate -> date.created
              *   ModDate -> date.created
              *   Creator -> description.provenance (application that created orig)
-             *   Producer -> description.provenance (convertor to pdf)
+             *   Producer -> description.provenance (converter to pdf)
              *   Subject -> description.abstract
              *   Keywords -> subject.other
              *    date is java.util.Calendar

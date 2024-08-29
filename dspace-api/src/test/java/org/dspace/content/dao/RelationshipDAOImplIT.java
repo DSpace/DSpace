@@ -72,7 +72,7 @@ public class RelationshipDAOImplIT extends AbstractIntegrationTest {
     protected EntityTypeService entityTypeService = ContentServiceFactory.getInstance().getEntityTypeService();
 
     /**
-     * Initalize DSpace objects used for testing for each test
+     * Initialize DSpace objects used for testing for each test
      */
     @Before
     @Override
@@ -106,7 +106,7 @@ public class RelationshipDAOImplIT extends AbstractIntegrationTest {
     }
 
     /**
-     * Delete all initalized DSpace objects after each test
+     * Delete all initialized DSpace objects after each test
      */
     @After
     @Override

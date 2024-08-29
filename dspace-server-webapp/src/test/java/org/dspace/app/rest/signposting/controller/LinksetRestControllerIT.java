@@ -188,7 +188,7 @@ public class LinksetRestControllerIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void findOneItemJsonLinksetsWithLicence() throws Exception {
-        String licenceUrl = "https://exmple.com/licence";
+        String licenceUrl = "https://example.com/licence";
         String url = configurationService.getProperty("dspace.ui.url");
         String signpostingUrl = configurationService.getProperty("signposting.path");
         context.turnOffAuthorisationSystem();

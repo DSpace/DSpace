@@ -47,7 +47,7 @@ public class EPersonConsumer implements Consumer {
             = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
-     * Initalise the consumer
+     * Initialise the consumer
      *
      * @throws Exception if error
      */

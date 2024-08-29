@@ -553,7 +553,7 @@ public class S3BitStoreService extends BaseBitStoreService {
         store.bucketName = DEFAULT_BUCKET_PREFIX + hostname + ".s3test";
         store.s3Service.createBucket(store.bucketName);
         /* Broken in DSpace 6 TODO Refactor
-        // time everything, todo, swtich to caliper
+        // time everything, todo, switch to caliper
         long start = System.currentTimeMillis();
         // Case 1: store a file
         String id = store.generateId();

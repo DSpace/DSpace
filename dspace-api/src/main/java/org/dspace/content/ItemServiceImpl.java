@@ -1005,7 +1005,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         throws SQLException, AuthorizeException {
         // Bundles should inherit from DEFAULT_ITEM_READ so that if the item is readable, the files
         // can be listed (even if they are themselves not readable as per DEFAULT_BITSTREAM_READ or other
-        // policies or embargos applied
+        // policies or embargoes applied
         List<ResourcePolicy> defaultCollectionBundlePolicies = authorizeService
                 .getPoliciesActionFilter(context, collection, Constants.DEFAULT_ITEM_READ);
         // Bitstreams should inherit from DEFAULT_BITSTREAM_READ

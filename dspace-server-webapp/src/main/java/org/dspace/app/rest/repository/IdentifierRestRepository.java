@@ -67,7 +67,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Item REST Repository and Controller for persistent identifiers.
  * The controller annotation and endpoint registration allows the "find DSO by identifier" method which was
- * previously implmented in org.dspace.app.rest.IdentifierRestController
+ * previously implemented in org.dspace.app.rest.IdentifierRestController
  *
  * @author Kim Shepherd
  */

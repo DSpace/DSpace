@@ -2210,7 +2210,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                         emailErrorMessage(eperson, exceptionString);
                         throw new Exception(e.getMessage());
                     } catch (Exception e2) {
-                        // wont throw here
+                        // won't throw here
                     }
                 } finally {
                     // Make sure the database connection gets closed in all conditions.

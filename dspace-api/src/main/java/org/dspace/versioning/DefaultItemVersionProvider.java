@@ -72,7 +72,7 @@ public class DefaultItemVersionProvider extends AbstractVersionProvider implemen
             if (versionHistoryService.isLastVersion(c, history, versionToDelete)
                 && versioningService.getVersionsByHistory(c, history).size() > 1) {
                 // if a new version gets archived, the old one is set to false.
-                // we need to do the oposite now, if the old version was previously
+                // we need to do the opposite now, if the old version was previously
                 // unarchived. If the old version is still archived, the new
                 // version is a WorkspaceItem or WorkflowItem we should skip this,
                 // as unarchiving of previous versions is done only when a newer
@@ -116,8 +116,8 @@ public class DefaultItemVersionProvider extends AbstractVersionProvider implemen
             // DSpace knows several types of resource policies (see the class
             // org.dspace.authorize.ResourcePolicy): Submission, Workflow, Custom
             // and inherited. Submission, Workflow and Inherited policies will be
-            // set automatically as neccessary. We need to copy the custom policies
-            // only to preserve customly set policies and embargos (which are
+            // set automatically as necessary. We need to copy the custom policies
+            // only to preserve customly set policies and embargoes (which are
             // realized by custom policies with a start date).
             List<ResourcePolicy> policies =
                 authorizeService.findPoliciesByDSOAndType(c, previousItem, ResourcePolicy.TYPE_CUSTOM);

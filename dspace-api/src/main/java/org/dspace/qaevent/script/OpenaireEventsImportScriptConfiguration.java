@@ -13,7 +13,7 @@ import org.apache.commons.cli.Options;
 import org.dspace.scripts.configuration.ScriptConfiguration;
 
 /**
- * Extension of {@link ScriptConfiguration} to perfom a QAEvents import from
+ * Extension of {@link ScriptConfiguration} to perform a QAEvents import from
  * file.
  *
  * @author Alessandro Martelli (alessandro.martelli at 4science.it)
