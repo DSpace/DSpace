@@ -120,7 +120,7 @@
                 // Check for WWW-Authenticate header. If found, this means we are not yet authenticated, and
                 // therefore we need to display available authentication options.
                 var authenticate = xhr.getResponseHeader("WWW-Authenticate");
-                if (authenticate !== null && authenticate.contains('location=')) {
+                if (authenticate !== null && authenticate.includes('location=')) {
                     var element = $('div.other-login-methods');
                     var realms = authenticate.match(/(\w+ (\w+=((".*?")|[^,]*)(, )?)*)/g);
                     if (realms.length === 1){
