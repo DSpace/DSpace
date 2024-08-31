@@ -27,6 +27,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.IndexableCollection;
 import org.dspace.discovery.indexobject.IndexableCommunity;
@@ -109,7 +110,7 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
                         .getHandleService().resolveToObject(context, param);
                 if (dso != null) {
                     final IndexFactory indexableObjectService = IndexObjectFactoryFactory.getInstance().
-                            getIndexFactoryByType(String.valueOf(dso.getType()));
+                            getIndexFactoryByType(Constants.typeText[dso.getType()]);
                     indexableObject = indexableObjectService.findIndexableObject(context, dso.getID().toString());
                 }
             }
