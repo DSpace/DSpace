@@ -15,7 +15,11 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
@@ -295,11 +299,16 @@ public class RequestItemRepository
     public String getLinkTokenEmail(String token)
             throws URISyntaxException, MalformedURLException {
         final String base = configurationService.getProperty("dspace.ui.url");
+
         URIBuilder uriBuilder = new URIBuilder(base);
-        // Add request-a-copy/token to the existing path (without breaking /sub/dir dspace URLs)
-        URI uri = uriBuilder.setPath(
-                (uriBuilder.getPath() == null ? "" : StringUtils.stripEnd(uriBuilder.getPath(), ""))
-                        + "/request-a-copy/" + token).build();
+        List<String> segments = new LinkedList<>();
+        if (StringUtils.isNotBlank(uriBuilder.getPath())) {
+            segments.add(StringUtils.strip(uriBuilder.getPath(), "/"));
+        }
+        segments.add("request-a-copy");
+        segments.add(token);
+        URI uri = uriBuilder.setPathSegments(segments).build();
+
         return uri.toURL().toExternalForm();
     }
 }
