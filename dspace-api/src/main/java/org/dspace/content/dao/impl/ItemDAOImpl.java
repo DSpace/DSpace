@@ -440,9 +440,34 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     @Override
     public Iterator<Item> findByLastModifiedSince(Context context, Date since)
         throws SQLException {
-        Query query = createQuery(context,
-                "SELECT i.id FROM Item i WHERE last_modified > :last_modified ORDER BY id");
-        query.setParameter("last_modified", since, TemporalType.TIMESTAMP);
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<UUID> criteriaQuery = criteriaBuilder.createQuery(UUID.class);
+        Root<Item> itemRoot = criteriaQuery.from(Item.class);
+        criteriaQuery.select(itemRoot.get(Item_.id));
+        criteriaQuery.where(criteriaBuilder.greaterThan(itemRoot.get(Item_.lastModified), since));
+        criteriaQuery.orderBy(criteriaBuilder.asc(itemRoot.get((Item_.id))));
+
+        // Transform into a query object to execute
+        Query query = createQuery(context, criteriaQuery);
+        @SuppressWarnings("unchecked")
+        List<UUID> uuids = query.getResultList();
+        return new UUIDIterator<Item>(context, uuids, Item.class, this);
+    }
+
+    @Override
+    public Iterator<Item> findAllByCollectionLastModifiedSince(Context context, Collection collection,
+                                                               Date last) throws SQLException {
+        // Select UUID of all items which have this "collection" in their list of collections
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery<UUID> criteriaQuery = criteriaBuilder.createQuery(UUID.class);
+        Root<Item> itemRoot = criteriaQuery.from(Item.class);
+        criteriaQuery.select(itemRoot.get(Item_.id));
+        criteriaQuery.where(criteriaBuilder.isMember(collection, itemRoot.get(Item_.collections)));
+        criteriaQuery.where(criteriaBuilder.greaterThan(itemRoot.get(Item_.lastModified), last));
+        criteriaQuery.orderBy(criteriaBuilder.asc(itemRoot.get((Item_.id))));
+
+        // Transform into a query object to execute
+        Query query = createQuery(context, criteriaQuery);
         @SuppressWarnings("unchecked")
         List<UUID> uuids = query.getResultList();
         return new UUIDIterator<Item>(context, uuids, Item.class, this);
