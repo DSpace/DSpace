@@ -1692,6 +1692,12 @@ prevent the generation of resource policy entry values with null dspace_object a
     }
 
     @Override
+    public Iterator<Item> findByCollectionLastModifiedSince(Context context, Collection collection, Date last)
+        throws SQLException {
+        return itemDAO.findAllByCollectionLastModifiedSince(context, collection, last);
+    }
+
+    @Override
     public int countTotal(Context context) throws SQLException {
         return itemDAO.countRows(context);
     }
