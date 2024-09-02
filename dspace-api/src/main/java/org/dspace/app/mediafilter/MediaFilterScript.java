@@ -8,8 +8,10 @@
 package org.dspace.app.mediafilter;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -223,7 +225,7 @@ public class MediaFilterScript extends DSpaceRunnable<MediaFilterScriptConfigura
         }
 
         if (fromDate != null) {
-            mediaFilterService.setFromDate(fromDate);
+            mediaFilterService.setFromDate(Date.from(fromDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
         }
 
         Context c = null;

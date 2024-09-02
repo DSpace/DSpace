@@ -8,7 +8,7 @@
 package org.dspace.app.mediafilter.service;
 
 import java.sql.SQLException;
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -151,5 +151,5 @@ public interface MediaFilterService {
      */
     public void setLogHandler(DSpaceRunnableHandler handler);
 
-    public void setFromDate(LocalDate fromDate);
+    public void setFromDate(Date fromDate);
 }
