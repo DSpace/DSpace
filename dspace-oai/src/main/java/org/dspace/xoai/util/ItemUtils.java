@@ -401,7 +401,10 @@ public class ItemUtils {
         if (restricted) {
             other.getField().add(createValue("restrictedAccess", "true"));
         }
-        other.getField().add(createValue("owningCollection", item.getOwningCollection().getName()));
+        // Because we reindex Solr, which is not done in vanilla
+        // The owning collection for workspace items is null
+        other.getField().add(createValue("owningCollection",
+                item.getOwningCollection() != null ? item.getOwningCollection().getName() : null));
         other.getField().add(createValue("itemId", item.getID().toString()));
         metadata.getElement().add(other);
 
