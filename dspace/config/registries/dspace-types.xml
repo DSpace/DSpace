@@ -32,6 +32,34 @@
 
     <dc-type>
         <schema>dspace</schema>
+        <element>collection</element>
+        <qualifier>customfooter</qualifier>
+        <scope_note>Custom footer for the Collection home, browse page and collection item pages.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>collection</element>
+        <qualifier>headertext</qualifier>
+        <scope_note>Custom header for the Collection home, browse page and collection item pages.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>collection</element>
+        <qualifier>homepageintrotext</qualifier>
+        <scope_note>Custom introduction test for the Collection home. This is to share who curates this collection.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>collection</element>
+        <qualifier>ownername</qualifier>
+        <scope_note>Custom owner name for the Collection home. This is to share who curates this collection.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
         <element>entity</element>
         <qualifier>type</qualifier>
         <scope_note>Stores the type of Entity that a specific Item represents</scope_note>
