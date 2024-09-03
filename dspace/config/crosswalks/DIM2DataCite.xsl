@@ -25,6 +25,10 @@
          to register DOIs anymore. Please follow and reuse the examples
          included in this file. For more information on the DataCite
          Schema, see https://schema.datacite.org. -->
+    <!-- Note regarding language codes: xml:lang regional language codes require a hyphen, whereas many
+         repositories use underscores when storing these language codes (e.g. en_GB, de_CH).
+         This template translates all underscores to hyphens when selecting value of @lang in an attribute
+         so the output will be e.g. xml:lang="en-GB", xml:lang="de-CH". -->
     
     <!-- We need the prefix to determine DOIs that were minted by ourself. -->
     <xsl:param name="prefix">10.5072/dspace-</xsl:param>
@@ -362,20 +366,20 @@
     <!-- DataCite (3) :: Title -->
     <xsl:template match="dspace:field[@mdschema='dc' and @element='title']">
         <xsl:element name="title">
-            <xsl:attribute name="xml:lang"><xsl:value-of select="@lang" /></xsl:attribute>
+            <xsl:attribute name="xml:lang"><xsl:value-of select="translate(@lang, '_', '-')" /></xsl:attribute>
             <xsl:if test="@qualifier='alternative'">
-                <xsl:attribute name="xml:lang"><xsl:value-of select="@lang" /></xsl:attribute>
+                <xsl:attribute name="xml:lang"><xsl:value-of select="translate(@lang, '_', '-')" /></xsl:attribute>
                 <xsl:attribute name="titleType">AlternativeTitle</xsl:attribute>
             </xsl:if>
-            <!-- DSpace does include niehter a dc.title.subtitle nor a 
+            <!-- DSpace doesn't include a dc.title.subtitle nor a
                  dc.title.translated. If necessary, please create those in the 
                  metadata field registry. -->
             <xsl:if test="@qualifier='subtitle'">
-                <xsl:attribute name="xml:lang"><xsl:value-of select="@lang" /></xsl:attribute>
+                <xsl:attribute name="xml:lang"><xsl:value-of select="translate(@lang, '_', '-')" /></xsl:attribute>
                 <xsl:attribute name="titleType">Subtitle</xsl:attribute>
             </xsl:if>
             <xsl:if test="@qualifier='translated'">
-                <xsl:attribute name="xml:lang"><xsl:value-of select="@lang" /></xsl:attribute>
+                <xsl:attribute name="xml:lang"><xsl:value-of select="translate(@lang, '_', '-')" /></xsl:attribute>
                 <xsl:attribute name="titleType">TranslatedTitle</xsl:attribute>
             </xsl:if>
             <xsl:value-of select="." />
@@ -394,7 +398,7 @@
     -->
     <xsl:template match="//dspace:field[@mdschema='dc' and @element='subject']">
         <xsl:element name="subject">
-            <xsl:attribute name="xml:lang"><xsl:value-of select="@lang" /></xsl:attribute>
+            <xsl:attribute name="xml:lang"><xsl:value-of select="translate(@lang, '_', '-')" /></xsl:attribute>
             <xsl:if test="@qualifier">
                 <xsl:attribute name="subjectScheme"><xsl:value-of select="@qualifier" /></xsl:attribute>
             </xsl:if>
@@ -626,7 +630,7 @@
     -->
     <xsl:template match="//dspace:field[@mdschema='dc' and @element='description' and (@qualifier='abstract' or @qualifier='tableofcontents' or not(@qualifier))]">
         <xsl:element name="description">
-            <xsl:attribute name="xml:lang"><xsl:value-of select="@lang" /></xsl:attribute>
+            <xsl:attribute name="xml:lang"><xsl:value-of select="translate(@lang, '_', '-')" /></xsl:attribute>
             <xsl:attribute name="descriptionType">
            	<xsl:choose>
                     <xsl:when test="@qualifier='abstract'">Abstract</xsl:when>
