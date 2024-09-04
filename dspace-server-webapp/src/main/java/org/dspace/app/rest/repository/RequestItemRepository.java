@@ -300,6 +300,7 @@ public class RequestItemRepository
             throws URISyntaxException, MalformedURLException {
         final String base = configurationService.getProperty("dspace.ui.url");
 
+        // Construct the link, making sure to support sub-paths
         URIBuilder uriBuilder = new URIBuilder(base);
         List<String> segments = new LinkedList<>();
         if (StringUtils.isNotBlank(uriBuilder.getPath())) {
@@ -307,8 +308,8 @@ public class RequestItemRepository
         }
         segments.add("request-a-copy");
         segments.add(token);
-        URI uri = uriBuilder.setPathSegments(segments).build();
 
-        return uri.toURL().toExternalForm();
+        // Build and return the URL from segments (or throw exception)
+        return uriBuilder.setPathSegments(segments).build().toURL().toExternalForm();
     }
 }
