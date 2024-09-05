@@ -45,23 +45,19 @@
     <bean name="jcloudStore" class="org.dspace.storage.bitstore.JCloudBitStoreService" scope="singleton" lazy-init="true">
         <property name="enabled" value="${assetstore.s3.generic.enabled:false}"/>
         <property name="useRelativePath" value="${assetstore.s3.generic.useRelativePath:false}"/>
+        <property name="providerOrApi" value="${assetstore.s3.generic.provider}"/>
         <property name="container" value="${assetstore.s3.generic.container}"/>
-        <property name="endpoint" value="${assetstore.s3.endpoint}"/>
-
-        <property name="providerOrApi" value="aws-s3"/>
-        <property name="identity" value="${assetstore.s3.generic.awsAccessKey}"/>
-        <property name="credentials" value="${assetstore.s3.generic.awsSecretKey}"/>
         <property name="maxCounter" value="${assetstore.s3.maxCounter:100}"/>
-
         <property name="overrides">
             <props>
-                <prop key="#{propertyBaseDir}">./local/filesystemstorage</prop>
+                <prop key="#{propertyBaseDir}">target/testing/dspace</prop>
             </props>
         </property>
-
-        <!-- Subfolder to organize assets within the bucket, in case this bucket is shared -->
+        <!--
+        Subfolder to organize assets within the bucket, in case this bucket is shared -->
         <!-- Optional, default is root level of bucket -->
-        <property name="subFolder" value="${assetstore.s3.generic.subfolder}"/>
+        <property name="subfolder" value="${assetstore.s3.generic.subfolder}"/>
+
     </bean>
 
     <!-- <bean name="localStore2 ... -->
