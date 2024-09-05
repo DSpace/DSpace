@@ -13,6 +13,8 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.storage.bitstore.factory.StorageServiceFactory;
+import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,10 +27,13 @@ import org.junit.Test;
 public class BitstreamJCloudBitstoreTest extends BitstreamTest {
 
     protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance()
-                                                                                   .getBitstreamFormatService();
+            .getBitstreamFormatService();
 
     private final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    protected BitstreamStorageService bitstreamService = StorageServiceFactory.getInstance()
+            .getBitstreamStorageService();
 
 
     /**
@@ -41,7 +46,7 @@ public class BitstreamJCloudBitstoreTest extends BitstreamTest {
     @Before
     @Override
     public void init() {
-        configurationService.setProperty("assetstore.index.primary", "2");
+        bitstreamService.setIncomingExternal(2);
         super.init();
     }
 
@@ -65,7 +70,7 @@ public class BitstreamJCloudBitstoreTest extends BitstreamTest {
     @After
     @Override
     public void destroy() {
-        configurationService.setProperty("assetstore.index.primary", "0");
+        bitstreamService.setIncomingExternal(0);
         super.destroy();
     }
 
