@@ -91,6 +91,11 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     }
 
     @Override
+    public void setIncomingExternal(int incoming) {
+        this.incoming = incoming;
+    }
+
+    @Override
     public void afterPropertiesSet() throws Exception {
         for (Map.Entry<Integer, BitStoreService> storeEntry : stores.entrySet()) {
             if (storeEntry.getValue().isEnabled() && !storeEntry.getValue().isInitialized()) {
