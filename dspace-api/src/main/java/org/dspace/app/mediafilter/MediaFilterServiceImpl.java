@@ -225,7 +225,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                 }
             }
         }
-        return false;        
+        return false;
     }
 
     @Override
