@@ -201,18 +201,31 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
 
     @Override
     public boolean filterItem(Context context, Item myItem) throws Exception {
-        // get 'original' bundles
-        List<Bundle> myBundles = itemService.getBundles(myItem, "ORIGINAL");
-        boolean done = false;
-        for (Bundle myBundle : myBundles) {
-            // now look at all of the bitstreams
-            List<Bitstream> myBitstreams = myBundle.getBitstreams();
+        List<Bundle> originalBundles = itemService.getBundles(myItem, "ORIGINAL");
+        for (Bundle originalBundle : originalBundles) {
+            // try to generate thumbnail from primary bitstream
+            Bitstream primaryBitstream = originalBundle.getPrimaryBitstream();
+            if (primaryBitstream != null && filterBitstream(context, myItem, primaryBitstream)) {
+                return true;
+            }
 
-            for (Bitstream myBitstream : myBitstreams) {
-                done |= filterBitstream(context, myItem, myBitstream);
+            // consider other bitstreams for thumbnail generation
+            List<Bitstream> bitstreams = originalBundle.getBitstreams();
+            if (bitstreams == null || bitstreams.isEmpty()) {
+                return false;
+            }
+
+            for (Bitstream bitstream : bitstreams) {
+                if (primaryBitstream != null && primaryBitstream.getID().equals(bitstream.getID())) {
+                    // skip primary bitstream since it was considered before
+                    continue;
+                }
+                if (filterBitstream(context, myItem, bitstream)) {
+                    return true;
+                }
             }
         }
-        return done;
+        return false;        
     }
 
     @Override
@@ -308,7 +321,6 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                     } catch (Exception e) {
                         logError("ERROR filtering, skipping bitstream #"
                                                + myBitstream.getID() + " " + e);
-                        e.printStackTrace();
                     }
                 }
             }
