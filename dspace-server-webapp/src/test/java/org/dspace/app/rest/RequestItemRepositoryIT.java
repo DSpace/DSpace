@@ -627,7 +627,7 @@ public class RequestItemRepositoryIT
     @Test
     public void testGetLinkTokenEmailWithSubPath() throws MalformedURLException, URISyntaxException {
         RequestItemRepository instance = applicationContext.getBean(
-                RequestItemRest.CATEGORY + '.' + RequestItemRest.PLURAL_NAME,
+                RequestItemRest.CATEGORY + '.' + RequestItemRest.NAME,
                 RequestItemRepository.class);
         String currentDspaceUrl = configurationService.getProperty("dspace.ui.url");
         String newDspaceUrl = currentDspaceUrl + "/subdir";
@@ -646,7 +646,7 @@ public class RequestItemRepositoryIT
     @Test
     public void testGetLinkTokenEmailWithoutSubPath() throws MalformedURLException, URISyntaxException {
         RequestItemRepository instance = applicationContext.getBean(
-                RequestItemRest.CATEGORY + '.' + RequestItemRest.PLURAL_NAME,
+                RequestItemRest.CATEGORY + '.' + RequestItemRest.NAME,
                 RequestItemRepository.class);
         String currentDspaceUrl = configurationService.getProperty("dspace.ui.url");
         String expectedUrl = currentDspaceUrl + "/request-a-copy/token";
