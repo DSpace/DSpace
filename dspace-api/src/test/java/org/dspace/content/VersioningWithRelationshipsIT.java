@@ -60,6 +60,9 @@ import org.dspace.content.virtual.VirtualMetadataConfiguration;
 import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.core.Constants;
 import org.dspace.discovery.SolrSearchCore;
+import org.dspace.identifier.IdentifierProvider;
+import org.dspace.identifier.IdentifierServiceImpl;
+import org.dspace.identifier.VersionedHandleIdentifierProvider;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.versioning.Version;
@@ -81,7 +84,7 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
         ContentServiceFactory.getInstance().getItemService();
     private final SolrSearchCore solrSearchCore =
         DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(SolrSearchCore.class).get(0);
-
+    private IdentifierServiceImpl identifierService;
     protected Community community;
     protected Collection collection;
     protected EntityType publicationEntityType;
@@ -98,12 +101,31 @@ public class VersioningWithRelationshipsIT extends AbstractIntegrationTestWithDa
     protected RelationshipType isIssueOfJournalVolume;
     protected RelationshipType isProjectOfPerson;
 
+    private void registerProvider(Class type) {
+        // Register our new provider
+        IdentifierProvider identifierProvider =
+                (IdentifierProvider) DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(type.getName(), type);
+        if (identifierProvider == null) {
+            DSpaceServicesFactory.getInstance().getServiceManager().registerServiceClass(type.getName(), type);
+            identifierProvider = (IdentifierProvider) DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(type.getName(), type);
+        }
+
+        // Overwrite the identifier-service's providers with the new one to ensure only this provider is used
+        identifierService = DSpaceServicesFactory.getInstance().getServiceManager()
+                .getServicesByType(IdentifierServiceImpl.class).get(0);
+        identifierService.setProviders(new ArrayList<>());
+        identifierService.setProviders(List.of(identifierProvider));
+    }
+
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
 
         context.turnOffAuthorisationSystem();
+
+
+        registerProvider(VersionedHandleIdentifierProvider.class);
 
         community = CommunityBuilder.createCommunity(context)
             .withName("community")
