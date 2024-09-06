@@ -10,6 +10,7 @@ package org.dspace.builder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -41,14 +42,31 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
 
     public static WorkspaceItemBuilder createWorkspaceItem(final Context context, final Collection col) {
         WorkspaceItemBuilder builder = new WorkspaceItemBuilder(context);
-        return builder.create(context, col);
+        return builder.create(context, col, null);
     }
 
-    private WorkspaceItemBuilder create(final Context context, final Collection col) {
+    public static WorkspaceItemBuilder createWorkspaceItem(final Context context, final Collection col, UUID uuid) {
+        WorkspaceItemBuilder builder = new WorkspaceItemBuilder(context);
+        return builder.create(context, col, uuid);
+    }
+
+    /**
+     * Create with a specific UUID (e.g. restoring items with Packager import)
+     *
+     * @param context DSpace context
+     * @param col Parent collection
+     * @param uuid Item UUID
+     * @return WorkspaceItemBuilder
+     */
+    private WorkspaceItemBuilder create(final Context context, final Collection col, UUID uuid) {
         this.context = context;
 
         try {
-            workspaceItem = workspaceItemService.create(context, col, false);
+            if (uuid == null) {
+                workspaceItem = workspaceItemService.create(context, col, false);
+            } else {
+                workspaceItem = workspaceItemService.create(context, col, uuid, false, false);
+            }
             item = workspaceItem.getItem();
         } catch (Exception e) {
             return handleException(e);
