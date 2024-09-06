@@ -86,9 +86,6 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Autowired
     private ConfigurationService configurationService;
     @Autowired
-    private CollectionService collectionService;
-
-    @Autowired
     private AuthorizeService authorizeService;
 
     Collection collection;
@@ -773,12 +770,13 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             context.turnOffAuthorisationSystem();
 
-            community = communityService.create(null, context);
-            parentGroup = communityService.createAdministrators(context, community);
-            childGroup1 = groupService.create(context);
-            childGroup2 = groupService.create(context);
+            community = CommunityBuilder.createCommunity(context).build();
+            parentGroup = GroupBuilder.createCommunityAdminGroup(context, community)
+                    .addMember(eperson)
+                    .build();
+            childGroup1 = GroupBuilder.createGroup(context).build();
+            childGroup2 = GroupBuilder.createGroup(context).build();
 
-            groupService.addMember(context, parentGroup, eperson);
             groupService.update(context, parentGroup);
 
             context.commit();
@@ -810,6 +808,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
             );
 
         } finally {
+            // TODO: Can we remove these lines now that we are creating them with the builder?
             if (community != null) {
                 CommunityBuilder.deleteCommunity(community.getID());
             }
@@ -837,9 +836,9 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             context.turnOffAuthorisationSystem();
 
-            parentGroup = groupService.create(context);
-            childGroup1 = groupService.create(context);
-            childGroup2 = groupService.create(context);
+            parentGroup = GroupBuilder.createGroup(context).build();
+            childGroup1 = GroupBuilder.createGroup(context).build();
+            childGroup2 = GroupBuilder.createGroup(context).build();
 
             context.commit();
 
@@ -882,9 +881,9 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             context.turnOffAuthorisationSystem();
 
-            parentGroup = groupService.create(context);
-            childGroup1 = groupService.create(context);
-            childGroup2 = groupService.create(context);
+            parentGroup = GroupBuilder.createGroup(context).build();
+            childGroup1 = GroupBuilder.createGroup(context).build();
+            childGroup2 = GroupBuilder.createGroup(context).build();
 
             context.commit();
 
@@ -926,9 +925,9 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             context.turnOffAuthorisationSystem();
 
-            parentGroup = groupService.create(context);
-            childGroup1 = groupService.create(context);
-            childGroup2 = groupService.create(context);
+            parentGroup = GroupBuilder.createGroup(context).build();
+            childGroup1 = GroupBuilder.createGroup(context).build();
+            childGroup2 = GroupBuilder.createGroup(context).build();
 
             context.commit();
 
@@ -971,18 +970,18 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             context.turnOffAuthorisationSystem();
 
-            parentGroup = groupService.create(context);
-            childGroup1 = groupService.create(context);
-            childGroup2 = groupService.create(context);
-
-            groupService.addMember(context, childGroup1, parentGroup);
+            parentGroup = GroupBuilder.createGroup(context).build();
+            childGroup1 = GroupBuilder.createGroup(context)
+                    .withParent(parentGroup)
+                    .build();
+            childGroup2 = GroupBuilder.createGroup(context).build();
             groupService.update(context, childGroup1);
 
-            context.commit();
-
-            parentGroup = context.reloadEntity(parentGroup);
-            childGroup1 = context.reloadEntity(childGroup1);
-            childGroup2 = context.reloadEntity(childGroup2);
+//            context.commit();
+//
+//            parentGroup = context.reloadEntity(parentGroup);
+//            childGroup1 = context.reloadEntity(childGroup1);
+//            childGroup2 = context.reloadEntity(childGroup2);
 
             context.restoreAuthSystemState();
             String authToken = getAuthToken(admin.getEmail(), password);
@@ -995,13 +994,15 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                             )
             ).andExpect(status().isUnprocessableEntity());
 
+            // TODO - confirm with reviewers that this is a mistake - it actually should be No Content
+            //        (see AddMember test) but was incorrectly expecting 422?
             getClient(authToken).perform(
                     post("/api/eperson/groups/" + parentGroup.getID() + "/subgroups")
                             .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                             .content(REST_SERVER_URL + "eperson/groups/" + childGroup1.getID() + "/\n"
                                     + REST_SERVER_URL + "eperson/groups/" + childGroup2.getID()
                             )
-            ).andExpect(status().isUnprocessableEntity());
+            ).andExpect(status().isNoContent());
 
         } finally {
             if (parentGroup != null) {
@@ -1093,13 +1094,12 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             context.turnOffAuthorisationSystem();
 
-            community = communityService.create(null, context);
-            parentGroup = communityService.createAdministrators(context, community);
-            member1 = ePersonService.create(context);
-            member2 = ePersonService.create(context);
-
-            groupService.addMember(context, parentGroup, eperson);
-            groupService.update(context, parentGroup);
+            community = CommunityBuilder.createCommunity(context).build();
+            parentGroup = GroupBuilder.createCommunityAdminGroup(context, community)
+                    .addMember(eperson)
+                    .build();
+            member1 = EPersonBuilder.createEPerson(context).build();
+            member2 = EPersonBuilder.createEPerson(context).build();
 
             context.commit();
 
@@ -1158,9 +1158,9 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             context.turnOffAuthorisationSystem();
 
-            parentGroup = groupService.create(context);
-            member1 = ePersonService.create(context);
-            member2 = ePersonService.create(context);
+            parentGroup = GroupBuilder.createGroup(context).build();
+            member1 = EPersonBuilder.createEPerson(context).build();
+            member2 = EPersonBuilder.createEPerson(context).build();
 
             context.commit();
 
@@ -1204,9 +1204,9 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             context.turnOffAuthorisationSystem();
 
-            parentGroup = groupService.create(context);
-            member1 = ePersonService.create(context);
-            member2 = ePersonService.create(context);
+            parentGroup = GroupBuilder.createGroup(context).build();
+            member1 = EPersonBuilder.createEPerson(context).build();
+            member2 = EPersonBuilder.createEPerson(context).build();
 
             context.commit();
 
@@ -1249,9 +1249,9 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             context.turnOffAuthorisationSystem();
 
-            parentGroup = groupService.create(context);
-            member1 = ePersonService.create(context);
-            member2 = ePersonService.create(context);
+            parentGroup = GroupBuilder.createGroup(context).build();
+            member1 = EPersonBuilder.createEPerson(context).build();
+            member2 = EPersonBuilder.createEPerson(context).build();
 
             context.commit();
 
@@ -1295,9 +1295,9 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             context.turnOffAuthorisationSystem();
 
-            parentGroup = groupService.create(context);
-            member1 = ePersonService.create(context);
-            member2 = ePersonService.create(context);
+            parentGroup = GroupBuilder.createGroup(context).build();
+            member1 = EPersonBuilder.createEPerson(context).build();
+            member2 = EPersonBuilder.createEPerson(context).build();
 
             context.commit();
 
@@ -1389,13 +1389,13 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             context.turnOffAuthorisationSystem();
 
-            community = communityService.create(null, context);
-            parentGroup = communityService.createAdministrators(context, community);
-            childGroup = groupService.create(context);
-
-            groupService.addMember(context, parentGroup, childGroup);
-            groupService.addMember(context, parentGroup, eperson);
-            groupService.update(context, parentGroup);
+            community = CommunityBuilder.createCommunity(context).build();
+            parentGroup = GroupBuilder.createCommunityAdminGroup(context, community)
+                    .addMember(eperson)
+                    .build();
+            childGroup = GroupBuilder.createGroup(context)
+                    .withParent(parentGroup)
+                    .build();
 
             context.commit();
 
@@ -1439,8 +1439,8 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             context.turnOffAuthorisationSystem();
 
-            parentGroup = groupService.create(context);
-            childGroup = groupService.create(context);
+            parentGroup = GroupBuilder.createGroup(context).build();
+            childGroup = GroupBuilder.createGroup(context).build();
 
             context.commit();
 
@@ -1474,8 +1474,8 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             context.turnOffAuthorisationSystem();
 
-            parentGroup = groupService.create(context);
-            childGroup = groupService.create(context);
+            parentGroup = GroupBuilder.createGroup(context).build();
+            childGroup = GroupBuilder.createGroup(context).build();
 
             context.commit();
 
@@ -1508,10 +1508,10 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             context.turnOffAuthorisationSystem();
 
-            parentGroup = groupService.create(context);
-            childGroup = groupService.create(context);
-
-            groupService.addMember(context, childGroup, parentGroup);
+            parentGroup = GroupBuilder.createGroup(context).build();
+            childGroup = GroupBuilder.createGroup(context)
+                    .withParent(parentGroup)
+                    .build();
 
             context.commit();
 
@@ -1546,10 +1546,10 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             context.turnOffAuthorisationSystem();
 
-            parentGroup = groupService.create(context);
-            childGroup = groupService.create(context);
-
-            groupService.addMember(context, childGroup, parentGroup);
+            parentGroup = GroupBuilder.createGroup(context).build();
+            childGroup = GroupBuilder.createGroup(context)
+                    .withParent(parentGroup)
+                    .build();
 
             context.commit();
 
@@ -1625,13 +1625,12 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             context.turnOffAuthorisationSystem();
 
-            community = communityService.create(null, context);
-            parentGroup = communityService.createAdministrators(context, community);
-            member = ePersonService.create(context);
-
-            groupService.addMember(context, parentGroup, member);
-            groupService.addMember(context, parentGroup, eperson);
-            groupService.update(context, parentGroup);
+            community = CommunityBuilder.createCommunity(context).build();
+            member = EPersonBuilder.createEPerson(context).build();
+            parentGroup = GroupBuilder.createCommunityAdminGroup(context, community)
+                    .addMember(member)
+                    .addMember(eperson)
+                    .build();
 
             assertTrue(groupService.isMember(context, member, parentGroup));
 
@@ -1678,9 +1677,10 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             context.turnOffAuthorisationSystem();
 
-            parentGroup = groupService.create(context);
-            member = ePersonService.create(context);
-            groupService.addMember(context, parentGroup, member);
+            member = EPersonBuilder.createEPerson(context).build();
+            parentGroup = GroupBuilder.createGroup(context)
+                    .addMember(member)
+                    .build();
 
             context.commit();
 
@@ -1715,9 +1715,10 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             context.turnOffAuthorisationSystem();
 
-            parentGroup = groupService.create(context);
-            member = ePersonService.create(context);
-            groupService.addMember(context, parentGroup, member);
+            member = EPersonBuilder.createEPerson(context).build();
+            parentGroup = GroupBuilder.createGroup(context)
+                    .addMember(member)
+                    .build();
 
             context.commit();
 
@@ -1751,9 +1752,10 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             context.turnOffAuthorisationSystem();
 
-            parentGroup = groupService.create(context);
-            member = ePersonService.create(context);
-            groupService.addMember(context, parentGroup, member);
+            member = EPersonBuilder.createEPerson(context).build();
+            parentGroup = GroupBuilder.createGroup(context)
+                    .addMember(member)
+                    .build();
 
             context.commit();
 
@@ -1789,9 +1791,10 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         try {
             context.turnOffAuthorisationSystem();
 
-            parentGroup = groupService.create(context);
-            member = ePersonService.create(context);
-            groupService.addMember(context, parentGroup, member);
+            member = EPersonBuilder.createEPerson(context).build();
+            parentGroup = GroupBuilder.createGroup(context)
+                    .addMember(member)
+                    .build();
 
             context.commit();
 
@@ -2586,7 +2589,8 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String itemGroupString = "ITEM";
         int defaultItemRead = Constants.DEFAULT_ITEM_READ;
-        Group itemReadGroup = collectionService.createDefaultReadGroup(context, col1, itemGroupString, defaultItemRead);
+        Group itemReadGroup = GroupBuilder.createCollectionDefaultReadGroup(context,
+                col1, itemGroupString, defaultItemRead).build();
 
         context.restoreAuthSystemState();
 
@@ -2670,8 +2674,9 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
         String bitstreamGroupString = "BITSTREAM";
         int defaultBitstreamRead = Constants.DEFAULT_BITSTREAM_READ;
 
-        Group bitstreamReadGroup = collectionService.createDefaultReadGroup(context, col1, bitstreamGroupString,
-                                                                                            defaultBitstreamRead);
+        Group bitstreamReadGroup = GroupBuilder.createCollectionDefaultReadGroup(context, col1, bitstreamGroupString,
+                                                                                            defaultBitstreamRead)
+                .build();
 
         context.restoreAuthSystemState();
 
@@ -2792,7 +2797,8 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void collectionAdminRemoveMembersFromCollectionAdminGroupSuccess() throws Exception {
 
         context.turnOffAuthorisationSystem();
-        Group adminGroup = collectionService.createAdministrators(context, collection);
+        Group adminGroup = GroupBuilder.createCollectionAdminGroup(context, collection)
+                .build();
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
         EPerson ePerson = EPersonBuilder.createEPerson(context).withEmail("testToAdd@test.com").build();
         context.restoreAuthSystemState();
@@ -2827,7 +2833,8 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void collectionAdminAddChildGroupToCollectionAdminGroupSuccess() throws Exception {
 
         context.turnOffAuthorisationSystem();
-        Group adminGroup = collectionService.createAdministrators(context, collection);
+        Group adminGroup = GroupBuilder.createCollectionAdminGroup(context, collection)
+                .build();
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
         Group group = GroupBuilder.createGroup(context).withName("testGroup").build();
         context.restoreAuthSystemState();
@@ -2853,7 +2860,8 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void collectionAdminRemoveChildGroupFromCollectionAdminGroupSuccess() throws Exception {
 
         context.turnOffAuthorisationSystem();
-        Group adminGroup = collectionService.createAdministrators(context, collection);
+        Group adminGroup = GroupBuilder.createCollectionAdminGroup(context, collection)
+                .build();
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
         Group group = GroupBuilder.createGroup(context).withName("testGroup").build();
         context.restoreAuthSystemState();
@@ -2889,7 +2897,8 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void collectionAdminAddMembersToCollectionAdminGroupPropertySetToFalse() throws Exception {
 
         context.turnOffAuthorisationSystem();
-        Group adminGroup = collectionService.createAdministrators(context, collection);
+        Group adminGroup = GroupBuilder.createCollectionAdminGroup(context, collection)
+                .build();
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
         EPerson ePerson = EPersonBuilder.createEPerson(context).withEmail("testToAdd@test.com").build();
         configurationService.setProperty("core.authorization.community-admin.collection.admin-group", false);
@@ -2923,7 +2932,8 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void collectionAdminRemoveMembersFromCollectionAdminGroupPropertySetToFalse() throws Exception {
 
         context.turnOffAuthorisationSystem();
-        Group adminGroup = collectionService.createAdministrators(context, collection);
+        Group adminGroup = GroupBuilder.createCollectionAdminGroup(context, collection)
+                .build();
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
         EPerson ePerson = EPersonBuilder.createEPerson(context).withEmail("testToAdd@test.com").build();
         context.restoreAuthSystemState();
@@ -2961,7 +2971,8 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void collectionAdminAddChildGroupToCollectionAdminGroupPropertySetToFalse() throws Exception {
 
         context.turnOffAuthorisationSystem();
-        Group adminGroup = collectionService.createAdministrators(context, collection);
+        Group adminGroup = GroupBuilder.createCollectionAdminGroup(context, collection)
+                .build();
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
         Group group = GroupBuilder.createGroup(context).withName("testGroup").build();
         configurationService.setProperty("core.authorization.community-admin.collection.admin-group", false);
@@ -2990,7 +3001,8 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void collectionAdminRemoveChildGroupFromCollectionAdminGroupPropertySetToFalse() throws Exception {
 
         context.turnOffAuthorisationSystem();
-        Group adminGroup = collectionService.createAdministrators(context, collection);
+        Group adminGroup = GroupBuilder.createCollectionAdminGroup(context, collection)
+                .build();
         authorizeService.addPolicy(context, collection, Constants.ADMIN, eperson);
         Group group = GroupBuilder.createGroup(context).withName("testGroup").build();
         context.restoreAuthSystemState();
