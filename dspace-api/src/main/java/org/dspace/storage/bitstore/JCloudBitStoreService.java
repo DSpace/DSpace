@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -347,34 +349,34 @@ public class JCloudBitStoreService extends BaseBitStoreService {
         }
     }
 
-    @Override
     @SuppressWarnings("unchecked")
-    public Map about(Bitstream bitstream, Map attrs) throws IOException {
+    public Map<String, Object> about(Bitstream bitstream, List<String> attrs) throws IOException {
         File file = getFile(bitstream);
         BlobStore blobStore = blobStoreContext.getBlobStore();
         BlobMetadata blobMetadata = blobStore.blobMetadata(getContainer(), file.toString());
+        Map<String, Object> metadata = new HashMap<>();
         if (blobMetadata != null) {
             ContentMetadata contentMetadata = blobMetadata.getContentMetadata();
 
             if (contentMetadata != null) {
-                attrs.put("size_bytes", String.valueOf(contentMetadata.getContentLength()));
+                metadata.put("size_bytes", String.valueOf(contentMetadata.getContentLength()));
                 final HashCode hashCode = contentMetadata.getContentMD5AsHashCode();
                 if (hashCode != null) {
-                    attrs.put("checksum", Utils.toHex(contentMetadata.getContentMD5AsHashCode().asBytes()));
-                    attrs.put("checksum_algorithm", CSA);
+                    metadata.put("checksum", Utils.toHex(contentMetadata.getContentMD5AsHashCode().asBytes()));
+                    metadata.put("checksum_algorithm", CSA);
                 }
-                attrs.put("modified", String.valueOf(blobMetadata.getLastModified().getTime()));
+                metadata.put("modified", String.valueOf(blobMetadata.getLastModified().getTime()));
 
-                attrs.put("ContentDisposition", contentMetadata.getContentDisposition());
-                attrs.put("ContentEncoding", contentMetadata.getContentEncoding());
-                attrs.put("ContentLanguage", contentMetadata.getContentLanguage());
-                attrs.put("ContentType", contentMetadata.getContentType());
+                metadata.put("ContentDisposition", contentMetadata.getContentDisposition());
+                metadata.put("ContentEncoding", contentMetadata.getContentEncoding());
+                metadata.put("ContentLanguage", contentMetadata.getContentLanguage());
+                metadata.put("ContentType", contentMetadata.getContentType());
 
                 if (contentMetadata.getExpires() != null) {
-                    attrs.put("Expires", contentMetadata.getExpires().getTime());
+                    metadata.put("Expires", contentMetadata.getExpires().getTime());
                 }
             }
-            return attrs;
+            return metadata;
         }
         return null;
     }
