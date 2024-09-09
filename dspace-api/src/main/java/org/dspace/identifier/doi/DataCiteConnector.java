@@ -7,6 +7,10 @@
  */
 package org.dspace.identifier.doi;
 
+import static org.dspace.identifier.DOIIdentifierProvider.DOI_ELEMENT;
+import static org.dspace.identifier.DOIIdentifierProvider.DOI_QUALIFIER;
+import static org.dspace.identifier.DOIIdentifierProvider.MD_SCHEMA;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -15,6 +19,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -383,6 +388,10 @@ public class DataCiteConnector
             parameters.put("hostinginstitution",
                            configurationService.getProperty(CFG_HOSTINGINSTITUTION));
         }
+        parameters.put("mdSchema", MD_SCHEMA);
+        parameters.put("mdElement", DOI_ELEMENT);
+        // Pass an empty string for qualifier if the metadata field doesn't have any
+        parameters.put("mdQualifier", DOI_QUALIFIER);
 
         Element root = null;
         try {
@@ -410,7 +419,7 @@ public class DataCiteConnector
         }
 
         String metadataDOI = extractDOI(root);
-        if (null == metadataDOI) {
+        if (StringUtils.isBlank(metadataDOI)) {
             // The DOI will be saved as metadata of dso after successful
             // registration. To register a doi it has to be part of the metadata
             // sent to DataCite. So we add it to the XML we'll send to DataCite

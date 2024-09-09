@@ -24,6 +24,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -57,13 +58,30 @@ public class VersionedHandleIdentifierProviderIT extends AbstractIntegrationTest
                 .build();
     }
 
+    @After
+    @Override
+    public void destroy() throws Exception {
+        super.destroy();
+        // After this test has finished running, refresh application context and
+        // set the expected 'default' versioned handle provider back to ensure other tests don't fail
+        DSpaceServicesFactory.getInstance().getServiceManager().getApplicationContext().refresh();
+    }
+
     private void registerProvider(Class type) {
         // Register our new provider
-        serviceManager.registerServiceClass(type.getName(), type);
         IdentifierProvider identifierProvider =
-                (IdentifierProvider) serviceManager.getServiceByName(type.getName(), type);
+                (IdentifierProvider) DSpaceServicesFactory.getInstance().getServiceManager()
+                        .getServiceByName(type.getName(), type);
+        if (identifierProvider == null) {
+            DSpaceServicesFactory.getInstance().getServiceManager().registerServiceClass(type.getName(), type);
+            identifierProvider = (IdentifierProvider) DSpaceServicesFactory.getInstance().getServiceManager()
+                    .getServiceByName(type.getName(), type);
+        }
 
         // Overwrite the identifier-service's providers with the new one to ensure only this provider is used
+        identifierService = DSpaceServicesFactory.getInstance().getServiceManager()
+                .getServicesByType(IdentifierServiceImpl.class).get(0);
+        identifierService.setProviders(new ArrayList<>());
         identifierService.setProviders(List.of(identifierProvider));
     }
 
