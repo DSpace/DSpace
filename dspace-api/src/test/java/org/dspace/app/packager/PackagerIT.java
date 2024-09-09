@@ -24,6 +24,7 @@ import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
 import org.dspace.builder.ItemBuilder;
+import org.dspace.builder.WorkspaceItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
@@ -159,7 +160,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         performExportScript(article.getHandle(), tempFile);
         UUID id = article.getID();
         itemService.delete(context, article);
-        WorkspaceItem workspaceItem = workspaceItemService.create(context, col1, id, false);
+        WorkspaceItem workspaceItem = WorkspaceItemBuilder.createWorkspaceItem(context, col1, id).build();
         installItemService.installItem(context, workspaceItem, "123456789/0100");
         performImportNoForceScript(tempFile);
         Iterator<Item> items = itemService.findByCollection(context, col1);
