@@ -59,6 +59,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchemaEnum;
+import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
@@ -83,6 +84,8 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
     private ConfigurationService configurationService;
     @Autowired
     private AuthorizeService authorizeService;
+    @Autowired
+    private CollectionService collectionService;
 
     Collection collection;
 
