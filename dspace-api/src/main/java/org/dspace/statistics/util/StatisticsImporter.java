@@ -494,7 +494,8 @@ public class StatisticsImporter {
                 e);
         } catch (NullPointerException e) {
             log.error(
-                    "The value of the property usage-statistics.dbfile is null. You may need to install the GeoLite Database file and/or uncomment the property in the config file!",
+                    "The value of the property usage-statistics.dbfile is null. You may need to install the GeoLite " +
+                    "Database file and/or uncomment the property in the config file!",
                 e);
         }
 
