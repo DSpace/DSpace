@@ -35,7 +35,7 @@ public interface OrcidCommonObjectFactory {
      * represent a date with a supported format.
      *
      * @param  metadataValue the metadata value
-     * @return               the FuzzyDate istance, if any
+     * @return               the FuzzyDate instance, if any
      */
     public Optional<FuzzyDate> createFuzzyDate(MetadataValue metadataValue);
 

@@ -451,7 +451,7 @@ public class HTMLReport implements Report {
     }
 
     /**
-     * Clean Stirngs for display in HTML
+     * Clean Strings for display in HTML
      *
      * @param s The String to clean
      * @return The cleaned String

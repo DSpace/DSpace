@@ -78,7 +78,7 @@ public class SolrUpgradePre6xStatistics {
     private static final int    NUMREC_DEFAULT = 100000;
     private static final int    BATCH_DEFAULT = 10000;
 
-    //After processing each batch of updates to SOLR, evaulate if the hibernate cache needs to be cleared
+    //After processing each batch of updates to SOLR, evaluate if the hibernate cache needs to be cleared
     private static final int    CACHE_LIMIT = 20000;
 
     private static final String INDEX_DEFAULT = "statistics";
@@ -112,7 +112,7 @@ public class SolrUpgradePre6xStatistics {
     //Logger
     private static final Logger log = LogManager.getLogger();
 
-    //DSpace Servcies
+    //DSpace Services
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     protected CommunityService   communityService     = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService  collectionService    = ContentServiceFactory.getInstance().getCollectionService();
@@ -271,7 +271,7 @@ public class SolrUpgradePre6xStatistics {
         options.addOption(HELP_OPTION, "help", false, "Get help on options for this command.");
         options.addOption(INDEX_NAME_OPTION, "index-name", true,
                 "The names of the indexes to process. At least one is required (default=statistics)");
-        options.addOption(NUMREC_OPTION, "num-rec", true, "Total number of records to update (defaut=100,000).");
+        options.addOption(NUMREC_OPTION, "num-rec", true, "Total number of records to update (default=100,000).");
         options.addOption(BATCH_OPTION, "batch-size", true,
                 "Number of records to batch update to SOLR at one time (default=10,000).");
         return options;
@@ -327,7 +327,7 @@ public class SolrUpgradePre6xStatistics {
         System.out.println(" * This process should be run iteratively over every statistics shard ");
         System.out.println(" * until there are no remaining records with legacy ids present.");
         System.out.println(" * This process can be run while the system is in use.");
-        System.out.println(" * It is likely to take 1 hour/1,000,000 legacy records to be udpated.");
+        System.out.println(" * It is likely to take 1 hour/1,000,000 legacy records to be updated.");
         System.out.println(" *");
         System.out.println(" * This process will rewrite most solr statistics records and may temporarily double ");
         System.out.println(
@@ -408,7 +408,7 @@ public class SolrUpgradePre6xStatistics {
                 } else if (id == Constants.ITEM) {
                     name = "Item " + s;
                 } else if (id == Constants.BITSTREAM) {
-                    name = "Bistream " + s;
+                    name = "Bitstream " + s;
                 } else {
                     /*
                      * In testing, I discovered some unexpected values in the scopeType field. It
@@ -479,7 +479,7 @@ public class SolrUpgradePre6xStatistics {
         sQ.setRows(batchSize);
 
         // Ensure that items are grouped by id
-        // Sort by id fails due to presense of id and string fields. The ord function
+        // Sort by id fails due to presence of id and string fields. The ord function
         // seems to help
         sQ.addSort("type", SolrQuery.ORDER.desc);
         sQ.addSort("scopeType", SolrQuery.ORDER.desc);

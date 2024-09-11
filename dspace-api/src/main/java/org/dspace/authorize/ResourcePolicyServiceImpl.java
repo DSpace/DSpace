@@ -417,7 +417,7 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService {
         ResourcePolicy resourcePolicy = resourcePolicyDAO.findOneById(context, id);
         Group group = resourcePolicy.getGroup();
 
-        if (resourcePolicy.getEPerson() != null && resourcePolicy.getEPerson().getID() == eperson.getID()) {
+        if (resourcePolicy.getEPerson() != null && resourcePolicy.getEPerson().getID().equals(eperson.getID())) {
             isMy = true;
         } else if (group != null && groupService.isMember(context, eperson, group)) {
             isMy = true;

@@ -26,7 +26,7 @@ import org.flywaydb.core.api.FlywayException;
  * @author Tim Donohue
  */
 public class PostgresUtils {
-    // PostgreSQL pgcrypto extention name, and required versions of Postgres & pgcrypto
+    // PostgreSQL pgcrypto extension name, and required versions of Postgres & pgcrypto
     public static final String PGCRYPTO = "pgcrypto";
     public static final Double PGCRYPTO_VERSION = 1.1;
     public static final Double POSTGRES_VERSION = 9.4;

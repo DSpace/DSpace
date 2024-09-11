@@ -74,7 +74,7 @@ public class QAEventMatcher extends TypeSafeMatcher<QAEvent> {
      * @param  message    the message to match
      * @param  topic      the topic to match
      * @param  trust      the trust to match
-     * @return            the matcher istance
+     * @return            the matcher instance
      */
     public static QAEventMatcher pendingOpenaireEventWith(String originalId, Item target,
         String title, String message, String topic, Double trust) {

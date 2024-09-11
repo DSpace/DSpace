@@ -133,7 +133,7 @@ public class SwordUrlManager {
 
             String iid = location.substring(cBaseUrl.length());
             if (iid.endsWith(".atom")) {
-                // this is the atom url, so we need to strip that to ge tthe item id
+                // this is the atom url, so we need to strip that to ge the item id
                 iid = iid.substring(0, iid.length() - ".atom".length());
             } else if (iid.endsWith(".rdf")) {
                 // this is the rdf url so we need to strip that to get the item id
