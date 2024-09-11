@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.apache.solr.common.SolrDocument;
 import org.dspace.authority.AuthorityValue;
-import org.dspace.core.Context;
 
 /**
  * This service contains all methods for using authority values
@@ -25,30 +24,30 @@ public interface AuthorityValueService {
     public static final String SPLIT = "::";
     public static final String GENERATE = "will be generated" + SPLIT;
 
-    public AuthorityValue generate(Context context, String authorityKey, String content, String field);
+    public AuthorityValue generate(String authorityKey, String content, String field);
 
     public AuthorityValue update(AuthorityValue value);
 
-    public AuthorityValue findByUID(Context context, String authorityID);
+    public AuthorityValue findByUID(String authorityID);
 
-    public List<AuthorityValue> findByValue(Context context, String field, String value);
+    public List<AuthorityValue> findByValue(String field, String value);
 
-    public AuthorityValue findByOrcidID(Context context, String orcid_id);
+    public AuthorityValue findByOrcidID(String orcid_id);
 
-    public List<AuthorityValue> findByName(Context context, String schema, String element, String qualifier,
+    public List<AuthorityValue> findByName(String schema, String element, String qualifier,
                                            String name);
 
-    public List<AuthorityValue> findByAuthorityMetadata(Context context, String schema, String element,
+    public List<AuthorityValue> findByAuthorityMetadata(String schema, String element,
                                                         String qualifier, String value);
 
-    public List<AuthorityValue> findByExactValue(Context context, String field, String value);
+    public List<AuthorityValue> findByExactValue(String field, String value);
 
-    public List<AuthorityValue> findByValue(Context context, String schema, String element, String qualifier,
+    public List<AuthorityValue> findByValue(String schema, String element, String qualifier,
                                             String value);
 
-    public List<AuthorityValue> findOrcidHolders(Context context);
+    public List<AuthorityValue> findOrcidHolders();
 
-    public List<AuthorityValue> findAll(Context context);
+    public List<AuthorityValue> findAll();
 
     public AuthorityValue fromSolr(SolrDocument solrDocument);
 
