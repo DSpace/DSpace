@@ -945,7 +945,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             return query + " AND ";
         }
     }
-    
+
     public DiscoverResult retrieveObjectWithAdmin(Context context, DiscoverQuery discoverQuery,
             String entityType, Community community, String q)
             throws SQLException, SearchServiceException {

@@ -605,7 +605,7 @@ public interface AuthorizeService {
      */
     public void replaceAllPolicies(Context context, DSpaceObject source, DSpaceObject dest)
             throws SQLException, AuthorizeException;
-    
+
     /**
      * Finds all Indexed Objects where the current user has admin rights. If the user is an super Admin,
      * this is all Indexed Objects(community/collection). Otherwise, it includes those objects where
@@ -613,7 +613,8 @@ public interface AuthorizeService {
      *
      * @param context                    DSpace context
      * @param discoverQuery
-     * @param entityType                 limit the returned object(community/collection) to those related to given entity type
+     * @param entityType                 limit the returned object(community/collection) to those related to
+     * given entity type
      * @param community                  parent community, could be null
      * @param q                          limit the returned collection to those with metadata values matching the query
      *                                   terms. The terms are used to make also a prefix query on SOLR
