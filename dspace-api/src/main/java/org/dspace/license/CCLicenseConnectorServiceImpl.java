@@ -30,8 +30,10 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
+import org.dspace.util.ProxyUtils;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -50,13 +52,13 @@ import org.xml.sax.InputSource;
  */
 public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService, InitializingBean {
 
-    private Logger log = org.apache.logging.log4j.LogManager.getLogger(CCLicenseConnectorServiceImpl.class);
+    private final Logger log = LogManager.getLogger();
 
     private CloseableHttpClient client;
     protected SAXBuilder parser = new SAXBuilder();
 
-    private String postArgument = "answers";
-    private String postAnswerFormat =
+    private final String postArgument = "answers";
+    private final String postAnswerFormat =
             "<answers> " +
                     "<locale>{1}</locale>" +
                     "<license-{0}>" +
@@ -70,12 +72,11 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        HttpClientBuilder builder = HttpClientBuilder.create();
-
-        client = builder
+        HttpClientBuilder builder = HttpClientBuilder.create()
                 .disableAutomaticRetries()
-                .setMaxConnTotal(5)
-                .build();
+                .setMaxConnTotal(5);
+        builder = ProxyUtils.addProxy(builder);
+        client = builder.build();
 
         // disallow DTD parsing to ensure no XXE attacks can occur.
         // See https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
@@ -88,6 +89,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
      * @param language - the language to retrieve the licenses for
      * @return a map of licenses with the id and the license for the provided language
      */
+    @Override
     public Map<String, CCLicense> retrieveLicenses(String language) {
         String ccLicenseUrl = configurationService.getProperty("cc.api.rooturl");
 
@@ -252,6 +254,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
      * @param answerMap - the answers to the different field questions
      * @return the CC License URI
      */
+    @Override
     public String retrieveRightsByQuestion(String licenseId,
                                            String language,
                                            Map<String, String> answerMap) {
@@ -351,7 +354,8 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
             return doc;
 
         } catch (Exception e) {
-            log.error("Error while retrieving the license document for URI: " + licenseURI, e);
+            log.error("Error while retrieving the license document for URI: {}",
+                    licenseURI, e);
         }
         return null;
     }
@@ -362,6 +366,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
      * @param doc - The license document from which to retrieve the license name
      * @return the license name
      */
+    @Override
     public String retrieveLicenseName(final Document doc) {
         return getSingleNodeValue(doc, "//result/license-name");
     }
