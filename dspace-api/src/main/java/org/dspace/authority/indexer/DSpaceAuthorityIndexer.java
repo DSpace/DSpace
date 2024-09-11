@@ -107,7 +107,7 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
                 }
                 if (value != null) {
                     if (requiresItemUpdate) {
-                        value.updateItem(context, item, metadataValue);
+                        value.updateItem(context, metadataValue);
                         try {
                             itemService.update(context, item);
                         } catch (Exception e) {
