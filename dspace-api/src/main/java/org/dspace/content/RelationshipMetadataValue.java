@@ -16,7 +16,7 @@ import org.dspace.core.Constants;
  * whether these Values should be counted for place calculation on both the native MetadataValues and the
  * Relationship's place attributes.
  */
-public class RelationshipMetadataValue extends MetadataValue {
+public class RelationshipMetadataValue extends VirtualMetadataValue {
 
     /**
      * This property determines whether this RelationshipMetadataValue should be used in place calculation or not

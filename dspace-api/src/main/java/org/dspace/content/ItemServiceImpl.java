@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +31,8 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.util.AuthorizeUtil;
+import org.dspace.authority.AuthorityValue;
+import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
@@ -49,6 +52,8 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.content.virtual.AuthorityVirtualMetadataConfiguration;
+import org.dspace.content.virtual.AuthorityVirtualMetadataPopulator;
 import org.dspace.content.virtual.VirtualMetadataPopulator;
 import org.dspace.contentreport.QueryPredicate;
 import org.dspace.core.Constants;
@@ -146,6 +151,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
 
     @Autowired(required = true)
     protected VirtualMetadataPopulator virtualMetadataPopulator;
+
+    @Autowired
+    protected AuthorityVirtualMetadataPopulator authorityVirtualMetadataPopulator;
+    @Autowired
+    protected AuthorityValueService authorityValueService;
 
     @Autowired(required = true)
     private RelationshipMetadataService relationshipMetadataService;
@@ -1764,12 +1774,18 @@ prevent the generation of resource policy entry values with null dspace_object a
         }
         if (item.isModifiedMetadataCache()) {
             log.debug("Called getMetadata for " + item.getID() + " with invalid cache");
-            //rebuild cache
+            // Rebuild cache
             List<MetadataValue> dbMetadataValues = item.getMetadata();
 
             List<MetadataValue> fullMetadataValueList = new LinkedList<>();
             fullMetadataValueList.addAll(relationshipMetadataService.getRelationshipMetadata(item, true));
             fullMetadataValueList.addAll(dbMetadataValues);
+
+            // Now get authority virtual metadata - note this requires the configuration property *and* the
+            // enableVirtualMetadata parameter to be true
+            if (configurationService.getBooleanProperty("authority.metadata.virtual", false)) {
+                fullMetadataValueList.addAll(getAuthorityVirtualMetadata(item, dbMetadataValues));
+            }
 
             item.setCachedMetadata(MetadataValueComparators.sort(fullMetadataValueList));
         }
@@ -1785,6 +1801,87 @@ prevent the generation of resource policy entry values with null dspace_object a
 
         // Create an array of matching values
         return values;
+    }
+
+    private List<MetadataValue> getAuthorityVirtualMetadata(Item item, List<MetadataValue> dbMetadataValues) {
+        Map<String, HashMap<String, AuthorityVirtualMetadataConfiguration>> authorityVirtualMaps
+                = authorityVirtualMetadataPopulator.getMap();
+        List<MetadataValue> authorityMetadataValues = new LinkedList<>();
+        // Make a map of counts - we want to calc a real 'place'
+        Map<String, Integer> fieldCounts = new HashMap<>();
+        for (MetadataValue mv : dbMetadataValues) {
+            String mvfn = mv.getMetadataField().toString('.');
+            if (!fieldCounts.containsKey(mvfn)) {
+                fieldCounts.put(mvfn, 1);
+            } else {
+                fieldCounts.put(mvfn, fieldCounts.get(mvfn) + 1);
+            }
+        }
+        Context context = new Context();
+        try {
+            for (MetadataValue dbValue : dbMetadataValues) {
+                if (null != dbValue.getAuthority()) {
+                    // Get field
+                    MetadataField dbField = dbValue.getMetadataField();
+                    // In the virtual authority metadata spring XML, the map keys are field names of
+                    // authority-controlled fields
+                    String dbFieldName = dbField.toString('.');
+                    // Check if this field is mapped *and* is configured for authority control
+                    if (authorityVirtualMaps.containsKey(dbFieldName)
+                            && metadataAuthorityService.isAuthorityControlled(dbFieldName) ) {
+                        AuthorityValue authorityValue = authorityValueService.findByUID(dbValue.getAuthority());
+                        if (authorityValue == null) {
+                            continue;
+                        }
+                        // Get map from config
+                        HashMap<String, AuthorityVirtualMetadataConfiguration> authorityVirtualFieldMap =
+                                authorityVirtualMaps.get(dbField.toString('.'));
+                        // Iterate mapped fields
+                        for (String virtualFieldName : authorityVirtualFieldMap.keySet()) {
+                            if (virtualFieldName.equals(dbFieldName)) {
+                                // Special case - we don't want to override / add to the actual field associated with
+                                // this authority
+                                // even if it is mapped, right?
+                                continue;
+                            }
+                            AuthorityVirtualMetadataConfiguration authorityVirtualMetadataConfiguration =
+                                    authorityVirtualFieldMap.get(virtualFieldName);
+                            MetadataField virtualField = metadataFieldService.findByString(context,
+                                    virtualFieldName, '.');
+                            if (virtualField != null) {
+                                List<String> virtualAuthorityValues =
+                                        authorityVirtualMetadataConfiguration.getValues(authorityValue);
+                                // Iterate virtual authority values and insert them as authority virtual metadata
+                                for (String virtualAuthorityValue : virtualAuthorityValues) {
+                                    AuthorityVirtualMetadataValue metadataValue = new AuthorityVirtualMetadataValue();
+                                    metadataValue.setMetadataField(virtualField);
+                                    // There is no information in the source authority object to help determine the
+                                    // place so instead we use the running count to set an appropriate place at the
+                                    // end of the existing metadata values for this field
+                                    int place = (fieldCounts.getOrDefault(virtualFieldName, 0));
+                                    metadataValue.setPlace(place);
+                                    fieldCounts.put(virtualFieldName, ++place);
+                                    // In RelationVirtualMetadata, the authority uses the prefix and the relationship
+                                    // ID, but we will instead use the authority ID as the second component
+                                    metadataValue.setAuthority(Constants.VIRTUAL_AUTHORITY_PREFIX
+                                            + authorityValue.getId());
+                                    metadataValue.setValue(virtualAuthorityValue);
+                                    metadataValue.setDSpaceObject(item);
+                                    authorityMetadataValues.add(metadataValue);
+                                }
+                            } else {
+                                log.error("Could not find virtual field specified in authority" +
+                                        "virtual metadata config: {}", virtualFieldName);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
+        return authorityMetadataValues;
     }
 
     /**
