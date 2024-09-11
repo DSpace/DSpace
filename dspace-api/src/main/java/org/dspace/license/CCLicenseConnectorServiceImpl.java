@@ -345,7 +345,7 @@ public class CCLicenseConnectorServiceImpl implements CCLicenseConnectorService,
         } catch (MalformedURLException e) {
             return null;
         }
-        URLConnection connection = request_url.openConnection();
+        URLConnection connection = request_url.openConnection(ProxyUtils.getProxy());
         connection.setDoOutput(true);
         try {
             // parsing document from input stream
