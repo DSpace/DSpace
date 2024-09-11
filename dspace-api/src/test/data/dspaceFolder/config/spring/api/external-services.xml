@@ -104,5 +104,24 @@
             </list>
         </property>
     </bean>
+
+    <!--
+      - Additional REST connectors for use with external data import, authority, live import.
+      - Configuration contstructor args come with safe defaults as well as Apache commons config references
+     -->
+    <!-- LOBID GND API: https://lobid.org/gnd/api -->
+    <bean id="lobidGNDRestConnector" class="org.dspace.external.LobidGNDRestConnector" autowire-candidate="true">
+        <constructor-arg value="${gnd.api.url:https://lobid.org/gnd/}"/>
+    </bean>
+    <!-- Geonames API: https://www.geonames.org/export/JSON-webservices.html -->
+    <bean id="geonamesRestConnector" class="org.dspace.external.GeonamesRestConnector" autowire-candidate="true">
+        <constructor-arg value="${geonames.api.endpoint:http://api.geonames.org/getJSON}"/>
+        <constructor-arg value="${geonames.api.username:test}"/>
+    </bean>
+    <!-- Wikimedia REST API: https://www.mediawiki.org/wiki/API:Main_page -->
+    <bean id="wikimediaRestConnector" class="org.dspace.external.WikimediaRestConnector" autowire-candidate="true">
+        <constructor-arg value="${wikimedia.api.endpoint:https://commons.wikimedia.org/w/api.php}"/>
+    </bean>
+
 </beans>
 

@@ -1,0 +1,152 @@
+{
+  "type" : [ "CorporateBody", "AuthorityResource" ],
+  "@context" : "http://lobid.org/gnd/context.jsonld",
+  "gndSubjectCategory" : [ {
+    "id" : "https://d-nb.info/standards/vocab/gnd/gnd-sc#6.6",
+    "label" : "Hochschule"
+  } ],
+  "oldAuthorityNumber" : [ "(DE-588c)4504669-4", "(DE-588)1087357195", "(DE-588)4504669-4", "(DE-588b)1010747-2" ],
+  "geographicAreaCode" : [ {
+    "id" : "https://d-nb.info/standards/vocab/gnd/geographic-area-code#XE-NZ",
+    "label" : "Neuseeland"
+  } ],
+  "deprecatedUri" : [ "https://d-nb.info/gnd/1087357195", "https://d-nb.info/gnd/4504669-4" ],
+  "placeOfBusiness" : [ {
+    "id" : "https://d-nb.info/gnd/4086091-7",
+    "label" : "Auckland"
+  } ],
+  "precedingCorporateBody" : [ {
+    "id" : "https://d-nb.info/gnd/110198-5",
+    "label" : "Auckland University College"
+  } ],
+  "dateOfEstablishment" : [ "1961" ],
+  "describedBy" : {
+    "id" : "https://d-nb.info/gnd/1010747-2/about",
+    "license" : {
+      "id" : "http://creativecommons.org/publicdomain/zero/1.0/",
+      "label" : "http://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "dateModified" : "2019-07-24T00:33:50.000",
+    "descriptionLevel" : {
+      "id" : "https://d-nb.info/standards/vocab/gnd/description-level#1",
+      "label" : "Allgemeines, Interdisziplinäre Allgemeinwörter"
+    }
+  },
+  "gndIdentifier" : "1010747-2",
+  "id" : "https://d-nb.info/gnd/1010747-2",
+  "preferredName" : "University of Auckland",
+  "wikipedia" : [ {
+    "id" : "https://de.wikipedia.org/wiki/University_of_Auckland",
+    "label" : "https://de.wikipedia.org/wiki/University_of_Auckland"
+  } ],
+  "variantName" : [ "Universität Auckland", "Oklendskij universitet", "Auckland University", "Universidad de Auckland", "Università di Auckland", "Université d'Auckland", "The University of Auckland New Zealand", "Te Whare Wānanga o Tāmaki Makaurau", "Université de Auckland" ],
+  "homepage" : [ {
+    "id" : "http://www.auckland.ac.nz/uoa/",
+    "label" : "http://www.auckland.ac.nz/uoa/"
+  } ],
+  "sameAs" : [ {
+    "collection" : {
+      "abbr" : "BNF",
+      "name" : "Bibliothèque nationale de France",
+      "publisher" : "Bibliothèque nationale de France",
+      "icon" : "https://www.bnf.fr/themes/custom/bnfsi/favicon.ico",
+      "id" : "http://www.wikidata.org/entity/Q19938912"
+    },
+    "id" : "http://catalogue.bnf.fr/ark:/12148/cb12103718b"
+  }, {
+    "id" : "http://id.loc.gov/rwo/agents/n80066997",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q13219454",
+      "abbr" : "LC",
+      "publisher" : "Library of Congress",
+      "icon" : "http://www.loc.gov/favicon.ico",
+      "name" : "NACO Authority File"
+    }
+  }, {
+    "id" : "http://isni.org/isni/0000000403723343",
+    "collection" : {
+      "id" : "http://isni.org"
+    }
+  }, {
+    "id" : "http://viaf.org/viaf/155936478",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q54919",
+      "abbr" : "VIAF",
+      "publisher" : "OCLC",
+      "icon" : "http://viaf.org/viaf/images/viaf.ico",
+      "name" : "Virtual International Authority File (VIAF)"
+    }
+  }, {
+    "id" : "http://www.wikidata.org/entity/Q492467",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q2013",
+      "abbr" : "WIKIDATA",
+      "publisher" : "Wikimedia Foundation Inc.",
+      "icon" : "https://www.wikidata.org/static/favicon/wikidata.ico",
+      "name" : "Wikidata"
+    }
+  }, {
+    "collection" : {
+      "abbr" : "DNB",
+      "name" : "Gemeinsame Normdatei (GND) im Katalog der Deutschen Nationalbibliothek",
+      "publisher" : "Deutsche Nationalbibliothek",
+      "icon" : "https://www.dnb.de/SiteGlobals/Frontend/DNBWeb/Images/favicon.png?__blob=normal&v=4",
+      "id" : "http://www.wikidata.org/entity/Q36578"
+    },
+    "id" : "https://d-nb.info/gnd/1010747-2/about"
+  }, {
+    "id" : "https://d-nb.info/gnd/1087357195",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q36578",
+      "abbr" : "DNB",
+      "publisher" : "Deutsche Nationalbibliothek",
+      "icon" : "http://www.dnb.de/SiteGlobals/StyleBundles/Bilder/favicon.png?__blob=normal&v=1",
+      "name" : "Gemeinsame Normdatei (GND) im Katalog der Deutschen Nationalbibliothek"
+    }
+  }, {
+    "id" : "https://d-nb.info/gnd/4504669-4",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q36578",
+      "abbr" : "DNB",
+      "publisher" : "Deutsche Nationalbibliothek",
+      "icon" : "http://www.dnb.de/SiteGlobals/StyleBundles/Bilder/favicon.png?__blob=normal&v=1",
+      "name" : "Gemeinsame Normdatei (GND) im Katalog der Deutschen Nationalbibliothek"
+    }
+  }, {
+    "collection" : {
+      "abbr" : "dewiki",
+      "name" : "Wikipedia (Deutsch)",
+      "publisher" : "Wikimedia Foundation Inc.",
+      "icon" : "https://de.wikipedia.org/static/favicon/wikipedia.ico",
+      "id" : "http://www.wikidata.org/entity/Q48183"
+    },
+    "id" : "https://de.wikipedia.org/wiki/University_of_Auckland"
+  }, {
+    "collection" : {
+      "abbr" : "enwiki",
+      "name" : "Wikipedia (English)",
+      "publisher" : "Wikimedia Foundation Inc.",
+      "icon" : "https://en.wikipedia.org/static/favicon/wikipedia.ico",
+      "id" : "http://www.wikidata.org/entity/Q328"
+    },
+    "id" : "https://en.wikipedia.org/wiki/University_of_Auckland"
+  }, {
+    "collection" : {
+      "abbr" : "DE-611",
+      "name" : "Kalliope Verbundkatalog",
+      "publisher" : "Staatsbibliothek zu Berlin - Preußischer Kulturbesitz",
+      "icon" : "https://kalliope-verbund.info/img/favicon.ico",
+      "id" : "https://kalliope-verbund.info"
+    },
+    "id" : "https://kalliope-verbund.info/gnd/1010747-2"
+  }, {
+    "collection" : {
+      "abbr" : "DDB",
+      "name" : "Deutsche Digitale Bibliothek",
+      "publisher" : "Deutsche Digitale Bibliothek",
+      "icon" : "https://www.deutsche-digitale-bibliothek.de/favicon.ico",
+      "id" : "http://www.wikidata.org/entity/Q621630"
+    },
+    "id" : "https://www.deutsche-digitale-bibliothek.de/organization/gnd/1010747-2"
+  } ]
+}
