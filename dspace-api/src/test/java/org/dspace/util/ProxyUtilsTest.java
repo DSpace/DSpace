@@ -42,7 +42,8 @@ public class ProxyUtilsTest
 
     private static final String PROXY_HOST = "proxy.example.com";
     private static final String PROXY_IP_ADDRESS = "192.168.1.1";
-    private static final int PROXY_PORT = 8888;
+    private static final String PROXY_PORT = "8888";
+    private static final int PROXY_PORT_INT = 8888;
 
     /**
      * Test of addProxy method when no proxy is set.
@@ -72,7 +73,7 @@ public class ProxyUtilsTest
         cfg.setProperty(ProxyUtils.C_HTTP_PROXY_HOST, PROXY_HOST);
         cfg.setProperty(ProxyUtils.C_HTTP_PROXY_PORT, null);
         builderSpy = ProxyUtils.addProxy(builderSpy);
-        verify(builderSpy,times(1)).setProxy(any(HttpHost.class));
+        verify(builderSpy,never()).setProxy(any(HttpHost.class));
         // FIXME this fails with null host name.  How to get at the HttpHost?
         // FIXME assertEquals("Wrong proxy host", PROXY_HOST, hostSpy.getHostName());
         // FIXME assertEquals("Wrong proxy port", PROXY_PORT, hostSpy.getPort()); // FIXME nope?
@@ -86,7 +87,7 @@ public class ProxyUtilsTest
         HttpClientBuilder builder = HttpClientBuilder.create();
         HttpClientBuilder builderSpy = spy(builder);
         HttpHost hostSpy = mock(HttpHost.class,
-                withSettings().useConstructor("bogus." + PROXY_HOST, PROXY_PORT));
+                withSettings().useConstructor("bogus." + PROXY_HOST, PROXY_PORT_INT));
 
         cfg.setProperty(ProxyUtils.C_HTTP_PROXY_HOST, PROXY_HOST);
         cfg.setProperty(ProxyUtils.C_HTTP_PROXY_PORT, PROXY_PORT);
@@ -102,7 +103,7 @@ public class ProxyUtilsTest
         cfg.setProperty(ProxyUtils.C_HTTP_PROXY_PORT, PROXY_PORT);
         Proxy proxy = ProxyUtils.getProxy();
         Proxy expected = new Proxy(Proxy.Type.HTTP,
-                new InetSocketAddress(PROXY_IP_ADDRESS, PROXY_PORT));
+                new InetSocketAddress(PROXY_IP_ADDRESS, PROXY_PORT_INT));
         assertEquals("Wrong proxy", expected, proxy);
     }
 

@@ -52,6 +52,7 @@ import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.DOI;
 import org.dspace.services.ConfigurationService;
+import org.dspace.util.ProxyUtils;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -699,7 +700,9 @@ public class DataCiteConnector
         httpContext.setCredentialsProvider(credentialsProvider);
 
         HttpEntity entity = null;
-        try ( CloseableHttpClient httpclient = HttpClientBuilder.create().build(); ) {
+        HttpClientBuilder builder = HttpClientBuilder.create();
+        builder = ProxyUtils.addProxy(builder);
+        try ( CloseableHttpClient httpclient = builder.build(); ) {
             HttpResponse response = httpclient.execute(req, httpContext);
 
             StatusLine status = response.getStatusLine();
