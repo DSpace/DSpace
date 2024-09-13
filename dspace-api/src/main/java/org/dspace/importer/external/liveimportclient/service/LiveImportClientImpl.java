@@ -12,7 +12,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.IOUtils;
@@ -27,10 +26,11 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
+import org.dspace.util.ProxyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -53,8 +53,15 @@ public class LiveImportClientImpl implements LiveImportClient {
     @Override
     public String executeHttpGetRequest(int timeout, String URL, Map<String, Map<String, String>> params) {
         HttpGet method = null;
-        try (CloseableHttpClient httpClient = Optional.ofNullable(this.httpClient)
-                                                      .orElseGet(HttpClients::createDefault)) {
+        CloseableHttpClient theClient;
+        if (null != httpClient) {
+            theClient = httpClient;
+        } else {
+            HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+            ProxyUtils.addProxy(clientBuilder);
+            theClient = clientBuilder.build();
+        }
+        try (theClient) {
 
             Builder requestConfigBuilder = RequestConfig.custom();
             requestConfigBuilder.setConnectionRequestTimeout(timeout);
@@ -75,7 +82,7 @@ public class LiveImportClientImpl implements LiveImportClient {
             if (log.isDebugEnabled()) {
                 log.debug("Performing GET request to \"" + uri + "\"...");
             }
-            HttpResponse httpResponse = httpClient.execute(method);
+            HttpResponse httpResponse = theClient.execute(method);
             if (isNotSuccessfull(httpResponse)) {
                 throw new RuntimeException("The request failed with: " + getStatusCode(httpResponse) + " code, reason= "
                                            + httpResponse.getStatusLine().getReasonPhrase());
@@ -95,9 +102,15 @@ public class LiveImportClientImpl implements LiveImportClient {
     @Override
     public String executeHttpPostRequest(String URL, Map<String, Map<String, String>> params, String entry) {
         HttpPost method = null;
-        try (CloseableHttpClient httpClient = Optional.ofNullable(this.httpClient)
-                                                      .orElseGet(HttpClients::createDefault)) {
-
+        CloseableHttpClient theClient;
+        if (null == httpClient) {
+            HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+            ProxyUtils.addProxy(clientBuilder);
+            theClient = clientBuilder.build();
+        } else {
+            theClient = httpClient;
+        }
+        try (theClient) {
             Builder requestConfigBuilder = RequestConfig.custom();
             RequestConfig defaultRequestConfig = requestConfigBuilder.build();
 
@@ -113,7 +126,7 @@ public class LiveImportClientImpl implements LiveImportClient {
             if (log.isDebugEnabled()) {
                 log.debug("Performing POST request to \"" + uri + "\"..." );
             }
-            HttpResponse httpResponse = httpClient.execute(method);
+            HttpResponse httpResponse = theClient.execute(method);
             if (isNotSuccessfull(httpResponse)) {
                 throw new RuntimeException();
             }
@@ -142,7 +155,7 @@ public class LiveImportClientImpl implements LiveImportClient {
 
     /**
      * Allows to set the header parameters to the HTTP Post method
-     * 
+     *
      * @param method  HttpPost method
      * @param params  This map contains the header params to be included in the request.
      */
@@ -157,7 +170,7 @@ public class LiveImportClientImpl implements LiveImportClient {
 
     /**
      * This method allows you to add the parameters contained in the requestParams map to the URL
-     * 
+     *
      * @param URL                   URL
      * @param requestParams         This map contains the parameters to be included in the request.
      *                              Each parameter will be added to the url?(key=value)
