@@ -118,9 +118,10 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
                 handler.logInfo("Indexing " + commandLine.getOptionValue('i') + " force " + commandLine.hasOption("f"));
                 final long startTimeMillis = System.currentTimeMillis();
                 final long count = indexAll(indexer, ContentServiceFactory.getInstance().getItemService(), context,
-                        indexableObject.get());
+                    indexableObject.get());
                 final long seconds = (System.currentTimeMillis() - startTimeMillis) / 1000;
-                handler.logInfo("Indexed " + count + " object" + (count > 1 ? "s" : "") + " in " + seconds + " seconds");
+                handler.logInfo("Indexed " + count + " object" + (count > 1 ? "s" : "") + 
+                                " in " + seconds + " seconds");
                 break;
             case UPDATE:
             case UPDATEANDSPELLCHECK:
@@ -218,7 +219,8 @@ public class IndexClient extends DSpaceRunnable<IndexDiscoveryScriptConfiguratio
             final IndexableObject indexableObject) throws IOException, SearchServiceException, SQLException {
         long count = 0;
 
-        boolean commit = indexableObject instanceof IndexableCommunity || indexableObject instanceof IndexableCollection;
+        boolean commit = indexableObject instanceof IndexableCommunity || 
+            indexableObject instanceof IndexableCollection;
         indexingService.indexContent(context, indexableObject, true, commit);
         count++;
 
