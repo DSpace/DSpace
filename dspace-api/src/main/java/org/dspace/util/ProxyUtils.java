@@ -31,8 +31,6 @@ public class ProxyUtils {
     public static final String C_HTTP_PROXY_PORT = "http.proxy.port";
 
     private static final Logger LOG = LogManager.getLogger();
-    private static final ConfigurationService configurationService
-            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     private ProxyUtils() {}
 
@@ -43,9 +41,11 @@ public class ProxyUtils {
      * @return the builder, possibly configured with a proxy.
      */
     public static HttpClientBuilder addProxy(HttpClientBuilder builder) {
-        String proxyHost = configurationService.getProperty(C_HTTP_PROXY_HOST);
+        ConfigurationService cfg = DSpaceServicesFactory.getInstance()
+                .getConfigurationService();
+        String proxyHost = cfg.getProperty(C_HTTP_PROXY_HOST);
         if (StringUtils.isNotBlank(proxyHost)) {
-            int proxyPort = getPort();
+            int proxyPort = getPort(cfg);
             if (proxyPort >= 0) {
                 HttpHost proxy = new HttpHost(proxyHost, proxyPort);
                 builder.setProxy(proxy);
@@ -64,10 +64,12 @@ public class ProxyUtils {
      * @return a configured Proxy, or {@link Proxy.NO_PROXY} if not configured.
      */
     public static Proxy getProxy() {
+        ConfigurationService cfg = DSpaceServicesFactory.getInstance()
+                .getConfigurationService();
         Proxy proxy = Proxy.NO_PROXY;
-        String proxyHost = configurationService.getProperty(C_HTTP_PROXY_HOST);
+        String proxyHost = cfg.getProperty(C_HTTP_PROXY_HOST);
         if (StringUtils.isNotBlank(proxyHost)) {
-            int proxyPort = getPort();
+            int proxyPort = getPort(cfg);
             if (proxyPort >= 0) {
                 proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort));
             } else {
@@ -84,12 +86,12 @@ public class ProxyUtils {
      *
      * @return the port number, or -1 if none.
      */
-    private static int getPort() {
-        String proxyPort = configurationService.getProperty(C_HTTP_PROXY_PORT);
+    private static int getPort(ConfigurationService cfg) {
+        String proxyPort = cfg.getProperty(C_HTTP_PROXY_PORT);
         if (StringUtils.isNumeric(proxyPort)) {
             return Integer.parseUnsignedInt(proxyPort);
         } else {
-            if (configurationService.hasProperty(C_HTTP_PROXY_PORT)) {
+            if (cfg.hasProperty(C_HTTP_PROXY_PORT)) {
                 LOG.warn("Proxy port setting " + C_HTTP_PROXY_PORT +
                         " = '{}' is not a positive number.  Treating as unset",
                         proxyPort);

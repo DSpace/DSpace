@@ -24,26 +24,38 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.dspace.AbstractUnitTest;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
+ * Test utilities for setting outgoing HTTP proxies.
  *
  * @author mwood
  */
 public class ProxyUtilsTest
         extends AbstractUnitTest {
-    private static ConfigurationService cfg;
-
-    @BeforeClass
-    public static void initme() {
-        cfg = new DSpace().getConfigurationService();
-    }
-
     private static final String PROXY_HOST = "proxy.example.com";
     private static final String PROXY_IP_ADDRESS = "192.168.1.1";
     private static final String PROXY_PORT = "8888";
-    private static final int PROXY_PORT_INT = 8888;
+    private static final int PROXY_PORT_INT = Integer.parseInt(PROXY_PORT);
+
+    private static ConfigurationService cfg;
+    private static String old_host;
+    private static String old_port;
+
+    @BeforeClass
+    public static void setup() {
+        cfg = new DSpace().getConfigurationService();
+        old_host = cfg.getProperty(ProxyUtils.C_HTTP_PROXY_HOST);
+        old_port = cfg.getProperty(ProxyUtils.C_HTTP_PROXY_PORT);
+    }
+
+    @AfterClass
+    public static void shutdown() {
+        cfg.setProperty(ProxyUtils.C_HTTP_PROXY_HOST, old_host);
+        cfg.setProperty(ProxyUtils.C_HTTP_PROXY_PORT, old_port);
+    }
 
     /**
      * Test of addProxy method when no proxy is set.
@@ -55,6 +67,7 @@ public class ProxyUtilsTest
 
         // Test no proxy
         cfg.setProperty(ProxyUtils.C_HTTP_PROXY_HOST, null);
+        cfg.setProperty(ProxyUtils.C_HTTP_PROXY_PORT, null);
         builderSpy = ProxyUtils.addProxy(builderSpy);
         verify(builderSpy,never()).setProxy(any(HttpHost.class));
     }
@@ -62,7 +75,6 @@ public class ProxyUtilsTest
     /**
      * Test of addProxy method when only host is set.
      */
-//    @Ignore
     @Test
     public void testAddProxyNoPort() {
         HttpClientBuilder builder = HttpClientBuilder.create();
@@ -97,8 +109,11 @@ public class ProxyUtilsTest
         // FIXME assertEquals("Wrong proxy port", PROXY_PORT, hostSpy.getPort());
     }
 
+    /**
+     * Test of getProxy when a proxy is configured.
+     */
     @Test
-    public void TestGetProxy() {
+    public void testGetProxy() {
         cfg.setProperty(ProxyUtils.C_HTTP_PROXY_HOST, PROXY_IP_ADDRESS);
         cfg.setProperty(ProxyUtils.C_HTTP_PROXY_PORT, PROXY_PORT);
         Proxy proxy = ProxyUtils.getProxy();
@@ -107,9 +122,13 @@ public class ProxyUtilsTest
         assertEquals("Wrong proxy", expected, proxy);
     }
 
+    /**
+     * Test of getProxy when no proxy is configured.
+     */
     @Test
-    public void TestGetProxyNone() {
+    public void testGetProxyNone() {
         cfg.setProperty(ProxyUtils.C_HTTP_PROXY_HOST, null);
+        cfg.setProperty(ProxyUtils.C_HTTP_PROXY_PORT, null);
         Proxy proxy = ProxyUtils.getProxy();
         Proxy expected = Proxy.NO_PROXY;
         assertEquals("Wrong proxy", expected, proxy);
