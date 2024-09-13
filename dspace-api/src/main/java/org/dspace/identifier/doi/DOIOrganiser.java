@@ -66,6 +66,7 @@ public class DOIOrganiser {
     protected ConfigurationService configurationService;
     // This filter will override the default provider filter / behaviour
     protected Filter filter;
+    private int batchSize = 100; // Default batch size
 
     /**
      * Constructor to be called within the main() method
@@ -82,6 +83,22 @@ public class DOIOrganiser {
         this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         this.filter = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(
                 "always_true_filter", TrueFilter.class);
+    }
+
+    /**
+     * Set the batch size for processing operations
+     * @param batchSize - number of operations after which to commit
+     */
+    public void setBatchSize(int batchSize) {
+        this.batchSize = batchSize;
+    }
+
+    /**
+     * Get the batch size for processing operations
+     * @return batchSize
+     */
+    public int getBatchSize() {
+        return this.batchSize;
     }
 
     /**
@@ -176,6 +193,15 @@ public class DOIOrganiser {
 
         options.addOption(delete);
 
+        Option batchSizeOption = Option.builder()
+                .longOpt("batch-size")
+                .hasArg()
+                .argName("size")
+                .desc("Set the batch size for processing operations. Default is 100.")
+                .build();
+
+        options.addOption(batchSizeOption);
+
         // initialize parser
         CommandLineParser parser = new DefaultParser();
         CommandLine line = null;
@@ -196,6 +222,11 @@ public class DOIOrganiser {
 
         if (line.hasOption('q')) {
             organiser.setQuiet();
+        }
+
+        if (line.hasOption("batch-size")) {
+            int batchSize = Integer.parseInt(line.getOptionValue("batch-size"));
+            organiser.setBatchSize(batchSize);
         }
 
         if (line.hasOption('l')) {
@@ -226,9 +257,16 @@ public class DOIOrganiser {
                                            + "that could be reserved.");
                 }
 
+                int batchCounter = 0;
                 for (DOI doi : dois) {
                     organiser.reserve(doi);
                     context.uncacheEntity(doi);
+
+                    batchCounter++;
+                    if (batchCounter % organiser.getBatchSize() == 0) {
+                        context.commit();
+                        context.clearCache();
+                    }
                 }
             } catch (SQLException ex) {
                 System.err.println("Error in database connection:" + ex.getMessage());
@@ -244,9 +282,16 @@ public class DOIOrganiser {
                     System.err.println("There are no objects in the database "
                                            + "that could be registered.");
                 }
+                int batchCounter = 0;
                 for (DOI doi : dois) {
                     organiser.register(doi);
                     context.uncacheEntity(doi);
+
+                    batchCounter++;
+                    if (batchCounter % organiser.getBatchSize() == 0) {
+                        context.commit();
+                        context.clearCache();
+                    }
                 }
             } catch (SQLException ex) {
                 System.err.println("Error in database connection:" + ex.getMessage());
@@ -267,9 +312,16 @@ public class DOIOrganiser {
                                            + "whose metadata needs an update.");
                 }
 
+                int batchCounter = 0;
                 for (DOI doi : dois) {
                     organiser.update(doi);
                     context.uncacheEntity(doi);
+
+                    batchCounter++;
+                    if (batchCounter % organiser.getBatchSize() == 0) {
+                        context.commit();
+                        context.clearCache();
+                    }
                 }
             } catch (SQLException ex) {
                 System.err.println("Error in database connection:" + ex.getMessage());
@@ -287,11 +339,18 @@ public class DOIOrganiser {
                 }
 
                 Iterator<DOI> iterator = dois.iterator();
+                int batchCounter = 0;
                 while (iterator.hasNext()) {
                     DOI doi = iterator.next();
                     iterator.remove();
                     organiser.delete(doi.getDoi());
                     context.uncacheEntity(doi);
+
+                    batchCounter++;
+                    if (batchCounter % organiser.getBatchSize() == 0) {
+                        context.commit();
+                        context.clearCache();
+                    }
                 }
             } catch (SQLException ex) {
                 System.err.println("Error in database connection:" + ex.getMessage());
