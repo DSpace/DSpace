@@ -71,7 +71,7 @@ public class PDFBoxThumbnail extends MediaFilter {
         BufferedImage buf;
 
         String pageNumberStr =  currentItem.getItemService()
-            .getMetadataFirstValue(currentItem, "dspace", "filter-media", "page", Item.ANY);
+            .getMetadataFirstValue(currentItem, "dspace", "thumbnail", "page", Item.ANY);
 
         int pageNumber = 0;
 
@@ -92,6 +92,9 @@ public class PDFBoxThumbnail extends MediaFilter {
             buf = renderer.renderImage(pageNumber);
         } catch (InvalidPasswordException ex) {
             log.error("PDF is encrypted. Cannot create thumbnail (item: {})", currentItem::getHandle);
+            return null;
+        } catch (IndexOutOfBoundsException ex) {
+            log.error("Cannot create thumbnail with the given page number: {}", pageNumber + 1);
             return null;
         }
 

@@ -46,6 +46,8 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
 
     protected static final String PRE = ImageMagickThumbnailFilter.class.getName();
 
+    private Item item;
+
     static {
         String s = configurationService.getProperty(PRE + ".ProcessStarter");
         ProcessStarter.setGlobalSearchPath(s);
@@ -143,6 +145,19 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
             op.density(Integer.valueOf(density));
         }
 
+        int pageNumber = 0;
+        String pageNumberStr = itemService.getMetadataFirstValue(this.item, "dspace", "thumbnail", "page", Item.ANY);
+
+        try {
+            if (pageNumberStr != null) {
+                pageNumber = Integer.parseInt(pageNumberStr);
+                pageNumber -= 1;
+            }
+        } catch (Exception e) {
+            System.out.format("dspace.thumbnail.page metadata contains an invalid page number: %s\n",
+                    pageNumberStr);
+            return null;
+        }
         // Check the PDF's MediaBox and CropBox to see if they are the same.
         // If not, then tell ImageMagick to use the CropBox when generating
         // the thumbnail because the CropBox is generally used to define the
@@ -154,7 +169,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
         // same size as the MediaBox if it doesn't exist. Also note that we
         // only need to check the first page, since that's what we use for
         // generating the thumbnail (PDDocument uses a zero-based index).
-        PDPage pdfPage = PDDocument.load(f).getPage(0);
+        PDPage pdfPage = PDDocument.load(f).getPage(pageNumber);
         PDRectangle pdfPageMediaBox = pdfPage.getMediaBox();
         PDRectangle pdfPageCropBox = pdfPage.getCropBox();
 
@@ -163,7 +178,7 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
             op.define("pdf:use-cropbox=true");
         }
 
-        String s = "[0]";
+        String s = "[" + pageNumber + "]";
         op.addImage(f.getAbsolutePath() + s);
         if (configurationService.getBooleanProperty(PRE + ".flatten", true)) {
             op.flatten();
@@ -191,6 +206,8 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter {
 
     @Override
     public boolean preProcessBitstream(Context c, Item item, Bitstream source, boolean verbose) throws Exception {
+        this.item = item;
+
         String nsrc = source.getName();
         for (Bundle b : itemService.getBundles(item, "THUMBNAIL")) {
             for (Bitstream bit : b.getBitstreams()) {
