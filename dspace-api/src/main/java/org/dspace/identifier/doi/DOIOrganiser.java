@@ -265,7 +265,6 @@ public class DOIOrganiser {
                     batchCounter++;
                     if (batchCounter % organiser.getBatchSize() == 0) {
                         context.commit();
-                        context.clearCache();
                     }
                 }
             } catch (SQLException ex) {
@@ -290,7 +289,6 @@ public class DOIOrganiser {
                     batchCounter++;
                     if (batchCounter % organiser.getBatchSize() == 0) {
                         context.commit();
-                        context.clearCache();
                     }
                 }
             } catch (SQLException ex) {
@@ -320,7 +318,6 @@ public class DOIOrganiser {
                     batchCounter++;
                     if (batchCounter % organiser.getBatchSize() == 0) {
                         context.commit();
-                        context.clearCache();
                     }
                 }
             } catch (SQLException ex) {
@@ -349,7 +346,6 @@ public class DOIOrganiser {
                     batchCounter++;
                     if (batchCounter % organiser.getBatchSize() == 0) {
                         context.commit();
-                        context.clearCache();
                     }
                 }
             } catch (SQLException ex) {
