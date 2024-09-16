@@ -61,7 +61,7 @@ public class RegistrationDataMetadata implements ReloadableEntity<Integer>, Comp
      * related to the metadataField {@link MetadataField}
      */
     @Lob
-    @Type(type = "org.dspace.storage.rdbms.hibernate.DatabaseAwareLobType")
+    @Type(type = "org.hibernate.type.TextType")
     @Column(name = "text_value")
     private String value = null;
 

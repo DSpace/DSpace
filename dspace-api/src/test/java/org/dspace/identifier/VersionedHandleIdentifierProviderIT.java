@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,10 +25,16 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class VersionedHandleIdentifierProviderIT extends AbstractIntegrationTestWithDatabase {
+
+    private static final String REGISTERED_PROVIDERS_PREFIX = "VersionedHandleIdentifierProvider{0}";
+    private List<IdentifierProvider> originalProviders;
+    private List<String> registeredProviders = new ArrayList<>(1);
+
     private ServiceManager serviceManager;
     private IdentifierServiceImpl identifierService;
 
@@ -42,12 +49,10 @@ public class VersionedHandleIdentifierProviderIT extends AbstractIntegrationTest
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        context.turnOffAuthorisationSystem();
-
         serviceManager = DSpaceServicesFactory.getInstance().getServiceManager();
+        originalProviders = serviceManager.getServicesByType(IdentifierProvider.class);
         identifierService = serviceManager.getServicesByType(IdentifierServiceImpl.class).get(0);
-        // Clean out providers to avoid any being used for creation of community and collection
-        identifierService.setProviders(new ArrayList<>());
+        context.turnOffAuthorisationSystem();
 
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
@@ -55,30 +60,65 @@ public class VersionedHandleIdentifierProviderIT extends AbstractIntegrationTest
         collection = CollectionBuilder.createCollection(context, parentCommunity)
                 .withName("Collection")
                 .build();
+
+        context.restoreAuthSystemState();
     }
 
-    private void registerProvider(Class type) {
-        // Register our new provider
-        serviceManager.registerServiceClass(type.getName(), type);
-        IdentifierProvider identifierProvider =
-                (IdentifierProvider) serviceManager.getServiceByName(type.getName(), type);
+    @After
+    public void destroy() throws Exception {
+        // set all providers to cleanup the context.
+        identifierService.setProviders(serviceManager.getServicesByType(IdentifierProvider.class));
+        super.destroy();
+        // unregister the created services
+        unregisterServices();
+    }
 
-        // Overwrite the identifier-service's providers with the new one to ensure only this provider is used
-        identifierService.setProviders(List.of(identifierProvider));
+    private void unregisterServices() {
+        // restore the default providers
+        identifierService.setProviders(originalProviders);
+        if (registeredProviders.isEmpty()) {
+            return;
+        }
+        // clear the registered additional providers
+        for (String serviceName : registeredProviders) {
+            serviceManager.unregisterService(serviceName);
+        }
+        registeredProviders.clear();
+        originalProviders.clear();
+    }
+
+    private void registerSingleProvider(IdentifierProvider provider) {
+        identifierService.setProviders(List.of(provider));
+    }
+
+    private <T> T getOrProvide(Class<T> type) {
+        List<T> servicesByType = serviceManager.getServicesByType(type);
+        if (servicesByType == null || servicesByType.isEmpty()) {
+            String serviceBeanName = MessageFormat.format(REGISTERED_PROVIDERS_PREFIX, type.getName());
+            servicesByType = List.of(serviceManager.registerServiceClass(serviceBeanName, type));
+            registeredProviders.add(serviceBeanName);
+        }
+        return servicesByType.get(0);
     }
 
     private void createVersions() throws SQLException, AuthorizeException {
+        context.turnOffAuthorisationSystem();
+
         itemV1 = ItemBuilder.createItem(context, collection)
                 .withTitle("First version")
                 .build();
         firstHandle = itemV1.getHandle();
         itemV2 = VersionBuilder.createVersion(context, itemV1, "Second version").build().getItem();
         itemV3 = VersionBuilder.createVersion(context, itemV1, "Third version").build().getItem();
+
+        context.restoreAuthSystemState();
     }
 
     @Test
     public void testDefaultVersionedHandleProvider() throws Exception {
-        registerProvider(VersionedHandleIdentifierProvider.class);
+        registerSingleProvider(
+            getOrProvide(VersionedHandleIdentifierProvider.class)
+        );
         createVersions();
 
         // Confirm the original item only has its original handle
@@ -94,7 +134,9 @@ public class VersionedHandleIdentifierProviderIT extends AbstractIntegrationTest
 
     @Test
     public void testCanonicalVersionedHandleProvider() throws Exception {
-        registerProvider(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
+        registerSingleProvider(
+            getOrProvide(VersionedHandleIdentifierProviderWithCanonicalHandles.class)
+        );
         createVersions();
 
         // Confirm the original item only has a version handle
