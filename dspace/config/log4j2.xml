@@ -71,7 +71,7 @@
                   type='RollingFile'
                   fileName='${log.dir}/file_downloads.log'>
             <Layout type='PatternLayout'
-                    pattern='%m%n'/>
+                    pattern='%d %m%n'/>
             <policies>
                 <policy type='TimeBasedTriggeringPolicy'>yyyy-MM-dd</policy>
             </policies>

@@ -122,8 +122,6 @@ public class ClarinMatomoBitstreamTracker extends ClarinMatomoTracker {
 
         List<Item> items = clarinItemService.findByBitstreamUUID(context, bit.getID());
         if (CollectionUtils.isEmpty(items)) {
-            log.error("Cannot find the Item for the bitstream with ID: " + bit.getID() +
-                    " - the statistics cannot be logged.");
             return;
         }
 
