@@ -23,9 +23,9 @@ HANDLEDIR=`$BINDIR/dspace dsprop --property handle.dir`
 LOGDIR=$DSPACEDIR/log
 
 #Allow user to specify java options through JAVA_OPTS variable
-if [ "$JAVA_OPTS" = "" ]; then
+if [ "$JAVA_OPTS_HANDLE" = "" ]; then
   #Default Java to use 256MB of memory
-  JAVA_OPTS=-Xmx256m
+  $JAVA_OPTS_HANDLE=-Xmx256m
 fi
 
 # Remove lock file, in case the old Handle server did not shut down properly
@@ -34,7 +34,7 @@ rm -f $HANDLEDIR/txns/lock
 # Start the Handle server, with a special log4j properties file.
 # We cannot simply write to the same logs, since log4j
 # does not support more than one JVM writing to the same rolling log.
-nohup java $JAVA_OPTS -classpath `$BINDIR/dspace classpath` \
+nohup java $JAVA_OPTS_HANDLE -classpath `$BINDIR/dspace classpath` \
     -Ddspace.log.init.disable=true \
     -Dlog4j.configuration=log4j-handle-plugin.properties \
     net.handle.server.Main $HANDLEDIR \

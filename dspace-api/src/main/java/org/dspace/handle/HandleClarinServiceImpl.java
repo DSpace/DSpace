@@ -268,8 +268,9 @@ public class HandleClarinServiceImpl implements HandleClarinService {
         if (isInternalResource(handle)) {
             // Internal handle
             // Create url for internal handle
-            url = configurationService.getProperty("dspace.ui.url")
-                    + "/handle/" + handleStr;
+            String currentUiUrl = configurationService.getProperty("dspace.ui.url");
+            url = currentUiUrl.endsWith("/") ? currentUiUrl : currentUiUrl + "/";
+            url += "handle/" + handleStr;
         } else {
             // External handle
             url = handle.getUrl();
