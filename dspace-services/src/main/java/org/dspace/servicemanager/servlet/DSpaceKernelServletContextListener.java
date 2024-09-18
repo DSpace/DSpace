@@ -47,6 +47,7 @@ public final class DSpaceKernelServletContextListener implements ServletContextL
      * Initially look for JNDI Resource called "java:/comp/env/dspace.dir".
      * If not found, look for "dspace.dir" initial context parameter.
      */
+    @SuppressWarnings("BanJNDI")
     private String getProvidedHome(ServletContextEvent arg0) {
         String providedHome = null;
         try {

@@ -50,16 +50,11 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
     extends AbstractDSpaceRestRepository
     implements PagingAndSortingRepository<T, ID>, BeanNameAware {
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DSpaceRestRepository.class);
-
     private String thisRepositoryBeanName;
     private DSpaceRestRepository<T, ID> thisRepository;
 
     @Autowired
     private ApplicationContext applicationContext;
-
-    @Autowired
-    private MetadataFieldService metadataFieldService;
 
     /**
      * From BeanNameAware. Allows us to capture the name of the bean, so we can load it into thisRepository.
