@@ -31,7 +31,7 @@ CREATE TABLE registrationdata_metadata (
   registrationdata_metadata_id INTEGER NOT NULL,
   registrationdata_id INTEGER,
   metadata_field_id INTEGER,
-  text_value VARCHAR2(2000),
+  text_value CLOB,
   CONSTRAINT pk_registrationdata_metadata PRIMARY KEY (registrationdata_metadata_id)
 );
 
