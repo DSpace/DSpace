@@ -51,7 +51,7 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         }
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        try (InputStream file = getClass().getResourceAsStream("wos-responce.xml")) {
+        try (InputStream file = getClass().getResourceAsStream("wos-response.xml")) {
             String wosXmlResp = IOUtils.toString(file, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);
@@ -80,7 +80,7 @@ public class WOSImportMetadataSourceServiceIT extends AbstractLiveImportIntegrat
         }
         CloseableHttpClient originalHttpClient = liveImportClientImpl.getHttpClient();
         CloseableHttpClient httpClient = Mockito.mock(CloseableHttpClient.class);
-        try (InputStream file = getClass().getResourceAsStream("wos-responce.xml")) {
+        try (InputStream file = getClass().getResourceAsStream("wos-response.xml")) {
             String wosXmlResp = IOUtils.toString(file, Charset.defaultCharset());
 
             liveImportClientImpl.setHttpClient(httpClient);

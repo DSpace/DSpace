@@ -3306,7 +3306,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     }
 
     @Test
-    public void findByItemsAndTypeEmptyResponceTest() throws Exception {
+    public void findByItemsAndTypeEmptyResponseTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
 
