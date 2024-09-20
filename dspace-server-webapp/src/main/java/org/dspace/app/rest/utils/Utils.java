@@ -29,6 +29,11 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +49,10 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
@@ -1075,5 +1084,53 @@ public class Utils {
         } finally {
             context.restoreAuthSystemState();
         }
+    }
+
+    /**
+     * Disables SSL certificate validation for the given connection
+     *
+     * @param connection
+     */
+    public static void disableCertificateValidation(HttpsURLConnection connection) {
+        try {
+            // Create a TrustManager that trusts all certificates
+            TrustManager[] trustAllCerts = { new X509TrustManager() {
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+
+                public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+                }
+
+                public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+                } }
+            };
+
+            // Install the TrustManager
+            SSLContext sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, trustAllCerts, new SecureRandom());
+            connection.setSSLSocketFactory(sslContext.getSocketFactory());
+
+            // Set a HostnameVerifier that accepts all hostnames
+            connection.setHostnameVerifier((hostname, session) -> true);
+
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            throw new RuntimeException("Error disabling SSL certificate validation", e);
+        }
+    }
+
+    /**
+     * Function to encode only non-ASCII characters
+     */
+    public static String encodeNonAsciiCharacters(String input) {
+        StringBuilder result = new StringBuilder();
+        for (char ch : input.toCharArray()) {
+            if (!StringUtils.isAsciiPrintable(String.valueOf(ch))) { // Use Apache Commons method
+                result.append(URLEncoder.encode(String.valueOf(ch), StandardCharsets.UTF_8));
+            } else {
+                result.append(ch); // Leave ASCII characters intact
+            }
+        }
+        return result.toString();
     }
 }

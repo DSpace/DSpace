@@ -34,7 +34,7 @@ import com.maxmind.geoip2.model.CityResponse;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
-import org.dspace.app.rest.utils.ClarinUtils;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 import org.json.simple.JSONArray;
@@ -237,7 +237,7 @@ public class ClarinDiscoJuiceFeedsDownloadService implements InitializingBean {
             conn.setReadTimeout(10000);
             // Disable SSL certificate validation
             if (disableSSL && conn instanceof HttpsURLConnection) {
-                ClarinUtils.disableCertificateValidation((HttpsURLConnection) conn);
+                Utils.disableCertificateValidation((HttpsURLConnection) conn);
             }
             //Caution does not follow redirects, and even if you set it to http->https is not possible
             Object obj = parser.parse(new InputStreamReader(conn.getInputStream()));

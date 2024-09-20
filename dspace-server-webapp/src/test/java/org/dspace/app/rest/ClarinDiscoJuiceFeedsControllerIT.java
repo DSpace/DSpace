@@ -22,7 +22,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.app.rest.utils.ClarinUtils;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.services.ConfigurationService;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -64,7 +64,7 @@ public class ClarinDiscoJuiceFeedsControllerIT extends AbstractControllerIntegra
 
             // Disable SSL certificate validation
             if (disableSSL && conn instanceof HttpsURLConnection) {
-                ClarinUtils.disableCertificateValidation((HttpsURLConnection) conn);
+                Utils.disableCertificateValidation((HttpsURLConnection) conn);
             }
 
             Object obj = parser.parse(new InputStreamReader(conn.getInputStream()));
