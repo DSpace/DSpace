@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
@@ -106,7 +107,8 @@ public class ItemUtils {
         return e;
     }
 
-    private static Element createBundlesElement(Context context, Item item) throws SQLException {
+    private static Element createBundlesElement(Context context, Item item, AtomicBoolean restricted)
+            throws SQLException {
         Element bundles = create("bundles");
 
         List<Bundle> bs;
@@ -136,13 +138,24 @@ public class ItemUtils {
                 // get handle of parent Item of this bitstream, if there
                 // is one:
                 List<Bundle> bn = bit.getBundles();
-                if (!bn.isEmpty()) {
+                if (bn.size() > 0) {
                     List<Item> bi = bn.get(0).getItems();
-                    if (!bi.isEmpty()) {
+                    if (bi.size() > 0) {
                         handle = bi.get(0).getHandle();
                     }
                 }
-                url = baseUrl + "/bitstreams/" + bit.getID().toString() + "/download";
+                if (bsName == null) {
+                    List<String> ext = bit.getFormat(context).getExtensions();
+                    bsName = "bitstream_" + sid + (ext.size() > 0 ? ext.get(0) : "");
+                }
+                if (handle != null && baseUrl != null) {
+                    url = baseUrl + "/bitstream/"
+                            + handle + "/"
+                            + sid + "/"
+                            + URLUtils.encode(bsName);
+                } else {
+                    url = URLUtils.encode(bsName);
+                }
 
                 String cks = bit.getChecksum();
                 String cka = bit.getChecksumAlgorithm();
@@ -166,7 +179,17 @@ public class ItemUtils {
                 bitstream.getField().add(createValue("checksumAlgorithm", cka));
                 bitstream.getField().add(createValue("sid", bit.getSequenceID() + ""));
                 bitstream.getField().add(createValue("id", bit.getID().toString()));
-
+                if (!restricted.get()) {
+                    List<ClarinLicenseResourceMapping> clarinLicenseResourceMappingList =
+                            clarinLicenseResourceMappingService.findByBitstreamUUID(context, bit.getID());
+                    for (ClarinLicenseResourceMapping clrm : clarinLicenseResourceMappingList) {
+                        if (clrm.getLicense().getRequiredInfo() != null
+                                && clrm.getLicense().getRequiredInfo().length() > 0) {
+                            restricted.set( true);
+                            break;
+                        }
+                    }
+                }
             }
         }
 
@@ -293,100 +316,11 @@ public class ItemUtils {
         // Now adding bitstream info
 
         //indicate restricted bitstreams -> restricted access
-        boolean restricted = false;
+        AtomicBoolean restricted = new AtomicBoolean(false);
 
         try {
-            Element bundles = createBundlesElement(context, item);
+            Element bundles = createBundlesElement(context, item, restricted);
             metadata.getElement().add(bundles);
-            List<Bundle> bs;
-
-            bs = item.getBundles();
-            for (Bundle b : bs) {
-                Element bundle = create("bundle");
-                bundles.getElement().add(bundle);
-                bundle.getField()
-                        .add(createValue("name", b.getName()));
-
-                Element bitstreams = create("bitstreams");
-                bundle.getElement().add(bitstreams);
-                List<Bitstream> bits = b.getBitstreams();
-                for (Bitstream bit : bits) {
-                    Element bitstream = create("bitstream");
-                    bitstreams.getElement().add(bitstream);
-                    String url = "";
-                    String bsName = bit.getName();
-                    String sid = String.valueOf(bit.getSequenceID());
-                    String baseUrl = configurationService.getProperty("oai", "bitstream.baseUrl");
-                    String handle = null;
-                    // get handle of parent Item of this bitstream, if there
-                    // is one:
-                    List<Bundle> bn = bit.getBundles();
-                    if (bn.size() > 0) {
-                        List<Item> bi = bn.get(0).getItems();
-                        if (bi.size() > 0) {
-                            handle = bi.get(0).getHandle();
-                        }
-                    }
-                    if (bsName == null) {
-                        List<String> ext = bit.getFormat(context).getExtensions();
-                        bsName = "bitstream_" + sid
-                                + (ext.size() > 0 ? ext.get(0) : "");
-                    }
-                    if (handle != null && baseUrl != null) {
-                        url = baseUrl + "/bitstream/"
-                                + handle + "/"
-                                + sid + "/"
-                                + URLUtils.encode(bsName);
-                    } else {
-                        url = URLUtils.encode(bsName);
-                    }
-
-                    String cks = bit.getChecksum();
-                    String cka = bit.getChecksumAlgorithm();
-                    String oname = bit.getSource();
-                    String name = bit.getName();
-                    String description = bit.getDescription();
-
-                    if (name != null) {
-                        bitstream.getField().add(
-                                createValue("name", name));
-                    }
-                    if (oname != null) {
-                        bitstream.getField().add(
-                                createValue("originalName", name));
-                    }
-                    if (description != null) {
-                        bitstream.getField().add(
-                                createValue("description", description));
-                    }
-                    bitstream.getField().add(
-                            createValue("format", bit.getFormat(context)
-                                    .getMIMEType()));
-                    bitstream.getField().add(
-                            createValue("size", "" + bit.getSizeBytes()));
-                    bitstream.getField().add(createValue("url", url));
-                    bitstream.getField().add(
-                            createValue("checksum", cks));
-                    bitstream.getField().add(
-                            createValue("checksumAlgorithm", cka));
-                    bitstream.getField().add(
-                            createValue("sid", bit.getSequenceID()
-                                    + ""));
-                    bitstream.getField().add(
-                            createValue("id", bit.getID() + ""));
-                    if (!restricted) {
-                        List<ClarinLicenseResourceMapping> clarinLicenseResourceMappingList =
-                                clarinLicenseResourceMappingService.findByBitstreamUUID(context, bit.getID());
-                        for (ClarinLicenseResourceMapping clrm : clarinLicenseResourceMappingList) {
-                            if (clrm.getLicense().getRequiredInfo() != null
-                                    && clrm.getLicense().getRequiredInfo().length() > 0) {
-                                restricted = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
         } catch (SQLException e) {
             log.warn(e.getMessage(), e);
         }
@@ -398,7 +332,7 @@ public class ItemUtils {
         other.getField().add(createValue("identifier", DSpaceItem.buildIdentifier(item.getHandle())));
         other.getField().add(createValue("lastModifyDate", item.getLastModified().toString()));
 
-        if (restricted) {
+        if (restricted.get()) {
             other.getField().add(createValue("restrictedAccess", "true"));
         }
         // Because we reindex Solr, which is not done in vanilla
