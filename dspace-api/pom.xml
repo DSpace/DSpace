@@ -864,5 +864,18 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- required frontpage generation -->
+        <dependency>
+            <groupId>org.thymeleaf</groupId>
+            <artifactId>thymeleaf</artifactId>
+            <version>3.1.2.RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.xhtmlrenderer</groupId>
+            <artifactId>flying-saucer-pdf</artifactId>
+            <version>9.9.0</version>
+        </dependency>
     </dependencies>
 </project>

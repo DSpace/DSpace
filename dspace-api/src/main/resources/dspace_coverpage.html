@@ -1,0 +1,125 @@
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+
+    <!-- only limited subset of CSS v3 features are supported. Be careful to check the rendered result! -->
+    <style>
+        body {
+            background: white;
+            height: 100%; /* Ensure the html and body are full height */
+        }
+
+        .page {
+            min-height: 100%; /* Ensure the page container takes up the full height */
+            position: relative; /* Allow positioning the footer relative to this container */
+        }
+
+        .body {
+            padding-bottom: 100px; /* Add bottom padding equal to footer height to prevent overlap */
+        }
+
+        .footer {
+            position: absolute;
+            top: 22cm;
+            width: 100%;
+        }
+
+        * {
+            font-family: sans-serif;
+        }
+
+        .header img {
+            width: 206px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #495A63;
+            font-family: Verdana, sans-serif;
+        }
+
+        .metadata {
+            margin-top: 40px;
+            margin-bottom: 40px;
+            background: rgb(243, 174, 61);
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        /* 18pt */
+        .metadata .title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* 13pt */
+        .metadata .author {
+            padding-top: 5px;
+            font-size: 17.3px;
+            font-weight: bold;
+        }
+
+        /* 13pt */
+        .metadata .editor {
+            padding-top: 5px;
+            font-size: 17.3px;
+            font-weight: bold;
+        }
+
+        /* 13pt */
+        .metadata .issued {
+            padding-top: 5px;
+
+            font-size: 17.3px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+    <div class="header">
+        <img th:src="@{classpath:dspace_logo.png}" src="dspace_logo.png"/>
+
+        <div>
+            <a th:href="@{https://dspace.org/}" href="https://dspace.org">
+                https://dspace.org/
+            </a>
+        </div>
+    </div>
+
+    <div class="body">
+        <div class="metadata">
+            <div class="title" th:text="${metadata_title}">Test title</div>
+
+            <div class="author" th:text="${metadata_author}">Autor 1; Author 2; Author 3</div>
+
+            <div class="editor" th:text="${metadata_editor}">Editor 1; Editor 2; Editor 3</div>
+
+            <div class="issued" th:text="${dc_date_issued}">2017</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        This is the footer
+
+        <a th:href="@{https://dspace.org}" href="https://dspace.org">
+            https://dspace.org/
+        </a>
+    </div>
+</div>
+
+
+</body>
+</html>
