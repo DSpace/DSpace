@@ -176,7 +176,7 @@ public class OrcidLoginFilterIT extends AbstractControllerIntegrationTest {
 
             String rdToken = matcher.group(1);
 
-            getClient().perform(get("/api/eperson/registration/search/findByToken")
+            getClient().perform(get("/api/eperson/registrations/search/findByToken")
                                     .param("token", rdToken))
                        .andExpect(status().is2xxSuccessful())
                        .andExpect(content().contentType(contentType))
