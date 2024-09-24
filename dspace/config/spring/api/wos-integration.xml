@@ -13,32 +13,30 @@
     <context:annotation-config/>
     <!-- allows us to use spring annotations in beans -->
 
-    <util:map id="wosMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+    <util:list id="wosMetadataFieldMap"
               value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
-        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
-            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
-            what metadatafield is generated.
+        <description>Defines which metadatum is mapped on which metadatum.
         </description>
-        <entry key-ref="wos.citationEdition" value-ref="wosCitationEditionContrib"/>
-        <entry key-ref="wos.pubyear" value-ref="wosPubyearContrib"/>
-        <entry key-ref="wos.startPage" value-ref="wosStartPageContrib"/>
-        <entry key-ref="wos.endPage" value-ref="wosEndPageContrib"/>
-        <entry key-ref="wos.type" value-ref="wosTypeContrib"/>
-        <entry key-ref="wos.volume" value-ref="wosVolumeContrib"/>
-        <entry key-ref="wos.ispartof" value-ref="wosIspartofContrib"/>
-        <entry key-ref="wos.ispartofseries" value-ref="wosIspartofseriesContrib"/>
-        <entry key-ref="wos.title" value-ref="wosTitleContrib"/>
-        <entry key-ref="wos.doi" value-ref="wosIdentifierContrib"/>
-        <entry key-ref="wos.issue" value-ref="wosIssueContrib"/>
-        <entry key-ref="wos.abstract" value-ref="wosAbstractContrib"/>
-        <entry key-ref="wos.languageIso" value-ref="wosLanguageIsoContrib"/>
-        <entry key-ref="wos.fullName" value-ref="wosFullNameContrib"/>
-        <entry key-ref="wos.subject" value-ref="wosSubjectContrib"/>
-        <entry key-ref="wos.orcid" value-ref="wosOrcidContrib"/>
-        <entry key-ref="wos.contributorEditor" value-ref="wosContributorEditorContrib"/>
-        <entry key-ref="wos.wosId" value-ref="wosIdContrib"/>
-        <entry key-ref="wos.rid" value-ref="wosRidContrib"/>
-    </util:map>
+        <ref bean="wosCitationEditionContrib"/>
+        <ref bean="wosPubyearContrib"/>
+        <ref bean="wosStartPageContrib"/>
+        <ref bean="wosEndPageContrib"/>
+        <ref bean="wosTypeContrib"/>
+        <ref bean="wosVolumeContrib"/>
+        <ref bean="wosIspartofContrib"/>
+        <ref bean="wosIspartofseriesContrib"/>
+        <ref bean="wosTitleContrib"/>
+        <ref bean="wosIdentifierContrib"/>
+        <ref bean="wosIssueContrib"/>
+        <ref bean="wosAbstractContrib"/>
+        <ref bean="wosLanguageIsoContrib"/>
+        <ref bean="wosFullNameContrib"/>
+        <ref bean="wosSubjectContrib"/>
+        <ref bean="wosOrcidContrib"/>
+        <ref bean="wosContributorEditorContrib"/>
+        <ref bean="wosIdContrib"/>
+        <ref bean="wosRidContrib"/>
+    </util:list>
  
     <bean id="wosCitationEditionContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="wos.citationEdition"/>

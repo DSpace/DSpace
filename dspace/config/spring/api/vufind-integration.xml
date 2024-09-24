@@ -11,26 +11,23 @@
     <context:annotation-config/>
     <!-- allows us to use spring annotations in beans -->
 
-    <util:map id="vufindMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+    <util:list id="vufindMetadataFieldMap"
               value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
-        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
-            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
-            what metadatafield is generated.
-        </description>
-        <entry key-ref="vufind.id" value-ref="vufindIDContrib"/>
-        <entry key-ref="vufind.dc.language.iso" value-ref="vufindLanguages"/>
-        <entry key-ref="vufind.dc.publisher" value-ref="vufindPublisher"/>
-        <entry key-ref="vufind.dc.title" value-ref="vufindTitle"/>
-        <entry key-ref="vufind.dc.identifier" value-ref="vufindIdentifier"/>
-        <entry key-ref="vufind.dc.contributor.author" value-ref="vufindAuthors"/>
-        <entry key-ref="vufind.dc.subject" value-ref="vufindSubject"/>
-        <entry key-ref="vufind.dc.description.abstract" value-ref="vufindAbstract"/>
-        <entry key-ref="vufind.dc.titlealternative" value-ref="vufindTitleAlternative"/>
-        <entry key-ref="vufind.dc.contributor.editor" value-ref="vufindContributorEditor"/>
-        <entry key-ref="vufind.dc.date.issued" value-ref="vufindDateIssued"/>
-        <entry key-ref="vufind.dc.identifier.doi" value-ref="vufindIdentifierDoi"/>
-        <entry key-ref="vufind.dc.identifier.isbn" value-ref="vufindIdentifierIsbn"/>
-    </util:map>
+        <description>Defines which metadatum is mapped on which metadatum.</description>
+        <ref bean="vufindIDContrib"/>
+        <ref bean="vufindLanguages"/>
+        <ref bean="vufindPublisher"/>
+        <ref bean="vufindTitle"/>
+        <ref bean="vufindIdentifier"/>
+        <ref bean="vufindAuthors"/>
+        <ref bean="vufindSubject"/>
+        <ref bean="vufindAbstract"/>
+        <ref bean="vufindTitleAlternative"/>
+        <ref bean="vufindContributorEditor"/>
+        <ref bean="vufindDateIssued"/>
+        <ref bean="vufindIdentifierDoi"/>
+        <ref bean="vufindIdentifierIsbn"/>
+    </util:list>
 
     <bean id="vufindIDContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
         <property name="field" ref="vufind.id"/>

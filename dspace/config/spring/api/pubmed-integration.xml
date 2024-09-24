@@ -11,21 +11,18 @@
     <context:annotation-config/>
     <!-- allows us to use spring annotations in beans -->
 
-    <util:map id="pubmedMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+    <util:list id="pubmedMetadataFieldMap"
               value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
-        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
-            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
-            what metadatafield is generated.
-        </description>
-        <entry key-ref="dc.title" value-ref="titleContrib"/>
-        <entry key-ref="dc.description.abstract" value-ref="abstractContrib"/>
-        <entry key-ref="dc.identifier.other" value-ref="pubmedContrib"/>
-        <entry key-ref="dc.contributor.author" value-ref="authorContrib"/>
-        <entry key-ref="dc.date.issued" value-ref="dateContrib"/>
-        <entry key-ref="dc.language.iso" value-ref="pubmedLanguageContrib"/>
-        <entry key-ref="dc.subject" value-ref="keywordContrib"/>
+        <description>Defines which metadatum is mapped on which metadatum.</description>
+        <ref bean="titleContrib"/>
+        <ref bean="abstractContrib"/>
+        <ref bean="pubmedContrib"/>
+        <ref bean="authorContrib"/>
+        <ref bean="dateContrib"/>
+        <ref bean="pubmedLanguageContrib"/>
+        <ref bean="keywordContrib"/>
 
-    </util:map>
+    </util:list>
 
     <bean id="pubmedLanguageContrib" class="org.dspace.importer.external.pubmed.metadatamapping.contributor.PubmedLanguageMetadatumContributor">
         <property name="field" ref="dc.language.iso"/>

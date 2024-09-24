@@ -12,17 +12,14 @@
     <context:annotation-config/>
     <!-- allows us to use spring annotations in beans -->
 
-    <util:map id="dataciteMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+    <util:list id="dataciteMetadataFieldMap"
               value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
-        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
-            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
-            what metadatafield is generated.
-        </description>
-        <entry key-ref="datacite.title" value-ref="dataciteTitleContrib"/>
-        <entry key-ref="datacite.id" value-ref="dataciteIDContrib"/>
-        <entry key-ref="datacite.author" value-ref="dataciteAuthorContrib"/>
+        <description>Defines which metadatum is mapped on which metadatum.</description>
+        <ref bean="dataciteTitleContrib"/>
+        <ref bean="dataciteIDContrib"/>
+        <ref bean="dataciteAuthorContrib"/>
         <!-- TODO: Further Mappings here! querys are applied among the data.attributes object containing the informations -->
-    </util:map>
+    </util:list>
 
     <bean id="dataciteAuthorContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
         <property name="metadataProcessor">

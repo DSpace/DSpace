@@ -156,6 +156,9 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         metadatums.add(citationVolume);
         metadatums.add(citationIssue);
         metadatums.add(subject);
+        metadatums.add(rights);
+        metadatums.add(ispartof);
+        metadatums.add(ispartofseries);
         metadatums.add(author);
         metadatums.add(scopusAuthorId);
         metadatums.add(orgunit);
@@ -165,9 +168,6 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         metadatums.add(author3);
         metadatums.add(scopusAuthorId3);
         metadatums.add(orgunit3);
-        metadatums.add(rights);
-        metadatums.add(ispartof);
-        metadatums.add(ispartofseries);
         ImportRecord firstrRecord = new ImportRecord(metadatums);
 
         //define second record
@@ -208,6 +208,9 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         metadatums2.add(citationVolume2);
         metadatums2.add(citationIssue2);
         metadatums2.add(subject2);
+        metadatums2.add(rights2);
+        metadatums2.add(ispartof2);
+        metadatums2.add(ispartofseries2);
         metadatums2.add(author4);
         metadatums2.add(scopusAuthorId4);
         metadatums2.add(orgunit4);
@@ -220,9 +223,6 @@ public class ScopusImportMetadataSourceServiceIT extends AbstractLiveImportInteg
         metadatums2.add(author7);
         metadatums2.add(scopusAuthorId7);
         metadatums2.add(orgunit7);
-        metadatums2.add(rights2);
-        metadatums2.add(ispartof2);
-        metadatums2.add(ispartofseries2);
         ImportRecord secondRecord = new ImportRecord(metadatums2);
         records.add(firstrRecord);
         records.add(secondRecord);

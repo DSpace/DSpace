@@ -11,35 +11,29 @@
     <context:annotation-config/>
     <!-- allows us to use spring annotations in beans -->
 
-    <util:map id="csvMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+    <util:list id="csvMetadataFieldMap" 
               value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
-        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
-            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
-            what metadatafield is generated.
-        </description>
-        <entry key-ref="dcTitle" value-ref="charSepTitleContrib" />
-        <entry key-ref="dcAuthors" value-ref="charSepAuthorsContrib" />
-        <entry key-ref="dcIssued" value-ref="charSepDateContrib" />
-		<entry key-ref="dcJournal" value-ref="charSepJournalContrib" />
-		<entry key-ref="dcAbstract" value-ref="charSepAbstractContrib" />    
-		<entry key-ref="dcJissn" value-ref="charSepJissnContrib" />    
-		<entry key-ref="dcSubtype" value-ref="charSepTypeContrib" />    
-    </util:map>
+        <description>Defines which metadatum is mapped on which metadatum.</description>
+        <ref bean="charSepTitleContrib" />
+        <ref bean="charSepAuthorsContrib" />
+        <ref bean="charSepDateContrib" />
+		<ref bean="charSepJournalContrib" />
+		<ref bean="charSepAbstractContrib" />    
+		<ref bean="charSepJissnContrib" />    
+		<ref bean="charSepTypeContrib" />    
+    </util:list>
 
-    <util:map id="tsvMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+    <util:list id="tsvMetadataFieldMap"
               value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
-        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
-            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
-            what metadatafield is generated.
-        </description>
-        <entry key-ref="dcTitle" value-ref="charSepTitleContrib" />
-        <entry key-ref="dcAuthors" value-ref="charSepAuthorsContrib" />
-        <entry key-ref="dcIssued" value-ref="charSepDateContrib" />
-		<entry key-ref="dcJournal" value-ref="charSepJournalContrib" />
-		<entry key-ref="dcAbstract" value-ref="charSepAbstractContrib" />    
-		<entry key-ref="dcJissn" value-ref="charSepJissnContrib" />    
-		<entry key-ref="dcSubtype" value-ref="charSepTypeContrib" />    
-    </util:map>
+        <description>Defines which metadatum is mapped on which metadatum.</description>
+        <ref bean="charSepTitleContrib" />
+        <ref bean="charSepAuthorsContrib" />
+        <ref bean="charSepDateContrib" />
+		<ref bean="charSepJournalContrib" />
+		<ref bean="charSepAbstractContrib" />    
+		<ref bean="charSepJissnContrib" />    
+		<ref bean="charSepTypeContrib" />    
+    </util:list>
 
 
     <bean id="charSepTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">

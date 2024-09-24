@@ -11,20 +11,20 @@
     <context:annotation-config/>
     <!-- allows us to use spring annotations in beans -->
 
-    <util:map id="risMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+    <util:list id="risMetadataFieldMap" 
               value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
         <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
             only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
             what metadatafield is generated.
         </description>
-        <entry key-ref="dcTitle" value-ref="risTitleContrib" />
-        <entry key-ref="dcAuthors" value-ref="risAuthorContrib" />
-        <entry key-ref="dcJournal" value-ref="risSourceContrib" />
-		<entry key-ref="dcIssued" value-ref="risDateContrib" />
-		<entry key-ref="dcJissn" value-ref="risISSNContrib" />    
-		<entry key-ref="dcSubtype" value-ref="risTypeContrib" />    
-		<entry key-ref="dcAbstract" value-ref="risAbstractContrib" />    
-    </util:map>
+        <ref bean="risTitleContrib" />
+        <ref bean="risAuthorContrib" />
+        <ref bean="risSourceContrib" />
+		<ref bean="risDateContrib" />
+		<ref bean="risISSNContrib" />
+		<ref bean="risTypeContrib" />
+		<ref bean="risAbstractContrib" />
+    </util:list>
 
 
     <bean id="risTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.MultipleMetadataContributor">

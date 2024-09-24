@@ -7,7 +7,7 @@
  */
 package org.dspace.importer.external.ads;
 
-import java.util.Map;
+import java.util.List;
 import javax.annotation.Resource;
 
 import org.dspace.importer.external.metadatamapping.AbstractMetadataFieldMapping;
@@ -32,7 +32,7 @@ public class ADSFieldMapping extends AbstractMetadataFieldMapping {
     @Override
     @SuppressWarnings("unchecked")
     @Resource(name = "adsMetadataFieldMap")
-    public void setMetadataFieldMap(Map metadataFieldMap) {
+    public void setMetadataFieldMap(List metadataFieldMap) {
         super.setMetadataFieldMap(metadataFieldMap);
     }
 

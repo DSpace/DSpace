@@ -13,15 +13,15 @@
     <context:annotation-config/>
     <!-- allows us to use spring annotations in beans -->
 
-    <util:map id="scieloMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+    <util:list id="scieloMetadataFieldMap"
               value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
         <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
             only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
             what metadatafield is generated.
         </description>
-        <entry key-ref="scielo.doi" value-ref="scieloSimpleContrib"/>
-        <entry key-ref="scielo.abstract" value-ref="scieloAbstractContrib"/>
-    </util:map>
+        <ref bean="scieloSimpleContrib"/>
+        <ref bean="scieloAbstractContrib"/>
+    </util:list>
 
     <bean id="scieloAbstractContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleRisToMetadataConcatContributor">
         <property name="tag" value="AB"/>

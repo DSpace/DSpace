@@ -11,26 +11,23 @@
     <context:annotation-config/>
     <!-- allows us to use spring annotations in beans -->
 
-    <util:map id="pubmedEuropeMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+    <util:list id="pubmedEuropeMetadataFieldMap"
               value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
-        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
-            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
-            what metadatafield is generated.
-        </description>
-        <entry key-ref="pubeu.doi" value-ref="pubEuDoiContrib"/>
-        <entry key-ref="pubeu.title" value-ref="pubEuTitleContrib"/>
-        <entry key-ref="pubeu.author" value-ref="pubEuAuthorContrib"/>
-        <entry key-ref="pubeu.journal" value-ref="pubEuJournalContrib"/>
-        <entry key-ref="pubeu.date" value-ref="pubEuDateContrib"/>
-        <entry key-ref="pubeu.lang" value-ref="pubEuLangContrib"/>
-        <entry key-ref="pubeu.type" value-ref="pubEuTypeContrib"/>
-        <entry key-ref="pubeu.keyword" value-ref="pubEuKeywordContrib"/>
-        <entry key-ref="pubeu.abstract" value-ref="pubEuAbstractContrib"/>
-        <entry key-ref="pubeu.sissn" value-ref="pubEuISSNContrib"/>
-        <entry key-ref="pubeu.isbn" value-ref="pubEuISBNContrib"/>
-        <entry key-ref="pubeu.publisher" value-ref="pubEuPublisherContrib"/>
-        <entry key-ref="pubeu.other" value-ref="pubEuOtherContrib"/>
-    </util:map>
+        <description>Defines which metadatum is mapped on which metadatum.</description>
+        <ref bean="pubEuDoiContrib"/>
+        <ref bean="pubEuTitleContrib"/>
+        <ref bean="pubEuAuthorContrib"/>
+        <ref bean="pubEuJournalContrib"/>
+        <ref bean="pubEuDateContrib"/>
+        <ref bean="pubEuLangContrib"/>
+        <ref bean="pubEuTypeContrib"/>
+        <ref bean="pubEuKeywordContrib"/>
+        <ref bean="pubEuAbstractContrib"/>
+        <ref bean="pubEuISSNContrib"/>
+        <ref bean="pubEuISBNContrib"/>
+        <ref bean="pubEuPublisherContrib"/>
+        <ref bean="pubEuOtherContrib"/>
+    </util:list>
 
     <bean id="pubEuOtherContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="pubeu.other"/>

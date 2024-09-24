@@ -12,26 +12,24 @@
     <context:annotation-config/>
     <!-- allows us to use spring annotations in beans -->
 
-    <util:map id="crossrefMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+    <util:list id="crossrefMetadataFieldMap"
               value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
-        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
-            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
-            what metadatafield is generated.
+        <description>Defines which metadatum is mapped on which metadatum.
         </description>
-        <entry key-ref="crossref.title" value-ref="crossrefTitleContrib"/>
-        <entry key-ref="crossref.authors" value-ref="crossrefAuthorContrib"/>
-        <entry key-ref="crossref.isbn" value-ref="crossrefISBNContrib"/>
-        <entry key-ref="crossref.year" value-ref="crossrefYearContrib"/>
-        <entry key-ref="crossref.editors" value-ref="crossrefEditorsContrib"/>
-        <entry key-ref="crossref.type" value-ref="crossrefDoiTypeContrib"/>
-        <entry key-ref="crossref.journal" value-ref="crossrefJournalContrib"/>
-        <entry key-ref="crossref.id" value-ref="crossrefIDContrib"/>
-        <entry key-ref="crossref.issn" value-ref="crossrefIdentifierISSN" />
-        <entry key-ref="crossref.volume" value-ref="crossrefVolume" />
-        <entry key-ref="crossref.issue" value-ref="crossrefIssue" />
-        <entry key-ref="crossref.abstract" value-ref="crossrefAbstract" />
-        <entry key-ref="crossref.publisher" value-ref="crossrefPublisher" />
-    </util:map>
+        <ref bean="crossrefTitleContrib"/>
+        <ref bean="crossrefAuthorContrib"/>
+        <ref bean="crossrefISBNContrib"/>
+        <ref bean="crossrefYearContrib"/>
+        <ref bean="crossrefEditorsContrib"/>
+        <ref bean="crossrefDoiTypeContrib"/>
+        <ref bean="crossrefJournalContrib"/>
+        <ref bean="crossrefIDContrib"/>
+        <ref bean="crossrefIdentifierISSN" />
+        <ref bean="crossrefVolume" />
+        <ref bean="crossrefIssue" />
+        <ref bean="crossrefAbstract" />
+        <ref bean="crossrefPublisher" />
+    </util:list>
 
     <bean id="crossrefIDContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
         <property name="field" ref="crossref.id"/>

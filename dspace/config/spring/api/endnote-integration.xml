@@ -11,18 +11,16 @@
     <context:annotation-config/>
     <!-- allows us to use spring annotations in beans -->
 
-    <util:map id="endnoteMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+    <util:list id="endnoteMetadataFieldMap"
               value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
-        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
-            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
-            what metadatafield is generated.
+        <description>Defines which metadatum is mapped on which metadatum.
         </description>
-        <entry key-ref="dcTitle" value-ref="endnoteTitleContrib" />
-        <entry key-ref="dcAuthors" value-ref="endnoteAuthorsContrib" />
-        <entry key-ref="dcAbstract" value-ref="endnoteAbstractContrib" />
-		<entry key-ref="dcIssued" value-ref="endnoteIssuedContrib" />
-		<entry key-ref="dcJournal" value-ref="endnoteJournalContrib" />    
-    </util:map>
+        <ref bean="endnoteTitleContrib" />
+        <ref bean="endnoteAuthorsContrib" />
+        <ref bean="endnoteAbstractContrib" />
+		<ref bean="endnoteIssuedContrib" />
+		<ref bean="endnoteJournalContrib" />
+    </util:list>
 
     <bean id="endnoteJournalContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
         <property name="field" ref="dcJournal"/>

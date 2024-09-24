@@ -11,23 +11,22 @@
     <context:annotation-config/>
     <!-- allows us to use spring annotations in beans -->
 
-    <util:map id="adsMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
-              value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
+    <util:list id="adsMetadataFieldMap" value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
         <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
             only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
             what metadatafield is generated.
         </description>
-        <entry key-ref="ads.abstract" value-ref="adsAbstractContrib"/>
-        <entry key-ref="ads.author" value-ref="adsAuthorContrib"/>
-        <entry key-ref="ads.doi" value-ref="adsDoiContrib"/>
-        <entry key-ref="ads.type" value-ref="adsTypeContrib"/>
-        <entry key-ref="ads.id" value-ref="adsIdContrib"/>
-        <entry key-ref="ads.issue" value-ref="adsIssueContrib"/>
-        <entry key-ref="ads.keywrd" value-ref="adsKeywordContrib"/>
-        <entry key-ref="ads.lang" value-ref="adsLangContrib"/>
-        <entry key-ref="ads.source" value-ref="adsSourceContrib"/>
-        <entry key-ref="ads.title" value-ref="adsTitleContrib"/>
-    </util:map>
+        <ref bean="adsAbstractContrib"/>
+        <ref bean="adsAuthorContrib"/>
+        <ref bean="adsDoiContrib"/>
+        <ref bean="adsTypeContrib"/>
+        <ref bean="adsIdContrib"/>
+        <ref bean="adsIssueContrib"/>
+        <ref bean="adsKeywordContrib"/>
+        <ref bean="adsLangContrib"/>
+        <ref bean="adsSourceContrib"/>
+        <ref bean="adsTitleContrib"/>
+    </util:list>
 
     <bean id="adsTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
         <property name="field" ref="ads.title"/>

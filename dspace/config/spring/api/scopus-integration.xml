@@ -11,31 +11,28 @@
     <context:annotation-config/>
     <!-- allows us to use spring annotations in beans -->
 
-    <util:map id="scopusMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+    <util:list id="scopusMetadataFieldMap"
               value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
-        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
-            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
-            what metadatafield is generated.
-        </description>
-        <entry key-ref="scopus.doi" value-ref="scopusDoiContrib"/>
-        <entry key-ref="scopus.title" value-ref="scopusTitleContrib"/>
-        <entry key-ref="scopus.type" value-ref="scopusTypeContrib"/>
-        <entry key-ref="scopus.isbn" value-ref="scopusIsbnContrib"/>
-        <entry key-ref="scopus.issn" value-ref="scopusIssnContrib"/>
-        <entry key-ref="scopus.date" value-ref="scopusDateContrib"/>
-        <entry key-ref="scopus.eid" value-ref="scopusEidContrib"/>
-        <entry key-ref="scopus.volume" value-ref="scopusVolumeContrib"/>
-        <entry key-ref="scopus.issueIdentifier" value-ref="scopusIssueIdentifierContrib"/>
-        <entry key-ref="scopus.authkeywords" value-ref="scopusAuthkeywordsContrib"/>        
-        <entry key-ref="scopus.creator" value-ref="scopusCreatorContrib"/>
-        <entry key-ref="scopus.openaccessFlag" value-ref="scopusOpenaccessFlagContrib"/>
-        <entry key-ref="scopus.ispartof" value-ref="scopusIspartofContrib"/>
-        <entry key-ref="scopus.ispartofseries" value-ref="scopusIspartofseriesContrib"/>
-        <entry key-ref="scopus.authname" value-ref="scopusAuthorMetadataContrib"/>
-        <!--   <entry key-ref="scopus.source" value-ref="scopusSourceContrib"/>            -->
-        <!--   <entry key-ref="scopus.abstract" value-ref="scopusAbstractContrib"/>        -->
-        <!--   <entry key-ref="scopus.author" value-ref="scopusAuthorsContrib"/>           -->
-    </util:map>
+        <description>Defines which metadatum is mapped on which metadatum.</description>
+        <ref bean="scopusDoiContrib"/>
+        <ref bean="scopusTitleContrib"/>
+        <ref bean="scopusTypeContrib"/>
+        <ref bean="scopusIsbnContrib"/>
+        <ref bean="scopusIssnContrib"/>
+        <ref bean="scopusDateContrib"/>
+        <ref bean="scopusEidContrib"/>
+        <ref bean="scopusVolumeContrib"/>
+        <ref bean="scopusIssueIdentifierContrib"/>
+        <ref bean="scopusAuthkeywordsContrib"/>
+<!--        <ref bean="scopusCreatorContrib"/>-->
+        <ref bean="scopusOpenaccessFlagContrib"/>
+        <ref bean="scopusIspartofContrib"/>
+        <ref bean="scopusIspartofseriesContrib"/>
+        <ref bean="scopusAuthorMetadataContrib"/>
+        <!--   <ref bean="scopusSourceContrib"/>            -->
+        <!--   <ref bean="scopusAbstractContrib"/>        -->
+        <!--   <ref bean="scopusAuthorsContrib"/>           -->
+    </util:list>
     
     <bean id="scopusOpenaccessFlagContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="scopus.openaccessFlag"/>

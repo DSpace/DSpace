@@ -11,22 +11,19 @@
     <context:annotation-config/>
     <!-- allows us to use spring annotations in beans -->
 
-    <util:map id="epoMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+    <util:list id="epoMetadataFieldMap"
               value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
-        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
-            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
-            what metadatafield is generated.
-        </description>
-        <entry key-ref="epo.identifier.other" value-ref="epoIDContrib"/>
-        <entry key-ref="epo.dc.identifier" value-ref="epoApplicationNumberContrib"/>
-        <entry key-ref="epo.dc.date.issued" value-ref="epoDateContrib"/>
-        <entry key-ref="epo.dc.date.filed" value-ref="epoDateFiledContrib"/>
-        <entry key-ref="epo.dc.contributor" value-ref="epoApplicantContrib"/>
-        <entry key-ref="epo.dc.contributor.author" value-ref="epoInventorContrib"/>
-        <entry key-ref="epo.dc.title" value-ref="epoInventionTitleContrib"/>
-        <entry key-ref="epo.dc.subject" value-ref="epoIpcContrib"/>
-        <entry key-ref="epo.dc.description.abstract" value-ref="epoAbstractContrib"/>
-    </util:map>
+        <description>Defines which metadatum is mapped on which metadatum.</description>
+        <ref bean="epoIDContrib"/>
+        <ref bean="epoApplicationNumberContrib"/>
+        <ref bean="epoDateContrib"/>
+        <ref bean="epoDateFiledContrib"/>
+        <ref bean="epoApplicantContrib"/>
+        <ref bean="epoInventorContrib"/>
+        <ref bean="epoInventionTitleContrib"/>
+        <ref bean="epoIpcContrib"/>
+        <ref bean="epoAbstractContrib"/>
+    </util:list>
         
     <bean id="epoIpcContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="epo.dc.subject"/>
