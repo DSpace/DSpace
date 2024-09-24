@@ -459,7 +459,7 @@ public class EtdLoader {
 
         if (strEmbargo.equals("never")) {
             log.info("Embargoed forever");
-            rp = resourcePolicyService.create(context);
+            rp = resourcePolicyService.create(context, null, null);
             rp.setAction(Constants.READ);
             rp.setGroup(etdgroup);
             lPolicies.add(rp);
@@ -467,13 +467,13 @@ public class EtdLoader {
             Date date = format.parse(strEmbargo);
             log.info("Embargoed until " + date);
 
-            rp = resourcePolicyService.create(context);
+            rp = resourcePolicyService.create(context, null, null);
             rp.setAction(Constants.READ);
             rp.setGroup(etdgroup);
             rp.setEndDate(date);
             lPolicies.add(rp);
 
-            rp = resourcePolicyService.create(context);
+            rp = resourcePolicyService.create(context, null, null);
             rp.setAction(Constants.READ);
             rp.setGroup(anongroup);
             rp.setStartDate(date);

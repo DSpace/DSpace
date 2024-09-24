@@ -109,8 +109,7 @@ public class CommunityCommunityGroupControllerIT extends AbstractControllerInteg
 
                 context.turnOffAuthorisationSystem();
 
-                createResourcePolicy(context)
-                                .withUser(eperson)
+                createResourcePolicy(context, eperson, null)
                                 .withAction(WRITE)
                                 .withDspaceObject(community)
                                 .build();
