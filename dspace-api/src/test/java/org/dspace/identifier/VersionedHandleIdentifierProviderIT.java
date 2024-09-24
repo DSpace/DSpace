@@ -68,7 +68,9 @@ public class VersionedHandleIdentifierProviderIT extends AbstractIntegrationTest
     }
 
     @After
-    public void tearDown() throws Exception {
+    @Override
+    public void destroy() throws Exception {
+        super.destroy();
         // restore providers
         identifierService.setProviders(originalProviders);
         // clean beans
