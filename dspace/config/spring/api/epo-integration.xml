@@ -26,89 +26,62 @@
     </util:list>
         
     <bean id="epoIpcContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
-        <property name="field" ref="epo.dc.subject"/>
+        <property name="field" ref="dc.subject"/>
         <property name="query" value="//ns:classification-ipcr/ns:text"/>
         <property name="prefixToNamespaceMapping" ref="nsEpoPrefixToNamespaceMapping"/>
     </bean>
-    <bean id="epo.dc.subject" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.subject"/>
-    </bean>
     
     <bean id="epoAbstractContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
-        <property name="field" ref="epo.dc.description.abstract"/>
+        <property name="field" ref="dc.description.abstract"/>
         <property name="query" value="//ns:abstract"/>
         <property name="prefixToNamespaceMapping" ref="nsEpoPrefixToNamespaceMapping"/>
     </bean>
-    <bean id="epo.dc.description.abstract" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.description.abstract"/>
-    </bean>
     
     <bean id="epoIDContrib" class="org.dspace.importer.external.metadatamapping.contributor.EpoIdMetadataContributor">
-        <property name="field" ref="epo.identifier.other"/>
+        <property name="field" ref="dc.identifier.other"/>
         <property name="query" value="//ns:publication-reference"/>
         <property name="prefixToNamespaceMapping" ref="nsEpoPrefixToNamespaceMapping"/>
         <property name="needType" value="true"></property>
     </bean>
-    <bean id="epo.identifier.other" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.other"/>
-    </bean>
 
     <bean id="epoInventionTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
-        <property name="field" ref="epo.dc.title"/>
+        <property name="field" ref="dc.title"/>
         <property name="query" value="//ns:invention-title"/>
         <property name="prefixToNamespaceMapping" ref="nsEpoPrefixToNamespaceMapping"/>
     </bean>
-    <bean id="epo.dc.title" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.title"/>
-    </bean>
 
     <bean id="epoInventorContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
-        <property name="field" ref="epo.dc.contributor.author"/>
+        <property name="field" ref="dc.contributor.author"/>
         <property name="query" value="//ns:inventor-name/ns:name"/>
         <property name="prefixToNamespaceMapping" ref="nsEpoPrefixToNamespaceMapping"/>
     </bean>
-    <bean id="epo.dc.contributor.author" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.contributor.author"/>
-    </bean>
 
     <bean id="epoApplicantContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
-        <property name="field" ref="epo.dc.contributor"/>
+        <property name="field" ref="dc.contributor"/>
         <property name="query" value="//ns:applicant-name/ns:name"/>
         <property name="prefixToNamespaceMapping" ref="nsEpoPrefixToNamespaceMapping"/>
     </bean>
-    <bean id="epo.dc.contributor" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.contributor"/>
-    </bean>
 
     <bean id="epoApplicationNumberContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
-        <property name="field" ref="epo.dc.identifier"/>
+        <property name="field" ref="dc.identifier"/>
         <property name="query" value="//ns:application-reference/ns:document-id[@document-id-type=&quot;original&quot;]/ns:doc-number"/>
         <property name="prefixToNamespaceMapping" ref="nsEpoPrefixToNamespaceMapping"/>
     </bean>
-    <bean id="epo.dc.identifier" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier"/>
-    </bean>
 
     <bean id="epoDateContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathDateFormatMetadataContributor">
-        <property name="field" ref="epo.dc.date.issued"/>
+        <property name="field" ref="dc.date.issued"/>
         <property name="query" value="//ns:publication-reference/ns:document-id[@document-id-type=&quot;epodoc&quot;]/ns:date"/>
         <property name="prefixToNamespaceMapping" ref="nsEpoPrefixToNamespaceMapping"/>
         <property name="dateFormatFrom" value="yyyymmdd"/>
         <property name="dateFormatTo" value="yyyy-MM-dd"></property>
     </bean>
-    <bean id="epo.dc.date.issued" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.date.issued"/>
-    </bean>        
     
     <bean id="epoDateFiledContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathDateFormatMetadataContributor">
-        <property name="field" ref="epo.dc.date.filed"/>
+        <property name="field" ref="dc.date.submitted"/>
         <property name="query" value="//ns:application-reference/ns:document-id/ns:date"/>
         <property name="prefixToNamespaceMapping" ref="nsEpoPrefixToNamespaceMapping"/>
         <property name="dateFormatFrom" value="yyyymmdd"/>
         <property name="dateFormatTo" value="yyyy-MM-dd"></property>
-    </bean>
-    <bean id="epo.dc.date.filed" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.date.submitted"/>
     </bean>
     
     <util:map id="xlinkEpoPrefixToNamespaceMapping" map-class="java.util.HashMap"

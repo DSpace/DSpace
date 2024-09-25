@@ -29,61 +29,15 @@
 
     <util:map id="mapOfmetadata"
         map-class="java.util.HashMap" key-type="java.lang.String" value-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <entry key="awardNumber" value-ref="openaireAwardNumber" />
-        <entry key="fundingStream" value-ref="openaireFundingStream" />
-        <entry key="awardURI" value-ref="openaireAwardURI" />
-        <entry key="funderName" value-ref="openaireFunderName" />
-        <entry key="funderIdentifier" value-ref="openaireFunderIdentifier" />
-        <entry key="dcTitle" value-ref="openaireTitle" />
-        <entry key="titleAlternative" value-ref="openaireTitleAlternative" />
-        <entry key="dcIdentifier" value-ref="openaireIdentifier" />
-        <entry key="coverageSpatial" value-ref="openaireSpatial" />
-        <entry key="dcDescription" value-ref="openaireDescription" />
-        <entry key="dcSubject" value-ref="openaireSubject" />
+        <entry key="awardNumber" value-ref="oaire.awardNumber" />
+        <entry key="fundingStream" value-ref="oaire.fundingStream" />
+        <entry key="awardURI" value-ref="oaire.awardURI" />
+        <entry key="funderName" value-ref="project.funder.name" />
+        <entry key="funderIdentifier" value-ref="project.funder.identifier" />
+        <entry key="dcTitle" value-ref="dc.title" />
+        <entry key="titleAlternative" value-ref="dc.title.alternative" />
+        <entry key="coverageSpatial" value-ref="dc.coverage.spatial" />
+        <entry key="dcSubject" value-ref="dc.subject" />
     </util:map>
 
-    <bean id="openaireAwardNumber" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="oaire.awardNumber"/>
-    </bean>
-
-    <bean id="openaireFundingStream" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="oaire.fundingStream"/>
-    </bean>
-    
-    <bean id="openaireAwardURI" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="oaire.awardURI"/>
-    </bean>
-
-    <bean id="openaireFunderName" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="project.funder.name"/>
-    </bean>
-
-    <bean id="openaireFunderIdentifier" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="project.funder.identifier"/>
-    </bean>
-
-    <bean id="openaireTitle" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.title"/>
-    </bean>
-
-    <bean id="openaireTitleAlternative" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.title.alternative"/>
-    </bean>
-
-    <bean id="openaireIdentifier" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier"/>
-    </bean>
-
-    <bean id="openaireSpatial" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.coverage.spatial"/>
-    </bean>
-
-    <bean id="openaireDescription" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.description"/>
-    </bean>
-
-    <bean id="openaireSubject" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.subject"/>
-    </bean>
-	
 </beans>

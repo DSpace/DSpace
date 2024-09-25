@@ -12,10 +12,7 @@
     <!-- allows us to use spring annotations in beans -->
 
     <util:list id="adsMetadataFieldMap" value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
-        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
-            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
-            what metadatafield is generated.
-        </description>
+        <description>Defines which metadatum is mapped on which metadatum.</description>
         <ref bean="adsAbstractContrib"/>
         <ref bean="adsAuthorContrib"/>
         <ref bean="adsDoiContrib"/>
@@ -29,83 +26,53 @@
     </util:list>
 
     <bean id="adsTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
-        <property name="field" ref="ads.title"/>
+        <property name="field" ref="dc.title"/>
         <property name="query" value="/title"/>
-    </bean>
-    <bean id="ads.title" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.title"/>
     </bean>
 
     <bean id="adsSourceContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
-        <property name="field" ref="ads.source"/>
+        <property name="field" ref="dc.source"/>
         <property name="query" value="/pub"/>
-    </bean>
-    <bean id="ads.source" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.source"/>
     </bean>
 
     <bean id="adsLangContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
-        <property name="field" ref="ads.lang"/>
+        <property name="field" ref="dc.language.iso"/>
         <property name="query" value="/lang"/>
-    </bean>
-    <bean id="ads.lang" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.language.iso"/>
     </bean>
 
     <bean id="adsKeywordContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
-        <property name="field" ref="ads.keywrd"/>
+        <property name="field" ref="dc.subject"/>
         <property name="query" value="/keyword"/>
-    </bean>
-    <bean id="ads.keywrd" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.subject"/>
     </bean>
 
     <bean id="adsIssueContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
-        <property name="field" ref="ads.issue"/>
+        <property name="field" ref="dc.date.issued"/>
         <property name="query" value="/year"/>
-    </bean>
-    <bean id="ads.issue" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.date.issued"/>
     </bean>
 
     <bean id="adsIdContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
-        <property name="field" ref="ads.id"/>
+        <property name="field" ref="dc.identifier.other"/>
         <property name="query" value="/bibcode"/>
-    </bean>
-    <bean id="ads.id" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.other"/>
     </bean>
 
     <bean id="adsTypeContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
-        <property name="field" ref="ads.type"/>
+        <property name="field" ref="dc.type"/>
         <property name="query" value="/doctype"/>
-    </bean>
-    <bean id="ads.type" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.type"/>
     </bean>
 
     <bean id="adsDoiContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
-        <property name="field" ref="ads.doi"/>
+        <property name="field" ref="dc.identifier.doi"/>
         <property name="query" value="/doi"/>
-    </bean>
-    <bean id="ads.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.doi"/>
     </bean>
 
     <bean id="adsAuthorContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
-        <property name="field" ref="ads.author"/>
+        <property name="field" ref="dc.contributor.author"/>
         <property name="query" value="/author"/>
-    </bean>
-    <bean id="ads.author" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.contributor.author"/>
     </bean>
 
     <bean id="adsAbstractContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
-        <property name="field" ref="ads.abstract"/>
+        <property name="field" ref="dc.description.abstract"/>
         <property name="query" value="/abstract"/>
-    </bean>
-    <bean id="ads.abstract" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.description.abstract"/>
     </bean>
 
     <bean class="java.lang.Integer" id="maxRetry">

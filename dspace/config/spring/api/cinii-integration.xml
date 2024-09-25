@@ -20,8 +20,7 @@
     -->
     <util:list id="ciniiMetadataFieldMap"
               value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
-        <description>Defines which metadatum is mapped on which metadatum.
-        </description>
+        <description>Defines which metadatum is mapped on which metadatum.</description>
         <ref bean="ciniiTitleContrib"/>
         <ref bean="ciniiISSNContrib"/>
         <ref bean="ciniiJournalContrib"/>
@@ -31,48 +30,33 @@
     </util:list>
 
     <bean id="ciniiDescriptionContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
-        <property name="field" ref="cinii.description"/>
+        <property name="field" ref="dc.description.abstract"/>
         <property name="query" value="dc:description"/>
         <property name="prefixToNamespaceMapping" ref="ciniiPrefixToNamespaceMapping"/>
     </bean>
-    <bean id="cinii.description" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.description.abstract"/>
-    </bean>
 
     <bean id="ciniiLanguageContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
-        <property name="field" ref="cinii.language"/>
+        <property name="field" ref="dc.language.iso"/>
         <property name="query" value="dc:language"/>
         <property name="prefixToNamespaceMapping" ref="ciniiPrefixToNamespaceMapping"/>
     </bean>
-    <bean id="cinii.language" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.language.iso"/>
-    </bean>
 
     <bean id="ciniiIssuedContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
-        <property name="field" ref="cinii.issued"/>
+        <property name="field" ref="dc.date.issued"/>
         <property name="query" value="prism:publicationDate"/>
         <property name="prefixToNamespaceMapping" ref="ciniiPrefixToNamespaceMapping"/>
     </bean>
-    <bean id="cinii.issued" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.date.issued"/>
-    </bean>
 
     <bean id="ciniiJournalContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
-        <property name="field" ref="cinii.journal"/>
+        <property name="field" ref="dc.source"/>
         <property name="query" value="prism:publicationName"/>
         <property name="prefixToNamespaceMapping" ref="ciniiPrefixToNamespaceMapping"/>
     </bean>
-    <bean id="cinii.journal" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.source"/>
-    </bean>
 
     <bean id="ciniiISSNContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
-        <property name="field" ref="cinii.issn"/>
+        <property name="field" ref="dc.identifier.issn"/>
         <property name="query" value="prism:issn"/>
         <property name="prefixToNamespaceMapping" ref="ciniiPrefixToNamespaceMapping"/>
-    </bean>
-    <bean id="cinii.issn" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.issn"/>
     </bean>
 
 	<!--  alternative authors, titles, etc (based on languages) isn't used at the moment, 
@@ -80,12 +64,9 @@
           could be useful to implements metadata remapping.
     -->
     <bean id="ciniiTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
-        <property name="field" ref="cinii.title"/>
+        <property name="field" ref="dc.title"/>
         <property name="query" value="dc:title"/>
         <property name="prefixToNamespaceMapping" ref="ciniiPrefixToNamespaceMapping"/>
-    </bean>
-    <bean id="cinii.title" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.title"/>
     </bean>
 
 	<util:map id="ciniiPrefixToNamespaceMapping" map-class="java.util.HashMap">

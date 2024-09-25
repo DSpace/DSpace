@@ -112,37 +112,6 @@
         <property name="prefixToNamespaceMapping" ref="prefixToNamespaceMapping"/>
     </bean>
 
-    <bean id="dc.title" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.title"/>
-    </bean>
-
-    <bean id="dc.description.abstract" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.description.abstract"/>
-    </bean>
-
-
-    <bean id="dc.contributor.author" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.contributor.author"/>
-    </bean>
-
-    <bean id="dc.date.issued" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.date.issued"/>
-    </bean>
-
-    <bean id="dc.language.iso" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.language.iso"/>
-    </bean>
-
-
-    <bean id="dc.subject" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.subject"/>
-    </bean>
-
-    <bean id="dc.identifier.other" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.other"/>
-    </bean>
-
-
     <util:map id="prefixToNamespaceMapping">
     </util:map>
 

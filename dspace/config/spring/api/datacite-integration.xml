@@ -28,10 +28,7 @@
                 <property name="elementAttribute" value="/name"/>
             </bean>
         </property>
-        <property name="field" ref="datacite.author"/>
-    </bean>
-    <bean id="datacite.author" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.contributor.author"/>
+        <property name="field" ref="dc.contributor.author"/>
     </bean>
 
     <bean id="dataciteTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
@@ -41,19 +38,13 @@
                 <property name="elementAttribute" value="/title"/>
             </bean>
         </property>
-        <property name="field" ref="datacite.title"/>
-    </bean>
-    <bean id="datacite.title" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.title"/>
+        <property name="field" ref="dc.title"/>
     </bean>
 
     <!-- must be present to be imported, since it's used as the recordId-->
     <bean id="dataciteIDContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
-        <property name="field" ref="datacite.id"/>
+        <property name="field" ref="dc.identifier.doi"/>
         <property name="query" value="/doi"/>
-    </bean>
-    <bean id="datacite.id" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.doi"/>
     </bean>
 
 </beans>

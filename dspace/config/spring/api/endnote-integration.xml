@@ -23,27 +23,27 @@
     </util:list>
 
     <bean id="endnoteJournalContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
-        <property name="field" ref="dcJournal"/>
+        <property name="field" ref="dc.source"/>
         <property name="key" value="SO" />
     </bean>
 
     <bean id="endnoteIssuedContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
-        <property name="field" ref="dcIssued"/>
+        <property name="field" ref="dc.date.issued"/>
         <property name="key" value="PY" />
     </bean>
 
     <bean id="endnoteAbstractContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
-        <property name="field" ref="dcAbstract"/>
+        <property name="field" ref="dc.description.abstract"/>
         <property name="key" value="AB" />
     </bean>
     
     <bean id="endnoteAuthorsContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
-        <property name="field" ref="dcAuthors"/>
+        <property name="field" ref="dc.contributor.author"/>
         <property name="key" value="AU" />
     </bean>
     
     <bean id="endnoteTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
-        <property name="field" ref="dcTitle"/>
+        <property name="field" ref="dc.title"/>
         <property name="key" value="TI" />
     </bean>
     
