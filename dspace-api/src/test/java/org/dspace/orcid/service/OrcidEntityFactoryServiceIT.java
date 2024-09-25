@@ -196,8 +196,6 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
 
         Item product = ItemBuilder.createItem(context, products)
             .withTitle("Test dataset")
-            .withAuthor("Walter White")
-            .withAuthor("Jesse Pinkman")
             .withEditor("Editor")
             .withIssueDate("2021-04-30")
             .withDescriptionAbstract("Product description")
@@ -215,6 +213,13 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
                 .withPersonIdentifierLastName("Walter")
                 .withPersonIdentifierFirstName("White")
                 .build();
+        Item person2 = ItemBuilder.createItem(context, persons)
+                .withTitle("Jesse Pinkman")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Jesse, Pinkman")
+                .withPersonIdentifierLastName("Jesse")
+                .withPersonIdentifierFirstName("Pinkman")
+                .build();
 
         EntityType productType = EntityTypeBuilder.createEntityTypeBuilder(context, "Product").build();
         EntityType personType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
@@ -223,6 +228,7 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
                 "isCreatorOfProduct", "isProductOfCreator", 0, null, 0, null).build();
 
         RelationshipBuilder.createRelationshipBuilder(context, product, person, isCreatorOfProduct).build();
+        RelationshipBuilder.createRelationshipBuilder(context, product, person2, isCreatorOfProduct).build();
 
         context.restoreAuthSystemState();
 
@@ -247,9 +253,9 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
 
         List<Contributor> contributors = work.getWorkContributors().getContributor();
         assertThat(contributors, hasSize(2));
-        assertThat(contributors, has(contributor("Walter White", AUTHOR, FIRST)));
+        assertThat(contributors, has(contributor("Walter, White", AUTHOR, FIRST)));
         // assertThat(contributors, has(contributor("Editor", EDITOR, FIRST)));
-        assertThat(contributors, has(contributor("Jesse Pinkman", AUTHOR, ADDITIONAL)));
+        assertThat(contributors, has(contributor("Jesse, Pinkman", AUTHOR, ADDITIONAL)));
 
         assertThat(work.getExternalIdentifiers(), notNullValue());
 
@@ -268,7 +274,6 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
 
         Item patent = ItemBuilder.createItem(context, patents)
             .withTitle("Test patent")
-            .withAuthor("Jesse Pinkman")
             .withIssueDate("2021-04-30")
             .withDescriptionAbstract("Patent description")
             .withPublisher("Patent registration office")
@@ -284,6 +289,13 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
                 .withPersonIdentifierLastName("Walter")
                 .withPersonIdentifierFirstName("White")
                 .build();
+        Item person2 = ItemBuilder.createItem(context, persons)
+                .withTitle("Jesse Pinkman")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Jesse, Pinkman")
+                .withPersonIdentifierLastName("Jesse")
+                .withPersonIdentifierFirstName("Pinkman")
+                .build();
 
         EntityType patentType = EntityTypeBuilder.createEntityTypeBuilder(context, "Patent").build();
         EntityType personType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
@@ -292,6 +304,7 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
                 "isInventorOfPatent", "isPatentOfInventor", 0, null, 0, null).build();
 
         RelationshipBuilder.createRelationshipBuilder(context, patent, person, isInventorOfPatent).build();
+        RelationshipBuilder.createRelationshipBuilder(context, patent, person2, isInventorOfPatent).build();
 
         context.restoreAuthSystemState();
 
@@ -305,8 +318,6 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
         assertThat(work.getPublicationDate(), matches(date("2021", "04", "30")));
         assertThat(work.getShortDescription(), is("Patent description"));
         assertThat(work.getPutCode(), nullValue());
-        // assertThat(work.getWorkCitation(), notNullValue());
-        // assertThat(work.getWorkCitation().getCitation(), containsString("Test patent"));
         assertThat(work.getWorkType(), is(WorkType.PATENT));
         assertThat(work.getWorkTitle(), notNullValue());
         assertThat(work.getWorkTitle().getTitle(), notNullValue());
@@ -315,8 +326,10 @@ public class OrcidEntityFactoryServiceIT extends AbstractIntegrationTestWithData
         assertThat(work.getUrl(), matches(urlEndsWith(patent.getHandle())));
 
         List<Contributor> contributors = work.getWorkContributors().getContributor();
-        assertThat(contributors, hasSize(1));
-        assertThat(contributors, has(contributor("Jesse Pinkman", AUTHOR, FIRST)));
+        assertThat(contributors, hasSize(2));
+        assertThat(contributors, has(contributor("Walter, White", AUTHOR, FIRST)));
+        // assertThat(contributors, has(contributor("Editor", EDITOR, FIRST)));
+        assertThat(contributors, has(contributor("Jesse, Pinkman", AUTHOR, ADDITIONAL)));
 
         assertThat(work.getExternalIdentifiers(), notNullValue());
 
