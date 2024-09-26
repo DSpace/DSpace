@@ -1829,7 +1829,8 @@ prevent the generation of resource policy entry values with null dspace_object a
                     // Check if this field is mapped *and* is configured for authority control
                     if (authorityVirtualMaps.containsKey(dbFieldName)
                             && metadataAuthorityService.isAuthorityControlled(dbFieldName) ) {
-                        AuthorityValue authorityValue = authorityValueService.findByUID(dbValue.getAuthority());
+                        AuthorityValue authorityValue = authorityValueService.findByUID(context,
+                                dbValue.getAuthority());
                         if (authorityValue == null) {
                             continue;
                         }
