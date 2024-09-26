@@ -55,8 +55,10 @@ public class AuthorityVirtualMetadataServiceImpl implements AuthorityVirtualMeta
     public void init() {
         validVirtualFieldNames = new HashMap<>();
         authorityVirtualMaps = new HashMap<>();
+        Context context = null;
         // Obtain new context and initialise lists and maps
-        try (Context context = new Context(Context.Mode.READ_ONLY)) {
+        try {
+            context = new Context(Context.Mode.READ_ONLY);
             // Get field maps configured in virtual metadata spring configuration
              authorityVirtualMaps = authorityVirtualMetadataPopulator.getMap();
             // Iterate map of maps, just to check each virtual field name (key of 2nd-level map) exists
@@ -72,6 +74,10 @@ public class AuthorityVirtualMetadataServiceImpl implements AuthorityVirtualMeta
         } catch (SQLException e) {
             log.error("Could not obtain context" + e.getMessage(), e);
             throw new RuntimeException(e);
+        } finally {
+            if (context != null) {
+                context.close();
+            }
         }
     }
 
