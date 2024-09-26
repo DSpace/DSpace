@@ -503,6 +503,7 @@ public class LDAPAuthentication
                     } else {
                         searchName = ldap_provider_url + ldap_search_context;
                     }
+                    @SuppressWarnings("BanJNDI")
                     NamingEnumeration<SearchResult> answer = ctx.search(
                         searchName,
                         "(&({0}={1}))", new Object[] {ldap_id_field,
@@ -553,7 +554,7 @@ public class LDAPAuthentication
                             att = atts.get(attlist[4]);
                             if (att != null) {
                                 // loop through all groups returned by LDAP
-                                ldapGroup = new ArrayList<String>();
+                                ldapGroup = new ArrayList<>();
                                 for (NamingEnumeration val = att.getAll(); val.hasMoreElements(); )  {
                                     ldapGroup.add((String) val.next());
                                 }
@@ -633,7 +634,8 @@ public class LDAPAuthentication
                         ctx.addToEnvironment(javax.naming.Context.AUTHORITATIVE, "true");
                         ctx.addToEnvironment(javax.naming.Context.REFERRAL, "follow");
                         // dummy operation to check if authentication has succeeded
-                        ctx.getAttributes("");
+                        @SuppressWarnings("BanJNDI")
+                        Attributes trash = ctx.getAttributes("");
                     } else if (!useTLS) {
                         // Authenticate
                         env.put(javax.naming.Context.SECURITY_AUTHENTICATION, "Simple");
