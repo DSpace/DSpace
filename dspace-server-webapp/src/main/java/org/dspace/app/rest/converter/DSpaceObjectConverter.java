@@ -21,6 +21,7 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,7 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
     @Autowired
     RequestService requestService;
 
+    protected abstract DSpaceObjectService<M> getDSOService();
 
     @Override
     public R convert(M obj, Projection projection) {
@@ -62,7 +64,7 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
         if (obj.getID() != null) {
             resource.setUuid(obj.getID().toString());
         }
-        resource.setName(obj.getName());
+        resource.setName(getDSOService().getName(obj));
 
         MetadataValueList metadataValues = getPermissionFilteredMetadata(
                 ContextUtil.obtainCurrentRequestContext(), obj);

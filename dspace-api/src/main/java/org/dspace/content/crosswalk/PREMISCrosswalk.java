@@ -26,6 +26,7 @@ import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
@@ -60,6 +61,8 @@ public class PREMISCrosswalk
 
     private static final Namespace namespaces[] = {PREMIS_NS};
 
+    protected BundleService bundleService
+            = ContentServiceFactory.getInstance().getBundleService();
     protected BitstreamService bitstreamService
             = ContentServiceFactory.getInstance().getBitstreamService();
     protected BitstreamFormatService bitstreamFormatService
@@ -128,18 +131,19 @@ public class PREMISCrosswalk
                         String md = fixity.getChildTextTrim("messageDigest", PREMIS_NS);
                         String b_alg = bitstream.getChecksumAlgorithm();
                         String b_md = bitstream.getChecksum();
+                        String name = bitstreamService.getName(bitstream);
+
                         if (StringUtils.equals(alg, b_alg)) {
                             if (StringUtils.equals(md, b_md)) {
-                                log.debug("Bitstream checksum agrees with PREMIS: " + bitstream.getName());
+                                log.debug("Bitstream checksum agrees with PREMIS: " + name);
                             } else {
                                 throw new MetadataValidationException(
                                     "Bitstream " + alg + " Checksum does not match value in PREMIS (" + b_md + " != "
-                                        + md + "), for bitstream: " + bitstream
-                                        .getName());
+                                        + md + "), for bitstream: " + name);
                             }
                         } else {
-                            log.warn("Cannot test checksum on bitstream=" + bitstream.getName() +
-                                         ", algorithm in PREMIS is different: " + alg);
+                            log.warn("Cannot test checksum on bitstream=" + name
+                                         + ", algorithm in PREMIS is different: " + alg);
                         }
                     }
 
@@ -156,7 +160,7 @@ public class PREMISCrosswalk
 
                 // Apply new bitstream name if we found it.
                 if (bsName != null) {
-                    bitstream.setName(context, bsName);
+                    bitstreamService.setName(context, bitstream, bsName);
                     log.debug(
                         "Changing bitstream id=" + String.valueOf(bitstream.getID()) + "name and source to: " + bsName);
                 }
@@ -171,7 +175,7 @@ public class PREMISCrosswalk
                 }
 
                 if (bf != null) {
-                    bitstream.setFormat(context, bf);
+                    bitstreamService.setFormat(context, bitstream, bf);
                 }
             } else {
                 log.debug("Skipping element: " + me.toString());
@@ -234,9 +238,9 @@ public class PREMISCrosswalk
             }
         }
         // get or make up name for bitstream:
-        String bsName = bitstream.getName();
+        String bsName = bitstreamService.getName(bitstream);
         if (bsName == null) {
-            List<String> ext = bitstream.getFormat(context).getExtensions();
+            List<String> ext = bitstreamService.getFormat(context, bitstream).getExtensions();
             bsName = "bitstream_" + sid + (ext.size() > 0 ? ext.get(0) : "");
         }
         if (handle != null && baseUrl != null) {
@@ -289,15 +293,15 @@ public class PREMISCrosswalk
         Element format = new Element("format", PREMIS_NS);
         Element formatDes = new Element("formatDesignation", PREMIS_NS);
         Element formatName = new Element("formatName", PREMIS_NS);
-        formatName.setText(bitstream.getFormat(context).getMIMEType());
+        formatName.setText(bitstreamService.getFormat(context, bitstream).getMIMEType());
         formatDes.addContent(formatName);
         format.addContent(formatDes);
         ochar.addContent(format);
 
         // originalName <- name (or source if none)
-        String oname = bitstream.getName();
+        String oname = bitstreamService.getName(bitstream);
         if (oname == null) {
-            oname = bitstream.getSource();
+            oname = bitstreamService.getSource(bitstream);
         }
         if (oname != null) {
             Element on = new Element("originalName", PREMIS_NS);

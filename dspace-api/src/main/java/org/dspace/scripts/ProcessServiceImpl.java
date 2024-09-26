@@ -179,7 +179,7 @@ public class ProcessServiceImpl implements ProcessService {
             throw new IllegalArgumentException("Cannot create another file of type: " + type + " for this process" +
                                                    " with id: " + process.getID());
         }
-        bitstream.setName(context, fileName);
+        bitstreamService.setName(context, bitstream, fileName);
         bitstreamService.setFormat(context, bitstream, bitstreamFormatService.guessFormat(context, bitstream));
         MetadataField dspaceProcessFileTypeField = metadataFieldService
             .findByString(context, Process.BITSTREAM_TYPE_METADATAFIELD, '.');
@@ -227,7 +227,7 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public Bitstream getBitstreamByName(Context context, Process process, String bitstreamName) {
         for (Bitstream bitstream : getBitstreams(context, process)) {
-            if (StringUtils.equals(bitstream.getName(), bitstreamName)) {
+            if (StringUtils.equals(bitstreamService.getName(bitstream), bitstreamName)) {
                 return bitstream;
             }
         }

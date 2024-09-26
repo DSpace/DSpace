@@ -76,20 +76,20 @@ public class DeleteBitstreamsByFilterAction extends UpdateBitstreamsAction {
 
         for (Bundle b : bundles) {
             List<Bitstream> bitstreams = b.getBitstreams();
-            String bundleName = b.getName();
+            String bundleName = bundleService.getName(b);
 
             for (Bitstream bs : bitstreams) {
                 if (filter.accept(bs)) {
                     if (isTest) {
-                        ItemUpdate.pr("Delete from bundle " + bundleName + " bitstream " + bs.getName()
+                        ItemUpdate.pr("Delete from bundle " + bundleName + " bitstream " + bitstreamService.getName(bs)
                                           + " with id = " + bs.getID());
                     } else {
                         //provenance is not maintained for derivative bitstreams
                         if (!bundleName.equals("THUMBNAIL") && !bundleName.equals("TEXT")) {
-                            deleted.add(bs.getName());
+                            deleted.add(bitstreamService.getName(bs));
                         }
                         bundleService.removeBitstream(context, b, bs);
-                        ItemUpdate.pr("Deleted " + bundleName + " bitstream " + bs.getName()
+                        ItemUpdate.pr("Deleted " + bundleName + " bitstream " + bitstreamService.getName(bs)
                                           + " with id = " + bs.getID());
                     }
                 }

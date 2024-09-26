@@ -25,6 +25,8 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataSchemaEnum;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -61,6 +63,8 @@ public class OREDisseminationCrosswalk
     private static final Namespace DS_NS =
         Namespace.getNamespace("ds", "http://www.dspace.org/objectModel/");
     protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected final BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+    protected final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected final ConfigurationService configurationService = DSpaceServicesFactory.getInstance()
                                                                                      .getConfigurationService();
 
@@ -225,7 +229,7 @@ public class OREDisseminationCrosswalk
         List<Bitstream> bitstreams;
         for (Bundle bundle : bundles) {
             // Omit the special "ORE" bitstream
-            if (bundle.getName().equals("ORE")) {
+            if (bundleService.getName(bundle).equals("ORE")) {
                 continue;
             }
 
@@ -234,23 +238,24 @@ public class OREDisseminationCrosswalk
                 arLink = new Element("link", ATOM_NS);
                 arLink.setAttribute("rel", ORE_NS.getURI() + "aggregates");
                 arLink.setAttribute("href", dsUrl + "/bitstream/handle/" + item.getHandle() + "/" + encodeForURL(
-                    bs.getName()) + "?sequence=" + bs.getSequenceID());
-                arLink.setAttribute("title", bs.getName());
-                arLink.setAttribute("type", bs.getFormat(context).getMIMEType());
+                    bitstreamService.getName(bs)) + "?sequence=" + bs.getSequenceID());
+                arLink.setAttribute("title", bitstreamService.getName(bs));
+                arLink.setAttribute("type", bitstreamService.getFormat(context, bs).getMIMEType());
                 arLink.setAttribute("length", Long.toString(bs.getSizeBytes()));
 
                 aggregation.addContent(arLink);
 
                 // metadata about the bitstream
                 rdfDescription = new Element("Description", RDF_NS);
-                rdfDescription.setAttribute("about",
-                                            dsUrl + "/bitstream/handle/" + item.getHandle() + "/" + encodeForURL(
-                                                bs.getName()) + "?sequence=" + bs.getSequenceID(), RDF_NS);
+                rdfDescription.setAttribute(
+                    "about", dsUrl + "/bitstream/handle/" + item.getHandle() + "/" + encodeForURL(
+                        bitstreamService.getName(bs)) + "?sequence=" + bs.getSequenceID(), RDF_NS
+                );
 
                 rdfType = new Element("type", RDF_NS);
                 rdfType.setAttribute("resource", DS_NS.getURI() + "DSpaceBitstream", RDF_NS);
                 dcDesc = new Element("description", DCTERMS_NS);
-                dcDesc.addContent(bundle.getName());
+                dcDesc.addContent(bundleService.getName(bundle));
 
                 rdfDescription.addContent(rdfType);
                 rdfDescription.addContent(dcDesc);

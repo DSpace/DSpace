@@ -154,7 +154,8 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
     private void setAllValuesOfRest(Context c, BitstreamFormat bitstreamFormat,
                                     BitstreamFormatRest bitstreamFormatRest) {
         try {
-            bitstreamFormat.setShortDescription(c, bitstreamFormatRest.getShortDescription());
+            String s = bitstreamFormatRest.getShortDescription();
+            bitstreamFormatService.setShortDescription(c, bitstreamFormat, s);
         } catch (SQLException e) {
             throw new RuntimeException("RuntimeException: Unable to set the short description (" +
                     bitstreamFormatRest.getShortDescription() + ") for bitstream", e);
@@ -165,7 +166,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
         if (supportLevelID == -1) {
             throw new DSpaceBadRequestException("Not a valid supportLevel: " + bitstreamFormatRest.getSupportLevel());
         }
-        bitstreamFormat.setSupportLevel(supportLevelID);
+        bitstreamFormatService.setSupportLevel(bitstreamFormat, supportLevelID);
         bitstreamFormat.setInternal(bitstreamFormatRest.isInternal());
         bitstreamFormat.setExtensions(bitstreamFormatRest.getExtensions());
     }

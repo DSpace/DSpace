@@ -122,7 +122,7 @@ public class ItemDepositor extends Depositor {
                 List<Bundle> bundles = item.getBundles();
                 Bundle swordBundle = null;
                 for (Bundle bundle : bundles) {
-                    if (bundleName.equals(bundle.getName())) {
+                    if (bundleName.equals(bundleService.getName(bundle))) {
                         // we found one
                         swordBundle = bundle;
                         break;
@@ -146,9 +146,8 @@ public class ItemDepositor extends Depositor {
                         fis.close();
                     }
                 }
-                bitstream.setName(context, fn);
-                bitstream.setDescription(context,
-                                         "Original file deposited via SWORD");
+                bitstreamService.setName(context, bitstream, fn);
+                bitstreamService.setDescription(context, bitstream, "Original file deposited via SWORD");
 
                 BitstreamFormat bf = bitstreamFormatService
                     .findByMIMEType(context, deposit.getContentType());

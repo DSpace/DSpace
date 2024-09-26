@@ -22,7 +22,9 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Site;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.services.ConfigurationService;
+import org.dspace.utils.DSpace;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -69,11 +71,13 @@ public class CuratorReportTest
     public void testCurate_Reporting()
             throws SQLException, IOException, AuthorizeException {
         // Configure for testing.
-        ConfigurationService cfg = kernelImpl.getConfigurationService();
+        ConfigurationService cfg = new DSpace().getConfigurationService();
         cfg.setProperty("plugin.named.org.dspace.curate.CurationTask",
                 Task1.class.getName() + " = task1");
         cfg.addPropertyValue("plugin.named.org.dspace.curate.CurationTask",
                 Task2.class.getName() + " = task2");
+
+        CoreServiceFactory.getInstance().getPluginService().clearNamedPluginClasses();
 
         // Create some structure.
         context.turnOffAuthorisationSystem();

@@ -7,7 +7,10 @@
  */
 package org.dspace.app.rest.model;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Date;
+import java.util.Locale;
 
 import org.dspace.app.rest.RestResourceController;
 
@@ -41,6 +44,8 @@ public class QAEventRest extends BaseObjectRest<String> {
     private Date eventDate;
     private QAEventMessageRest message;
     private String status;
+
+    public static final DecimalFormat TRUST_FMT = new DecimalFormat("0.000", new DecimalFormatSymbols(Locale.ENGLISH));
 
     @Override
     public String getType() {

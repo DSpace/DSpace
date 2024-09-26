@@ -91,6 +91,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -133,6 +134,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     private static final String IP_V4_REGEX = "^((?:\\d{1,3}\\.){3})\\d{1,3}$";
     private static final String IP_V6_REGEX = "^(.*):.*:.*$";
 
+    @Autowired(required = true)
+    protected BundleService bundleService;
     @Autowired(required = true)
     protected BitstreamService bitstreamService;
     @Autowired(required = true)
@@ -243,7 +246,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 Bitstream bit = (Bitstream) dspaceObject;
                 List<Bundle> bundles = bit.getBundles();
                 for (Bundle bundle : bundles) {
-                    doc1.addField("bundleName", bundle.getName());
+                    doc1.addField("bundleName", bundleService.getName(bundle));
                 }
             }
 
@@ -290,7 +293,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 Bitstream bit = (Bitstream) dspaceObject;
                 List<Bundle> bundles = bit.getBundles();
                 for (Bundle bundle : bundles) {
-                    doc1.addField("bundleName", bundle.getName());
+                    doc1.addField("bundleName", bundleService.getName(bundle));
                 }
             }
 
@@ -1404,7 +1407,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                             List<Bundle> bundles = bitstream.getBundles();
                             if (bundles != null && 0 < bundles.size()) {
                                 Bundle bundle = bundles.get(0);
-                                bundleName = bundle.getName();
+                                bundleName = bundleService.getName(bundle);
                             } else {
                                 //No bundle found, we are either a collection or a community logo, check for it !
                                 DSpaceObject parentObject = bitstreamService.getParentObject(context, bitstream);

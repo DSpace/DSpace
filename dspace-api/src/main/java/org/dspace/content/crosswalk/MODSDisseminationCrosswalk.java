@@ -34,6 +34,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.SelfNamedPlugin;
@@ -103,6 +104,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     protected final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     protected static final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
+    protected final SiteService siteService = ContentServiceFactory.getInstance().getSiteService();
 
     /**
      * Fill in the plugin alias table from DSpace configuration entries
@@ -414,8 +416,8 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
 
         String identifier_uri = handleService.getCanonicalPrefix()
             + site.getHandle();
-        String title = site.getName();
-        String url = site.getURL();
+        String title = siteService.getName(site);
+        String url = siteService.getURL(site);
 
         metadata.add(createDCValue("identifier.uri", null, identifier_uri));
 

@@ -343,14 +343,14 @@ public class ItemRestRepository extends DSpaceObjectRestRepository<Item, ItemRes
      */
     public Bundle addBundleToItem(Context context, Item item, BundleRest bundleRest)
         throws SQLException, AuthorizeException {
-        if (item.getBundles(bundleRest.getName()).size() > 0) {
+        if (itemService.getBundles(item, bundleRest.getName()).size() > 0) {
             throw new DSpaceBadRequestException("The bundle name already exists in the item");
         }
 
         Bundle bundle = bundleService.create(context, item, bundleRest.getName());
 
         metadataConverter.setMetadata(context, bundle, bundleRest.getMetadata());
-        bundle.setName(context, bundleRest.getName());
+        bundleService.setName(context, bundle, bundleRest.getName());
 
         context.commit();
 

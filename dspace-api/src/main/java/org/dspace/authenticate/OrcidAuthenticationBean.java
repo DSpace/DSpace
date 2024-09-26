@@ -229,12 +229,12 @@ public class OrcidAuthenticationBean implements AuthenticationMethod {
 
             Optional<String> firstName = getFirstName(person);
             if (firstName.isPresent()) {
-                eperson.setFirstName(context, firstName.get());
+                ePersonService.setFirstName(context, eperson, firstName.get());
             }
 
             Optional<String> lastName = getLastName(person);
             if (lastName.isPresent()) {
-                eperson.setLastName(context, lastName.get());
+                ePersonService.setLastName(context, eperson, lastName.get());
             }
             eperson.setCanLogIn(true);
             eperson.setSelfRegistered(true);

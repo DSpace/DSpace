@@ -256,7 +256,7 @@ public class MetadataImportIT extends AbstractIntegrationTestWithDatabase {
                 "TestAuthorToRemove"));
 
         String[] csv = {"id,collection,dc.title,dc.contributor.author",
-            item.getID().toString() + "," + personCollection.getHandle() + "," + item.getName() + ","};
+            item.getID().toString() + "," + personCollection.getHandle() + "," + itemService.getName(item) + ","};
         performImportScript(csv);
         item = findItemByName(itemTitle);
         assertEquals(0, itemService.getMetadata(item, "dc", "contributor", "author", Item.ANY).size());

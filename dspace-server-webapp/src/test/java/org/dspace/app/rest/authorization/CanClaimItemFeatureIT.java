@@ -205,7 +205,7 @@ public class CanClaimItemFeatureIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
 
         Item ownedItem = ItemBuilder.createItem(context, personCollection)
-            .withDspaceObjectOwner("owner", "ownerAuthority")
+            .withDSpaceObjectOwner("owner", "ownerAuthority")
             .build();
 
         context.restoreAuthSystemState();
@@ -230,7 +230,7 @@ public class CanClaimItemFeatureIT extends AbstractControllerIntegrationTest {
 
         ItemBuilder.createItem(context, personCollection)
             .withTitle("User")
-            .withDspaceObjectOwner("User", eperson.getID().toString())
+            .withDSpaceObjectOwner("User", eperson.getID().toString())
             .build();
 
         context.restoreAuthSystemState();

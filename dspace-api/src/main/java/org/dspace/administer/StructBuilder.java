@@ -362,7 +362,7 @@ public class StructBuilder {
         // Export this Community.
         Element element = new Element("community");
         element.setAttribute("identifier", community.getHandle());
-        element.addContent(new Element("name").setText(community.getName()));
+        element.addContent(new Element("name").setText(communityService.getName(community)));
         element.addContent(new Element("description")
                 .setText(communityService.getMetadataFirstValue(community,
                         MetadataSchemaEnum.DC.getName(), "description", "abstract", Item.ANY)));
@@ -399,7 +399,7 @@ public class StructBuilder {
         // Export this Collection.
         Element element = new Element("collection");
         element.setAttribute("identifier", collection.getHandle());
-        element.addContent(new Element("name").setText(collection.getName()));
+        element.addContent(new Element("name").setText(collectionService.getName(collection)));
         element.addContent(new Element("description")
                 .setText(collectionService.getMetadataFirstValue(collection,
                         MetadataSchemaEnum.DC.getName(), "description", "abstract", Item.ANY)));

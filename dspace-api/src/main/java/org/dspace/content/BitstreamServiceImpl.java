@@ -202,9 +202,9 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
     @Override
     public String getFormatDescription(Context context, Bitstream bitstream) throws SQLException {
-        if (bitstream.getFormat(context).getShortDescription().equals("Unknown")) {
+        if (getFormat(context, bitstream).getShortDescription().equals("Unknown")) {
             // Get user description if there is one
-            String desc = bitstream.getUserFormatDescription();
+            String desc = getUserFormatDescription(bitstream);
 
             if (desc == null) {
                 return "Unknown";
@@ -214,7 +214,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         }
 
         // not null or Unknown
-        return bitstream.getFormat(context).getShortDescription();
+        return getFormat(context, bitstream).getShortDescription();
     }
 
     @Override
@@ -386,7 +386,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
             List<Bitstream> bitstreams = bundle.getBitstreams();
             for (int j = 0; j < bitstreams.size(); j++) {
                 Bitstream bitstream = bitstreams.get(j);
-                if (StringUtils.equals(bitstream.getName(), bitstreamName)) {
+                if (StringUtils.equals(getName(bitstream), bitstreamName)) {
                     return bitstream;
                 }
             }
@@ -414,7 +414,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
             for (Item item : bundle.getItems()) {
                 for (Bundle thumbnails : itemService.getBundles(item, "THUMBNAIL")) {
                     for (Bitstream thumbnail : thumbnails.getBitstreams()) {
-                        if (pattern.matcher(thumbnail.getName()).matches()) {
+                        if (pattern.matcher(getName(thumbnail)).matches()) {
                             return thumbnail;
                         }
                     }
@@ -426,10 +426,10 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     }
 
     protected Pattern getBitstreamNamePattern(Bitstream bitstream) {
-        if (bitstream.getName() != null) {
-            return Pattern.compile("^" + Pattern.quote(bitstream.getName()) + ".([^.]+)$");
+        if (getName(bitstream) != null) {
+            return Pattern.compile("^" + Pattern.quote(getName(bitstream)) + ".([^.]+)$");
         }
-        return Pattern.compile("^" + bitstream.getName() + ".([^.]+)$");
+        return Pattern.compile("^" + getName(bitstream) + ".([^.]+)$");
     }
 
     @Override
@@ -495,5 +495,47 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Override
     public Long getLastModified(Bitstream bitstream) throws IOException {
         return bitstreamStorageService.getLastModified(bitstream);
+    }
+
+    /**
+     * Get the name of this bitstream - typically the filename, without any path
+     * information
+     * <br>
+     * Note: unlike {@link org.dspace.content.service.DSpaceObjectService#getName}, this method may return null
+     *
+     * @return the name of the bitstream
+     */
+    @Override
+    public String getName(Bitstream bitstream) {
+        return getMetadataFirstValue(bitstream, MetadataSchemaEnum.DC.getName(), "title", null, Item.ANY);
+    }
+
+    @Override
+    public String getSource(Bitstream bitstream) {
+        return getMetadataFirstValue(bitstream, MetadataSchemaEnum.DC.getName(), "source", null, Item.ANY);
+    }
+
+    @Override
+    public void setSource(Context context, Bitstream bitstream, String source) throws SQLException {
+        setMetadataSingleValue(context, bitstream, MetadataSchemaEnum.DC.getName(), "source", null, null, source);
+    }
+
+    @Override
+    public String getDescription(Bitstream bitstream) {
+        return getMetadataFirstValue(bitstream, MetadataSchemaEnum.DC.getName(), "description", null, Item.ANY);
+    }
+
+    @Override
+    public void setDescription(Context context, Bitstream bitstream, String desc) throws SQLException {
+        setMetadataSingleValue(context, bitstream, MetadataSchemaEnum.DC.getName(), "description", null, null, desc);
+    }
+
+    public String getUserFormatDescription(Bitstream bitstream) {
+        return getMetadataFirstValue(bitstream, MetadataSchemaEnum.DC.getName(), "format", null, Item.ANY);
+    }
+
+    @Override
+    public void setAcceptanceDate(Context context, Bitstream bitstream, DCDate acceptanceDate) throws SQLException {
+        setMetadataSingleValue(context, bitstream, "dcterms", "accessRights", null, null, acceptanceDate.toString());
     }
 }

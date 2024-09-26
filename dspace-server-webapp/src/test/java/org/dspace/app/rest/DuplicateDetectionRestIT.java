@@ -114,8 +114,8 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
         simpleCol = CollectionBuilder.createCollection(context, parentCommunity)
                 .withName("Test Collection without Workflow")
                 .build();
-        eperson.setFirstName(context, "first");
-        eperson.setLastName(context, "last");
+        ePersonService.setFirstName(context, eperson, "first");
+        ePersonService.setLastName(context, eperson, "last");
 
         anotherEPerson = EPersonBuilder.createEPerson(context)
                 .withEmail("test-another-user@email.com")

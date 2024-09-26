@@ -85,7 +85,8 @@ public class ClamScan extends AbstractCurationTask {
     @Override
     public int perform(DSpaceObject dso) throws IOException {
         status = Curator.CURATE_SKIP;
-        logDebugMessage("The target dso is " + dso.getName());
+        logDebugMessage("The target dso is "
+                            + ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getName(dso));
         if (dso instanceof Item) {
             status = Curator.CURATE_SUCCESS;
             Item item = (Item) dso;
@@ -103,7 +104,7 @@ public class ClamScan extends AbstractCurationTask {
                 results = new ArrayList<>();
                 for (Bitstream bitstream : bundle.getBitstreams()) {
                     InputStream inputstream = bitstreamService.retrieve(Curator.curationContext(), bitstream);
-                    logDebugMessage("Scanning " + bitstream.getName() + " . . . ");
+                    logDebugMessage("Scanning " + bitstreamService.getName(bitstream) + " . . . ");
                     int bstatus = scan(bitstream, inputstream, getItemHandle(item));
                     inputstream.close();
                     if (bstatus == Curator.CURATE_ERROR) {
@@ -256,7 +257,7 @@ public class ClamScan extends AbstractCurationTask {
             logDebugMessage("Response: " + response);
             if (response.contains("FOUND")) {
                 String itemMsg = "item - " + itemHandle + ": ";
-                String bsMsg = "bitstream - " + bitstream.getName() +
+                String bsMsg = "bitstream - " + bitstreamService.getName(bitstream) +
                     ": SequenceId - " + bitstream.getSequenceID() + ": infected";
                 report(itemMsg + bsMsg);
                 results.add(bsMsg);

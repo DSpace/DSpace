@@ -63,7 +63,7 @@ public class FilteredItemConverter {
         if (obj.getID() != null) {
             item.setUuid(obj.getID().toString());
         }
-        item.setName(obj.getName());
+        item.setName(itemService.getName(obj));
 
         MetadataValueList metadataValues = getPermissionFilteredMetadata(
                 ContextUtil.obtainCurrentRequestContext(), obj);

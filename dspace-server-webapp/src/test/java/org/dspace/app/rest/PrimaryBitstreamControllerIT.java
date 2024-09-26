@@ -34,6 +34,7 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
+import org.dspace.content.service.ItemService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,6 +49,8 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
     BundleService bundleService;
     @Autowired
     BitstreamService bitstreamService;
+    @Autowired
+    ItemService itemService;
 
     Item item;
     Bitstream bitstream;
@@ -73,7 +76,7 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                                          .withMimeType("text/plain")
                                          .build();
         }
-        bundle = item.getBundles("ORIGINAL").get(0);
+        bundle = itemService.getBundles(item, "ORIGINAL").get(0);
         context.restoreAuthSystemState();
     }
 
@@ -109,8 +112,8 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream.getID())))
                         .andExpect(status().isCreated())
-                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle.getName(), bundle.getID(),
-                                                                           bundle.getHandle(), bundle.getType())));
+                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(
+                            bundleService.getName(bundle), bundle.getID(), bundle.getHandle(), bundle.getType())));
         // verify primaryBitstream was actually added
         bundle = context.reloadEntity(bundle);
         Assert.assertEquals(bitstream, bundle.getPrimaryBitstream());
@@ -190,8 +193,8 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream2.getID())))
                         .andExpect(status().isCreated())
-                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle2.getName(), bundle2.getID(),
-                                                                           bundle2.getHandle(), bundle2.getType())));
+                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(
+                            bundleService.getName(bundle2), bundle2.getID(), bundle2.getHandle(), bundle2.getType())));
         // verify primaryBitstream was actually added
         bundle2 = context.reloadEntity(bundle2);
         Assert.assertEquals(bitstream2, bundle2.getPrimaryBitstream());
@@ -218,8 +221,8 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream2.getID())))
                         .andExpect(status().isCreated())
-                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle2.getName(), bundle2.getID(),
-                                                                           bundle2.getHandle(), bundle2.getType())));
+                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(
+                            bundleService.getName(bundle2), bundle2.getID(), bundle2.getHandle(), bundle2.getType())));
         // verify primaryBitstream was actually added
         bundle2 = context.reloadEntity(bundle2);
         Assert.assertEquals(bitstream2, bundle2.getPrimaryBitstream());
@@ -245,8 +248,8 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream2.getID())))
                         .andExpect(status().isCreated())
-                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle2.getName(), bundle2.getID(),
-                                                                           bundle2.getHandle(), bundle2.getType())));
+                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(
+                            bundleService.getName(bundle2), bundle2.getID(), bundle2.getHandle(), bundle2.getType())));
         // verify primaryBitstream was actually added
         bundle2 = context.reloadEntity(bundle2);
         Assert.assertEquals(bitstream2, bundle2.getPrimaryBitstream());
@@ -288,8 +291,8 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream2.getID())))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle.getName(), bundle.getID(),
-                                                                               bundle.getHandle(), bundle.getType())));
+                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(
+                            bundleService.getName(bundle), bundle.getID(), bundle.getHandle(), bundle.getType())));
         // verify primaryBitstream was actually updated
         bundle = context.reloadEntity(bundle);
         Assert.assertEquals(bitstream2, bundle.getPrimaryBitstream());
@@ -366,8 +369,8 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream3.getID())))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle2.getName(), bundle2.getID(),
-                                                                           bundle2.getHandle(), bundle2.getType())));
+                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(
+                            bundleService.getName(bundle2), bundle2.getID(), bundle2.getHandle(), bundle2.getType())));
         // verify primaryBitstream was actually updated
         bundle2 = context.reloadEntity(bundle2);
         Assert.assertEquals(bitstream3, bundle2.getPrimaryBitstream());
@@ -397,8 +400,8 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream3.getID())))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle2.getName(), bundle2.getID(),
-                                                                           bundle2.getHandle(), bundle2.getType())));
+                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(
+                            bundleService.getName(bundle2), bundle2.getID(), bundle2.getHandle(), bundle2.getType())));
         // verify primaryBitstream was actually updated
         bundle2 = context.reloadEntity(bundle2);
         Assert.assertEquals(bitstream3, bundle2.getPrimaryBitstream());
@@ -427,8 +430,8 @@ public class PrimaryBitstreamControllerIT extends AbstractControllerIntegrationT
                                      .contentType(textUriContentType)
                                      .content(getBitstreamUrl(bitstream3.getID())))
                         .andExpect(status().isOk())
-                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(bundle2.getName(), bundle2.getID(),
-                                                                           bundle2.getHandle(), bundle2.getType())));
+                        .andExpect(jsonPath("$", BundleMatcher.matchProperties(
+                            bundleService.getName(bundle2), bundle2.getID(), bundle2.getHandle(), bundle2.getType())));
         // verify primaryBitstream was actually updated
         bundle2 = context.reloadEntity(bundle2);
         Assert.assertEquals(bitstream3, bundle2.getPrimaryBitstream());

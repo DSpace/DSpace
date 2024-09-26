@@ -147,15 +147,15 @@ public class BundlePrimaryBitstreamLinkRepository extends AbstractDSpaceRestRepo
             throw new ResourceNotFoundException("No such bundle: " + bundleId);
         }
         if (!shouldBeSet && bundle.getPrimaryBitstream() == null) {
-            throw new DSpaceBadRequestException("Bundle '" + bundle.getName()
+            throw new DSpaceBadRequestException("Bundle '" + bundleService.getName(bundle)
                                                     + "' does not have a primary bitstream.");
         }
         if (shouldBeSet && bundle.getPrimaryBitstream() != null) {
-            throw new DSpaceBadRequestException("Bundle '" + bundle.getName()
+            throw new DSpaceBadRequestException("Bundle '" + bundleService.getName(bundle)
                                                     + "' already has a primary bitstream.");
         }
         if (bitstream != null && !bundle.getBitstreams().contains(bitstream)) {
-            throw new UnprocessableEntityException("Bundle '" + bundle.getName() + "' does not contain " +
+            throw new UnprocessableEntityException("Bundle '" + bundleService.getName(bundle) + "' does not contain " +
                                                        "bitstream with id: " + bitstream.getID());
         }
 

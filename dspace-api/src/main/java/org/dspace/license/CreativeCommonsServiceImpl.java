@@ -169,12 +169,12 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
         }
 
         Bitstream bs = bitstreamService.create(context, bundle, licenseStm);
-        bs.setSource(context, CC_BS_SOURCE);
-        bs.setName(context, (mimeType != null &&
+        bitstreamService.setSource(context, bs, CC_BS_SOURCE);
+        bitstreamService.setName(context, bs, (mimeType != null &&
                 (mimeType.equalsIgnoreCase("text/xml") ||
                         mimeType.equalsIgnoreCase("text/rdf"))) ?
                 BSN_LICENSE_RDF : BSN_LICENSE_TEXT);
-        bs.setFormat(context, bs_format);
+        bitstreamService.setFormat(context, bs, bs_format);
         bitstreamService.update(context, bs);
     }
 
@@ -299,9 +299,9 @@ public class CreativeCommonsServiceImpl implements CreativeCommonsService, Initi
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
         Bitstream bs = bitstreamService.create(context, bundle, bais);
 
-        bs.setName(context, bitstream_name);
-        bs.setSource(context, CC_BS_SOURCE);
-        bs.setFormat(context, format);
+        bitstreamService.setName(context, bs, bitstream_name);
+        bitstreamService.setSource(context, bs, CC_BS_SOURCE);
+        bitstreamService.setFormat(context, bs, format);
 
         // commit everything
         bitstreamService.update(context, bs);

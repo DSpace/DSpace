@@ -26,6 +26,8 @@ import org.dspace.content.DCDate;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
@@ -42,6 +44,8 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
                                                                                    .getBitstreamFormatService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
+    protected BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
     public AddBitstreamsAction() {
         //empty
@@ -159,9 +163,11 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
                 for (Bundle b : bundles) {
                     List<Bitstream> bitstreams = b.getBitstreams();
                     for (Bitstream bsm : bitstreams) {
-                        if (bsm.getName().equals(ce.filename)) {
-                            throw new IllegalArgumentException("Duplicate bundle + filename cannot be added: "
-                                                                   + b.getName() + " + " + bsm.getName());
+                        if (bitstreamService.getName(bsm).equals(ce.filename)) {
+                            throw new IllegalArgumentException(
+                                "Duplicate bundle + filename cannot be added: "
+                                    + bundleService.getName(b) + " + " + bitstreamService.getName(bsm)
+                            );
                         }
                     }
                 }
@@ -173,7 +179,7 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
             try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(f));) {
                 bs = bitstreamService.create(context, targetBundle, bis);
             }
-            bs.setName(context, ce.filename);
+            bitstreamService.setName(context, bs, ce.filename);
 
             // Identify the format
             // FIXME - guessing format guesses license.txt incorrectly as a text file format!
@@ -181,7 +187,7 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
             bitstreamService.setFormat(context, bs, fmt);
 
             if (ce.description != null) {
-                bs.setDescription(context, ce.description);
+                bitstreamService.setDescription(context, bs, ce.description);
             }
 
             if ((ce.permissionsActionId != -1) && (ce.permissionsGroupName != null)) {
@@ -199,7 +205,7 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
             if (!suppressUndo) {
                 itarch.addUndoDeleteContents(bs.getID());
             }
-            return targetBundle.getName();
+            return bundleService.getName(targetBundle);
         }
         return "";
     }

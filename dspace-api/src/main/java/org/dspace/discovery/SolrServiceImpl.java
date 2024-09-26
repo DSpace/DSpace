@@ -728,7 +728,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 commColl = contentServiceFactory.getDSpaceObjectService(type).find(context, UUID.fromString(value));
             }
             if (commColl != null) {
-                return commColl.getName();
+                return contentServiceFactory.getDSpaceObjectService(commColl).getName(commColl);
             }
 
         }

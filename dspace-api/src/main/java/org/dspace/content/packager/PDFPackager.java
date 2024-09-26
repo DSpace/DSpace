@@ -97,7 +97,7 @@ public class PDFPackager
         List<BitstreamFormat> bf = bitstreamFormatService.findNonInternal(context);
         for (BitstreamFormat aBf : bf) {
             if (aBf.getMIMEType().equalsIgnoreCase(mimeType)) {
-                bs.setFormat(context, aBf);
+                bitstreamService.setFormat(context, bs, aBf);
                 break;
             }
         }
@@ -155,7 +155,7 @@ public class PDFPackager
                 }
             }
 
-            bs.setName(context, "package.pdf");
+            bitstreamService.setName(context, bs, "package.pdf");
             setFormatToMIMEType(context, bs, "application/pdf");
             bitstreamService.update(context, bs);
             if (log.isDebugEnabled()) {

@@ -409,7 +409,7 @@ public class SWORDUrlManager {
 
             if (handle != null && !"".equals(handle)) {
                 bsLink = bsLink + "/bitstream/" + handle + "/" +
-                    bitstream.getSequenceID() + "/" + bitstream.getName();
+                    bitstream.getSequenceID() + "/" + bitstreamService.getName(bitstream);
             } else {
                 bsLink = bsLink + "/retrieve/" + bitstream.getID();
             }

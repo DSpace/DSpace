@@ -97,6 +97,11 @@ public class SiteServiceImpl extends DSpaceObjectServiceImpl<Site> implements Si
     }
 
     @Override
+    public String getURL(Site dso) {
+        return configurationService.getProperty("dspace.ui.url");
+    }
+
+    @Override
     public void delete(Context context, Site dso) throws SQLException, AuthorizeException, IOException {
         throw new AuthorizeException("Site object cannot be deleted");
     }

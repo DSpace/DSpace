@@ -13,8 +13,10 @@ import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
+import org.dspace.content.service.BundleService;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.IndexableItem;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This plugin adds three fields to the solr index to make a facet with/without
@@ -28,6 +30,8 @@ import org.dspace.discovery.indexobject.IndexableItem;
  * @author Christian Scheible christian.scheible@uni-konstanz.de
  */
 public class SolrServiceContentInOriginalBundleFilterPlugin implements SolrServiceIndexPlugin {
+    @Autowired
+    BundleService bundleService;
 
     @Override
     public void additionalIndex(Context context, IndexableObject indexableObject, SolrInputDocument document) {
@@ -63,7 +67,7 @@ public class SolrServiceContentInOriginalBundleFilterPlugin implements SolrServi
         bundles = item.getBundles();
         if (bundles != null) {
             for (Bundle curBundle : bundles) {
-                String bName = curBundle.getName();
+                String bName = bundleService.getName(curBundle);
                 if ((bName != null) && bName.equals("ORIGINAL")) {
                     List<Bitstream> bitstreams = curBundle.getBitstreams();
                     if (bitstreams != null && bitstreams.size() > 0) {

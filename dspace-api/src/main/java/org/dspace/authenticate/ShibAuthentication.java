@@ -749,10 +749,10 @@ public class ShibAuthentication implements AuthenticationMethod {
         }
         eperson.setEmail(email.toLowerCase());
         if (fname != null) {
-            eperson.setFirstName(context, fname);
+            ePersonService.setFirstName(context, eperson, fname);
         }
         if (lname != null) {
-            eperson.setLastName(context, lname);
+            ePersonService.setLastName(context, eperson, lname);
         }
         eperson.setCanLogIn(true);
 
@@ -834,10 +834,10 @@ public class ShibAuthentication implements AuthenticationMethod {
             eperson.setEmail(email.toLowerCase());
         }
         if (fname != null) {
-            eperson.setFirstName(context, fname);
+            ePersonService.setFirstName(context, eperson, fname);
         }
         if (lname != null) {
-            eperson.setLastName(context, lname);
+            ePersonService.setLastName(context, eperson, lname);
         }
 
         if (log.isDebugEnabled()) {

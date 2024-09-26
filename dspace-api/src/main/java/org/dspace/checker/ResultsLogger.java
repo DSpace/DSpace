@@ -14,6 +14,8 @@ import java.util.Date;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.Bitstream;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 
@@ -31,6 +33,8 @@ public class ResultsLogger implements ChecksumResultsCollector {
      * Usual Log4J logger.
      */
     private static final Logger LOG = org.apache.logging.log4j.LogManager.getLogger(ResultsLogger.class);
+
+    private final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
     /**
      * Utility date format.
@@ -90,14 +94,14 @@ public class ResultsLogger implements ChecksumResultsCollector {
         LOG.info(msg("bitstream-found") + ": " + info.isBitstreamFound());
         LOG.info(msg("to-be-processed") + ": " + info.isToBeProcessed());
         LOG.info(msg("internal-id") + ": " + bitstream.getInternalId());
-        LOG.info(msg("name") + ": " + bitstream.getName());
+        LOG.info(msg("name") + ": " + bitstreamService.getName(bitstream));
         LOG.info(msg("store-number") + ": " + bitstream.getStoreNumber());
         LOG.info(msg("size") + ": " + bitstream.getSizeBytes());
-        LOG.info(msg("bitstream-format") + ": " + (bitstream.getFormat(context) != null ? bitstream.getFormat(context)
-                                                                                                   .getID() : "-1"));
+        LOG.info(msg("bitstream-format") + ": " + (bitstreamService.getFormat(context, bitstream) != null
+            ? bitstreamService.getFormat(context, bitstream).getID() : "-1"));
         LOG.info(msg("user-format-description") + ": "
-                     + bitstream.getUserFormatDescription());
-        LOG.info(msg("source") + ": " + bitstream.getSource());
+                     + bitstreamService.getUserFormatDescription(bitstream));
+        LOG.info(msg("source") + ": " + bitstreamService.getSource(bitstream));
         LOG
             .info(msg("checksum-algorithm") + ": "
                       + info.getChecksumAlgorithm());

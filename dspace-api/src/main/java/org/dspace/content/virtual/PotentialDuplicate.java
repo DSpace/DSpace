@@ -11,8 +11,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.ItemService;
 
 /**
  * Model of potential duplicate item. Provides as little data as possible, but enough to be useful
@@ -23,6 +27,11 @@ import org.dspace.content.MetadataValue;
  * @author Kim Shepherd
  */
 public class PotentialDuplicate {
+    private static final CollectionService collectionService =
+        ContentServiceFactory.getInstance().getCollectionService();
+    private static final ItemService itemService
+        = ContentServiceFactory.getInstance().getItemService();
+
     /**
      * Title of duplicate object
      */
@@ -68,12 +77,13 @@ public class PotentialDuplicate {
         // Instantiate metadata value list
         this.metadataValueList = new LinkedList<>();
         // Set title
-        this.title = item.getName();
+        this.title = itemService.getName(item);
         // Set UUID
         this.uuid = item.getID();
         // Set owning collection name
         if (item.getOwningCollection() != null) {
-            this.owningCollectionName = item.getOwningCollection().getName();
+            Collection collection = item.getOwningCollection();
+            this.owningCollectionName = collectionService.getName(collection);
         }
     }
 

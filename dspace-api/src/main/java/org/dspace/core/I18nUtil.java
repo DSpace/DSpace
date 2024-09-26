@@ -18,6 +18,8 @@ import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -36,6 +38,8 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 
 public class I18nUtil {
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(I18nUtil.class);
+
+    private static final EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
     // delimiters between elements of UNIX/POSIX locale spec, e.g. en_US.UTF-8
     private static final String LOCALE_DELIMITERS = " _.";
@@ -100,7 +104,7 @@ public class I18nUtil {
             return I18nUtil.getDefaultLocale();
         }
 
-        String lang = ep.getLanguage();
+        String lang = epersonService.getLanguage(ep);
 
         if (StringUtils.isBlank(lang)) {
             log.info("No language specified for EPerson " + ep.getID() + ", returning default locale");

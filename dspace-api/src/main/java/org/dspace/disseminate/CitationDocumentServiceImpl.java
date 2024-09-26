@@ -39,6 +39,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
@@ -105,6 +106,8 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     protected BitstreamService bitstreamService;
     @Autowired(required = true)
     protected CommunityService communityService;
+    @Autowired(required = true)
+    protected CollectionService collectionService;
     @Autowired(required = true)
     protected ItemService itemService;
     @Autowired(required = true)
@@ -292,7 +295,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
     @Override
     public boolean canGenerateCitationVersion(Context context, Bitstream bitstream) throws SQLException {
-        return VALID_TYPES.contains(bitstream.getFormat(context).getMIMEType());
+        return VALID_TYPES.contains(bitstreamService.getFormat(context, bitstream).getMIMEType());
     }
 
     @Override
@@ -468,7 +471,8 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         try {
             List<Community> comms = itemService.getCommunities(context, item);
             if (comms.size() > 0) {
-                return comms.get(0).getName();
+                Community community = comms.get(0);
+                return communityService.getName(community);
             } else {
                 return " ";
             }
@@ -481,7 +485,8 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
 
     @Override
     public String getOwningCollection(Item item) {
-        return item.getOwningCollection().getName();
+        Collection collection = item.getOwningCollection();
+        return collectionService.getName(collection);
     }
 
     @Override

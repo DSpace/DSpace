@@ -29,6 +29,9 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
@@ -92,6 +95,7 @@ public class Curator {
     protected CommunityService communityService;
     protected ItemService itemService;
     protected HandleService handleService;
+    protected EPersonService epersonService;
     protected DSpaceRunnableHandler handler;
 
     /**
@@ -111,6 +115,7 @@ public class Curator {
         communityService = ContentServiceFactory.getInstance().getCommunityService();
         itemService = ContentServiceFactory.getInstance().getItemService();
         handleService = HandleServiceFactory.getInstance().getHandleService();
+        epersonService = EPersonServiceFactory.getInstance().getEPersonService();
         resolver = new TaskResolver();
     }
 
@@ -329,7 +334,8 @@ public class Curator {
             taskQ = (TaskQueue) CoreServiceFactory.getInstance().getPluginService().getSinglePlugin(TaskQueue.class);
         }
         if (taskQ != null) {
-            taskQ.enqueue(queueId, new TaskQueueEntry(c.getCurrentUser().getName(),
+            EPerson ePerson = c.getCurrentUser();
+            taskQ.enqueue(queueId, new TaskQueueEntry(epersonService.getName(ePerson),
                                                       System.currentTimeMillis(), perfList, id));
         } else {
             System.out.println("curate - no TaskQueue implemented");

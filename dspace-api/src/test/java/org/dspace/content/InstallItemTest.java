@@ -25,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.InstallItemService;
@@ -49,6 +50,7 @@ public class InstallItemTest extends AbstractUnitTest {
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
     private Collection collection;
     private Community owningCommunity;
@@ -203,10 +205,10 @@ public class InstallItemTest extends AbstractUnitTest {
         Item item = installItemService.installItem(context, is);
 
         Bitstream one = itemService.createSingleBitstream(context, new FileInputStream(f), item);
-        one.setName(context, "one");
+        bitstreamService.setName(context, one, "one");
 
         Bitstream two = itemService.createSingleBitstream(context, new FileInputStream(f), item);
-        two.setName(context, "two");
+        bitstreamService.setName(context, two, "two");
 
         context.restoreAuthSystemState();
 

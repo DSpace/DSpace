@@ -47,6 +47,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
@@ -145,6 +146,7 @@ public class SyndicationFeed {
     protected CollectionService collectionService;
     protected CommunityService communityService;
     protected ItemService itemService;
+    protected BitstreamService bitstreamService;
 
     /**
      * Constructor.
@@ -155,6 +157,7 @@ public class SyndicationFeed {
         itemService = contentServiceFactory.getItemService();
         collectionService = contentServiceFactory.getCollectionService();
         communityService = contentServiceFactory.getCommunityService();
+        bitstreamService = contentServiceFactory.getBitstreamService();
     }
 
     /**
@@ -192,7 +195,7 @@ public class SyndicationFeed {
             Bitstream logo = null;
             if (dso instanceof IndexableCollection) {
                 Collection col = ((IndexableCollection) dso).getIndexedObject();
-                defaultTitle = col.getName();
+                defaultTitle = collectionService.getName(col);
                 defaultDescriptionField = collectionService.getMetadataFirstValue(col,
                         CollectionService.MD_SHORT_DESCRIPTION, Item.ANY);
                 logo = col.getLogo();
@@ -203,7 +206,7 @@ public class SyndicationFeed {
                 objectURL = resolveURL(request, col);
             } else if (dso instanceof IndexableCommunity) {
                 Community comm = ((IndexableCommunity) dso).getIndexedObject();
-                defaultTitle = comm.getName();
+                defaultTitle = communityService.getName(comm);
                 defaultDescriptionField = communityService.getMetadataFirstValue(comm,
                         CommunityService.MD_SHORT_DESCRIPTION, Item.ANY);
                 logo = comm.getLogo();
@@ -365,10 +368,10 @@ public class SyndicationFeed {
                         if (bunds.get(0) != null) {
                             List<Bitstream> bits = bunds.get(0).getBitstreams();
                             for (Bitstream bit : bits) {
-                                String mime = bit.getFormat(context).getMIMEType();
+                                String mime = bitstreamService.getFormat(context, bit).getMIMEType();
                                 if (ArrayUtils.contains(podcastableMIMETypes, mime)) {
                                     SyndEnclosure enc = new SyndEnclosureImpl();
-                                    enc.setType(bit.getFormat(context).getMIMEType());
+                                    enc.setType(bitstreamService.getFormat(context, bit).getMIMEType());
                                     enc.setLength(bit.getSizeBytes());
                                     enc.setUrl(urlOfBitstream(request, bit));
                                     enclosures.add(enc);
@@ -504,7 +507,7 @@ public class SyndicationFeed {
 
     // returns absolute URL to download content of bitstream (which might not belong to any Item)
     protected String urlOfBitstream(HttpServletRequest request, Bitstream logo) {
-        String name = logo.getName();
+        String name = bitstreamService.getName(logo);
         return resolveURL(request, null) +
             "/bitstreams/" + logo.getID() + "/download";
     }

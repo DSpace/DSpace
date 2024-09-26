@@ -240,6 +240,16 @@ public interface CollectionService
     public String getLicense(Collection collection);
 
     /**
+     * Set the license for this collection. Passing in <code>null</code> means
+     * that the site-wide default will be used.
+     *
+     * @param context context
+     * @param license the license, or <code>null</code>
+     * @throws SQLException if database error
+     */
+    void setLicense(Context context, Collection collection, String license) throws SQLException;
+
+    /**
      * Find out if the collection has a custom license
      *
      * @param collection Collection

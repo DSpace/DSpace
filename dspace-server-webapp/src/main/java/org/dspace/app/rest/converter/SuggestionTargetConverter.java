@@ -10,6 +10,9 @@ package org.dspace.app.rest.converter;
 import org.dspace.app.rest.model.SuggestionTargetRest;
 import org.dspace.app.rest.projection.Projection;
 import org.dspace.app.suggestion.SuggestionTarget;
+import org.dspace.content.Item;
+import org.dspace.content.service.ItemService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,8 +22,10 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-public class SuggestionTargetConverter
-        implements DSpaceConverter<SuggestionTarget, SuggestionTargetRest> {
+public class SuggestionTargetConverter implements DSpaceConverter<SuggestionTarget, SuggestionTargetRest> {
+    @Autowired
+    ItemService itemService;
+
 
     @Override
     public SuggestionTargetRest convert(SuggestionTarget target, Projection projection) {
@@ -28,7 +33,8 @@ public class SuggestionTargetConverter
         targetRest.setProjection(projection);
         targetRest.setId(target.getID());
         if (target != null && target.getTarget() != null) {
-            targetRest.setDisplay(target.getTarget().getName());
+            Item item = target.getTarget();
+            targetRest.setDisplay(itemService.getName(item));
         }
         targetRest.setTotal(target.getTotal());
         targetRest.setSource(target.getSource());
