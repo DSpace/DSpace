@@ -267,6 +267,7 @@
         <entry key="dc.contributor" value-ref="orcid-details"/>
     </util:map>
     <bean class="org.dspace.content.virtual.AuthorityConcatenate" id="orcid-details">
+        <property name="separator" value=", "/>
         <property name="fields">
             <util:list>
                 <value>label_external_identifier</value>
