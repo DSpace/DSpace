@@ -254,4 +254,25 @@
         <property name="virtualMetadataConfiguration" ref="volumeJournal_uuid"/>
     </bean>
     <bean class="org.dspace.content.virtual.UUIDValue" id="volumeJournal_uuid"/>
+
+    <!-- Authority virtual metadata -->
+    <bean class="org.dspace.content.virtual.AuthorityVirtualMetadataPopulator">
+        <property name="map">
+            <map>
+                <entry key="dc.contributor.author" value-ref="orcidContributorAuthorityMap" />
+            </map>
+        </property>
+    </bean>
+    <util:map id="orcidContributorAuthorityMap">
+        <entry key="dc.contributor" value-ref="orcid-details"/>
+    </util:map>
+    <bean class="org.dspace.content.virtual.AuthorityConcatenate" id="orcid-details">
+        <property name="fields">
+            <util:list>
+                <value>label_external_identifier</value>
+                <value>label_researcher_url</value>
+                <value>label_biography</value>
+            </util:list>
+        </property>
+    </bean>
 </beans>
