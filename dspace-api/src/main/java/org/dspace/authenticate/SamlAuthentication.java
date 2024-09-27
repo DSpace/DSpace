@@ -394,47 +394,49 @@ public class SamlAuthentication implements AuthenticationMethod {
             lastName = lastName.substring(0, NAME_MAX_SIZE);
         }
 
-        // Turn off authorizations to create a new user
+        try {
+            context.turnOffAuthorisationSystem();
 
-        context.turnOffAuthorisationSystem();
+            EPerson ePerson = ePersonService.create(context);
 
-        EPerson ePerson = ePersonService.create(context);
+            // Set the minimum attributes for the new eperson
 
-        // Set the minimum attributes for the new eperson
+            if (nameId != null) {
+                ePerson.setNetid(nameId);
+            }
 
-        if (nameId != null) {
-            ePerson.setNetid(nameId);
+            ePerson.setEmail(email.toLowerCase());
+            ePerson.setFirstName(context, firstName);
+            ePerson.setLastName(context, lastName);
+            ePerson.setCanLogIn(true);
+            ePerson.setSelfRegistered(true);
+
+            // Commit the new eperson
+
+            AuthenticateServiceFactory.getInstance().getAuthenticationService().initEPerson(context, request, ePerson);
+
+            ePersonService.update(context, ePerson);
+            context.dispatchEvents();
+
+            if (log.isInfoEnabled()) {
+                String message = "Auto registered new eperson using SAML attributes:\n";
+
+                message += "  netid: " + ePerson.getNetid() + "\n";
+                message += "  email: " + ePerson.getEmail() + "\n";
+                message += "  firstName: " + ePerson.getFirstName() + "\n";
+                message += "  lastName: " + ePerson.getLastName();
+
+                log.info(message);
+            }
+
+            return ePerson;
+        } catch (SQLException | AuthorizeException e) {
+            log.error(e.getMessage(), e);
+
+            throw e;
+        } finally {
+            context.restoreAuthSystemState();
         }
-
-        ePerson.setEmail(email.toLowerCase());
-        ePerson.setFirstName(context, firstName);
-        ePerson.setLastName(context, lastName);
-        ePerson.setCanLogIn(true);
-        ePerson.setSelfRegistered(true);
-
-        // Commit the new eperson
-
-        AuthenticateServiceFactory.getInstance().getAuthenticationService().initEPerson(context, request, ePerson);
-
-        ePersonService.update(context, ePerson);
-        context.dispatchEvents();
-
-        // Turn authorizations back on
-
-        context.restoreAuthSystemState();
-
-        if (log.isInfoEnabled()) {
-            String message = "Auto registered new eperson using SAML attributes:\n";
-
-            message += "  netid: " + ePerson.getNetid() + "\n";
-            message += "  email: " + ePerson.getEmail() + "\n";
-            message += "  firstName: " + ePerson.getFirstName() + "\n";
-            message += "  lastName: " + ePerson.getLastName();
-
-            log.info(message);
-        }
-
-        return ePerson;
     }
 
     /**
@@ -480,75 +482,82 @@ public class SamlAuthentication implements AuthenticationMethod {
             lastName = lastName.substring(0, NAME_MAX_SIZE);
         }
 
-        context.turnOffAuthorisationSystem();
+        try {
+            context.turnOffAuthorisationSystem();
 
-        // 1) Update the minimum metadata
+            // 1) Update the minimum metadata
 
-        // Only update the netid if none has been previously set. This can occur when a repo switches
-        // to netid based authentication. The current users do not have netids and fall back to email-based
-        // identification but once they login we update their record and lock the account to a particular netid.
+            // Only update the netid if none has been previously set. This can occur when a repo switches
+            // to netid based authentication. The current users do not have netids and fall back to email-based
+            // identification but once they login we update their record and lock the account to a particular netid.
 
-        if (nameId != null && eperson.getNetid() == null) {
-            eperson.setNetid(nameId);
-        }
-
-        // The email could have changed if using netid based lookup.
-
-        if (email != null) {
-            eperson.setEmail(email.toLowerCase());
-        }
-
-        if (firstName != null) {
-            eperson.setFirstName(context, firstName);
-        }
-
-        if (lastName != null) {
-            eperson.setLastName(context, lastName);
-        }
-
-        if (log.isDebugEnabled()) {
-            String message = "Updated the eperson's minimal metadata: \n";
-
-            message += " Email: " + emailAttributeName + "=" + email + "' \n";
-            message += " First name: " + firstNameAttributeName +  "=" + firstName + "\n";
-            message += " Last name: " + lastNameAttributeName + "=" + lastName;
-
-            log.debug(message);
-        }
-
-        // 2) Update additional eperson metadata
-
-        for (String attributeName : metadataHeaderMap.keySet()) {
-            String metadataFieldName = metadataHeaderMap.get(attributeName);
-            String value = findSingleAttribute(request, attributeName);
-
-            // Truncate values
-
-            if (value == null) {
-                log.warn("Unable to update the eperson's '{}' metadata"
-                        + " because the attribute '{}' does not exist.", metadataFieldName, attributeName);
-                continue;
-            } else if ("phone".equals(metadataFieldName) && value.length() > PHONE_MAX_SIZE) {
-                log.warn("Truncating eperson phone metadata because it is longer than {}: {}",
-                        PHONE_MAX_SIZE, value);
-                value = value.substring(0, PHONE_MAX_SIZE);
-            } else if (value.length() > METADATA_MAX_SIZE) {
-                log.warn("Truncating eperson {} metadata because it is longer than {}: {}",
-                        metadataFieldName, METADATA_MAX_SIZE, value);
-                value = value.substring(0, METADATA_MAX_SIZE);
+            if (nameId != null && eperson.getNetid() == null) {
+                eperson.setNetid(nameId);
             }
 
-            ePersonService.setMetadataSingleValue(context, eperson,
-                    MetadataSchemaEnum.EPERSON.getName(), metadataFieldName, null, null, value);
+            // The email could have changed if using netid based lookup.
 
-            log.debug("Updated the eperson's {} metadata using attribute: {}={}",
-                    metadataFieldName, attributeName, value);
+            if (email != null) {
+                eperson.setEmail(email.toLowerCase());
+            }
+
+            if (firstName != null) {
+                eperson.setFirstName(context, firstName);
+            }
+
+            if (lastName != null) {
+                eperson.setLastName(context, lastName);
+            }
+
+            if (log.isDebugEnabled()) {
+                String message = "Updated the eperson's minimal metadata: \n";
+
+                message += " Email: " + emailAttributeName + "=" + email + "' \n";
+                message += " First name: " + firstNameAttributeName +  "=" + firstName + "\n";
+                message += " Last name: " + lastNameAttributeName + "=" + lastName;
+
+                log.debug(message);
+            }
+
+            // 2) Update additional eperson metadata
+
+            for (String attributeName : metadataHeaderMap.keySet()) {
+                String metadataFieldName = metadataHeaderMap.get(attributeName);
+                String value = findSingleAttribute(request, attributeName);
+
+                // Truncate values
+
+                if (value == null) {
+                    log.warn("Unable to update the eperson's '{}' metadata"
+                            + " because the attribute '{}' does not exist.", metadataFieldName, attributeName);
+                    continue;
+                } else if ("phone".equals(metadataFieldName) && value.length() > PHONE_MAX_SIZE) {
+                    log.warn("Truncating eperson phone metadata because it is longer than {}: {}",
+                            PHONE_MAX_SIZE, value);
+                    value = value.substring(0, PHONE_MAX_SIZE);
+                } else if (value.length() > METADATA_MAX_SIZE) {
+                    log.warn("Truncating eperson {} metadata because it is longer than {}: {}",
+                            metadataFieldName, METADATA_MAX_SIZE, value);
+                    value = value.substring(0, METADATA_MAX_SIZE);
+                }
+
+                ePersonService.setMetadataSingleValue(context, eperson,
+                        MetadataSchemaEnum.EPERSON.getName(), metadataFieldName, null, null, value);
+
+                log.debug("Updated the eperson's {} metadata using attribute: {}={}",
+                        metadataFieldName, attributeName, value);
+            }
+
+            ePersonService.update(context, eperson);
+
+            context.dispatchEvents();
+        } catch (SQLException | AuthorizeException e) {
+            log.error(e.getMessage(), e);
+
+            throw e;
+        } finally {
+            context.restoreAuthSystemState();
         }
-
-        ePersonService.update(context, eperson);
-
-        context.dispatchEvents();
-        context.restoreAuthSystemState();
     }
 
     /**
@@ -602,7 +611,7 @@ public class SamlAuthentication implements AuthenticationMethod {
             String attributeName = metadataParts[0].trim();
             String metadataFieldName = metadataParts[1].trim().toLowerCase();
 
-            boolean valid = checkIfEpersonMetadataFieldExists(context, metadataFieldName);
+            boolean valid = checkIfEPersonMetadataFieldExists(context, metadataFieldName);
 
             if (!valid && autoCreate) {
                 valid = autoCreateEPersonMetadataField(context, metadataFieldName);
@@ -635,7 +644,7 @@ public class SamlAuthentication implements AuthenticationMethod {
      * @return True if a valid metadata field, otherwise false.
      * @throws SQLException if database error
      */
-    protected synchronized boolean checkIfEpersonMetadataFieldExists(Context context, String metadataName)
+    protected synchronized boolean checkIfEPersonMetadataFieldExists(Context context, String metadataName)
         throws SQLException {
 
         if (metadataName == null) {
