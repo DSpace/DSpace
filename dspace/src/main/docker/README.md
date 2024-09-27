@@ -145,15 +145,15 @@ can be pulled / built following the [docker compose resources](../docker-compose
 documentation. Or, to just build and/or run Solr:
 
 ```bash
-docker-compose build dspacesolr
-docker-compose -p d8 up -d dspacesolr
+docker compose build dspacesolr
+docker compose -p d8 up -d dspacesolr
 ```
 
 If you're making iterative changes to the DSpace Solr configsets you'll need to rebuild /
 restart the `dspacesolr` container for the changes to be deployed. From DSpace root:
 
 ```bash
-docker-compose -p d8 up --detach --build dspacesolr
+docker compose -p d8 up --detach --build dspacesolr
 ```
 
 ## ./test/ folder

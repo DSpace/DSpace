@@ -416,7 +416,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
                 || currentOutcome.getType() == ActionResult.TYPE.TYPE_SUBMISSION_PAGE) {
             //We either pressed the cancel button or got an order to return to the submission page, so don't return
             // an action
-            //By not returning an action we ensure ourselfs that we go back to the submission page
+            //By not returning an action we ensure ourselves that we go back to the submission page
             c.restoreAuthSystemState();
             return null;
         } else if (currentOutcome.getType() == ActionResult.TYPE.TYPE_OUTCOME) {

@@ -43,7 +43,7 @@ public class HalMatcher {
      * a separate matcher.
      *
      * @param rels the names of the rels. If a given name ends with "[]", it is assumed to be a paged subresource
-     *             and must therefore contain an embeded array with the same property name as the rel (without the []).
+     *             and must therefore contain an embedded array with the same property name as the rel (without the []).
      */
     public static Matcher<? super Object> matchEmbeds(String... rels) {
         if (rels.length == 0) {

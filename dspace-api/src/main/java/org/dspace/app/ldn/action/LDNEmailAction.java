@@ -27,7 +27,7 @@ import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Action to send email to receipients provided in actionSendFilter. The email
+ * Action to send email to recipients provided in actionSendFilter. The email
  * body will be result of templating actionSendFilter.
  */
 public class LDNEmailAction implements LDNAction {

@@ -16,7 +16,7 @@ import org.dspace.core.Context;
  * ScriptedTask describes a rather generic ability to perform an operation
  * upon a DSpace object. It's semantics are identical to the CurationTask interface,
  * but is designed to be implemented in scripting languages, rather than
- * Java. For this reason, the 'perform' methods are renamed to accomodate
+ * Java. For this reason, the 'perform' methods are renamed to accommodate
  * languages (like Ruby) that lack method overloading.
  *
  * @author richardrodgers

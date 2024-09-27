@@ -229,7 +229,7 @@ public abstract class Action {
      * Adds info in the metadata field dc.description.provenance about item being approved containing in which step
      * it was approved, which user approved it and the time
      *
-     * @param c   DSpace contect
+     * @param c   DSpace contact
      * @param wfi Workflow item we're adding workflow accept provenance on
      */
     public void addApprovedProvenance(Context c, XmlWorkflowItem wfi) throws SQLException, AuthorizeException {

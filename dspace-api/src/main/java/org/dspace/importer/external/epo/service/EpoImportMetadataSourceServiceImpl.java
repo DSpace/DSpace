@@ -106,7 +106,7 @@ public class EpoImportMetadataSourceServiceImpl extends AbstractImportMetadataSo
     }
 
     /**
-     * Set the costumer epo secret
+     * Set the customer epo secret
      * @param consumerSecret the customer epo secret
      */
     public void setConsumerSecret(String consumerSecret) {

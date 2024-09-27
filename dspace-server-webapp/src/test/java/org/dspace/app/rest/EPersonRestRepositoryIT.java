@@ -72,7 +72,6 @@ import org.dspace.builder.GroupBuilder;
 import org.dspace.builder.WorkflowItemBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.Item;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -2120,7 +2119,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
             .build();
 
         this.ePersonService
-            .addMetadata(context, ePerson, "eperson", "firstname", null, Item.ANY, List.of(first, second, third));
+            .addMetadata(context, ePerson, "eperson", "firstname", null, null, List.of(first, second, third));
 
         context.restoreAuthSystemState();
 

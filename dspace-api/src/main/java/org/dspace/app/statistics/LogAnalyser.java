@@ -481,7 +481,7 @@ public class LogAnalyser {
         // of the log file are sequential, but can we assume the files are
         // provided in a data sequence?
         for (i = 0; i < logFiles.length; i++) {
-            // check to see if this file is a log file agains the global regex
+            // check to see if this file is a log file against the global regex
             Matcher matchRegex = logRegex.matcher(logFiles[i].getName());
             if (matchRegex.matches()) {
                 // if it is a log file, open it up and lets have a look at the

@@ -44,7 +44,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 
 /**
- * Implementation of {@link DSpaceRunnable} to perfom a QAEvents import from a
+ * Implementation of {@link DSpaceRunnable} to perform a QAEvents import from a
  * json file. The JSON file contains an array of JSON Events, where each event
  * has the following structure. The message attribute follows the structure
  * documented at
@@ -323,7 +323,7 @@ public class OpenaireEventsImport
         try {
             return brokerClient.listSubscriptions(openaireBrokerURL, email);
         } catch (Exception ex) {
-            throw new IllegalArgumentException("An error occurs retriving the subscriptions "
+            throw new IllegalArgumentException("An error occurs retrieving the subscriptions "
                 + "from the OPENAIRE broker: " + getMessage(ex), ex);
         }
     }
