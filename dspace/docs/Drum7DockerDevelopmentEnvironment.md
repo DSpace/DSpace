@@ -99,9 +99,6 @@ main branch for DRUM development.
    to populate the Postgres database with a DSpace 7 database dump from
    Kubernetes.
 
-   **Note:** If populating the Postgres database from a DSpace 6 database
-   snapshot, use [dspace/docs/DrumDBRestoreFromDSpace6.md](DrumDBRestoreFromDSpace6.md)
-
 6) Generate the HTTPS certificate for the back-end:
 
    ```zsh
