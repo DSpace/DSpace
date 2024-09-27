@@ -842,6 +842,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      *
      * @throws Exception
      */
+    @Test
     public void findByObjectBadRequestSSRTest() throws Exception {
         Site site = siteService.findSite(context);
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
@@ -963,7 +964,6 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)));
     }
 
-    @Test
     /**
      * Verify that the findByObject return the 401 Unauthorized response when an eperson is involved
      *
