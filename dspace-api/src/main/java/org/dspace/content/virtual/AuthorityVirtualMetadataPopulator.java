@@ -36,7 +36,7 @@ public class AuthorityVirtualMetadataPopulator {
     }
 
     /**
-     * Retrieves the map of authority controlled field names to a map of virtual metadata field names and configurations.
+     * Retrieves the map of authority controlled field names to a map of virtual metadata field names and configurations
      *
      * @return the map of authority controlled field names to virtual metadata field names and configurations
      */
