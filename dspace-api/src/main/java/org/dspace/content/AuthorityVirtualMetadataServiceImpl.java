@@ -47,20 +47,29 @@ public class AuthorityVirtualMetadataServiceImpl implements AuthorityVirtualMeta
     @Autowired
     protected MetadataAuthorityService metadataAuthorityService;
 
+    /**
+     * Map of virtual field names that are configured for authority control and exist in metadata registry
+     */
     private HashMap<String, MetadataField> validVirtualFieldNames;
+    /**
+     * Map of authority virtual metadata configurations, see virtual-metadata.xml
+     */
     private Map<String, HashMap<String, AuthorityVirtualMetadataConfiguration>> authorityVirtualMaps;
 
     private static final Logger log = LogManager.getLogger();
 
-    public void init() {
-        validVirtualFieldNames = new HashMap<>();
-        authorityVirtualMaps = new HashMap<>();
-        Context context = null;
-        // Obtain new context and initialise lists and maps
-        try {
-            context = new Context(Context.Mode.READ_ONLY);
+    /**
+     * Initialize hashmaps for field / configuration lookups. This is only executed the first time a lookup
+     * is attempted, to keep database load down for data retrieval that typically will not change between
+     * service restarts.
+     */
+    public void initMaps() throws SQLException {
+        if (validVirtualFieldNames == null && authorityVirtualMaps == null) {
+            validVirtualFieldNames = new HashMap<>();
+            authorityVirtualMaps = new HashMap<>();
+            Context context = new Context(Context.Mode.READ_ONLY);
             // Get field maps configured in virtual metadata spring configuration
-             authorityVirtualMaps = authorityVirtualMetadataPopulator.getMap();
+            authorityVirtualMaps = authorityVirtualMetadataPopulator.getMap();
             // Iterate map of maps, just to check each virtual field name (key of 2nd-level map) exists
             // and populate the virtual field names list so we can look it up later without further database calls
             for (String configuredAuthorityField : authorityVirtualMaps.keySet()) {
@@ -70,13 +79,6 @@ public class AuthorityVirtualMetadataServiceImpl implements AuthorityVirtualMeta
                         validVirtualFieldNames.put(virtualFieldName, virtualField);
                     }
                 }
-            }
-        } catch (SQLException e) {
-            log.error("Could not obtain context" + e.getMessage(), e);
-            throw new RuntimeException(e);
-        } finally {
-            if (context != null) {
-                context.close();
             }
         }
     }
@@ -93,6 +95,16 @@ public class AuthorityVirtualMetadataServiceImpl implements AuthorityVirtualMeta
      */
     public List<MetadataValue> getAuthorityVirtualMetadata(Item item, List<MetadataValue> dbMetadataValues) {
         List<MetadataValue> authorityMetadataValues = new LinkedList<>();
+        // If maps are not initialized, do it now
+        if (authorityVirtualMaps == null || validVirtualFieldNames == null) {
+            try {
+                initMaps();
+            } catch (SQLException e) {
+                log.error("Error initializing authority virtual metadata configuration", e);
+                return authorityMetadataValues;
+            }
+        }
+
         // Make a map of counts - we want to calc a real 'place'
         Map<String, Integer> fieldCounts = new HashMap<>();
         for (MetadataValue mv : dbMetadataValues) {
