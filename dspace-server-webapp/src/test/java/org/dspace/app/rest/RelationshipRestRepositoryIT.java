@@ -2324,6 +2324,77 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
     }
 
     @Test
+    public void findRelationshipByLabelWithRelatedEntityTypeTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        RelationshipType isAuthorOfPublicationRelationshipTypePublication = relationshipTypeService
+            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
+                                    entityTypeService.findByEntityType(context, "Person"),
+                                    "isAuthorOfPublication", "isPublicationOfAuthor");
+        RelationshipType isAuthorOfPublicationRelationshipTypeOrgUnit = relationshipTypeService
+            .findbyTypesAndTypeName(context, entityTypeService.findByEntityType(context, "Publication"),
+                                    entityTypeService.findByEntityType(context, "OrgUnit"),
+                                    "isAuthorOfPublication", "isPublicationOfAuthor");
+
+        // We're creating a Relationship of type isAuthorOfPublication between a Publication and a Person
+        Relationship relationship1 = RelationshipBuilder
+            .createRelationshipBuilder(context, publication1, author1, isAuthorOfPublicationRelationshipTypePublication)
+            .build();
+
+        // We're creating a Relationship of type isAuthorOfPublication between a Publication and an OrgUnit
+        Relationship relationship2 = RelationshipBuilder
+            .createRelationshipBuilder(context, publication1, orgUnit1, isAuthorOfPublicationRelationshipTypeOrgUnit)
+            .build();
+        context.restoreAuthSystemState();
+
+        // Perform a GET request to the searchByLabel endpoint, asking for Relationships of type isAuthorOfPublication
+        // With an extra parameter namely DSO which resolves to the publication used by both relationships.
+        // Both relationships should be returned if we don't specify the DSO's related entity type
+        getClient().perform(get("/api/core/relationships/search/byLabel")
+                                .param("label", "isAuthorOfPublication")
+                                .param("dso", publication1.getID().toString())
+                                .param("projection", "full"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.page", is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 2))))
+            .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
+                RelationshipMatcher.matchRelationship(relationship1),
+                RelationshipMatcher.matchRelationship(relationship2)
+            )))
+        ;
+
+        // Perform a GET request to the searchByLabel endpoint, asking for Relationships of type isAuthorOfPublication
+        // With an extra parameter namely DSO which resolves to the publication used by both relationships.
+        // Only the Person relationship should be returned if we specify the DSO's related entity type
+        getClient().perform(get("/api/core/relationships/search/byLabel")
+                                .param("label", "isAuthorOfPublication")
+                                .param("dso", publication1.getID().toString())
+                                .param("relatedEntityType", "Person")
+                                .param("projection", "full"))
+
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.page", is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1))))
+            .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
+                RelationshipMatcher.matchRelationship(relationship1)
+            )))
+        ;
+
+        // Perform a GET request to the searchByLabel endpoint, asking for Relationships of type isAuthorOfPublication
+        // With an extra parameter namely DSO which resolves to the publication used by both relationships.
+        // Only the OrgUnit relationship should be returned if we specify the DSO's related entity type
+        getClient().perform(get("/api/core/relationships/search/byLabel")
+                                .param("label", "isAuthorOfPublication")
+                                .param("dso", publication1.getID().toString())
+                                .param("relatedEntityType", "OrgUnit")
+                                .param("projection", "full"))
+
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.page", is(PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 1))))
+            .andExpect(jsonPath("$._embedded.relationships", containsInAnyOrder(
+                RelationshipMatcher.matchRelationship(relationship2)
+            )))
+        ;
+    }
+
+    @Test
     public void putRelationshipWithNonexistentID() throws Exception {
         context.turnOffAuthorisationSystem();
 

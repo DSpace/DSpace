@@ -6,9 +6,12 @@
 # http://www.dspace.org/license/
 #
 
-version: '3.7'
 networks:
-  dspacenet:
+  # Default to using network named 'dspacenet' from docker-compose.yml.
+  # Its full name will be prepended with the project name (e.g. "-p d7" means it will be named "d7_dspacenet")
+  default:
+    name: ${COMPOSE_PROJECT_NAME}_dspacenet
+    external: true
 services:
   dspace-angular:
     container_name: dspace-angular
@@ -24,8 +27,6 @@ services:
       DSPACE_REST_PORT: 8080
       DSPACE_REST_NAMESPACE: /server
     image: dspace/dspace-angular:dspace-7_x
-    networks:
-      dspacenet:
     ports:
     - published: 4000
       target: 4000

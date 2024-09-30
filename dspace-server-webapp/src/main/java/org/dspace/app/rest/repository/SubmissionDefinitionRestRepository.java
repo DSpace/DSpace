@@ -70,7 +70,7 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
             return null;
         }
         SubmissionDefinitionRest def = converter
-            .toRest(submissionConfigService.getSubmissionConfigByCollection(col.getHandle()),
+            .toRest(submissionConfigService.getSubmissionConfigByCollection(col),
                     utils.obtainProjection());
         return def;
     }

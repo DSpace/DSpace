@@ -251,7 +251,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         }
 
         SubmissionConfig submissionConfig =
-            submissionConfigService.getSubmissionConfigByCollection(collection.getHandle());
+            submissionConfigService.getSubmissionConfigByCollection(collection);
         List<WorkspaceItem> result = null;
         List<ImportRecord> records = new ArrayList<>();
         try {

@@ -39,12 +39,10 @@ public class BitstreamConverterIT extends AbstractControllerIntegrationTest {
         context.turnOffAuthorisationSystem();
 
         Group etdEmbargoGroup = GroupBuilder.createGroup(context).withName("ETD Embargo").build();
-        etdEmbargoPolicy = ResourcePolicyBuilder.createResourcePolicy(context)
-                            .withGroup(etdEmbargoGroup).build();
+        etdEmbargoPolicy = ResourcePolicyBuilder.createResourcePolicy(context, null, etdEmbargoGroup).build();
 
         Group otherGroup = GroupBuilder.createGroup(context).withName("Other").build();
-        otherPolicy = ResourcePolicyBuilder.createResourcePolicy(context)
-                        .withGroup(otherGroup).build();
+        otherPolicy = ResourcePolicyBuilder.createResourcePolicy(context, null, otherGroup).build();
 
         mockBitstream = mock(Bitstream.class);
         context.restoreAuthSystemState();

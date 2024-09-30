@@ -84,11 +84,6 @@ public class SyndicationFeed {
     public static final String MSG_FEED_TITLE = "feed.title";
     public static final String MSG_FEED_DESCRIPTION = "general-feed.description";
     public static final String MSG_METADATA = "metadata.";
-    public static final String MSG_UITYPE = "ui.type";
-
-    // UI keywords
-    public static final String UITYPE_XMLUI = "xmlui";
-    public static final String UITYPE_JSPUI = "jspui";
 
     // default DC fields for entry
     protected String defaultTitleField = "dc.title";
@@ -145,10 +140,6 @@ public class SyndicationFeed {
     // the feed object we are building
     protected SyndFeed feed = null;
 
-    // memory of UI that called us, "xmlui" or "jspui"
-    // affects Bitstream retrieval URL and I18N keys
-    protected String uiType = null;
-
     protected HttpServletRequest request = null;
 
     protected CollectionService collectionService;
@@ -157,12 +148,9 @@ public class SyndicationFeed {
 
     /**
      * Constructor.
-     *
-     * @param ui either "xmlui" or "jspui"
      */
-    public SyndicationFeed(String ui) {
+    public SyndicationFeed() {
         feed = new SyndFeedImpl();
-        uiType = ui;
         ContentServiceFactory contentServiceFactory = ContentServiceFactory.getInstance();
         itemService = contentServiceFactory.getItemService();
         collectionService = contentServiceFactory.getCollectionService();
@@ -518,8 +506,7 @@ public class SyndicationFeed {
     protected String urlOfBitstream(HttpServletRequest request, Bitstream logo) {
         String name = logo.getName();
         return resolveURL(request, null) +
-            (uiType.equalsIgnoreCase(UITYPE_XMLUI) ? "/bitstream/id/" : "/retrieve/") +
-            logo.getID() + "/" + (name == null ? "" : name);
+            "/bitstreams/" + logo.getID() + "/download";
     }
 
     protected String baseURL = null;  // cache the result for null

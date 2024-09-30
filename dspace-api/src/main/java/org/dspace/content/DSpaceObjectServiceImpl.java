@@ -242,9 +242,30 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 
     }
 
+    /**
+     * Add metadata value(s) to a MetadataField of a DSpace Object
+     * @param context current DSpace context
+     * @param dso DSpaceObject to modify
+     * @param metadataField MetadataField to add values to
+     * @param lang Language code to add
+     * @param values One or more metadata values to add
+     * @param authorities One or more authorities to add
+     * @param confidences One or more confidences to add (for authorities)
+     * @param placeSupplier Supplier of "place" for new metadata values
+     * @return List of newly added metadata values
+     * @throws SQLException if database error occurs
+     * @throws IllegalArgumentException for an empty list of values
+     */
     public List<MetadataValue> addMetadata(Context context, T dso, MetadataField metadataField, String lang,
             List<String> values, List<String> authorities, List<Integer> confidences, Supplier<Integer> placeSupplier)
                     throws SQLException {
+
+        // Throw an error if we are attempting to add empty values
+        if (values == null || values.isEmpty()) {
+            throw new IllegalArgumentException("Cannot add empty values to a new metadata field " +
+                                                   metadataField.toString() + " on object with uuid = " +
+                                                   dso.getID().toString() + " and type = " + getTypeText(dso));
+        }
 
         boolean authorityControlled = metadataAuthorityService.isAuthorityControlled(metadataField);
         boolean authorityRequired = metadataAuthorityService.isAuthorityRequired(metadataField);
@@ -314,20 +335,26 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     @Override
     public MetadataValue addMetadata(Context context, T dso, MetadataField metadataField, String language,
                             String value, String authority, int confidence) throws SQLException {
-        return addMetadata(context, dso, metadataField, language, Arrays.asList(value), Arrays.asList(authority),
-                    Arrays.asList(confidence)).get(0);
+        List<MetadataValue> metadataValues =
+            addMetadata(context, dso, metadataField, language, Arrays.asList(value), Arrays.asList(authority),
+                        Arrays.asList(confidence));
+        return CollectionUtils.isNotEmpty(metadataValues) ? metadataValues.get(0) : null;
     }
 
     @Override
     public MetadataValue addMetadata(Context context, T dso, String schema, String element, String qualifier,
                              String lang, String value) throws SQLException {
-        return addMetadata(context, dso, schema, element, qualifier, lang, Arrays.asList(value)).get(0);
+        List<MetadataValue> metadataValues =
+            addMetadata(context, dso, schema, element, qualifier, lang, Arrays.asList(value));
+        return CollectionUtils.isNotEmpty(metadataValues) ? metadataValues.get(0) : null;
     }
 
     @Override
     public MetadataValue addMetadata(Context context, T dso, MetadataField metadataField, String language, String value)
         throws SQLException {
-        return addMetadata(context, dso, metadataField, language, Arrays.asList(value)).get(0);
+        List<MetadataValue> metadataValues =
+            addMetadata(context, dso, metadataField, language, Arrays.asList(value));
+        return CollectionUtils.isNotEmpty(metadataValues) ? metadataValues.get(0) : null;
     }
 
     @Override

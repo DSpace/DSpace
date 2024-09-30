@@ -285,7 +285,6 @@ public class OpenSearchController {
         labelMap.put(SyndicationFeed.MSG_UNTITLED, "notitle");
         labelMap.put(SyndicationFeed.MSG_LOGO_TITLE, "logo.title");
         labelMap.put(SyndicationFeed.MSG_FEED_DESCRIPTION, "general-feed.description");
-        labelMap.put(SyndicationFeed.MSG_UITYPE, SyndicationFeed.UITYPE_JSPUI);
         for (String selector : SyndicationFeed.getDescriptionSelectors()) {
             labelMap.put("metadata." + selector, selector);
         }

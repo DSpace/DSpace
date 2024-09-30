@@ -15,16 +15,33 @@ import org.dspace.app.rest.RestResourceController;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-    @LinkRest(
-        name = WorkflowItemRest.STEP,
-        method = "getStep"
-    )
+        @LinkRest(
+                name = WorkflowItemRest.STEP,
+                method = "getStep"
+        ),
+        @LinkRest(
+                name = WorkflowItemRest.SUBMITTER,
+                method = "getWorkflowItemSubmitter"
+        ),
+        @LinkRest(
+                name = WorkflowItemRest.ITEM,
+                method = "getWorkflowItemItem"
+        ),
+        @LinkRest(
+                name = WorkflowItemRest.COLLECTION,
+                method = "getWorkflowItemCollection"
+        )
 })
 public class WorkflowItemRest extends AInprogressSubmissionRest {
     public static final String NAME = "workflowitem";
     public static final String CATEGORY = RestAddressableModel.WORKFLOW;
 
     public static final String STEP = "step";
+
+    public static final String SUBMITTER = "submitter";
+    public static final String ITEM = "item";
+    public static final String COLLECTION = "collection";
+
 
     @Override
     public String getCategory() {

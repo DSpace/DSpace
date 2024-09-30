@@ -14,7 +14,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.ServletException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
@@ -150,17 +149,16 @@ public class DCInputsReader {
      * Returns the set of DC inputs used for a particular collection, or the
      * default set if no inputs defined for the collection
      *
-     * @param collectionHandle collection's unique Handle
+     * @param collection collection for which search the set of DC inputs
      * @return DC input set
      * @throws DCInputsReaderException if no default set defined
-     * @throws ServletException
      */
-    public List<DCInputSet> getInputsByCollectionHandle(String collectionHandle)
+    public List<DCInputSet> getInputsByCollection(Collection collection)
         throws DCInputsReaderException {
         SubmissionConfig config;
         try {
             config = SubmissionServiceFactory.getInstance().getSubmissionConfigService()
-                        .getSubmissionConfigByCollection(collectionHandle);
+                        .getSubmissionConfigByCollection(collection);
             String formName = config.getSubmissionName();
             if (formName == null) {
                 throw new DCInputsReaderException("No form designated as default");
@@ -691,7 +689,7 @@ public class DCInputsReader {
 
     public String getInputFormNameByCollectionAndField(Collection collection, String field)
         throws DCInputsReaderException {
-        List<DCInputSet> inputSets = getInputsByCollectionHandle(collection.getHandle());
+        List<DCInputSet> inputSets = getInputsByCollection(collection);
         for (DCInputSet inputSet : inputSets) {
             String[] tokenized = Utils.tokenize(field);
             String schema = tokenized[0];

@@ -1743,7 +1743,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                     } else {
                         logInfo("\tSetting special permissions for "
                             + bitstreamName);
-                        setPermission(c, myGroup, actionID, bs);
+                        String rpType = useWorkflow ? ResourcePolicy.TYPE_SUBMISSION : ResourcePolicy.TYPE_INHERITED;
+                        setPermission(c, myGroup, rpType, actionID, bs);
                     }
                 }
 
@@ -1801,24 +1802,25 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
      *
      * @param c        DSpace Context
      * @param g        Dspace Group
+     * @param rpType   resource policy type string
      * @param actionID action identifier
      * @param bs       Bitstream
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      * @see org.dspace.core.Constants
      */
-    protected void setPermission(Context c, Group g, int actionID, Bitstream bs)
+    protected void setPermission(Context c, Group g, String rpType, int actionID, Bitstream bs)
         throws SQLException, AuthorizeException {
         if (!isTest) {
             // remove the default policy
             authorizeService.removeAllPolicies(c, bs);
 
             // add the policy
-            ResourcePolicy rp = resourcePolicyService.create(c);
+            ResourcePolicy rp = resourcePolicyService.create(c, null, g);
 
             rp.setdSpaceObject(bs);
             rp.setAction(actionID);
-            rp.setGroup(g);
+            rp.setRpType(rpType);
 
             resourcePolicyService.update(c, rp);
         } else {
@@ -1957,58 +1959,57 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         try {
             while (entries.hasMoreElements()) {
                 entry = entries.nextElement();
+                String entryName = entry.getName();
+                File outFile = new File(zipDir + entryName);
+                // Verify that this file/directory will be extracted into our zipDir (and not somewhere else!)
+                if (!outFile.toPath().normalize().startsWith(zipDir)) {
+                    throw new IOException("Bad zip entry: '" + entryName
+                                              + "' in file '" + zipfile.getAbsolutePath() + "'!"
+                                              + " Cannot process this file or directory.");
+                }
                 if (entry.isDirectory()) {
-                    if (!new File(zipDir + entry.getName()).mkdirs()) {
+                    if (!outFile.mkdirs()) {
                         logError("Unable to create contents directory: " + zipDir + entry.getName());
                     }
                 } else {
-                    String entryName = entry.getName();
-                    File outFile = new File(zipDir + entryName);
-                    // Verify that this file will be extracted into our zipDir (and not somewhere else!)
-                    if (!outFile.toPath().normalize().startsWith(zipDir)) {
-                        throw new IOException("Bad zip entry: '" + entryName
-                                                  + "' in file '" + zipfile.getAbsolutePath() + "'!"
-                                                  + " Cannot process this file.");
-                    } else {
-                        logInfo("Extracting file: " + entryName);
+                    logInfo("Extracting file: " + entryName);
 
-                        int index = entryName.lastIndexOf('/');
-                        if (index == -1) {
-                            // Was it created on Windows instead?
-                            index = entryName.lastIndexOf('\\');
-                        }
-                        if (index > 0) {
-                            File dir = new File(zipDir + entryName.substring(0, index));
-                            if (!dir.exists() && !dir.mkdirs()) {
-                                logError("Unable to create directory: " + dir.getAbsolutePath());
-                            }
-
-                            //Entries could have too many directories, and we need to adjust the sourcedir
-                            // file1.zip (SimpleArchiveFormat / item1 / contents|dublin_core|...
-                            //            SimpleArchiveFormat / item2 / contents|dublin_core|...
-                            // or
-                            // file2.zip (item1 / contents|dublin_core|...
-                            //            item2 / contents|dublin_core|...
-
-                            //regex supports either windows or *nix file paths
-                            String[] entryChunks = entryName.split("/|\\\\");
-                            if (entryChunks.length > 2) {
-                                if (StringUtils.equals(sourceDirForZip, sourcedir)) {
-                                    sourceDirForZip = sourcedir + "/" + entryChunks[0];
-                                }
-                            }
-                        }
-                        byte[] buffer = new byte[1024];
-                        int len;
-                        InputStream in = zf.getInputStream(entry);
-                        BufferedOutputStream out = new BufferedOutputStream(
-                            new FileOutputStream(outFile));
-                        while ((len = in.read(buffer)) >= 0) {
-                            out.write(buffer, 0, len);
-                        }
-                        in.close();
-                        out.close();
+                    int index = entryName.lastIndexOf('/');
+                    if (index == -1) {
+                        // Was it created on Windows instead?
+                        index = entryName.lastIndexOf('\\');
                     }
+                    if (index > 0) {
+                        File dir = new File(zipDir + entryName.substring(0, index));
+                        if (!dir.exists() && !dir.mkdirs()) {
+                            logError("Unable to create directory: " + dir.getAbsolutePath());
+                        }
+
+                        //Entries could have too many directories, and we need to adjust the sourcedir
+                        // file1.zip (SimpleArchiveFormat / item1 / contents|dublin_core|...
+                        //            SimpleArchiveFormat / item2 / contents|dublin_core|...
+                        // or
+                        // file2.zip (item1 / contents|dublin_core|...
+                        //            item2 / contents|dublin_core|...
+
+                        //regex supports either windows or *nix file paths
+                        String[] entryChunks = entryName.split("/|\\\\");
+                        if (entryChunks.length > 2) {
+                            if (StringUtils.equals(sourceDirForZip, sourcedir)) {
+                                sourceDirForZip = sourcedir + "/" + entryChunks[0];
+                            }
+                        }
+                    }
+                    byte[] buffer = new byte[1024];
+                    int len;
+                    InputStream in = zf.getInputStream(entry);
+                    BufferedOutputStream out = new BufferedOutputStream(
+                        new FileOutputStream(outFile));
+                    while ((len = in.read(buffer)) >= 0) {
+                        out.write(buffer, 0, len);
+                    }
+                    in.close();
+                    out.close();
                 }
             }
         } finally {
@@ -2233,7 +2234,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                                     String fileName) throws MessagingException {
         try {
             Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);
-            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "bte_batch_import_success"));
+            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "batch_import_success"));
             email.addRecipient(eperson.getEmail());
             email.addArgument(fileName);
 
@@ -2249,7 +2250,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         logError("An error occurred during item import, the user will be notified. " + error);
         try {
             Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);
-            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "bte_batch_import_error"));
+            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "batch_import_error"));
             email.addRecipient(eperson.getEmail());
             email.addArgument(error);
             email.addArgument(configurationService.getProperty("dspace.ui.url") + "/feedback");

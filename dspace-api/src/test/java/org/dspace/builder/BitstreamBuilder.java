@@ -20,6 +20,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.MetadataValueService;
 import org.dspace.core.Constants;
@@ -164,6 +165,19 @@ public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
             bitstream.setFormat(context, bf);
         }
 
+        return this;
+    }
+
+    /**
+     * Guess the bitstream format as during the submission via the
+     * {@link BitstreamFormatService#guessFormat(Context, Bitstream)}
+     * 
+     * @return the BitstreamBuilder with the format set according to
+     * {@link BitstreamFormatService#guessFormat(Context, Bitstream)}
+     * @throws SQLException
+     */
+    public BitstreamBuilder guessFormat() throws SQLException {
+        bitstream.setFormat(context, bitstreamFormatService.guessFormat(context, bitstream));
         return this;
     }
 

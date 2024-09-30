@@ -34,7 +34,7 @@ public interface SubmissionConfigService {
 
     public int countSubmissionConfigs();
 
-    public SubmissionConfig getSubmissionConfigByCollection(String collectionHandle);
+    public SubmissionConfig getSubmissionConfigByCollection(Collection collection);
 
     public SubmissionConfig getSubmissionConfigByName(String submitName);
 

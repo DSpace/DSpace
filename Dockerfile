@@ -22,12 +22,15 @@ USER dspace
 ADD --chown=dspace . /app/
 # Build DSpace (note: this build doesn't include the optional, deprecated "dspace-rest" webapp)
 # Copy the dspace-installer directory to /install.  Clean up the build to keep the docker image small
-RUN mvn --no-transfer-progress package && \
+# Maven flags here ensure that we skip building test environment and skip all code verification checks.
+# These flags speed up this compilation as much as reasonably possible.
+ENV MAVEN_FLAGS="-P-test-environment -Denforcer.skip=true -Dcheckstyle.skip=true -Dlicense.skip=true -Dxml.skip=true"
+RUN mvn --no-transfer-progress package ${MAVEN_FLAGS} && \
   mv /app/dspace/target/${TARGET_DIR}/* /install && \
   mvn clean
 
 # Step 2 - Run Ant Deploy
-FROM openjdk:${JDK_VERSION}-slim as ant_build
+FROM eclipse-temurin:${JDK_VERSION} as ant_build
 ARG TARGET_DIR=dspace-installer
 # COPY the /install directory from 'build' container to /dspace-src in this container
 COPY --from=build /install /dspace-src

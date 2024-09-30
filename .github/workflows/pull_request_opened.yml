@@ -21,4 +21,4 @@ jobs:
     # Assign the PR to whomever created it. This is useful for visualizing assignments on project boards
     # See https://github.com/toshimaru/auto-author-assign
     - name: Assign PR to creator
-      uses: toshimaru/auto-author-assign@v1.6.2
+      uses: toshimaru/auto-author-assign@v2.1.0

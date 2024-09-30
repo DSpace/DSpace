@@ -636,6 +636,9 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
                 owningCollection = inProgressSubmission.getCollection();
             }
 
+            itemService.populateWithTemplateItemMetadata(context, owningCollection, params.useCollectionTemplate(),
+                item);
+
             addLicense(context, item, license, owningCollection
                 , params);
 
