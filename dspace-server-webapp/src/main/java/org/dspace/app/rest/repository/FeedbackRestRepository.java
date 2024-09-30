@@ -30,8 +30,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import static org.dspace.eperson.service.CaptchaService.FEEDBACK_ACTION;
-
 /**
  * This is the Repository that takes care of the operations on the {@link FeedbackRest} objects
  * 
@@ -78,7 +76,7 @@ public class FeedbackRestRepository extends DSpaceRestRepository<FeedbackRest, I
 
         if (verificationEnabled) {
             try {
-                captchaService.processResponse(captchaToken, FEEDBACK_ACTION);
+                captchaService.processResponse(captchaToken, CaptchaService.FEEDBACK_ACTION);
             } catch (InvalidReCaptchaException e) {
                 throw new InvalidReCaptchaException(e.getMessage(), e);
             }

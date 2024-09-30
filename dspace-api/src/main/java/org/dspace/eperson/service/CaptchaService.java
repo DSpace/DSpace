@@ -18,7 +18,7 @@ public interface CaptchaService {
 
     public String REGISTER_ACTION = "register_email";
 
-    public static String FEEDBACK_ACTION = "feedback";
+    public String FEEDBACK_ACTION = "feedback";
 
     /**
      * validate the entered reCaptcha token
