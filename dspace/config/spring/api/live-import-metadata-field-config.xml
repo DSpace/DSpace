@@ -59,9 +59,6 @@
         <constructor-arg value="dc.identifier"/>
     </bean>
 
-
-
-
     <bean id="dc.language.iso" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.language.iso"/>
     </bean>
@@ -149,9 +146,5 @@
     <bean id="person.identifier.rid" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="person.identifier.rid"/>
     </bean>
-
-
-
-
 
 </beans>
