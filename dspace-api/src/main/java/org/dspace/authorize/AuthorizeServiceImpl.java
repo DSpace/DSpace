@@ -550,13 +550,11 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         List<ResourcePolicy> newPolicies = new ArrayList<>(policies.size());
 
         for (ResourcePolicy srp : policies) {
-            ResourcePolicy rp = resourcePolicyService.create(c);
+            ResourcePolicy rp = resourcePolicyService.create(c, srp.getEPerson(), srp.getGroup());
 
             // copy over values
             rp.setdSpaceObject(dest);
             rp.setAction(srp.getAction());
-            rp.setEPerson(srp.getEPerson());
-            rp.setGroup(srp.getGroup());
             rp.setStartDate(srp.getStartDate());
             rp.setEndDate(srp.getEndDate());
             rp.setRpName(srp.getRpName());
@@ -670,11 +668,9 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                 "We need at least an eperson or a group in order to create a resource policy.");
         }
 
-        ResourcePolicy myPolicy = resourcePolicyService.create(context);
+        ResourcePolicy myPolicy = resourcePolicyService.create(context, eperson, group);
         myPolicy.setdSpaceObject(dso);
         myPolicy.setAction(type);
-        myPolicy.setGroup(group);
-        myPolicy.setEPerson(eperson);
         myPolicy.setRpType(rpType);
         myPolicy.setRpName(rpName);
         myPolicy.setRpDescription(rpDescription);
@@ -895,7 +891,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
                 return true;
             }
         } catch (SearchServiceException e) {
-            log.error("Failed getting getting community/collection admin status for "
+            log.error("Failed getting community/collection admin status for "
                 + context.getCurrentUser().getEmail() + " The search error is: " + e.getMessage()
                 + " The search resourceType filter was: " + query);
         }

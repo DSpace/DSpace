@@ -159,7 +159,7 @@ public class PackagerIT extends AbstractIntegrationTestWithDatabase {
         performExportScript(article.getHandle(), tempFile);
         UUID id = article.getID();
         itemService.delete(context, article);
-        WorkspaceItem workspaceItem = workspaceItemService.create(context, col1, id, false);
+        WorkspaceItem workspaceItem = workspaceItemService.create(context, col1, id, false, false);
         installItemService.installItem(context, workspaceItem, "123456789/0100");
         performImportNoForceScript(tempFile);
         Iterator<Item> items = itemService.findByCollection(context, col1);

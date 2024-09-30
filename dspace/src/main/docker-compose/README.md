@@ -78,6 +78,7 @@ docker-compose -p d7 up -d
 ```
 docker-compose -p d7 -f docker-compose.yml -f dspace/src/main/docker-compose/docker-compose-angular.yml up -d
 ```
+NOTE: This starts the UI in development mode. It will take a few minutes to see the UI as the Angular code needs to be compiled.
 
 ## Run DSpace REST and DSpace Angular from local branches
 

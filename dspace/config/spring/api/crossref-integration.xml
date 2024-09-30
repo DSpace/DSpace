@@ -132,8 +132,11 @@
 
     <bean id="crossrefAbstract" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
         <property name="field" ref="crossref.abstract"/>
-        <property name="query" value="/abstract"/>
+        <property name="metadataProcessor" ref="crossrefAbstractMetadataProcessor"></property>
     </bean>
+    <bean name="crossrefAbstractMetadataProcessor" class="org.dspace.importer.external.crossref.CrossRefAbstractProcessor">
+        <property name="path" value="/abstract"></property>
+    </bean>	
     <bean id="crossref.abstract" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.description.abstract"/>
     </bean>

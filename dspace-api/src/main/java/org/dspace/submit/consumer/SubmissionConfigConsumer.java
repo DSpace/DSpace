@@ -8,15 +8,10 @@
 package org.dspace.submit.consumer;
 
 import org.apache.logging.log4j.Logger;
-import org.dspace.content.Collection;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.discovery.IndexingService;
-import org.dspace.discovery.indexobject.IndexableCollection;
 import org.dspace.event.Consumer;
 import org.dspace.event.Event;
-import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.submit.factory.SubmissionServiceFactory;
 
 /**
@@ -28,11 +23,9 @@ public class SubmissionConfigConsumer implements Consumer {
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(SubmissionConfigConsumer.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(SubmissionConfigConsumer.class);
 
-    IndexingService indexer = DSpaceServicesFactory.getInstance().getServiceManager()
-            .getServiceByName(IndexingService.class.getName(),
-                              IndexingService.class);
+    private boolean reloadNeeded = false;
 
     @Override
     public void initialize() throws Exception {
@@ -42,37 +35,27 @@ public class SubmissionConfigConsumer implements Consumer {
     @Override
     public void consume(Context ctx, Event event) throws Exception {
         int st = event.getSubjectType();
-        int et = event.getEventType();
 
+        if (st == Constants.COLLECTION) {
+            // NOTE: IndexEventConsumer ("discovery") should be declared before this consumer
+            // We don't reindex the collection because it will normally be reindexed by IndexEventConsumer
+            // before the submission configurations are reloaded
 
-        if ( st == Constants.COLLECTION ) {
-            switch (et) {
-                case Event.MODIFY_METADATA:
-                    // Submission configuration it's based on solr
-                    // for collection's entity type but, at this point
-                    // that info isn't indexed yet, we need to force it
-                    DSpaceObject subject = event.getSubject(ctx);
-                    Collection collectionFromDSOSubject = (Collection) subject;
-                    indexer.indexContent(ctx, new IndexableCollection (collectionFromDSOSubject), true, false, false);
-                    indexer.commit();
-
-                    log.debug("SubmissionConfigConsumer occured: " + event.toString());
-                    // reload submission configurations
-                    SubmissionServiceFactory.getInstance().getSubmissionConfigService().reload();
-                    break;
-
-                default:
-                    log.debug("SubmissionConfigConsumer occured: " + event.toString());
-                    // reload submission configurations
-                    SubmissionServiceFactory.getInstance().getSubmissionConfigService().reload();
-                    break;
-            }
+            log.debug("SubmissionConfigConsumer occurred: " + event);
+            // submission configurations should be reloaded
+            reloadNeeded = true;
         }
     }
 
     @Override
     public void end(Context ctx) throws Exception {
-        // No-op
+        if (reloadNeeded) {
+            // reload submission configurations
+            SubmissionServiceFactory.getInstance().getSubmissionConfigService().reload();
+
+            // Reset the boolean used
+            reloadNeeded = false;
+        }
     }
 
     @Override

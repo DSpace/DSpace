@@ -633,9 +633,9 @@ public class BundleTest extends AbstractDSpaceObjectTest {
     @Test
     public void testReplaceAllBitstreamPolicies() throws SQLException, AuthorizeException {
         List<ResourcePolicy> newpolicies = new ArrayList<ResourcePolicy>();
-        newpolicies.add(resourcePolicyService.create(context));
-        newpolicies.add(resourcePolicyService.create(context));
-        newpolicies.add(resourcePolicyService.create(context));
+        newpolicies.add(resourcePolicyService.create(context, eperson, null));
+        newpolicies.add(resourcePolicyService.create(context, eperson, null));
+        newpolicies.add(resourcePolicyService.create(context, eperson, null));
         bundleService.replaceAllBitstreamPolicies(context, b, newpolicies);
 
         List<ResourcePolicy> bspolicies = bundleService.getBundlePolicies(context, b);

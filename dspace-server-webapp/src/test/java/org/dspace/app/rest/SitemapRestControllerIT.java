@@ -216,7 +216,12 @@ public class SitemapRestControllerIT extends AbstractControllerIntegrationTest {
                                       //** THEN **
                                       .andExpect(status().isOk())
                                       //We expect the content type to match
-                                      .andExpect(content().contentType("application/xml;charset=UTF-8"))
+                                      .andExpect(res -> {
+                                          String actual = res.getResponse().getContentType();
+                                          assertTrue("Content Type",
+                                                  "text/xml;charset=UTF-8".equals(actual) ||
+                                                          "application/xml;charset=UTF-8".equals(actual));
+                                      })
                                       .andReturn();
 
         String response = result.getResponse().getContentAsString();
@@ -232,7 +237,12 @@ public class SitemapRestControllerIT extends AbstractControllerIntegrationTest {
                                       //** THEN **
                                       .andExpect(status().isOk())
                                       //We expect the content type to match
-                                      .andExpect(content().contentType("application/xml;charset=UTF-8"))
+                                      .andExpect(res -> {
+                                          String actual = res.getResponse().getContentType();
+                                          assertTrue("Content Type",
+                                                  "text/xml;charset=UTF-8".equals(actual) ||
+                                                          "application/xml;charset=UTF-8".equals(actual));
+                                      })
                                       .andReturn();
 
         String response = result.getResponse().getContentAsString();

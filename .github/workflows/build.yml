@@ -45,24 +45,15 @@ jobs:
     steps:
       # https://github.com/actions/checkout
       - name: Checkout codebase
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # https://github.com/actions/setup-java
       - name: Install JDK ${{ matrix.java }}
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
-
-      # https://github.com/actions/cache
-      - name: Cache Maven dependencies
-        uses: actions/cache@v3
-        with:
-          # Cache entire ~/.m2/repository
-          path: ~/.m2/repository
-          # Cache key is hash of all pom.xml files. Therefore any changes to POMs will invalidate cache
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-maven-
+          cache: 'maven'
 
       # Run parallel Maven builds based on the above 'strategy.matrix'
       - name: Run Maven ${{ matrix.type }}
@@ -74,14 +65,14 @@ jobs:
       # (This artifact is downloadable at the bottom of any job's summary page)
       - name: Upload Results of ${{ matrix.type }} to Artifact
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.type }} results
           path: ${{ matrix.resultsdir }}
 
       # Upload code coverage report to artifact, so that it can be shared with the 'codecov' job (see below)
       - name: Upload code coverage report to Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.type }} coverage report
           path: 'dspace/target/site/jacoco-aggregate/jacoco.xml'
@@ -96,11 +87,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Download artifacts from previous 'tests' job
       - name: Download coverage artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
 
       # Now attempt upload to Codecov using its action.
       # NOTE: We use a retry action to retry the Codecov upload if it fails the first time.
@@ -108,10 +99,14 @@ jobs:
       # Retry action: https://github.com/marketplace/actions/retry-action
       # Codecov action: https://github.com/codecov/codecov-action
       - name: Upload coverage to Codecov.io
-        uses: Wandalen/wretry.action@v1.0.36
+        uses: Wandalen/wretry.action@v1.3.0
         with:
-          action: codecov/codecov-action@v3
-          # Try upload 5 times max
+          action: codecov/codecov-action@v4
+          # Ensure codecov-action throws an error when it fails to upload
+          with: |
+            fail_ci_if_error: true
+            token: ${{ secrets.CODECOV_TOKEN }}
+          # Try re-running action 5 times max
           attempt_limit: 5
           # Run again in 30 seconds
           attempt_delay: 30000
