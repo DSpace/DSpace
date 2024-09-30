@@ -21,12 +21,16 @@ import org.dspace.app.rest.model.FeedbackRest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.service.FeedbackService;
 import org.dspace.core.Context;
+import org.dspace.eperson.InvalidReCaptchaException;
+import org.dspace.eperson.service.CaptchaService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+
+import static org.dspace.eperson.service.CaptchaService.FEEDBACK_ACTION;
 
 /**
  * This is the Repository that takes care of the operations on the {@link FeedbackRest} objects
@@ -40,6 +44,9 @@ public class FeedbackRestRepository extends DSpaceRestRepository<FeedbackRest, I
     private FeedbackService feedbackService;
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private CaptchaService captchaService;
 
     @Override
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
@@ -65,6 +72,18 @@ public class FeedbackRestRepository extends DSpaceRestRepository<FeedbackRest, I
             throw new DSpaceFeedbackNotFoundException("Feedback cannot be sent at this time, Feedback recipient " +
                 "is disabled");
         }
+
+        String captchaToken = req.getHeader("X-Recaptcha-Token");
+        boolean verificationEnabled = configurationService.getBooleanProperty("feedback.verification.enabled");
+
+        if (verificationEnabled) {
+            try {
+                captchaService.processResponse(captchaToken, FEEDBACK_ACTION);
+            } catch (InvalidReCaptchaException e) {
+                throw new InvalidReCaptchaException(e.getMessage(), e);
+            }
+        }
+
 
         try {
             feedbackRest = mapper.readValue(req.getInputStream(), FeedbackRest.class);
