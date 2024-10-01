@@ -147,4 +147,40 @@
         <constructor-arg value="person.identifier.rid"/>
     </bean>
 
+    <bean id="organization.legalName" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="organization.legalName"/>
+    </bean>
+
+    <bean id="organization.identifier.ror" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="organization.identifier.ror"/>
+    </bean>
+
+    <bean id="organization.alternateName" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="organization.alternateName"/>
+    </bean>
+
+    <bean id="organization.url" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="organization.url"/>
+    </bean>
+
+    <bean id="organization.address.addressCountry" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="organization.address.addressCountry"/>
+    </bean>
+
+    <bean id="organization.foundingDate" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="organization.foundingDate"/>
+    </bean>
+
+    <bean id="organization.identifier.crossrefid" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="organization.identifier.crossrefid"/>
+    </bean>
+
+    <bean id="organization.identifier.isni" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="organization.identifier.isni"/>
+    </bean>
+    
+    <bean id="organization.parentOrganization" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="organization.parentOrganization"/>
+    </bean>
+
 </beans>
