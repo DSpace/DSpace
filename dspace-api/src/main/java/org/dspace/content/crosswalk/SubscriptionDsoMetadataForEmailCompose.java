@@ -49,7 +49,7 @@ public class SubscriptionDsoMetadataForEmailCompose implements StreamDisseminati
             for (String actualMetadata : metadata) {
                 String[] splitted = actualMetadata.split("\\.");
                 String qualifier = null;
-                if (splitted.length == 1) {
+                if (splitted.length == 3) {
                     qualifier = splitted[2];
                 }
                 var metadataValue = itemService.getMetadataFirstValue(item, splitted[0], splitted[1], qualifier, ANY);

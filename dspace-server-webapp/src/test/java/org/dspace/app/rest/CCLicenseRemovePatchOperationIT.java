@@ -64,7 +64,7 @@ public class CCLicenseRemovePatchOperationIT extends AbstractControllerIntegrati
         // First add a license and verify it is added
         List<Operation> ops = new ArrayList<>();
         AddOperation addOperation = new AddOperation("/sections/cclicense/uri",
-                                                     "http://creativecommons.org/licenses/by-nc-sa/4.0/");
+                                                     "https://creativecommons.org/licenses/by-nc-sa/4.0/");
 
         ops.add(addOperation);
         String patchBody = getPatchContent(ops);
@@ -75,7 +75,7 @@ public class CCLicenseRemovePatchOperationIT extends AbstractControllerIntegrati
                                               .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
                              .andExpect(status().isOk())
                              .andExpect(jsonPath("$.sections.cclicense", allOf(
-                                     hasJsonPath("$.uri", is("http://creativecommons.org/licenses/by-nc-sa/4.0/")),
+                                     hasJsonPath("$.uri", is("https://creativecommons.org/licenses/by-nc-sa/4.0/")),
                                      hasJsonPath("$.rights",
                                                  is("Attribution-NonCommercial-ShareAlike 4.0 International")),
                                      hasJsonPath("$.file.name", is("license_rdf"))

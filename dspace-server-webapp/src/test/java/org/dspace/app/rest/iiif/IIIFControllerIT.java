@@ -222,6 +222,93 @@ public class IIIFControllerIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void findOneWithExcludedBitstreamIT() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                .build();
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .enableIIIF()
+                .build();
+
+        String bitstreamContent = "ThisIsSomeText";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            BitstreamBuilder
+                    .createBitstream(context, publicItem1, is)
+                    .withName("Bitstream1.jpg")
+                    .withMimeType("image/jpeg")
+                    .withIIIFLabel("Custom Label")
+                    .build();
+        }
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            BitstreamBuilder
+                    .createBitstream(context, publicItem1, is)
+                    .withName("Bitstream2.jpg")
+                    .withMimeType("image/jpeg")
+                    .withIIIFDisabled()
+                    .build();
+        }
+        context.restoreAuthSystemState();
+        // Expect canvas label, width and height to match bitstream description.
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sequences[0].canvases", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
+                .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
+                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c0")))
+                .andExpect(jsonPath("$.sequences[0].canvases[0].label", is("Custom Label")));
+    }
+
+    @Test
+    public void findOneWithExcludedBitstreamBundleIT() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                .build();
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .enableIIIF()
+                .build();
+
+        String bitstreamContent = "ThisIsSomeText";
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            BitstreamBuilder
+                    .createBitstream(context, publicItem1, is)
+                    .withName("Bitstream1.jpg")
+                    .withMimeType("image/jpeg")
+                    .withIIIFLabel("Custom Label")
+                    .build();
+        }
+        // Add bitstream
+        try (InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            BitstreamBuilder
+                    .createBitstream(context, publicItem1, is, "ExcludedBundle", false)
+                    .withName("Bitstream2.jpg")
+                    .withMimeType("image/jpeg")
+                    .build();
+        }
+        context.restoreAuthSystemState();
+        // Expect canvas label, width and height to match bitstream description.
+        getClient().perform(get("/iiif/" + publicItem1.getID() + "/manifest"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sequences[0].canvases", Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.@context", is("http://iiif.io/api/presentation/2/context.json")))
+                .andExpect(jsonPath("$.sequences[0].canvases[0].@id",
+                        Matchers.containsString("/iiif/" + publicItem1.getID() + "/canvas/c0")))
+                .andExpect(jsonPath("$.sequences[0].canvases[0].label", is("Custom Label")));
+    }
+
+
+    @Test
     public void findOneIIIFSearchableWithCustomBundleAndConfigIT() throws Exception {
         context.turnOffAuthorisationSystem();
         parentCommunity = CommunityBuilder.createCommunity(context)

@@ -764,8 +764,25 @@ Common usage:
 
     <!-- Test the connection to the database -->
     <target name="test_database">
+        <path id="jar.classpath">
+            <fileset dir="lib">
+                <include name="**/*.jar" />
+            </fileset>
+        </path>
+        <manifestclasspath property="reduced.classpath" jarfile="pathing.jar">
+            <classpath refid="jar.classpath"/>
+        </manifestclasspath>
+        <jar destfile="pathing.jar">
+            <manifest>
+                <attribute name="Class-Path" value="${reduced.classpath}"/>
+            </manifest>
+        </jar>
+        <path id="class.path.database">
+            <pathelement path="${env.CLASSPATH}" />
+            <pathelement path="pathing.jar" />
+        </path>
         <java classname="org.dspace.app.launcher.ScriptLauncher"
-              classpathref="class.path"
+              classpathref="class.path.database"
               fork="yes"
               failonerror="yes">
             <sysproperty key="log4j.configurationFile"

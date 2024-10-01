@@ -16,7 +16,7 @@ jobs:
       # Only add to project board if issue is flagged as "needs triage" or has no labels
       # NOTE: By default we flag new issues as "needs triage" in our issue template
       if: (contains(github.event.issue.labels.*.name, 'needs triage') || join(github.event.issue.labels.*.name) == '')
-      uses: actions/add-to-project@v0.5.0
+      uses: actions/add-to-project@v1.0.0
       # Note, the authentication token below is an ORG level Secret. 
       # It must be created/recreated manually via a personal access token with admin:org, project, public_repo permissions
       # See: https://docs.github.com/en/actions/configuring-and-managing-workflows/authenticating-with-the-github_token#permissions-for-the-github_token

@@ -40,7 +40,18 @@ public interface AccessStatusService {
      *
      * @param context the DSpace context
      * @param item    the item
+     * @return an access status value
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     public String getAccessStatus(Context context, Item item) throws SQLException;
+
+    /**
+     * Retrieve embargo information for the item
+     *
+     * @param context the DSpace context
+     * @param item the item to check for embargo information
+     * @return an embargo date
+     * @throws SQLException An exception that provides information on a database access error or other errors.
+     */
+    public String getEmbargoFromItem(Context context, Item item) throws SQLException;
 }

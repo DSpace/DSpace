@@ -10,6 +10,7 @@ package org.dspace.storage.bitstore;
 import static java.lang.String.valueOf;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -103,6 +104,11 @@ public class S3BitStoreService extends BaseBitStoreService {
     private boolean useRelativePath;
 
     /**
+     * The maximum size of individual chunk to download from S3 when a file is accessed. Default 5Mb
+     */
+    private long bufferSize = 5 * 1024 * 1024;
+
+    /**
      * container for all the assets
      */
     private String bucketName = null;
@@ -169,7 +175,7 @@ public class S3BitStoreService extends BaseBitStoreService {
     @Override
     public void init() throws IOException {
 
-        if (this.isInitialized()) {
+        if (this.isInitialized() || !this.isEnabled()) {
             return;
         }
 
@@ -258,20 +264,7 @@ public class S3BitStoreService extends BaseBitStoreService {
         if (isRegisteredBitstream(key)) {
             key = key.substring(REGISTERED_FLAG.length());
         }
-        try {
-            File tempFile = File.createTempFile("s3-disk-copy-" + UUID.randomUUID(), "temp");
-            tempFile.deleteOnExit();
-
-            GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, key);
-
-            Download download = tm.download(getObjectRequest, tempFile);
-            download.waitForCompletion();
-
-            return new DeleteOnCloseFileInputStream(tempFile);
-        } catch (AmazonClientException | InterruptedException e) {
-            log.error("get(" + key + ")", e);
-            throw new IOException(e);
-        }
+        return new S3LazyInputStream(key, bufferSize, bitstream.getSizeBytes());
     }
 
     /**
@@ -622,4 +615,84 @@ public class S3BitStoreService extends BaseBitStoreService {
         return internalId.startsWith(REGISTERED_FLAG);
     }
 
+    public void setBufferSize(long bufferSize) {
+        this.bufferSize = bufferSize;
+    }
+
+    /**
+     * This inner class represent an InputStream that uses temporary files to
+     * represent chunk of the object downloaded from S3. When the input stream is
+     * read the class look first to the current chunk and download a new one once if
+     * the current one as been fully read. The class is responsible to close a chunk
+     * as soon as a new one is retrieved, the last chunk is closed when the input
+     * stream itself is closed or the last byte is read (the first of the two)
+     */
+    public class S3LazyInputStream extends InputStream {
+        private InputStream currentChunkStream;
+        private String objectKey;
+        private long endOfChunk = -1;
+        private long chunkMaxSize;
+        private long currPos = 0;
+        private long fileSize;
+
+        public S3LazyInputStream(String objectKey, long chunkMaxSize, long fileSize) throws IOException {
+            this.objectKey = objectKey;
+            this.chunkMaxSize = chunkMaxSize;
+            this.endOfChunk = 0;
+            this.fileSize = fileSize;
+            downloadChunk();
+        }
+
+        @Override
+        public int read() throws IOException {
+            // is the current chunk completely read and other are available?
+            if (currPos == endOfChunk && currPos < fileSize) {
+                currentChunkStream.close();
+                downloadChunk();
+            }
+
+            int byteRead = currPos < endOfChunk ? currentChunkStream.read() : -1;
+            // do we get any data or are we at the end of the file?
+            if (byteRead != -1) {
+                currPos++;
+            } else {
+                currentChunkStream.close();
+            }
+            return byteRead;
+        }
+
+        /**
+         * This method download the next chunk from S3
+         *
+         * @throws IOException
+         * @throws FileNotFoundException
+         */
+        private void downloadChunk() throws IOException, FileNotFoundException {
+            // Create a DownloadFileRequest with the desired byte range
+            long startByte = currPos; // Start byte (inclusive)
+            long endByte = Long.min(startByte + chunkMaxSize - 1, fileSize - 1); // End byte (inclusive)
+            GetObjectRequest getRequest = new GetObjectRequest(bucketName, objectKey)
+                    .withRange(startByte, endByte);
+
+            File currentChunkFile = File.createTempFile("s3-disk-copy-" + UUID.randomUUID(), "temp");
+            currentChunkFile.deleteOnExit();
+            try {
+                Download download = tm.download(getRequest, currentChunkFile);
+                download.waitForCompletion();
+                currentChunkStream = new DeleteOnCloseFileInputStream(currentChunkFile);
+                endOfChunk = endOfChunk + download.getProgress().getBytesTransferred();
+            } catch (AmazonClientException | InterruptedException e) {
+                currentChunkFile.delete();
+                throw new IOException(e);
+            }
+        }
+
+        @Override
+        public void close() throws IOException {
+            if (currentChunkStream != null) {
+                currentChunkStream.close();
+            }
+        }
+
+    }
 }

@@ -141,20 +141,10 @@ public class Groomer {
             System.out.println();
 
             if (delete) {
-                List<String> whyNot = ePersonService.getDeleteConstraints(myContext, account);
-                if (!whyNot.isEmpty()) {
-                    System.out.print("\tCannot be deleted; referenced in");
-                    for (String table : whyNot) {
-                        System.out.print(' ');
-                        System.out.print(table);
-                    }
-                    System.out.println();
-                } else {
-                    try {
-                        ePersonService.delete(myContext, account);
-                    } catch (AuthorizeException | IOException ex) {
-                        System.err.println(ex.getMessage());
-                    }
+                try {
+                    ePersonService.delete(myContext, account);
+                } catch (AuthorizeException | IOException ex) {
+                    System.err.println(ex.getMessage());
                 }
             }
         }

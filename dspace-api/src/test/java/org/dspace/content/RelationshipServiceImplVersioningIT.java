@@ -26,7 +26,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.Before;
 import org.junit.Test;
 
-public class RelationshipServiceImplVersioningTest extends AbstractIntegrationTestWithDatabase {
+public class RelationshipServiceImplVersioningIT extends AbstractIntegrationTestWithDatabase {
 
     private RelationshipService relationshipService;
     private RelationshipDAO relationshipDAO;

@@ -266,12 +266,6 @@ public interface SolrLoggerService {
      */
     public String getIgnoreSpiderIPs();
 
-    /**
-     * Maintenance to keep a SOLR index efficient.
-     * Note: This might take a long time.
-     */
-    public void optimizeSOLR();
-
     public void shardSolrIndex() throws IOException, SolrServerException;
 
     public void reindexBitstreamHits(boolean removeDeletedBitstreams) throws Exception;

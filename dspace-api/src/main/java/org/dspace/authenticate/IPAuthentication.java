@@ -253,6 +253,11 @@ public class IPAuthentication implements AuthenticationMethod {
     }
 
     @Override
+    public boolean areSpecialGroupsApplicable(Context context, HttpServletRequest request) {
+        return true;
+    }
+
+    @Override
     public int authenticate(Context context, String username, String password,
                             String realm, HttpServletRequest request) throws SQLException {
         return BAD_ARGS;

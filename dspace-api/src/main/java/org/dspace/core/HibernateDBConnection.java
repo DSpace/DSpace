@@ -337,4 +337,17 @@ public class HibernateDBConnection implements DBConnection<Session> {
             }
         }
     }
+
+    /**
+     * Do a manual flush. This synchronizes the in-memory state of the Session
+     * with the database (write changes to the database)
+     *
+     * @throws SQLException passed through.
+     */
+    @Override
+    public void flushSession() throws SQLException {
+        if (getSession().isDirty()) {
+            getSession().flush();
+        }
+    }
 }

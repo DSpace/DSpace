@@ -64,7 +64,7 @@ public class EntityServiceImpl implements EntityService {
         List<Relationship> fullList = entity.getRelationships();
         List<Relationship> listToReturn = new LinkedList<>();
         for (Relationship relationship : fullList) {
-            if (relationship.getLeftItem().getID() == entity.getItem().getID()) {
+            if (relationship.getLeftItem().getID().equals(entity.getItem().getID())) {
                 listToReturn.add(relationship);
             }
         }
@@ -76,7 +76,7 @@ public class EntityServiceImpl implements EntityService {
         List<Relationship> fullList = entity.getRelationships();
         List<Relationship> listToReturn = new LinkedList<>();
         for (Relationship relationship : fullList) {
-            if (relationship.getRightItem().getID() == entity.getItem().getID()) {
+            if (relationship.getRightItem().getID().equals(entity.getItem().getID())) {
                 listToReturn.add(relationship);
             }
         }

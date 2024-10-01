@@ -26,7 +26,7 @@ import org.mockito.junit.MockitoJUnitRunner;
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  */
 @RunWith(MockitoJUnitRunner.class)
-public class RegexPasswordValidatorTest extends AbstractIntegrationTest {
+public class RegexPasswordValidatorIT extends AbstractIntegrationTest {
 
     @Mock
     private ConfigurationService configurationService;

@@ -33,6 +33,7 @@
         <ref bean="wosFullNameContrib"/>
         <ref bean="wosSubjectContrib"/>
         <ref bean="wosOrcidContrib"/>
+        <ref bean="wosPublisherContrib"/>
         <ref bean="wosContributorEditorContrib"/>
         <ref bean="wosIdContrib"/>
         <ref bean="wosRidContrib"/>

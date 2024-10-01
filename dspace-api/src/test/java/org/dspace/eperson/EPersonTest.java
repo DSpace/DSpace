@@ -8,17 +8,23 @@
 package org.dspace.eperson;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import javax.mail.MessagingException;
 
 import org.apache.commons.codec.DecoderException;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
@@ -274,63 +280,184 @@ public class EPersonTest extends AbstractUnitTest {
 */
 
     /**
-     * Test of search method, of class EPerson.
+     * Test of search() and searchResultCount() methods of EPersonService
+     * NOTE: Pagination is not verified here because it is tested in EPersonRestRepositoryIT
      */
-/*
     @Test
-    public void testSearch_Context_String()
-            throws Exception
-    {
-        System.out.println("search");
-        Context context = null;
-        String query = "";
-        EPerson[] expResult = null;
-        EPerson[] result = EPerson.search(context, query);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testSearchAndCountByNameEmail() throws SQLException, AuthorizeException, IOException {
+        List<EPerson> allEPeopleAdded = new ArrayList<>();
+        Group testGroup = createGroup("TestingGroup");
+        try {
+            // Create 4 EPersons.  Add a few to a test group to verify group membership doesn't matter
+            EPerson eperson1 = createEPersonAndAddToGroup("eperson1@example.com", "Jane", "Doe", testGroup);
+            EPerson eperson2 = createEPerson("eperson2@example.com", "John", "Doe");
+            EPerson eperson3 = createEPersonAndAddToGroup("eperson3@example.com", "John", "Smith", testGroup);
+            EPerson eperson4 = createEPerson("eperson4@example.com", "Doe", "Smith");
+            allEPeopleAdded.addAll(Arrays.asList(eperson1, eperson2, eperson3, eperson4));
+
+            List<EPerson> allJohns = Arrays.asList(eperson2, eperson3);
+            List<EPerson> searchJohnResults = ePersonService.search(context, "John", -1, -1);
+            assertTrue(searchJohnResults.containsAll(allJohns));
+            assertEquals(searchJohnResults.size(), ePersonService.searchResultCount(context, "John"));
+
+            List<EPerson> allDoes = Arrays.asList(eperson1, eperson2, eperson4);
+            List<EPerson> searchDoeResults = ePersonService.search(context, "Doe", -1, -1);
+            assertTrue(searchDoeResults.containsAll(allDoes));
+            assertEquals(searchDoeResults.size(), ePersonService.searchResultCount(context, "Doe"));
+
+            List<EPerson> allSmiths = Arrays.asList(eperson3, eperson4);
+            List<EPerson> searchSmithResults = ePersonService.search(context, "Smith", -1, -1);
+            assertTrue(searchSmithResults.containsAll(allSmiths));
+            assertEquals(searchSmithResults.size(), ePersonService.searchResultCount(context, "Smith"));
+
+            // Assert search on example.com returns everyone
+            List<EPerson> searchEmailResults = ePersonService.search(context, "example.com", -1, -1);
+            assertTrue(searchEmailResults.containsAll(allEPeopleAdded));
+            assertEquals(searchEmailResults.size(), ePersonService.searchResultCount(context, "example.com"));
+
+            // Assert exact email search returns just one
+            List<EPerson> exactEmailResults = ePersonService.search(context, "eperson1@example.com", -1, -1);
+            assertTrue(exactEmailResults.contains(eperson1));
+            assertEquals(exactEmailResults.size(), ePersonService.searchResultCount(context, "eperson1@example.com"));
+
+            // Assert UUID search returns exact match
+            List<EPerson> uuidResults = ePersonService.search(context, eperson4.getID().toString(), -1, -1);
+            assertTrue(uuidResults.contains(eperson4));
+            assertEquals(1, uuidResults.size());
+            assertEquals(uuidResults.size(), ePersonService.searchResultCount(context, eperson4.getID().toString()));
+        } finally {
+            // Remove all Groups & EPersons we added for this test
+            context.turnOffAuthorisationSystem();
+            groupService.delete(context, testGroup);
+            for (EPerson ePerson : allEPeopleAdded) {
+                ePersonService.delete(context, ePerson);
+            }
+            context.restoreAuthSystemState();
+        }
     }
-*/
 
     /**
-     * Test of search method, of class EPerson.
+     * Test of searchNonMembers() and searchNonMembersCount() methods of EPersonService
+     * NOTE: Pagination is not verified here because it is tested in EPersonRestRepositoryIT
      */
-/*
     @Test
-    public void testSearch_4args()
-            throws Exception
-    {
-        System.out.println("search");
-        Context context = null;
-        String query = "";
-        int offset = 0;
-        int limit = 0;
-        EPerson[] expResult = null;
-        EPerson[] result = EPerson.search(context, query, offset, limit);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-*/
+    public void testSearchAndCountByNameEmailNonMembers() throws SQLException, AuthorizeException, IOException {
+        List<EPerson> allEPeopleAdded = new ArrayList<>();
+        Group testGroup1 = createGroup("TestingGroup1");
+        Group testGroup2 = createGroup("TestingGroup2");
+        Group testGroup3 = createGroup("TestingGroup3");
+        try {
+            // Create two EPersons in Group 1
+            EPerson eperson1 = createEPersonAndAddToGroup("eperson1@example.com", "Jane", "Doe", testGroup1);
+            EPerson eperson2 = createEPersonAndAddToGroup("eperson2@example.com", "John", "Smith", testGroup1);
 
-    /**
-     * Test of searchResultCount method, of class EPerson.
-     */
-/*
-    @Test
-    public void testSearchResultCount()
-            throws Exception
-    {
-        System.out.println("searchResultCount");
-        Context context = null;
-        String query = "";
-        int expResult = 0;
-        int result = EPerson.searchResultCount(context, query);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+            // Create one more EPerson, and add it and a previous EPerson to Group 2
+            EPerson eperson3 = createEPersonAndAddToGroup("eperson3@example.com", "John", "Doe", testGroup2);
+            context.turnOffAuthorisationSystem();
+            groupService.addMember(context, testGroup2, eperson2);
+            groupService.update(context, testGroup2);
+            ePersonService.update(context, eperson2);
+            context.restoreAuthSystemState();
+
+            // Create 2 more EPersons with no group memberships
+            EPerson eperson4 = createEPerson("eperson4@example.com", "John", "Anthony");
+            EPerson eperson5 = createEPerson("eperson5@example.org", "Smith", "Doe");
+            allEPeopleAdded.addAll(Arrays.asList(eperson1, eperson2, eperson3, eperson4, eperson5));
+
+            // FIRST, test search by last name
+            // Verify all Does match a nonMember search of Group3 (which is an empty group)
+            List<EPerson> allDoes = Arrays.asList(eperson1, eperson3, eperson5);
+            List<EPerson> searchDoeResults = ePersonService.searchNonMembers(context, "Doe", testGroup3, -1, -1);
+            assertTrue(searchDoeResults.containsAll(allDoes));
+            assertEquals(searchDoeResults.size(), ePersonService.searchNonMembersCount(context, "Doe", testGroup3));
+
+            // Verify searching "Doe" with Group 2 *excludes* the one which is already a member
+            List<EPerson> allNonMemberDoes = Arrays.asList(eperson1, eperson5);
+            List<EPerson> searchNonMemberDoeResults = ePersonService.searchNonMembers(context, "Doe", testGroup2,
+                                                                                      -1, -1);
+            assertTrue(searchNonMemberDoeResults.containsAll(allNonMemberDoes));
+            assertFalse(searchNonMemberDoeResults.contains(eperson3));
+            assertEquals(searchNonMemberDoeResults.size(), ePersonService.searchNonMembersCount(context, "Doe",
+                                                                                                testGroup2));
+
+            // Verify searching "Doe" with Group 1 *excludes* the one which is already a member
+            allNonMemberDoes = Arrays.asList(eperson3, eperson5);
+            searchNonMemberDoeResults = ePersonService.searchNonMembers(context, "Doe", testGroup1, -1, -1);
+            assertTrue(searchNonMemberDoeResults.containsAll(allNonMemberDoes));
+            assertFalse(searchNonMemberDoeResults.contains(eperson1));
+            assertEquals(searchNonMemberDoeResults.size(), ePersonService.searchNonMembersCount(context, "Doe",
+                                                                                                testGroup1));
+
+            // SECOND, test search by first name
+            // Verify all Johns match a nonMember search of Group3 (which is an empty group)
+            List<EPerson> allJohns = Arrays.asList(eperson2, eperson3, eperson4);
+            List<EPerson> searchJohnResults = ePersonService.searchNonMembers(context, "John",
+                                                                               testGroup3, -1, -1);
+            assertTrue(searchJohnResults.containsAll(allJohns));
+            assertEquals(searchJohnResults.size(), ePersonService.searchNonMembersCount(context, "John",
+                                                                                         testGroup3));
+
+            // Verify searching "John" with Group 2 *excludes* the two who are already a member
+            List<EPerson> allNonMemberJohns = Arrays.asList(eperson4);
+            List<EPerson> searchNonMemberJohnResults = ePersonService.searchNonMembers(context, "John",
+                                                                                        testGroup2, -1, -1);
+            assertTrue(searchNonMemberJohnResults.containsAll(allNonMemberJohns));
+            assertFalse(searchNonMemberJohnResults.contains(eperson2));
+            assertFalse(searchNonMemberJohnResults.contains(eperson3));
+            assertEquals(searchNonMemberJohnResults.size(), ePersonService.searchNonMembersCount(context, "John",
+                                                                                                   testGroup2));
+
+            // FINALLY, test search by email
+            // Assert search on example.com excluding Group 1 returns just those not in that group
+            List<EPerson> exampleNonMembers = Arrays.asList(eperson3, eperson4);
+            List<EPerson> searchEmailResults = ePersonService.searchNonMembers(context, "example.com",
+                                                                               testGroup1, -1, -1);
+            assertTrue(searchEmailResults.containsAll(exampleNonMembers));
+            assertFalse(searchEmailResults.contains(eperson1));
+            assertFalse(searchEmailResults.contains(eperson2));
+            assertEquals(searchEmailResults.size(), ePersonService.searchNonMembersCount(context, "example.com",
+                                                                                         testGroup1));
+
+            // Assert exact email search returns just one (if not in group)
+            List<EPerson> exactEmailResults = ePersonService.searchNonMembers(context, "eperson1@example.com",
+                                                                              testGroup2, -1, -1);
+            assertTrue(exactEmailResults.contains(eperson1));
+            assertEquals(exactEmailResults.size(), ePersonService.searchNonMembersCount(context, "eperson1@example.com",
+                                                                                        testGroup2));
+            // But, change the group to one they are a member of, and they won't be included
+            exactEmailResults = ePersonService.searchNonMembers(context, "eperson1@example.com",
+                                                                testGroup1, -1, -1);
+            assertFalse(exactEmailResults.contains(eperson1));
+            assertEquals(exactEmailResults.size(), ePersonService.searchNonMembersCount(context, "eperson1@example.com",
+                                                                                        testGroup1));
+
+            // Assert UUID search returns exact match (if not in group)
+            List<EPerson> uuidResults = ePersonService.searchNonMembers(context, eperson3.getID().toString(),
+                                                                        testGroup1, -1, -1);
+            assertTrue(uuidResults.contains(eperson3));
+            assertEquals(1, uuidResults.size());
+            assertEquals(uuidResults.size(), ePersonService.searchNonMembersCount(context, eperson3.getID().toString(),
+                                                                              testGroup1));
+            // But, change the group to one they are a member of, and you'll get no results
+            uuidResults = ePersonService.searchNonMembers(context, eperson3.getID().toString(),
+                                                          testGroup2, -1, -1);
+            assertFalse(uuidResults.contains(eperson3));
+            assertEquals(0, uuidResults.size());
+            assertEquals(uuidResults.size(), ePersonService.searchNonMembersCount(context, eperson3.getID().toString(),
+                                                                                  testGroup2));
+
+        } finally {
+            // Remove all Groups & EPersons we added for this test
+            context.turnOffAuthorisationSystem();
+            groupService.delete(context, testGroup1);
+            groupService.delete(context, testGroup2);
+            groupService.delete(context, testGroup3);
+            for (EPerson ePerson : allEPeopleAdded) {
+                ePersonService.delete(context, ePerson);
+            }
+            context.restoreAuthSystemState();
+        }
     }
-*/
 
     /**
      * Test of findAll method, of class EPerson.
@@ -1029,6 +1156,57 @@ public class EPersonTest extends AbstractUnitTest {
                 wfi.getSubmitter());
     }
 
+    @Test
+    public void findAndCountByGroups() throws SQLException, AuthorizeException, IOException {
+        // Create a group with 3 EPerson members
+        Group group = createGroup("parentGroup");
+        EPerson eperson1 = createEPersonAndAddToGroup("test1@example.com", group);
+        EPerson eperson2 = createEPersonAndAddToGroup("test2@example.com", group);
+        EPerson eperson3 = createEPersonAndAddToGroup("test3@example.com", group);
+        groupService.update(context, group);
+
+        Group group2 = null;
+        EPerson eperson4 = null;
+
+        try {
+            // Assert that findByGroup is the same list of EPersons as getMembers() when pagination is ignored
+            // (NOTE: Pagination is tested in GroupRestRepositoryIT)
+            // NOTE: isEqualCollection() must be used for comparison because Hibernate's "PersistentBag" cannot be
+            // compared directly to a List. See https://stackoverflow.com/a/57399383/3750035
+            assertTrue(
+                CollectionUtils.isEqualCollection(group.getMembers(),
+                                                  ePersonService.findByGroups(context, Set.of(group), -1, -1)));
+            // Assert countByGroups is the same as the size of members
+            assertEquals(group.getMembers().size(), ePersonService.countByGroups(context, Set.of(group)));
+
+            // Add another group with duplicate EPerson
+            group2 = createGroup("anotherGroup");
+            groupService.addMember(context, group2, eperson1);
+            groupService.update(context, group2);
+
+            // Verify countByGroups is still 3 (existing person should not be counted twice)
+            assertEquals(3, ePersonService.countByGroups(context, Set.of(group, group2)));
+
+            // Add a new EPerson to new group, verify count goes up by one
+            eperson4 = createEPersonAndAddToGroup("test4@example.com", group2);
+            assertEquals(4, ePersonService.countByGroups(context, Set.of(group, group2)));
+        } finally {
+            // Clean up our data
+            context.turnOffAuthorisationSystem();
+            groupService.delete(context, group);
+            if (group2 != null) {
+                groupService.delete(context, group2);
+            }
+            ePersonService.delete(context, eperson1);
+            ePersonService.delete(context, eperson2);
+            ePersonService.delete(context, eperson3);
+            if (eperson4 != null) {
+                ePersonService.delete(context, eperson4);
+            }
+            context.restoreAuthSystemState();
+        }
+    }
+
     /**
      * Creates an item, sets the specified submitter.
      *
@@ -1074,5 +1252,55 @@ public class EPersonTest extends AbstractUnitTest {
         workspaceItemService.update(context, wsi);
         context.restoreAuthSystemState();
         return wsi;
+    }
+
+    protected Group createGroup(String name) throws SQLException, AuthorizeException {
+        context.turnOffAuthorisationSystem();
+        Group group = groupService.create(context);
+        group.setName(name);
+        groupService.update(context, group);
+        context.restoreAuthSystemState();
+        return group;
+    }
+
+    protected EPerson createEPersonAndAddToGroup(String email, Group group) throws SQLException, AuthorizeException {
+        context.turnOffAuthorisationSystem();
+        EPerson ePerson = createEPerson(email);
+        groupService.addMember(context, group, ePerson);
+        groupService.update(context, group);
+        ePersonService.update(context, ePerson);
+        context.restoreAuthSystemState();
+        return ePerson;
+    }
+
+    protected EPerson createEPersonAndAddToGroup(String email, String firstname, String lastname, Group group)
+        throws SQLException, AuthorizeException {
+        context.turnOffAuthorisationSystem();
+        EPerson ePerson = createEPerson(email, firstname, lastname);
+        groupService.addMember(context, group, ePerson);
+        groupService.update(context, group);
+        ePersonService.update(context, ePerson);
+        context.restoreAuthSystemState();
+        return ePerson;
+    }
+
+    protected EPerson createEPerson(String email) throws SQLException, AuthorizeException {
+        context.turnOffAuthorisationSystem();
+        EPerson ePerson = ePersonService.create(context);
+        ePerson.setEmail(email);
+        ePersonService.update(context, ePerson);
+        context.restoreAuthSystemState();
+        return ePerson;
+    }
+    protected EPerson createEPerson(String email, String firstname, String lastname)
+        throws SQLException, AuthorizeException {
+        context.turnOffAuthorisationSystem();
+        EPerson ePerson = ePersonService.create(context);
+        ePerson.setEmail(email);
+        ePerson.setFirstName(context, firstname);
+        ePerson.setLastName(context, lastname);
+        ePersonService.update(context, ePerson);
+        context.restoreAuthSystemState();
+        return ePerson;
     }
 }

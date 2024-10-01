@@ -154,7 +154,11 @@ public class IndexEventConsumer implements Consumer {
 
             case Event.REMOVE:
             case Event.ADD:
-                if (object == null) {
+                // At this time, ADD and REMOVE actions are ignored on SITE object. They are only triggered for
+                // top-level communities. No action is necessary as Community itself is indexed (or deleted) separately.
+                if (event.getSubjectType() == Constants.SITE) {
+                    log.debug(event.getEventTypeAsString() + " event triggered for Site object. Skipping it.");
+                } else if (object == null) {
                     log.warn(event.getEventTypeAsString() + " event, could not get object for "
                                  + event.getObjectTypeAsString() + " id="
                                  + event.getObjectID()
@@ -201,6 +205,10 @@ public class IndexEventConsumer implements Consumer {
     @Override
     public void end(Context ctx) throws Exception {
 
+        // Change the mode to readonly to improve performance
+        Context.Mode originalMode = ctx.getCurrentMode();
+        ctx.setMode(Context.Mode.READ_ONLY);
+
         try {
             for (String uid : uniqueIdsToDelete) {
                 try {
@@ -230,6 +238,8 @@ public class IndexEventConsumer implements Consumer {
                 uniqueIdsToDelete.clear();
                 createdItemsToUpdate.clear();
             }
+
+            ctx.setMode(originalMode);
         }
     }
 

@@ -126,7 +126,7 @@ public class Bundle extends DSpaceObject implements DSpaceObjectLegacySupport {
      * Unset the primary bitstream ID of the bundle
      */
     public void unsetPrimaryBitstreamID() {
-        primaryBitstream = null;
+        setPrimaryBitstreamID(null);
     }
 
     /**

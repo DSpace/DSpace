@@ -1432,6 +1432,18 @@
             <xsl:when test="$lc_dc_type = 'book review'">
                 <xsl:text>literature</xsl:text>
             </xsl:when>
+            <xsl:when test="$lc_dc_type = 'bachelor thesis'">
+                <xsl:text>literature</xsl:text>
+            </xsl:when>
+            <xsl:when test="$lc_dc_type = 'doctoral thesis'">
+                <xsl:text>literature</xsl:text>
+            </xsl:when>
+            <xsl:when test="$lc_dc_type = 'master thesis'">
+                <xsl:text>literature</xsl:text>
+            </xsl:when>
+            <xsl:when test="$lc_dc_type = 'thesis'">
+                <xsl:text>literature</xsl:text>
+            </xsl:when>		
             <xsl:when test="$lc_dc_type = 'dataset'">
                 <xsl:text>dataset</xsl:text>
             </xsl:when>
