@@ -74,28 +74,28 @@
 			</xsl:for-each>
 			<xsl:if test="doc:metadata/doc:element[@name='thesis']">
 			<degree>
-			<xsl:for-each select="doc:metadata/doc:element[@name='thesis']/doc:element[@name='name']/doc:element/doc:field[@name='value']">
+			<xsl:for-each select="doc:metadata/doc:element[@name='thesis']/doc:element[@name='degree']/doc:element[@name='name']/doc:element/doc:field[@name='value']">
 				<name><xsl:value-of select="." /></name>
 			</xsl:for-each>
-			<xsl:for-each select="doc:metadata/doc:element[@name='thesis']/doc:element[@name='name']/doc:element/doc:element/doc:field[@name='value']">
+			<xsl:for-each select="doc:metadata/doc:element[@name='thesis']/doc:element[@name='degree']/doc:element[@name='name']/doc:element/doc:element/doc:field[@name='value']">
 				<name><xsl:value-of select="." /></name>
 			</xsl:for-each>
-			<xsl:for-each select="doc:metadata/doc:element[@name='thesis']/doc:element[@name='level']/doc:element/doc:field[@name='value']">
+			<xsl:for-each select="doc:metadata/doc:element[@name='thesis']/doc:element[@name='degree']/doc:element[@name='level']/doc:element/doc:field[@name='value']">
 				<level><xsl:value-of select="." /></level>
 			</xsl:for-each>
-			<xsl:for-each select="doc:metadata/doc:element[@name='thesis']/doc:element[@name='level']/doc:element/doc:element/doc:field[@name='value']">
+			<xsl:for-each select="doc:metadata/doc:element[@name='thesis']/doc:element[@name='degree']/doc:element[@name='level']/doc:element/doc:element/doc:field[@name='value']">
 				<level><xsl:value-of select="." /></level>
 			</xsl:for-each>
-			<xsl:for-each select="doc:metadata/doc:element[@name='thesis']/doc:element[@name='discipline']/doc:element/doc:field[@name='value']">
+			<xsl:for-each select="doc:metadata/doc:element[@name='thesis']/doc:element[@name='degree']/doc:element[@name='discipline']/doc:element/doc:field[@name='value']">
 				<discipline><xsl:value-of select="." /></discipline>
 			</xsl:for-each>
-			<xsl:for-each select="doc:metadata/doc:element[@name='thesis']/doc:element[@name='discipline']/doc:element/doc:element/doc:field[@name='value']">
+			<xsl:for-each select="doc:metadata/doc:element[@name='thesis']/doc:element[@name='degree']/doc:element[@name='discipline']/doc:element/doc:element/doc:field[@name='value']">
 				<discipline><xsl:value-of select="." /></discipline>
 			</xsl:for-each>
-			<xsl:for-each select="doc:metadata/doc:element[@name='thesis']/doc:element[@name='grantor']/doc:element/doc:field[@name='value']">
+			<xsl:for-each select="doc:metadata/doc:element[@name='thesis']/doc:element[@name='degree']/doc:element[@name='grantor']/doc:element/doc:field[@name='value']">
 				<grantor><xsl:value-of select="." /></grantor>
 			</xsl:for-each>
-			<xsl:for-each select="doc:metadata/doc:element[@name='thesis']/doc:element[@name='grantor']/doc:element/doc:element/doc:field[@name='value']">
+			<xsl:for-each select="doc:metadata/doc:element[@name='thesis']/doc:element[@name='degree']/doc:element[@name='grantor']/doc:element/doc:element/doc:field[@name='value']">
 				<grantor><xsl:value-of select="." /></grantor>
 			</xsl:for-each>
 			</degree>
