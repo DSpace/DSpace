@@ -13,6 +13,14 @@ This document focuses on the customizations made for DRUM.
 DRUM uses the DataCite "MDS" API to mint DOIs. See
 <https://support.datacite.org/docs/mds-api-guide>
 
+## DataCite Schema
+
+DRUM uses a custom file, "dspace/config/crosswalks/DIM2UmdDataCite.xsl", to
+convert DSpace metadata into the DataCite schema. This file is based on the
+stock "dspace/config/crosswalks/DIM2DataCite.xsl" file, and configured for use
+in the `crosswalk.dissemination.DataCite.stylesheet` property of the "local.cfg"
+file.
+
 ## Random DOIs
 
 By default, DSpace creates ("mints") DOIs as integers that increment
