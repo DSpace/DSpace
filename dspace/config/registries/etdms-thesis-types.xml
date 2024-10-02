@@ -1,0 +1,40 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>ETD-MS v1.1</title>
+        <contributor.author>Rachel Wang & Scholars Portal</contributor.author>
+        <description>
+            ETD-MS v1.1 standard metadata elements used to describe an electronic thesis or dissertation.
+        </description>
+    </dspace-header>
+
+    <dc-schema>
+        <name>thesis</name>
+        <namespace>https://ndltd.org/wp-content/uploads/2021/04/etd-ms-v1.1.html</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>degree</schema>
+        <element>name</element>
+        <scope_note>Name of the degree associated with the work as it appears within the work. (example: Masters in Operations Research).</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>degree</schema>
+        <element>level</element>
+        <scope_note>Three levels are valid: 0 Undergraduate (pre-masters), 1 Limited public access, 2 Publicly accessible.</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>degree</schema>
+        <element>discipline</element>
+        <scope_note>Area of study of the intellectual content of the document. Usually, this will be the name of a program or department.</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>degree</schema>
+        <element>grantor</element>
+        <scope_note>Institution granting the degree associated with the work. Like other names and institutions, this field should be entered in free text form as it appears on the title page or equivalent, with a link to to an authority record if available.</scope_note>
+    </dc-type>
+
+</dspace-dc-types>
