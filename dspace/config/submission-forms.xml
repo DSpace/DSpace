@@ -1371,9 +1371,9 @@
                     <dc-element>equitableAccessSubmission</dc-element>
                     <dc-qualifier></dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Equitable Access</label>
+                    <label>Is this article being submitted to comply with the "Equitable Access to Scholarly Articles Authored by University Faculty" (https://equitableaccess.umd.edu/) policy?</label>
                     <input-type value-pairs-name="yes_no">dropdown</input-type>
-                    <hint>This item is being submitted to comply with the "Equitable Access to Scholarly Articles Authored by University Faculty" (https://equitableaccess.umd.edu/) policy.</hint>
+                    <hint></hint>
                     <required>Please select "Yes" or "No"</required>
                     <type-bind>
                         <!-- Should only display for "Article" -->
