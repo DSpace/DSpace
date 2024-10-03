@@ -1409,9 +1409,9 @@
                     <dc-element>contributor</dc-element>
                     <dc-qualifier>author</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>Author</label>
+                    <label>Author (Last Name, First Name)</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the author's name (Family name, Given names).</hint>
+                    <hint>Enter the author's name (Last name, First name).</hint>
                     <required>You must enter an author for this item.</required>
                 </field>
             </row>
@@ -1421,9 +1421,9 @@
                     <dc-element>contributor</dc-element>
                     <dc-qualifier>advisor</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>Advisor</label>
+                    <label>Advisor (Last Name, First Name)</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the advisor's name (Family name, Given names).</hint>
+                    <hint>Enter the advisor's name (Last name, First name).</hint>
                     <required></required>
                 </field>
             </row>
