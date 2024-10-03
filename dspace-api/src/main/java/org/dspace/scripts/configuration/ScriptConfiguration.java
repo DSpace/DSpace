@@ -107,7 +107,7 @@ public abstract class ScriptConfiguration<T extends DSpaceRunnable> implements B
     public abstract Options getOptions();
 
     /**
-     * The getter for the options of the Script (help informations)
+     * The getter for the options of the Script (help information)
      * 
      * @return the options value of this ScriptConfiguration for help
      */

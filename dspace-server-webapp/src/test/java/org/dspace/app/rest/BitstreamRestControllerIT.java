@@ -1248,7 +1248,6 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         Mockito.verify(inputStreamSpy, times(1)).close();
     }
 
-
     @Test
     public void checkContentDispositionOfFormats() throws Exception {
         configurationService.setProperty("webui.content_disposition_format", new String[] {
@@ -1265,7 +1264,7 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         Bitstream rtf;
         Bitstream xml;
         Bitstream txt;
-        Bitstream html;
+        Bitstream csv;
         try (InputStream is = IOUtils.toInputStream(content, CharEncoding.UTF_8)) {
             rtf = BitstreamBuilder.createBitstream(context, item, is)
                                   .withMimeType("text/richtext").build();
@@ -1273,8 +1272,8 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                                   .withMimeType("text/xml").build();
             txt = BitstreamBuilder.createBitstream(context, item, is)
                                   .withMimeType("text/plain").build();
-            html = BitstreamBuilder.createBitstream(context, item, is)
-                                   .withMimeType("text/html").build();
+            csv = BitstreamBuilder.createBitstream(context, item, is)
+                                   .withMimeType("text/csv").build();
         }
         context.restoreAuthSystemState();
 
@@ -1283,8 +1282,88 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
         verifyBitstreamDownload(xml, "text/xml;charset=UTF-8", true);
         verifyBitstreamDownload(txt, "text/plain;charset=UTF-8", true);
         // this format is not configured and should open inline
-        verifyBitstreamDownload(html, "text/html;charset=UTF-8", false);
+        verifyBitstreamDownload(csv, "text/csv;charset=UTF-8", false);
     }
+
+    @Test
+    public void checkHardcodedContentDispositionFormats() throws Exception {
+        // This test is similar to the above test, but it verifies that our *hardcoded settings* for
+        // webui.content_disposition_format are protecting us from loading specific formats *inline*.
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+        String content = "Test Content";
+        Bitstream html;
+        Bitstream js;
+        Bitstream rdf;
+        Bitstream xml;
+        Bitstream unknown;
+        Bitstream svg;
+        try (InputStream is = IOUtils.toInputStream(content, CharEncoding.UTF_8)) {
+            html = BitstreamBuilder.createBitstream(context, item, is)
+                                   .withMimeType("text/html").build();
+            js = BitstreamBuilder.createBitstream(context, item, is)
+                                 .withMimeType("text/javascript").build();
+            // NOTE: RDF has a MIME Type with a "charset" in our bitstream-formats.xml
+            rdf = BitstreamBuilder.createBitstream(context, item, is)
+                                  .withMimeType("application/rdf+xml; charset=utf-8").build();
+            xml = BitstreamBuilder.createBitstream(context, item, is)
+                                  .withMimeType("text/xml").build();
+            unknown = BitstreamBuilder.createBitstream(context, item, is)
+                                      .withMimeType("application/octet-stream").build();
+            svg = BitstreamBuilder.createBitstream(context, item, is)
+                                  .withMimeType("image/svg+xml").build();
+
+        }
+        context.restoreAuthSystemState();
+
+        // By default, HTML, JS & XML should all download. This protects us from possible XSS attacks, as
+        // each of these formats can embed JavaScript which may execute when the file is loaded *inline*.
+        verifyBitstreamDownload(html, "text/html;charset=UTF-8", true);
+        verifyBitstreamDownload(js, "text/javascript;charset=UTF-8", true);
+        verifyBitstreamDownload(rdf, "application/rdf+xml;charset=UTF-8", true);
+        verifyBitstreamDownload(xml, "text/xml;charset=UTF-8", true);
+        // Unknown file formats should also always download
+        verifyBitstreamDownload(unknown, "application/octet-stream;charset=UTF-8", true);
+        // SVG does NOT currently exist as a recognized format in DSpace's bitstream-formats.xml, but it's another
+        // format that allows embedded JavaScript. This test is a reminder that SVGs should NOT be opened inline.
+        verifyBitstreamDownload(svg, "application/octet-stream;charset=UTF-8", true);
+    }
+
+    @Test
+    public void checkWildcardContentDispositionFormats() throws Exception {
+        // Setting "*" should result in all formats being downloaded (nothing will be opened inline)
+        configurationService.setProperty("webui.content_disposition_format", "*");
+
+        context.turnOffAuthorisationSystem();
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        Item item = ItemBuilder.createItem(context, collection).build();
+        String content = "Test Content";
+        Bitstream csv;
+        Bitstream jpg;
+        Bitstream mpg;
+        Bitstream pdf;
+        try (InputStream is = IOUtils.toInputStream(content, CharEncoding.UTF_8)) {
+            csv = BitstreamBuilder.createBitstream(context, item, is)
+                                  .withMimeType("text/csv").build();
+            jpg = BitstreamBuilder.createBitstream(context, item, is)
+                                   .withMimeType("image/jpeg").build();
+            mpg = BitstreamBuilder.createBitstream(context, item, is)
+                                  .withMimeType("video/mpeg").build();
+            pdf = BitstreamBuilder.createBitstream(context, item, is)
+                                  .withMimeType("application/pdf").build();
+        }
+        context.restoreAuthSystemState();
+
+        // All formats should be download only
+        verifyBitstreamDownload(csv, "text/csv;charset=UTF-8", true);
+        verifyBitstreamDownload(jpg, "image/jpeg;charset=UTF-8", true);
+        verifyBitstreamDownload(mpg, "video/mpeg;charset=UTF-8", true);
+        verifyBitstreamDownload(pdf, "application/pdf;charset=UTF-8", true);
+    }
+
 
     private void verifyBitstreamDownload(Bitstream file, String contentType, boolean shouldDownload) throws Exception {
         String token = getAuthToken(admin.getEmail(), password);
@@ -1294,11 +1373,15 @@ public class BitstreamRestControllerIT extends AbstractControllerIntegrationTest
                                          .andExpect(content().contentType(contentType))
                                          .andReturn().getResponse().getHeader("content-disposition");
         if (shouldDownload) {
-            assertTrue(header.contains("attachment"));
-            assertFalse(header.contains("inline"));
+            assertTrue("Content-Disposition should contain 'attachment' for " + contentType,
+                       header.contains("attachment"));
+            assertFalse("Content-Disposition should NOT contain 'inline' for " + contentType,
+                        header.contains("inline"));
         } else {
-            assertTrue(header.contains("inline"));
-            assertFalse(header.contains("attachment"));
+            assertTrue("Content-Disposition should contain 'inline' for " + contentType,
+                       header.contains("inline"));
+            assertFalse("Content-Disposition should NOT contain 'attachment' for " + contentType,
+                        header.contains("attachment"));
         }
     }
 }

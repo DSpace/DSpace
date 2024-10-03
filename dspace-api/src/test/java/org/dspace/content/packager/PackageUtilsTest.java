@@ -79,7 +79,7 @@ public class PackageUtilsTest extends AbstractUnitTest {
             CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
             log.info("setUpClass() - CREATE TEST HIERARCHY");
-            // Create a hierachy of sub-Communities and Collections
+            // Create a hierarchy of sub-Communities and Collections
             // which looks like this:
             //  "Top Community"
             //      - "Child Community"

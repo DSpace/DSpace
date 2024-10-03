@@ -35,7 +35,7 @@ import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
- * This class tests BitstreamFormat. Due to it being tighly coupled with the
+ * This class tests BitstreamFormat. Due to it being tightly coupled with the
  * database, most of the methods use mock objects, which only proved a very
  * basic test level (ensure the method doesn't throw an exception). The real
  * testing of the class will be done in the Integration Tests.
@@ -230,7 +230,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
      */
     @Test(expected = AuthorizeException.class)
     public void testCreateNotAdmin() throws SQLException, AuthorizeException {
-        // Disalow full Admin perms
+        // Disallow full Admin perms
         when(authorizeServiceSpy.isAdmin(context)).thenReturn(false);
 
         bitstreamFormatService.create(context);

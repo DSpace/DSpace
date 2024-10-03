@@ -490,7 +490,7 @@ public class ItemExportServiceImpl implements ItemExportService {
 
         File wkDir = new File(workDir);
         if (!wkDir.exists() && !wkDir.mkdirs()) {
-            logError("Unable to create working direcory");
+            logError("Unable to create working directory");
         }
 
         File dnDir = new File(destDirName);
@@ -498,11 +498,18 @@ public class ItemExportServiceImpl implements ItemExportService {
             logError("Unable to create destination directory");
         }
 
-        // export the items using normal export method
-        exportItem(context, items, workDir, seqStart, migrate, excludeBitstreams);
+        try {
+            // export the items using normal export method (this exports items to our workDir)
+            exportItem(context, items, workDir, seqStart, migrate, excludeBitstreams);
 
-        // now zip up the export directory created above
-        zip(workDir, destDirName + System.getProperty("file.separator") + zipFileName);
+            // now zip up the workDir directory created above
+            zip(workDir, destDirName + System.getProperty("file.separator") + zipFileName);
+        } finally {
+            // Cleanup workDir created above, if it still exists
+            if (wkDir.exists()) {
+                deleteDirectory(wkDir);
+            }
+        }
     }
 
     @Override
@@ -718,7 +725,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                         try {
                             emailErrorMessage(eperson, e1.getMessage());
                         } catch (Exception e) {
-                            // wont throw here
+                            // won't throw here
                         }
                         throw new IllegalStateException(e1);
                     } finally {

@@ -54,7 +54,7 @@ public class BitstreamResourcePolicyAddPatchOperation extends AddPatchOperation<
         Item item = source.getItem();
 
         List<Bundle> bundle = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
-        ;
+
         UploadConfiguration uploadConfig = uploadConfigurationService.getMap().get(splitPath[2]);
         for (Bundle bb : bundle) {
             int idx = 0;

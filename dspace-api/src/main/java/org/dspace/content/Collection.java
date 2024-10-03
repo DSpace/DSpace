@@ -28,7 +28,6 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.browse.ItemCountException;
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
@@ -156,7 +155,7 @@ public class Collection extends CacheableDSpaceObject implements DSpaceObjectLeg
     /**
      * Set the default group of submitters
      *
-     * Package protected in order to preven unauthorized calls to this method
+     * Package protected in order to prevent unauthorized calls to this method
      *
      * @param submitters the group of submitters
      */
@@ -230,7 +229,7 @@ public class Collection extends CacheableDSpaceObject implements DSpaceObjectLeg
      * @throws SQLException if database error
      */
     public void setLicense(Context context, String license) throws SQLException {
-        getCollectionService().setMetadataSingleValue(context, this, MD_LICENSE, Item.ANY, license);
+        getCollectionService().setMetadataSingleValue(context, this, MD_LICENSE, null, license);
     }
 
     /**
@@ -335,18 +334,4 @@ public class Collection extends CacheableDSpaceObject implements DSpaceObjectLeg
         }
         return collectionService;
     }
-
-    /**
-     * return count of the collection items
-     *
-     * @return int
-     */
-    public int countArchivedItems() {
-        try {
-            return collectionService.countArchivedItems(this);
-        } catch (ItemCountException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 }

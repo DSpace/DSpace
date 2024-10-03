@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>8.0-SNAPSHOT</version>
+        <version>9.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -623,7 +623,7 @@
         <dependency>
             <groupId>dnsjava</groupId>
             <artifactId>dnsjava</artifactId>
-            <version>2.1.9</version>
+            <version>3.6.0</version>
         </dependency>
 
         <dependency>

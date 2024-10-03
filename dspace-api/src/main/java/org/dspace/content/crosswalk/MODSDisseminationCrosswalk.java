@@ -202,7 +202,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      * e.g.  dc.contributor.author
      *
      * 2. XML fragment is prototype of metadata element, with empty or "%s"
-     * placeholders for value(s).  NOTE: Leave the %s's in becaue
+     * placeholders for value(s).  NOTE: Leave the %s's in because
      * it's much easier then to see if something is broken.
      *
      * 3. XPath expression listing point(s) in the above XML where

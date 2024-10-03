@@ -50,7 +50,7 @@ public class LogHelper {
 
 
         StringBuilder result = new StringBuilder();
-        // Escape everthing but the extra context info because for some crazy reason two fields
+        // Escape everything but the extra context info because for some crazy reason two fields
         // are generated inside this entry one for the session id, and another for the ip
         // address. Everything else should be escaped.
         result.append(escapeLogField(email)).append(":").append(contextExtraInfo).append(":")

@@ -188,6 +188,15 @@ public class DSpaceCSV implements Serializable {
                     // Verify that the heading is valid in the metadata registry
                     String[] clean = element.split("\\[");
                     String[] parts = clean[0].split("\\.");
+                    // Check language if present, if it's ANY then throw an exception
+                    if (clean.length > 1 && clean[1].equals(Item.ANY + "]")) {
+                        throw new MetadataImportInvalidHeadingException("Language ANY (*) was found in the heading " +
+                                                                                "of the metadata value to import, " +
+                                                                                "this should never be the case",
+                                                                        MetadataImportInvalidHeadingException.ENTRY,
+                                                                        columnCounter);
+
+                    }
 
                     if (parts.length < 2) {
                         throw new MetadataImportInvalidHeadingException(element,
@@ -221,6 +230,15 @@ public class DSpaceCSV implements Serializable {
                                                                                 .ELEMENT,
                                                                             columnCounter);
                         }
+                    }
+
+                    // Verify there isn’t already a header that is the same; if it already exists,
+                    // throw MetadataImportInvalidHeadingException
+                    String header = authorityPrefix + element;
+                    if (headings.contains(header)) {
+                        throw new MetadataImportInvalidHeadingException("Duplicate heading found: " + header,
+                                                                        MetadataImportInvalidHeadingException.ENTRY,
+                                                                        columnCounter);
                     }
 
                     // Store the heading
@@ -457,7 +475,7 @@ public class DSpaceCSV implements Serializable {
                 key = key + "." + metadataField.getQualifier();
             }
 
-            // Add the language if there is one (schema.element.qualifier[langauge])
+            // Add the language if there is one (schema.element.qualifier[language])
             //if ((value.language != null) && (!"".equals(value.language)))
             if (value.getLanguage() != null) {
                 key = key + "[" + value.getLanguage() + "]";

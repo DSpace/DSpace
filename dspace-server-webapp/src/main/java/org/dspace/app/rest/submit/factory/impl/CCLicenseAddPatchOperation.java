@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Example: <code>
  * curl -X PATCH http://${dspace.server.url}/api/submission/workspaceitems/31599 -H "Content-Type:
  * application/json" -d '[{ "op": "add", "path": "/sections/cclicense/uri",
- * "value":"http://creativecommons.org/licenses/by-nc-sa/3.0/us/"}]'
+ * "value":"https://creativecommons.org/licenses/by-nc-sa/4.0/us/"}]'
  * </code>
  */
 public class CCLicenseAddPatchOperation extends AddPatchOperation<String> {

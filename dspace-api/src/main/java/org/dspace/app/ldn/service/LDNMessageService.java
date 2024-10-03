@@ -98,8 +98,9 @@ public interface LDNMessageService {
      * 
      * @return number of messages fixed
      * @param context The DSpace context
+     * @throws SQLException
      */
-    public int checkQueueMessageTimeout(Context context);
+    public int checkQueueMessageTimeout(Context context) throws SQLException;
 
     /**
      * Elaborates the oldest enqueued message
@@ -154,4 +155,11 @@ public interface LDNMessageService {
      * @param sourceIp the ip to evaluate
      */
     public boolean isValidIp(NotifyServiceEntity origin, String sourceIp);
+
+    /**
+     * check if the notification is targeting the current system
+     * 
+     * @param notification   the LDN Message entity
+     */
+    boolean isTargetCurrent(Notification notification);
 }

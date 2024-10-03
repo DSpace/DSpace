@@ -920,8 +920,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         is(PageMatcher.pageEntry(0, 20))))
                 //The date values need to be as specified below
                 .andExpect(jsonPath("$._embedded.values", containsInAnyOrder(
-                        //We'll always get atleast two intervals with the items specified above, so we ask to match
-                        // twice atleast
+                        //We'll always get at least two intervals with the items specified above, so we ask to match
+                        // twice at least
                         FacetValueMatcher.entryDateIssued(),
                         FacetValueMatcher.entryDateIssued()
                 )))
@@ -1284,11 +1284,11 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                                          DiscoverySortFieldConfiguration.SORT_ORDER.desc.name()),
                        SortOptionMatcher.sortOptionMatcher("organization.legalName",
                                          DiscoverySortFieldConfiguration.SORT_ORDER.asc.name()),
-                       SortOptionMatcher.sortOptionMatcher("organisation.address.addressCountry",
+                       SortOptionMatcher.sortOptionMatcher("organization.address.addressCountry",
                                          DiscoverySortFieldConfiguration.SORT_ORDER.asc.name()),
-                       SortOptionMatcher.sortOptionMatcher("organisation.address.addressLocality",
+                       SortOptionMatcher.sortOptionMatcher("organization.address.addressLocality",
                                          DiscoverySortFieldConfiguration.SORT_ORDER.asc.name()),
-                       SortOptionMatcher.sortOptionMatcher("organisation.foundingDate",
+                       SortOptionMatcher.sortOptionMatcher("organization.foundingDate",
                                          DiscoverySortFieldConfiguration.SORT_ORDER.desc.name()),
                        SortOptionMatcher.sortOptionMatcher("dc.date.accessioned",
                                          DiscoverySortFieldConfiguration.SORT_ORDER.desc.name()),
@@ -6713,7 +6713,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         SupervisionOrderBuilder.createSupervisionOrder(context, wfItem1Admin.getItem(), groupA).build();
         SupervisionOrderBuilder.createSupervisionOrder(context, wfItem1Admin.getItem(), groupB).build();
 
-        // 6. a pool taks in the second step of the workflow
+        // 6. a pool task in the second step of the workflow
         ClaimedTask cTask2 = ClaimedTaskBuilder.createClaimedTask(context, col2, admin).withTitle("Pool Step2 Item")
                                                .withIssueDate("2010-11-04")
                                                .build();

@@ -164,6 +164,15 @@
                     </key>
                     <ref bean="outcomingAnnounceIngestAction" />
                 </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Announce</value>
+                            <value>coar-notify:RelationshipAction</value>
+                        </set>
+                    </key>
+                    <ref bean="outcomingAnnounceRelationAction" />
+                </entry>
             </map>
         </property>
     </bean>
@@ -266,6 +275,14 @@
     </bean>
 
     <bean name="outcomingAnnounceReviewAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.SendLDNMessageAction"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="outcomingAnnounceRelationAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
         <property name="actions">
             <list value-type="org.dspace.app.ldn.action.LDNAction">
                 <bean class="org.dspace.app.ldn.action.SendLDNMessageAction"/>

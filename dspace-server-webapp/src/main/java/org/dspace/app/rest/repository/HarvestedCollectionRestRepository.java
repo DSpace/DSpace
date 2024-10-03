@@ -148,7 +148,7 @@ public class HarvestedCollectionRestRepository extends AbstractDSpaceRestReposit
 
     /**
      * Function used to verify that the harvest settings work
-     * @param harvestedCollectionRest    A object containg the harvest settings to be tested
+     * @param harvestedCollectionRest    A object containing the harvest settings to be tested
      * @return
      */
     private List<String> testHarvestSettings(HarvestedCollectionRest harvestedCollectionRest) {

@@ -28,7 +28,7 @@
     "as:object": "newValue",
     "oldas:relationship": "http://purl.org/vocab/frbr/core#supplement",    
     "as:relationship": "somethingElse",
-    "as:subject": "https://research-organisation.org/repository/item/201203/421/",    
+    "as:subject": "<<object_handle>>",    
 	"id": "<<object_handle>>",
     "type": "Relationship"
   },

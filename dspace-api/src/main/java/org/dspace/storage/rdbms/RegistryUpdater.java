@@ -86,7 +86,7 @@ public class RegistryUpdater implements Callback {
             context.restoreAuthSystemState();
             // Commit changes and close context
             context.complete();
-            log.info("All Bitstream Format Regitry and Metadata Registry updates were completed.");
+            log.info("All Bitstream Format Registry and Metadata Registry updates were completed.");
         } catch (IOException | SQLException | ParserConfigurationException
                 | TransformerException | RegistryImportException
                 | AuthorizeException | NonUniqueMetadataException

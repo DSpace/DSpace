@@ -295,8 +295,7 @@
                 <property name="statements">
                     <list>
                         <!-- Has a non-empty title -->
-                        <bean id="has-title_condition"
-                              class="org.dspace.content.logic.condition.MetadataValueMatchCondition">
+                        <bean class="org.dspace.content.logic.condition.MetadataValueMatchCondition">
                             <property name="parameters">
                                 <map>
                                     <entry key="field" value="dc.title" />
@@ -352,8 +351,7 @@
                 <property name="statements">
                     <list>
                         <!-- Has a non-empty title -->
-                        <bean id="has-title_condition"
-                              class="org.dspace.content.logic.condition.MetadataValueMatchCondition">
+                        <bean class="org.dspace.content.logic.condition.MetadataValueMatchCondition">
                             <property name="parameters">
                                 <map>
                                     <entry key="field" value="dc.title" />

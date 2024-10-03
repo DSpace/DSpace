@@ -176,7 +176,7 @@ public class ManageGroupsFeatureIT extends AbstractControllerIntegrationTest {
 
         // Verify an ePerson in a subgroup of the site administrators has this feature
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/sites/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/sites/" + siteService.findSite(context).getID() + "&feature=canManageGroups"))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='canManageGroups')]")
@@ -285,7 +285,7 @@ public class ManageGroupsFeatureIT extends AbstractControllerIntegrationTest {
 
         // Verify an ePerson in a sub-subgroup of the site administrators has this feature
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/sites/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/sites/" + siteService.findSite(context).getID() + "&feature=canManageGroups"))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='canManageGroups')]")
@@ -502,7 +502,7 @@ public class ManageGroupsFeatureIT extends AbstractControllerIntegrationTest {
 
         // Verify an ePerson in a subgroup of the site administrators has this feature
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/sites/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/sites/" + siteService.findSite(context).getID() + "&feature=canManageGroups"))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='canManageGroups')]")
@@ -636,7 +636,7 @@ public class ManageGroupsFeatureIT extends AbstractControllerIntegrationTest {
 
         // Verify an ePerson in a sub-subgroup of the site administrators has this feature
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/sites/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/sites/" + siteService.findSite(context).getID() + "&feature=canManageGroups"))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='canManageGroups')]")
@@ -897,7 +897,7 @@ public class ManageGroupsFeatureIT extends AbstractControllerIntegrationTest {
 
         // Verify an ePerson in a subgroup of the site administrators has this feature
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/sites/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/sites/" + siteService.findSite(context).getID() + "&feature=canManageGroups"))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='canManageGroups')]")
@@ -1051,7 +1051,7 @@ public class ManageGroupsFeatureIT extends AbstractControllerIntegrationTest {
 
         // Verify an ePerson in a sub-subgroup of the site administrators has this feature
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/sites/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/sites/" + siteService.findSite(context).getID() + "&feature=canManageGroups"))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='canManageGroups')]")
@@ -1352,7 +1352,7 @@ public class ManageGroupsFeatureIT extends AbstractControllerIntegrationTest {
 
         // Verify an ePerson in a subgroup of the site administrators has this feature
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/sites/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/sites/" + siteService.findSite(context).getID() + "&feature=canManageGroups"))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='canManageGroups')]")
@@ -1526,7 +1526,7 @@ public class ManageGroupsFeatureIT extends AbstractControllerIntegrationTest {
 
         // Verify an ePerson in a sub-subgroup of the site administrators has this feature
         getClient(token).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/sites/" + siteService.findSite(context).getID()))
+            + "http://localhost/api/core/sites/" + siteService.findSite(context).getID() + "&feature=canManageGroups"))
             .andExpect(status().isOk())
             .andExpect(
                 jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='canManageGroups')]")

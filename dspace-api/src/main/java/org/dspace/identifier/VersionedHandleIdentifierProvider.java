@@ -127,7 +127,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider implem
                 try {
                     versionNumber = Integer.valueOf(versionHandleMatcher.group(1));
                 } catch (NumberFormatException ex) {
-                    throw new IllegalStateException("Cannot detect the interger value of a digit.", ex);
+                    throw new IllegalStateException("Cannot detect the integer value of a digit.", ex);
                 }
 
                 // get history
@@ -148,7 +148,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider implem
                     try {
                         versionHistoryService.getVersion(context, history, item);
                     } catch (SQLException ex) {
-                        throw new RuntimeException("Problem with the database connection occurd.", ex);
+                        throw new RuntimeException("Problem with the database connection occurred.", ex);
                     }
 
                     // did we found a version?
@@ -184,11 +184,11 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider implem
                     } catch (SQLException | IOException ex) {
                         throw new RuntimeException("Unable to restore a versioned "
                                                        + "handle as there was a problem in creating a "
-                                                       + "neccessary item version: ", ex);
+                                                       + "necessary item version: ", ex);
                     } catch (AuthorizeException ex) {
                         throw new RuntimeException("Unable to restore a versioned "
                                                        + "handle as the current user was not allowed to "
-                                                       + "create a neccessary item version: ", ex);
+                                                       + "create a necessary item version: ", ex);
                     }
                     return;
                 }

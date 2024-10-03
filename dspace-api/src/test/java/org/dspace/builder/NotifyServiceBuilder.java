@@ -121,6 +121,11 @@ public class NotifyServiceBuilder extends AbstractBuilder<NotifyServiceEntity, N
         return this;
     }
 
+    public NotifyServiceBuilder withStatus(boolean enabled) {
+        notifyServiceEntity.setEnabled(enabled);
+        return this;
+    }
+
     public NotifyServiceBuilder withScore(BigDecimal score) {
         notifyServiceEntity.setScore(score);
         return this;

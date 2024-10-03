@@ -87,7 +87,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
             try {
                 object = authorizationRestUtil.getObject(context, id);
             } catch (IllegalArgumentException e) {
-                log.warn("Object informations not found in the specified id {}", id, e);
+                log.warn("Object information not found in the specified id {}", id, e);
                 return null;
             }
 
@@ -104,7 +104,7 @@ public class AuthorizationRestRepository extends DSpaceRestRepository<Authorizat
             try {
                 user = authorizationRestUtil.getEperson(context, id);
             } catch (IllegalArgumentException e) {
-                log.warn("Invalid eperson informations in the specified id {}", id, e);
+                log.warn("Invalid eperson information in the specified id {}", id, e);
                 return null;
             }
             EPerson currUser = context.getCurrentUser();

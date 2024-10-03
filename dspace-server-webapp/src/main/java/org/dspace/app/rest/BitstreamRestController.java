@@ -20,6 +20,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.core.Response;
 import org.apache.catalina.connector.ClientAbortException;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.converter.ConverterService;
@@ -204,12 +205,39 @@ public class BitstreamRestController {
             || responseCode.equals(Response.Status.Family.REDIRECTION);
     }
 
+    /**
+     * Check if a Bitstream of the specified format should always be downloaded (i.e. "content-disposition: attachment")
+     * or can be opened inline (i.e. "content-disposition: inline").
+     * <P>
+     * NOTE that downloading via "attachment" is more secure, as the user's browser will not attempt to process or
+     * display the file. But, downloading via "inline" may be seen as more user-friendly for common formats.
+     * @param format BitstreamFormat
+     * @return true if always download ("attachment"). false if can be opened inline ("inline")
+     */
     private boolean checkFormatForContentDisposition(BitstreamFormat format) {
-        // never automatically download undefined formats
-        if (format == null) {
-            return false;
+        // Undefined or Unknown formats should ALWAYS be downloaded for additional security.
+        if (format == null || format.getSupportLevel() == BitstreamFormat.UNKNOWN) {
+            return true;
         }
-        List<String> formats = List.of((configurationService.getArrayProperty("webui.content_disposition_format")));
+
+        // Load additional formats configured to require download
+        List<String> configuredFormats = List.of(configurationService.
+                                                     getArrayProperty("webui.content_disposition_format"));
+
+        // If configuration includes "*", then all formats will always be downloaded.
+        if (configuredFormats.contains("*")) {
+            return true;
+        }
+
+        // Define a download list of formats which DSpace forces to ALWAYS be downloaded.
+        // These formats can embed JavaScript which may be run in the user's browser if the file is opened inline.
+        // Therefore, DSpace blocks opening these formats inline as it could be used for an XSS attack.
+        List<String> downloadOnlyFormats = List.of("text/html", "text/javascript", "text/xml", "rdf");
+
+        // Combine our two lists
+        List<String> formats = ListUtils.union(downloadOnlyFormats, configuredFormats);
+
+        // See if the passed in format's MIME type or file extension is listed.
         boolean download = formats.contains(format.getMIMEType());
         if (!download) {
             for (String ext : format.getExtensions()) {

@@ -163,6 +163,9 @@ public class LDNMessageConsumer implements Consumer {
         ldn.addArgument(generateBitstreamDownloadUrl(item));
         ldn.addArgument(getBitstreamMimeType(findPrimaryBitstream(item)));
         ldn.addArgument(ldnMessage.getID());
+        ldn.addArgument(getRelationUri(item));
+        ldn.addArgument("http://purl.org/vocab/frbr/core#supplement");
+        ldn.addArgument(format("urn:uuid:%s", UUID.randomUUID()));
 
         ldnMessage.setMessage(ldn.generateLDNMessage());
     }
@@ -173,6 +176,15 @@ public class LDNMessageConsumer implements Consumer {
 
     private String getIdentifierUri(Item item) {
         return itemService.getMetadataByMetadataString(item, "dc.identifier.uri")
+                          .stream()
+                          .findFirst()
+                          .map(MetadataValue::getValue)
+                          .orElse("");
+    }
+
+    private String getRelationUri(Item item) {
+        String relationMetadata = configurationService.getProperty("ldn.notify.relation.metadata", "dc.relation");
+        return itemService.getMetadataByMetadataString(item, relationMetadata)
                           .stream()
                           .findFirst()
                           .map(MetadataValue::getValue)
