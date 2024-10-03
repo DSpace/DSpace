@@ -5,6 +5,9 @@
 This page describes the DRUM Embargo functionality and other access
 restrictions, as of DSpace 7.
 
+For changes to the submission form, see
+[dspace/docs/DrumSubmissionForms.md](DrumSubmissionForms.md).
+
 ## Useful Resources
 
 * <https://wiki.lyrasis.org/display/DSDOC7x/Embargo>

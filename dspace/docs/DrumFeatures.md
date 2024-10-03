@@ -54,6 +54,9 @@ for additional information
 * LIBDRUM-679 - Added "Embargo List" page for administrators reporting all the
   embargoed bitstreams, and enabling CSV download for administrators.
 
+See also the changes to the submission form in detailed in
+[dspace/docs/DrumSubmissionForms.md](DrumSubmissionForms.md).
+
 ## Email Templates
 
 The email templates in "dspace/config/emails" have been modified to use the
@@ -63,35 +66,15 @@ lines and signatures.
 
 ## Submissions
 
-* LIBDRUM-675 - For default submission workflow:
-  * "Author" field is required
-  * "Advisor" field added
-  * See also LIBDRUM-728
-
-* LIBDRUM-711 - "Equitable Access" field added to default submission form
-  * Automatically maps Equitable Access-submitted materials to the
-    "Equitable Access" group.
-
-* LIBDRUM-727 - "Creative Commons" license field added to submission form
-
-* LIBDRUM-729 - List of available types for "Type"  was simplified from DSpace
-  defaults
-
-* LIBDRUM-747 - "Modifying access conditions" section allowing users to create
-  item embargoes was removed.
+See [dspace/docs/DrumSubmissionForms.md](DrumSubmissionForms.md).
 
 ## Data Community
 
-* LIBDRUM-682:
-  * Modified submission form fields based on item type of "Dataset" or
-    "Software"
-  * "Dataset" or "Software" items automatically mapped to "UMD Data Community"
+See [dspace/docs/DrumSubmissionForms.md](DrumSubmissionForms.md).
 
 ## Minority Health and Health Equity Archive (MHHEA)
 
-* LIBDRUM-684 - Created custom workflow and submission form for submissions to
-  the MHHEA group
-* See also LIBDRUM-728
+See [dspace/docs/DrumSubmissionForms.md](DrumSubmissionForms.md).
 
 ## Community Groups
 
