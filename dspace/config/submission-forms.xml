@@ -1349,25 +1349,8 @@
         </form>
 
         <!-- UMD Customization -->
-        <!-- Equitable access submission form -->
-        <form name="equitableAccessSubmission">
-            <row>
-                <field>
-                    <dc-schema>local</dc-schema>
-                    <dc-element>equitableAccessSubmission</dc-element>
-                    <dc-qualifier></dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Equitable Access</label>
-                    <input-type value-pairs-name="yes_no">dropdown</input-type>
-                    <hint>This item is being submitted to comply with the "Equitable Access to Scholarly Articles Authored by University Faculty" (https://equitableaccess.umd.edu/) policy.</hint>
-                    <required>Please select "Yes" or "No"</required>
-                </field>
-            </row>
-        </form>
-
-        <!-- Default "Describe" form for UMD submissions. Used for both
-             default and MHHEA submissions -->
-        <form name="umdDescribe">
+        <!-- "Type" field (with Equitable Access question) for default UMD submissions -->
+        <form name="umdType">
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
@@ -1381,6 +1364,45 @@
                     <required>Please select a type for this item.</required>
                 </field>
             </row>
+
+            <row>
+                <field>
+                    <dc-schema>local</dc-schema>
+                    <dc-element>equitableAccessSubmission</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Equitable Access</label>
+                    <input-type value-pairs-name="yes_no">dropdown</input-type>
+                    <hint>This item is being submitted to comply with the "Equitable Access to Scholarly Articles Authored by University Faculty" (https://equitableaccess.umd.edu/) policy.</hint>
+                    <required>Please select "Yes" or "No"</required>
+                    <type-bind>
+                        <!-- Should only display for "Article" -->
+                        Article
+                    </type-bind>
+                </field>
+            </row>
+        </form>
+
+        <!-- "Type" field (without Equitable Access question) for MHHEA submissions -->
+        <form name="mhheaType">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Type</label>
+                    <input-type value-pairs-name="umd_common_types">dropdown</input-type>
+                    <hint>Select the type of content of the item.
+                    </hint>
+                    <required>Please select a type for this item.</required>
+                </field>
+            </row>
+        </form>
+
+        <!-- Default "Describe" form for UMD submissions. Used for both
+             default and MHHEA submissions -->
+        <form name="umdDescribe">
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
