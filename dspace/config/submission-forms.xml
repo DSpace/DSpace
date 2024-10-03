@@ -1659,7 +1659,7 @@
                     <repeatable>true</repeatable>
                     <label>Subject Keywords</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter appropriate subject keywords or phrases.</hint>
+                    <hint>Enter appropriate subject keywords or phrases. To add multiple subject keywords, enter one term or phrase at a time and then click "Add more".</hint>
                     <required></required>
                 </field>
             </row>
