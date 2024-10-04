@@ -1349,25 +1349,8 @@
         </form>
 
         <!-- UMD Customization -->
-        <!-- Equitable access submission form -->
-        <form name="equitableAccessSubmission">
-            <row>
-                <field>
-                    <dc-schema>local</dc-schema>
-                    <dc-element>equitableAccessSubmission</dc-element>
-                    <dc-qualifier></dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Equitable Access</label>
-                    <input-type value-pairs-name="yes_no">dropdown</input-type>
-                    <hint>This item is being submitted to comply with the "Equitable Access to Scholarly Articles Authored by University Faculty" (https://equitableaccess.umd.edu/) policy.</hint>
-                    <required>Please select "Yes" or "No"</required>
-                </field>
-            </row>
-        </form>
-
-        <!-- Default "Describe" form for UMD submissions. Used for both
-             default and MHHEA submissions -->
-        <form name="umdDescribe">
+        <!-- "Type" field (with Equitable Access question) for default UMD submissions -->
+        <form name="umdType">
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
@@ -1381,15 +1364,54 @@
                     <required>Please select a type for this item.</required>
                 </field>
             </row>
+
+            <row>
+                <field>
+                    <dc-schema>local</dc-schema>
+                    <dc-element>equitableAccessSubmission</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Is this article being submitted to comply with the "Equitable Access to Scholarly Articles Authored by University Faculty" (https://equitableaccess.umd.edu/) policy?</label>
+                    <input-type value-pairs-name="yes_no">dropdown</input-type>
+                    <hint></hint>
+                    <required>Please select "Yes" or "No"</required>
+                    <type-bind>
+                        <!-- Should only display for "Article" -->
+                        Article
+                    </type-bind>
+                </field>
+            </row>
+        </form>
+
+        <!-- "Type" field (without Equitable Access question) for MHHEA submissions -->
+        <form name="mhheaType">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Type</label>
+                    <input-type value-pairs-name="umd_common_types">dropdown</input-type>
+                    <hint>Select the type of content of the item.
+                    </hint>
+                    <required>Please select a type for this item.</required>
+                </field>
+            </row>
+        </form>
+
+        <!-- Default "Describe" form for UMD submissions. Used for both
+             default and MHHEA submissions -->
+        <form name="umdDescribe">
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>contributor</dc-element>
                     <dc-qualifier>author</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>Author</label>
+                    <label>Author (Last Name, First Name)</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the author's name (Family name, Given names).</hint>
+                    <hint>Enter the author's name (Last name, First name).</hint>
                     <required>You must enter an author for this item.</required>
                 </field>
             </row>
@@ -1399,9 +1421,9 @@
                     <dc-element>contributor</dc-element>
                     <dc-qualifier>advisor</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>Advisor</label>
+                    <label>Advisor (Last Name, First Name)</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the advisor's name (Family name, Given names).</hint>
+                    <hint>Enter the advisor's name (Last name, First name).</hint>
                     <required></required>
                 </field>
             </row>
@@ -1637,7 +1659,7 @@
                     <repeatable>true</repeatable>
                     <label>Subject Keywords</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter appropriate subject keywords or phrases.</hint>
+                    <hint>Enter appropriate subject keywords or phrases. To add multiple subject keywords, enter one term or phrase at a time and then click "Add more".</hint>
                     <required></required>
                 </field>
             </row>

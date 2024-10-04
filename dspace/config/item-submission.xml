@@ -53,10 +53,10 @@
         <name-map collection-handle="123456789/29" submission-name="JournalVolume"/>
         <name-map collection-handle="123456789/30" submission-name="JournalIssue"/>
         -->
-        <!-- These configurations enable default submission forms per Entity type 
-            
+        <!-- These configurations enable default submission forms per Entity type
+
             The  collection-entity-type will be the entity-type attribute associated with a collection,
-            typically the entity name that is associated with a collection if any created or loaded 
+            typically the entity name that is associated with a collection if any created or loaded
             (that is usually specified in relationship-types.xml).
             - - - - - -
             PLEASE NOTICE THAT YOU WILL HAVE TO RESTART DSPACE
@@ -239,6 +239,19 @@
         </step-definition>
 
         <!-- UMD Customization -->
+        <!-- LIBDRUM-876 -->
+        <step-definition id="umdType" mandatory="true">
+          <heading>submit.progressbar.describe.umdType</heading>
+          <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+          <type>submission-form</type>
+        </step-definition>
+
+        <step-definition id="mhheaType" mandatory="true">
+          <heading>submit.progressbar.describe.mhheaType</heading>
+          <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+          <type>submission-form</type>
+        </step-definition>
+
         <step-definition id="umdDescribe" mandatory="true">
             <heading>submit.progressbar.describe.stepone</heading>
             <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
@@ -252,13 +265,6 @@
             <type>upload</type>
         </step-definition>
 
-        <!-- LIBDRUM-711 -->
-        <step-definition id="equitableAccessSubmission">
-            <heading>submit.progressbar.equitableAccessSubmission</heading>
-            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
-            <type>submission-form</type>
-            <scope>submission</scope>
-        </step-definition>
         <!-- End UMD Customization -->
     </step-definitions>
 
@@ -422,7 +428,7 @@
         <!-- UMD default submission process -->
         <submission-process name="umd-submission">
             <step id="collection"/>
-            <step id="equitableAccessSubmission"/>
+            <step id="umdType"/>
             <step id="umdDescribe"/>
             <step id="upload"/>
             <step id="cclicense"/>
@@ -434,6 +440,7 @@
             collection -->
         <submission-process name="MHHEA-submission">
             <step id="collection"/>
+            <step id="mhheaType"/>
             <step id="umdDescribe"/>
             <step id="optionalUpload"/>
             <step id="cclicense"/>
