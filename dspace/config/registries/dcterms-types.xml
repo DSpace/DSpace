@@ -358,4 +358,12 @@
     <element>valid</element>
     <scope_note>Date (often a range) of validity of a resource.</scope_note>
   </dc-type>
+
+  <dc-type>
+    <schema>dspace</schema>
+    <element>thumbnail</element>
+    <qualifier>description</qualifier>
+    <scope_note>Stores the thumbnail description of collections or communities. Valid values; text</scope_note>
+  </dc-type>
+
 </dspace-dc-types>
