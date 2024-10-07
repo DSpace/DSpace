@@ -26,8 +26,24 @@ import org.mockito.stubbing.Answer;
  */
 public class MockOrcid extends Orcidv3SolrAuthorityImpl {
 
+    public MockOrcid() {
+        setupMockConnector();
+        setAccessToken("mock-access-token");
+    }
+
     @Override
     public void init() {
+        // Empty implementation as setup is now done in constructor
+    }
+
+    @Override
+    public void initializeAccessToken() {
+        if (getAccessToken() == null) {
+            setAccessToken("mock-access-token");
+        }
+    }
+
+    private void setupMockConnector() {
         OrcidRestConnector orcidRestConnector = Mockito.mock(OrcidRestConnector.class);
         when(orcidRestConnector.get(ArgumentMatchers.startsWith("search?"), ArgumentMatchers.any()))
         .thenAnswer(new Answer<InputStream>() {
@@ -53,5 +69,4 @@ public class MockOrcid extends Orcidv3SolrAuthorityImpl {
 
         setOrcidRestConnector(orcidRestConnector);
     }
-
 }
