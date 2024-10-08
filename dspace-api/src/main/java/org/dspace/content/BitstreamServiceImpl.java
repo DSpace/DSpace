@@ -51,6 +51,12 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
     @Autowired(required = true)
     protected BitstreamDAO bitstreamDAO;
+
+    @Override
+    public List<MetadataValue> addMetadata(Context context, Bitstream dso, MetadataField metadataField, String lang, List<String> values, List<String> authorities, List<Integer> confidences) throws SQLException {
+        return super.addMetadata(context, dso, metadataField, lang, values, authorities, confidences);
+    }
+
     @Autowired(required = true)
     protected ItemService itemService;
 

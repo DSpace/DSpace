@@ -72,7 +72,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
             .getSimpleName().toLowerCase() + " ";
 
         Query hibernateQuery = getSearchQuery(context, queryString, query, queryFields, null,
-                                              sortFields, null, limit, offset);
+                                              sortFields, null, limit, offset, false);
         return list(hibernateQuery);
     }
 
@@ -93,7 +93,20 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
             .getSimpleName().toLowerCase() + " ";
 
         Query hibernateQuery = getSearchQuery(context, queryString, query, queryFields, excludeGroup,
-                                              sortFields, null, limit, offset);
+                                              sortFields, null, limit, offset, false);
+        return list(hibernateQuery);
+    }
+
+    @Override
+    public List<EPerson> searchMember(Context context, String query, List<MetadataField> queryFields,
+                                         Group includeGroup, List<MetadataField> sortFields,
+                                         int offset, int limit) throws SQLException {
+        String queryString = "SELECT " + EPerson.class.getSimpleName()
+                .toLowerCase() + " FROM EPerson as " + EPerson.class
+                .getSimpleName().toLowerCase() + " ";
+
+        Query hibernateQuery = getSearchQuery(context, queryString, query, queryFields, includeGroup,
+                sortFields, null, limit, offset, true);
         return list(hibernateQuery);
     }
 
@@ -102,9 +115,18 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
         String queryString = "SELECT count(*) FROM EPerson as " + EPerson.class.getSimpleName().toLowerCase();
 
         Query hibernateQuery = getSearchQuery(context, queryString, query, queryFields, excludeGroup,
-                                              Collections.EMPTY_LIST, null, -1, -1);
+                                              Collections.EMPTY_LIST, null, -1, -1, false);
         return count(hibernateQuery);
     }
+    
+    public int searchMemberCount(Context context, String query, List<MetadataField> queryFields,
+            Group includeGroup) throws SQLException {
+		String queryString = "SELECT count(*) FROM EPerson as " + EPerson.class.getSimpleName().toLowerCase();
+		
+		Query hibernateQuery = getSearchQuery(context, queryString, query, queryFields, includeGroup,
+		                 Collections.EMPTY_LIST, null, -1, -1, true);
+		return count(hibernateQuery);
+	}
 
     @Override
     public List<EPerson> findAll(Context context, MetadataField metadataSortField, String sortField, int pageSize,
@@ -120,7 +142,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
         }
 
         Query query = getSearchQuery(context, queryString, null, ListUtils.EMPTY_LIST, null,
-                                     sortFields, sortField, pageSize, offset);
+                                     sortFields, sortField, pageSize, offset, false);
         return list(query);
 
     }
@@ -192,7 +214,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
     protected Query getSearchQuery(Context context, String queryString, String queryParam,
                                    List<MetadataField> queryFields, List<MetadataField> sortFields, String sortField)
         throws SQLException {
-        return getSearchQuery(context, queryString, queryParam, queryFields, null, sortFields, sortField, -1, -1);
+        return getSearchQuery(context, queryString, queryParam, queryFields, null, sortFields, sortField, -1, -1, false);
     }
 
     /**
@@ -205,8 +227,8 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
      * @param queryString String which defines the beginning "SELECT" for the SQL query
      * @param queryParam Actual text being searched for
      * @param queryFields List of metadata fields to search within
-     * @param excludeGroup Optional Group which should be excluded from search. Any EPersons who are members
-     *                     of this group will not be included in the results.
+     * @param group Optional Group which should be either excluded or included from search. Any EPersons who are members
+     *                     of this group will be included or excluded in the results based upon the flag isIncludeGroup value.
      * @param sortFields Optional List of metadata fields to sort by (should not be specified if sortField is used)
      * @param sortField Optional database column to sort on (should not be specified if sortFields is used)
      * @param pageSize  how many results return
@@ -215,9 +237,9 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
      * @throws SQLException if error occurs
      */
     protected Query getSearchQuery(Context context, String queryString, String queryParam,
-                                   List<MetadataField> queryFields, Group excludeGroup,
+                                   List<MetadataField> queryFields, Group group,
                                    List<MetadataField> sortFields, String sortField,
-                                    int pageSize, int offset) throws SQLException {
+                                    int pageSize, int offset, boolean isIncludeGroup) throws SQLException {
         // Initialize SQL statement using the passed in "queryString"
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append(queryString);
@@ -235,18 +257,23 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
             addMetadataValueWhereQuery(queryBuilder, queryFields, "like",
                                        EPerson.class.getSimpleName().toLowerCase() + ".email like :queryParam");
         }
-        // If excludeGroup is specified, exclude members of that group from results
-        // This uses a subquery to find the excluded group & verify that it is not in the EPerson list of "groups"
-        if (excludeGroup != null) {
-            // If query params exist, then we already have a WHERE clause (see above) and just need to append an AND
+        // If group is specified, then based upon the isIncludeGroup flag, include/exclude members of that group from results
+        if (group != null) {
             if (StringUtils.isNotBlank(queryParam)) {
                 queryBuilder.append(" AND ");
             } else {
                 // no WHERE clause yet, so this is the start of the WHERE
                 queryBuilder.append(" WHERE ");
             }
-            queryBuilder.append("(FROM Group g where g.id = :group_id) NOT IN elements (")
+            // If query params exist, then we already have a WHERE clause (see above) and just need to append an AND
+            if (isIncludeGroup) {
+                queryBuilder.append("(FROM Group g where g.id = :group_id) IN elements (")
                         .append(EPerson.class.getSimpleName().toLowerCase()).append(".groups)");
+            } else {
+                queryBuilder.append("(FROM Group g where g.id = :group_id) NOT IN elements (")
+                        .append(EPerson.class.getSimpleName().toLowerCase()).append(".groups)");
+            }
+
         }
         // Add sort/order by info to query, if specified
         if (!CollectionUtils.isEmpty(sortFields) || StringUtils.isNotBlank(sortField)) {
@@ -269,8 +296,8 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
         for (MetadataField metadataField : metadataFieldsToJoin) {
             query.setParameter(metadataField.toString(), metadataField.getID());
         }
-        if (excludeGroup != null) {
-            query.setParameter("group_id", excludeGroup.getID());
+        if (group != null) {
+            query.setParameter("group_id", group.getID());
         }
 
         query.setHint("org.hibernate.cacheable", Boolean.TRUE);
