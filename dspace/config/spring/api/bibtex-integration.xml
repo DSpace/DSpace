@@ -11,39 +11,36 @@
     <context:annotation-config/>
     <!-- allows us to use spring annotations in beans -->
 
-    <util:map id="bibtexMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+    <util:list id="bibtexMetadataFieldMap"
               value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
-        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
-            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
-            what metadatafield is generated.
-        </description>
-        <entry key-ref="dcType" value-ref="bibtexTypeContrib" />
-        <entry key-ref="dcTitle" value-ref="bibtexTitleContrib" />
-        <entry key-ref="dcAuthors" value-ref="bibtexAuthorsContrib" />
-        <entry key-ref="dcJournal" value-ref="bibtexJournalContrib" />
-		<entry key-ref="dcIssued" value-ref="bibtexIssuedContrib" />
-		<entry key-ref="dcJissn" value-ref="bibtexJissnContrib" />    
-    </util:map>
+        <description>Defines which metadatum is mapped on which metadatum.</description>
+        <ref bean="bibtexTypeContrib" />
+        <ref bean="bibtexTitleContrib" />
+        <ref bean="bibtexAuthorsContrib" />
+        <ref bean="bibtexJournalContrib" />
+		<ref bean="bibtexIssuedContrib" />
+		<ref bean="bibtexJissnContrib" />    
+    </util:list>
 
     <bean id="bibtexJissnContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
-        <property name="field" ref="dcJissn"/>
+        <property name="field" ref="dc.identifier.issn"/>
         <property name="key" value="ISSN" />
     </bean>
 
     <bean id="bibtexIssuedContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
-        <property name="field" ref="dcIssued"/>
+        <property name="field" ref="dc.date.issued"/>
         <property name="key" value="year" />
     </bean>
 
     <bean id="bibtexJournalContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
-        <property name="field" ref="dcJournal"/>
+        <property name="field" ref="dc.source"/>
         <property name="key" value="journal" />
     </bean>
     
     <bean id="bibtexAuthorsContrib" class="org.dspace.importer.external.metadatamapping.contributor.SplitMetadataContributor">
         <constructor-arg name="innerContributor">
             <bean class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
-                <property name="field" ref="dcAuthors"/>
+                <property name="field" ref="dc.contributor.author"/>
                 <property name="key" value="author" />
             </bean>
         </constructor-arg>
@@ -51,12 +48,12 @@
     </bean>
     
     <bean id="bibtexTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
-        <property name="field" ref="dcTitle"/>
+        <property name="field" ref="dc.title"/>
         <property name="key" value="title" />
     </bean>
 
     <bean id="bibtexTypeContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleMetadataContributor">
-        <property name="field" ref="dcType"/>
+        <property name="field" ref="dc.type"/>
         <property name="key" value="type" />
     </bean>
 
