@@ -10,6 +10,7 @@ package org.dspace.orcid.client;
 import java.util.List;
 import java.util.Optional;
 
+import org.dspace.orcid.OrcidToken;
 import org.dspace.orcid.exception.OrcidClientException;
 import org.dspace.orcid.model.OrcidTokenResponseDTO;
 import org.orcid.jaxb.model.v3.release.record.Person;
@@ -160,5 +161,12 @@ public interface OrcidClient {
      * @throws OrcidClientException if some error occurs during the search
      */
     OrcidResponse deleteByPutCode(String accessToken, String orcid, String putCode, String path);
+
+    /**
+     * Revokes the given {@param accessToken} with a POST method.
+     * @param orcidToken   the access token to revoke
+     * @throws OrcidClientException if some error occurs during the search
+     */
+    void revokeToken(OrcidToken orcidToken);
 
 }
