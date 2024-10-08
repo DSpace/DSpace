@@ -15,12 +15,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
@@ -941,5 +944,41 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         } else {
             return query + " AND ";
         }
+    }
+
+    public DiscoverResult retrieveObjectWithAdmin(Context context, DiscoverQuery discoverQuery,
+            String entityType, Community community, String q)
+            throws SQLException, SearchServiceException {
+
+        StringBuilder query = new StringBuilder();
+        EPerson currentUser = context.getCurrentUser();
+        if (!isAdmin(context)) {
+            String userId = "";
+            if (currentUser != null) {
+                userId = currentUser.getID().toString();
+            }
+            query.append("admin:(e").append(userId);
+
+            Set<Group> groups = groupService.allMemberGroupsSet(context, currentUser);
+            for (Group group : groups) {
+                query.append(" OR g").append(group.getID());
+            }
+            query.append(")");
+            discoverQuery.addFilterQueries(query.toString());
+        }
+        if (Objects.nonNull(community)) {
+            discoverQuery.addFilterQueries("location.comm:" + community.getID().toString());
+        }
+        if (StringUtils.isNotBlank(entityType)) {
+            discoverQuery.addFilterQueries("search.entitytype:" + entityType);
+        }
+        if (StringUtils.isNotBlank(q)) {
+            StringBuilder buildQuery = new StringBuilder();
+            String escapedQuery = ClientUtils.escapeQueryChars(q);
+            buildQuery.append("(").append(escapedQuery).append(" OR ").append(escapedQuery).append("*").append(")");
+            discoverQuery.setQuery(buildQuery.toString());
+        }
+        DiscoverResult resp = searchService.search(context, discoverQuery);
+        return resp;
     }
 }
