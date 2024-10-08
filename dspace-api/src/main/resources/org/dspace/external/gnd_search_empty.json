@@ -1,0 +1,13 @@
+{
+  "@context" : "https://lobid.org/gnd/context.jsonld",
+  "id" : "https://lobid.org/gnd/search?q=badsearch&from=0&size=2&format=json",
+  "totalItems" : 0,
+  "member" : [ ],
+  "aggregation" : {
+    "gndSubjectCategory.id" : [ ],
+    "professionOrOccupation.id" : [ ],
+    "geographicAreaCode.id" : [ ],
+    "dateOfBirth" : [ ],
+    "type" : [ ]
+  }
+}
