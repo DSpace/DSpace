@@ -45,7 +45,17 @@
     <bean class="org.dspace.content.BundleServiceImpl"/>
     <bean class="org.dspace.content.CommunityServiceImpl"/>
     <bean class="org.dspace.content.InstallItemServiceImpl"/>
-    <bean class="org.dspace.content.ItemServiceImpl"/>
+    <bean class="org.dspace.content.ItemServiceImpl">
+        <property name="nonCopyableMetadataFields">
+            <set>
+                <value>dc.date.accessioned</value>
+                <value>dspace.entity.type</value>
+                <value>dc.identifier.uri</value>
+                <value>dc.provenance</value>
+                <value>dc.description.provenance</value>
+            </set>
+        </property>
+    </bean>
     <bean class="org.dspace.content.MetadataDSpaceCsvExportServiceImpl"/>
     <bean class="org.dspace.content.MetadataFieldServiceImpl"/>
     <bean class="org.dspace.content.MetadataSchemaServiceImpl"/>
