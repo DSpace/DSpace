@@ -137,7 +137,11 @@ public class ClarinBitstreamImportController {
 
             Boolean deleted = Boolean.parseBoolean(deletedString);
             //set size bytes
-            bitstream.setSizeBytes(bitstreamRest.getSizeBytes());
+            if (Objects.nonNull(bitstreamRest.getSizeBytes())) {
+                bitstream.setSizeBytes(bitstreamRest.getSizeBytes());
+            } else {
+                log.info("SizeBytes is null. Bitstream UUID: " + bitstream.getID());
+            }
             //set checksum
             bitstream.setChecksum(bitstreamRest.getCheckSum().getValue());
             //set checksum algorithm
@@ -206,7 +210,7 @@ public class ClarinBitstreamImportController {
                 message += " for bundle with uuid: " + bundle.getID();
             }
             log.error(message, e);
-            throw new RuntimeException("message", e);
+            throw new RuntimeException(message, e);
         }
         return bitstreamRest;
     }

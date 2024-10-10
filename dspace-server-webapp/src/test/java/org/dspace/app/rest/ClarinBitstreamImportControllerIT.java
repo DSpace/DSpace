@@ -270,6 +270,41 @@ public class ClarinBitstreamImportControllerIT extends AbstractEntityIntegration
         assertEquals(bitstreamService.findAll(context).size(), 0);
     }
 
+    @Test
+    public void importDeletedBitstreamTest() throws Exception {
+        //input data
+        ObjectNode checksumNode = jsonNodeFactory.objectNode();
+        checksumNode.set("checkSumAlgorithm", null);
+        checksumNode.set("value", null);
+        ObjectNode node = jsonNodeFactory.objectNode();
+        node.set("sizeBytes", null);
+        node.set("checkSum", checksumNode);
+
+        //create new bitstream for existing file
+        ObjectMapper mapper = new ObjectMapper();
+        uuid =  UUID.fromString(read( getClient(token).perform(post("/api/clarin/import/core/bitstream")
+                        .content(mapper.writeValueAsBytes(node))
+                        .contentType(contentType)
+                        .param("internal_id", internalId)
+                        .param("storeNumber", "0")
+                        .param("deleted", "true"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString(),
+                "$.id"));
+
+        bitstream = bitstreamService.find(context, uuid);
+        assertEquals(bitstream.getSizeBytes(), 0);
+        assertEquals(bitstream.getInternalId(), internalId);
+        assertEquals(bitstream.getStoreNumber(), 0);
+        assertEquals(bitstream.getSequenceID(), -1);
+        assertEquals(bitstream.isDeleted(), true);
+
+        //clean all
+        context.turnOffAuthorisationSystem();
+        BitstreamBuilder.deleteBitstream(uuid);
+        context.restoreAuthSystemState();
+    }
+
     private void checkCreatedBitstream(UUID uuid, String internalId, int storeNumber,
                                        String bitstreamFormat, int sequence, boolean deleted, long sizeBytes,
                                        String checkSum) throws SQLException {
