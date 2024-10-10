@@ -343,6 +343,18 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
             <version>${spring-boot.version}</version>
+            <exclusions>
+                <!-- Use version brought in by spring-boot-starter-web above -->
+                <exclusion>
+                    <groupId>io.micrometer</groupId>
+                    <artifactId>micrometer-observation</artifactId>
+                </exclusion>
+                <!-- Use version brought in by spring-boot-starter-web above -->
+                <exclusion>
+                    <groupId>io.micrometer</groupId>
+                    <artifactId>micrometer-commons</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -437,7 +449,7 @@
             <artifactId>spring-boot-starter-security</artifactId>
             <version>${spring-boot.version}</version>
             <exclusions>
-                <!-- Later version brought in by spring-boot-starter-web above -->
+                <!-- Use version brought in by spring-boot-starter-web above -->
                 <exclusion>
                     <groupId>io.micrometer</groupId>
                     <artifactId>micrometer-observation</artifactId>
