@@ -237,41 +237,6 @@ public class SamlAuthenticationTest extends AbstractUnitTest {
     }
 
     @Test
-    public void testUpdatedNamesAreTruncated() throws Exception {
-        context.setCurrentUser(null);
-        context.turnOffAuthorisationSystem();
-
-        testUser = EPersonBuilder.createEPerson(context)
-            .withEmail("alyssa@dspace.org")
-            .withNetId("001")
-            .withNameInMetadata("Alyssa", "Hacker")
-            .withCanLogin(true)
-            .build();
-
-        context.restoreAuthSystemState();
-
-        request.setAttribute("org.dspace.saml.NAME_ID", "001");
-
-        request.setAttribute("org.dspace.saml.GIVEN_NAME",
-            "This name is really very long and in fact its much too long so it must be trucated yes I said truncated");
-
-        request.setAttribute("org.dspace.saml.SURNAME",
-            "What is going on with these long names it's frankly out of control and I can't take it any more");
-
-        int result = samlAuth.authenticate(context, null, null, null, request);
-
-        assertEquals(AuthenticationMethod.SUCCESS, result);
-
-        EPerson user = context.getCurrentUser();
-
-        assertNotNull(user);
-        assertEquals("alyssa@dspace.org", user.getEmail());
-        assertEquals("001", user.getNetid());
-        assertEquals("This name is really very long and in fact its much too long so i", user.getFirstName());
-        assertEquals("What is going on with these long names it's frankly out of contr", user.getLastName());
-    }
-
-    @Test
     public void testAuthenticateExistingUserAdditionalMetadata() throws Exception {
         configurationService.setProperty("authentication-saml.eperson.metadata",
             "org.dspace.saml.PHONE => phone," +
@@ -312,49 +277,6 @@ public class SamlAuthenticationTest extends AbstractUnitTest {
         assertEquals("123-456-7890", metadata.get(2).getValue());
         assertEquals("eperson_nickname", metadata.get(3).getMetadataField().toString());
         assertEquals("Liz", metadata.get(3).getValue());
-    }
-
-    @Test
-    public void testUpdatedAdditionalMetadataAreTruncated() throws Exception {
-        configurationService.setProperty("authentication-saml.eperson.metadata",
-            "org.dspace.saml.PHONE => phone," +
-            "org.dspace.saml.NICKNAME => nickname");
-
-        context.setCurrentUser(null);
-        context.turnOffAuthorisationSystem();
-
-        testUser = EPersonBuilder.createEPerson(context)
-            .withEmail("alyssa@dspace.org")
-            .withNetId("001")
-            .withNameInMetadata("Alyssa", "Hacker")
-            .withCanLogin(true)
-            .build();
-
-        context.restoreAuthSystemState();
-
-        request.setAttribute("org.dspace.saml.NAME_ID", "001");
-        request.setAttribute("org.dspace.saml.PHONE", "1234567890-1234567890-1234567890-1234567890");
-        request.setAttribute("org.dspace.saml.NICKNAME", "this is a long nickname.".repeat(100));
-
-        int result = samlAuth.authenticate(context, null, null, null, request);
-
-        assertEquals(AuthenticationMethod.SUCCESS, result);
-
-        EPerson user = context.getCurrentUser();
-
-        assertNotNull(user);
-        assertEquals("alyssa@dspace.org", user.getEmail());
-        assertEquals("001", user.getNetid());
-        assertEquals("Alyssa", user.getFirstName());
-        assertEquals("Hacker", user.getLastName());
-
-        List<MetadataValue> metadata = user.getMetadata();
-
-        assertEquals(4, metadata.size());
-        assertEquals("eperson_phone", metadata.get(2).getMetadataField().toString());
-        assertEquals("1234567890-1234567890-1234567890", metadata.get(2).getValue());
-        assertEquals("eperson_nickname", metadata.get(3).getMetadataField().toString());
-        assertEquals("this is a long nickname.".repeat(42) + "this is a long n", metadata.get(3).getValue());
     }
 
     @Test

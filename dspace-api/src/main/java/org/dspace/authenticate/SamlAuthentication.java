@@ -47,13 +47,6 @@ public class SamlAuthentication implements AuthenticationMethod {
     // Additional metadata mappings.
     protected Map<String, String> metadataHeaderMap = null;
 
-    // Maximum length for ePerson fields.
-    protected final int NAME_MAX_SIZE = 64;
-    protected final int PHONE_MAX_SIZE = 32;
-
-    // Maximum length for ePerson additional metadata fields.
-    protected final int METADATA_MAX_SIZE = 1024;
-
     protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
     protected MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
@@ -380,20 +373,6 @@ public class SamlAuthentication implements AuthenticationMethod {
             return null;
         }
 
-        // Truncate values of parameters that are too big.
-
-        if (firstName.length() > NAME_MAX_SIZE) {
-            log.warn(
-                "Truncating eperson's first name because it is longer than " + NAME_MAX_SIZE + ": " + firstName);
-
-            firstName = firstName.substring(0, NAME_MAX_SIZE);
-        }
-        if (lastName.length() > NAME_MAX_SIZE) {
-            log.warn("Truncating eperson's last name because it is longer than " + NAME_MAX_SIZE + ": " + lastName);
-
-            lastName = lastName.substring(0, NAME_MAX_SIZE);
-        }
-
         try {
             context.turnOffAuthorisationSystem();
 
@@ -467,21 +446,6 @@ public class SamlAuthentication implements AuthenticationMethod {
         String firstName = findSingleAttribute(request, firstNameAttributeName);
         String lastName = findSingleAttribute(request, lastNameAttributeName);
 
-        // Truncate values of parameters that are too big.
-
-        if (firstName != null && firstName.length() > NAME_MAX_SIZE) {
-            log.warn(
-                "Truncating eperson's first name because it is longer than " + NAME_MAX_SIZE + ": " + firstName);
-
-            firstName = firstName.substring(0, NAME_MAX_SIZE);
-        }
-
-        if (lastName != null && lastName.length() > NAME_MAX_SIZE) {
-            log.warn("Truncating eperson's last name because it is longer than " + NAME_MAX_SIZE + ": " + lastName);
-
-            lastName = lastName.substring(0, NAME_MAX_SIZE);
-        }
-
         try {
             context.turnOffAuthorisationSystem();
 
@@ -531,14 +495,6 @@ public class SamlAuthentication implements AuthenticationMethod {
                     log.warn("Unable to update the eperson's '{}' metadata"
                             + " because the attribute '{}' does not exist.", metadataFieldName, attributeName);
                     continue;
-                } else if ("phone".equals(metadataFieldName) && value.length() > PHONE_MAX_SIZE) {
-                    log.warn("Truncating eperson phone metadata because it is longer than {}: {}",
-                            PHONE_MAX_SIZE, value);
-                    value = value.substring(0, PHONE_MAX_SIZE);
-                } else if (value.length() > METADATA_MAX_SIZE) {
-                    log.warn("Truncating eperson {} metadata because it is longer than {}: {}",
-                            metadataFieldName, METADATA_MAX_SIZE, value);
-                    value = value.substring(0, METADATA_MAX_SIZE);
                 }
 
                 ePersonService.setMetadataSingleValue(context, eperson,
