@@ -21,6 +21,8 @@ import org.dspace.app.rest.model.UsageReportPointDateRest;
 import org.dspace.app.rest.model.UsageReportPointDsoTotalVisitsRest;
 import org.dspace.app.rest.model.UsageReportRest;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.Site;
@@ -54,6 +56,7 @@ public class UsageReportUtils {
     public static final String TOTAL_DOWNLOADS_REPORT_ID = "TotalDownloads";
     public static final String TOP_COUNTRIES_REPORT_ID = "TopCountries";
     public static final String TOP_CITIES_REPORT_ID = "TopCities";
+    public static final String TOP_ITEMS_REPORT_ID = "TopItems";
 
     /**
      * Get list of usage reports that are applicable to the DSO (of given UUID)
@@ -65,19 +68,14 @@ public class UsageReportUtils {
     public List<UsageReportRest> getUsageReportsOfDSO(Context context, DSpaceObject dso)
         throws SQLException, ParseException, SolrServerException, IOException {
         List<UsageReportRest> usageReports = new ArrayList<>();
-        if (dso instanceof Site) {
-            UsageReportRest globalUsageStats = this.resolveGlobalUsageReport(context);
-            globalUsageStats.setId(dso.getID().toString() + "_" + TOTAL_VISITS_REPORT_ID);
-            usageReports.add(globalUsageStats);
-        } else {
-            usageReports.add(this.createUsageReport(context, dso, TOTAL_VISITS_REPORT_ID));
-            usageReports.add(this.createUsageReport(context, dso, TOTAL_VISITS_PER_MONTH_REPORT_ID));
-            usageReports.add(this.createUsageReport(context, dso, TOP_COUNTRIES_REPORT_ID));
-            usageReports.add(this.createUsageReport(context, dso, TOP_CITIES_REPORT_ID));
+        usageReports.add(this.createUsageReport(context, dso, TOTAL_VISITS_REPORT_ID));
+        usageReports.add(this.createUsageReport(context, dso, TOTAL_VISITS_PER_MONTH_REPORT_ID));
+        if (!(dso instanceof Item || dso instanceof Bitstream)) {
+            usageReports.add(this.createUsageReport(context, dso, TOP_ITEMS_REPORT_ID));
         }
-        if (dso instanceof Item || dso instanceof Bitstream) {
-            usageReports.add(this.createUsageReport(context, dso, TOTAL_DOWNLOADS_REPORT_ID));
-        }
+        usageReports.add(this.createUsageReport(context, dso, TOTAL_DOWNLOADS_REPORT_ID));
+        usageReports.add(this.createUsageReport(context, dso, TOP_COUNTRIES_REPORT_ID));
+        usageReports.add(this.createUsageReport(context, dso, TOP_CITIES_REPORT_ID));
         return usageReports;
     }
 
@@ -104,21 +102,25 @@ public class UsageReportUtils {
                     usageReportRest.setReportType(TOTAL_VISITS_PER_MONTH_REPORT_ID);
                     break;
                 case TOTAL_DOWNLOADS_REPORT_ID:
-                    usageReportRest = resolveTotalDownloads(context, dso);
+                    usageReportRest = resolveTotalDownloads(context, (dso instanceof Site ? null : dso));
                     usageReportRest.setReportType(TOTAL_DOWNLOADS_REPORT_ID);
                     break;
                 case TOP_COUNTRIES_REPORT_ID:
-                    usageReportRest = resolveTopCountries(context, dso);
+                    usageReportRest = resolveTopCountries(context, (dso instanceof Site ? null : dso));
                     usageReportRest.setReportType(TOP_COUNTRIES_REPORT_ID);
                     break;
                 case TOP_CITIES_REPORT_ID:
-                    usageReportRest = resolveTopCities(context, dso);
+                    usageReportRest = resolveTopCities(context, (dso instanceof Site ? null : dso));
                     usageReportRest.setReportType(TOP_CITIES_REPORT_ID);
+                    break;
+                case TOP_ITEMS_REPORT_ID:
+                    usageReportRest = resolveTopItems(context, (dso instanceof Site ? null : dso));
+                    usageReportRest.setReportType(TOP_ITEMS_REPORT_ID);
                     break;
                 default:
                     throw new ResourceNotFoundException("The given report id can't be resolved: " + reportId + "; " +
                                                         "available reports: TotalVisits, TotalVisitsPerMonth, " +
-                                                        "TotalDownloads, TopCountries, TopCities");
+                                                        "TotalDownloads, TopCountries, TopCities, TopItems");
             }
             usageReportRest.setId(dso.getID() + "_" + reportId);
             return usageReportRest;
@@ -142,12 +144,14 @@ public class UsageReportUtils {
         DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
         // TODO make max nr of top items (views wise)? Must be set
         dsoAxis.addDsoChild(Constants.ITEM, 10, false, -1);
+        dsoAxis.setIncludeTotal(true);
         statListing.addDatasetGenerator(dsoAxis);
 
         Dataset dataset = statListing.getDataset(context, 1);
 
         UsageReportRest usageReportRest = new UsageReportRest();
-        for (int i = 0; i < dataset.getColLabels().size(); i++) {
+        int numDataRows = dataset.getColLabels().size();
+        for (int i = 0; i < numDataRows; i++) {
             UsageReportPointDsoTotalVisitsRest totalVisitPoint = new UsageReportPointDsoTotalVisitsRest();
             totalVisitPoint.setType("item");
             String urlOfItem = dataset.getColLabelsAttrs().get(i).get("url");
@@ -162,7 +166,50 @@ public class UsageReportUtils {
                 }
             }
         }
+        usageReportRest.appendTotal(dataset);
         usageReportRest.setReportType(TOTAL_VISITS_REPORT_ID);
+        return usageReportRest;
+    }
+
+    /**
+     * Create stat usage report of the items most popular over entire site
+     *
+     * @param context DSpace context
+     * @return Usage report with top most popular items
+     */
+    private UsageReportRest resolveTopItems(Context context, DSpaceObject colComDso)
+        throws SQLException, IOException, ParseException, SolrServerException {
+        StatisticsListing statListing = new StatisticsListing(new StatisticsDataVisits(colComDso));
+
+        // Adding a new generator for our top 10 items without a name length delimiter
+        DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
+        // TODO make max nr of top items (views wise)? Must be set
+        dsoAxis.addDsoChild(Constants.ITEM, 25, false, -1);
+        dsoAxis.setIncludeTotal(true);
+        statListing.addDatasetGenerator(dsoAxis);
+
+        Dataset dataset = statListing.getDataset(context, 1);
+
+        UsageReportRest usageReportRest = new UsageReportRest();
+        int numDataRows = dataset.getColLabels().size();
+        for (int i = 0; i < numDataRows; i++) {
+            UsageReportPointDsoTotalVisitsRest totalVisitPoint = new UsageReportPointDsoTotalVisitsRest();
+            totalVisitPoint.setType("item");
+            String urlOfItem = dataset.getColLabelsAttrs().get(i).get("url");
+            if (urlOfItem != null) {
+                String handle = StringUtils.substringAfterLast(urlOfItem, "handle/");
+                if (handle != null) {
+                    DSpaceObject dso = handleService.resolveToObject(context, handle);
+                    String itemLink = "<a href='" + urlOfItem + "'>" + dso.getName() + "</a>";
+                    totalVisitPoint.setId(dso != null ? dso.getID().toString() : urlOfItem);
+                    totalVisitPoint.setLabel(dso != null ? itemLink : urlOfItem);
+                    totalVisitPoint.addValue("views", Integer.valueOf(dataset.getMatrix()[0][i]));
+                    usageReportRest.addPoint(totalVisitPoint);
+                }
+            }
+        }
+        usageReportRest.appendTotal(dataset);
+        usageReportRest.setReportType(TOP_ITEMS_REPORT_ID);
         return usageReportRest;
     }
 
@@ -177,7 +224,6 @@ public class UsageReportUtils {
     private UsageReportRest resolveTotalVisits(Context context, DSpaceObject dso)
         throws SQLException, IOException, ParseException, SolrServerException {
         Dataset dataset = this.getDSOStatsDataset(context, dso, 1, dso.getType());
-
         UsageReportRest usageReportRest = new UsageReportRest();
         UsageReportPointDsoTotalVisitsRest totalVisitPoint = new UsageReportPointDsoTotalVisitsRest();
         totalVisitPoint.setType(StringUtils.substringAfterLast(dso.getClass().getName().toLowerCase(), "."));
@@ -244,23 +290,27 @@ public class UsageReportUtils {
             return this.resolveTotalVisits(context, dso);
         }
 
-        if (dso instanceof org.dspace.content.Item) {
-            Dataset dataset = this.getDSOStatsDataset(context, dso, 1, Constants.BITSTREAM);
-
-            UsageReportRest usageReportRest = new UsageReportRest();
-            for (int i = 0; i < dataset.getColLabels().size(); i++) {
-                UsageReportPointDsoTotalVisitsRest totalDownloadsPoint = new UsageReportPointDsoTotalVisitsRest();
-                totalDownloadsPoint.setType("bitstream");
-
-                totalDownloadsPoint.setId(dataset.getColLabelsAttrs().get(i).get("id"));
-                totalDownloadsPoint.setLabel(dataset.getColLabels().get(i));
-
-                totalDownloadsPoint.addValue("views", Integer.valueOf(dataset.getMatrix()[0][i]));
-                usageReportRest.addPoint(totalDownloadsPoint);
+        Dataset dataset = this.getDSOStatsDataset(context, dso, 1, Constants.BITSTREAM);
+        UsageReportRest usageReportRest = new UsageReportRest();
+        int numDataRows = dataset.getColLabels().size();
+        for (int i = 0; i < numDataRows; i++) {
+            String dsoId = dataset.getColLabelsAttrs().get(i).get("id");
+            String dsoLabel = dataset.getColLabels().get(i);
+            UsageReportPointDsoTotalVisitsRest totalDownloadsPoint = new UsageReportPointDsoTotalVisitsRest();
+            if (dsoId == null || dsoLabel == null || dsoId.equals(dsoLabel)) {
+                continue;
             }
-            return usageReportRest;
+            totalDownloadsPoint.setType("bitstream");
+            totalDownloadsPoint.setId(dsoId);
+            totalDownloadsPoint.setLabel(dsoLabel);
+            if (dso == null || dso instanceof Collection || dso instanceof Community) {
+                totalDownloadsPoint.addValue("item", dataset.getColLabelsAttrs().get(i).get("owningItemUrl"));
+            }
+            totalDownloadsPoint.addValue("views", Integer.valueOf(dataset.getMatrix()[0][i]));
+            usageReportRest.addPoint(totalDownloadsPoint);
         }
-        throw new IllegalArgumentException("TotalDownloads report only available for items and bitstreams");
+        usageReportRest.appendTotal(dataset);
+        return usageReportRest;
     }
 
     /**
@@ -284,6 +334,7 @@ public class UsageReportUtils {
             countryPoint.addValue("views", Integer.valueOf(dataset.getMatrix()[0][i]));
             usageReportRest.addPoint(countryPoint);
         }
+        usageReportRest.appendTotal(dataset);
         return usageReportRest;
     }
 
@@ -308,6 +359,7 @@ public class UsageReportUtils {
             cityPoint.addValue("views", Integer.valueOf(dataset.getMatrix()[0][i]));
             usageReportRest.addPoint(cityPoint);
         }
+        usageReportRest.appendTotal(dataset);
         return usageReportRest;
     }
 
@@ -325,7 +377,8 @@ public class UsageReportUtils {
         throws SQLException, IOException, ParseException, SolrServerException {
         StatisticsListing statsList = new StatisticsListing(new StatisticsDataVisits(dso));
         DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
-        dsoAxis.addDsoChild(dsoType, 10, false, -1);
+        dsoAxis.addDsoChild(dsoType, 25, false, -1);
+        dsoAxis.setIncludeTotal(true);
         statsList.addDatasetGenerator(dsoAxis);
         return statsList.getDataset(context, facetMinCount);
     }
@@ -348,7 +401,8 @@ public class UsageReportUtils {
         DatasetTypeGenerator typeAxis = new DatasetTypeGenerator();
         typeAxis.setType(typeAxisString);
         // TODO make max nr of top countries/cities a request para? Must be set
-        typeAxis.setMax(100);
+        typeAxis.setMax(25);
+        typeAxis.setIncludeTotal(true);
         statListing.addDatasetGenerator(typeAxis);
         return statListing.getDataset(context, facetMinCount);
     }

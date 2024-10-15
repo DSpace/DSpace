@@ -23,7 +23,7 @@ public abstract class UsageReportPointRest extends BaseObjectRest<String> {
     public static final String CATEGORY = RestModel.STATISTICS;
     protected String id;
     protected String label;
-    private Map<String, Integer> values;
+    private Map<String, Object> values;
 
     /**
      * Returns the category of this Rest object, {@link #CATEGORY}
@@ -70,7 +70,7 @@ public abstract class UsageReportPointRest extends BaseObjectRest<String> {
      *
      * @return The values of this {@link UsageReportPointRest} object, containing the amount of views
      */
-    public Map<String, Integer> getValues() {
+    public Map<String, Object> getValues() {
         return values;
     }
 
@@ -98,7 +98,7 @@ public abstract class UsageReportPointRest extends BaseObjectRest<String> {
      * @param key   Key of new value pair
      * @param value Value of new value pair
      */
-    public void addValue(String key, Integer value) {
+    public void addValue(String key, Object value) {
         if (values == null) {
             values = new HashMap<>();
         }
@@ -110,7 +110,7 @@ public abstract class UsageReportPointRest extends BaseObjectRest<String> {
      *
      * @param values All values of this {@link UsageReportPointRest} object
      */
-    public void setValues(Map<String, Integer> values) {
+    public void setValues(Map<String, Object> values) {
         this.values = values;
     }
 

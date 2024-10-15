@@ -57,7 +57,7 @@ public class UsageReportMatcher {
             hasJsonPath("$.points", Matchers.containsInAnyOrder(
                 points.stream()
                       .map(point -> UsageReportPointMatcher.matchUsageReportPoint(
-                          point.getId(), point.getLabel(), point.getType(), point.getValues().get("views")
+                          point.getId(), point.getLabel(), point.getType(), (Integer) point.getValues().get("views")
                       ))
                       .collect(Collectors.toList()))
             )
