@@ -7,7 +7,7 @@
  */
 package org.dspace.importer.external.datacite;
 
-import java.util.Map;
+import java.util.List;
 
 import jakarta.annotation.Resource;
 import org.dspace.importer.external.metadatamapping.AbstractMetadataFieldMapping;
@@ -31,7 +31,7 @@ public class DataCiteFieldMapping extends AbstractMetadataFieldMapping {
      */
     @Override
     @Resource(name = "dataciteMetadataFieldMap")
-    public void setMetadataFieldMap(Map metadataFieldMap) {
+    public void setMetadataFieldMap(List metadataFieldMap) {
         super.setMetadataFieldMap(metadataFieldMap);
     }
 
