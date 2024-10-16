@@ -7,6 +7,7 @@
  */
 package org.dspace.handle;
 
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,9 +17,11 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -26,6 +29,7 @@ import org.dspace.handle.dao.HandleDAO;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * Interface to the <a href="https://www.handle.net" target=_new>CNRI Handle
@@ -56,6 +60,10 @@ public class HandleServiceImpl implements HandleService {
     @Autowired(required = true)
     protected ConfigurationService configurationService;
 
+    @Autowired(required = true)
+    @Qualifier("org.dspace.content.ItemServiceImpl") // We must choose one
+    protected DSpaceObjectService dspaceObjectService;
+
     @Autowired
     protected SiteService siteService;
 
@@ -81,12 +89,27 @@ public class HandleServiceImpl implements HandleService {
             return null;
         }
 
-        String url = configurationService.getProperty("dspace.ui.url")
-            + "/handle/" + handle;
-
-        log.debug("Resolved {} to {}", handle, url);
-
-        return url;
+        /* Unfortunately we must choose between module coupling and circular
+         * dependency here.  Knowledge of the structure of URLs should be
+         * encapsulated in dspace-server-webapp, but that and the Handle plugin
+         * both depend on dspace-api.  Assuming the URL structure here seemed
+         * less troublesome -- mwood.
+         */
+        DSpaceObject object = dbhandle.getDSpaceObject();
+        String objectID = object.getID().toString();
+        String objectType = dspaceObjectService.getTypeTextPlural(object).toLowerCase();
+        try {
+            String url = new URIBuilder(configurationService.getProperty("dspace.ui.url"))
+                    .setPathSegments(objectType, objectID)
+                    .build()
+                    .toString();
+            log.debug("Resolved {} to {}", handle, url);
+            return url;
+        } catch (URISyntaxException e) {
+            log.error("Could not construct a URL for handle {}:  {}",
+                    handle, e.getMessage());
+            return null;
+        }
     }
 
     @Override
