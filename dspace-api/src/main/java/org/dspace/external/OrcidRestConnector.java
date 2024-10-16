@@ -18,6 +18,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dspace.util.ProxyUtils;
 
 /**
  * @author Antoine Snyers (antoine at atmire.com)
@@ -49,8 +50,10 @@ public class OrcidRestConnector {
             httpGet.addHeader("Content-Type", "application/vnd.orcid+xml");
             httpGet.addHeader("Authorization","Bearer " + accessToken);
         }
+        HttpClientBuilder builder = HttpClientBuilder.create();
+        ProxyUtils.addProxy(builder);
         try {
-            HttpClient httpClient = HttpClientBuilder.create().build();
+            HttpClient httpClient = builder.build();
             getResponse = httpClient.execute(httpGet);
             //do not close this httpClient
             result = getResponse.getEntity().getContent();
