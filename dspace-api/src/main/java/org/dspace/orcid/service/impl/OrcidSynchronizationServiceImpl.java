@@ -36,9 +36,11 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.orcid.OrcidQueue;
 import org.dspace.orcid.OrcidToken;
 import org.dspace.orcid.model.OrcidEntityType;
 import org.dspace.orcid.model.OrcidTokenResponseDTO;
+import org.dspace.orcid.service.OrcidQueueService;
 import org.dspace.orcid.service.OrcidSynchronizationService;
 import org.dspace.orcid.service.OrcidTokenService;
 import org.dspace.profile.OrcidEntitySyncPreference;
@@ -59,6 +61,9 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private OrcidQueueService orcidQueueService;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -114,6 +119,8 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
     @Override
     public void unlinkProfile(Context context, Item profile) throws SQLException {
 
+        String orcid = itemService.getMetadataFirstValue(profile, "person", "identifier", "orcid", Item.ANY);
+
         itemService.clearMetadata(context, profile, "person", "identifier", "orcid", Item.ANY);
         itemService.clearMetadata(context, profile, "dspace", "orcid", "scope", Item.ANY);
         itemService.clearMetadata(context, profile, "dspace", "orcid", "authenticated", Item.ANY);
@@ -122,9 +129,20 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
             clearSynchronizationSettings(context, profile);
         }
 
+        EPerson eperson = ePersonService.findByNetid(context, orcid);
+        if (eperson != null ) {
+            eperson.setNetid(null);
+            updateEPerson(context, eperson);
+        }
+
         orcidTokenService.deleteByProfileItem(context, profile);
 
         updateItem(context, profile);
+
+        List<OrcidQueue> queueRecords = orcidQueueService.findByProfileItemId(context, profile.getID());
+        for (OrcidQueue queueRecord : queueRecords) {
+            orcidQueueService.delete(context, queueRecord);
+        }
 
     }
 
