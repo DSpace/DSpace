@@ -132,10 +132,18 @@ public class BasicLinkChecker extends AbstractCurationTask {
         try {
             URL theURL = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) theURL.openConnection();
-            int code = connection.getResponseCode();
-            connection.disconnect();
+            connection.setInstanceFollowRedirects(true);
+            int statusCode = connection.getResponseCode();
+            if ((statusCode == HttpURLConnection.HTTP_MOVED_TEMP || statusCode == HttpURLConnection.HTTP_MOVED_PERM ||
+                    statusCode == HttpURLConnection.HTTP_SEE_OTHER)) {
+                connection.disconnect();
+                String newUrl = connection.getHeaderField("Location");
+                if (newUrl != null) {
+                    return getResponseStatus(newUrl);
+                }
 
-            return code;
+            }
+            return statusCode;
 
         } catch (IOException ioe) {
             // Must be a bad URL
