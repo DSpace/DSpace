@@ -10,6 +10,7 @@ tags
 .project
 .classpath
 .checkstyle
+.factorypath
 
 ## Ignore project files created by IntelliJ IDEA
 *.iml
