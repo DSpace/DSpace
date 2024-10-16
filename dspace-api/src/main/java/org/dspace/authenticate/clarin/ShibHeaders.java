@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,7 +33,7 @@ public class ShibHeaders {
     // constants
     //
     private static final String header_separator_ = ";";
-    private String netIdHeader = "";
+    private String[] netIdHeaders = null;
     ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     // variables
@@ -105,7 +106,7 @@ public class ShibHeaders {
         List<String> values = get(name);
         if (values != null && !values.isEmpty()) {
             // Format netId
-            if (StringUtils.equals(name, this.netIdHeader)) {
+            if (ArrayUtils.contains(this.netIdHeaders, name)) {
                 return Util.formatNetId(values.get(0), this.get_idp());
             }
             return values.get(0);
@@ -150,6 +151,10 @@ public class ShibHeaders {
     }
 
     private void initializeNetIdHeader() {
-        this.netIdHeader = configurationService.getProperty("authentication-shibboleth.netid-header");
+        this.netIdHeaders = configurationService.getArrayProperty("authentication-shibboleth.netid-header");
+    }
+
+    public String[] getNetIdHeaders() {
+        return this.netIdHeaders;
     }
 }

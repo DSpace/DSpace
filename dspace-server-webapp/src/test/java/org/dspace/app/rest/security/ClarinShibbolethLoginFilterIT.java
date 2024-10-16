@@ -9,6 +9,7 @@ package org.dspace.app.rest.security;
 
 import static org.dspace.app.rest.security.ShibbolethLoginFilterIT.PASS_ONLY;
 import static org.dspace.app.rest.security.clarin.ClarinShibbolethLoginFilter.VERIFICATION_TOKEN_HEADER;
+import static org.dspace.rdf.negotiation.MediaRange.token;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -19,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -53,8 +55,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ClarinShibbolethLoginFilterIT extends AbstractControllerIntegrationTest {
 
     public static final String[] SHIB_ONLY = {"org.dspace.authenticate.clarin.ClarinShibAuthentication"};
+    private static final String NET_ID_EPPN_HEADER = "eppn";
+    private static final String NET_ID_PERSISTENT_ID = "persistent-id";
     private static final String NET_ID_TEST_EPERSON = "123456789";
     private static final String IDP_TEST_EPERSON = "Test Idp";
+    private static final String KNIHOVNA_KUN_TEST_ZLUTOUCKY = "knihovna Kůň test Žluťoučký";
+
 
     private EPersonRest ePersonRest;
     private final String feature = CanChangePasswordFeature.NAME;
@@ -183,10 +189,7 @@ public class ClarinShibbolethLoginFilterIT extends AbstractControllerIntegration
                 .andExpect(status().isOk());
 
         // Check if was created a user with such email and netid.
-        EPerson ePerson = ePersonService.findByNetid(context, Util.formatNetId(netId, idp));
-        assertTrue(Objects.nonNull(ePerson));
-        assertEquals(ePerson.getEmail(), email);
-        assertEquals(ePerson.getNetid(), Util.formatNetId(netId, idp));
+        EPerson ePerson = checkUserWasCreated(netId, idp, email, null);
 
         // The user is registered now log him
         getClient().perform(post("/api/authn/shibboleth")
@@ -207,7 +210,7 @@ public class ClarinShibbolethLoginFilterIT extends AbstractControllerIntegration
                 .andExpect(status().isFound());
 
         // Delete created eperson - clean after the test
-        EPersonBuilder.deleteEPerson(ePerson.getID());
+        deleteShibbolethUser(ePerson);
     }
 
     @Test
@@ -226,11 +229,7 @@ public class ClarinShibbolethLoginFilterIT extends AbstractControllerIntegration
                 .andExpect(redirectedUrl("http://localhost:4000"))
                 .andReturn().getResponse().getHeader("Authorization");
 
-
-        getClient(token).perform(get("/api/authn/status"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.authenticated", is(true)))
-                .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")));
+        checkUserIsSignedIn(token);
 
         // Check if was created a user with such email and netid.
         EPerson ePerson = ePersonService.findByNetid(context, Util.formatNetId(netId, IDP_TEST_EPERSON));
@@ -252,6 +251,33 @@ public class ClarinShibbolethLoginFilterIT extends AbstractControllerIntegration
         EPersonBuilder.deleteEPerson(ePerson.getID());
     }
 
+    // Login with email without netid, but the user with such email already exists and it has assigned netid.
+    @Test
+    public void testShouldReturnDuplicateUserErrorLoginWithoutNetId() throws Exception {
+        String email = "test@email.sk";
+        String netId = email;
+
+        // login through shibboleth
+        String token = getClient().perform(get("/api/authn/shibboleth")
+                        .header("SHIB-MAIL", email)
+                        .header("SHIB-NETID", netId)
+                        .header("Shib-Identity-Provider", IDP_TEST_EPERSON))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("http://localhost:4000"))
+                .andReturn().getResponse().getHeader("Authorization");
+
+        checkUserIsSignedIn(token);
+
+        // Should not login because the user with such email already exists
+        getClient().perform(get("/api/authn/shibboleth")
+                        .header("SHIB-MAIL", email)
+                        .header("Shib-Identity-Provider", IDP_TEST_EPERSON))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("http://localhost:4000/login/duplicate-user?email=" + email))
+                .andReturn().getResponse().getHeader("Authorization");
+
+    }
+
     // This test is copied from the `ShibbolethLoginFilterIT` and modified following the Clarin updates.
     @Test
     public void testRedirectToGivenTrustedUrl() throws Exception {
@@ -264,10 +290,7 @@ public class ClarinShibbolethLoginFilterIT extends AbstractControllerIntegration
                 .andExpect(redirectedUrl("http://localhost:8080/server/api/authn/status"))
                 .andReturn().getResponse().getHeader("Authorization");
 
-        getClient(token).perform(get("/api/authn/status"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.authenticated", is(true)))
-                .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")));
+        checkUserIsSignedIn(token);
 
         getClient(token).perform(
                         get("/api/authz/authorizations/search/object")
@@ -299,11 +322,7 @@ public class ClarinShibbolethLoginFilterIT extends AbstractControllerIntegration
                 .andExpect(redirectedUrl("http://localhost:4000"))
                 .andReturn().getResponse().getHeader("Authorization");
 
-
-        getClient(token).perform(get("/api/authn/status"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.authenticated", is(true)))
-                .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")));
+        checkUserIsSignedIn(token);
 
         // updates password
         getClient(token).perform(patch("/api/eperson/epersons/" + clarinEperson.getID())
@@ -328,11 +347,7 @@ public class ClarinShibbolethLoginFilterIT extends AbstractControllerIntegration
                 .andExpect(redirectedUrl("http://localhost:4000"))
                 .andReturn().getResponse().getHeader("Authorization");
 
-
-        getClient(token).perform(get("/api/authn/status"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.authenticated", is(true)))
-                .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")));
+        checkUserIsSignedIn(token);
 
         getClient(token).perform(
                         get("/api/authz/authorizations/search/object")
@@ -463,28 +478,10 @@ public class ClarinShibbolethLoginFilterIT extends AbstractControllerIntegration
                 .andExpect(redirectedUrl("http://localhost:4000"))
                 .andReturn().getResponse().getHeader("Authorization");
 
-
-        getClient(token).perform(get("/api/authn/status"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.authenticated", is(true)))
-                .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")));
-
+        checkUserIsSignedIn(token);
         // Check if was created a user with such email and netid.
-        EPerson ePerson = ePersonService.findByNetid(context, Util.formatNetId(testNetId, testIdp));
-        assertTrue(Objects.nonNull(ePerson));
-        assertEquals(ePerson.getEmail(), testMail);
-        assertEquals(ePerson.getFirstName(), "knihovna Kůň test Žluťoučký");
-
-        EPersonBuilder.deleteEPerson(ePerson.getID());
-
-        getClient(token).perform(
-                        get("/api/authz/authorizations/search/object")
-                                .param("embed", "feature")
-                                .param("feature", feature)
-                                .param("uri", utils.linkToSingleResource(ePersonRest, "self").getHref()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.page.totalElements", is(0)))
-                .andExpect(jsonPath("$._embedded").doesNotExist());
+        EPerson ePerson = checkUserWasCreated(testNetId, testIdp, testMail, KNIHOVNA_KUN_TEST_ZLUTOUCKY);
+        deleteShibbolethUser(ePerson);
     }
 
     @Test
@@ -500,33 +497,15 @@ public class ClarinShibbolethLoginFilterIT extends AbstractControllerIntegration
                         .header("SHIB-MAIL", testMail)
                         .header("Shib-Identity-Provider", testIdp)
                         .header("SHIB-NETID", testNetId)
-                        .header("SHIB-GIVENNAME", "knihovna Kůň test Žluťoučký"))
+                        .header("SHIB-GIVENNAME", KNIHOVNA_KUN_TEST_ZLUTOUCKY))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("http://localhost:4000"))
                 .andReturn().getResponse().getHeader("Authorization");
 
-
-        getClient(token).perform(get("/api/authn/status"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.authenticated", is(true)))
-                .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")));
-
+        checkUserIsSignedIn(token);
         // Check if was created a user with such email and netid.
-        EPerson ePerson = ePersonService.findByNetid(context, Util.formatNetId(testNetId, testIdp));
-        assertTrue(Objects.nonNull(ePerson));
-        assertEquals(ePerson.getEmail(), testMail);
-        assertEquals(ePerson.getFirstName(), "knihovna Kůň test Žluťoučký");
-
-        EPersonBuilder.deleteEPerson(ePerson.getID());
-
-        getClient(token).perform(
-                        get("/api/authz/authorizations/search/object")
-                                .param("embed", "feature")
-                                .param("feature", feature)
-                                .param("uri", utils.linkToSingleResource(ePersonRest, "self").getHref()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.page.totalElements", is(0)))
-                .andExpect(jsonPath("$._embedded").doesNotExist());
+        EPerson ePerson = checkUserWasCreated(testNetId, testIdp, testMail, KNIHOVNA_KUN_TEST_ZLUTOUCKY);
+        deleteShibbolethUser(ePerson);
     }
 
     @Test
@@ -539,5 +518,129 @@ public class ClarinShibbolethLoginFilterIT extends AbstractControllerIntegration
                         .header("SHIB-NETID", NET_ID_TEST_EPERSON))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl(expectedMissingHeadersUrl));
+    }
+
+    // eppn is set
+    @Test
+    public void testSuccessFullLoginEppnNetId() throws Exception {
+        String token = getClient().perform(get("/api/authn/shibboleth")
+                        .header("Shib-Identity-Provider", IDP_TEST_EPERSON)
+                        .header("SHIB-MAIL", clarinEperson.getEmail())
+                        .header(NET_ID_EPPN_HEADER, NET_ID_TEST_EPERSON))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("http://localhost:4000"))
+                .andReturn().getResponse().getHeader("Authorization");
+
+        checkUserIsSignedIn(token);
+
+        EPerson ePerson = checkUserWasCreated(NET_ID_TEST_EPERSON, IDP_TEST_EPERSON, clarinEperson.getEmail(), null);
+        deleteShibbolethUser(ePerson);
+    }
+
+    // persistent-id is set
+    @Test
+    public void testSuccessFullLoginPersistentIdNetId() throws Exception {
+        String token = getClient().perform(get("/api/authn/shibboleth")
+                        .header("Shib-Identity-Provider", IDP_TEST_EPERSON)
+                        .header("SHIB-MAIL", clarinEperson.getEmail())
+                        .header(NET_ID_PERSISTENT_ID, NET_ID_TEST_EPERSON))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("http://localhost:4000"))
+                .andReturn().getResponse().getHeader("Authorization");
+
+        checkUserIsSignedIn(token);
+        EPerson ePerson = checkUserWasCreated(NET_ID_TEST_EPERSON, IDP_TEST_EPERSON, clarinEperson.getEmail(), null);
+        deleteShibbolethUser(ePerson);
+    }
+
+    @Test
+    public void testSuccessFullLoginWithTwoEmails() throws Exception {
+        String firstEmail = "efg@test.edu";
+        String secondEmail = "abc@test.edu";
+        String token = getClient().perform(get("/api/authn/shibboleth")
+                        .header("Shib-Identity-Provider", IDP_TEST_EPERSON)
+                        .header("SHIB-MAIL", firstEmail + ";" + secondEmail))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("http://localhost:4000"))
+                .andReturn().getResponse().getHeader("Authorization");
+
+        checkUserIsSignedIn(token);
+        // Find the user by the second email
+        EPerson ePerson = checkUserWasCreated(null, IDP_TEST_EPERSON, secondEmail, null);
+        deleteShibbolethUser(ePerson);
+    }
+
+    // The user has changed the email. But that email is already used by another user.
+    @Test
+    public void testDuplicateEmailError() throws Exception {
+        String userWithEppnEmail = "user@eppn.sk";
+        String customEppn = "custom eppn";
+
+        // Create a user with netid and email
+        String tokenEppnUser = getClient().perform(get("/api/authn/shibboleth")
+                        .header("Shib-Identity-Provider", IDP_TEST_EPERSON)
+                        .header(NET_ID_PERSISTENT_ID, customEppn)
+                        .header("SHIB-MAIL", userWithEppnEmail))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("http://localhost:4000"))
+                .andReturn().getResponse().getHeader("Authorization");
+
+        checkUserIsSignedIn(tokenEppnUser);
+
+        // Try to update an email of existing user - the email is already used by another user - the user should be
+        // redirected to the login page
+        getClient().perform(get("/api/authn/shibboleth")
+                        .header("Shib-Identity-Provider", IDP_TEST_EPERSON)
+                        .header(NET_ID_PERSISTENT_ID, NET_ID_TEST_EPERSON)
+                        .header("SHIB-MAIL", userWithEppnEmail))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("http://localhost:4000/login/duplicate-user?email=" + userWithEppnEmail));
+
+        // Check if was created a user with such email and netid.
+        EPerson ePerson = checkUserWasCreated(customEppn, IDP_TEST_EPERSON, userWithEppnEmail, null);
+        // Delete created eperson - clean after the test
+        deleteShibbolethUser(ePerson);
+    }
+
+    private EPerson checkUserWasCreated(String netIdValue, String idpValue, String email, String name)
+            throws SQLException {
+        // Check if was created a user with such email and netid.
+        EPerson ePerson = null;
+        if (netIdValue != null) {
+            ePerson = ePersonService.findByNetid(context, Util.formatNetId(netIdValue, idpValue));
+        } else {
+            ePerson = ePersonService.findByEmail(context, email);
+        }
+        assertTrue(Objects.nonNull(ePerson));
+        if (email != null) {
+            assertEquals(ePerson.getEmail(), email);
+        }
+
+        if (name != null) {
+            assertEquals(ePerson.getFirstName(), name);
+        }
+        return ePerson;
+    }
+
+    private void checkUserIsSignedIn(String token) throws Exception {
+        getClient(token).perform(get("/api/authn/status"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.authenticated", is(true)))
+                .andExpect(jsonPath("$.authenticationMethod", is("shibboleth")));
+    }
+
+
+    private void deleteShibbolethUser(EPerson ePerson) throws Exception {
+        EPersonBuilder.deleteEPerson(ePerson.getID());
+
+        // Check it was correctly deleted
+        getClient(token).perform(
+                        get("/api/authz/authorizations/search/object")
+                                .param("embed", "feature")
+                                .param("feature", feature)
+                                .param("uri", utils.linkToSingleResource(ePersonRest, "self").getHref()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page.totalElements", is(0)))
+                .andExpect(jsonPath("$._embedded").doesNotExist());
     }
 }
