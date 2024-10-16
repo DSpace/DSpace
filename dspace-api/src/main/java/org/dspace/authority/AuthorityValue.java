@@ -14,8 +14,10 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +27,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
@@ -41,34 +42,42 @@ public class AuthorityValue {
     /**
      * The id of the record in solr
      */
-    private String id;
+    protected String id;
 
     /**
      * The metadata field that this authority value is for
      */
-    private String field;
+    protected String field;
 
     /**
      * The text value of this authority
      */
-    private String value;
+    protected String value;
 
     /**
      * When this authority record has been created
      */
-    private Date creationDate;
+    protected Date creationDate;
 
     /**
      * If this authority has been removed
      */
-    private boolean deleted;
+    protected boolean deleted;
 
     /**
      * represents the last time that DSpace got updated information from its external source
      */
-    private Date lastModified;
+    protected Date lastModified;
+
+    protected Map<String, List<String>> otherMetadataMap;
+
+    /**
+     * log4j logger
+     */
+    private static final Logger log = LogManager.getLogger();
 
     public AuthorityValue() {
+        this.otherMetadataMap = new LinkedHashMap<>();
     }
 
     public AuthorityValue(SolrDocument document) {
@@ -145,7 +154,8 @@ public class AuthorityValue {
     }
 
     /**
-     * Generate a solr record from this instance
+     * Generate a Solr record from this instance. The otherMetadataMap values will be iterated
+     * and added with a label_ prefix
      *
      * @return SolrInputDocument
      */
@@ -160,11 +170,20 @@ public class AuthorityValue {
         doc.addField("creation_date", solrDateFormatter.format(getCreationDate()));
         doc.addField("last_modified_date", solrDateFormatter.format(getLastModified()));
         doc.addField("authority_type", getAuthorityType());
+        // Other metadata - set dynamic fields for each key
+        for (String metadataKey : otherMetadataMap.keySet()) {
+            List<String> metadata = otherMetadataMap.get(metadataKey);
+            for (String value : metadata) {
+                doc.addField("label_" + metadataKey, value);
+            }
+        }
         return doc;
     }
 
     /**
-     * Initialize this instance based on a solr record
+     * Set values for this AuthorityValue based on a Solr record.
+     * Any supplementary information saved with the label_ prefix will be added to the
+     * otherMetadataMap with the label_ prefix stripped.
      *
      * @param document SolrDocument
      */
@@ -175,18 +194,28 @@ public class AuthorityValue {
         this.deleted = (Boolean) document.getFieldValue("deleted");
         this.creationDate = (Date) document.getFieldValue("creation_date");
         this.lastModified = (Date) document.getFieldValue("last_modified_date");
+        // Set other metadata
+        for (String key : document.getFieldNames()) {
+            if (key.startsWith("label_")) {
+                String otherMetadataKey = key.replace("label_", "");
+                Collection<Object> values = document.getFieldValues(key);
+                if (values != null) {
+                    Collection<String> stringValues = (Collection<String>) (Object) values;
+                    otherMetadataMap.put(otherMetadataKey, new ArrayList<>(stringValues));
+                }
+            }
+        }
     }
 
     /**
-     * Replace an item's DCValue with this authority
+     * Replace an item's DCValue with this authority value and key
      *
      * @param context     context
      * @param value       metadata value
-     * @param currentItem item
      * @throws SQLException       if database error
      * @throws AuthorizeException if authorization error
      */
-    public void updateItem(Context context, Item currentItem, MetadataValue value)
+    public void updateItem(Context context, MetadataValue value)
         throws SQLException, AuthorizeException {
         value.setValue(getValue());
         value.setAuthority(getId());
@@ -194,7 +223,7 @@ public class AuthorityValue {
     }
 
     /**
-     * Information that can be used the choice ui.
+     * Information that can be used with the ChoiceAuthority UI
      *
      * @return map
      */
@@ -206,7 +235,7 @@ public class AuthorityValue {
      * Build a list of ISO date formatters to parse various forms.
      *
      * <p><strong>Note:</strong>  any formatter which does not parse a zone or
-     * offset must have a default zone set.  See {@link stringToDate}.
+     * offset must have a default zone set.  See {@link #stringToDate}.
      *
      * @return the formatters.
      */
@@ -244,20 +273,39 @@ public class AuthorityValue {
     }
 
     /**
-     * log4j logger
+     * Set a key-value pair in the otherMetadataMap.
+     *
+     * @param key   the key for the metadata entry
+     * @param value the value for the metadata entry
      */
-    private static Logger log = LogManager.getLogger();
+    public void setMetadataMapEntry(String key, String value) {
+        List<String> values;
+        if (!this.otherMetadataMap.containsKey(key)) {
+            values = new ArrayList<>();
+        } else {
+            values = this.otherMetadataMap.get(key);
+        }
+        values.add(value);
+        this.otherMetadataMap.put(key, values);
+    }
 
-    @Override
-    public String toString() {
-        return "AuthorityValue{" +
-            "id='" + id + '\'' +
-            ", field='" + field + '\'' +
-            ", value='" + value + '\'' +
-            ", creationDate=" + creationDate +
-            ", deleted=" + deleted +
-            ", lastModified=" + lastModified +
-            '}';
+    /**
+     * Retrieves the other metadata map of the AuthorityValue object.
+     * In the solr document this is in the form of label_{dc.example.field}
+     *
+     * @return the other metadata map of the AuthorityValue object
+     */
+    public Map<String, List<String>> getOtherMetadataMap() {
+        return otherMetadataMap;
+    }
+
+    /**
+     * Set the other metadata map
+     *
+     * @param otherMetadataMap the map of fields and values
+     */
+    public void setOtherMetadataMap(Map<String, List<String>> otherMetadataMap) {
+        this.otherMetadataMap = otherMetadataMap;
     }
 
     /**
@@ -312,9 +360,6 @@ public class AuthorityValue {
         if (deleted != that.deleted) {
             return false;
         }
-        if (field != null ? !field.equals(that.field) : that.field != null) {
-            return false;
-        }
         if (id != null ? !id.equals(that.id) : that.id != null) {
             return false;
         }
@@ -323,5 +368,17 @@ public class AuthorityValue {
         }
 
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "AuthorityValue{" +
+                "id='" + id + '\'' +
+                ", field='" + field + '\'' +
+                ", value='" + value + '\'' +
+                ", creationDate=" + creationDate +
+                ", deleted=" + deleted +
+                ", lastModified=" + lastModified +
+                '}';
     }
 }
