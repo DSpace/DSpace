@@ -74,6 +74,7 @@ public class DCInputsReader {
      * Keyname for storing the name of the complex input type
      */
     static final String COMPLEX_DEFINITION_REF = "complex-definition-ref";
+    public static final String TYPE_BIND_FIELD_ATTRIBUTE = "field";
 
 
     /**

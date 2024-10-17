@@ -320,4 +320,49 @@ public class ClarinWorkflowItemRestRepositoryIT extends AbstractControllerIntegr
         }
         assertThat(containsSubmitterProvenance, is(true));
     }
+
+    // When some input field has <type-bind field="something">...</type-bind> in the submission-forms.xml
+    @Test
+    public void shouldCreateItemWithCustomTypeBindField() throws Exception {
+        context.turnOffAuthorisationSystem();
+        String CITATION_VALUE = "Some citation";
+
+        //** GIVEN **
+        //1. A community with one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        // Submitter group - allow deposit a new item without workflow
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection")
+                .build();
+
+        //3. a workspace item
+        WorkspaceItem wsitem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
+                .withTitle("Type-bind test")
+                .withIssueDate("2017-10-17")
+                .grantLicense()
+                .withMetadata("dc", "identifier", "citation", CITATION_VALUE)
+                .build();
+
+        context.restoreAuthSystemState();
+
+        // get the submitter auth token
+        String authToken = getAuthToken(admin.getEmail(), password);
+
+        // submit the workspaceitem to start the workflow
+        getClient(authToken)
+                .perform(post(BASE_REST_SERVER_URL + "/api/workflow/workflowitems")
+                        .content("/api/submission/workspaceitems/" + wsitem.getID())
+                        .contentType(textUriContentType))
+                .andExpect(status().isCreated());
+
+        // Load deposited item and check the provenance metadata
+        Item depositedItem = itemService.find(context, wsitem.getItem().getID());
+        List<MetadataValue> mvList = itemService.getMetadata(depositedItem, "dc", "identifier",
+                "citation", Item.ANY);
+        assertFalse(mvList.isEmpty());
+        assertThat(mvList.get(0).getValue(), is(CITATION_VALUE));
+    }
 }

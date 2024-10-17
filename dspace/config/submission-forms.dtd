@@ -20,6 +20,9 @@
  <!ELEMENT dc-qualifier (#PCDATA) >
  <!ELEMENT language (#PCDATA)>
  <!ELEMENT type-bind (#PCDATA) >
+ <!-- When you configure special field for the `type-bind` you must update it in the `submit.type-bind.field`
+  configuration property like this: `<INPUT_METADATA_FIELD>=><TYPE_BIND_FIELD>` e.g. `dc.language.iso=>edm.type`-->
+ <!ATTLIST type-bind field CDATA #IMPLIED >
 
  <!ELEMENT repeatable (#PCDATA) >
  <!ELEMENT label (#PCDATA) >

@@ -63,6 +63,8 @@ import org.springframework.util.ObjectUtils;
  */
 public class DescribeStep extends AbstractProcessingStep {
 
+    public static final String KEY_VALUE_SEPARATOR = "=>";
+
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DescribeStep.class);
 
     // Input reader for form configuration
@@ -93,15 +95,34 @@ public class DescribeStep extends AbstractProcessingStep {
 
     private void readField(InProgressSubmission obj, SubmissionStepConfig config, DataDescribe data,
                            DCInputSet inputConfig) throws DCInputsReaderException {
-        String documentTypeValue = "";
-        List<MetadataValue> documentType = itemService.getMetadataByMetadataString(obj.getItem(),
-                configurationService.getProperty("submit.type-bind.field", "dc.type"));
-        if (documentType.size() > 0) {
-            documentTypeValue = documentType.get(0).getValue();
+        List<String> documentTypeValueList = new ArrayList<>();
+        List<String> typeBindFields = Arrays.asList(
+                configurationService.getArrayProperty("submit.type-bind.field", new String[0]));
+
+        for (String typeBindField : typeBindFields) {
+            String typeBFKey = typeBindField;
+            if (typeBindField.contains(KEY_VALUE_SEPARATOR)) {
+                String[] parts = typeBindField.split(KEY_VALUE_SEPARATOR);
+                // Get the second part of the split - the metadata field
+                typeBFKey = parts[1];
+            }
+            List<MetadataValue> documentType = itemService.getMetadataByMetadataString(obj.getItem(), typeBFKey);
+            if (documentType.size() > 0) {
+                documentTypeValueList.add(documentType.get(0).getValue());
+            }
         }
 
         // Get list of all field names (including qualdrop names) allowed for this dc.type
-        List<String> allowedFieldNames = inputConfig.populateAllowedFieldNames(documentTypeValue);
+        List<String> allowedFieldNames = new ArrayList<>();
+
+        if (CollectionUtils.isEmpty(documentTypeValueList)) {
+            // If no dc.type is set, we allow all fields
+            allowedFieldNames.addAll(inputConfig.populateAllowedFieldNames(null));
+        } else {
+            documentTypeValueList.forEach(documentTypeValue -> {
+                allowedFieldNames.addAll(inputConfig.populateAllowedFieldNames(documentTypeValue));
+            });
+        }
 
         // Loop input rows and process submitted metadata
         for (DCInput[] row : inputConfig.getFields()) {

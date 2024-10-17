@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.submit.step.validation;
 
+import static org.dspace.app.rest.submit.step.DescribeStep.KEY_VALUE_SEPARATOR;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -68,22 +70,46 @@ public class MetadataValidation extends AbstractValidation {
                                     SubmissionStepConfig config) throws DCInputsReaderException, SQLException {
 
         List<ErrorRest> errors = new ArrayList<>();
-        String documentTypeValue = "";
         DCInputSet inputConfig = getInputReader().getInputsByFormName(config.getId());
-        List<MetadataValue> documentType = itemService.getMetadataByMetadataString(obj.getItem(),
-                configurationService.getProperty("submit.type-bind.field", "dc.type"));
-        if (documentType.size() > 0) {
-            documentTypeValue = documentType.get(0).getValue();
+        List<String> documentTypeValueList = new ArrayList<>();
+        // Get the list of type-bind fields. It could be in the form of schema.element.qualifier=>metadata_field, or
+        // just metadata_field
+        List<String> typeBindFields = Arrays.asList(
+                configurationService.getArrayProperty("submit.type-bind.field", new String[0]));
+
+        for (String typeBindField : typeBindFields) {
+            String typeBFKey = typeBindField;
+            // If the type-bind field is in the form of schema.element.qualifier=>metadata_field, split it and get the
+            // metadata field
+            if (typeBindField.contains(KEY_VALUE_SEPARATOR)) {
+                String[] parts = typeBindField.split(KEY_VALUE_SEPARATOR);
+                // Get the second part of the split - the metadata field
+                typeBFKey = parts[1];
+            }
+            // Get the metadata value for the type-bind field
+            List<MetadataValue> documentType = itemService.getMetadataByMetadataString(obj.getItem(), typeBFKey);
+            if (documentType.size() > 0) {
+                documentTypeValueList.add(documentType.get(0).getValue());
+            }
         }
 
-        // Get list of all field names (including qualdrop names) allowed for this dc.type
-        List<String> allowedFieldNames = inputConfig.populateAllowedFieldNames(documentTypeValue);
+        // Get list of all field names (including qualdrop names) allowed for this dc.type, or specific type-bind field
+        List<String> allowedFieldNames = new ArrayList<>();
 
-        // Begin the actual validation loop
+        if (CollectionUtils.isEmpty(documentTypeValueList)) {
+            // If no dc.type is set, we allow all fields
+            allowedFieldNames.addAll(inputConfig.populateAllowedFieldNames(null));
+        } else {
+            documentTypeValueList.forEach(documentTypeValue -> {
+                allowedFieldNames.addAll(inputConfig.populateAllowedFieldNames(documentTypeValue));
+            });
+        }
+
         for (DCInput[] row : inputConfig.getFields()) {
             for (DCInput input : row) {
                 String fieldKey =
-                    metadataAuthorityService.makeFieldKey(input.getSchema(), input.getElement(), input.getQualifier());
+                        metadataAuthorityService.makeFieldKey(input.getSchema(), input.getElement(),
+                                input.getQualifier());
                 boolean isAuthorityControlled = metadataAuthorityService.isAuthorityControlled(fieldKey);
 
                 List<String> fieldsName = new ArrayList<String>();
@@ -99,10 +125,10 @@ public class MetadataValidation extends AbstractValidation {
 
                         // Check the lookup list. If no other inputs of the same field name allow this type,
                         // then remove. This includes field name without qualifier.
-                        if (!input.isAllowedFor(documentTypeValue) &&  (!allowedFieldNames.contains(fullFieldname)
+                        if (!input.isAllowedFor(documentTypeValueList) && (!allowedFieldNames.contains(fullFieldname)
                                 && !allowedFieldNames.contains(input.getFieldName()))) {
                             itemService.removeMetadataValues(ContextUtil.obtainCurrentRequestContext(),
-                                        obj.getItem(), mdv);
+                                    obj.getItem(), mdv);
                         } else {
                             validateMetadataValues(mdv, input, config, isAuthorityControlled, fieldKey, errors);
                             if (mdv.size() > 0 && input.isVisible(DCInput.SUBMISSION_SCOPE)) {
@@ -126,7 +152,7 @@ public class MetadataValidation extends AbstractValidation {
                 for (String fieldName : fieldsName) {
                     boolean valuesRemoved = false;
                     List<MetadataValue> mdv = itemService.getMetadataByMetadataString(obj.getItem(), fieldName);
-                    if (!input.isAllowedFor(documentTypeValue)) {
+                    if (!input.isAllowedFor(documentTypeValueList)) {
                         // Check the lookup list. If no other inputs of the same field name allow this type,
                         // then remove. Otherwise, do not
                         if (!(allowedFieldNames.contains(fieldName))) {
@@ -134,26 +160,26 @@ public class MetadataValidation extends AbstractValidation {
                                     obj.getItem(), mdv);
                             valuesRemoved = true;
                             log.debug("Stripping metadata values for " + input.getFieldName() + " on type "
-                                    + documentTypeValue + " as it is allowed by another input of the same field " +
+                                    + documentTypeValueList + " as it is allowed by another input of the same field " +
                                     "name");
                         } else {
                             log.debug("Not removing unallowed metadata values for " + input.getFieldName() + " on type "
-                                    + documentTypeValue + " as it is allowed by another input of the same field " +
+                                    + documentTypeValueList + " as it is allowed by another input of the same field " +
                                     "name");
                         }
                     }
                     validateMetadataValues(mdv, input, config, isAuthorityControlled, fieldKey, errors);
                     if (((input.isRequired() && mdv.size() == 0) && input.isVisible(DCInput.SUBMISSION_SCOPE)
-                                                                && !valuesRemoved)
+                            && !valuesRemoved)
                             || !isValidComplexDefinitionMetadata(input, mdv)) {
                         // Is the input required for *this* type? In other words, are we looking at a required
                         // input that is also allowed for this document type
-                        if (input.isAllowedFor(documentTypeValue)) {
+                        if (input.isAllowedFor(documentTypeValueList)) {
                             // since this field is missing add to list of error
                             // fields
                             addError(errors, ERROR_VALIDATION_REQUIRED, "/"
                                     + WorkspaceItemRestRepository.OPERATION_PATH_SECTIONS + "/" + config.getId() + "/" +
-                                            input.getFieldName());
+                                    input.getFieldName());
                         }
                     }
                     if (LOCAL_METADATA_HAS_CMDI.equals(fieldName)) {
@@ -167,7 +193,9 @@ public class MetadataValidation extends AbstractValidation {
                     }
                 }
             }
+
         }
+
         return errors;
     }
 

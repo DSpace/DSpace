@@ -1776,6 +1776,9 @@
                     <required>Please give us a description</required>
                 </field>
             </row>
+            <!-- When you configure special field for the `type-bind` you must update it in the `submit.type-bind.field`
+            configuration property like this: `<INPUT_METADATA_FIELD>=><TYPE_BIND_FIELD>`
+            e.g. `dc.language.iso=>edm.type`-->
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
@@ -1783,7 +1786,7 @@
                     <dc-qualifier>iso</dc-qualifier>
                     <repeatable>true</repeatable>
                     <label>Pick the languages of the TEXT</label>
-                    <type-bind>TEXT</type-bind>
+                    <type-bind field="edm.type">TEXT</type-bind>
                     <input-type>autocomplete</input-type>
                     <hint>Select the language of the main content of the item. Multiple languages are possible. Start
                         typing the language and use autocomplete form that will appear if applicable. Better to list all the languages then to use the 'mul' iso code (if there are too many, contact support).
@@ -1798,7 +1801,7 @@
                     <dc-qualifier>iso</dc-qualifier>
                     <repeatable>true</repeatable>
                     <label>Language</label>
-                    <type-bind>VIDEO,IMAGE,SOUND,3D</type-bind>
+                    <type-bind field="edm.type">VIDEO,IMAGE,SOUND,3D</type-bind>
                     <input-type>autocomplete</input-type>
                     <hint>Optionally, select the language of the main content
                         of the item. Multiple languages are possible. Start
