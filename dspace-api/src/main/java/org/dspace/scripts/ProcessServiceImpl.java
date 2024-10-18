@@ -175,10 +175,6 @@ public class ProcessServiceImpl implements ProcessService {
     public void appendFile(Context context, Process process, InputStream is, String type, String fileName)
         throws IOException, SQLException, AuthorizeException {
         Bitstream bitstream = bitstreamService.create(context, is);
-        if (getBitstream(context, process, type) != null) {
-            throw new IllegalArgumentException("Cannot create another file of type: " + type + " for this process" +
-                                                   " with id: " + process.getID());
-        }
         bitstream.setName(context, fileName);
         bitstreamService.setFormat(context, bitstream, bitstreamFormatService.guessFormat(context, bitstream));
         MetadataField dspaceProcessFileTypeField = metadataFieldService
