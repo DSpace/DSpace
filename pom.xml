@@ -1785,13 +1785,13 @@
             <dependency>
                 <groupId>com.google.inject</groupId>
                 <artifactId>guice</artifactId>
-                <version>5.1.0</version> <!-- Update to the latest compatible version -->
+                <version>7.0.0</version> <!-- Update to the latest compatible version -->
             </dependency>
 
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
-                <version>2.8.8</version> <!-- Ensure this version is compatible with your code -->
+                <version>2.10.1</version> <!-- Ensure this version is compatible with your code -->
             </dependency>
 
             <!-- Findbugs annotations -->
