@@ -163,7 +163,7 @@ public class DCInput {
      * The scope of the input sets, this restricts hidden metadata fields from
      * view by the end user during submission.
      */
-    public static final String SUBMISSION_SCOPE = "submit";
+    public static final String SUBMISSION_SCOPE = "submission";
 
     /**
      * Class constructor for creating a DCInput object based on the contents of
