@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -121,12 +122,39 @@ public class HandleServiceImpl implements HandleService {
 
         String handle = null;
 
-        if (url.startsWith(dspaceUrl)) {
+        if (url.startsWith(dspaceUrl)) { // legacy DSO URL
             handle = url.substring(dspaceUrl.length());
-        }
-
-        if (url.startsWith(handleResolver)) {
+        } else if (url.startsWith(handleResolver)) { // Handle URL
             handle = url.substring(handleResolver.length());
+        } else { // current DSO URL
+            URIBuilder parsedURI;
+            try {
+                parsedURI = new URIBuilder(url);
+            } catch (URISyntaxException e) {
+                log.error("Not a URL", e.getMessage());
+                return null;
+            }
+            List<String> path = parsedURI.getPathSegments();
+            if (path.size() == 2) { // OBJECT_TYPE / UUID
+                UUID uuid;
+                try {
+                    uuid = UUID.fromString(path.get(1));
+                } catch (IllegalArgumentException e) {
+                    log.error("'{}' is not a UUID",
+                            path.get(1), e.getMessage());
+                    return null;
+                }
+                DSpaceObject dso = dspaceObjectService.find(context, uuid);
+                if (null == dso) {
+                    log.error("'{}' does not identify a DSpaceObject",
+                            parsedURI.getPath());
+                    return null;
+                } else {
+                    handle = dso.getHandle();
+                }
+            } else {
+                log.error("could not resolve '{}' to a Handle", url);
+            }
         }
 
         if (null == handle) {
