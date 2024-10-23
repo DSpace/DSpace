@@ -30,6 +30,7 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.core.Context;
 import org.dspace.curate.AbstractCurationTask;
+import org.dspace.curate.CurationTask;
 import org.dspace.curate.Curator;
 import org.dspace.curate.Distributive;
 import org.dspace.curate.Mutative;
@@ -104,10 +105,17 @@ public class CitationPage extends AbstractCurationTask {
      */
     @Override
     protected void performItem(Item item) throws SQLException {
+        List<Bundle> originalBundles = itemService.getBundles(item, "ORIGINAL");
+        if (originalBundles == null || originalBundles.isEmpty()) {
+            log.error("Item " + item.getHandle() + " without or with empty bundle ORIGINAL");
+            this.resBuilder.append(", skip citation page generation as ORIGINAL bundle does not exist or is empty.\n");
+            this.status = Curator.CURATE_SKIP;
+            return;
+        }
+        
         //Determine if the DISPLAY bundle exits. If not, create it.
         List<Bundle> dBundles = itemService.getBundles(item, CitationPage.DISPLAY_BUNDLE_NAME);
-        Bundle original = itemService.getBundles(item, "ORIGINAL").get(0);
-        Bundle dBundle = null;
+        Bundle dBundle;
         if (dBundles == null || dBundles.isEmpty()) {
             try {
                 dBundle = bundleService.create(Curator.curationContext(), item, CitationPage.DISPLAY_BUNDLE_NAME);
@@ -177,6 +185,7 @@ public class CitationPage extends AbstractCurationTask {
                         this.addCitedPageToItem(citedInputStream, bundle, pBundle,
                                                 dBundle, item, bitstream);
                         // now set the policies of the preservation and display bundle
+                        Bundle original = originalBundles.get(0);
                         clonePolicies(Curator.curationContext(), original, pBundle);
                         clonePolicies(Curator.curationContext(), original, dBundle);
                     } catch (Exception e) {
