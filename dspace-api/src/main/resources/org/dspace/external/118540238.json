@@ -1,0 +1,868 @@
+{
+  "@context" : "http://lobid.org/gnd/context.jsonld",
+  "acquaintanceshipOrFriendship" : [ {
+    "id" : "https://d-nb.info/gnd/118633252",
+    "label" : "Willemer, Marianne von"
+  }, {
+    "id" : "https://d-nb.info/gnd/118638076",
+    "label" : "Buff, Charlotte"
+  }, {
+    "id" : "https://d-nb.info/gnd/119277387",
+    "label" : "Herzlieb, Minna"
+  }, {
+    "id" : "https://d-nb.info/gnd/118727907",
+    "label" : "Levetzow, Ulrike von"
+  }, {
+    "id" : "https://d-nb.info/gnd/118617222",
+    "label" : "Stein, Charlotte von"
+  }, {
+    "id" : "https://d-nb.info/gnd/118607626",
+    "label" : "Schiller, Friedrich"
+  } ],
+  "biographicalOrHistoricalInformation" : [ "Staatsmann, Geheimrat" ],
+  "dateOfBirth" : [ "1749-08-28" ],
+  "dateOfDeath" : [ "1832-03-22" ],
+  "deprecatedUri" : [ "https://d-nb.info/gnd/1032060956", "https://d-nb.info/gnd/1022736213", "https://d-nb.info/gnd/101488358X", "https://d-nb.info/gnd/1095607278", "https://d-nb.info/gnd/1131918517", "https://d-nb.info/gnd/1014927390", "https://d-nb.info/gnd/185848826", "https://d-nb.info/gnd/4021455-2" ],
+  "familialRelationship" : [ {
+    "id" : "https://d-nb.info/gnd/11854022X",
+    "label" : "Goethe, August von"
+  }, {
+    "id" : "https://d-nb.info/gnd/118540246",
+    "label" : "Goethe, Katharina Elisabeth"
+  }, {
+    "id" : "https://d-nb.info/gnd/118628011",
+    "label" : "Goethe, Christiane von"
+  }, {
+    "id" : "https://d-nb.info/gnd/118540254",
+    "label" : "Goethe, Ottilie von"
+  }, {
+    "id" : "https://d-nb.info/gnd/118695940",
+    "label" : "Goethe, Johann Caspar"
+  }, {
+    "id" : "https://d-nb.info/gnd/118795163",
+    "label" : "Schlosser, Johann Georg"
+  }, {
+    "id" : "https://d-nb.info/gnd/11687256X",
+    "label" : "Melber, Johanna Maria"
+  }, {
+    "id" : "https://d-nb.info/gnd/11871791X",
+    "label" : "Goethe, Cornelia"
+  } ],
+  "gender" : [ {
+    "id" : "https://d-nb.info/standards/vocab/gnd/gender#male",
+    "label" : "Männlich"
+  } ],
+  "geographicAreaCode" : [ {
+    "id" : "https://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-DE",
+    "label" : "Deutschland"
+  } ],
+  "gndIdentifier" : "118540238",
+  "gndSubjectCategory" : [ {
+    "id" : "https://d-nb.info/standards/vocab/gnd/gnd-sc#12.2p",
+    "label" : "Personen zu Literaturgeschichte (Schriftsteller)"
+  }, {
+    "id" : "https://d-nb.info/standards/vocab/gnd/gnd-sc#15.1p",
+    "label" : "Personen zu Theater, Tanz"
+  }, {
+    "id" : "https://d-nb.info/standards/vocab/gnd/gnd-sc#7.14p",
+    "label" : "Personen zu Recht"
+  }, {
+    "id" : "https://d-nb.info/standards/vocab/gnd/gnd-sc#16.5p",
+    "label" : "Personen der Geschichte (Politiker und historische Persönlichkeiten)"
+  }, {
+    "id" : "https://d-nb.info/standards/vocab/gnd/gnd-sc#18p",
+    "label" : "Personen zu Natur, Naturwissenschaften allgemein"
+  }, {
+    "id" : "https://d-nb.info/standards/vocab/gnd/gnd-sc#13.4p",
+    "label" : "Personen zu Malerei, Zeichnung, Grafik"
+  } ],
+  "id" : "https://d-nb.info/gnd/118540238",
+  "languageCode" : [ {
+    "id" : "http://id.loc.gov/vocabulary/iso639-2/ger",
+    "label" : "http://id.loc.gov/vocabulary/iso639-2/ger"
+  } ],
+  "oldAuthorityNumber" : [ "(DE-588a)118540238", "(DE-588a)1014123208", "(DE-588)1131918517", "(DE-588)101488358X", "(DE-588)1014927390", "(DE-588c)4021455-2", "(DE-588)185808069", "(DE-588a)101488358X", "(DE-588)1095607278", "(DE-588a)185808069", "(DE-588)1032060956", "(DE-588a)1014927390", "(DE-588)185848826", "(DE-588a)185848826", "(DE-588)1022736213" ],
+  "placeOfActivity" : [ {
+    "id" : "https://d-nb.info/gnd/4065105-8",
+    "label" : "Weimar"
+  } ],
+  "placeOfBirth" : [ {
+    "id" : "https://d-nb.info/gnd/4018118-2",
+    "label" : "Frankfurt am Main"
+  } ],
+  "placeOfDeath" : [ {
+    "id" : "https://d-nb.info/gnd/4065105-8",
+    "label" : "Weimar"
+  } ],
+  "preferredName" : "Goethe, Johann Wolfgang von",
+  "preferredNameEntityForThePerson" : {
+    "forename" : [ "Johann Wolfgang" ],
+    "prefix" : [ "von" ],
+    "surname" : [ "Goethe" ]
+  },
+  "professionOrOccupation" : [ {
+    "id" : "https://d-nb.info/gnd/4041423-1",
+    "label" : "Naturwissenschaftler"
+  }, {
+    "id" : "https://d-nb.info/gnd/4200345-3",
+    "label" : "Zeichner"
+  }, {
+    "id" : "https://d-nb.info/gnd/4185044-0",
+    "label" : "Theaterintendant"
+  }, {
+    "id" : "https://d-nb.info/gnd/4053309-8",
+    "label" : "Schriftsteller"
+  }, {
+    "id" : "https://d-nb.info/gnd/4037215-7",
+    "label" : "Maler"
+  }, {
+    "id" : "https://d-nb.info/gnd/4176310-5",
+    "label" : "Publizist"
+  }, {
+    "id" : "https://d-nb.info/gnd/4046517-2",
+    "label" : "Politiker"
+  }, {
+    "id" : "https://d-nb.info/gnd/4029050-5",
+    "label" : "Jurist"
+  } ],
+  "professionalRelationship" : [ {
+    "id" : "https://d-nb.info/gnd/11856014X",
+    "label" : "Karl August, Sachsen-Weimar-Eisenach, Großherzog"
+  } ],
+  "relatedWork" : [ {
+    "id" : "https://d-nb.info/gnd/1085150313",
+    "label" : "Exlibris (Goethe, Johann Wolfgang von), 01"
+  }, {
+    "id" : "https://d-nb.info/gnd/1085154025",
+    "label" : "Exlibris (Goethe, Johann Wolfgang von), 02"
+  } ],
+  "sameAs" : [ {
+    "collection" : {
+      "abbr" : "JudaicaLink",
+      "name" : "JudaicaLink",
+      "publisher" : "Stuttgart Media University",
+      "icon" : "https://data.judaicalink.org/static/img/favicon.ico",
+      "id" : "http://data.judaicalink.org"
+    },
+    "id" : "http://data.judaicalink.org/data/gnd/118540238"
+  }, {
+    "id" : "http://dbpedia.org/resource/Johann_Wolfgang_von_Goethe",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/QQ465",
+      "abbr" : "DBpedia",
+      "publisher" : "DBpedia",
+      "icon" : "http://dbpedia.org/favicon.ico",
+      "name" : "DBpedia"
+    }
+  }, {
+    "collection" : {
+      "abbr" : "FFMPL",
+      "name" : "Frankfurter Personenlexikon",
+      "publisher" : "Frankfurter Bürgerstiftung im Holzhausenschlösschen",
+      "id" : "http://www.wikidata.org/entity/Q39845173"
+    },
+    "id" : "http://frankfurter-personenlexikon.de/beacon/beacon.php?118540238"
+  }, {
+    "collection" : {
+      "abbr" : "LC",
+      "name" : "NACO Authority File",
+      "publisher" : "Library of Congress",
+      "icon" : "https://www.loc.gov/favicon.ico",
+      "id" : "http://www.wikidata.org/entity/Q13219454"
+    },
+    "id" : "http://id.loc.gov/rwo/agents/n79003362"
+  }, {
+    "collection" : {
+      "abbr" : "ISNI",
+      "name" : "International Standard Name Identifier (ISNI)",
+      "publisher" : "International Standard Name Identifier (ISNI)",
+      "icon" : "https://www.isni.org/sites/default/files/isni_new_favicon.ico",
+      "id" : "http://isni.org"
+    },
+    "id" : "http://isni.org/isni/0000000120999104"
+  }, {
+    "id" : "http://viaf.org/viaf/24602065",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q54919",
+      "abbr" : "VIAF",
+      "publisher" : "OCLC",
+      "icon" : "http://viaf.org/viaf/images/viaf.ico",
+      "name" : "Virtual International Authority File (VIAF)"
+    }
+  }, {
+    "collection" : {
+      "abbr" : "ADB",
+      "name" : "Allgemeine Deutsche Biographie (ADB)",
+      "publisher" : "Historische Kommission bei der Bayerischen Akademie der Wissenschaften und Bayerische Staatsbibliothek",
+      "icon" : "https://www.deutsche-biographie.de/favicon.ico",
+      "id" : "http://www.deutsche-biographie.de"
+    },
+    "id" : "http://www.deutsche-biographie.de/pnd118540238.html#adbcontent"
+  }, {
+    "collection" : {
+      "abbr" : "NDB",
+      "name" : "Neue Deutsche Biographie (NDB)",
+      "publisher" : "Historische Kommission bei der Bayerischen Akademie der Wissenschaften und Bayerische Staatsbibliothek",
+      "icon" : "https://www.deutsche-biographie.de/favicon.ico",
+      "id" : "http://www.deutsche-biographie.de"
+    },
+    "id" : "http://www.deutsche-biographie.de/pnd118540238.html#ndbcontent"
+  }, {
+    "id" : "http://www.filmportal.de/person/CCBAA3CEF5654B98AD772651F9023DE6",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q15706812",
+      "abbr" : "filmportal.de",
+      "publisher" : "Deutsches Filminstitut",
+      "icon" : "http://filmportal.de/misc/favicon.ico",
+      "name" : "Filmportal"
+    }
+  }, {
+    "collection" : {
+      "abbr" : "CH_HLS",
+      "name" : "Historisches Lexikon der Schweiz (HLS)",
+      "publisher" : "Historisches Lexikon der Schweiz (HLS)",
+      "icon" : "https://www.hls-dhs-dss.ch/favicon.ico",
+      "id" : "http://www.wikidata.org/entity/Q642074"
+    },
+    "id" : "http://www.hls-dhs-dss.ch/textes/d/D11638.php"
+  }, {
+    "collection" : {
+      "abbr" : "PACELLI",
+      "name" : "Kritische Online-Edition der Nuntiaturberichte Eugenio Pacellis (1917-1929)",
+      "publisher" : "Kritische Online-Edition der Nuntiaturberichte Eugenio Pacellis (1917-1929)",
+      "id" : "http://www.pacelli-edition.de"
+    },
+    "id" : "http://www.pacelli-edition.de/gnd/118540238"
+  }, {
+    "collection" : {
+      "abbr" : "Portraitindex",
+      "name" : "Digitaler Portraitindex der druckgraphischen Bildnisse der Frühen Neuzeit",
+      "publisher" : "Deutsches Dokumentationszentrum für Kunstgeschichte - Bildarchiv Foto Marburg",
+      "icon" : "https://www.portraitindex.de/favicon.ico",
+      "id" : "http://www.wikidata.org/entity/Q2105262"
+    },
+    "id" : "http://www.portraitindex.de/dokumente/pnd/118540238"
+  }, {
+    "collection" : {
+      "abbr" : "WIKIDATA",
+      "name" : "Wikidata",
+      "publisher" : "Wikimedia Foundation Inc.",
+      "icon" : "https://www.wikidata.org/static/favicon/wikidata.ico",
+      "id" : "http://www.wikidata.org/entity/Q2013"
+    },
+    "id" : "http://www.wikidata.org/entity/Q5879"
+  }, {
+    "id" : "https://d-nb.info/gnd/101488358X",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q36578",
+      "abbr" : "DNB",
+      "publisher" : "Deutsche Nationalbibliothek",
+      "icon" : "http://www.dnb.de/SiteGlobals/StyleBundles/Bilder/favicon.png?__blob=normal&v=1",
+      "name" : "Gemeinsame Normdatei (GND) im Katalog der Deutschen Nationalbibliothek"
+    }
+  }, {
+    "id" : "https://d-nb.info/gnd/1014927390",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q36578",
+      "abbr" : "DNB",
+      "publisher" : "Deutsche Nationalbibliothek",
+      "icon" : "http://www.dnb.de/SiteGlobals/StyleBundles/Bilder/favicon.png?__blob=normal&v=1",
+      "name" : "Gemeinsame Normdatei (GND) im Katalog der Deutschen Nationalbibliothek"
+    }
+  }, {
+    "id" : "https://d-nb.info/gnd/1022736213",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q36578",
+      "abbr" : "DNB",
+      "publisher" : "Deutsche Nationalbibliothek",
+      "icon" : "http://www.dnb.de/SiteGlobals/StyleBundles/Bilder/favicon.png?__blob=normal&v=1",
+      "name" : "Gemeinsame Normdatei (GND) im Katalog der Deutschen Nationalbibliothek"
+    }
+  }, {
+    "id" : "https://d-nb.info/gnd/1032060956",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q36578",
+      "abbr" : "DNB",
+      "publisher" : "Deutsche Nationalbibliothek",
+      "icon" : "http://www.dnb.de/SiteGlobals/StyleBundles/Bilder/favicon.png?__blob=normal&v=1",
+      "name" : "Gemeinsame Normdatei (GND) im Katalog der Deutschen Nationalbibliothek"
+    }
+  }, {
+    "id" : "https://d-nb.info/gnd/1095607278",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q36578",
+      "abbr" : "DNB",
+      "publisher" : "Deutsche Nationalbibliothek",
+      "icon" : "http://www.dnb.de/SiteGlobals/StyleBundles/Bilder/favicon.png?__blob=normal&v=1",
+      "name" : "Gemeinsame Normdatei (GND) im Katalog der Deutschen Nationalbibliothek"
+    }
+  }, {
+    "id" : "https://d-nb.info/gnd/1131918517",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q36578",
+      "abbr" : "DNB",
+      "publisher" : "Deutsche Nationalbibliothek",
+      "icon" : "http://www.dnb.de/SiteGlobals/StyleBundles/Bilder/favicon.png?__blob=normal&v=1",
+      "name" : "Gemeinsame Normdatei (GND) im Katalog der Deutschen Nationalbibliothek"
+    }
+  }, {
+    "collection" : {
+      "abbr" : "DNB",
+      "name" : "Gemeinsame Normdatei (GND) im Katalog der Deutschen Nationalbibliothek",
+      "publisher" : "Deutsche Nationalbibliothek",
+      "icon" : "https://www.dnb.de/SiteGlobals/Frontend/DNBWeb/Images/favicon.png?__blob=normal&v=4",
+      "id" : "http://www.wikidata.org/entity/Q36578"
+    },
+    "id" : "https://d-nb.info/gnd/118540238/about"
+  }, {
+    "id" : "https://d-nb.info/gnd/185848826",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q36578",
+      "abbr" : "DNB",
+      "publisher" : "Deutsche Nationalbibliothek",
+      "icon" : "http://www.dnb.de/SiteGlobals/StyleBundles/Bilder/favicon.png?__blob=normal&v=1",
+      "name" : "Gemeinsame Normdatei (GND) im Katalog der Deutschen Nationalbibliothek"
+    }
+  }, {
+    "id" : "https://d-nb.info/gnd/4021455-2",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q36578",
+      "abbr" : "DNB",
+      "publisher" : "Deutsche Nationalbibliothek",
+      "icon" : "http://www.dnb.de/SiteGlobals/StyleBundles/Bilder/favicon.png?__blob=normal&v=1",
+      "name" : "Gemeinsame Normdatei (GND) im Katalog der Deutschen Nationalbibliothek"
+    }
+  }, {
+    "collection" : {
+      "abbr" : "dewiki",
+      "name" : "Wikipedia (Deutsch)",
+      "publisher" : "Wikimedia Foundation Inc.",
+      "icon" : "https://de.wikipedia.org/static/favicon/wikipedia.ico",
+      "id" : "http://www.wikidata.org/entity/Q48183"
+    },
+    "id" : "https://de.wikipedia.org/wiki/Johann_Wolfgang_von_Goethe"
+  }, {
+    "collection" : {
+      "abbr" : "WIKISOURCE",
+      "name" : "Wikisource",
+      "publisher" : "Wikimedia Foundation Inc.",
+      "icon" : "https://wikisource.org/static/favicon/wikisource.ico",
+      "id" : "http://www.wikidata.org/entity/Q263"
+    },
+    "id" : "https://de.wikisource.org/wiki/Johann_Wolfgang_von_Goethe"
+  }, {
+    "collection" : {
+      "abbr" : "enwiki",
+      "name" : "Wikipedia (English)",
+      "publisher" : "Wikimedia Foundation Inc.",
+      "icon" : "https://en.wikipedia.org/static/favicon/wikipedia.ico",
+      "id" : "http://www.wikidata.org/entity/Q328"
+    },
+    "id" : "https://en.wikipedia.org/wiki/Johann_Wolfgang_von_Goethe"
+  }, {
+    "collection" : {
+      "abbr" : "DE-611",
+      "name" : "Kalliope Verbundkatalog",
+      "publisher" : "Staatsbibliothek zu Berlin - Preußischer Kulturbesitz",
+      "icon" : "https://kalliope-verbund.info/img/favicon.ico",
+      "id" : "https://kalliope-verbund.info"
+    },
+    "id" : "https://kalliope-verbund.info/gnd/118540238"
+  }, {
+    "collection" : {
+      "abbr" : "ARCHIV-D",
+      "name" : "Archivportal-D",
+      "publisher" : "Deutsche Digitale Bibliothek",
+      "icon" : "https://www.archivportal-d.de/favicon.ico",
+      "id" : "https://www.archivportal-d.de"
+    },
+    "id" : "https://www.archivportal-d.de/person/gnd/118540238"
+  }, {
+    "collection" : {
+      "abbr" : "DDB",
+      "name" : "Deutsche Digitale Bibliothek",
+      "publisher" : "Deutsche Digitale Bibliothek",
+      "icon" : "https://www.deutsche-digitale-bibliothek.de/favicon.ico",
+      "id" : "http://www.wikidata.org/entity/Q621630"
+    },
+    "id" : "https://www.deutsche-digitale-bibliothek.de/person/gnd/118540238"
+  }, {
+    "collection" : {
+      "abbr" : "LAGIS",
+      "name" : "Hessische Biografie",
+      "publisher" : "Hessisches Landesamt für geschichtliche Landeskunde",
+      "icon" : "https://www.lagis-hessen.de/favicon.ico",
+      "id" : "http://www.wikidata.org/entity/Q14564246"
+    },
+    "id" : "https://www.lagis-hessen.de/pnd/118540238"
+  } ],
+  "type" : [ "AuthorityResource", "DifferentiatedPerson", "Person" ],
+  "variantName" : [ "Gyot'e, Yohan Volfgang", "Gūta", "Gkaite, Giochan Bolphnkannk phon", "Goethe, Ioannes W.", "Koet'e, Yohan Polp'ŭgang p'on", "Goethe, Wolfgango", "Gete, Jōhan Wolfgang fon", "Gete, Yohann Volfqanq", "Goethe, J. W. von", "Gete, J. V.", "Gūta, Yūhān Wulfgāng fun", "Гёте, Йоҳанн Волфганг", "Goete, Iohan V. p'on", "Goethe, Juan W.", "Géte, Johans Volfgangs", "Von Goethe, Johann Wolfgang", "Goethe", "Giote, Johan Wolphgang", "Ġūta, Yūhān Fūlfġānḡ", "Goithios", "Gete, Volʹfgang", "Gete, Jogann-Vol'fgang", "Gete", "Gete, I.-V.", "Gkaite, Giochan Bolphnkannk êphonë", "Gete, Yogann Volʹfgang", "Goethe, João Wolfgang von", "Gotenin", "Gǐote, Jochan Volfgang", "G'ote, V. f.", "約翰・沃爾夫岡・馮・歌德", "Göthe, J. W. von", "Goethe, J. W. v.", "Ġūtih, Yūhān Fūlfġānḡ", "Goethe, Wolfgang", "G'ote", "Gete, Yohan Volfgang", "Goethe, Johan Wolphgang", "Ġūtah, Yūhān Fūlfġānḡ", "Gėtė, Johanas Volfgangas", "Kēōthē", "Geteh, Yohan Ṿolfgang fon", "Gete, Yôhân Wôlfgang fôn", "He͏̈te, E͏̈han Vol'fhanh", "Ǧīta", "Goethe, Joh. Wolfg. v.", "Gete, Johann Volʹfgang", "Ġūtih, Yūhān Fūlfġānġ fūn", "Ge de", "Göthe, Giov. Volfango", "Gkaite, Iōann Mpolphgang", "Gūta, Yūhān Wulfgāng fūn", "Kote, V.", "Kêôt'ê, Volfkank", "Goethe, Johann Wolfgang v.", "גתה, יוהן וולפגנג פון", "Goethe, J. W.", "Ǧītih", "Goethe, Giov. L.", "Goet'e", "Gót", "Koet'e", "Göthe, Jan Wolfgang", "Kote, Johann Volfgang", "Gêôt'ê", "Goethe, J.W.", "G'ote, Jochan Volfgang", "Gete, I. V.", "Yo han Bol peu gang pon Goe te", "Gejteh", "Hëte, &Euml;han Vol'fhanh", "Göte, Iogann V.", "Goethe, Jan Wolfgang", "Gkaite", "Gě'ṭe", "歌德", "Yue han Wo fu gang Ge de", "Gēte", "Kote, J. V.", "Göthe", "Kote, Jochann Volfgang", "Goethe, J. Wolfgang", "Gete, Iogann Volʹfgang", "Hete, Johann-Vol'fhanh", "Gyote, Yohan Wolfgang", "Gete, Jochan Volfgang", "Giote, J. V.", "Goethe, Johann Wolfgang", "Gyote, Johān Bholphgãā", "Gette, G.", "约翰・沃尔夫冈・冯・歌德", "Ǧītā", "Goethe, Wolfgang von", "Goethe, I. W.", "Goythe", "Gete, Johan Volfgang", "Goethe, Juan Wolfgang von", "Gete, Jogann Vol'fgang fon", "Gede", "Gete, Yohan Wolfgang", "Gót, J. V.", "Gete, Iohan Volfgang", "Giote, J. W.", "Goethius", "Gyot'e, Yohan Wolfgang", "Göte", "Gëte, Johann Volfgang", "Goethe, Johan Wolfgang von", "Göthe, Johann Wolfgang von", "Gêtê, Y. W.", "Goethe, Volfgango", "Gëte, Iogann Vol'fgang", "Goethe, Wolfango", "Gēte, Yohan Vorufugangu Fon", "Goethe, W. von", "Goethe, Iohan Wolphgang", "Ǧūta, Yūhān Wulfǧānǧ fūn", "Goe te", "Gete, V.", "Gete, J.-V.", "Goet'e, Iohan Volp'gang", "Gete, I. W.", "Go't, I. V.", "Gete, Y. W.", "Gete, Egan Vol'fgang", "Goethe, Juan Wolfgang", "Goethe, G. L.", "Goethe, Johan W. von", "Göthe, Johann W. êvonë", "ゲーテ, ヨハン・ヴォルフガング・フォン", "Gede, Yuehan Wofugang", "Goethe, Jean Wolfgang von", "Ġūtih, Yūhān Vūlfġanġ fūn", "Ge͏̈te, Iogann Vol'fgang", "Goithios, I.V.", "Gkaite, Giochan B. phon", "Höte, Iohann Volfqanq", "Goethe, Volfango", "Yuehan-Wofugang-Gede", "Gête, Yôhan Wolfgang", "Ǧītah", "Göthe, Jan Wolfang", "Goethe, J.W. von", "Yohan-Bolpeugang-pon-Goete", "Goethe, Johann W. von", "Goethe, Iohann Wolfgang", "Goethe, Johann W.", "Goytä, Yohan Welfgang fon", "GŚutih, YŚuhŚan VŚulf·gan·g fŚun", "Gete, J.V.", "Gete, Jogann Vol'fgang êfonë", "Gete, Iogann W." ],
+  "variantNameEntityForThePerson" : [ {
+    "forename" : [ "Johan W." ],
+    "prefix" : [ "von" ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "J. V." ],
+    "surname" : [ "Gót" ]
+  }, {
+    "forename" : [ "Volʹfgang" ],
+    "surname" : [ "Gete" ]
+  }, {
+    "forename" : [ "Iogann W." ],
+    "surname" : [ "Gete" ]
+  }, {
+    "forename" : [ "Yohan Vorufugangu Fon" ],
+    "surname" : [ "Gēte" ]
+  }, {
+    "personalName" : [ "Ǧīta" ]
+  }, {
+    "forename" : [ "Yohan Wolfgang" ],
+    "surname" : [ "Gyote" ]
+  }, {
+    "forename" : [ "Iogann Vol'fgang" ],
+    "surname" : [ "Ge͏̈te" ]
+  }, {
+    "forename" : [ "Giochan Bolphnkannk" ],
+    "prefix" : [ "phon" ],
+    "surname" : [ "Gkaite" ]
+  }, {
+    "forename" : [ "Йоҳанн Волфганг" ],
+    "surname" : [ "Гёте" ]
+  }, {
+    "forename" : [ "J. Wolfgang" ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "personalName" : [ "Gotenin" ]
+  }, {
+    "forename" : [ "Iogann V." ],
+    "surname" : [ "Göte" ]
+  }, {
+    "forename" : [ "&Euml;han Vol'fhanh" ],
+    "surname" : [ "Hëte" ]
+  }, {
+    "forename" : [ "Iohann Volfqanq" ],
+    "surname" : [ "Höte" ]
+  }, {
+    "forename" : [ "Johan Volfgang" ],
+    "surname" : [ "Gete" ]
+  }, {
+    "forename" : [ "Johān Bholphgãā" ],
+    "surname" : [ "Gyote" ]
+  }, {
+    "forename" : [ "Wolfango" ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "Jogann-Vol'fgang" ],
+    "surname" : [ "Gete" ]
+  }, {
+    "forename" : [ "João Wolfgang" ],
+    "prefix" : [ "von" ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "Iohan V." ],
+    "prefix" : [ "p'on" ],
+    "surname" : [ "Goete" ]
+  }, {
+    "forename" : [ "J.-V." ],
+    "surname" : [ "Gete" ]
+  }, {
+    "personalName" : [ "Ǧītih" ]
+  }, {
+    "personalName" : [ "Gkaite" ]
+  }, {
+    "personalName" : [ "Ge de" ]
+  }, {
+    "forename" : [ "J. W." ],
+    "prefix" : [ "von" ],
+    "surname" : [ "Göthe" ]
+  }, {
+    "personalName" : [ "Kēōthē" ]
+  }, {
+    "forename" : [ "V." ],
+    "prefix" : [ "f." ],
+    "surname" : [ "G'ote" ]
+  }, {
+    "personalName" : [ "Yue han Wo fu gang Ge de" ]
+  }, {
+    "personalName" : [ "Koet'e" ]
+  }, {
+    "forename" : [ "יוהן וולפגנג פון" ],
+    "surname" : [ "גתה" ]
+  }, {
+    "forename" : [ "Jan Wolfang" ],
+    "surname" : [ "Göthe" ]
+  }, {
+    "forename" : [ "Wolfgango" ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "J. V." ],
+    "surname" : [ "Giote" ]
+  }, {
+    "personalName" : [ "Goythe" ]
+  }, {
+    "forename" : [ "J. W." ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "I.V." ],
+    "surname" : [ "Goithios" ]
+  }, {
+    "personalName" : [ "Gede" ]
+  }, {
+    "forename" : [ "Giov. L." ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "Yôhân Wôlfgang" ],
+    "prefix" : [ "fôn" ],
+    "surname" : [ "Gete" ]
+  }, {
+    "forename" : [ "Giov. Volfango" ],
+    "surname" : [ "Göthe" ]
+  }, {
+    "forename" : [ "Johann W. êvonë" ],
+    "surname" : [ "Göthe" ]
+  }, {
+    "personalName" : [ "Ǧītah" ]
+  }, {
+    "forename" : [ "Yūhān Vūlfġanġ" ],
+    "prefix" : [ "fūn" ],
+    "surname" : [ "Ġūtih" ]
+  }, {
+    "forename" : [ "ヨハン・ヴォルフガング・フォン" ],
+    "surname" : [ "ゲーテ" ]
+  }, {
+    "personalName" : [ "Goe te" ]
+  }, {
+    "forename" : [ "Yohan Polp'ŭgang" ],
+    "prefix" : [ "p'on" ],
+    "surname" : [ "Koet'e" ]
+  }, {
+    "personalName" : [ "Goithios" ]
+  }, {
+    "forename" : [ "Volfkank" ],
+    "surname" : [ "Kêôt'ê" ]
+  }, {
+    "forename" : [ "Jogann Vol'fgang êfonë" ],
+    "surname" : [ "Gete" ]
+  }, {
+    "forename" : [ "Jean Wolfgang" ],
+    "prefix" : [ "von" ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "E͏̈han Vol'fhanh" ],
+    "surname" : [ "He͏̈te" ]
+  }, {
+    "personalName" : [ "Yohan-Bolpeugang-pon-Goete" ]
+  }, {
+    "forename" : [ "Johann W." ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "Johann Volʹfgang" ],
+    "surname" : [ "Gete" ]
+  }, {
+    "forename" : [ "Yūhān Wulfgāng" ],
+    "prefix" : [ "fun" ],
+    "surname" : [ "Gūta" ]
+  }, {
+    "forename" : [ "Yūhān Wulfǧānǧ" ],
+    "prefix" : [ "fūn" ],
+    "surname" : [ "Ǧūta" ]
+  }, {
+    "forename" : [ "Yūhān Wulfgāng" ],
+    "prefix" : [ "fūn" ],
+    "surname" : [ "Gūta" ]
+  }, {
+    "forename" : [ "Giochan B." ],
+    "prefix" : [ "phon" ],
+    "surname" : [ "Gkaite" ]
+  }, {
+    "forename" : [ "Juan W." ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "V." ],
+    "surname" : [ "Kote" ]
+  }, {
+    "forename" : [ "Y. W." ],
+    "surname" : [ "Gete" ]
+  }, {
+    "forename" : [ "J. V." ],
+    "surname" : [ "Kote" ]
+  }, {
+    "forename" : [ "Yohan Volfgang" ],
+    "surname" : [ "Gyot'e" ]
+  }, {
+    "personalName" : [ "Göthe" ]
+  }, {
+    "forename" : [ "Wolfgang" ],
+    "prefix" : [ "von" ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "Iohan Wolphgang" ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "personalName" : [ "Goethe" ]
+  }, {
+    "forename" : [ "J. W." ],
+    "prefix" : [ "von" ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "Jogann Vol'fgang" ],
+    "prefix" : [ "fon" ],
+    "surname" : [ "Gete" ]
+  }, {
+    "forename" : [ "Jan Wolfgang" ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "personalName" : [ "Gete" ]
+  }, {
+    "forename" : [ "I. V." ],
+    "surname" : [ "Gete" ]
+  }, {
+    "forename" : [ "Johans Volfgangs" ],
+    "surname" : [ "Géte" ]
+  }, {
+    "personalName" : [ "Gêôt'ê" ]
+  }, {
+    "personalName" : [ "Gě'ṭe" ]
+  }, {
+    "forename" : [ "YŚuhŚan VŚulf·gan·g fŚun" ],
+    "surname" : [ "GŚutih" ]
+  }, {
+    "forename" : [ "Johann Wolfgang" ],
+    "prefix" : [ "v." ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "Jochann Volfgang" ],
+    "surname" : [ "Kote" ]
+  }, {
+    "personalName" : [ "Yo han Bol peu gang pon Goe te" ]
+  }, {
+    "forename" : [ "Jochan Volfgang" ],
+    "surname" : [ "G'ote" ]
+  }, {
+    "forename" : [ "Yūhān Fūlfġānḡ" ],
+    "surname" : [ "Ġūta" ]
+  }, {
+    "forename" : [ "Volfango" ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "Johan Wolphgang" ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "W." ],
+    "prefix" : [ "von" ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "Yūhān Fūlfġānḡ" ],
+    "surname" : [ "Ġūtah" ]
+  }, {
+    "forename" : [ "Yohan Volfgang" ],
+    "surname" : [ "Gete" ]
+  }, {
+    "forename" : [ "I. V." ],
+    "surname" : [ "Go't" ]
+  }, {
+    "forename" : [ "Yohan Ṿolfgang" ],
+    "prefix" : [ "fon" ],
+    "surname" : [ "Geteh" ]
+  }, {
+    "forename" : [ "Wolfgang" ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "J.W." ],
+    "prefix" : [ "von" ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "J. V." ],
+    "surname" : [ "Gete" ]
+  }, {
+    "forename" : [ "ヨハン・ヴォルフガング・フォン" ],
+    "surname" : [ "ゲーテ" ]
+  }, {
+    "forename" : [ "Johanas Volfgangas" ],
+    "surname" : [ "Gėtė" ]
+  }, {
+    "personalName" : [ "Gēte" ]
+  }, {
+    "forename" : [ "Yôhan Wolfgang" ],
+    "surname" : [ "Gête" ]
+  }, {
+    "forename" : [ "Johann-Vol'fhanh" ],
+    "surname" : [ "Hete" ]
+  }, {
+    "personalName" : [ "Gejteh" ]
+  }, {
+    "forename" : [ "Iogann Vol'fgang" ],
+    "surname" : [ "Gëte" ]
+  }, {
+    "forename" : [ "Yūhān Fūlfġānḡ" ],
+    "surname" : [ "Ġūtih" ]
+  }, {
+    "forename" : [ "J. W." ],
+    "surname" : [ "Giote" ]
+  }, {
+    "forename" : [ "Yohan Welfgang" ],
+    "prefix" : [ "fon" ],
+    "surname" : [ "Goytä" ]
+  }, {
+    "forename" : [ "Johann Wolfgang" ],
+    "surname" : [ "Von Goethe" ]
+  }, {
+    "forename" : [ "Ioannes W." ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "Johann Volfgang" ],
+    "surname" : [ "Gëte" ]
+  }, {
+    "forename" : [ "Yohann Volfqanq" ],
+    "surname" : [ "Gete" ]
+  }, {
+    "forename" : [ "Volfgango" ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "personalName" : [ "Goet'e" ]
+  }, {
+    "personalName" : [ "Goethius" ]
+  }, {
+    "forename" : [ "G. L." ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "I. W." ],
+    "surname" : [ "Gete" ]
+  }, {
+    "forename" : [ "Joh. Wolfg." ],
+    "prefix" : [ "v." ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "Iogann Volʹfgang" ],
+    "surname" : [ "Gete" ]
+  }, {
+    "forename" : [ "G." ],
+    "surname" : [ "Gette" ]
+  }, {
+    "forename" : [ "Iōann Mpolphgang" ],
+    "surname" : [ "Gkaite" ]
+  }, {
+    "forename" : [ "J.V." ],
+    "surname" : [ "Gete" ]
+  }, {
+    "forename" : [ "Jōhan Wolfgang" ],
+    "prefix" : [ "fon" ],
+    "surname" : [ "Gete" ]
+  }, {
+    "forename" : [ "Yohan Wolfgang" ],
+    "surname" : [ "Gyot'e" ]
+  }, {
+    "forename" : [ "Johann Wolfgang" ],
+    "prefix" : [ "von" ],
+    "surname" : [ "Göthe" ]
+  }, {
+    "personalName" : [ "約翰・沃爾夫岡・馮・歌德" ]
+  }, {
+    "personalName" : [ "Gūta" ]
+  }, {
+    "personalName" : [ "G'ote" ]
+  }, {
+    "forename" : [ "Yogann Volʹfgang" ],
+    "surname" : [ "Gete" ]
+  }, {
+    "forename" : [ "Yuehan Wofugang" ],
+    "surname" : [ "Gede" ]
+  }, {
+    "personalName" : [ "Göte" ]
+  }, {
+    "forename" : [ "Johan Wolphgang" ],
+    "surname" : [ "Giote" ]
+  }, {
+    "forename" : [ "Iohann Wolfgang" ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "V." ],
+    "surname" : [ "Gete" ]
+  }, {
+    "forename" : [ "J.W." ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "personalName" : [ "歌德" ]
+  }, {
+    "forename" : [ "Johann W." ],
+    "prefix" : [ "von" ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "Yohan Wolfgang" ],
+    "surname" : [ "Gete" ]
+  }, {
+    "forename" : [ "Johann Wolfgang" ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "Y. W." ],
+    "surname" : [ "Gêtê" ]
+  }, {
+    "forename" : [ "Egan Vol'fgang" ],
+    "surname" : [ "Gete" ]
+  }, {
+    "personalName" : [ "约翰・沃尔夫冈・冯・歌德" ]
+  }, {
+    "forename" : [ "Jochan Volfgang" ],
+    "surname" : [ "Gǐote" ]
+  }, {
+    "forename" : [ "Yūhān Fūlfġānġ fūn" ],
+    "surname" : [ "Ġūtih" ]
+  }, {
+    "forename" : [ "I.-V." ],
+    "surname" : [ "Gete" ]
+  }, {
+    "forename" : [ "J. W." ],
+    "prefix" : [ "v." ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "Jan Wolfgang" ],
+    "surname" : [ "Göthe" ]
+  }, {
+    "personalName" : [ "Ǧītā" ]
+  }, {
+    "personalName" : [ "Gót" ]
+  }, {
+    "forename" : [ "Iohan Volp'gang" ],
+    "surname" : [ "Goet'e" ]
+  }, {
+    "personalName" : [ "歌德" ]
+  }, {
+    "personalName" : [ "Yuehan-Wofugang-Gede" ]
+  }, {
+    "forename" : [ "Juan Wolfgang" ],
+    "prefix" : [ "von" ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "Giochan Bolphnkannk êphonë" ],
+    "surname" : [ "Gkaite" ]
+  }, {
+    "forename" : [ "Juan Wolfgang" ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "Johan Wolfgang" ],
+    "prefix" : [ "von" ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "Johann Volfgang" ],
+    "surname" : [ "Kote" ]
+  }, {
+    "forename" : [ "Iohan Volfgang" ],
+    "surname" : [ "Gete" ]
+  }, {
+    "forename" : [ "I. W." ],
+    "surname" : [ "Goethe" ]
+  }, {
+    "forename" : [ "Jochan Volfgang" ],
+    "surname" : [ "Gete" ]
+  } ],
+  "wikipedia" : [ {
+    "id" : "http://de.wikipedia.org/wiki/Johann_Wolfgang_von_Goethe",
+    "label" : "http://de.wikipedia.org/wiki/Johann_Wolfgang_von_Goethe"
+  } ],
+  "depiction" : [ {
+    "id" : "https://commons.wikimedia.org/wiki/Special:FilePath/Goethe%20%28Stieler%201828%29.jpg",
+    "url" : "https://commons.wikimedia.org/wiki/File:Goethe%20%28Stieler%201828%29.jpg?uselang=de",
+    "thumbnail" : "https://commons.wikimedia.org/wiki/Special:FilePath/Goethe%20%28Stieler%201828%29.jpg?width=270"
+  } ]
+}
