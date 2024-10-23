@@ -10,6 +10,7 @@ package org.dspace.scripts;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
@@ -207,5 +208,17 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
 
     public enum StepResult {
         Continue, Exit;
+    }
+
+    /*
+     * This method can optionally be overridden by the implementing class to provide an actual 'type' for a file
+     * parameter. By default, all file parameters are given the 'inputfile' type.
+     * This method can be used to provide a more specific type for a file parameter.
+     * Which is especially useful for scripts that should take multiple file parameters.
+     *
+     * @param fileParameter the file parameter passed to the script, e.g. 'example.pdf'
+     */
+    public Optional<String> fileParameterToBitstreamType(String fileParameter) {
+        return Optional.empty();
     }
 }
