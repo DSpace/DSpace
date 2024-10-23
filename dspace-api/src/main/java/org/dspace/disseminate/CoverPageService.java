@@ -45,7 +45,9 @@ public class CoverPageService {
 
     /**
      * Render a PDF coverpage for the given Item. The implementation may use the context and
-     * any relevant meta data from the Item to populuate dynamic content in the rendered page.
+     * any relevant meta data from the Item to populate dynamic content in the rendered page.
+     * All metadata fields (using format schema_field_qualifier) are passed to coverPageContributor
+     * and can be referenced in HTML template
      *
      * @param item the current item
      * @return a PDDocument containing the rendered coverpage.
@@ -58,7 +60,7 @@ public class CoverPageService {
         // The contributor allows to calculate additional parameters for the template or to replace existing ones.
         parameters = coverPageContributor.processCoverPageParams(item, parameters);
 
-        LOG.info("Rendering cover document with params = {}", parameters);
+        LOG.debug("Rendering cover document with params = {}", parameters);
 
         var html = pdfGenerator.parseThymeleafTemplate(coverTemplate, parameters);
 

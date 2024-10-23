@@ -221,7 +221,7 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         }
 
         // If previous logic didn't return true, then we're false.
-        return true;
+        return false;
     }
 
     /**

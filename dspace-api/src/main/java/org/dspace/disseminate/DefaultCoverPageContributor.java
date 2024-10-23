@@ -26,7 +26,7 @@ public class DefaultCoverPageContributor implements CoverPageContributor {
         if (StringUtils.isBlank(dcTitleSubtitle)) {
             parameters.put("metadata_title", dcTitle);
         } else {
-            parameters.put("metadata_title", "%s: %s".formatted(dcTitle, dcTitleSubtitle));
+            parameters.put("metadata_title", String.format("%s: %s", dcTitle, dcTitleSubtitle));
         }
 
         // join authors to list

@@ -14,6 +14,11 @@
 
     <!-- only limited subset of CSS v3 features are supported. Be careful to check the rendered result! -->
     <style>
+        /*  check the documentation for details how to configure the page size
+            https://flyingsaucerproject.github.io/flyingsaucer/r8/guide/users-guide-R8.html#xil_34
+        */
+        @page {  size: A4 }
+
         body {
             background: white;
             height: 100%; /* Ensure the html and body are full height */
@@ -101,6 +106,7 @@
 
     <div class="body">
         <div class="metadata">
+            <!-- The metadata fields from the current item can be referenced here in the format schema_field_qualifier -->
             <div class="title" th:text="${metadata_title}">Test title</div>
 
             <div class="author" th:text="${metadata_author}">Autor 1; Author 2; Author 3</div>
