@@ -17,7 +17,7 @@ import org.hamcrest.Matcher;
 
 public class RegistrationMatcher {
 
-    private RegistrationMatcher(){}
+    private RegistrationMatcher() {}
 
     public static Matcher<? super Object> matchRegistration(String email, UUID epersonUuid) {
         return allOf(
