@@ -174,9 +174,9 @@ public class AuthorizeConfiguration {
      *
      * @return true/false
      */
-    public static boolean canCommunityAdminPerformItemReinstatiate() {
+    public static boolean canCommunityAdminPerformItemReinstate() {
         init();
-        return configurationService.getBooleanProperty("core.authorization.community-admin.item.reinstatiate", true);
+        return configurationService.getBooleanProperty("core.authorization.community-admin.item.reinstate", true);
     }
 
     /**
@@ -306,9 +306,9 @@ public class AuthorizeConfiguration {
      *
      * @return true/false
      */
-    public static boolean canCollectionAdminPerformItemReinstatiate() {
+    public static boolean canCollectionAdminPerformItemReinstate() {
         init();
-        return configurationService.getBooleanProperty("core.authorization.collection-admin.item.reinstatiate", true);
+        return configurationService.getBooleanProperty("core.authorization.collection-admin.item.reinstate", true);
     }
 
     /**
