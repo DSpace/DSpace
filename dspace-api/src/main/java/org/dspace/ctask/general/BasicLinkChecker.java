@@ -19,6 +19,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
+import org.dspace.util.ProxyUtils;
 
 /**
  * A basic link checker that is designed to be extended. By default this link checker
@@ -36,11 +37,8 @@ public class BasicLinkChecker extends AbstractCurationTask {
     // The status of the link checking of this item
     private int status = Curator.CURATE_UNSET;
 
-    // The results of link checking this item
-    private List<String> results = null;
-
     // The log4j logger for this class
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BasicLinkChecker.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
 
     /**
@@ -94,7 +92,7 @@ public class BasicLinkChecker extends AbstractCurationTask {
     protected List<String> getURLs(Item item) {
         // Get URIs from anyschema.anyelement.uri.*
         List<MetadataValue> urls = itemService.getMetadata(item, Item.ANY, Item.ANY, "uri", Item.ANY);
-        ArrayList<String> theURLs = new ArrayList<String>();
+        ArrayList<String> theURLs = new ArrayList<>();
         for (MetadataValue url : urls) {
             theURLs.add(url.getValue());
         }
@@ -131,7 +129,8 @@ public class BasicLinkChecker extends AbstractCurationTask {
     protected int getResponseStatus(String url) {
         try {
             URL theURL = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) theURL.openConnection();
+            HttpURLConnection connection
+                    = (HttpURLConnection) theURL.openConnection(ProxyUtils.getProxy());
             int code = connection.getResponseCode();
             connection.disconnect();
 
@@ -139,7 +138,7 @@ public class BasicLinkChecker extends AbstractCurationTask {
 
         } catch (IOException ioe) {
             // Must be a bad URL
-            log.debug("Bad link: " + ioe.getMessage());
+            log.debug("Bad link: {}", ioe::getMessage);
             return 0;
         }
     }

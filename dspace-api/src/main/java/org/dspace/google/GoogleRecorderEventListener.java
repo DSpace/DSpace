@@ -21,7 +21,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.logging.log4j.Logger;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -31,6 +31,7 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.model.Event;
 import org.dspace.usage.AbstractUsageEventListener;
 import org.dspace.usage.UsageEvent;
+import org.dspace.util.ProxyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -46,9 +47,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class GoogleRecorderEventListener extends AbstractUsageEventListener {
 
     private String analyticsKey;
-    private CloseableHttpClient httpclient;
-    private String GoogleURL = "https://www.google-analytics.com/collect";
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(GoogleRecorderEventListener.class);
+    private final CloseableHttpClient httpclient;
+    private final String GoogleURL = "https://www.google-analytics.com/collect";
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     protected ContentServiceFactory contentServiceFactory;
     protected ConfigurationService configurationService;
@@ -56,7 +57,9 @@ public class GoogleRecorderEventListener extends AbstractUsageEventListener {
 
     public GoogleRecorderEventListener() {
         // httpclient is threadsafe so we only need one.
-        httpclient = HttpClients.createDefault();
+        HttpClientBuilder builder = HttpClientBuilder.create();
+        ProxyUtils.addProxy(builder);
+        httpclient = builder.build();
     }
 
     @Autowired
@@ -113,7 +116,7 @@ public class GoogleRecorderEventListener extends AbstractUsageEventListener {
     private void logEvent(UsageEvent ue, String category, String action) throws IOException, SQLException {
         HttpPost httpPost = new HttpPost(GoogleURL);
 
-        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        List<NameValuePair> nvps = new ArrayList<>();
         nvps.add(new BasicNameValuePair("v", "1"));
         nvps.add(new BasicNameValuePair("tid", analyticsKey));
 
