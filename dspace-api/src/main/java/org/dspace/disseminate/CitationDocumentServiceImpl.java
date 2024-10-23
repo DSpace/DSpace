@@ -23,10 +23,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
@@ -74,10 +74,6 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     protected final Set<String> PDF_MIMES = new HashSet<>(2);
 
     /**
-     * A set of MIME types that refer to a JPEG, PNG, or GIF
-     */
-    protected final Set<String> RASTER_MIMES = new HashSet<>();
-    /**
      * A set of MIME types that refer to a SVG
      */
     protected final Set<String> SVG_MIMES = new HashSet<>();
@@ -117,12 +113,11 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     public void afterPropertiesSet() throws Exception {
         // Add valid format MIME types to set. This could be put in the Schema
         // instead.
-        //Populate RASTER_MIMES
+        //Populate SVG_MIMES
         SVG_MIMES.add("image/jpeg");
         SVG_MIMES.add("image/pjpeg");
         SVG_MIMES.add("image/png");
         SVG_MIMES.add("image/gif");
-        //Populate SVG_MIMES
         SVG_MIMES.add("image/svg");
         SVG_MIMES.add("image/svg+xml");
 
@@ -300,11 +295,12 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             throws IOException, SQLException, AuthorizeException {
         PDDocument document = new PDDocument();
         PDDocument sourceDocument = new PDDocument();
+        ByteArrayOutputStream os = null;
         try {
             Item item = (Item) bitstreamService.getParentObject(context, bitstream);
             final InputStream inputStream = bitstreamService.retrieve(context, bitstream);
             try {
-                sourceDocument = sourceDocument.load(inputStream);
+                sourceDocument = PDDocument.load(inputStream);
             } finally {
                 inputStream.close();
             }
@@ -312,17 +308,16 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             generateCoverPage(context, document, coverPage, item);
             addCoverPageToDocument(document, sourceDocument, coverPage);
 
-            //We already have the full PDF in memory, so keep it there
-            try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-                document.save(out);
-
-                byte[] data = out.toByteArray();
-                return Pair.of(data, Long.valueOf(data.length));
-            }
-
+            os = new ByteArrayOutputStream();
+            document.save(os);
+            byte[] data = os.toByteArray();
+            return Pair.of(data, (long) data.length);
         } finally {
             sourceDocument.close();
             document.close();
+            if (os != null) {
+                os.close();
+            }
         }
     }
 
@@ -399,19 +394,14 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     }
 
     protected void addCoverPageToDocument(PDDocument document, PDDocument sourceDocument, PDPage coverPage) {
-        PDPageTree sourcePageList = sourceDocument.getDocumentCatalog().getPages();
-
+        PDFMergerUtility mergerUtility = new PDFMergerUtility();
         if (isCitationFirstPage()) {
             //citation as cover page
             document.addPage(coverPage);
-            for (PDPage sourcePage : sourcePageList) {
-                document.addPage(sourcePage);
-            }
+            mergerUtility.appendDocument(document, sourceDocument);
         } else {
             //citation as tail page
-            for (PDPage sourcePage : sourcePageList) {
-                document.addPage(sourcePage);
-            }
+            mergerUtility.appendDocument(document, sourceDocument);
             document.addPage(coverPage);
         }
     }
