@@ -393,7 +393,8 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
         }
     }
 
-    protected void addCoverPageToDocument(PDDocument document, PDDocument sourceDocument, PDPage coverPage) {
+    protected void addCoverPageToDocument(PDDocument document, PDDocument sourceDocument, PDPage coverPage)
+        throws IOException {
         PDFMergerUtility mergerUtility = new PDFMergerUtility();
         if (isCitationFirstPage()) {
             //citation as cover page
