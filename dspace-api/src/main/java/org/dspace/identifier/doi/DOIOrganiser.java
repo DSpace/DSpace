@@ -577,7 +577,8 @@ public class DOIOrganiser {
             }
         } catch (IdentifierException ex) {
             if (!(ex instanceof DOIIdentifierException)) {
-                LOG.error("It wasn't possible to register the identifier online. ", ex);
+                LOG.error("Registering DOI {} for object {}:  the registrar returned an error.",
+                        doiRow.getDoi(), dso.getID(), ex);
             }
 
             DOIIdentifierException doiIdentifierException = (DOIIdentifierException) ex;
