@@ -14,7 +14,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import jakarta.annotation.Resource;
@@ -113,7 +112,7 @@ public class BibtexImportMetadataSourceServiceImpl extends AbstractPlainMetadata
     @Override
     @SuppressWarnings("unchecked")
     @Resource(name = "bibtexMetadataFieldMap")
-    public void setMetadataFieldMap(@SuppressWarnings("rawtypes") Map metadataFieldMap) {
+    public void setMetadataFieldMap(@SuppressWarnings("rawtypes") List metadataFieldMap) {
         super.setMetadataFieldMap(metadataFieldMap);
     }
 
