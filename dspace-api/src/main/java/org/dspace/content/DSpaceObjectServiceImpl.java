@@ -117,6 +117,11 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     }
 
     @Override
+    public String getTypeTextPlural(T dso) {
+        return Constants.typeTextPlural[dso.getType()];
+    }
+
+    @Override
     public List<MetadataValue> getMetadata(T dso, String schema, String element, String qualifier, String lang) {
         // Build up list of matching values
         List<MetadataValue> values = new ArrayList<>();
