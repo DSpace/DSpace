@@ -1,9 +1,9 @@
 # Database initialization for docker-compose
 
 Place your database dump file in this directory, and the "dspacedb" container
-will use it to initialize the database, via the "drum_pg_restore.sh" script.
+will use it to initialize the database, via the "pg_restore_drum.sh" script.
 
-## drum_pg_restore.sh and CVE-2023-2454
+## pg_restore_drum.sh and CVE-2023-2454
 
 Prior to DSpace 7.6.2, it was possible to use "pg_dump" to create a "plain" SQL
 file (with a ".sql" extension), and the "postgres" Docker image
@@ -16,12 +16,12 @@ process running as the "postgres" user, and the use of the "pgcrypto"
 extension). Note that plain SQL dumps *will* work when run from the Docker
 container's command-line.
 
-The workaround was to create the "postgres-init/drum_pg_restore.sh", script
+The workaround was to create the "postgres-init/pg_restore_drum.sh", script
 which uses "pg_restore" to populate the database with a Postgres "custom" dump
 file. This is used in preference to a plain SQL file, to keep the automatic
 Docker initialization from interfering with the process.
 
-The "postgres-init/drum_pg_restore.sh" will run automatically when the Docker
+The "postgres-init/pg_restore_drum.sh" will run automatically when the Docker
 container starts, *if* a database doesn't already exist.
 
 ## Creating the Postgres dump
@@ -33,7 +33,7 @@ $ kubectl exec drum-db-0 -- pg_dump -Fc -C -O -U drum -d drum > postgres-init/dr
 ```
 
 **Note:** The output file MUST use a ".dump" extension, in order for the
-"drum_pg_restore.sh" script to process it.
+"pg_restore_drum.sh" script to process it.
 
 ## Delete local database data
 
