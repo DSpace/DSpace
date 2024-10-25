@@ -11,6 +11,7 @@ import static org.apache.commons.codec.CharEncoding.UTF_8;
 import static org.apache.commons.io.IOUtils.toInputStream;
 import static org.dspace.app.rest.utils.UsageReportUtils.TOP_CITIES_REPORT_ID;
 import static org.dspace.app.rest.utils.UsageReportUtils.TOP_COUNTRIES_REPORT_ID;
+import static org.dspace.app.rest.utils.UsageReportUtils.TOP_ITEMS_REPORT_ID;
 import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_DOWNLOADS_REPORT_ID;
 import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_VISITS_PER_MONTH_REPORT_ID;
 import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_VISITS_REPORT_ID;
@@ -797,7 +798,8 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                            itemNotVisitedWithBitstreams.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID,
                            TOTAL_DOWNLOADS_REPORT_ID,
                            List.of(
-                               getExpectedDsoViews(bitstreamVisited, 1)
+                               getExpectedDsoViews(bitstreamVisited, 1),
+                               getExpectedTotalViews(1)
                            )
                        )
                    )));
@@ -824,9 +826,9 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
 
     @Test
     public void TotalDownloadsReport_NotSupportedDSO_Collection() throws Exception {
-        getClient(adminToken)
-            .perform(get("/api/statistics/usagereports/" + collectionVisited.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID))
-            .andExpect(status().isNotFound());
+        getClient(adminToken).perform(
+            get("/api/statistics/usagereports/" + collectionVisited.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID))
+              .andExpect(status().isOk());
     }
 
     /**
@@ -932,10 +934,12 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                            communityVisited.getID() + "_" + TOP_COUNTRIES_REPORT_ID,
                            TOP_COUNTRIES_REPORT_ID,
                            List.of(
-                               getExpectedCountryViews("US", "United States", 2)
+                               getExpectedCountryViews("US", "United States", 2),
+                               getExpectedTotalViews(2)
                            )
                        )
                    )));
+
     }
 
     /**
@@ -978,7 +982,8 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                                 .andExpect(status().isCreated());
 
         List<UsageReportPointRest> expectedPoints = List.of(
-            getExpectedCityViews("New York", 1)
+            getExpectedCityViews("New York", 1),
+            getExpectedTotalViews(1)
         );
 
         // And request that item's TopCities report
@@ -1035,10 +1040,10 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
     @Test
     public void topCitiesReport_Community_Visited() throws Exception {
         // ** WHEN **
-        // We visit a Community thrice
+        // We thrice visit an Item owned by a Community
         ViewEventRest viewEventRest = new ViewEventRest();
-        viewEventRest.setTargetType("community");
-        viewEventRest.setTargetId(communityVisited.getID());
+        viewEventRest.setTargetType("item");
+        viewEventRest.setTargetId(itemVisited.getID());
 
         ObjectMapper mapper = new ObjectMapper();
 
@@ -1046,12 +1051,10 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
             .content(mapper.writeValueAsBytes(viewEventRest))
             .contentType(contentType))
                                 .andExpect(status().isCreated());
-
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
             .contentType(contentType))
                                 .andExpect(status().isCreated());
-
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
             .contentType(contentType))
@@ -1059,15 +1062,16 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
 
         // And request that community's TopCities report
         getClient(adminToken).perform(
-            get("/api/statistics/usagereports/" + communityVisited.getID() + "_" + TOP_CITIES_REPORT_ID))
+            get("/api/statistics/usagereports/" + communityNotVisited.getID() + "_" + TOP_CITIES_REPORT_ID))
                    // ** THEN **
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", Matchers.is(
                        UsageReportMatcher.matchUsageReport(
-                           communityVisited.getID() + "_" + TOP_CITIES_REPORT_ID,
+                           communityNotVisited.getID() + "_" + TOP_CITIES_REPORT_ID,
                            TOP_CITIES_REPORT_ID,
                            List.of(
-                               getExpectedCityViews("New York", 3)
+                               getExpectedCityViews("New York", 3),
+                               getExpectedTotalViews(3)
                            )
                        )
                    )));
@@ -1227,9 +1231,43 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                     site.getID() + "_" + TOTAL_VISITS_REPORT_ID,
                     TOTAL_VISITS_REPORT_ID,
                     List.of(
-                        getExpectedDsoViews(itemVisited, 1),
-                        getExpectedDsoViews(itemVisited2, 2)
+                        getExpectedDsoViews(site, 0)
                     )
+                ),
+                UsageReportMatcher.matchUsageReport(
+                    site.getID() + "_" + TOTAL_VISITS_PER_MONTH_REPORT_ID,
+                    TOTAL_VISITS_PER_MONTH_REPORT_ID,
+                    this.getListOfVisitsPerMonthsPoints(0)
+                ),
+                UsageReportMatcher.matchUsageReport(
+                    site.getID() + "_" + TOP_ITEMS_REPORT_ID,
+                    TOP_ITEMS_REPORT_ID,
+                    List.of(
+                        getExpectedTopItemViews(itemVisited, 1),
+                        getExpectedTopItemViews(itemVisited2, 2),
+                        getExpectedTotalViews(3)
+                    )
+                ),
+                UsageReportMatcher.matchUsageReport(
+                    site.getID() + "_" + TOP_CITIES_REPORT_ID,
+                    TOP_CITIES_REPORT_ID,
+                    List.of(
+                        getExpectedCityViews("New York", 3),
+                        getExpectedTotalViews(3)
+                    )
+                ),
+                UsageReportMatcher.matchUsageReport(
+                    site.getID() + "_" + TOP_COUNTRIES_REPORT_ID,
+                    TOP_COUNTRIES_REPORT_ID,
+                    List.of(
+                        getExpectedCountryViews("US", "United States", 3),
+                        getExpectedTotalViews(3)
+                    )
+                ),
+                UsageReportMatcher.matchUsageReport(
+                    site.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID,
+                    TOTAL_DOWNLOADS_REPORT_ID,
+                    List.of()
                 )
             )));
     }
@@ -1272,16 +1310,22 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                 UsageReportMatcher.matchUsageReport(
                     communityVisited.getID() + "_" + TOP_CITIES_REPORT_ID,
                     TOP_CITIES_REPORT_ID,
-                    List.of(
-                        getExpectedCityViews("New York", 1)
-                    )
+                    List.of()
                 ),
                 UsageReportMatcher.matchUsageReport(
                     communityVisited.getID() + "_" + TOP_COUNTRIES_REPORT_ID,
                     TOP_COUNTRIES_REPORT_ID,
-                    List.of(
-                        getExpectedCountryViews("US", "United States", 1)
-                    )
+                    List.of()
+                ),
+                UsageReportMatcher.matchUsageReport(
+                    communityVisited.getID() + "_" + TOP_ITEMS_REPORT_ID,
+                    TOP_ITEMS_REPORT_ID,
+                    List.of()
+                ),
+                UsageReportMatcher.matchUsageReport(
+                    communityVisited.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID,
+                    TOTAL_DOWNLOADS_REPORT_ID,
+                    List.of()
                 )
             )));
     }
@@ -1319,7 +1363,18 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                     collectionNotVisited.getID() + "_" + TOP_COUNTRIES_REPORT_ID,
                     TOP_COUNTRIES_REPORT_ID,
                     List.of()
+                ),
+                UsageReportMatcher.matchUsageReport(
+                    collectionNotVisited.getID() + "_" + TOP_ITEMS_REPORT_ID,
+                    TOP_ITEMS_REPORT_ID,
+                    List.of()
+                ),
+                UsageReportMatcher.matchUsageReport(
+                    collectionNotVisited.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID,
+                    TOTAL_DOWNLOADS_REPORT_ID,
+                    List.of()
                 )
+
             )));
     }
 
@@ -1362,14 +1417,16 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                     itemVisited.getID() + "_" + TOP_CITIES_REPORT_ID,
                     TOP_CITIES_REPORT_ID,
                     List.of(
-                        getExpectedCityViews("New York", 1)
+                        getExpectedCityViews("New York", 1),
+                        getExpectedTotalViews(1)
                     )
                 ),
                 UsageReportMatcher.matchUsageReport(
                     itemVisited.getID() + "_" + TOP_COUNTRIES_REPORT_ID,
                     TOP_COUNTRIES_REPORT_ID,
                     List.of(
-                        getExpectedCountryViews("US", "United States", 1)
+                        getExpectedCountryViews("US", "United States", 1),
+                        getExpectedTotalViews(1)
                     )
                 ),
                 UsageReportMatcher.matchUsageReport(
@@ -1449,14 +1506,16 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                     itemVisited.getID() + "_" + TOP_CITIES_REPORT_ID,
                     TOP_CITIES_REPORT_ID,
                     List.of(
-                        getExpectedCityViews("New York", 1)
+                        getExpectedCityViews("New York", 1),
+                        getExpectedTotalViews(1)
                     )
                 ),
                 UsageReportMatcher.matchUsageReport(
                     itemVisited.getID() + "_" + TOP_COUNTRIES_REPORT_ID,
                     TOP_COUNTRIES_REPORT_ID,
                     List.of(
-                        getExpectedCountryViews("US", "United States", 1)
+                        getExpectedCountryViews("US", "United States", 1),
+                        getExpectedTotalViews(1)
                     )
                 ),
                 UsageReportMatcher.matchUsageReport(
@@ -1464,7 +1523,8 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                     TOTAL_DOWNLOADS_REPORT_ID,
                     List.of(
                         getExpectedDsoViews(bitstream1, 1),
-                        getExpectedDsoViews(bitstream2, 2)
+                        getExpectedDsoViews(bitstream2, 2),
+                        getExpectedTotalViews(3)
                     )
                 )
             )));
@@ -1510,22 +1570,21 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                 UsageReportMatcher.matchUsageReport(
                     bitstreamVisited.getID() + "_" + TOP_CITIES_REPORT_ID,
                     TOP_CITIES_REPORT_ID,
-                    List.of(
-                        getExpectedCityViews("New York", 1)
-                    )
+                    List.of()
                 ),
                 UsageReportMatcher.matchUsageReport(
                     bitstreamVisited.getID() + "_" + TOP_COUNTRIES_REPORT_ID,
                     TOP_COUNTRIES_REPORT_ID,
-                    List.of(
-                        getExpectedCountryViews("US", "United States", 1)
-                    )
+                    List.of()
                 ),
                 UsageReportMatcher.matchUsageReport(
                     bitstreamVisited.getID() + "_" + TOTAL_DOWNLOADS_REPORT_ID,
                     TOTAL_DOWNLOADS_REPORT_ID,
-                    expectedTotalVisits
+                    List.of(
+                        getExpectedDsoViews(bitstreamVisited, 1)
+                    )
                 )
+
             )));
     }
 
@@ -1579,4 +1638,27 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
 
         return point;
     }
+
+    private UsageReportPointDsoTotalVisitsRest getExpectedTotalViews(int views) {
+        UsageReportPointDsoTotalVisitsRest point = new UsageReportPointDsoTotalVisitsRest();
+
+        point.addValue("views", views);
+        point.setId("total");
+        point.setLabel("Total");
+        point.setType("total");
+
+        return point;
+    }
+
+    private UsageReportPointDsoTotalVisitsRest getExpectedTopItemViews(Item item, int views) {
+        UsageReportPointDsoTotalVisitsRest point = new UsageReportPointDsoTotalVisitsRest();
+
+        String url = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
+        point.addValue("views", views);
+        point.setId(item.getID().toString());
+        point.setLabel("<a href='" + url + "'>" + item.getName() + "</a>");
+        point.setType("item");
+        return point;
+    }
+
 }
