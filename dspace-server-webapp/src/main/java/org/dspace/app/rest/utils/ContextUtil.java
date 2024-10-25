@@ -16,6 +16,7 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.model.AuthnRest;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.services.RequestService;
@@ -73,7 +74,13 @@ public class ContextUtil {
 
         if (context == null) {
             try {
-                context = ContextUtil.initializeContext();
+                // Create a read-only context if this is a GET request
+                if (request.getMethod().equals("GET") &&
+                    !request.getRequestURI().contains("/api/" + AuthnRest.CATEGORY)) {
+                    context = ContextUtil.initializeContext(Context.Mode.READ_ONLY);
+                } else {
+                    context = ContextUtil.initializeContext(null);
+                }
             } catch (SQLException e) {
                 log.error("Unable to initialize context", e);
                 return null;
@@ -140,12 +147,19 @@ public class ContextUtil {
     /**
      * Initialize a new Context object
      *
+     * @param initialMode the initial mode of the context
      * @return a DSpace Context Object
      * @throws SQLException
      */
-    private static Context initializeContext() throws SQLException {
+    private static Context initializeContext(Context.Mode initialMode) throws SQLException {
         // Create a new Context
-        Context context = new Context();
+
+        Context context = null;
+        if (initialMode != null) {
+            context = new Context(initialMode);
+        } else {
+            context = new Context();
+        }
 
         // Set the session ID
         /**context.setExtraLogInfo("session_id="
