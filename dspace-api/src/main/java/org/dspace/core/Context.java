@@ -664,6 +664,10 @@ public class Context implements AutoCloseable {
      * @param groupID UUID of group
      */
     public void setSpecialGroup(UUID groupID) {
+        if (isReadOnly()) {
+            // Clear the cache to prevent any inconsistencies
+            readOnlyCache.clear();
+        }
         specialGroups.add(groupID);
     }
 
