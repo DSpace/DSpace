@@ -7,6 +7,9 @@
  */
 package org.dspace.sort;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 /**
  * Standard date ordering delegate implementation. The only "special" need is
  * to treat dates with less than 4-digit year.
@@ -14,6 +17,8 @@ package org.dspace.sort;
  * @author Andrea Bollini
  */
 public class OrderFormatDate implements OrderFormatDelegate {
+    private final SimpleDateFormat yearIso = new SimpleDateFormat("yyyy");
+
     @Override
     public String makeSortString(String value, String language) {
         int padding = 0;
@@ -25,13 +30,27 @@ public class OrderFormatDate implements OrderFormatDelegate {
             padding = 4 - value.length();
         }
 
+        String newValue = value;
         if (padding > 0) {
             // padding the value from left with 0 so that 87 -> 0087, 687-11-24
             // -> 0687-11-24
-            return String.format("%1$0" + padding + "d", 0)
+            newValue = String.format("%1$0" + padding + "d", 0)
                 + value;
-        } else {
-            return value;
         }
+
+        if (isValidDate(newValue)) {
+            return newValue;
+        } else {
+            return null;
+        }
+    }
+
+    private boolean isValidDate(String value) {
+        try {
+            yearIso.parse(value);
+        } catch (ParseException e) {
+            return false;
+        }
+        return true;
     }
 }
