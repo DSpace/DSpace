@@ -24,6 +24,9 @@ updates:
         - "com.google.errorprone:*"
         - "com.puppycrawl.tools:checkstyle"
         - "org.sonatype.plugins:*"
+        exclude-patterns:
+        # Exclude anything from Spring, as that is in a separate group
+        - "org.springframework.*:*"
         update-types:
         - "minor"
         - "patch"
