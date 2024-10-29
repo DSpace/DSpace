@@ -19,7 +19,7 @@ import org.dspace.app.rest.RestResourceController;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-        @LinkRest(name = SuggestionTargetRest.TARGET, method = "getTarget")
+    @LinkRest(name = SuggestionTargetRest.TARGET, method = "getTarget")
 })
 public class SuggestionTargetRest extends BaseObjectRest<String> {
     private static final long serialVersionUID = 1L;
