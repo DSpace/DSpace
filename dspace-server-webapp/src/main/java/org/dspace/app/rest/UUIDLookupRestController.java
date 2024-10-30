@@ -24,9 +24,11 @@ import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.DSpaceObjectUtils;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.discovery.SearchServiceException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
@@ -66,6 +68,9 @@ public class UUIDLookupRestController implements InitializingBean {
     private DiscoverableEndpointsService discoverableEndpointsService;
 
     @Autowired
+    private AuthorizeService authorizeService;
+
+    @Autowired
     private ConverterService converter;
 
     @Override
@@ -85,13 +90,14 @@ public class UUIDLookupRestController implements InitializingBean {
     public void getDSObyIdentifier(HttpServletRequest request,
                                    HttpServletResponse response,
                                    @RequestParam(PARAM) UUID uuid)
-            throws IOException, SQLException, SearchServiceException {
+        throws IOException, SQLException, AuthorizeException {
 
         Context context = null;
         try {
             context = ContextUtil.obtainContext(request);
             DSpaceObject dso = dspaceObjectUtil.findDSpaceObject(context, uuid);
             if (dso != null) {
+                authorizeService.authorizeAction(context, dso, Constants.READ);
                 DSpaceObjectRest dsor = converter.toRest(dso, utils.obtainProjection());
                 URI link = linkTo(dsor.getController(), dsor.getCategory(), dsor.getTypePlural()).slash(dsor.getId())
                         .toUri();
