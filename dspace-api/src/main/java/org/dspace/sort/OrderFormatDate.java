@@ -21,6 +21,10 @@ public class OrderFormatDate implements OrderFormatDelegate {
 
     @Override
     public String makeSortString(String value, String language) {
+        if (!isValidDate(value)) {
+            return null;
+        }
+
         int padding = 0;
         int endYearIdx = value.indexOf('-');
 
@@ -30,18 +34,13 @@ public class OrderFormatDate implements OrderFormatDelegate {
             padding = 4 - value.length();
         }
 
-        String newValue = value;
         if (padding > 0) {
             // padding the value from left with 0 so that 87 -> 0087, 687-11-24
             // -> 0687-11-24
-            newValue = String.format("%1$0" + padding + "d", 0)
+            return String.format("%1$0" + padding + "d", 0)
                 + value;
-        }
-
-        if (isValidDate(newValue)) {
-            return newValue;
         } else {
-            return null;
+            return value;
         }
     }
 
