@@ -276,6 +276,9 @@ public class ClarinShibbolethLoginFilterIT extends AbstractControllerIntegration
                 .andExpect(redirectedUrl("http://localhost:4000/login/duplicate-user?email=" + email))
                 .andReturn().getResponse().getHeader("Authorization");
 
+        // Check if was created a user with such email and netid.
+        EPerson ePerson = checkUserWasCreated(netId, IDP_TEST_EPERSON, email, null);
+        deleteShibbolethUser(ePerson);
     }
 
     // This test is copied from the `ShibbolethLoginFilterIT` and modified following the Clarin updates.
@@ -567,6 +570,7 @@ public class ClarinShibbolethLoginFilterIT extends AbstractControllerIntegration
         checkUserIsSignedIn(token);
         // Find the user by the second email
         EPerson ePerson = checkUserWasCreated(null, IDP_TEST_EPERSON, secondEmail, null);
+        assertTrue(Objects.nonNull(ePerson));
         deleteShibbolethUser(ePerson);
     }
 
