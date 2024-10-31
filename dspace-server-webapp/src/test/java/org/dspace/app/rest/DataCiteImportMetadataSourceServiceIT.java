@@ -136,6 +136,9 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
         MetadatumDTO author8 = createMetadatumDTO("dc", "contributor", "author", "Schleicher, Dierk");
         MetadatumDTO author9 = createMetadatumDTO("dc", "contributor", "author", "Stock, Benedikt");
         MetadatumDTO author10 = createMetadatumDTO("dc", "contributor", "author", "Zelmanov, Efim");
+        MetadatumDTO dateissued = createMetadatumDTO("dc", "date", "issued", "2022");
+        MetadatumDTO publisher = createMetadatumDTO("dc", "publisher", null, "arXiv");
+        MetadatumDTO type = createMetadatumDTO("dc", "type", null, "Working Paper");
         metadatums.add(title);
         metadatums.add(doi);
         metadatums.add(author1);
@@ -148,6 +151,9 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
         metadatums.add(author8);
         metadatums.add(author9);
         metadatums.add(author10);
+        metadatums.add(dateissued);
+        metadatums.add(publisher);
+        metadatums.add(type);
 
         ImportRecord firstRecord = new ImportRecord(metadatums);
 
