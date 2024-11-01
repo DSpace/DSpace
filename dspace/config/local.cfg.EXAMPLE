@@ -354,12 +354,6 @@ loglevel.dspace = INFO
 ############################
 webui.user.assumelogin = true
 
-# Creative Commons settings
-cc.api.rooturl = https://api.creativecommons.org/rest/1.5
-# A list of license classes that should be excluded from selection process
-# Excluding "publicdomain" because it is now a duplicate of the CC0 license
-cc.license.classfilter = recombo, mark, publicdomain
-
 # Browse configuration
 webui.browse.index.1 = dateissued:item:dateissued
 webui.browse.index.2 = author:metadata:dc.contributor.author:text
