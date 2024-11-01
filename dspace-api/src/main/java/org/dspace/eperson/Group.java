@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -59,7 +60,7 @@ public class Group extends CacheableDSpaceObject implements DSpaceObjectLegacySu
     /**
      * lists of epeople and groups in the group
      */
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
     @JoinTable(
         name = "epersongroup2eperson",
         joinColumns = {@JoinColumn(name = "eperson_group_id")},
@@ -67,7 +68,7 @@ public class Group extends CacheableDSpaceObject implements DSpaceObjectLegacySu
     )
     private final List<EPerson> epeople = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
     @JoinTable(
         name = "group2group",
         joinColumns = {@JoinColumn(name = "parent_id")},
