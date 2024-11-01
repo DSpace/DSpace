@@ -1,9 +1,9 @@
 # Database initialization for docker-compose
 
 Place your database dump file in this directory, and the "dspacedb" container
-will use it to initialize the database, via the "pg_restore_drum.sh" script.
+will use it to initialize the database, via the "pg_restore.sh" script.
 
-## pg_restore_drum.sh and CVE-2023-2454
+## pg_restore.sh and CVE-2023-2454
 
 Prior to DSpace 7.6.2, it was possible to use "pg_dump" to create a "plain" SQL
 file (with a ".sql" extension), and the "postgres" Docker image
@@ -16,12 +16,12 @@ process running as the "postgres" user, and the use of the "pgcrypto"
 extension). Note that plain SQL dumps *will* work when run from the Docker
 container's command-line.
 
-The workaround was to create the "postgres-init/pg_restore_drum.sh", script
+The workaround was to create the "postgres-init/pg_restore.sh", script
 which uses "pg_restore" to populate the database with a Postgres "custom" dump
 file. This is used in preference to a plain SQL file, to keep the automatic
 Docker initialization from interfering with the process.
 
-The "postgres-init/pg_restore_drum.sh" will run automatically when the Docker
+The "postgres-init/pg_restore.sh" will run automatically when the Docker
 container starts, *if* a database doesn't already exist.
 
 ## Creating the Postgres dump
@@ -33,7 +33,34 @@ $ kubectl exec drum-db-0 -- pg_dump -Fc -C -O -U drum -d drum > postgres-init/dr
 ```
 
 **Note:** The output file MUST use a ".dump" extension, in order for the
-"pg_restore_drum.sh" script to process it.
+"pg_restore.sh" script to process it.
+
+## (Optional) Verifying the Postgres dump
+
+Use of the custom dump format is slightly risky because the Kubernetes
+connection might have terminated before completing the dump.
+
+Assuming that Postgres is installed on the local workstation, one way to
+verify that the dump is complete, is to convert the database dump into a
+plain SQL file (such as "verify-db.sql") by running:
+
+```zsh
+$ pg_restore -f verify-db.sql postgres-init/drum-db.dump
+```
+
+and then running the "tail" command against the plain SQL file:
+
+```zsh
+$ tail verify-db.sql
+```
+
+If the dump is complete, the last lines will be:
+
+```text
+--
+-- PostgreSQL database dump complete
+--
+```
 
 ## Delete local database data
 

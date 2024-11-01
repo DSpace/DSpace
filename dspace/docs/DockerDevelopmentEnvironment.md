@@ -1,4 +1,4 @@
-# DRUM 7 Docker Development Environment
+# Docker Development Environment
 
 This document contains instructions for building a local development instance
 of a DSpace 7-based DRUM using Docker.
@@ -51,8 +51,8 @@ and add the following lines:
 
 ## Development Setup
 
-This repository uses the "GitHub Flow" branching model, with "drum-main" as the
-main branch for DRUM development.
+This repository uses the "GitHub Flow" branching model, with "drum-main" as
+the main branch for DRUM development.
 
 1) Clone the Git repository and switch to the directory:
 
@@ -79,23 +79,24 @@ main branch for DRUM development.
 
 4) Edit the local configuration file:
 
-    ```zsh
-    $ vi dspace/config/local.cfg
-    ```
+   ```zsh
+   $ vi dspace/config/local.cfg
+   ```
 
-   and enter values for the following properties:
+  and enter values for the following properties:
 
-   * drum.ldap.bind.auth
-   * drum.ldap.bind.password
+  * drum.ldap.bind.auth
+  * drum.ldap.bind.password
 
-   The appropriate values can be found in LastPass.
+  The appropriate values can be found in LastPass.
 
-   **Note:** The "drum.ldap.bind.auth" value typically contains commas (for
-   example "uid=foo,cn=bar,ou=baz,dc=quuz,dc=zot"), which must be escaped. So
-   the actual value added to the file would be similar to
-   `uid=foo\,cn=bar\,ou=baz\,dc=quuz\,dc=zot`.
+  **Note:** The "drum.ldap.bind.auth" value typically contains commas (for
+  example "uid=foo,cn=bar,ou=baz,dc=quuz,dc=zot"), which must be escaped. So
+  the actual value added to the file would be similar to
+  `uid=foo\,cn=bar\,ou=baz\,dc=quuz\,dc=zot`.
 
-5) Follow the instructions at [dspace/docs/DrumDBRestore.md](DrumDBRestore.md)
+5) Follow the instructions at
+   [dspace/docs/DrumDBRestore.md](DrumDBRestore.md)
    to populate the Postgres database with a DSpace 7 database dump from
    Kubernetes.
 
@@ -116,7 +117,6 @@ main branch for DRUM development.
     ```zsh
     # Build the dspace image
     $ docker compose -f docker-compose.yml build
-
     ```
 
 8) Start all the containers
@@ -154,6 +154,9 @@ $ docker compose -p d7 up -d dspacedb dspacesolr nginx
 # Start the dspace container
 $ docker compose -p d7 up dspace
 ```
+
+Once the REST API starts, it should be accessible at
+<https://api.drum-local.lib.umd.edu/server>
 
 ## Visual Studio Code IDE Setup
 

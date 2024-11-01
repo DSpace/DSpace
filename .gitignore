@@ -10,7 +10,7 @@ dspace/src/main/docker/nginx/certs/*
 # Ignore database dump directory to be used with docker-compose for initializing
 postgres-init/*
 !postgres-init/README.md
-!postgres-init/pg_restore_drum.sh
+!postgres-init/pg_restore.sh
 ## End UMD Customization
 
 ## Ignore the MVN compiled output directories from version tracking
