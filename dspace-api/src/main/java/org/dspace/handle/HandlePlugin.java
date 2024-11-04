@@ -255,6 +255,54 @@ public class HandlePlugin implements HandleStorage {
     ////////////////////////////////////////
 
     /**
+     * Resolve the given handle to DSpace object.
+     *
+     * @param context the context
+     * @param handle the handle to resolve
+     * @return the resolved DSpaceObject
+     * @throws HandleException if an error occurs during resolution
+     */
+    private static DSpaceObject resolveHandleToObject(Context context, String handle) throws HandleException {
+        try {
+            return handleClarinService.resolveToObject(context, handle);
+        } catch (Exception e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Exception in resolveHandleToObject", e);
+            }
+            throw new HandleException(HandleException.INTERNAL_ERROR);
+        }
+    }
+
+    /**
+     * Retrieves handle values as a map.
+     *
+     * @param handle the handle to resolve
+     * @return a map containing the handle values
+     * @throws HandleException if an error occurs during handle resolution
+     */
+    public static Map<String, String> getMapHandleValues(String handle) throws HandleException {
+        if (log.isInfoEnabled()) {
+            log.info("Called getMapHandleValues");
+        }
+        loadServices();
+        Context context = new Context();
+        try {
+            DSpaceObject dso = null;
+            boolean resolveMetadata = configurationService.getBooleanProperty("lr.pid.resolvemetadata", true);
+            if (resolveMetadata) {
+                dso = resolveHandleToObject(context, handle);
+            }
+            return extractMetadata(dso);
+        } finally {
+            try {
+                context.complete();
+            } catch (SQLException sqle) {
+                // ignore
+            }
+        }
+    }
+
+    /**
      * Return the raw values for this handle. This implementation returns a
      * single URL value.
      *
@@ -285,15 +333,7 @@ public class HandlePlugin implements HandleStorage {
             String handle = Util.decodeString(theHandle);
 
             context = new Context();
-
-            DSpaceObject dso = null;
             String url = handleClarinService.resolveToURL(context, handle);
-
-            boolean resolveMetadata = configurationService.getBooleanProperty("lr.pid.resolvemetadata", true);
-            if (resolveMetadata) {
-                dso = handleClarinService.resolveToObject(context, handle);
-            }
-
             if (Objects.isNull(url)) {
                 // try with old prefix
 
@@ -332,6 +372,11 @@ public class HandlePlugin implements HandleStorage {
                 rh = new ResolvedHandle(url, splits[1], splits[2], splits[3], splits[4], splits[5], splits[6],
                         splits[7]);
             } else {
+                DSpaceObject dso = null;
+                boolean resolveMetadata = configurationService.getBooleanProperty("lr.pid.resolvemetadata", true);
+                if (resolveMetadata) {
+                    dso = resolveHandleToObject(context, handle);
+                }
                 rh = new ResolvedHandle(url, dso);
             }
             log.info(String.format("Handle [%s] resolved to [%s]", handle, url));

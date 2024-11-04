@@ -9,15 +9,18 @@ package org.dspace.app.rest.hdlresolver;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.handle.hdllib.HandleException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.handle.HandlePlugin;
 import org.dspace.handle.hdlresolver.HdlResolverDTO;
 import org.dspace.handle.hdlresolver.HdlResolverService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -166,19 +169,47 @@ public class HdlResolverRestController {
 
     /**
      * Maps the handle to a correct response.
+     * If the metadata parameter is provided, return additional handle values.
      *
      * @param request        HttpServletRequest
      * @param handleResolver HdlResolverDTO - Handle resolver
-     * @return One element list using String if found, else null String.
+     * @return One element list using String if found, else map of metadata if param is entered,
+     * else "null" in case of an error
      */
     private String resolveToURL(HttpServletRequest request, HdlResolverDTO handleResolver) {
-        return mapAsJson(this.hdlResolverService.resolveToURL(ContextUtil.obtainContext(request), handleResolver));
+        String url = this.hdlResolverService.resolveToURL(ContextUtil.obtainContext(request), handleResolver);
+        String param = request.getParameter("metadata");
+        if (StringUtils.isBlank(param)) {
+            return mapAsJson(url);
+        }
+        String handle = handleResolver.getHandle();
+        try {
+            Map<String, String> metadata = HandlePlugin.getMapHandleValues(handle);
+            metadata.put("URL", url);
+            return mapAsJson(metadata);
+        } catch (HandleException e) {
+            log.error("Failed to resolve handle values for handle: " + handle, e);
+        }
+        return "null";
     }
 
     protected String mapAsJson(final String resolvedUrl) {
         String json = "null";
         if (StringUtils.isNotEmpty(resolvedUrl)) {
             json = mapAsJson(List.of(resolvedUrl));
+        }
+        return json;
+    }
+
+    protected String mapAsJson(final Map<String, String> resolvedMap) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = "null";
+        try {
+            if (resolvedMap != null && !resolvedMap.isEmpty()) {
+                json = objectMapper.writeValueAsString(resolvedMap);
+            }
+        } catch (JsonProcessingException e) {
+            log.error("Error during conversion of response!", e);
         }
         return json;
     }
@@ -194,5 +225,4 @@ public class HdlResolverRestController {
         }
         return json;
     }
-
 }
