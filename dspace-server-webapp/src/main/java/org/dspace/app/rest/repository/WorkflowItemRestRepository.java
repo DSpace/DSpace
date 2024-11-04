@@ -257,6 +257,31 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
         }
     }
 
+    @Override
+    /**
+     * This method provides support for delete workflowitems on workflow process.
+     */
+    public void expungeById(Integer id) {
+        Context context = obtainContext();
+        XmlWorkflowItem witem = null;
+        try {
+            witem = wis.find(context, id);
+            if (witem == null) {
+                throw new ResourceNotFoundException("WorkflowItem ID " + id + " not found");
+            }
+            wis.delete(context, witem);
+            context.commit();
+        } catch (AuthorizeException e) {
+            throw new RESTAuthorizationException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException("SQLException in " + this.getClass() + "#delete trying to retrieve or delete a" +
+                " workflowitem from db.", e);
+        } catch (IOException e) {
+            throw new RuntimeException("IOException in " + this.getClass() + "#delete trying to delete a workflowitem" +
+                " from db (abort).", e);
+        }
+    }
+
     /**
      * Checks if @link{SUBMIT_EDIT_METADATA} is a valid option in the workflow step this task is currently at.
      * Patching and uploading is only allowed if this is the case.

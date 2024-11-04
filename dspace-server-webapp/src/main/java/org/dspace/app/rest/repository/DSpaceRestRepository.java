@@ -218,6 +218,20 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
     }
 
+    /**
+     * Method to implement to support delete of a single object instance by parameter
+     *
+     * @param id
+     *            the id of the rest object to delete
+     * @
+     * @throws AuthorizeException
+     * @throws RepositoryMethodNotImplementedException
+     *             returned by the default implementation when the operation is not supported for the entity
+     */
+    public void expungeById(ID id) throws AuthorizeException, RepositoryMethodNotImplementedException {
+        throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
+    }
+
     @Override
     /**
      * Method to implement to allow delete of a specific entity instance
