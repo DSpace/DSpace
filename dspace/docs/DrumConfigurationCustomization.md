@@ -21,7 +21,7 @@ In general, changes *should not* be made to this file.
 
 DRUM customization should be added to the "dspace/config/local.cfg.EXAMPLE"
 file, which, when deployed, should be copied to "dspace/config/local.cfg" (see
-the [DRUM 7 Docker Development Environment](Drum7DockerDevelopmentEnvironment.md).
+the [Docker Development Environment](DockerDevelopmentEnvironment.md).
 
 ## XML File Changes
 

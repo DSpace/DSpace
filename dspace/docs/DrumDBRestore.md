@@ -19,11 +19,11 @@ with DRUM running DSpace 7.
     ```
 
     **Note:** The output file MUST use a ".dump" extension, in order for the
-   "pg_restore_drum.sh" script to process it, see
+   "pg_restore.sh" script to process it, see
    "[postgres-init/README.md](../../postgres-init/README.md)"
 
 3) (Optional) This step can be skipped, if you are following the instructions in
-   [dspace/docs/Drum7DockerDevelopmentEnvironment.md](Drum7DockerDevelopmentEnvironment.md).
+   [dspace/docs/DockerDevelopmentEnvironment.md](DockerDevelopmentEnvironment.md).
 
    Start the "dspacedb" container and wait for the restore to complete.
 
