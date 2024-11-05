@@ -8,6 +8,7 @@
 package org.dspace.content.logic.condition;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -16,8 +17,12 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.logic.LogicalStatementException;
 import org.dspace.core.Context;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 /**
  * A condition that accepts a list of community handles and returns true
@@ -41,6 +46,30 @@ public class InCommunityCondition extends AbstractCondition {
 
         List<String> communityHandles = (List<String>)getParameters().get("communities");
         List<Collection> itemCollections = item.getCollections();
+
+        if (itemCollections == null) {
+            itemCollections = new ArrayList<>();
+        }
+        // do we have a worskpace or workflowitem?
+        WorkspaceItem wsi = null;
+        try {
+            wsi = ContentServiceFactory.getInstance().getWorkspaceItemService().findByItem(context, item);
+        } catch (SQLException ex) {
+            log.warn("Caught and SQLException", ex);
+        }
+        if (wsi != null && wsi.getCollection() != null) {
+            itemCollections.add(wsi.getCollection());
+        }
+        // do we have a workflowItem?
+        WorkflowItem wfi = null;
+        try {
+            wfi = WorkflowServiceFactory.getInstance().getWorkflowItemService().findByItem(context, item);
+        } catch (SQLException ex) {
+            log.warn("Caught and SQLException", ex);
+        }
+        if (wfi != null && wfi.getCollection() != null) {
+            itemCollections.add(wfi.getCollection());
+        }
 
         // Check communities of item.getCollections() - this will only see collections if the item is archived
         for (Collection collection : itemCollections) {

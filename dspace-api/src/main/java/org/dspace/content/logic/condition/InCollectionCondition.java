@@ -8,6 +8,7 @@
 package org.dspace.content.logic.condition;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -15,8 +16,12 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.logic.LogicalStatementException;
 import org.dspace.core.Context;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 /**
  * A condition that accepts a list of collection handles and returns true
@@ -43,6 +48,32 @@ public class InCollectionCondition extends AbstractCondition {
         // Look for the handle among an archived item's collections - this test will only work after submission
         // and archival is complete
         List<Collection> itemCollections = item.getCollections();
+        if (itemCollections == null) {
+            itemCollections = new ArrayList<>();
+        }
+        // do we have a worskpace or workflowitem?
+        WorkspaceItem wsi = null;
+        try {
+            wsi = ContentServiceFactory.getInstance().getWorkspaceItemService().findByItem(context, item);
+        } catch (SQLException ex) {
+            log.warn("Caught and SQLException", ex);
+        }
+        if (wsi != null && wsi.getCollection() != null) {
+            itemCollections.add(wsi.getCollection());
+        }
+
+        // do we have a workflowItem?
+        WorkflowItem wfi = null;
+        try {
+            wfi = WorkflowServiceFactory.getInstance().getWorkflowItemService().findByItem(context, item);
+        } catch (SQLException ex) {
+            log.warn("Caught and SQLException", ex);
+        }
+        if (wfi != null && wfi.getCollection() != null) {
+            itemCollections.add(wfi.getCollection());
+        }
+
+        // check if any of the collection found is in the list of collections we are looking for
         for (Collection collection : itemCollections) {
             if (collectionHandles.contains(collection.getHandle())) {
                 log.debug("item " + item.getHandle() + " is in collection "
