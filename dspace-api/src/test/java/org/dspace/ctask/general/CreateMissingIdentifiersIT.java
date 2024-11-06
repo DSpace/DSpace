@@ -23,6 +23,7 @@ import org.dspace.core.factory.CoreServiceFactory;
 import org.dspace.curate.Curator;
 import org.dspace.identifier.IdentifierProvider;
 import org.dspace.identifier.IdentifierServiceImpl;
+import org.dspace.identifier.VersionedHandleIdentifierProvider;
 import org.dspace.identifier.VersionedHandleIdentifierProviderWithCanonicalHandles;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.ConfigurationService;
@@ -76,8 +77,9 @@ public class CreateMissingIdentifiersIT
                                .build();
 
         /*
-         * Curate with regular test configuration -- should succeed.
+         * Curate with default Handle Provider
          */
+        registerProvider(VersionedHandleIdentifierProvider.class);
         curator.curate(context, item);
         int status = curator.getStatus(TASK_NAME);
         assertEquals("Curation should succeed", Curator.CURATE_SUCCESS, status);
@@ -98,16 +100,26 @@ public class CreateMissingIdentifiersIT
     @After
     public void destroy() throws Exception {
         super.destroy();
-        DSpaceServicesFactory.getInstance().getServiceManager().getApplicationContext().refresh();
+        // After test finishes, revert to default HandleIdentifierProvider (as defined in identifier-service.xml)
+        // This ensures later tests don't fail because they are using an unexpected Handle provider.
+        registerProvider(VersionedHandleIdentifierProvider.class);
     }
 
     private void registerProvider(Class type) {
         // Register our new provider
-        serviceManager.registerServiceClass(type.getName(), type);
         IdentifierProvider identifierProvider =
-                (IdentifierProvider) serviceManager.getServiceByName(type.getName(), type);
+            (IdentifierProvider) DSpaceServicesFactory.getInstance().getServiceManager()
+                                                      .getServiceByName(type.getName(), type);
+        if (identifierProvider == null) {
+            DSpaceServicesFactory.getInstance().getServiceManager().registerServiceClass(type.getName(), type);
+            identifierProvider = (IdentifierProvider) DSpaceServicesFactory.getInstance().getServiceManager()
+                                                                           .getServiceByName(type.getName(), type);
+        }
 
         // Overwrite the identifier-service's providers with the new one to ensure only this provider is used
+        identifierService = DSpaceServicesFactory.getInstance().getServiceManager()
+                                                 .getServicesByType(IdentifierServiceImpl.class).get(0);
+        identifierService.setProviders(new ArrayList<>());
         identifierService.setProviders(List.of(identifierProvider));
     }
 }

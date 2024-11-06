@@ -62,9 +62,9 @@ public class VersionedHandleIdentifierProviderIT extends AbstractIntegrationTest
     @Override
     public void destroy() throws Exception {
         super.destroy();
-        // After this test has finished running, refresh application context and
-        // set the expected 'default' versioned handle provider back to ensure other tests don't fail
-        DSpaceServicesFactory.getInstance().getServiceManager().getApplicationContext().refresh();
+        // After test finishes, revert to default HandleIdentifierProvider (as defined in identifier-service.xml)
+        // This ensures later tests don't fail because they are using an unexpected Handle provider.
+        registerProvider(VersionedHandleIdentifierProvider.class);
     }
 
     private void registerProvider(Class type) {
