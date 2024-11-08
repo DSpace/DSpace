@@ -60,14 +60,7 @@ public class CreateMissingIdentifiersIT
                                .build();
 
         /*
-         * Curate with default Handle Provider
-         */
-        curator.curate(context, item);
-        int status = curator.getStatus(TASK_NAME);
-        assertEquals("Curation should succeed", Curator.CURATE_SUCCESS, status);
-
-        /*
-         * Now install an incompatible provider to make the task fail.
+         * First, install an incompatible provider to make the task fail.
          */
         registerProvider(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
 
@@ -81,5 +74,13 @@ public class CreateMissingIdentifiersIT
         unregisterProvider(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
         // Re-register the default provider (for later tests which may depend on it)
         registerProvider(VersionedHandleIdentifierProvider.class);
+
+        /*
+         * Now, verify curate with default Handle Provider works
+         * (and that our re-registration of the default provider above was successful)
+         */
+        curator.curate(context, item);
+        int status = curator.getStatus(TASK_NAME);
+        assertEquals("Curation should succeed", Curator.CURATE_SUCCESS, status);
     }
 }
