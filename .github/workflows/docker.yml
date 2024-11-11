@@ -186,6 +186,25 @@ jobs:
           result=$(wget -O- -q http://127.0.0.1:8080/server/api/core/collections)
           echo "$result"
           echo "$result" |  grep -oE "\"Dog in Yard\","
+      # Verify Handle Server can be stared and is working properly
+      # 1. First generate the "[dspace]/handle-server" folder with the sitebndl.zip
+      # 2. Start the Handle Server (and wait 20 seconds to let it start up)
+      # 3. Verify logs do NOT include "Exception" in the text (as that means an error occurred)
+      # 4. Check that Handle Proxy HTML page is responding on default port (8000)
+      - name: Verify Handle Server is working properly
+        run: |
+          docker exec -i dspace /dspace/bin/make-handle-config
+          docker exec -i dspace /dspace/bin/start-handle-server
+          sleep 20
+          echo "Checking for errors in handle-server.log..."
+          result=$(docker exec -i dspace cat /dspace/log/handle-server.log)
+          echo "$result"
+          echo "$result" | grep -vqz "Exception"
+          echo "Checking to see if Handle Proxy webpage is available..."
+          result=$(wget -O- -q http://127.0.0.1:8000/)
+          echo "$result"
+          echo "$result" | grep -oE "Handle Proxy"
+        # Shutdown our containers
       - name: Shutdown Docker containers
         run: |
           docker compose -f docker-compose.yml down
