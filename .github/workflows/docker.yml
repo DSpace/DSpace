@@ -148,3 +148,44 @@ jobs:
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+
+  ########################################################################
+  # Test Deployment via Docker to ensure images are working properly
+  ########################################################################
+  docker-deploy:
+    # Ensure this job never runs on forked repos. It's only executed for 'dspace/dspace'
+    if: github.repository == 'dspace/dspace'
+    runs-on: ubuntu-latest
+    # Must run after all major images are built
+    needs: [dspace-test, dspace-cli, dspace-postgres-pgcrypto, dspace-solr]
+    steps:
+      - name: Checkout codebase
+        uses: actions/checkout@v4
+        # Start backend using our compose script in the codebase.
+      - name: Start backend in Docker
+        env:
+          # Override defaults dspace.server.url because backend starts at http://127.0.0.1:8080
+          dspace__P__server__P__url: http://127.0.0.1:8080/server
+        run: |
+          docker compose -f docker-compose.yml up -d
+          sleep 10
+          docker container ls
+        # Create a test admin account. Load test data from a simple set of AIPs as defined in cli.ingest.yml
+      - name: Load test data into Backend
+        run: |
+          docker compose -f docker-compose-cli.yml run --rm dspace-cli create-administrator -e test@test.edu -f admin -l user -p admin -c en
+          docker compose -f docker-compose-cli.yml -f dspace/src/main/docker-compose/cli.ingest.yml run --rm dspace-cli
+        # Verify backend started successfully.
+        # 1. Make sure root endpoint is responding (check for dspace.name defined in docker-compose.yml)
+        # 2. Also check /collections endpoint to ensure the test data loaded properly (check for a collection name in AIPs)
+      - name: Verify backend is responding properly
+        run: |
+          result=$(wget -O- -q http://127.0.0.1:8080/server/api)
+          echo "$result"
+          echo "$result" |  grep -oE "\"DSpace Started with Docker Compose\","
+          result=$(wget -O- -q http://127.0.0.1:8080/server/api/core/collections)
+          echo "$result"
+          echo "$result" |  grep -oE "\"Dog in Yard\","
+      - name: Shutdown Docker containers
+        run: |
+          docker compose -f docker-compose.yml down
