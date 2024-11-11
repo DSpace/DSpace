@@ -1155,6 +1155,13 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-orm</artifactId>
                 <version>${spring.version}</version>
+                <exclusions>
+                    <!-- Spring JCL is unnecessary and conflicts with commons-logging when both are on classpath -->
+                    <exclusion>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring-jcl</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.swordapp</groupId>
