@@ -33,6 +33,7 @@ import org.dspace.content.DSpaceObjectServiceImpl;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.QAEventProcessed;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -47,6 +48,7 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
 import org.dspace.orcid.service.OrcidTokenService;
+import org.dspace.qaevent.dao.QAEventsDAO;
 import org.dspace.services.ConfigurationService;
 import org.dspace.util.UUIDUtils;
 import org.dspace.versioning.Version;
@@ -106,6 +108,8 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     protected ConfigurationService configurationService;
     @Autowired
     protected OrcidTokenService orcidTokenService;
+    @Autowired
+    protected QAEventsDAO qaEventsDao;
 
     protected EPersonServiceImpl() {
         super();
@@ -339,11 +343,11 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         try {
             delete(context, ePerson, true);
         } catch (AuthorizeException ex) {
-            log.error("This AuthorizeException: " + ex + " occured while deleting Eperson with the ID: " +
+            log.error("This AuthorizeException: " + ex + " occurred while deleting Eperson with the ID: " +
                       ePerson.getID());
             throw new AuthorizeException(ex);
         } catch (IOException ex) {
-            log.error("This IOException: " + ex + " occured while deleting Eperson with the ID: " + ePerson.getID());
+            log.error("This IOException: " + ex + " occurred while deleting Eperson with the ID: " + ePerson.getID());
             throw new AuthorizeException(ex);
         } catch (EPersonDeletionException e) {
             throw new IllegalStateException(e);
@@ -447,7 +451,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
                                                                               ePerson, task.getStepID());
                             } catch (WorkflowConfigurationException ex) {
                                 log.error("This WorkflowConfigurationException: " + ex +
-                                          " occured while deleting Eperson with the ID: " + ePerson.getID());
+                                          " occurred while deleting Eperson with the ID: " + ePerson.getID());
                                 throw new AuthorizeException(new EPersonDeletionException(Collections
                                                                                           .singletonList(tableName)));
                             }
@@ -491,6 +495,11 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
         // Remove any subscriptions
         subscribeService.deleteByEPerson(context, ePerson);
+
+        List<QAEventProcessed> qaEvents = qaEventsDao.findByEPerson(context, ePerson);
+        for (QAEventProcessed qaEvent : qaEvents) {
+            qaEventsDao.delete(context, qaEvent);
+        }
 
         // Remove ourself
         ePersonDAO.delete(context, ePerson);

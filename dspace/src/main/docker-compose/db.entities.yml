@@ -8,7 +8,7 @@
 
 services:
   dspacedb:
-    image: dspace/dspace-postgres-pgcrypto:dspace-7_x-loadsql
+    image: dspace/dspace-postgres-pgcrypto:${DSPACE_VER:-latest}-loadsql
     environment:
       # This SQL is available from https://github.com/DSpace-Labs/AIP-Files/releases/tag/demo-entities-data
       - LOADSQL=https://github.com/DSpace-Labs/AIP-Files/releases/download/demo-entities-data/dspace7-entities-data.sql
@@ -17,11 +17,11 @@ services:
     # Ensure that the database is ready BEFORE starting tomcat
     # 1. While a TCP connection to dspacedb port 5432 is not available, continue to sleep
     # 2. Then, run migration latest version of database tables (run with "ignored" in case this SQL data is outdated)
-    # 3. Finally, start Tomcat
+    # 3. Finally, start DSpace
     entrypoint:
       - /bin/bash
       - '-c'
       - |
         while (!</dev/tcp/dspacedb/5432) > /dev/null 2>&1; do sleep 1; done;
         /dspace/bin/dspace database migrate ignored
-        catalina.sh run
+        java -jar /dspace/webapps/server-boot.jar --dspace.dir=/dspace

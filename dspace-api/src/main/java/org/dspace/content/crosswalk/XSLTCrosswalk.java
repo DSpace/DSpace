@@ -18,12 +18,12 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.SelfNamedPlugin;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.jdom2.Namespace;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Configurable XSLT-driven Crosswalk
@@ -88,7 +88,7 @@ public abstract class XSLTCrosswalk extends SelfNamedPlugin {
     /**
      * log4j category
      */
-    private static final Logger LOG = LoggerFactory.getLogger(XSLTCrosswalk.class);
+    private static final Logger LOG = LogManager.getLogger();
 
     /**
      * DSpace XML Namespace in JDOM form.
@@ -168,8 +168,8 @@ public abstract class XSLTCrosswalk extends SelfNamedPlugin {
             transformFile.lastModified() > transformLastModified) {
             try {
                 LOG.debug(
-                    (transformer == null ? "Loading {} XSLT stylesheet from {}" : "Reloading {} XSLT stylesheet from " +
-                        "{}"),
+                    (transformer == null ? "Loading {} XSLT stylesheet from {}"
+                            : "Reloading {} XSLT stylesheet from {}"),
                     getPluginInstanceName(), transformFile.toString());
 
                 Source transformSource

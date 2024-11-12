@@ -241,7 +241,7 @@ public class Swordv2IT extends AbstractWebClientIntegrationTest {
         String editLink = response.getHeaders().getLocation().toString();
 
         // Body should include that link as the rel="edit" URL
-        assertThat(response.getBody(), containsString("<link href=\"" + editLink + "\" rel=\"edit\"/>"));
+        assertThat(response.getBody(), containsString("<link href=\"" + editLink + "\" rel=\"edit\""));
 
         //----
         // STEP 2: Verify uploaded content can be read via SWORDv2

@@ -7,19 +7,20 @@
  */
 package org.dspace.content;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /**
  * This class represents a relationship
@@ -96,6 +97,7 @@ public class Relationship implements ReloadableEntity<Integer> {
      * This column affects what version of an item appears on search pages or the relationship listings of other items.
      */
     @Column(name = "latest_version_status")
+    @JdbcTypeCode(SqlTypes.INTEGER)
     private LatestVersionStatus latestVersionStatus = LatestVersionStatus.BOTH;
 
     /**

@@ -76,19 +76,9 @@ dspace.name = DSpace at My University
 # URL for connecting to database
 db.url = jdbc:postgresql://localhost:5432/dspace
 
-# JDBC Driver for PostgreSQL
-db.driver = org.postgresql.Driver
-
-# PostgreSQL Database Dialect (for Hibernate)
-db.dialect = org.hibernate.dialect.PostgreSQL94Dialect
-
 # Database username and password
 db.username = dspace
 db.password = dspace
-
-# Database Schema name
-# For PostgreSQL, this is often "public" (default schema)
-db.schema = public
 
 ## Connection pool parameters
 
@@ -241,3 +231,8 @@ db.schema = public
 
 # Maximum size of a multipart request (i.e. max total size of all files in one request)
 #spring.servlet.multipart.max-request-size = 512MB
+
+########################
+#  LDN INBOX SETTINGS  #
+########################
+ldn.enabled = true

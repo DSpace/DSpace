@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
+import jakarta.annotation.Nullable;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -253,7 +253,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                 displayChanges(changes, true);
             }
 
-            // Finsh off and tidy up
+            // Finish off and tidy up
             c.restoreAuthSystemState();
             c.complete();
         } catch (Exception e) {
@@ -1653,7 +1653,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                                                   .getLabel();
                 } else {
                     // Target item may be archived; check there.
-                    // Add to errors if Realtionship.type cannot be derived
+                    // Add to errors if Relationship.type cannot be derived
                     Item targetItem = null;
                     if (itemService.find(c, UUID.fromString(targetUUID)) != null) {
                         targetItem = itemService.find(c, UUID.fromString(targetUUID));
@@ -1698,7 +1698,7 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
                             validateTypesByTypeByTypeName(c, targetType, originType, typeName, originRow);
                         } else {
                             // Origin item may be archived; check there.
-                            // Add to errors if Realtionship.type cannot be derived.
+                            // Add to errors if Relationship.type cannot be derived.
                             Item originItem = null;
                             if (itemService.find(c, UUID.fromString(targetUUID)) != null) {
                                 DSpaceCSVLine dSpaceCSVLine = this.csv.getCSVLines()

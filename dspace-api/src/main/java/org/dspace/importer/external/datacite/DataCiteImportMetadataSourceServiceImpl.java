@@ -13,11 +13,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import javax.el.MethodNotFoundException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.el.MethodNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,7 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Implements a data source for querying Datacite
  * Mainly copied from CrossRefImportMetadataSourceServiceImpl.
  *
- * optional Affiliation informations are not part of the API request.
+ * optional Affiliation information are not part of the API request.
  * https://support.datacite.org/docs/can-i-see-more-detailed-affiliation-information-in-the-rest-api
  *
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)

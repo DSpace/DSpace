@@ -19,11 +19,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.logging.log4j.Logger;
 import org.purl.sword.atom.Summary;
@@ -159,7 +159,7 @@ public class DepositServlet extends HttpServlet {
      *
      * @param request  the request.
      * @param response the response.
-     * @throws javax.servlet.ServletException passed through.
+     * @throws jakarta.servlet.ServletException passed through.
      * @throws java.io.IOException            passed through.
      */
     @Override
@@ -174,7 +174,7 @@ public class DepositServlet extends HttpServlet {
      *
      * @param request  the request.
      * @param response the response.
-     * @throws javax.servlet.ServletException passed through.
+     * @throws jakarta.servlet.ServletException passed through.
      * @throws java.io.IOException            passed through.
      */
     @Override

@@ -69,5 +69,10 @@
 
     <bean class="org.dspace.supervision.dao.impl.SupervisionOrderDaoImpl"/>
 
+    <bean class="org.dspace.app.ldn.dao.impl.NotifyServiceDaoImpl"/>
+    <bean class="org.dspace.app.ldn.dao.impl.NotifyServiceInboundPatternDaoImpl"/>
+    <bean class="org.dspace.app.ldn.dao.impl.LDNMessageDaoImpl"/>
+    <bean class="org.dspace.app.ldn.dao.impl.NotifyPatternToTriggerDaoImpl"/>
+
 
 </beans>

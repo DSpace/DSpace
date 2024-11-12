@@ -1,0 +1,27 @@
+## Notification email sent when an item has been endorsed by a service
+##
+## Parameters: {0} Service Name
+##             {1} Item Name
+##             {2} Service URL
+##             {3} Item URL
+##             {4} Submitter's Name
+##             {5} Date of the received LDN notification
+##
+##
+#set($subject = "DSpace: The Service ${params[0]} has endorsed the Item ""${params[1]}""")
+
+An endorsement announce notification has been received by the service: ${params[0]}
+for the Item: ${params[1]}
+
+Here is a more detailed report:
+Item: ${params[1]}
+Item URL: ${params[3]}
+Submitted by: ${params[4]}
+
+Has a new status: ENDORSED
+
+By Service: ${params[0]}
+Service URL: ${params[2]}
+Date: ${params[5]}
+
+The ${config.get('dspace.name')} Team

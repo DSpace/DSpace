@@ -13,9 +13,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.collections.Buffer;
 import org.apache.commons.collections.BufferUtils;
 import org.apache.commons.collections.buffer.CircularFifoBuffer;
@@ -37,7 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Notifies Google Analytics of Bitstream VIEW events. These events are stored in memory and then
- * asynchronously processed by a single seperate thread.
+ * asynchronously processed by a single separate thread.
  *
  * @author April Herron
  * @author Luca Giamminonni
@@ -142,7 +142,7 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
     /**
      * Client ID, should uniquely identify the user or device. If we have an
      * X-CORRELATION-ID header or a session ID for the user, then lets use it,
-     * othwerwise generate a UUID.
+     * otherwise generate a UUID.
      */
     private String getClientId(UsageEvent usageEvent) {
         if (usageEvent.getRequest().getHeader("X-CORRELATION-ID") != null) {

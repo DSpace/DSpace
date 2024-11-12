@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The contents of this file are subject to the license and copyright detailed 
+    in the LICENSE and NOTICE files at the root of the source tree and available 
+    online at http://www.dspace.org/license/ -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util-3.0.xsd"
+    default-autowire-candidates="*">
+
+    <context:annotation-config />
+    <!-- allows us to use spring annotations in beans -->
+
+    <bean class="org.dspace.app.ldn.service.impl.NotifyServiceImpl"/>
+    <bean class="org.dspace.app.ldn.service.impl.NotifyServiceInboundPatternServiceImpl"/>
+    <bean class="org.dspace.app.ldn.service.impl.LDNMessageServiceImpl"/>
+    <bean class="org.dspace.app.ldn.service.impl.NotifyPatternToTriggerImpl"/>
+
+    <bean name="ldnRouter" class="org.dspace.app.ldn.LDNRouter">
+        <property name="incomingProcessors">
+            <map key-type="java.util.Set" value-type="org.dspace.app.ldn.LDNProcessor">
+                <entry>
+                    <key>
+                        <set>
+                            <value>Announce</value>
+                            <value>coar-notify:ReviewAction</value>
+                        </set>
+                    </key>
+                    <ref bean="announceReviewAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Announce</value>
+                            <value>coar-notify:EndorsementAction</value>
+                        </set>
+                    </key>
+                    <ref bean="announceEndorsementAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Accept</value>
+                            <value>coar-notify:ReviewAction</value>
+                        </set>
+                    </key>
+                    <ref bean="acceptAckAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>TentativeReject</value>
+                            <value>coar-notify:ReviewAction</value>
+                        </set>
+                    </key>
+                    <ref bean="rejectAckAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Accept</value>
+                            <value>coar-notify:EndorsementAction</value>
+                        </set>
+                    </key>
+                    <ref bean="acceptAckAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>TentativeReject</value>
+                            <value>coar-notify:EndorsementAction</value>
+                        </set>
+                    </key>
+                    <ref bean="rejectAckAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Accept</value>
+                            <value>coar-notify:IngestAction</value>
+                        </set>
+                    </key>
+                    <ref bean="acceptAckAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>TentativeReject</value>
+                            <value>coar-notify:IngestAction</value>
+                        </set>
+                    </key>
+                    <ref bean="rejectAckAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Announce</value>
+                            <value>coar-notify:RelationshipAction</value>
+                        </set>
+                    </key>
+                    <ref bean="announceReleaseAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Offer</value>
+                            <value>coar-notify:ReviewAction</value>
+                        </set>
+                    </key>
+                    <ref bean="offerReviewAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Offer</value>
+                            <value>coar-notify:IngestAction</value>
+                        </set>
+                    </key>
+                    <ref bean="offerIngestAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Offer</value>
+                            <value>coar-notify:EndorsementAction</value>
+                        </set>
+                    </key>
+                    <ref bean="offerEndorsementAction" />
+                </entry>
+            </map>
+        </property>
+        <property name="outcomingProcessors">
+            <map key-type="java.util.Set" value-type="org.dspace.app.ldn.LDNProcessor">
+                <entry>
+                    <key>
+                        <set>
+                            <value>Offer</value>
+                            <value>coar-notify:ReviewAction</value>
+                        </set>
+                    </key>
+                    <ref bean="outcomingAnnounceReviewAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Offer</value>
+                            <value>coar-notify:EndorsementAction</value>
+                        </set>
+                    </key>
+                    <ref bean="outcomingAnnounceEndorsementAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Offer</value>
+                            <value>coar-notify:IngestAction</value>
+                        </set>
+                    </key>
+                    <ref bean="outcomingAnnounceIngestAction" />
+                </entry>
+                <entry>
+                    <key>
+                        <set>
+                            <value>Announce</value>
+                            <value>coar-notify:RelationshipAction</value>
+                        </set>
+                    </key>
+                    <ref bean="outcomingAnnounceRelationAction" />
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <bean name="offerEndorsementAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.LDNEmailAction">
+                    <property name="actionSendFilter" value="${ldn.notification.email}" />
+                    <property name="actionSendEmailTextFile" value="coar_notify_reviewed" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="offerIngestAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.LDNEmailAction">
+                    <property name="actionSendFilter" value="${ldn.notification.email}" />
+                    <property name="actionSendEmailTextFile" value="coar_notify_reviewed" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="offerReviewAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.LDNEmailAction">
+                    <property name="actionSendFilter" value="${ldn.notification.email}" />
+                    <property name="actionSendEmailTextFile" value="coar_notify_reviewed" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="announceReviewAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.LDNEmailAction">
+                    <property name="actionSendFilter" value="${ldn.notification.email}" />
+                    <property name="actionSendEmailTextFile" value="coar_notify_reviewed" />
+                </bean>
+                <bean class="org.dspace.app.ldn.action.LDNCorrectionAction">
+                	<property name="qaEventTopic" value="ENRICH/MORE/REVIEW"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="announceEndorsementAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.LDNEmailAction">
+                    <property name="actionSendFilter" value="${ldn.notification.email}" />
+                    <property name="actionSendEmailTextFile" value="coar_notify_endorsed" />
+                </bean>
+                <bean class="org.dspace.app.ldn.action.LDNCorrectionAction">
+                	<property name="qaEventTopic" value="ENRICH/MORE/ENDORSEMENT"/>
+                </bean>                
+            </list>
+        </property>
+    </bean>
+
+    <bean name="acceptAckAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.LDNEmailAction">
+                    <property name="actionSendFilter" value="${ldn.notification.email}" />
+                    <property name="actionSendEmailTextFile" value="coar_notify_accepted" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="rejectAckAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.LDNEmailAction">
+                    <property name="actionSendFilter" value="${ldn.notification.email}" />
+                    <property name="actionSendEmailTextFile" value="coar_notify_rejected" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="announceReleaseAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.LDNEmailAction">
+                    <property name="actionSendFilter" value="${ldn.notification.email}" />
+                    <property name="actionSendEmailTextFile" value="coar_notify_relationship" />
+                </bean>
+                <bean class="org.dspace.app.ldn.action.LDNRelationCorrectionAction">
+                	<property name="qaEventTopic" value="ENRICH/MORE/LINK"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="outcomingAnnounceReviewAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.SendLDNMessageAction"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="outcomingAnnounceRelationAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.SendLDNMessageAction"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="outcomingAnnounceEndorsementAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.SendLDNMessageAction"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean name="outcomingAnnounceIngestAction" class="org.dspace.app.ldn.processor.LDNMetadataProcessor">
+        <property name="actions">
+            <list value-type="org.dspace.app.ldn.action.LDNAction">
+                <bean class="org.dspace.app.ldn.action.SendLDNMessageAction"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.dspace.coarnotify.SubmissionNotifyServiceImpl"/>
+
+    <bean class="org.dspace.coarnotify.NotifyConfigurationService">
+        <property name="patterns">
+            <map>
+                <entry key="coarnotify">
+                    <list>
+                        <ref bean="requestReview"/>
+                        <ref bean="requestEndorsement"/>
+                        <ref bean="requestIngest" />
+                    </list>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="requestReview" class="org.dspace.coarnotify.NotifyPattern">
+        <property name="pattern" value="request-review"/>
+        <property name="multipleRequest" value="true"/>
+    </bean>
+
+    <bean id="requestEndorsement" class="org.dspace.coarnotify.NotifyPattern">
+        <property name="pattern" value="request-endorsement"/>
+        <property name="multipleRequest" value="true"/>
+    </bean>
+
+    <bean id="requestIngest" class="org.dspace.coarnotify.NotifyPattern">
+        <property name="pattern" value="request-ingest"/>
+        <property name="multipleRequest" value="false"/>
+    </bean>
+
+</beans>

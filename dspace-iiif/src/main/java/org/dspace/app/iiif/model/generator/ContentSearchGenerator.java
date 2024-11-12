@@ -10,11 +10,11 @@ package org.dspace.app.iiif.model.generator;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import javax.validation.constraints.NotNull;
 
 import de.digitalcollections.iiif.model.Profile;
 import de.digitalcollections.iiif.model.Service;
 import de.digitalcollections.iiif.model.search.ContentSearchService;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;

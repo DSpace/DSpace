@@ -10,9 +10,9 @@ package org.dspace.app.rest;
 import static org.dspace.app.rest.utils.RegexUtils.REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT;
 
 import java.sql.SQLException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.dspace.app.rest.model.RelationshipRest;
 import org.dspace.app.rest.repository.RelationshipRestRepository;
 import org.dspace.app.rest.utils.ContextUtil;

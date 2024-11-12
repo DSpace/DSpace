@@ -687,10 +687,6 @@ Common usage:
             <fileset dir="${dspace.dir}/webapps/rdf/"/>
         </war>
 
-        <war destfile="${dspace.dir}/webapps/rest.war">
-            <fileset dir="${dspace.dir}/webapps/rest/"/>
-        </war>
-
         <war destfile="${dspace.dir}/webapps/sword.war">
             <fileset dir="${dspace.dir}/webapps/sword/" />
         </war>
