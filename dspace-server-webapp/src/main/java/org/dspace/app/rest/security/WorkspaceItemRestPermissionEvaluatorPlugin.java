@@ -7,8 +7,12 @@
  */
 package org.dspace.app.rest.security;
 
+import static org.dspace.app.rest.repository.WorkspaceItemRestRepository.SHARE_TOKEN;
+
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.Objects;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.WorkspaceItemRest;
@@ -88,6 +92,16 @@ public class WorkspaceItemRestPermissionEvaluatorPlugin extends RestObjectPermis
             if (witem.getSubmitter() != null) {
                 if (witem.getSubmitter().getID().equals(ePerson.getID())) {
                     return true;
+                }
+            }
+
+            // Check the request has shareToken the same as the workspace item
+            if (witem.getShareToken() != null) {
+                HttpServletRequest req = request.getHttpServletRequest();
+                if (Objects.nonNull(req)) {
+                    if (witem.getShareToken().equals(req.getParameter(SHARE_TOKEN))) {
+                        return true;
+                    }
                 }
             }
 

@@ -73,6 +73,9 @@ public class WorkspaceItem
     @Column(name = "page_reached")
     private Integer pageReached = -1;
 
+    @Column(name = "share_token")
+    private String shareToken = null;
+
     /**
      * Protected constructor, create object using:
      * {@link org.dspace.content.service.WorkspaceItemService#create(Context, Collection, boolean)}
@@ -129,6 +132,14 @@ public class WorkspaceItem
      */
     public void setPageReached(int v) {
         pageReached = v;
+    }
+
+    public String getShareToken() {
+        return shareToken;
+    }
+
+    public void setShareToken(String shareToken) {
+        this.shareToken = shareToken;
     }
 
     /**

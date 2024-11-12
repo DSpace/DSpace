@@ -30,6 +30,6 @@ ${config.get('dspace.name.short')} Team
 
 _____________________________________
 ${config.get('dspace.name')},
-WWW: ${config.get('dspace.url')}
-Email: ${config.get('help.mail')}
-Tel.: ${config.get('help.phone')}
+WWW: ${config.get('dspace.ui.url')}
+Email: ${config.get('lr.help.mail')}
+Tel.: ${config.get('lr.help.phone')}

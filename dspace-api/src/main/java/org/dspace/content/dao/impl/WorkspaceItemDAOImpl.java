@@ -82,6 +82,14 @@ public class WorkspaceItemDAOImpl extends AbstractHibernateDAO<WorkspaceItem> im
     }
 
     @Override
+    public List<WorkspaceItem> findByShareToken(Context context, String shareToken) throws SQLException {
+        Query query = createQuery(context,
+                "from WorkspaceItem ws where ws.shareToken = :shareToken");
+        query.setParameter("shareToken", shareToken);
+        return list(query);
+    }
+
+    @Override
     public List<WorkspaceItem> findAll(Context context) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, WorkspaceItem.class);

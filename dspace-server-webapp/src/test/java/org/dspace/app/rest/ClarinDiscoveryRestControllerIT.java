@@ -74,7 +74,7 @@ import org.springframework.http.MediaType;
  * This class is modified version of the DiscoveryRestControllerIT. Because for CLARIN customization
  * the facets/filters was updated and the tests were failing. So the test class had must be updated.
  *
- * @author Milan Majchrak (milan.majchrak at dataquest.sk)
+ * @author Milan Majchrak (dspace at dataquest.sk)
  */
 public class ClarinDiscoveryRestControllerIT extends AbstractControllerIntegrationTest {
     @Autowired

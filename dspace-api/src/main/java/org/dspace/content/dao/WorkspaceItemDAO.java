@@ -37,6 +37,8 @@ public interface WorkspaceItemDAO extends GenericDAO<WorkspaceItem> {
 
     public WorkspaceItem findByItem(Context context, Item i) throws SQLException;
 
+    public List<WorkspaceItem> findByShareToken(Context context, String shareToken) throws SQLException;
+
     public List<WorkspaceItem> findAll(Context context) throws SQLException;
 
     public List<WorkspaceItem> findAll(Context context, Integer limit, Integer offset) throws SQLException;

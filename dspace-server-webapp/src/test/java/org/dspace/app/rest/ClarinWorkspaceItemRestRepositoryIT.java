@@ -967,6 +967,30 @@ public class ClarinWorkspaceItemRestRepositoryIT extends AbstractControllerInteg
         context.restoreAuthSystemState();
     }
 
+    @Test
+    public void testWsiWithShareToken() throws Exception {
+        String shareToken = "1234567890";
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity)
+                .withName("Collection").build();
+        WorkspaceItem wItem = WorkspaceItemBuilder.createWorkspaceItem(context, col)
+                .withTitle("Item with custom handle")
+                .withIssueDate("2017-10-17")
+                .withShareToken(shareToken)
+                .build();
+        context.restoreAuthSystemState();
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        getClient(adminToken).perform(get("/api/submission/workspaceitems/search/shareToken")
+                        .param("shareToken", shareToken)
+                        .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.workspaceitems[0].id", is(wItem.getID())));
+    }
+
     /**
      * Create Clarin License Label object for testing purposes.
      */

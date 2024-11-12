@@ -54,7 +54,7 @@ import org.springframework.http.MediaType;
 /**
  * For testing the ClarinVersionedHandleIdentifierProvider
  *
- * @author Milan Majchrak (milan.majchrak at dataquest.sk)
+ * @author Milan Majchrak (dspace at dataquest.sk)
  */
 public class ClarinWorkflowItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 

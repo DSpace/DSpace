@@ -250,4 +250,13 @@ public class WorkspaceItemBuilder extends AbstractBuilder<WorkspaceItem, Workspa
                                     final String value) {
         return addMetadataValue(schema, element, qualifier, value);
     }
+
+    public WorkspaceItemBuilder withShareToken(String shareToken) {
+        try {
+            workspaceItem.setShareToken(shareToken);
+        } catch (Exception e) {
+            handleException(e);
+        }
+        return this;
+    }
 }
