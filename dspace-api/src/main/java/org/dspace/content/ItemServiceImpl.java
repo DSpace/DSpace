@@ -67,6 +67,7 @@ import org.dspace.event.Event;
 import org.dspace.harvest.HarvestedItem;
 import org.dspace.harvest.service.HarvestedItemService;
 import org.dspace.identifier.DOI;
+import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.DOIService;
 import org.dspace.identifier.service.IdentifierService;
@@ -851,6 +852,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         DOI doi = doiService.findDOIByDSpaceObject(context, item);
         if (doi != null) {
             doi.setDSpaceObject(null);
+            doi.setStatus(DOIIdentifierProvider.TO_BE_DELETED);
         }
 
         // remove version attached to the item
@@ -1005,7 +1007,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         throws SQLException, AuthorizeException {
         // Bundles should inherit from DEFAULT_ITEM_READ so that if the item is readable, the files
         // can be listed (even if they are themselves not readable as per DEFAULT_BITSTREAM_READ or other
-        // policies or embargos applied
+        // policies or embargoes applied
         List<ResourcePolicy> defaultCollectionBundlePolicies = authorizeService
                 .getPoliciesActionFilter(context, collection, Constants.DEFAULT_ITEM_READ);
         // Bitstreams should inherit from DEFAULT_BITSTREAM_READ
@@ -1799,7 +1801,7 @@ prevent the generation of resource policy entry values with null dspace_object a
                 //Retrieve the applicable relationship
                 Relationship rs = relationshipService.find(context,
                         ((RelationshipMetadataValue) rr).getRelationshipId());
-                if (rs.getLeftItem() == dso) {
+                if (rs.getLeftItem().equals(dso)) {
                     rs.setLeftPlace(place);
                 } else {
                     rs.setRightPlace(place);

@@ -63,7 +63,7 @@ public class HdlResolverRestController {
                     request,
                     Optional.ofNullable(request.getRequestURI().split(LISTHANDLES))
                         .filter(split -> split.length > 1)
-                        .map(splitted -> splitted[1])
+                        .map(split -> split[1])
                         .orElse(null)
             );
         } else if (LISTPREFIXES.contains(hdlService)) {

@@ -99,7 +99,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
             try {
                 history = versionHistoryService.findByItem(context, item);
             } catch (SQLException ex) {
-                throw new RuntimeException("A problem with the database connection occured.", ex);
+                throw new RuntimeException("A problem with the database connection occurred.", ex);
             }
             if (history != null) {
                 String canonical = getCanonical(context, item);
@@ -108,7 +108,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
                 try {
                     handleService.modifyHandleDSpaceObject(context, canonical, item);
                 } catch (SQLException ex) {
-                    throw new RuntimeException("A problem with the database connection occured.", ex);
+                    throw new RuntimeException("A problem with the database connection occurred.", ex);
                 }
 
                 Version version;
@@ -123,7 +123,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
                         previousItemHandle = handleService.findHandle(context, previous.getItem());
                     }
                 } catch (SQLException ex) {
-                    throw new RuntimeException("A problem with the database connection occured.", ex);
+                    throw new RuntimeException("A problem with the database connection occurred.", ex);
                 }
 
                 // we have to ensure the previous item still has a handle
@@ -131,8 +131,8 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
                 if (previous != null) {
                     try {
                         // If we have a reviewer they might not have the
-                        // rights to edit the metadata of thes previous item.
-                        // Temporarly grant them:
+                        // rights to edit the metadata of the previous item.
+                        // Temporarily grant them:
                         context.turnOffAuthorisationSystem();
 
                         // Check if our previous item hasn't got a handle anymore.
@@ -151,9 +151,9 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
                         // remove the canonical handle from the previous item's metadata
                         modifyHandleMetadata(context, previous.getItem(), previousItemHandle);
                     } catch (SQLException ex) {
-                        throw new RuntimeException("A problem with the database connection occured.", ex);
+                        throw new RuntimeException("A problem with the database connection occurred.", ex);
                     } catch (AuthorizeException ex) {
-                        // cannot occure, as the authorization system is turned of
+                        // cannot occur, as the authorization system is turned of
                         throw new IllegalStateException("Caught an "
                                                             + "AuthorizeException while the "
                                                             + "authorization system was turned off!", ex);
@@ -166,7 +166,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
                 // remove all handles from metadata and add the canonical one.
                 modifyHandleMetadata(context, item, getCanonical(id));
             } catch (SQLException ex) {
-                throw new RuntimeException("A problem with the database connection occured.", ex);
+                throw new RuntimeException("A problem with the database connection occurred.", ex);
             } catch (AuthorizeException ex) {
                 throw new RuntimeException("The current user is not authorized to change this item.", ex);
             }
@@ -248,7 +248,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
         Version latest = versionHistoryService.getLatestVersion(context, history);
 
 
-        // if restoring the lastest version: needed to move the canonical
+        // if restoring the latest version: needed to move the canonical
         if (latest.getVersionNumber() < versionNumber) {
             handleService.modifyHandleDSpaceObject(context, canonical, dso);
         }
@@ -362,7 +362,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
                             .getPrevious(context, history, versionHistoryService.getLatestVersion(context, history))
                             .getItem();
                     } catch (SQLException ex) {
-                        throw new RuntimeException("A problem with our database connection occured.", ex);
+                        throw new RuntimeException("A problem with our database connection occurred.", ex);
                     }
 
                     // Modify Canonical: 12345/100 will point to the new item
@@ -428,7 +428,7 @@ public class VersionedHandleIdentifierProviderWithCanonicalHandles extends Ident
         try {
             previous = versionHistoryService.getPrevious(context, history, version);
         } catch (SQLException ex) {
-            throw new RuntimeException("A problem with our database connection occured.");
+            throw new RuntimeException("A problem with our database connection occurred.");
         }
         String canonical = getCanonical(context, previous.getItem());
 

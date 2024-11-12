@@ -1382,7 +1382,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/items/" + publicItem.getID()))
                    .andExpect(status().isOk());
 
-        // Check publicItem bitstream creation (shuold be stored in bundle)
+        // Check publicItem bitstream creation (should be stored in bundle)
         getClient().perform(get("/api/core/items/" + publicItem.getID() + "/bundles"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))
@@ -1453,7 +1453,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/items/" + publicItem.getID()))
             .andExpect(status().isOk());
 
-        // Check publicItem bitstream creation (shuold be stored in bundle)
+        // Check publicItem bitstream creation (should be stored in bundle)
         getClient().perform(get("/api/core/items/" + publicItem.getID() + "/bundles"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(contentType))
@@ -1831,7 +1831,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                 )));
 
 
-        //Admin users are allowed to acceess undiscoverable items
+        //Admin users are allowed to access undiscoverable items
         String token1 = getAuthToken(admin.getEmail(), password);
         getClient(token1).perform(get("/api/core/items/" + unDiscoverableYetAccessibleItem1.getID()))
                 .andExpect(status().isOk())
@@ -4165,7 +4165,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                              .andExpect(jsonPath("$", CollectionMatcher.matchCollectionEntryFullProjection(
                                         col1.getName(), col1.getID(), col1.getHandle())));
 
-        // try to spoof information as a logged in eperson using embedding, verify that no embedds are included
+        // try to spoof information as a logged in eperson using embedding, verify that no embeds are included
         getClient(tokenEperson).perform(get("/api/core/items/" + item.getID())
                  .param("projection", "full"))
                  .andExpect(status().isOk())
@@ -4198,7 +4198,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(tokenEperson).perform(get("/api/core/items/" + item.getID() + "/owningCollection"))
                                .andExpect(status().isForbidden());
 
-        // try to spoof information as anonymous user using embedding, verify that no embedds are included
+        // try to spoof information as anonymous user using embedding, verify that no embeds are included
         getClient().perform(get("/api/core/items/" + item.getID())
                    .param("projection", "full"))
                    .andExpect(status().isOk())
@@ -4694,6 +4694,126 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/items/{uuid}/accessStatus", item.getID()))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$.status", notNullValue()));
+    }
+
+    @Test
+    public void findSubmitterByAdminTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("testone@mail.com")
+                .withPassword(password)
+                .withCanLogin(true)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/items/" + publicItem.getID())
+                        .param("projection", "full"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", ItemMatcher.matchFullEmbeds()));
+
+        getClient(token).perform(get("/api/core/items/" + publicItem.getID() + "/submitter"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(submitter.getID().toString())))
+                .andExpect(jsonPath("$.email", is(submitter.getEmail())));
+    }
+
+    @Test
+    public void findSubmitterWithoutReadAccessTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("testone@mail.com")
+                .withPassword(password)
+                .withCanLogin(true)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        Item publicItem = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        getClient(token).perform(get("/api/core/items/" + publicItem.getID())
+                        .param("projection", "full"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", ItemMatcher.matchFullEmbeds()));
+
+//      find submitter by user has no read access
+        getClient(token).perform(get("/api/core/items/" + publicItem.getID() + "/submitter"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void findSubmitterByAnonymousTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        EPerson submitter = EPersonBuilder.createEPerson(context)
+                .withEmail("testone@mail.com")
+                .withPassword(password)
+                .withCanLogin(true)
+                .build();
+
+        context.setCurrentUser(submitter);
+
+        Item publicItem = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .build();
+
+        context.restoreAuthSystemState();
+
+        getClient().perform(get("/api/core/items/" + publicItem.getID())
+                        .param("projection", "full"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", ItemMatcher.matchFullEmbeds()));
+
+        getClient().perform(get("/api/core/items/" + publicItem.getID() + "/submitter"))
+                .andExpect(status().isNoContent());
     }
 
 }

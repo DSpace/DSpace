@@ -286,8 +286,8 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         try {
             doiRow = loadOrCreateDOI(context, dso, doi, filter);
         } catch (SQLException ex) {
-            log.error("Error in databse connection: {}", ex::getMessage);
-            throw new RuntimeException("Error in database conncetion.", ex);
+            log.error("Error in database connection: {}", ex::getMessage);
+            throw new RuntimeException("Error in database connection.", ex);
         }
 
         if (DELETED.equals(doiRow.getStatus()) ||
@@ -473,7 +473,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
 
     /**
      * Update metadata for a registered object
-     * If the DOI for hte item already exists, *always* skip the filter since it should only be used for
+     * If the DOI for the item already exists, *always* skip the filter since it should only be used for
      * allowing / disallowing reservation and registration, not metadata updates or deletions
      *
      * @param context       - DSpace context
@@ -525,7 +525,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
 
     /**
      * Update metadata for a registered object in the DOI Connector to update the agency records
-     * If the DOI for hte item already exists, *always* skip the filter since it should only be used for
+     * If the DOI for the item already exists, *always* skip the filter since it should only be used for
      * allowing / disallowing reservation and registration, not metadata updates or deletions
      *
      * @param context       - DSpace context
@@ -611,7 +611,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
         try {
             doi = getDOIByObject(context, dso);
         } catch (SQLException e) {
-            log.error("Error while attemping to retrieve information about a DOI for {} with ID {}.",
+            log.error("Error while attempting to retrieve information about a DOI for {} with ID {}.",
                 contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso), dso.getID());
             throw new RuntimeException("Error while attempting to retrieve " +
                 "information about a DOI for " + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) +
@@ -709,7 +709,7 @@ public class DOIIdentifierProvider extends FilteredIdentifierProvider {
                 doi = getDOIByObject(context, dso);
             }
         } catch (SQLException ex) {
-            log.error("Error while attemping to retrieve information about a DOI for {} with ID {}.",
+            log.error("Error while attempting to retrieve information about a DOI for {} with ID {}.",
                 contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso),
                 dso.getID(), ex);
             throw new RuntimeException("Error while attempting to retrieve " +

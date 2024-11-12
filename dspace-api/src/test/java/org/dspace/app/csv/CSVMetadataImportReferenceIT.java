@@ -721,7 +721,7 @@ public class CSVMetadataImportReferenceIT extends AbstractIntegrationTestWithDat
      *
      * @param value the value of the dc.identifier.other to query for
      *
-     * @return first retrived UUID
+     * @return first retrieved UUID
      */
     private UUID getUUIDByIdentifierOther(String value) throws Exception {
         ArrayList<UUID> uuidList = new ArrayList<>();

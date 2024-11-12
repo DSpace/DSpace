@@ -147,7 +147,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     public void addMember(Context context, Group groupParent, Group groupChild) throws SQLException {
         // don't add if it's already a member
         // and don't add itself
-        if (groupParent.contains(groupChild) || groupParent.getID() == groupChild.getID()) {
+        if (groupParent.contains(groupChild) || groupParent.getID().equals(groupChild.getID())) {
             return;
         }
 
@@ -178,7 +178,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                 Role role = stepByName.getRole();
                 for (CollectionRole collectionRole : collectionRoles) {
                     if (StringUtils.equals(collectionRole.getRoleId(), role.getId())
-                            && claimedTask.getWorkflowItem().getCollection() == collectionRole.getCollection()) {
+                            && claimedTask.getWorkflowItem().getCollection().equals(collectionRole.getCollection())) {
                         // Count number of EPersons who are *direct* members of this group
                         int totalDirectEPersons = ePersonService.countByGroups(context, Set.of(group));
                         // Count number of Groups which have this groupParent as a direct parent

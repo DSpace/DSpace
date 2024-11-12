@@ -141,7 +141,7 @@ public class GenerateSitemaps {
     public static void deleteSitemaps() throws IOException {
         File outputDir = new File(configurationService.getProperty("sitemap.dir"));
         if (!outputDir.exists() && !outputDir.isDirectory()) {
-            log.error("Unable to delete sitemaps directory, doesn't exist or isn't a directort");
+            log.error("Unable to delete sitemaps directory, doesn't exist or isn't a directory");
         } else {
             FileUtils.deleteDirectory(outputDir);
         }

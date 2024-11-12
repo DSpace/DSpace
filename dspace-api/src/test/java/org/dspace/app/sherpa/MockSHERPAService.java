@@ -43,7 +43,7 @@ public class MockSHERPAService extends SHERPAService {
                 "https://v2.sherpa.ac.uk/cgi/retrieve");
             String apiKey = configurationService.getProperty("sherpa.romeo.apikey");
 
-            // Rather than search, we will simply attempt to build the URI using the real pepare method
+            // Rather than search, we will simply attempt to build the URI using the real prepare method
             // so that any errors there are caught, and will return a valid response for The Lancet
             InputStream content = null;
             try {
@@ -100,7 +100,7 @@ public class MockSHERPAService extends SHERPAService {
                 "https://v2.sherpa.ac.uk/cgi/retrieve");
             String apiKey = configurationService.getProperty("sherpa.romeo.apikey");
 
-            // Rather than search, we will simply attempt to build the URI using the real pepare method
+            // Rather than search, we will simply attempt to build the URI using the real prepare method
             // so that any errors there are caught, and will return a valid response for The Lancet
             InputStream content = null;
             try {

@@ -200,7 +200,7 @@ public class ITCommunityCollection extends AbstractIntegrationTest {
         groupService.addMember(context, adminGroup, commAdmin);
         groupService.update(context, adminGroup);
 
-        // Create a hierachy of sub-Communities and Collections and Items.
+        // Create a hierarchy of sub-Communities and Collections and Items.
         Community child = communityService.createSubcommunity(context, parentCom);
         Community child2 = communityService.createSubcommunity(context, parentCom);
         Community child3 = communityService.createSubcommunity(context, parentCom);
