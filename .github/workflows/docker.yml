@@ -217,6 +217,10 @@ jobs:
           echo "Starting Handle Server..."
           docker exec -i dspace /dspace/bin/start-handle-server
           sleep 20
+          echo "Checking for errors in error.log"
+          result=$(docker exec -i dspace sh -c "cat /dspace/handle-server/logs/error.log* || echo ''")
+          echo "$result"
+          echo "$result" | grep -vqz "Exception"
           echo "Checking for errors in handle-server.log..."
           result=$(docker exec -i dspace cat /dspace/log/handle-server.log)
           echo "$result"
