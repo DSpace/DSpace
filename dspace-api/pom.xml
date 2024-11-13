@@ -413,6 +413,16 @@
                     <groupId>org.mortbay.jasper</groupId>
                     <artifactId>apache-jsp</artifactId>
                 </exclusion>
+                <!-- Excluded BouncyCastle dependencies because we use a later version of BouncyCastle.
+                     Having two versions of BouncyCastle in the classpath can cause Handle Server to throw errors. -->
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcpkix-jdk15on</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk15on</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
