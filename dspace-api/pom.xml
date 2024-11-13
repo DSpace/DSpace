@@ -388,6 +388,13 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
+            <exclusions>
+                <!-- Spring JCL is unnecessary and conflicts with commons-logging when both are on classpath -->
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-jcl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -405,6 +412,16 @@
                 <exclusion>
                     <groupId>org.mortbay.jasper</groupId>
                     <artifactId>apache-jsp</artifactId>
+                </exclusion>
+                <!-- Excluded BouncyCastle dependencies because we use a later version of BouncyCastle.
+                     Having two versions of BouncyCastle in the classpath can cause Handle Server to throw errors. -->
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcpkix-jdk15on</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk15on</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
