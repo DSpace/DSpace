@@ -55,6 +55,11 @@ FROM tomcat:9-jdk${JDK_VERSION}
 ENV DSPACE_INSTALL=/dspace
 # Copy the /dspace directory from 'ant_build' container to /dspace in this container
 COPY --from=ant_build /dspace $DSPACE_INSTALL
+# Need host command for "[dspace]/bin/make-handle-config"
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends host \
+    && apt-get purge -y --auto-remove \
+    && rm -rf /var/lib/apt/lists/*
 # Expose Tomcat port and AJP port
 EXPOSE 8080 8009
 # Give java extra memory (2GB)
