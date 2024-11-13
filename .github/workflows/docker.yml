@@ -158,6 +158,12 @@ jobs:
     runs-on: ubuntu-latest
     # Must run after all major images are built
     needs: [dspace, dspace-test, dspace-cli, dspace-postgres-pgcrypto, dspace-solr]
+    env:
+      # Override defaults dspace.server.url because backend starts at http://127.0.0.1:8080
+      dspace__P__server__P__url: http://127.0.0.1:8080/server
+      # Force using "pr-testing" version of all Docker images. The "pr-testing" tag is a temporary tag that we
+      # assign to all PR-built docker images in reusabe-docker-build.yml
+      DSPACE_VER: pr-testing
     steps:
       # Checkout our codebase (to get access to Docker Compose scripts)
       - name: Checkout codebase
@@ -180,12 +186,6 @@ jobs:
           docker image ls -a
       # Start backend using our compose script in the codebase.
       - name: Start backend in Docker
-        env:
-          # Override defaults dspace.server.url because backend starts at http://127.0.0.1:8080
-          dspace__P__server__P__url: http://127.0.0.1:8080/server
-          # Force using "pr-testing" version of Docker images. The "pr-testing" tag is a temporary tag that we assign to
-          # all PR-built docker images in reusabe-docker-build.yml
-          DSPACE_VER: pr-testing
         run: |
           docker compose -f docker-compose.yml up -d
           sleep 10
@@ -214,6 +214,7 @@ jobs:
       - name: Verify Handle Server is working properly
         run: |
           docker exec -i dspace /dspace/bin/make-handle-config
+          echo "Starting Handle Server..."
           docker exec -i dspace /dspace/bin/start-handle-server
           sleep 20
           echo "Checking for errors in handle-server.log..."
