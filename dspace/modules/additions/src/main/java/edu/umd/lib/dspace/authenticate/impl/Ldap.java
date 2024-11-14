@@ -10,6 +10,8 @@ import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.SearchResult;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Unit;
@@ -20,6 +22,9 @@ import org.dspace.eperson.service.UnitService;
  * Class representing an LDAP result for a particular user
  */
 public class Ldap {
+    /** log4j category */
+    private static Logger log = LogManager.getLogger(Ldap.class);
+
     private String strUid;
     private SearchResult entry;
 
@@ -197,44 +202,67 @@ public class Ldap {
      * value.
      */
     public boolean isFaculty() throws NamingException {
-        if (strUid.equals("tstusr2")) {
+        if ("tstusr2".equals(strUid)) {
             return true;
         }
 
         List<String> l = getAttributeAll("umappointment");
 
         if (l != null) {
-            Iterator<String> i = l.iterator();
-
-            while (i.hasNext()) {
-                String strAppt = (String) i.next();
-                String strInst = strAppt.substring(0, 2);
-                String strCat = strAppt.substring(24, 26);
-                String strStatus = strAppt.substring(27, 28);
-
-                if ((strCat.equals("01") ||
-                        strCat.equals("02") ||
-                        strCat.equals("03") ||
-                        strCat.equals("15") ||
-                        strCat.equals("25") ||
-                        strCat.equals("36") ||
-                        strCat.equals("37") ||
-                        strCat.equals("EA"))
-                        &&
-                        (strStatus.equals("A") ||
-                                strStatus.equals("E") ||
-                                strStatus.equals("N") ||
-                                strStatus.equals("Q") ||
-                                strStatus.equals("T") ||
-                                strStatus.equals("F"))
-                        &&
-                        strInst.equals("01")) {
+            for (String umAppointment : l) {
+                if (isFaculty(umAppointment)) {
                     return true;
                 }
             }
         }
 
         return false;
+    }
+
+    /**
+     * Returns true if the given umAppointment string matches the criteria for
+     * a faculty member, false otherwise.
+     *
+     * @param umAppointment the LDAP "umappointment" string to check
+     * @return true if the given umAppointment string matches the criteria for
+     * a faculty member, false otherwise.
+     */
+    protected boolean isFaculty(String umAppointment) {
+
+        String[] components = umAppointment.split("\\$");
+        // Don't look for exactly 7 (or 8), because last term may be blank, and so not be present
+        if (components.length < 7) {
+            log.warn(
+                "The given umAppointment '{}' did not have the expected format",
+                umAppointment
+            );
+            return false;
+        }
+
+        String strInst = components[0]; // umInstitutionCode
+        String strCat = components[3]; // umCatStatus
+        String strStatus = components[4]; // EMP_STAT_CD
+
+        final List<String> facultyCategories = List.of(
+            "Tenured Fac",
+            "Ten Trk Fac",
+            "NT-Term Fac",
+            "NT-Cont. Fac",
+            "Post-Doctoral Scholar",
+            "Hrly Faculty",
+            "NT-NonRg Fac"
+        );
+
+        final List<String> employmentStatuses = List.of(
+            "A", // Active
+            "Q", // non-paid
+            // If is unclear what the following correspond to, or if they
+            // are even still used
+            "E", "N", "T", "F"
+        );
+
+        return "01".equals(strInst) && facultyCategories.contains(strCat) &&
+            employmentStatuses.contains(strStatus);
     }
 
     /**
