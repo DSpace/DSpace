@@ -27,7 +27,7 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>unpack</id>
+                        <id>unpack-additions</id>
                         <phase>prepare-package</phase>
                         <goals>
                             <goal>unpack-dependencies</goal>
@@ -40,6 +40,20 @@
                             -->
                             <outputDirectory>${project.build.directory}/additions</outputDirectory>
                             <excludes>META-INF/**</excludes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>unpack-server</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeScope>runtime</includeScope>
+                            <includeGroupIds>org.dspace</includeGroupIds>
+                            <includeArtifactIds>dspace-server-webapp</includeArtifactIds>
+                            <includes>**/static/**,**/*.properties</includes>
+                            <outputDirectory>${project.build.directory}/additions</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -65,26 +79,6 @@
                 <executions>
                     <execution>
                         <phase>prepare-package</phase>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>unpack</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includeScope>runtime</includeScope>
-                            <includeGroupIds>org.dspace</includeGroupIds>
-                            <includeArtifactIds>dspace-server-webapp</includeArtifactIds>
-                            <includes>**/static/**,**/*.properties</includes>
-                            <outputDirectory>${project.build.directory}/additions</outputDirectory>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
