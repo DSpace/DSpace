@@ -11,7 +11,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.orcid.OrcidHistory;
@@ -24,7 +25,7 @@ import org.dspace.orcid.service.OrcidHistoryService;
  */
 public class OrcidHistoryBuilder extends  AbstractBuilder<OrcidHistory, OrcidHistoryService> {
 
-    private static final Logger log = Logger.getLogger(OrcidHistoryBuilder.class);
+    private static final Logger log = LogManager.getLogger(OrcidHistoryBuilder.class);
 
     private OrcidHistory orcidHistory;
 
