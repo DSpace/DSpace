@@ -293,14 +293,6 @@
                 <artifactId>spring-expression</artifactId>
                 <version>${spring.version}</version>
             </dependency>
-
-            <!-- Specify the version of json-smart we want to use.
-                 This solves a version mismatch between nimbus-jose-jwt and json-path below. -->
-            <!--<dependency>
-                <groupId>net.minidev</groupId>
-                <artifactId>json-smart</artifactId>
-                <version>2.5.1</version>
-            </dependency>-->
         </dependencies>
     </dependencyManagement>
 
@@ -610,6 +602,13 @@
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
+            <exclusions>
+                <!-- We pull in a later version above -->
+                <exclusion>
+                    <groupId>net.minidev</groupId>
+                    <artifactId>json-smart</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
