@@ -193,13 +193,13 @@
 
     <xsl:template name="fundingProject">
         <xsl:for-each select="doc:metadata/doc:element[@name='local']/doc:element[@name='sponsor']/doc:element/doc:field[@name='value']">
-            <xsl:variable name="proj_arr" select="tokenize(., '@@')"/>
+            <xsl:variable name="proj_arr" select="tokenize(., ';')"/>
             <xsl:if test="count($proj_arr) &gt;= 4">
                 <xsl:if
                         test="$proj_arr[1] != '' and $proj_arr[2] != '' and $proj_arr[3] != '' and $proj_arr[4] != ''">
                     <ms:fundingProject>
                         <ms:projectName xml:lang="en">
-                            <xsl:value-of select="$proj_arr[3]"/>
+                            <xsl:value-of select="$proj_arr[4]"/>
                         </ms:projectName>
                         <xsl:choose>
                             <xsl:when test="starts-with($proj_arr[5], 'info:')">
@@ -216,16 +216,16 @@
                         </xsl:choose>
                         <ms:fundingType>
                             <xsl:choose>
-                                <xsl:when test="$proj_arr[4] = 'Other'">http://w3id.org/meta-share/meta-share/other</xsl:when>
+                                <xsl:when test="$proj_arr[1] = 'Other'">http://w3id.org/meta-share/meta-share/other</xsl:when>
                                 <xsl:otherwise>
-                                    <xsl:value-of select="concat('http://w3id.org/meta-share/meta-share/', $proj_arr[4])"/>
+                                    <xsl:value-of select="concat('http://w3id.org/meta-share/meta-share/', $proj_arr[1])"/>
                                 </xsl:otherwise>
                             </xsl:choose>
                         </ms:fundingType>
                         <ms:funder>
                             <ms:Organization>
                                 <ms:actorType>Organization</ms:actorType>
-                                <ms:organizationName xml:lang="en"><xsl:value-of select="$proj_arr[1]"/></ms:organizationName>
+                                <ms:organizationName xml:lang="en"><xsl:value-of select="$proj_arr[3]"/></ms:organizationName>
                             </ms:Organization>
                         </ms:funder>
                     </ms:fundingProject>
@@ -381,11 +381,198 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
 
     <xsl:template name="ms_language_inside">
         <xsl:param name="isoCode"/>
+        <xsl:variable name="modifiedIsoCode">
+            <xsl:choose>
+                <xsl:when test="$isoCode = 'eng'">en</xsl:when>
+                <xsl:when test="$isoCode = 'ces'">cs</xsl:when>
+                <xsl:when test="$isoCode = 'lit'">lt</xsl:when>
+                <xsl:when test="$isoCode = 'urd'">ur</xsl:when>
+                <xsl:when test="$isoCode = 'sme'">se</xsl:when>
+                <xsl:when test="$isoCode = 'kor'">ko</xsl:when>
+                <xsl:when test="$isoCode = 'uig'">ug</xsl:when>
+                <xsl:when test="$isoCode = 'vie'">vi</xsl:when>
+                <xsl:when test="$isoCode = 'bel'">be</xsl:when>
+                <xsl:when test="$isoCode = 'tur'">tr</xsl:when>
+                <xsl:when test="$isoCode = 'san'">sa</xsl:when>
+                <xsl:when test="$isoCode = 'slk'">sk</xsl:when>
+                <xsl:when test="$isoCode = 'ukr'">uk</xsl:when>
+                <xsl:when test="$isoCode = 'rus'">ru</xsl:when>
+                <xsl:when test="$isoCode = 'ara'">ar</xsl:when>
+                <xsl:when test="$isoCode = 'fas'">fa</xsl:when>
+                <xsl:when test="$isoCode = 'deu'">de</xsl:when>
+                <xsl:when test="$isoCode = 'its'">it</xsl:when>
+                <xsl:when test="$isoCode = 'hin'">hi</xsl:when>
+                <xsl:when test="$isoCode = 'som'">so</xsl:when>
+                <xsl:when test="$isoCode = 'ell'">el</xsl:when>
+                <xsl:when test="$isoCode = 'pol'">pl</xsl:when>
+                <xsl:when test="$isoCode = 'por'">pt</xsl:when>
+                <xsl:when test="$isoCode = 'fra'">fr</xsl:when>
+                <xsl:when test="$isoCode = 'afr'">af</xsl:when>
+                <xsl:when test="$isoCode = 'bul'">bg</xsl:when>
+                <xsl:when test="$isoCode = 'cat'">ca</xsl:when>
+                <xsl:when test="$isoCode = 'chu'">cu</xsl:when>
+                <xsl:when test="$isoCode = 'cym'">cy</xsl:when>
+                <xsl:when test="$isoCode = 'dan'">da</xsl:when>
+                <xsl:when test="$isoCode = 'est'">et</xsl:when>
+                <xsl:when test="$isoCode = 'eus'">eu</xsl:when>
+                <xsl:when test="$isoCode = 'fao'">fo</xsl:when>
+                <xsl:when test="$isoCode = 'fas'">fa</xsl:when>
+                <xsl:when test="$isoCode = 'fin'">fi</xsl:when>
+                <xsl:when test="$isoCode = 'gle'">ga</xsl:when>
+                <xsl:when test="$isoCode = 'heb'">he</xsl:when>
+                <xsl:when test="$isoCode = 'hrv'">hr</xsl:when>
+                <xsl:when test="$isoCode = 'hun'">hu</xsl:when>
+                <xsl:when test="$isoCode = 'hye'">hy</xsl:when>
+                <xsl:when test="$isoCode = 'ind'">id</xsl:when>
+                <xsl:when test="$isoCode = 'isl'">is</xsl:when>
+                <xsl:when test="$isoCode = 'ita'">it</xsl:when>
+                <xsl:when test="$isoCode = 'jpn'">ja</xsl:when>
+                <xsl:when test="$isoCode = 'lat'">la</xsl:when>
+                <xsl:when test="$isoCode = 'lav'">lv</xsl:when>
+                <xsl:when test="$isoCode = 'mar'">mr</xsl:when>
+                <xsl:when test="$isoCode = 'mlt'">mt</xsl:when>
+                <xsl:when test="$isoCode = 'nld'">nl</xsl:when>
+                <xsl:when test="$isoCode = 'nno'">nn</xsl:when>
+                <xsl:when test="$isoCode = 'nob'">nb</xsl:when>
+                <xsl:when test="$isoCode = 'ron'">ro</xsl:when>
+                <xsl:when test="$isoCode = 'slv'">sl</xsl:when>
+                <xsl:when test="$isoCode = 'srp'">sr</xsl:when>
+                <xsl:when test="$isoCode = 'tam'">ta</xsl:when>
+                <xsl:when test="$isoCode = 'tel'">te</xsl:when>
+                <xsl:when test="$isoCode = 'wol'">wo</xsl:when>
+                <xsl:when test="$isoCode = 'zho'">zh</xsl:when>
+                <xsl:when test="$isoCode = 'nor'">no</xsl:when>
+                <xsl:when test="$isoCode = 'glv'">gv</xsl:when>
+                <xsl:when test="$isoCode = 'gla'">gd</xsl:when>
+                <xsl:when test="$isoCode = 'swe'">sv</xsl:when>
+                <xsl:when test="$isoCode = 'glg'">gl</xsl:when>
+                <xsl:when test="$isoCode = 'kaz'">kk</xsl:when>
+                <xsl:when test="$isoCode = 'amh'">am</xsl:when>
+                <xsl:when test="$isoCode = 'bre'">br</xsl:when>
+                <xsl:when test="$isoCode = 'tha'">th</xsl:when>
+                <xsl:when test="$isoCode = 'ben'">bn</xsl:when>
+                <xsl:when test="$isoCode = 'guj'">gu</xsl:when>
+                <xsl:when test="$isoCode = 'kan'">kn</xsl:when>
+                <xsl:when test="$isoCode = 'mal'">ml</xsl:when>
+                <xsl:when test="$isoCode = 'mkd'">mk</xsl:when>
+                <xsl:when test="$isoCode = 'nep'">ne</xsl:when>
+                <xsl:when test="$isoCode = 'sqi'">sq</xsl:when>
+                <xsl:when test="$isoCode = 'swa'">sw</xsl:when>
+                <xsl:when test="$isoCode = 'jav'">jv</xsl:when>
+                <xsl:when test="$isoCode = 'tat'">tt</xsl:when>
+                <xsl:when test="$isoCode = 'fry'">fy</xsl:when>
+                <xsl:when test="$isoCode = 'spa'">es</xsl:when>
+                <xsl:when test="$isoCode = 'hbs'">sh</xsl:when>
+                <xsl:when test="$isoCode = 'tgl'">tl</xsl:when>
+                <xsl:when test="$isoCode = 'pan'">pa</xsl:when>
+                <xsl:when test="$isoCode = 'abk'">ab</xsl:when>
+                <xsl:when test="$isoCode = 'aka'">ak</xsl:when>
+                <xsl:when test="$isoCode = 'arg'">an</xsl:when>
+                <xsl:when test="$isoCode = 'asm'">as</xsl:when>
+                <xsl:when test="$isoCode = 'ava'">av</xsl:when>
+                <xsl:when test="$isoCode = 'aym'">ay</xsl:when>
+                <xsl:when test="$isoCode = 'aze'">az</xsl:when>
+                <xsl:when test="$isoCode = 'bak'">ba</xsl:when>
+                <xsl:when test="$isoCode = 'bam'">bm</xsl:when>
+                <xsl:when test="$isoCode = 'bis'">bi</xsl:when>
+                <xsl:when test="$isoCode = 'bod'">bo</xsl:when>
+                <xsl:when test="$isoCode = 'cha'">ch</xsl:when>
+                <xsl:when test="$isoCode = 'che'">ce</xsl:when>
+                <xsl:when test="$isoCode = 'chv'">cv</xsl:when>
+                <xsl:when test="$isoCode = 'cor'">kw</xsl:when>
+                <xsl:when test="$isoCode = 'cre'">cr</xsl:when>
+                <xsl:when test="$isoCode = 'div'">dv</xsl:when>
+                <xsl:when test="$isoCode = 'dzo'">dz</xsl:when>
+                <xsl:when test="$isoCode = 'eop'">ep</xsl:when>
+                <xsl:when test="$isoCode = 'ewe'">ee</xsl:when>
+                <xsl:when test="$isoCode = 'fij'">fj</xsl:when>
+                <xsl:when test="$isoCode = 'ful'">ff</xsl:when>
+                <xsl:when test="$isoCode = 'hat'">ht</xsl:when>
+                <xsl:when test="$isoCode = 'hau'">ha</xsl:when>
+                <xsl:when test="$isoCode = 'her'">hz</xsl:when>
+                <xsl:when test="$isoCode = 'hmo'">ho</xsl:when>
+                <xsl:when test="$isoCode = 'ibo'">ig</xsl:when>
+                <xsl:when test="$isoCode = 'iku'">iu</xsl:when>
+                <xsl:when test="$isoCode = 'ile'">ie</xsl:when>
+                <xsl:when test="$isoCode = 'ina'">ia</xsl:when>
+                <xsl:when test="$isoCode = 'ipk'">ik</xsl:when>
+                <xsl:when test="$isoCode = 'kal'">kl</xsl:when>
+                <xsl:when test="$isoCode = 'kas'">ks</xsl:when>
+                <xsl:when test="$isoCode = 'kat'">ka</xsl:when>
+                <xsl:when test="$isoCode = 'kau'">kr</xsl:when>
+                <xsl:when test="$isoCode = 'khm'">km</xsl:when>
+                <xsl:when test="$isoCode = 'kik'">ki</xsl:when>
+                <xsl:when test="$isoCode = 'kir'">ky</xsl:when>
+                <xsl:when test="$isoCode = 'kom'">kv</xsl:when>
+                <xsl:when test="$isoCode = 'kon'">kg</xsl:when>
+                <xsl:when test="$isoCode = 'kur'">ku</xsl:when>
+                <xsl:when test="$isoCode = 'lao'">lo</xsl:when>
+                <xsl:when test="$isoCode = 'lin'">ln</xsl:when>
+                <xsl:when test="$isoCode = 'ltz'">lb</xsl:when>
+                <xsl:when test="$isoCode = 'lug'">lg</xsl:when>
+                <xsl:when test="$isoCode = 'mah'">mh</xsl:when>
+                <xsl:when test="$isoCode = 'mlg'">mg</xsl:when>
+                <xsl:when test="$isoCode = 'mob'">mn</xsl:when>
+                <xsl:when test="$isoCode = 'mri'">mi</xsl:when>
+                <xsl:when test="$isoCode = 'msa'">ms</xsl:when>
+                <xsl:when test="$isoCode = 'mya'">my</xsl:when>
+                <xsl:when test="$isoCode = 'nau'">na</xsl:when>
+                <xsl:when test="$isoCode = 'nav'">nv</xsl:when>
+                <xsl:when test="$isoCode = 'ndo'">ng</xsl:when>
+                <xsl:when test="$isoCode = 'nya'">ny</xsl:when>
+                <xsl:when test="$isoCode = 'oci'">oc</xsl:when>
+                <xsl:when test="$isoCode = 'ori'">or</xsl:when>
+                <xsl:when test="$isoCode = 'orm'">om</xsl:when>
+                <xsl:when test="$isoCode = 'oss'">os</xsl:when>
+                <xsl:when test="$isoCode = 'pli'">pi</xsl:when>
+                <xsl:when test="$isoCode = 'pus'">ps</xsl:when>
+                <xsl:when test="$isoCode = 'que'">qu</xsl:when>
+                <xsl:when test="$isoCode = 'roh'">rm</xsl:when>
+                <xsl:when test="$isoCode = 'run'">rn</xsl:when>
+                <xsl:when test="$isoCode = 'sag'">sg</xsl:when>
+                <xsl:when test="$isoCode = 'sin'">si</xsl:when>
+                <xsl:when test="$isoCode = 'smo'">sm</xsl:when>
+                <xsl:when test="$isoCode = 'sna'">sn</xsl:when>
+                <xsl:when test="$isoCode = 'snd'">sd</xsl:when>
+                <xsl:when test="$isoCode = 'sot'">st</xsl:when>
+                <xsl:when test="$isoCode = 'srd'">sc</xsl:when>
+                <xsl:when test="$isoCode = 'ssw'">ss</xsl:when>
+                <xsl:when test="$isoCode = 'sun'">su</xsl:when>
+                <xsl:when test="$isoCode = 'tah'">ty</xsl:when>
+                <xsl:when test="$isoCode = 'tgk'">tg</xsl:when>
+                <xsl:when test="$isoCode = 'tir'">ti</xsl:when>
+                <xsl:when test="$isoCode = 'ton'">to</xsl:when>
+                <xsl:when test="$isoCode = 'tsn'">tn</xsl:when>
+                <xsl:when test="$isoCode = 'tso'">ts</xsl:when>
+                <xsl:when test="$isoCode = 'tuk'">tk</xsl:when>
+                <xsl:when test="$isoCode = 'twi'">tw</xsl:when>
+                <xsl:when test="$isoCode = 'uzb'">uz</xsl:when>
+                <xsl:when test="$isoCode = 'ven'">ve</xsl:when>
+                <xsl:when test="$isoCode = 'vol'">vo</xsl:when>
+                <xsl:when test="$isoCode = 'wln'">wa</xsl:when>
+                <xsl:when test="$isoCode = 'xho'">xh</xsl:when>
+                <xsl:when test="$isoCode = 'yid'">yi</xsl:when>
+                <xsl:when test="$isoCode = 'yor'">yo</xsl:when>
+                <xsl:when test="$isoCode = 'zha'">za</xsl:when>
+                <xsl:when test="$isoCode = 'zul'">zu</xsl:when>
+                <xsl:when test="$isoCode = 'bos'">bs</xsl:when>
+                <xsl:when test="$isoCode = 'cos'">co</xsl:when>
+                <xsl:when test="$isoCode = 'epo'">eo</xsl:when>
+                <xsl:when test="$isoCode = 'grn'">gn</xsl:when>
+                <xsl:when test="$isoCode = 'zul'">zu</xsl:when>
+                <xsl:when test="$isoCode = 'ido'">io</xsl:when>
+                <xsl:when test="$isoCode = 'lim'">li</xsl:when>
+                <xsl:when test="$isoCode = 'mon'">mn</xsl:when>
+                <xsl:when test="$isoCode = 'bos'">bs</xsl:when>
+                <xsl:when test="$isoCode = 'kin'">rw</xsl:when>
+                <xsl:otherwise><xsl:value-of select="$isoCode"/></xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
         <ms:languageTag>
-            <xsl:value-of select="$isoCode"/>
+            <xsl:value-of select="$modifiedIsoCode"/>
         </ms:languageTag>
         <ms:languageId>
-            <xsl:value-of select="$isoCode"/>
+            <xsl:value-of select="$modifiedIsoCode"/>
         </ms:languageId>
     </xsl:template>
 
@@ -607,7 +794,7 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
                     test="doc:metadata/doc:element[@name='local']/doc:element[@name='size']/doc:element[@name='info']/doc:element/doc:field[@name='value']">
                 <xsl:for-each
                         select="doc:metadata/doc:element[@name='local']/doc:element[@name='size']/doc:element[@name='info']/doc:element/doc:field[@name='value']">
-                    <xsl:variable name="size_arr" select="tokenize(., '@@')"/>
+                    <xsl:variable name="size_arr" select="tokenize(., ';')"/>
                     <xsl:call-template name="size">
                         <xsl:with-param name="amount" select="$size_arr[1]"/>
                         <xsl:with-param name="unit" select="$size_arr[2]"/>
@@ -616,7 +803,7 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
             </xsl:when>
             <xsl:otherwise>
                 <xsl:call-template name="size">
-                    <xsl:with-param name="amount" select="sum(exsl:node-set($files)/doc:element[@name='bitstream']/doc:field[@name='size']/text())"/>
+                    <xsl:with-param name="amount" select="format-number(sum(exsl:node-set($files)/doc:element[@name='bitstream']/doc:field[@name='size']/text()), '0')"/>
                     <xsl:with-param name="unit" select="'bytes'"/>
                 </xsl:call-template>
             </xsl:otherwise>
