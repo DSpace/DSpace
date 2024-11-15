@@ -161,10 +161,10 @@ jobs:
     env:
       # Override defaults dspace.server.url because backend starts at http://127.0.0.1:8080
       dspace__P__server__P__url: http://127.0.0.1:8080/server
-      # If this is a PR, force using "pr-testing" version of all Docker images. Otherwise, for branch commits, use the
-      # "latest" tag. NOTE: the "pr-testing" tag is a temporary tag that we assign to all PR-built docker images in
-      # reusabe-docker-build.yml
-      DSPACE_VER: ${{ github.event_name == 'pull_request' && 'pr-testing' || 'latest' }}
+      # If this is a PR, force using "pr-testing" version of all Docker images. Otherwise, if on main branch, use the
+      # "latest" tag. Otherwise, use the branch name. NOTE: the "pr-testing" tag is a temporary tag that we assign to
+      # all PR-built docker images in reusabe-docker-build.yml
+      DSPACE_VER: ${{ (github.event_name == 'pull_request' && 'pr-testing') || (github.ref_name == github.event.repository.default_branch && 'latest') || github.ref_name }}
     steps:
       # Checkout our codebase (to get access to Docker Compose scripts)
       - name: Checkout codebase
