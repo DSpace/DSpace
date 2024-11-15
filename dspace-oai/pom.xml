@@ -65,9 +65,8 @@
 
         <!-- Java Injection -->
         <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-            <version>1</version>
+            <groupId>jakarta.inject</groupId>
+            <artifactId>jakarta.inject-api</artifactId>
         </dependency>
 
         <!-- Needed to support Spring @Configuration classes (to register servlets/beans with Spring Boot webapp) -->
