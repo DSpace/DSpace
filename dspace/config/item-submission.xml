@@ -19,7 +19,6 @@
     <submission-map>
         <!-- Default submission process -->
         <name-map collection-handle="default" submission-name="traditional"/>
-        <name-map collection-handle="123456789/1127" submission-name="clariah"/>
         <name-map collection-handle="20.500.12800/3" submission-name="clariahSubmissions"/>
         <name-map collection-handle="11234/5012" submission-name="teachingSubmissions"/>
         <!-- Sample Entities Collection configuration based on the demo Entities dataset available at:
