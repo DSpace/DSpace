@@ -97,10 +97,6 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-web</artifactId>
-        </dependency>
 
         <!-- Replacement for Abdera (required by sword2-server dependency). Abdera is no longer maintained
              (https://abdera.apache.org/). But Axiom FOM is backwards compatible with Abdera.
