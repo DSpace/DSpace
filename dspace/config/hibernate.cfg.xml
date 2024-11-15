@@ -96,7 +96,7 @@
         <mapping class="org.dspace.orcid.OrcidHistory" />
         <mapping class="org.dspace.orcid.OrcidToken"/>
 
-        <mapping class="org.dspace.supervision.SupervisionOrder"/>        
+        <mapping class="org.dspace.supervision.SupervisionOrder"/>
 
         <!-- UMD Customization -->
         <!-- Mappings for UMD entities -->
