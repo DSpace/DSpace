@@ -28,6 +28,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataFieldName;
 import org.dspace.content.dto.MetadataValueDTO;
@@ -63,13 +65,11 @@ import org.orcid.jaxb.model.v3.release.record.WorkTitle;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkGroup;
 import org.orcid.jaxb.model.v3.release.record.summary.WorkSummary;
 import org.orcid.jaxb.model.v3.release.record.summary.Works;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementation of {@link ExternalDataProvider} that search for all the works
- * of the profile with the given orcid id that hava a source other than DSpace.
+ * of the profile with the given orcid id that have a source other than DSpace.
  * The id of the external data objects returned by the methods of this class is
  * the concatenation of the orcid id and the put code associated with the
  * publication, separated by :: (example 0000-0000-0123-4567::123456)
@@ -79,7 +79,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(OrcidPublicationDataProvider.class);
+    private final static Logger LOGGER = LogManager.getLogger();
 
     /**
      * Examples of valid ORCID IDs:
@@ -335,7 +335,8 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
         try {
             addMetadataValuesFromCitation(externalDataObject, work.getWorkCitation());
         } catch (Exception e) {
-            LOGGER.error("An error occurs reading the following citation: " + work.getWorkCitation().getCitation(), e);
+            LOGGER.error("An error occurs reading the following citation: {}",
+                    work.getWorkCitation().getCitation(), e);
         }
 
         return externalDataObject;
@@ -484,7 +485,7 @@ public class OrcidPublicationDataProvider extends AbstractExternalDataProvider {
 
     private boolean hasRole(Contributor contributor, ContributorRole role) {
         ContributorAttributes attributes = contributor.getContributorAttributes();
-        return attributes != null ? role.equals(attributes.getContributorRole()) : false;
+        return attributes != null ? role.value().equals(attributes.getContributorRole()) : false;
     }
 
     private Optional<String> getContributorName(Contributor contributor) {

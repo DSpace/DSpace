@@ -450,6 +450,16 @@ public class XOAI {
             doc.addField("item.communities", "com_" + com.getHandle().replace("/", "_"));
         }
 
+        boolean hasBitstream = false;
+
+        for (Bundle b : item.getBundles("ORIGINAL")) {
+            if (b.getBitstreams().size() > 0) {
+                hasBitstream = true;
+            }
+        }
+
+        doc.addField("item.hasbitstream", hasBitstream);
+
         List<MetadataValue> allData = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
         for (MetadataValue dc : allData) {
             MetadataField field = dc.getMetadataField();

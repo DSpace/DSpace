@@ -3,6 +3,12 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+    <bean id="import-openaire-events" class="org.dspace.qaevent.script.OpenaireEventsImportCliScriptConfiguration" primary="true">
+        <property name="description" value="Import new Openaire quality assurance broker events"/>
+        <property name="dspaceRunnableClass" value="org.dspace.qaevent.script.OpenaireEventsImportCli"/>
+    </bean>
+
     <bean id="index-discovery" class="org.dspace.discovery.IndexDiscoveryScriptConfiguration">
         <property name="description" value="Update Discovery Solr Search Index"/>
         <property name="dspaceRunnableClass" value="org.dspace.discovery.IndexClient"/>
@@ -22,7 +28,7 @@
         <property name="description" value="export metadata from a discovery search" />
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExportSearchCli" />
     </bean>
-
+    
     <bean id="retry-tracker" class="org.dspace.statistics.export.RetryFailedOpenUrlTrackerScriptConfiguration" scope="prototype">
         <property name="description" value="Retry all failed commits to the OpenURLTracker"/>
         <property name="dspaceRunnableClass" value="org.dspace.statistics.export.RetryFailedOpenUrlTracker"/>
@@ -50,7 +56,7 @@
         <property name="description" value="Manage the OAI-PMH harvesting of external collections"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.harvest.HarvestCli"/>
     </bean>
-
+        
     <bean id="process-cleaner" class="org.dspace.administer.ProcessCleanerCliConfiguration">
         <property name="description" value="Cleanup all the old processes in the specified state"/>
         <property name="dspaceRunnableClass" value="org.dspace.administer.ProcessCleanerCli"/>
@@ -60,12 +66,12 @@
         <property name="description" value="Perform the media filtering to extract full text from documents and to create thumbnails"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.mediafilter.MediaFilterScript"/>
     </bean>
-
+    
     <bean id="orcid-bulk-push" class="org.dspace.orcid.script.OrcidBulkPushScriptConfiguration">
         <property name="description" value="Perform the bulk synchronization of all the BATCH configured ORCID entities placed in the ORCID queue"/>
         <property name="dspaceRunnableClass" value="org.dspace.orcid.script.OrcidBulkPush"/>
     </bean>
-
+    
     <bean id="solr-database-resync" class="org.dspace.app.solrdatabaseresync.SolrDatabaseResyncCliScriptConfiguration">
         <property name="description" value="Update the database status of Items in solr"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.solrdatabaseresync.SolrDatabaseResyncCli"/>
@@ -89,6 +95,11 @@
     <bean id="bulk-access-control" class="org.dspace.app.bulkaccesscontrol.BulkAccessControlCliScriptConfiguration" primary="true">
         <property name="description" value="Bulk access control"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkaccesscontrol.BulkAccessControlCli"/>
+    </bean>
+
+    <bean id="import-openaire-suggestions" class="org.dspace.app.suggestion.openaire.PublicationLoaderCliScriptConfiguration">
+       <property name="description" value="Imports suggestions from OpenAIRE for publication claim"/>
+       <property name="dspaceRunnableClass" value="org.dspace.app.suggestion.openaire.PublicationLoaderRunnableCli"/>
     </bean>
 
     <!-- UMD Customization -->

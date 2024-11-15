@@ -87,6 +87,11 @@ public class ItemRest extends DSpaceObjectRest {
         return NAME;
     }
 
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
     public boolean getInArchive() {
         return inArchive;
     }

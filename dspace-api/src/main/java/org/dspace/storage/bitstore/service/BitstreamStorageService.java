@@ -12,8 +12,8 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
+import jakarta.annotation.Nullable;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.core.Context;

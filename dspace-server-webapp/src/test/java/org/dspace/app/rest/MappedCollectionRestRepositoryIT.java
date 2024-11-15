@@ -108,7 +108,7 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         getClient(adminToken).perform(
-                post("/api/core/items/" + publicItem1.getID() + "/mappedCollections/")
+                post("/api/core/items/" + publicItem1.getID() + "/mappedCollections")
                         .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                         .content(
                                 "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID() + "\n"
@@ -164,7 +164,7 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
 
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken)
-            .perform(post("/api/core/items/" + publicItem1.getID() + "/mappedCollections/")
+            .perform(post("/api/core/items/" + publicItem1.getID() + "/mappedCollections")
                     .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                     .content(
                             "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID() + "\n" +
@@ -229,7 +229,7 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
 
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken)
-            .perform(post("/api/core/items/" + publicItem1.getID() + "/mappedCollections/")
+            .perform(post("/api/core/items/" + publicItem1.getID() + "/mappedCollections")
                     .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                     .content(
                             "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID() + "\n" +
@@ -283,7 +283,7 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
 
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken)
-            .perform(post("/api/core/items/" + publicItem1.getID() + "/mappedCollections/")
+            .perform(post("/api/core/items/" + publicItem1.getID() + "/mappedCollections")
                     .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                     .content(
                             "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID() + "\n" +
@@ -335,7 +335,7 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
 
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken)
-            .perform(post("/api/core/items/" + publicItem1.getID() + "/mappedCollections/")
+            .perform(post("/api/core/items/" + publicItem1.getID() + "/mappedCollections")
                     .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                     .content(
                             "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID() + "\n" +
@@ -443,7 +443,7 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
 
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken)
-                .perform(post("/api/core/items/" + publicItem1.getID() + "/mappedCollections/")
+                .perform(post("/api/core/items/" + publicItem1.getID() + "/mappedCollections")
                         .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                         .content("https://localhost:8080/spring-rest/api/core/collections/" + col1.getID())
                 )
@@ -503,7 +503,7 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
 
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken)
-                .perform(post("/api/core/items/" + templateItem.getID() + "/mappedCollections/")
+                .perform(post("/api/core/items/" + templateItem.getID() + "/mappedCollections")
                         .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                         .content("https://localhost:8080/spring-rest/api/core/collections/" + col2.getID())
                 )
@@ -563,14 +563,14 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
 
         String adminToken = getAuthToken(admin.getEmail(), password);
         getClient(adminToken)
-                .perform(post("/api/core/items/" + publicItem1.getID() + "/mappedCollections/")
+                .perform(post("/api/core/items/" + publicItem1.getID() + "/mappedCollections")
                         .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                         .content("https://localhost:8080/spring-rest/api/core/collections/" + "badCollectionID")
                 )
                 .andExpect(status().isUnprocessableEntity());
 
         getClient(adminToken)
-                .perform(post("/api/core/items/" + "badItemID" + "/mappedCollections/")
+                .perform(post("/api/core/items/" + "badItemID" + "/mappedCollections")
                         .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                         .content("https://localhost:8080/spring-rest/api/core/collections/" + col1.getID())
                 )
@@ -646,7 +646,7 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
 //        itemService.update(context, publicItem1);
 
         getClient().perform(
-                post("/api/core/items/" + publicItem1.getID() + "/mappedCollections/")
+                post("/api/core/items/" + publicItem1.getID() + "/mappedCollections")
                         .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                         .content(
                                 "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()
@@ -686,7 +686,7 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
         String adminToken = getAuthToken(admin.getEmail(), password);
 
         getClient(adminToken).perform(
-                post("/api/core/items/" + publicItem1.getID() + "/mappedCollections/")
+                post("/api/core/items/" + publicItem1.getID() + "/mappedCollections")
                         .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                         .content(
                                 "https://localhost:8080/spring-rest/api/core/collections/" + col2.getID()
@@ -735,7 +735,7 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
 
         // Map the item to the sink collection
         getClient(adminToken).perform(
-            post("/api/core/items/" + item.getID() + "/mappedCollections/")
+            post("/api/core/items/" + item.getID() + "/mappedCollections")
                 .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                 .content(
                     "https://localhost:8080/spring-rest/api/core/collections/" + sink.getID() + "\n"
@@ -782,7 +782,7 @@ public class MappedCollectionRestRepositoryIT extends AbstractControllerIntegrat
 
         //3. The item mapped to the sink collection
         getClient(adminToken).perform(
-            post("/api/core/items/" + item.getID() + "/mappedCollections/")
+            post("/api/core/items/" + item.getID() + "/mappedCollections")
                 .contentType(parseMediaType(TEXT_URI_LIST_VALUE))
                 .content(
                     "https://localhost:8080/spring-rest/api/core/collections/" + sink.getID() + "\n"

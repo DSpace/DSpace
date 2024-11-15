@@ -9,9 +9,9 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.UUID;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.LicenseRest;
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
-@Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME + "." + CollectionRest.LICENSE)
+@Component(CollectionRest.CATEGORY + "." + CollectionRest.PLURAL_NAME + "." + CollectionRest.LICENSE)
 public class CollectionLicenseLinkRepository extends AbstractDSpaceRestRepository
     implements LinkRestRepository {
 

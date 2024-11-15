@@ -222,6 +222,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
         assertThat("testCreate 3", found.getSupportLevel(), equalTo(-1));
         assertFalse("testCreate 4", found.isInternal());
         bitstreamFormatService.delete(context, found);
+        context.commit();
     }
 
     /**
@@ -497,6 +498,7 @@ public class BitstreamFormatTest extends AbstractUnitTest {
         BitstreamFormat bitstreamFormat = bitstreamFormatService.create(context);
         int toDeleteIdentifier = bitstreamFormat.getID();
         bitstreamFormatService.delete(context, bitstreamFormat);
+        context.commit();
         BitstreamFormat b = bitstreamFormatService.find(context, toDeleteIdentifier);
         assertThat("testDeleteAdmin 0", b, nullValue());
     }

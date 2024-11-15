@@ -7,7 +7,7 @@ networks:
 services:
   dspace-cli:
     # UMD Customization
-    image: "docker.lib.umd.edu/drum-cli:${DSPACE_VER:-7_x}"
+    image: "docker.lib.umd.edu/drum-cli:${DSPACE_VER:-latest}"
     # End UMD Customization
     container_name: dspace-cli
     build:

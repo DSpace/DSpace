@@ -1200,4 +1200,71 @@ public class CollectionTest extends AbstractDSpaceObjectTest {
                    equalTo(owningCommunity));
     }
 
+    /**
+     * Test of retrieveCollectionWithSubmitByEntityType method getting the closest
+     * collection of non-item type starting from an item
+     */
+    @Test
+    public void testRetrieveCollectionWithSubmitByEntityType() throws SQLException, AuthorizeException {
+        context.setDispatcher("default");
+        context.turnOffAuthorisationSystem();
+        Community com = communityService.create(null, context);
+        Group submitters = groupService.create(context);
+        Collection collection = collectionService.create(context, com);
+        collectionService.addMetadata(context, collection, "dspace", "entity", "type",
+            null, "Publication");
+        com.addCollection(collection);
+        WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
+        Item item = installItemService.installItem(context, workspaceItem);
+        EPerson epersonA = ePersonService.create(context);
+        Collection collectionPerson = collectionService.create(context, com);
+        collectionService.addMetadata(context, collectionPerson, "dspace", "entity", "type",
+            null, "Person");
+        collectionPerson.setSubmitters(submitters);
+        groupService.addMember(context, submitters, epersonA);
+        context.setCurrentUser(epersonA);
+        context.commit();
+        context.restoreAuthSystemState();
+        Collection resultCollection = collectionService.retrieveCollectionWithSubmitByEntityType
+                (context, item, "Person");
+
+        assertThat("testRetrieveCollectionWithSubmitByEntityType 0", resultCollection, notNullValue());
+        assertThat("testRetrieveCollectionWithSubmitByEntityType 1", resultCollection, equalTo(collectionPerson));
+
+        context.setDispatcher("exclude-discovery");
+    }
+
+    /**
+     * Test of rretrieveCollectionWithSubmitByCommunityAndEntityType method getting the closest
+     * collection of non-community type starting from an community
+     */
+    @Test
+    public void testRetrieveCollectionWithSubmitByCommunityAndEntityType() throws SQLException, AuthorizeException {
+        context.setDispatcher("default");
+        context.turnOffAuthorisationSystem();
+        Community com = communityService.create(null, context);
+        Group submitters = groupService.create(context);
+        Collection collection = collectionService.create(context, com);
+        collectionService.addMetadata(context, collection, "dspace", "entity", "type",
+            null, "Publication");
+        com.addCollection(collection);
+        WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
+        Item item = installItemService.installItem(context, workspaceItem);
+        EPerson epersonA = ePersonService.create(context);
+        Collection collectionPerson = collectionService.create(context, com);
+        collectionService.addMetadata(context, collectionPerson, "dspace", "entity", "type",
+            null, "Person");
+        collectionPerson.setSubmitters(submitters);
+        groupService.addMember(context, submitters, epersonA);
+        context.setCurrentUser(epersonA);
+        context.commit();
+        context.restoreAuthSystemState();
+        Collection resultCollection = collectionService.retrieveCollectionWithSubmitByCommunityAndEntityType
+                (context, com, "Person");
+
+        assertThat("testRetrieveCollectionWithSubmitByEntityType 0", resultCollection, notNullValue());
+        assertThat("testRetrieveCollectionWithSubmitByEntityType 1", resultCollection, equalTo(collectionPerson));
+
+        context.setDispatcher("exclude-discovery");
+    }
 }

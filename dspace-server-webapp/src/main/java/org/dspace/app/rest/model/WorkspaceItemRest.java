@@ -34,6 +34,7 @@ import org.dspace.app.rest.RestResourceController;
 })
 public class WorkspaceItemRest extends AInprogressSubmissionRest {
     public static final String NAME = "workspaceitem";
+    public static final String PLURAL_NAME = "workspaceitems";
     public static final String CATEGORY = RestAddressableModel.SUBMISSION;
 
     public static final String SUPERVISION_ORDERS = "supervisionOrders";
@@ -49,6 +50,11 @@ public class WorkspaceItemRest extends AInprogressSubmissionRest {
     @Override
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     @Override

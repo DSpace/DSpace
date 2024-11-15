@@ -31,8 +31,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import javax.mail.MessagingException;
 
+import jakarta.mail.MessagingException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.itemexport.service.ItemExportService;

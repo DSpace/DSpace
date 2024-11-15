@@ -656,6 +656,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     // E.g. for an Author relationship,
                     //   the place should be updated using the same principle as dc.contributor.author.
                     StringUtils.startsWith(metadataValue.getAuthority(), Constants.VIRTUAL_AUTHORITY_PREFIX)
+                        && metadataValue instanceof RelationshipMetadataValue
                         && ((RelationshipMetadataValue) metadataValue).isUseForPlace()
                 ) {
                     int mvPlace = getMetadataValuePlace(fieldToLastPlace, metadataValue);

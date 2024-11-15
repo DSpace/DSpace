@@ -10,8 +10,8 @@ package org.dspace.eperson;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Locale;
-import javax.mail.MessagingException;
 
+import jakarta.mail.MessagingException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.service.AuthenticationService;
@@ -73,7 +73,7 @@ public class AccountServiceImpl implements AccountService {
      * @param email   Email address to send the registration email to
      * @throws java.sql.SQLException passed through.
      * @throws java.io.IOException passed through.
-     * @throws javax.mail.MessagingException passed through.
+     * @throws jakarta.mail.MessagingException passed through.
      * @throws org.dspace.authorize.AuthorizeException passed through.
      */
     @Override
@@ -105,7 +105,7 @@ public class AccountServiceImpl implements AccountService {
      * @param email   Email address to send the forgot-password email to
      * @throws java.sql.SQLException passed through.
      * @throws java.io.IOException passed through.
-     * @throws javax.mail.MessagingException passed through.
+     * @throws jakarta.mail.MessagingException passed through.
      * @throws org.dspace.authorize.AuthorizeException passed through.
      */
     @Override

@@ -21,6 +21,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.Period;
+
 import org.dspace.app.rest.matcher.BrowseEntryResourceMatcher;
 import org.dspace.app.rest.matcher.BrowseIndexMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
@@ -776,7 +778,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                         .withIssueDate("2017-08-10")
                                         .withAuthor("Mouse, Mickey")
                                         .withSubject("Cartoons").withSubject("Mice")
-                                        .withEmbargoPeriod("12 months")
+                                        .withEmbargoPeriod(Period.ofMonths(12))
                                         .build();
 
         //5. An item that is only readable for an internal groups
@@ -909,7 +911,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                         .withIssueDate("2017-08-10")
                                         .withAuthor("Mouse, Mickey")
                                         .withSubject("Cartoons").withSubject("Mice")
-                                        .withEmbargoPeriod("12 months")
+                                        .withEmbargoPeriod(Period.ofMonths(12))
                                         .build();
 
         //5. An item that is only readable for an internal groups

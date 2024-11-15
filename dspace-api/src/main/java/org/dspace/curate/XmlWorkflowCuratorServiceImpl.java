@@ -140,7 +140,6 @@ public class XmlWorkflowCuratorServiceImpl
             item.setOwningCollection(wfi.getCollection());
             for (Task task : step.tasks) {
                 curator.addTask(task.name);
-
                 // Check whether the task is configured to be queued rather than automatically run
                 if (StringUtils.isNotEmpty(step.queue)) {
                     // queue attribute has been set in the FlowStep configuration: add task to configured queue

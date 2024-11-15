@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.annotation.Resource;
 
+import jakarta.annotation.Resource;
 import org.apache.logging.log4j.Logger;
 import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.exception.SourceExceptionHandler;
@@ -167,9 +167,9 @@ public abstract class AbstractRemoteMetadataSource {
                 } catch (Exception e) {
                     throwSourceException(retry, e, operationId);
                 }
-                log.info("operation " + operationId + " started");
+                log.debug("Operation {} started. Calling {}", operationId, callable.getClass().getName());
                 T response = callable.call();
-                log.info("operation " + operationId + " successful");
+                log.debug("Operation {} successful", operationId);
                 return response;
             } catch (Exception e) {
                 this.error = e;
@@ -180,7 +180,8 @@ public abstract class AbstractRemoteMetadataSource {
 
                 // No MetadataSourceException has interrupted the loop
                 retry++;
-                log.warn("Error in trying operation " + operationId + " " + retry + " " + warning + ", retrying !", e);
+                log.warn("Error in calling {} in operation {} {} {}, retrying!", callable.getClass().getName(),
+                         operationId, retry, warning, e);
 
             } finally {
                 this.lastRequest = System.currentTimeMillis();

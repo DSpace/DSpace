@@ -10,10 +10,10 @@ package org.dspace.app.rest.hdlresolver;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

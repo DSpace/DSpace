@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataFieldName;
@@ -45,8 +47,6 @@ import org.dspace.orcid.service.OrcidTokenService;
 import org.dspace.profile.OrcidProfileSyncPreference;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The consumer to fill the ORCID queue. The addition to the queue is made for
@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  * be synchronized (based on the preferences set by the user)</li>
  * <li>are publications/fundings related to profile items linked to orcid (based
  * on the preferences set by the user)</li>
- * 
+ *
  * </ul>
  *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
@@ -64,7 +64,7 @@ import org.slf4j.LoggerFactory;
  */
 public class OrcidQueueConsumer implements Consumer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrcidQueueConsumer.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private OrcidQueueService orcidQueueService;
 
@@ -82,7 +82,7 @@ public class OrcidQueueConsumer implements Consumer {
 
     private RelationshipService relationshipService;
 
-    private List<UUID> alreadyConsumedItems = new ArrayList<>();
+    private final List<UUID> alreadyConsumedItems = new ArrayList<>();
 
     @Override
     public void initialize() throws Exception {
@@ -263,7 +263,7 @@ public class OrcidQueueConsumer implements Consumer {
 
             if (StringUtils.isBlank(putCode)) {
                 LOGGER.warn("The orcid history record with id {} should have a not blank put code",
-                    historyRecord.getID());
+                        historyRecord::getID);
                 continue;
             }
 

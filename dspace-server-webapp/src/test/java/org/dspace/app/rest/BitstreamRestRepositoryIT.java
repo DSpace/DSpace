@@ -7,8 +7,8 @@
  */
 package org.dspace.app.rest;
 
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
-import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataDoesNotExist;
 import static org.dspace.app.rest.repository.patch.operation.BitstreamRemoveOperation.OPERATION_PATH_BITSTREAM_REMOVE;
@@ -25,12 +25,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.InputStream;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
-import javax.ws.rs.core.MediaType;
 
+import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.rest.matcher.BitstreamFormatMatcher;
@@ -310,7 +311,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .withName("Test Embargoed Bitstream")
                 .withDescription("This bitstream is embargoed")
                 .withMimeType("text/plain")
-                .withEmbargoPeriod("3 months")
+                .withEmbargoPeriod(Period.ofMonths(3))
                 .build();
         }
         context.restoreAuthSystemState();
@@ -363,7 +364,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .withName("Test Embargoed Bitstream")
                 .withDescription("This bitstream is embargoed")
                 .withMimeType(bitstreamFormat.getMIMEType())
-                .withEmbargoPeriod("3 months")
+                .withEmbargoPeriod(Period.ofMonths(3))
                 .build();
         }
         context.restoreAuthSystemState();
@@ -517,7 +518,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .withName("Test Embargoed Bitstream")
                 .withDescription("This bitstream is embargoed")
                 .withMimeType("text/plain")
-                .withEmbargoPeriod("3 months")
+                .withEmbargoPeriod(Period.ofMonths(3))
                 .build();
         }
 
@@ -577,7 +578,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .withName("Test Embargoed Bitstream")
                 .withDescription("This bitstream is embargoed")
                 .withMimeType(bitstreamFormat.getMIMEType())
-                .withEmbargoPeriod("3 months")
+                .withEmbargoPeriod(Period.ofMonths(3))
                 .build();
         }
 
@@ -638,7 +639,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .withName("Test Embargoed Bitstream")
                 .withDescription("This bitstream is embargoed")
                 .withMimeType("text/plain")
-                .withEmbargoPeriod("3 months")
+                .withEmbargoPeriod(Period.ofMonths(3))
                 .build();
         }
 
@@ -701,7 +702,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .withName("Test Embargoed Bitstream")
                 .withDescription("This bitstream is embargoed")
                 .withMimeType(bitstreamFormat.getMIMEType())
-                .withEmbargoPeriod("3 months")
+                .withEmbargoPeriod(Period.ofMonths(3))
                 .build();
         }
 
@@ -768,7 +769,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .withName("Test Embargoed Bitstream")
                 .withDescription("This bitstream is embargoed")
                 .withMimeType("text/plain")
-                .withEmbargoPeriod("3 months")
+                .withEmbargoPeriod(Period.ofMonths(3))
                 .build();
         }
 
@@ -826,7 +827,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .withName("Test Embargoed Bitstream")
                 .withDescription("This bitstream is embargoed")
                 .withMimeType("text/plain")
-                .withEmbargoPeriod("3 months")
+                .withEmbargoPeriod(Period.ofMonths(3))
                 .build();
         }
 
@@ -1307,7 +1308,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient(token)
             .perform(patch("/api/core/bitstreams/" + bitstream.getID())
             .content(requestBody)
-            .contentType(javax.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
+            .contentType(jakarta.ws.rs.core.MediaType.APPLICATION_JSON_PATCH_JSON))
             .andExpect(status().isOk())
             .andExpect(
                  jsonPath("$.metadata",
@@ -1945,7 +1946,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                                       .withTitle("Test")
                                       .withIssueDate("2010-10-17")
                                       .withAuthor("Smith, Donald")
-                                      .withEmbargoPeriod("6 months")
+                                      .withEmbargoPeriod(Period.ofMonths(6))
                                       .build();
 
         String bitstreamContent = "This is an archived bitstream";
@@ -2418,7 +2419,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .withName("Test Embargoed Bitstream")
                 .withDescription("This bitstream is embargoed")
                 .withMimeType("text/plain")
-                .withEmbargoPeriod("3 months")
+                .withEmbargoPeriod(Period.ofMonths(3))
                 .build();
         }
 

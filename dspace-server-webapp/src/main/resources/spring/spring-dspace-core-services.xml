@@ -20,18 +20,15 @@
                     <map>
                         <!-- WARNING do not change "key" it match with Java code (TODO dynamic discover from PATCH operation); -->
                         <entry key="itemmetadata">
-                            <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.ItemMetadataValueMovePatchOperation"/>
+                            <bean class="org.dspace.app.rest.submit.factory.impl.ItemMetadataValueMovePatchOperation"/>
                         </entry>
                         <entry key="bitstreammetadata">
-                            <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueMovePatchOperation">
+                            <bean class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueMovePatchOperation">
                                 <property name="bitstreamMetadataValuePathUtils" ref="org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils" />
                             </bean>
                         </entry>
                         <entry key="bitstreammove">
-                            <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.BitstreamMovePatchOperation"/>
+                            <bean class="org.dspace.app.rest.submit.factory.impl.BitstreamMovePatchOperation"/>
                         </entry>
                     </map>
                 </entry>
@@ -39,29 +36,30 @@
                     <map>
                         <!-- WARNING do not change "key" it match with Java code (TODO dynamic discover from PATCH operation); -->
                         <entry key="itemmetadata">
-                            <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.ItemMetadataValueAddPatchOperation"/>
+                            <bean class="org.dspace.app.rest.submit.factory.impl.ItemMetadataValueAddPatchOperation"/>
                         </entry>
                         <entry key="bitstreammetadata">
-                            <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueAddPatchOperation">
+                            <bean class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueAddPatchOperation">
                                 <property name="bitstreamMetadataValuePathUtils" ref="org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils" />
                             </bean>
                         </entry>
                         <entry key="granted">
-                            <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.LicenseAddPatchOperation"/>
+                            <bean class="org.dspace.app.rest.submit.factory.impl.LicenseAddPatchOperation"/>
                         </entry>
                         <entry key="upload.accessConditions">
-                            <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.BitstreamResourcePolicyAddPatchOperation"/>
+                            <bean class="org.dspace.app.rest.submit.factory.impl.BitstreamResourcePolicyAddPatchOperation"/>
                         </entry>
                         <entry key="cclicense/uri">
-                            <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.CCLicenseAddPatchOperation"/>
+                            <bean class="org.dspace.app.rest.submit.factory.impl.CCLicenseAddPatchOperation"/>
                         </entry>
                         <entry key="accessConditions">
                             <bean class="org.dspace.app.rest.submit.factory.impl.AccessConditionAddPatchOperation"/>
+                        </entry>
+                        <entry key="coarnotify">
+                            <bean class="org.dspace.app.rest.submit.factory.impl.NotifyServiceAddPatchOperation"/>
+                        </entry>
+                        <entry key="primary">
+                            <bean class="org.dspace.app.rest.submit.factory.impl.PrimaryBitstreamAddPatchOperation"/>
                         </entry>
                     </map>
                 </entry>
@@ -69,33 +67,33 @@
                     <map>
                         <!-- WARNING do not change "key" it match with Java code (TODO dynamic discover from PATCH operation); -->
                         <entry key="itemmetadata">
-                            <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.ItemMetadataValueRemovePatchOperation" />
+                            <bean class="org.dspace.app.rest.submit.factory.impl.ItemMetadataValueRemovePatchOperation" />
                         </entry>
                         <entry key="bitstreammetadata">
-                            <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueRemovePatchOperation">
+                            <bean class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueRemovePatchOperation">
                                 <property name="bitstreamMetadataValuePathUtils" ref="org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils" />
                             </bean>
                         </entry>
                         <entry key="granted">
-                            <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.LicenseRemovePatchOperation"/>
+                            <bean class="org.dspace.app.rest.submit.factory.impl.LicenseRemovePatchOperation"/>
                         </entry>
                         <entry key="bitstreamremove">
-                            <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.BitstreamRemovePatchOperation" />
+                            <bean class="org.dspace.app.rest.submit.factory.impl.BitstreamRemovePatchOperation" />
                         </entry>
                         <entry key="upload.accessConditions">
-                            <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.BitstreamResourcePolicyRemovePatchOperation"/>
+                            <bean class="org.dspace.app.rest.submit.factory.impl.BitstreamResourcePolicyRemovePatchOperation"/>
                         </entry>
                         <entry key="cclicense/uri">
-                            <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.CCLicenseRemovePatchOperation"/>
+                            <bean class="org.dspace.app.rest.submit.factory.impl.CCLicenseRemovePatchOperation"/>
                         </entry>
                         <entry key="accessConditions">
                             <bean class="org.dspace.app.rest.submit.factory.impl.AccessConditionRemovePatchOperation"/>
+                        </entry>
+                        <entry key="coarnotify">
+                            <bean class="org.dspace.app.rest.submit.factory.impl.NotifyServiceRemovePatchOperation"/>
+                        </entry>
+                        <entry key="primary">
+                            <bean class="org.dspace.app.rest.submit.factory.impl.PrimaryBitstreamRemovePatchOperation"/>
                         </entry>
                     </map>
                 </entry>
@@ -103,32 +101,33 @@
                     <map>
                         <!-- WARNING do not change "key" it match with Java code (TODO dynamic discover from PATCH operation); -->
                         <entry key="itemmetadata">
-                            <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.ItemMetadataValueReplacePatchOperation"/>
+                            <bean class="org.dspace.app.rest.submit.factory.impl.ItemMetadataValueReplacePatchOperation"/>
                         </entry>
                         <entry key="bitstreammetadata">
-                            <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueReplacePatchOperation">
+                            <bean class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueReplacePatchOperation">
                                 <property name="bitstreamMetadataValuePathUtils" ref="org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils" />
                             </bean>
                         </entry>
                         <entry key="granted">
-                            <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.LicenseReplacePatchOperation"/>
+                            <bean class="org.dspace.app.rest.submit.factory.impl.LicenseReplacePatchOperation"/>
                         </entry>
                         <entry key="upload.accessConditions">
-                            <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.BitstreamResourcePolicyReplacePatchOperation"/>
+                            <bean class="org.dspace.app.rest.submit.factory.impl.BitstreamResourcePolicyReplacePatchOperation"/>
                         </entry>
                         <entry key="collection">
-                            <bean
-                                    class="org.dspace.app.rest.submit.factory.impl.CollectionReplacePatchOperation"/>
+                            <bean class="org.dspace.app.rest.submit.factory.impl.CollectionReplacePatchOperation"/>
                         </entry>
                         <entry key="discoverable">
                             <bean class="org.dspace.app.rest.submit.factory.impl.AccessConditionDiscoverableReplacePatchOperation"/>
                         </entry>
                         <entry key="accessConditions">
                             <bean class="org.dspace.app.rest.submit.factory.impl.AccessConditionReplacePatchOperation"/>
+                        </entry>
+                        <entry key="coarnotify">
+                            <bean class="org.dspace.app.rest.submit.factory.impl.NotifyServiceReplacePatchOperation"/>
+                        </entry>
+                        <entry key="primary">
+                            <bean class="org.dspace.app.rest.submit.factory.impl.PrimaryBitstreamReplacePatchOperation"/>
                         </entry>
                     </map>
                 </entry>
@@ -137,4 +136,7 @@
     </bean>
 
     <bean id="org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils" class="org.dspace.app.rest.utils.BitstreamMetadataValuePathUtils"/>
+
+    <bean id="coarNotifySubmissionService" class="org.dspace.app.rest.submit.factory.impl.NotifySubmissionService"/>
+
 </beans>

@@ -378,6 +378,22 @@ public class I18nUtil {
     }
 
     /**
+     * Get the appropriate localized version of a ldn template according to language settings
+     *
+     * @param locale Locale for this request
+     * @param name   String - base name of the ldn template
+     * @return templateName
+     * String - localized filename of a ldn template
+     */
+    public static String getLDNFilename(Locale locale, String name) {
+        String templateFile =
+            DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir") +
+                File.separator + "config" + File.separator + "ldn" + File.separator + name;
+
+        return getFilename(locale, templateFile, "");
+    }
+
+    /**
      * Creates array of Locales from text list of locale-specifications.
      * Used to parse lists in DSpace configuration properties.
      *

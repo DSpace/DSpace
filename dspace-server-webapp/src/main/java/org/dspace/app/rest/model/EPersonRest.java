@@ -27,6 +27,7 @@ import org.dspace.app.rest.RestResourceController;
 })
 public class EPersonRest extends DSpaceObjectRest {
     public static final String NAME = "eperson";
+    public static final String PLURAL_NAME = "epersons";
     public static final String CATEGORY = RestAddressableModel.EPERSON;
 
     public static final String GROUPS = "groups";
@@ -50,6 +51,11 @@ public class EPersonRest extends DSpaceObjectRest {
     @JsonProperty(access = Access.READ_ONLY)
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     public String getNetid() {
