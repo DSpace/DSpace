@@ -9,7 +9,7 @@ package org.dspace.xoai.app;
 
 import static com.lyncode.xoai.dataprovider.core.Granularity.Second;
 import static java.util.Objects.nonNull;
-import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.solr.common.params.CursorMarkParams.CURSOR_MARK_PARAM;
 import static org.apache.solr.common.params.CursorMarkParams.CURSOR_MARK_START;
 import static org.dspace.xoai.util.ItemUtils.retrieveMetadata;
