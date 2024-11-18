@@ -11,7 +11,8 @@ import java.sql.SQLException;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.signposting.model.LinksetNode;
 import org.dspace.app.rest.signposting.model.LinksetRelationType;
 import org.dspace.content.Bitstream;
@@ -33,7 +34,7 @@ public class ItemContentBitstreamsProcessor extends ItemSignpostingProcessor {
     /**
      * log4j category
      */
-    private static final Logger log = Logger.getLogger(ItemContentBitstreamsProcessor.class);
+    private static final Logger log = LogManager.getLogger(ItemContentBitstreamsProcessor.class);
 
     public ItemContentBitstreamsProcessor(FrontendUrlService frontendUrlService) {
         super(frontendUrlService);
