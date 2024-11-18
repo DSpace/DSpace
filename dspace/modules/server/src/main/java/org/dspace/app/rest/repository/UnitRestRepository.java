@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 /**
  * This is the repository responsible for managing the Unit Rest object
  */
-@Component(UnitRest.CATEGORY + "." + UnitRest.NAME)
+@Component(UnitRest.CATEGORY + "." + UnitRest.PLURAL_NAME)
 public class UnitRestRepository extends DSpaceObjectRestRepository<Unit, UnitRest> {
     @Autowired
     UnitService unitService;

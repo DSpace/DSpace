@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 /**
  * This is the repository responsible for managing the EtdUnit Rest object
  */
-@Component(EtdUnitRest.CATEGORY + "." + EtdUnitRest.NAME)
+@Component(EtdUnitRest.CATEGORY + "." + EtdUnitRest.PLURAL_NAME)
 public class EtdUnitRestRepository extends DSpaceObjectRestRepository<EtdUnit, EtdUnitRest> {
     @Autowired
     EtdUnitService etdunitService;

@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Mohamed Abdul Rasheed (mohideen at umd.edu)
  */
-@Component(CommunityGroupRest.CATEGORY + "." + CommunityGroupRest.NAME)
+@Component(CommunityGroupRest.CATEGORY + "." + CommunityGroupRest.PLURAL_NAME)
 public class CommunityGroupRestRepository extends DSpaceRestRepository<CommunityGroupRest, Integer> {
 
     private static final Logger log = org.apache.logging.log4j.LogManager

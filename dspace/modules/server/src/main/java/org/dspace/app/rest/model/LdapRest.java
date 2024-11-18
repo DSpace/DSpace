@@ -12,6 +12,7 @@ import org.dspace.app.rest.RestResourceController;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LdapRest extends DSpaceObjectRest {
     public static final String NAME = "ldap";
+    public static final String PLURAL_NAME = "ldaps";
     public static final String CATEGORY = RestAddressableModel.EPERSON;
 
     public static final String EPERSONS = "epersons";
@@ -31,6 +32,11 @@ public class LdapRest extends DSpaceObjectRest {
     @Override
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     public String getName() {

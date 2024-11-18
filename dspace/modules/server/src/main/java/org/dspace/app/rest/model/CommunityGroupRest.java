@@ -61,6 +61,11 @@ public class CommunityGroupRest extends BaseObjectRest<Integer> {
     }
 
     @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
+    @Override
     @JsonIgnore
     public Class getController() {
         return RestResourceController.class;
