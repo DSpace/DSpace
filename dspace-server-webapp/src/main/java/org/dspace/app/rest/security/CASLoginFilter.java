@@ -43,7 +43,7 @@ public class CASLoginFilter extends StatelessLoginFilter {
 
     public CASLoginFilter(String url, AuthenticationManager authenticationManager,
                           RestAuthenticationService restAuthenticationService) {
-        super(url, authenticationManager, restAuthenticationService);
+        super(url, "GET", authenticationManager, restAuthenticationService);
         logger.info("Created CASLoginFilter");
     }
 
