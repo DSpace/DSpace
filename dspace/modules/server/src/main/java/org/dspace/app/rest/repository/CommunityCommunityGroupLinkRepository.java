@@ -10,7 +10,7 @@ package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 import java.util.UUID;
 import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.model.CommunityGroupRest;
 import org.dspace.app.rest.model.CommunityRest;
@@ -27,9 +27,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * UMD Custom Class for LIBDRUM-701
- * 
+ *
  * LinkRepository for the CommunityGroup object for a Community
- * 
+ *
  * @author Mohamed Abdul Rasheed (mohideen at umd.edu)
  */
 @Component(CommunityRest.CATEGORY + "." + CommunityRest.NAME + "." + CommunityRest.COMMUNITY_GROUP)
@@ -43,7 +43,7 @@ public class CommunityCommunityGroupLinkRepository extends AbstractDSpaceRestRep
      * This method retrieves the ParentCommunity object for the Community which is
      * defined by the given communityId
      * It'll transform this Parent Community to a REST object and return this
-     * 
+     *
      * @param httpServletRequest The current request
      * @param communityId        The given Community UUID that will be used to find
      *                           the communityId

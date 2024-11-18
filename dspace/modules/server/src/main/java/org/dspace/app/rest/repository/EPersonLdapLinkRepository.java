@@ -6,7 +6,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import edu.umd.lib.dspace.authenticate.LdapService;
 import edu.umd.lib.dspace.authenticate.impl.Ldap;
