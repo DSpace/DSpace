@@ -74,8 +74,10 @@ public class RequestItemHelpdeskStrategyTest
     }
 
     @Before
-    public void setUp() {
+    public void setUp() throws SQLException {
         context = new Context();
+        // reload our EPerson entity into this new context (as it was created in a different Context)
+        johnDoe = context.reloadEntity(johnDoe);
         context.setCurrentUser(johnDoe);
         context.turnOffAuthorisationSystem();
         Community community = CommunityBuilder.createCommunity(context).build();
