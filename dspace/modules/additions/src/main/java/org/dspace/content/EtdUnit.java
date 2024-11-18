@@ -23,7 +23,6 @@ import jakarta.persistence.Transient;
 
 import org.dspace.content.service.EtdUnitService;
 import org.dspace.core.Constants;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * Class representing an ETD department as seen in the Proquest metadata element
@@ -34,9 +33,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
 @Table(name = "etdunit")
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
-public class EtdUnit extends DSpaceObject implements DSpaceObjectLegacySupport {
+public class EtdUnit extends CacheableDSpaceObject implements DSpaceObjectLegacySupport {
     @Column(name = "etdunit_id", insertable = false, updatable = false)
     private Integer legacyId;
 
