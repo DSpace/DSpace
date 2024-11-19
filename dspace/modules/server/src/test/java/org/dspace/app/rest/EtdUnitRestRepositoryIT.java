@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-import jakarta.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.ws.rs.core.MediaType;
 import org.dspace.app.rest.exception.EtdUnitNameNotProvidedException;
 import org.dspace.app.rest.matcher.EtdUnitMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;

@@ -9,8 +9,8 @@ package org.dspace.eperson.dao.impl;
 
 import java.sql.SQLException;
 import java.util.List;
-import jakarta.persistence.Query;
 
+import jakarta.persistence.Query;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.core.Context;

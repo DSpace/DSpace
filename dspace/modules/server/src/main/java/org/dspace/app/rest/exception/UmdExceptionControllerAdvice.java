@@ -4,9 +4,9 @@ import static org.springframework.web.servlet.DispatcherServlet.EXCEPTION_ATTRIB
 
 import java.io.IOException;
 import java.util.Set;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;

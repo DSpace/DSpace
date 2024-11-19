@@ -14,11 +14,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 // UMD Customization
 import org.apache.commons.lang.RandomStringUtils;
 // End UMD Customization
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
