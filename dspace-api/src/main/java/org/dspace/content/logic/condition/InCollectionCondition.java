@@ -47,10 +47,10 @@ public class InCollectionCondition extends AbstractCondition {
 
         // Look for the handle among an archived item's collections - this test will only work after submission
         // and archival is complete
-        List<Collection> itemCollections = item.getCollections();
-        if (itemCollections == null) {
-            itemCollections = new ArrayList<>();
-        }
+        // item.getCollections returns an array as immutable list. We need to copy it to a list we can extend.
+        List<Collection> itemCollections = new ArrayList<>();
+        itemCollections.addAll(item.getCollections());
+
         // do we have a worskpace or workflowitem?
         WorkspaceItem wsi = null;
         try {

@@ -45,11 +45,10 @@ public class InCommunityCondition extends AbstractCondition {
     public boolean getResult(Context context, Item item) throws LogicalStatementException {
 
         List<String> communityHandles = (List<String>)getParameters().get("communities");
-        List<Collection> itemCollections = item.getCollections();
+        // item.getCollections returns an array as immutable list. We need to copy it to a list we can extend.
+        List<Collection> itemCollections = new ArrayList<>();
+        itemCollections.addAll(item.getCollections());
 
-        if (itemCollections == null) {
-            itemCollections = new ArrayList<>();
-        }
         // do we have a worskpace or workflowitem?
         WorkspaceItem wsi = null;
         try {
