@@ -15,14 +15,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.collections.IteratorUtils;
 import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.app.util.service.DSpaceObjectUtils;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataDSpaceCsvExportService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
+import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -35,6 +38,12 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
 
     @Autowired
     private DSpaceObjectUtils dSpaceObjectUtils;
+
+    @Autowired
+    private ConfigurationService configurationService;
+
+    @Autowired
+    private GroupService groupService;
 
     @Override
     public DSpaceCSV handleExport(Context context, boolean exportAllItems, boolean exportAllMetadata, String identifier,
@@ -74,17 +83,19 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
             }
         }
 
-        DSpaceCSV csv = this.export(context, toExport, exportAllMetadata);
+        DSpaceCSV csv = this.export(context, toExport, exportAllMetadata, handler);
         return csv;
     }
 
     @Override
-    public DSpaceCSV export(Context context, Iterator<Item> toExport, boolean exportAll) throws Exception {
+    public DSpaceCSV export(Context context, Iterator<Item> toExport,
+                            boolean exportAll, DSpaceRunnableHandler handler) throws Exception {
         Context.Mode originalMode = context.getCurrentMode();
         context.setMode(Context.Mode.READ_ONLY);
 
         // Process each item
         DSpaceCSV csv = new DSpaceCSV(exportAll);
+        toExport = setItemsToExportWithLimit(context, toExport, handler);
         while (toExport.hasNext()) {
             Item item = toExport.next();
             csv.addItem(item);
@@ -97,8 +108,32 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
     }
 
     @Override
-    public DSpaceCSV export(Context context, Community community, boolean exportAll) throws Exception {
-        return export(context, buildFromCommunity(context, community), exportAll);
+    public DSpaceCSV export(Context context, Community community,
+                            boolean exportAll, DSpaceRunnableHandler handler) throws Exception {
+        return export(context, buildFromCommunity(context, community), exportAll, handler);
+    }
+
+    private Iterator<Item> setItemsToExportWithLimit(Context context, Iterator<Item> toExport,
+                                                     DSpaceRunnableHandler handler) throws SQLException {
+        int itemExportLimit = configurationService.getIntProperty(
+                "metadataexport.max.items", 500);
+        String[] ignoreLimitGroups =  configurationService.getArrayProperty(
+                "metadataexport.admin.groups");
+
+        for (String group : ignoreLimitGroups) {
+            if (groupService.isMember(context, context.getCurrentUser(), group)) {
+                itemExportLimit = Integer.MAX_VALUE;
+                break;
+            }
+        }
+
+        List<Item> items = IteratorUtils.toList(toExport);
+        if (items.size() > itemExportLimit) {
+            handler.logWarning("The amount of items to export is higher than the limit of " + itemExportLimit
+                    + " items. Only the first " + itemExportLimit + " items will be exported.");
+            items = items.subList(0, itemExportLimit);
+        }
+        return items.iterator();
     }
 
     /**
