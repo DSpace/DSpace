@@ -262,11 +262,6 @@ just adding new jar in the classloader</description>
             <artifactId>dspace-server-webapp</artifactId>
             <type>war</type>
         </dependency>
-        <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-solrj</artifactId>
-            <version>${solr.client.version}</version>
-        </dependency>
 
         <!-- Test Dependencies -->
         <dependency>
