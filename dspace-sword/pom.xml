@@ -25,15 +25,6 @@
     </properties>
 
     <dependencies>
-
-        <!-- Leave this out for the moment, as the source is in the tree -->
-        <!--
-        <dependency>
-        <groupId>org.dspace</groupId>
-        <artifactId>sword-common</artifactId>
-        <version>1.0.0</version>
-        </dependency>-->
-
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
@@ -64,11 +55,6 @@
         </dependency>
 
         <dependency>
-            <groupId>jaxen</groupId>
-            <artifactId>jaxen</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
@@ -96,10 +82,6 @@
             <groupId>xom</groupId>
             <artifactId>xom</artifactId>
             <version>1.3.9</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
         </dependency>
     </dependencies>
 
