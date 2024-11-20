@@ -51,7 +51,7 @@ services:
       JPDA_OPTS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
       # End UMD Customization
     # UMD Customization
-    image: "docker.lib.umd.edu/drum:${DSPACE_VER:-latest-test}"
+    image: "docker.lib.umd.edu/drum:${DSPACE_VER:-8_x-dev}"
     # End UMD Customization
     build:
       context: .

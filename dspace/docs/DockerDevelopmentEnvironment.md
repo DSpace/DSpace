@@ -64,7 +64,7 @@ the main branch for DRUM development.
 2) Optional: Build the dependent images.
 
     ```zsh
-    $ docker build -f Dockerfile.dependencies -t docker.lib.umd.edu/drum-dependencies-7_x:latest .
+    $ docker build -f Dockerfile.dependencies -t docker.lib.umd.edu/drum-dependencies-8_x:latest .
     $ docker build -f Dockerfile.ant -t docker.lib.umd.edu/drum-ant:latest .
     $ cd dspace/src/main/docker/dspace-postgres-pgcrypto
     $ docker build -t docker.lib.umd.edu/dspace-postgres:latest .
@@ -83,17 +83,17 @@ the main branch for DRUM development.
    $ vi dspace/config/local.cfg
    ```
 
-  and enter values for the following properties:
+    and enter values for the following properties:
 
-  * drum.ldap.bind.auth
-  * drum.ldap.bind.password
+    * drum.ldap.bind.auth
+    * drum.ldap.bind.password
 
-  The appropriate values can be found in LastPass.
+    The appropriate values can be found in LastPass.
 
-  **Note:** The "drum.ldap.bind.auth" value typically contains commas (for
-  example "uid=foo,cn=bar,ou=baz,dc=quuz,dc=zot"), which must be escaped. So
-  the actual value added to the file would be similar to
-  `uid=foo\,cn=bar\,ou=baz\,dc=quuz\,dc=zot`.
+    **Note:** The "drum.ldap.bind.auth" value typically contains commas (for
+    example "uid=foo,cn=bar,ou=baz,dc=quuz,dc=zot"), which must be escaped. So
+    the actual value added to the file would be similar to
+    `uid=foo\,cn=bar\,ou=baz\,dc=quuz\,dc=zot`.
 
 5) Follow the instructions at
    [dspace/docs/DrumDBRestore.md](DrumDBRestore.md)
@@ -137,10 +137,10 @@ customized Java classes.
 
 ```zsh
 # Base build
-$ docker build -f Dockerfile.dev-base -t docker.lib.umd.edu/drum:7_x-dev-base .
+$ docker build -f Dockerfile.dev-base -t docker.lib.umd.edu/drum:8_x-dev-base .
 
 # Overlay modules build
-$ docker build -f Dockerfile.dev-additions -t docker.lib.umd.edu/drum:7_x-dev .
+$ docker build -f Dockerfile.dev-additions -t docker.lib.umd.edu/drum:8_x-dev .
 ```
 
 Also, we can start the "dspace" container and the dependencies ("dspacedb"

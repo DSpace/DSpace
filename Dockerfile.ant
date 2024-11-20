@@ -1,9 +1,9 @@
 # This Docker image is based on Step 2 in "Dockerfile", with some steps removed
 # as they will be performed in the Dockerfiles that use this image
 # (Dockerfile.dev, Dockerfile.dev-additions)
-ARG JDK_VERSION=11
+ARG JDK_VERSION=17
 
-FROM openjdk:${JDK_VERSION}-slim as ant_build
+FROM eclipse-temurin:${JDK_VERSION} as ant_build
 # Create the initial install deployment using ANT
 ENV ANT_VERSION 1.10.13
 ENV ANT_HOME /tmp/ant-$ANT_VERSION

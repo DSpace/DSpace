@@ -10,7 +10,7 @@ ARG DSPACE_VERSION=latest
 
 # Step 1 - Run Maven Build
 # UMD Customization
-FROM docker.lib.umd.edu/drum-dependencies${DSPACE_VERSION} as build
+FROM docker.lib.umd.edu/drum-dependencies-8_x:${DSPACE_VERSION} as build
 # End UMD Customization
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
