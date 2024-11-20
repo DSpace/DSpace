@@ -302,7 +302,7 @@ public class EtdUnitRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // When no projection is requested, response should include expected properties,
         // links, and no embeds.
-        getClient(token).perform(get("/api/core/etdunit/" + generatedEtdUnitId))
+        getClient(token).perform(get("/api/core/etdunits/" + generatedEtdUnitId))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()));
     }

@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for the direct Ldap subresource of an individual eperson.
  */
-@Component(EPersonRest.CATEGORY + "." + EPersonRest.NAME + "." + EPersonRest.LDAP)
+@Component(EPersonRest.CATEGORY + "." + EPersonRest.PLURAL_NAME + "." + EPersonRest.LDAP)
 public class EPersonLdapLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
     private static final Logger log = LoggerFactory.getLogger(EPersonLdapLinkRepository.class);

@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
  * Link repository for the direct "collections" subresource of an individual
  * etdunit.
  */
-@Component(EtdUnitRest.CATEGORY + "." + EtdUnitRest.NAME + "." + EtdUnitRest.COLLECTIONS)
+@Component(EtdUnitRest.CATEGORY + "." + EtdUnitRest.PLURAL_NAME + "." + EtdUnitRest.COLLECTIONS)
 public class EtdUnitCollectionLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

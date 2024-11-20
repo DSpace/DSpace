@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Mohamed Abdul Rasheed (mohideen at umd.edu)
  */
-@Component(CommunityRest.CATEGORY + "." + CommunityRest.NAME + "." + CommunityRest.COMMUNITY_GROUP)
+@Component(CommunityRest.CATEGORY + "." + CommunityRest.PLURAL_NAME + "." + CommunityRest.COMMUNITY_GROUP)
 public class CommunityCommunityGroupLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 
