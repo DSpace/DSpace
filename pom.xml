@@ -1164,11 +1164,7 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <dependency>
-                <groupId>org.swordapp</groupId>
-                <artifactId>sword-common</artifactId>
-                <version>1.1</version>
-            </dependency>
+
             <!-- Explicitly Specify Latest Version of Spring -->
             <dependency>
                 <artifactId>spring-core</artifactId>
@@ -1476,14 +1472,6 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-collections4</artifactId>
                 <version>4.4</version>
-            </dependency>
-            <!-- commons-collections v3 is still required by commons-beanutils,
-                 which is required by commons-configuration. Once those are
-                 upgraded, we should remove this dependency -->
-            <dependency>
-                <groupId>commons-collections</groupId>
-                <artifactId>commons-collections</artifactId>
-                <version>3.2.2</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
