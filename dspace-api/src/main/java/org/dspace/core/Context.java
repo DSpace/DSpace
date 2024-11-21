@@ -906,10 +906,25 @@ public class Context implements AutoCloseable {
         }
     }
 
-    public void cacheAuthorizedAction(DSpaceObject dspaceObject, int action, EPerson eperson, Boolean result,
-                                      ResourcePolicy rp) {
+    public Boolean getCachedAuthorizationResultWithInheritance(DSpaceObject dspaceObject, int action, EPerson eperson) {
         if (isReadOnly()) {
-            readOnlyCache.cacheAuthorizedAction(dspaceObject, action, eperson, result);
+            return readOnlyCache.getCachedAuthorizationResultWithInheritance(dspaceObject, action, eperson);
+        } else {
+            return null;
+        }
+    }
+
+    public void cacheAuthorizedAction(DSpaceObject dspaceObject, int action, EPerson eperson, Boolean result,
+                                      boolean useInheritance, ResourcePolicy rp) {
+        if (isReadOnly()) {
+            if (useInheritance) {
+                readOnlyCache.cacheAuthorizedActionWithInheritance(dspaceObject, action, eperson, result);
+            } else {
+                readOnlyCache.cacheAuthorizedAction(dspaceObject, action, eperson, result);
+                if (result) {
+                    readOnlyCache.cacheAuthorizedActionWithInheritance(dspaceObject, action, eperson, result);
+                }
+            }
             try {
                 uncacheEntity(rp);
             } catch (SQLException e) {
