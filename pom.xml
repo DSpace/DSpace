@@ -1594,6 +1594,12 @@
                 <artifactId>log4j-core</artifactId>
                 <version>${log4j.version}</version>
             </dependency>
+            <!-- This bridge ensures any logging to slf4j is sent to log4j -->
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j2-impl</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.apache.pdfbox</groupId>
