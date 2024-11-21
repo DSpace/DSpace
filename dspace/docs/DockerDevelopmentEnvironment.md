@@ -122,7 +122,7 @@ the main branch for DRUM development.
 8) Start all the containers
 
     ```zsh
-    $ docker compose -p d7 up
+    $ docker compose -p d8 up
     ```
 
     Once the REST API starts, it should be accessible at
@@ -149,10 +149,10 @@ container to be started/stopped individually.
 
 ```zsh
 # Start the Postgres, Solr, and Nginx containers in detached mode
-$ docker compose -p d7 up -d dspacedb dspacesolr nginx
+$ docker compose -p d8 up -d dspacedb dspacesolr nginx
 
 # Start the dspace container
-$ docker compose -p d7 up dspace
+$ docker compose -p d8 up dspace
 ```
 
 Once the REST API starts, it should be accessible at

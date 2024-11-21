@@ -16,10 +16,7 @@ RUN mkdir /install \
 USER dspace
 # Copy the DSpace source code (from local machine) into the workdir (excluding .dockerignore contents)
 ADD --chown=dspace . /app/
-
 # Build DSpace.
 ENV MAVEN_FLAGS="-P-test-environment -Denforcer.skip=true -Dcheckstyle.skip=true -Dlicense.skip=true -Dxml.skip=true"
 RUN mvn install -Dlicense.skip=true -Dcheckstyle.skip ${MAVEN_FLAGS}
 
-# RUN mvn install -pl '!org.dspace.modules:additions'
-# RUN mvn package -rf org.dspace.modules:additions
