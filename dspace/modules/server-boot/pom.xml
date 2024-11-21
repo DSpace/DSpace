@@ -30,10 +30,6 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-server-webapp</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-solrj</artifactId>
-        </dependency>
 
         <!-- Test Dependencies -->
         <dependency>
