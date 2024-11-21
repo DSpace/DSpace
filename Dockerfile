@@ -1,12 +1,12 @@
 # This image will be published as dspace/dspace
 # See https://github.com/DSpace/DSpace/tree/main/dspace/src/main/docker for usage details
 #
-# - note: default tag for branch: dspace/dspace: dspace/dspace:latest
+# - note: default tag for branch: dspace/dspace: dspace/dspace:dspace-8_x
 
 # This Dockerfile uses JDK17 by default.
 # To build with other versions, use "--build-arg JDK_VERSION=[value]"
 ARG JDK_VERSION=17
-ARG DSPACE_VERSION=latest
+ARG DSPACE_VERSION=dspace-8_x
 
 # Step 1 - Run Maven Build
 FROM dspace/dspace-dependencies:${DSPACE_VERSION} AS build
