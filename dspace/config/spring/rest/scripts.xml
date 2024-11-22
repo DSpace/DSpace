@@ -44,11 +44,6 @@
         <property name="dspaceRunnableClass" value="org.dspace.administer.ProcessCleaner"/>
     </bean>
 
-    <bean id="process-cleaner-2" class="org.dspace.administer.ProcessCleanerCliConfiguration2">
-        <property name="description" value="Cleanup all the old processes in the specified state"/>
-        <property name="dspaceRunnableClass" value="org.dspace.administer.ProcessCleanerCli2"/>
-    </bean>
-
     <bean id="orcid-bulk-push" class="org.dspace.orcid.script.OrcidBulkPushScriptConfiguration" primary="true">
         <property name="description" value="Perform the bulk synchronization of all the BATCH configured ORCID entities placed in the ORCID queue"/>
         <property name="dspaceRunnableClass" value="org.dspace.orcid.script.OrcidBulkPush"/>
@@ -72,6 +67,11 @@
     <bean id="bulk-access-control" class="org.dspace.app.bulkaccesscontrol.BulkAccessControlScriptConfiguration" primary="true">
         <property name="description" value="Bulk access control"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkaccesscontrol.BulkAccessControl"/>
+    </bean>
+
+    <bean id="testing-script" class="org.dspace.testing.TestingScriptConfiguration">
+        <property name="description" value="Description for testing script"/>
+        <property name="dspaceRunnableClass" value="org.dspace.testing.Testing"/>
     </bean>
 
 </beans>

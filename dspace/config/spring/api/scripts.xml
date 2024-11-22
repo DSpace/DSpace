@@ -56,11 +56,6 @@
         <property name="dspaceRunnableClass" value="org.dspace.administer.ProcessCleanerCli"/>
     </bean>
 
-    <bean id="process-cleaner-2" class="org.dspace.administer.ProcessCleanerCliConfiguration2">
-        <property name="description" value="Cleanup all the old processes in the specified state"/>
-        <property name="dspaceRunnableClass" value="org.dspace.administer.ProcessCleanerCli2"/>
-    </bean>
-
     <bean id="filter-media" class="org.dspace.app.mediafilter.MediaFilterScriptConfiguration">
         <property name="description" value="Perform the media filtering to extract full text from documents and to create thumbnails"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.mediafilter.MediaFilterScript"/>
@@ -94,6 +89,11 @@
     <bean id="bulk-access-control" class="org.dspace.app.bulkaccesscontrol.BulkAccessControlCliScriptConfiguration" primary="true">
         <property name="description" value="Bulk access control"/>
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkaccesscontrol.BulkAccessControlCli"/>
+    </bean>
+
+    <bean id="testing-script" class="org.dspace.testing.TestingScriptConfiguration">
+        <property name="description" value="Description for testing script"/>
+        <property name="dspaceRunnableClass" value="org.dspace.testing.Testing"/>
     </bean>
 
 </beans>
