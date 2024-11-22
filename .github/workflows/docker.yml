@@ -161,6 +161,15 @@ jobs:
     env:
       # Override defaults dspace.server.url because backend starts at http://127.0.0.1:8080
       dspace__P__server__P__url: http://127.0.0.1:8080/server
+      # Enable all optional modules / controllers for this test deployment.
+      # This helps check for errors in deploying these modules via Spring Boot
+      iiif__P__enabled: true
+      ldn__P__enabled: true
+      oai__P__enabled: true
+      rdf__P__enabled: true
+      signposting__P__enabled: true
+      sword-server__P__enabled: true
+      swordv2-server__P__enabled: true
       # If this is a PR, force using "pr-testing" version of all Docker images. Otherwise, if on main branch, use the
       # "latest" tag. Otherwise, use the branch name. NOTE: the "pr-testing" tag is a temporary tag that we assign to
       # all PR-built docker images in reusabe-docker-build.yml
