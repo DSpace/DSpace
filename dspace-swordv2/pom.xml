@@ -97,6 +97,12 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
         </dependency>
+        <!-- NOTE: This log4jv1 -> log4jv2 bridge is REQUIRED because 'sword2-server' above uses log4jv1.
+             This bridge ensures our SWORDv2 webapp can startup without errors. -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-1.2-api</artifactId>
+        </dependency>
 
         <!-- Replacement for Abdera (required by sword2-server dependency). Abdera is no longer maintained
              (https://abdera.apache.org/). But Axiom FOM is backwards compatible with Abdera.
