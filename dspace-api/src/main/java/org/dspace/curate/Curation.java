@@ -165,7 +165,7 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
      * End of curation script; logs script time if -v verbose is set
      *
      * @param timeRun Time script was started
-     * @throws SQLException If DSpace contextx can't complete
+     * @throws SQLException If DSpace context can't complete
      */
     private void endScript(long timeRun) throws SQLException {
         context.complete();
@@ -300,9 +300,17 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
         // scope
         if (this.commandLine.getOptionValue('s') != null) {
             this.scope = this.commandLine.getOptionValue('s');
-            if (this.scope != null && Curator.TxScope.valueOf(this.scope.toUpperCase()) == null) {
-                this.handler.logError("Bad transaction scope '" + this.scope + "': only 'object', 'curation' or " +
-                                      "'open' recognized");
+            boolean knownScope;
+            try {
+                Curator.TxScope.valueOf(this.scope.toUpperCase());
+                knownScope = true;
+            } catch (IllegalArgumentException | NullPointerException e) {
+                knownScope = false;
+            }
+            if (!knownScope) {
+                this.handler.logError("Bad transaction scope '"
+                        + this.scope
+                        + "': only 'object', 'curation' or 'open' recognized");
                 throw new IllegalArgumentException(
                     "Bad transaction scope '" + this.scope + "': only 'object', 'curation' or " +
                     "'open' recognized");

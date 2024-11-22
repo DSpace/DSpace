@@ -148,3 +148,89 @@ jobs:
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+
+  ########################################################################
+  # Test Deployment via Docker to ensure images are working properly
+  ########################################################################
+  docker-deploy:
+    # Ensure this job never runs on forked repos. It's only executed for 'dspace/dspace'
+    if: github.repository == 'dspace/dspace'
+    runs-on: ubuntu-latest
+    # Must run after all major images are built
+    needs: [dspace, dspace-test, dspace-cli, dspace-postgres-pgcrypto, dspace-solr]
+    env:
+      # Override defaults dspace.server.url because backend starts at http://127.0.0.1:8080
+      dspace__P__server__P__url: http://127.0.0.1:8080/server
+      # If this is a PR, force using "pr-testing" version of all Docker images. Otherwise, if on main branch, use the
+      # "latest" tag. Otherwise, use the branch name. NOTE: the "pr-testing" tag is a temporary tag that we assign to
+      # all PR-built docker images in reusabe-docker-build.yml
+      DSPACE_VER: ${{ (github.event_name == 'pull_request' && 'pr-testing') || (github.ref_name == github.event.repository.default_branch && 'latest') || github.ref_name }}
+    steps:
+      # Checkout our codebase (to get access to Docker Compose scripts)
+      - name: Checkout codebase
+        uses: actions/checkout@v4
+      # For PRs, download Docker image artifacts (built by reusable-docker-build.yml for all PRs)
+      - name: Download Docker image artifacts (for PRs)
+        if: github.event_name == 'pull_request'
+        uses: actions/download-artifact@v4
+        with:
+          # Download all Docker images (TAR files) into the /tmp/docker directory
+          pattern: docker-image-*
+          path: /tmp/docker
+          merge-multiple: true
+      # For PRs, load each of the images into Docker by calling "docker image load" for each.
+      # This ensures we are using the images built from this PR & not the prior versions on DockerHub
+      - name: Load all downloaded Docker images (for PRs)
+        if: github.event_name == 'pull_request'
+        run: |
+          find /tmp/docker -type f -name "*.tar" -exec docker image load --input "{}" \;
+          docker image ls -a
+      # Start backend using our compose script in the codebase.
+      - name: Start backend in Docker
+        run: |
+          docker compose -f docker-compose.yml up -d
+          sleep 10
+          docker container ls
+      # Create a test admin account. Load test data from a simple set of AIPs as defined in cli.ingest.yml
+      - name: Load test data into Backend
+        run: |
+          docker compose -f docker-compose-cli.yml run --rm dspace-cli create-administrator -e test@test.edu -f admin -l user -p admin -c en
+          docker compose -f docker-compose-cli.yml -f dspace/src/main/docker-compose/cli.ingest.yml run --rm dspace-cli
+      # Verify backend started successfully.
+      # 1. Make sure root endpoint is responding (check for dspace.name defined in docker-compose.yml)
+      # 2. Also check /collections endpoint to ensure the test data loaded properly (check for a collection name in AIPs)
+      - name: Verify backend is responding properly
+        run: |
+          result=$(wget -O- -q http://127.0.0.1:8080/server/api)
+          echo "$result"
+          echo "$result" |  grep -oE "\"DSpace Started with Docker Compose\","
+          result=$(wget -O- -q http://127.0.0.1:8080/server/api/core/collections)
+          echo "$result"
+          echo "$result" |  grep -oE "\"Dog in Yard\","
+      # Verify Handle Server can be stared and is working properly
+      # 1. First generate the "[dspace]/handle-server" folder with the sitebndl.zip
+      # 2. Start the Handle Server (and wait 20 seconds to let it start up)
+      # 3. Verify logs do NOT include "Exception" in the text (as that means an error occurred)
+      # 4. Check that Handle Proxy HTML page is responding on default port (8000)
+      - name: Verify Handle Server is working properly
+        run: |
+          docker exec -i dspace /dspace/bin/make-handle-config
+          echo "Starting Handle Server..."
+          docker exec -i dspace /dspace/bin/start-handle-server
+          sleep 20
+          echo "Checking for errors in error.log"
+          result=$(docker exec -i dspace sh -c "cat /dspace/handle-server/logs/error.log* || echo ''")
+          echo "$result"
+          echo "$result" | grep -vqz "Exception"
+          echo "Checking for errors in handle-server.log..."
+          result=$(docker exec -i dspace cat /dspace/log/handle-server.log)
+          echo "$result"
+          echo "$result" | grep -vqz "Exception"
+          echo "Checking to see if Handle Proxy webpage is available..."
+          result=$(wget -O- -q http://127.0.0.1:8000/)
+          echo "$result"
+          echo "$result" | grep -oE "Handle Proxy"
+      # Shutdown our containers
+      - name: Shutdown Docker containers
+        run: |
+          docker compose -f docker-compose.yml down

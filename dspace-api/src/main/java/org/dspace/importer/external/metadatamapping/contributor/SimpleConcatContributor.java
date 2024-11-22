@@ -26,7 +26,7 @@ import org.jdom2.xpath.XPathFactory;
  * This contributor is able to concat multi value.
  * Given a certain path, if it contains several nodes,
  * the values of nodes will be concatenated into a single one.
- * The concrete example we can see in the file wos-responce.xml in the <abstract_text> node,
+ * The concrete example we can see in the file wos-response.xml in the <abstract_text> node,
  * which may contain several <p> paragraphs,
  * this Contributor allows concatenating all <p> paragraphs. to obtain a single one.
  * 

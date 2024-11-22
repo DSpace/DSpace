@@ -18,9 +18,9 @@ import org.dspace.app.rest.RestResourceController;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-        @LinkRest(name = VocabularyEntryDetailsRest.PARENT, method = "getParent"),
-        @LinkRest(name = VocabularyEntryDetailsRest.CHILDREN, method = "getChildren")
-        })
+    @LinkRest(name = VocabularyEntryDetailsRest.PARENT, method = "getParent"),
+    @LinkRest(name = VocabularyEntryDetailsRest.CHILDREN, method = "getChildren")
+})
 public class VocabularyEntryDetailsRest extends BaseObjectRest<String> {
     public static final String PLURAL_NAME = "vocabularyEntryDetails";
     public static final String NAME = "vocabularyEntryDetail";

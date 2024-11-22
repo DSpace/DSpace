@@ -8,7 +8,6 @@
 package org.dspace.utils.servicemanager;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
@@ -16,7 +15,7 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 /**
- * Tests the ability of a provider holder to release a reference correctly
+ * Tests the ability of a provider holder to release a reference correctly.
  *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
@@ -28,7 +27,7 @@ public class ProviderHolderTest {
 
     @Test
     public void testHolder() {
-        ProviderHolder<Thing> holder = new ProviderHolder<Thing>();
+        ProviderHolder<Thing> holder = new ProviderHolder<>();
         assertNull(holder.getProvider());
 
         Thing t = new Thing();
@@ -44,7 +43,7 @@ public class ProviderHolderTest {
 
     @Test
     public void testHolderRelease() {
-        ProviderHolder<Thing> holder = new ProviderHolder<Thing>();
+        ProviderHolder<Thing> holder = new ProviderHolder<>();
         Thing t = new Thing();
         holder.setProvider(t);
 
@@ -66,7 +65,7 @@ public class ProviderHolderTest {
 
     @Test
     public void testHolderException() {
-        ProviderHolder<Thing> holder = new ProviderHolder<Thing>();
+        ProviderHolder<Thing> holder = new ProviderHolder<>();
         try {
             holder.getProviderOrFail();
             fail("Should have died");
@@ -87,14 +86,10 @@ public class ProviderHolderTest {
 
     @Test
     public void testHolderHashEqualsString() {
-        ProviderHolder<Thing> holder = new ProviderHolder<Thing>();
-        assertNotNull(holder.hashCode());
-        assertFalse(holder.equals(null));
+        ProviderHolder<Thing> holder = new ProviderHolder<>();
         assertNotNull(holder.toString());
 
         holder.setProvider(new Thing());
-        assertNotNull(holder.hashCode());
-        assertFalse(holder.equals(null));
         assertNotNull(holder.toString());
 
         holder = null;

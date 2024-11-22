@@ -1,7 +1,7 @@
 ## E-mail sent to designated address about updates on subscribed items
 ##
-## Parameters: {0} Collections updates
-##             {1} Communities updates
+## Parameters: {0} Communities updates
+##             {1} Collections updates
 #set($subject = "${config.get('dspace.name')} Subscriptions")
 This email is sent from ${config.get('dspace.name')} based on the chosen subscription preferences.
 

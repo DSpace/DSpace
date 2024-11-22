@@ -18,9 +18,13 @@ import java.util.TimeZone;
 import org.apache.logging.log4j.Logger;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -63,6 +67,12 @@ public class AbstractDSpaceTest {
     protected static DSpaceKernelImpl kernelImpl;
 
     /**
+     * Obtain the TestName from JUnit, so that we can print it out in the test logs (see below)
+     */
+    @Rule
+    public TestName testName = new TestName();
+
+    /**
      * This method will be run before the first test as per @BeforeClass. It will
      * initialize shared resources required for all tests of this class.
      *
@@ -94,6 +104,19 @@ public class AbstractDSpaceTest {
         }
     }
 
+    @Before
+    public void printTestMethodBefore() {
+        // Log the test method being executed. Put lines around it to make it stand out.
+        log.info("---");
+        log.info("Starting execution of test method: {}()",  testName.getMethodName());
+        log.info("---");
+    }
+
+    @After
+    public void printTestMethodAfter() {
+        // Log the test method just completed.
+        log.info("Finished execution of test method: {}()", testName.getMethodName());
+    }
 
     /**
      * This method will be run after all tests finish as per @AfterClass. It

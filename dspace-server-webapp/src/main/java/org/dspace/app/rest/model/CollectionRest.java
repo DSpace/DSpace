@@ -15,38 +15,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-        @LinkRest(
-                name = CollectionRest.LICENSE,
-                method = "getLicense"
-        ),
-        @LinkRest(
-                name = CollectionRest.LOGO,
-                method = "getLogo"
-        ),
-        @LinkRest(
-                name = CollectionRest.MAPPED_ITEMS,
-                method = "getMappedItems"
-        ),
-        @LinkRest(
-                name = CollectionRest.PARENT_COMMUNITY,
-                method = "getParentCommunity"
-        ),
-        @LinkRest(
-                name = CollectionRest.ADMIN_GROUP,
-                method = "getAdminGroup"
-        ),
-        @LinkRest(
-                name = CollectionRest.SUBMITTERS_GROUP,
-                method = "getSubmittersGroup"
-        ),
-        @LinkRest(
-                name = CollectionRest.ITEM_READ_GROUP,
-                method = "getItemReadGroup"
-        ),
-        @LinkRest(
-                name = CollectionRest.BITSTREAM_READ_GROUP,
-                method = "getBitstreamReadGroup"
-        ),
+    @LinkRest(name = CollectionRest.LICENSE, method = "getLicense"),
+    @LinkRest(name = CollectionRest.LOGO, method = "getLogo"),
+    @LinkRest(name = CollectionRest.MAPPED_ITEMS, method = "getMappedItems"),
+    @LinkRest(name = CollectionRest.PARENT_COMMUNITY, method = "getParentCommunity"),
+    @LinkRest(name = CollectionRest.ADMIN_GROUP, method = "getAdminGroup"),
+    @LinkRest(name = CollectionRest.SUBMITTERS_GROUP, method = "getSubmittersGroup"),
+    @LinkRest(name = CollectionRest.ITEM_READ_GROUP, method = "getItemReadGroup"),
+    @LinkRest(name = CollectionRest.BITSTREAM_READ_GROUP, method = "getBitstreamReadGroup"),
 })
 public class CollectionRest extends DSpaceObjectRest {
     public static final String NAME = "collection";

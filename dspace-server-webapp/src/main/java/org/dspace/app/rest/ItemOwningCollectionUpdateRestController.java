@@ -43,7 +43,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * This controller will handle all the incoming calls on the api/code/items/{uuid}/owningCollection endpoint
+ * This controller will handle all the incoming calls on the api/core/items/{uuid}/owningCollection endpoint
  * where the uuid corresponds to the item of which you want to edit the owning collection.
  */
 @RestController

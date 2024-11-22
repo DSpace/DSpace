@@ -12,15 +12,17 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.LogManager;
@@ -287,19 +289,24 @@ public class RequestItemRepository
      * Generate a link back to DSpace, to act on a request.
      *
      * @param token identifies the request.
-     * @return URL to the item request API, with the token as request parameter
-     *          "token".
+     * @return URL to the item request API, with /request-a-copy/{token} as the last URL segments
      * @throws URISyntaxException passed through.
      * @throws MalformedURLException passed through.
      */
-    private String getLinkTokenEmail(String token)
+    public String getLinkTokenEmail(String token)
             throws URISyntaxException, MalformedURLException {
         final String base = configurationService.getProperty("dspace.ui.url");
 
-        URI link = new URIBuilder(base)
-                .setPathSegments("request-a-copy", token)
-                .build();
+        // Construct the link, making sure to support sub-paths
+        URIBuilder uriBuilder = new URIBuilder(base);
+        List<String> segments = new LinkedList<>();
+        if (StringUtils.isNotBlank(uriBuilder.getPath())) {
+            segments.add(StringUtils.strip(uriBuilder.getPath(), "/"));
+        }
+        segments.add("request-a-copy");
+        segments.add(token);
 
-        return link.toURL().toExternalForm();
+        // Build and return the URL from segments (or throw exception)
+        return uriBuilder.setPathSegments(segments).build().toURL().toExternalForm();
     }
 }

@@ -21,8 +21,12 @@ import org.dspace.builder.AbstractBuilder;
 import org.dspace.discovery.SearchUtils;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 
 /**
  * Abstract Test class copied from DSpace API
@@ -45,6 +49,12 @@ public class AbstractDSpaceIntegrationTest {
      * any other services.
      */
     protected static DSpaceKernelImpl kernelImpl;
+
+    /**
+     * Obtain the TestName from JUnit, so that we can print it out in the test logs (see below)
+     */
+    @Rule
+    public TestName testName = new TestName();
 
     /**
      * Default constructor
@@ -88,6 +98,20 @@ public class AbstractDSpaceIntegrationTest {
             log.error("Error initializing tests", ex);
             fail("Error initializing tests: " + ex.getMessage());
         }
+    }
+
+    @Before
+    public void printTestMethodBefore() {
+        // Log the test method being executed. Put lines around it to make it stand out.
+        log.info("---");
+        log.info("Starting execution of test method: {}()",  testName.getMethodName());
+        log.info("---");
+    }
+
+    @After
+    public void printTestMethodAfter() {
+        // Log the test method just completed.
+        log.info("Finished execution of test method: {}()", testName.getMethodName());
     }
 
     /**

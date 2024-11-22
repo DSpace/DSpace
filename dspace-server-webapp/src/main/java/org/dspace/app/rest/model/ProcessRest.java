@@ -21,18 +21,9 @@ import org.dspace.scripts.Process;
  * This class serves as a REST representation for the {@link Process} class
  */
 @LinksRest(links = {
-    @LinkRest(
-        name = ProcessRest.FILES,
-        method = "getFilesFromProcess"
-    ),
-    @LinkRest(
-        name = ProcessRest.FILE_TYPES,
-        method = "getFileTypesFromProcess"
-    ),
-    @LinkRest(
-        name = ProcessRest.OUTPUT,
-        method = "getOutputFromProcess"
-    )
+    @LinkRest(name = ProcessRest.FILES, method = "getFilesFromProcess"),
+    @LinkRest(name = ProcessRest.FILE_TYPES, method = "getFileTypesFromProcess"),
+    @LinkRest(name = ProcessRest.OUTPUT, method = "getOutputFromProcess")
 })
 public class ProcessRest extends BaseObjectRest<Integer> {
     public static final String NAME = "process";
