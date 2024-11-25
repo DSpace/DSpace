@@ -16,7 +16,17 @@ RUN mkdir /install \
 USER dspace
 # Copy the DSpace source code (from local machine) into the workdir (excluding .dockerignore contents)
 ADD --chown=dspace . /app/
-# Build DSpace.
+# Build DSpace
+# Copy the dspace-installer directory to /install.  Clean up the build to keep the docker image small
+# Maven flags here ensure that we skip building test environment and skip all code verification checks.
+# These flags speed up this compilation as much as reasonably possible.
 ENV MAVEN_FLAGS="-P-test-environment -Denforcer.skip=true -Dcheckstyle.skip=true -Dlicense.skip=true -Dxml.skip=true"
-RUN mvn install -Dlicense.skip=true -Dcheckstyle.skip ${MAVEN_FLAGS}
+# UMD Customization
+RUN mvn install ${MAVEN_FLAGS} && \
+  mvn clean
+# End UMD Customization
 
+# Remove the server webapp to keep image small.
+RUN rm -rf /install/webapps/server/
+
+# UMD Customization - Remaining steps are handled by Dockerfile.dev-additions

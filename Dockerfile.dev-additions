@@ -11,24 +11,27 @@ ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 
 USER dspace
+
+# UMD Customization
 # Copy the DSpace source code from the /dspace/modules/[additions]|[server]
 # directories from the local machine) into the workdir
 # (excluding .dockerignore contents)
 RUN rm -rf /app/dspace/modules/additions /app/dspace/modules/server
 ADD --chown=dspace dspace/modules/additions /app/dspace/modules/additions
 ADD --chown=dspace dspace/modules/server /app/dspace/modules/server
+# End UMD Customization
 
 # Copy the dspace-installer directory to /install.  Clean up the build to keep the docker image small
 # Maven flags here ensure that we skip building test environment and skip all code verification checks.
 # These flags speed up this compilation as much as reasonably possible.
 ENV MAVEN_FLAGS="-P-test-environment -Denforcer.skip=true -Dcheckstyle.skip=true -Dlicense.skip=true -Dxml.skip=true"
+# UMD Customization
 RUN mvn package -rf org.dspace:modules -pl '!org.dspace:dspace-iiif,!org.dspace:dspace-oai,!org.dspace:dspace-rdf,!org.dspace:dspace-sword,!org.dspace:dspace-swordv2' ${MAVEN_FLAGS} && \
+# End UMD Customization
   mv /app/dspace/target/${TARGET_DIR}/* /install && \
   mvn clean
-# UMD Customization
 # Remove the server webapp to keep image small.
-# RUN rm -rf /install/webapps/server/
-# End UMD Customization
+RUN rm -rf /install/webapps/server/
 
 # Step 2 - Run Ant Deploy
 # UMD Customization
@@ -46,13 +49,17 @@ WORKDIR /dspace-src
 # Run necessary 'ant' deploy scripts
 RUN ant init_installation update_configs update_code update_webapps
 
-# UMD Customization
-# Step 3 - Run tomcat
-# Create a new tomcat image that does not retain the the build directory contents
-FROM tomcat:10.1-jdk${JDK_VERSION}
+# Step 3 - Start up DSpace via Runnable JAR
+FROM eclipse-temurin:${JDK_VERSION}
+# NOTE: DSPACE_INSTALL must align with the "dspace.dir" default configuration.
 ENV DSPACE_INSTALL=/dspace
-ENV TOMCAT_INSTALL=/usr/local/tomcat
-
+# Copy the /dspace directory from 'ant_build' container to /dspace in this container
+COPY --from=ant_build /dspace $DSPACE_INSTALL
+WORKDIR $DSPACE_INSTALL
+# Expose Tomcat port
+EXPOSE 8080
+# Give java extra memory (2GB)
+ENV JAVA_OPTS=-Xmx2000m
 # Add csh and Perl libraries for scripts in /dspace/bin
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -64,23 +71,5 @@ RUN apt-get update && \
 RUN mkdir -p $DSPACE_INSTALL/proquest/incoming $DSPACE_INSTALL/proquest/processed \
              $DSPACE_INSTALL/proquest/csv $DSPACE_INSTALL/proquest/marc
 
-# Copy the /dspace directory from 'ant_build' container to /dspace in this container
-COPY --from=ant_build /dspace $DSPACE_INSTALL
-# Enable the AJP connector in Tomcat's server.xml
-# NOTE: secretRequired="false" should only be used when AJP is NOT accessible from an external network. But, secretRequired="true" isn't supported by mod_proxy_ajp until Apache 2.5
-RUN sed -i '/Service name="Catalina".*/a \\n    <Connector protocol="AJP/1.3" port="8009" address="0.0.0.0" redirectPort="8443" URIEncoding="UTF-8" secretRequired="false" />' $TOMCAT_INSTALL/conf/server.xml
-# Expose Tomcat port and debug port
-EXPOSE 8080 8000
-# Give java extra memory (2GB)
-ENV JAVA_OPTS=-Xmx2000m
-
-# Link the DSpace 'server' webapp into Tomcat's webapps directory.
-# This ensures that when we start Tomcat, it runs from /server path (e.g. http://localhost:8080/server/)
-# Also link the v6.x (deprecated) REST API off the "/rest" path
-RUN ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/server
-# If you wish to run "server" webapp off the ROOT path, then comment out the above RUN, and uncomment the below RUN.
-# You also MUST update the 'dspace.server.url' configuration to match.
-# Please note that server webapp should only run on one path at a time.
-#RUN mv /usr/local/tomcat/webapps/ROOT /usr/local/tomcat/webapps/ROOT.bk && \
-#    ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/ROOT
-# End UMD Customization
+# On startup, run DSpace Runnable JAR
+ENTRYPOINT ["java", "-jar", "webapps/server-boot.jar", "--dspace.dir=$DSPACE_INSTALL"]

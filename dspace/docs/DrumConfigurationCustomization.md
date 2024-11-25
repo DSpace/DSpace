@@ -18,21 +18,9 @@ Stock DSpace provides the following Dockerfiles for running DSpace:
 * Dockerfile.dependencies
 * Dockerfile.test
 
-Starting in DSpace 8, the stock files used Spring Boot and an "embedded Tomcat"
-server to run the back-end server. This turned out to be incompatible with
-the DSpace customization mechanism, where customizations were added to the
-"dspace/modules/additions" and "dspace/modules/server" directories (see
-DSpace Issue 9987 - <https://github.com/DSpace/DSpace/issues/9987)>).
-
-Each of the above files (except for "Dockerfile.test") have been modified to
-restore the use of an "external" Tomcat installation as was used in
-DSpace 7.6.2. This enables the UMD customizations in the
-"dspace/modules/additions" and "dspace/modules/server" directories to be
-retained.
-
 The "Dockerfile" is used to generate the Docker images used in production.
 
-Additionally, the following Dockerfiles were added to support local development:
+The following Dockerfiles were added to support local development:
 
 * Dockerfile.ant - Creates the Docker image for running Apache Ant
 * Dockefile.dev - The "local development" equivalent of the "Dockerfile". This
@@ -51,7 +39,23 @@ and "dspace/modules/server" directories only require the
 running "Dockerfile.dev".
 
 Finally, the "Dockerfile.ci" file supports generating a Docker image for use
-by Jenkins for continous integration setup and testing.
+by Jenkins for continuous integration setup and testing.
+
+---
+
+**Note:** Starting in DSpace 8, the stock files use Spring Boot and an
+"embedded Tomcat" server to run the back-end server. This turned out to be
+incompatible with the DSpace customization mechanism, when customizations are
+added to the "dspace/modules/server" directory (see DSpace Issue 9987 -
+<https://github.com/DSpace/DSpace/issues/9987)>).
+
+A fix to restore the the "dspace/modules/server" customizations was provided
+to DSpace in DSpace Pull 10043 (<https://github.com/DSpace/DSpace/pull/10043>).
+
+These customizations can be removed when upgrading to a DSpace version that
+contains the changes.
+
+---
 
 ## dspace/modules/[additions|server]
 
