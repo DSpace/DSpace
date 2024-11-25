@@ -45,7 +45,7 @@ public class BundleBitstreamLinkRepository extends AbstractDSpaceRestRepository
                                              @Nullable Pageable optionalPageable,
                                              Projection projection) {
         try {
-            Context context = obtainContext();
+            Context context = obtainReadOnlyContext();
             Bundle bundle = bundleService.find(context, bundleId);
             if (bundle == null) {
                 throw new ResourceNotFoundException("No such bundle: " + bundleId);
