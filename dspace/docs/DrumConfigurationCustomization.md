@@ -57,10 +57,16 @@ contains the changes.
 
 ---
 
+## .github/workflows/build.yml
+
+Commented out the "codecov" task, because UMD does not have an appropriate key
+to upload code coverage results to codecov.io, which was causing builds to
+be marked as "Failed" in GitHub.
+
 ## dspace/modules/[additions|server]
 
 All source code and resources for DRUM customizations should be placed in
-eith the "dspace/modules/additions" or "dspace/modules/server" directory.
+either the "dspace/modules/additions" or "dspace/modules/server" directory.
 
 ## dspace/config/dspace.cfg
 
