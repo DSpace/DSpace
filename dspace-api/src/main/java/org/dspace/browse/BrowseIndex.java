@@ -566,16 +566,6 @@ public class BrowseIndex {
     }
 
     /**
-     * Is this browse index type for a title?
-     *
-     * @return true if title type, false if not
-     */
-//    public boolean isTitle()
-//    {
-//        return "title".equals(getDataType());
-//    }
-
-    /**
      * Is the browse index type for a date?
      *
      * @return true if date type, false if not
@@ -583,16 +573,6 @@ public class BrowseIndex {
     public boolean isDate() {
         return "date".equals(getDataType());
     }
-
-    /**
-     * Is the browse index type for a plain text type?
-     *
-     * @return true if plain text type, false if not
-     */
-//    public boolean isText()
-//    {
-//        return "text".equals(getDataType());
-//    }
 
     /**
      * Is the browse index of display type single?
