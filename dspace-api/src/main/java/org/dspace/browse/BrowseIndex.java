@@ -544,34 +544,12 @@ public class BrowseIndex {
     }
 
     /**
-     * Get the name of the column that is used to store the default value column
-     *
-     * @return the name of the value column
-     */
-    public String getValueColumn() {
-        if (!isDate()) {
-            return "sort_text_value";
-        } else {
-            return "text_value";
-        }
-    }
-
-    /**
      * Get the name of the primary key index column
      *
      * @return the name of the primary key index column
      */
     public String getIndexColumn() {
         return "id";
-    }
-
-    /**
-     * Is the browse index type for a date?
-     *
-     * @return true if date type, false if not
-     */
-    public boolean isDate() {
-        return "date".equals(getDataType());
     }
 
     /**
