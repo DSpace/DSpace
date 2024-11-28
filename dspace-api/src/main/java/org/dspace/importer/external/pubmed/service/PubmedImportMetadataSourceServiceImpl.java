@@ -54,6 +54,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     private String urlFetch;
     private String urlSearch;
+    private String apiKey;
 
     private int attempt = 3;
 
@@ -209,6 +210,9 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
         @Override
         public Integer call() throws Exception {
             URIBuilder uriBuilder = new URIBuilder(urlSearch);
+            if (StringUtils.isNotBlank(apiKey)) {
+                uriBuilder.addParameter("api_key", apiKey);
+            }
             uriBuilder.addParameter("db", "pubmed");
             uriBuilder.addParameter("term", query.getParameterAsClass("query", String.class));
             Map<String, Map<String, String>> params = new HashMap<String, Map<String,String>>();
@@ -282,6 +286,9 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             List<ImportRecord> records = new LinkedList<ImportRecord>();
 
             URIBuilder uriBuilder = new URIBuilder(urlSearch);
+            if (StringUtils.isNotBlank(apiKey)) {
+                uriBuilder.addParameter("api_key", apiKey);
+            }
             uriBuilder.addParameter("db", "pubmed");
             uriBuilder.addParameter("retstart", start.toString());
             uriBuilder.addParameter("retmax", count.toString());
@@ -312,6 +319,9 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             String webEnv = getSingleElementValue(response, "WebEnv");
 
             URIBuilder uriBuilder2 = new URIBuilder(urlFetch);
+            if (StringUtils.isNotBlank(apiKey)) {
+                uriBuilder2.addParameter("api_key", apiKey);
+            }
             uriBuilder2.addParameter("db", "pubmed");
             uriBuilder2.addParameter("retstart", start.toString());
             uriBuilder2.addParameter("retmax", count.toString());
@@ -386,6 +396,9 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
         public ImportRecord call() throws Exception {
 
             URIBuilder uriBuilder = new URIBuilder(urlFetch);
+            if (StringUtils.isNotBlank(apiKey)) {
+                uriBuilder.addParameter("api_key", apiKey);
+            }
             uriBuilder.addParameter("db", "pubmed");
             uriBuilder.addParameter("retmode", "xml");
             uriBuilder.addParameter("id", query.getParameterAsClass("id", String.class));
@@ -426,6 +439,9 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
         public Collection<ImportRecord> call() throws Exception {
 
             URIBuilder uriBuilder = new URIBuilder(urlSearch);
+            if (StringUtils.isNotBlank(apiKey)) {
+                uriBuilder.addParameter("api_key", apiKey);
+            }
             uriBuilder.addParameter("db", "pubmed");
             uriBuilder.addParameter("usehistory", "y");
             uriBuilder.addParameter("term", query.getParameterAsClass("term", String.class));
@@ -455,6 +471,9 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             String queryKey = getSingleElementValue(response, "QueryKey");
 
             URIBuilder uriBuilder2 = new URIBuilder(urlFetch);
+            if (StringUtils.isNotBlank(apiKey)) {
+                uriBuilder.addParameter("api_key", apiKey);
+            }
             uriBuilder2.addParameter("db", "pubmed");
             uriBuilder2.addParameter("retmode", "xml");
             uriBuilder2.addParameter("WebEnv", webEnv);
@@ -528,6 +547,10 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     public void setUrlSearch(String urlSearch) {
         this.urlSearch = urlSearch;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
     }
 
 }
