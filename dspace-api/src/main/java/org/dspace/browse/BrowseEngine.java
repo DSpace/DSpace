@@ -199,11 +199,18 @@ public class BrowseEngine {
     private BrowseInfo browseByItem(BrowserScope bs)
         throws BrowseException {
         log.info(LogHelper.getHeader(context, "browse_by_item", ""));
+        boolean isDateBrowse = bs.getSortOption().getType().equals("date");
         try {
             // get the table name that we are going to be getting our data from
             dao.setTable(browseIndex.getTableName());
 
-            dao.setStartsWith(StringUtils.lowerCase(scope.getStartsWith()));
+            if (StringUtils.isNotBlank(scope.getStartsWith())) {
+                if (!isDateBrowse) {
+                    dao.setStartsWith(StringUtils.lowerCase(scope.getStartsWith()));
+                } else {
+                    dao.setDateStartsWith(scope.getStartsWith().trim());
+                }
+            }
 
             // tell the browse query whether we are ascending or descending on the value
             dao.setAscending(scope.isAscending());

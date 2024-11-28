@@ -94,6 +94,8 @@ public class SolrBrowseDAO implements BrowseDAO {
 
     private String startsWith = null;
 
+    private String dateStartsWith = null;
+
     /**
      * field to look for value in
      */
@@ -207,6 +209,13 @@ public class SolrBrowseDAO implements BrowseDAO {
                 }
                 if (StringUtils.isNotBlank(startsWith) && orderField != null) {
                     query.addFilterQueries("bi_" + orderField + "_sort:" + startsWith + "*");
+                }
+                if (StringUtils.isNotBlank(dateStartsWith)) {
+                    if (!ascending) {
+                        query.addFilterQueries("bi_" + orderField + "_sort" + ": [* TO \"" + dateStartsWith + "\"]");
+                    } else {
+                        query.addFilterQueries("bi_" + orderField + "_sort" + ": [\"" + dateStartsWith + "\" TO *]");
+                    }
                 }
                 // filter on item to be sure to don't include any other object
                 // indexed in the Discovery Search core
@@ -464,6 +473,11 @@ public class SolrBrowseDAO implements BrowseDAO {
     @Override
     public int getLimit() {
         return limit;
+    }
+
+    @Override
+    public void setDateStartsWith(String dateStartsWith) {
+        this.dateStartsWith = dateStartsWith;
     }
 
     /*
