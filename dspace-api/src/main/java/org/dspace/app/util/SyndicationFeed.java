@@ -11,9 +11,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
 
 import com.rometools.modules.itunes.EntryInformation;
 import com.rometools.modules.itunes.EntryInformationImpl;
@@ -35,6 +35,7 @@ import com.rometools.rome.feed.synd.SyndPerson;
 import com.rometools.rome.feed.synd.SyndPersonImpl;
 import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedOutput;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -84,11 +85,6 @@ public class SyndicationFeed {
     public static final String MSG_FEED_TITLE = "feed.title";
     public static final String MSG_FEED_DESCRIPTION = "general-feed.description";
     public static final String MSG_METADATA = "metadata.";
-    public static final String MSG_UITYPE = "ui.type";
-
-    // UI keywords
-    public static final String UITYPE_XMLUI = "xmlui";
-    public static final String UITYPE_JSPUI = "jspui";
 
     // default DC fields for entry
     protected String defaultTitleField = "dc.title";
@@ -140,14 +136,8 @@ public class SyndicationFeed {
     protected String[] podcastableMIMETypes =
         configurationService.getArrayProperty("webui.feed.podcast.mimetypes", new String[] {"audio/x-mpeg"});
 
-    // -------- Instance variables:
-
     // the feed object we are building
     protected SyndFeed feed = null;
-
-    // memory of UI that called us, "xmlui" or "jspui"
-    // affects Bitstream retrieval URL and I18N keys
-    protected String uiType = null;
 
     protected HttpServletRequest request = null;
 
@@ -155,29 +145,13 @@ public class SyndicationFeed {
     protected CommunityService communityService;
     protected ItemService itemService;
 
-    /**
-     * Constructor.
-     *
-     * @param ui either "xmlui" or "jspui"
-     */
-    public SyndicationFeed(String ui) {
+    public SyndicationFeed() {
         feed = new SyndFeedImpl();
-        uiType = ui;
         ContentServiceFactory contentServiceFactory = ContentServiceFactory.getInstance();
         itemService = contentServiceFactory.getItemService();
         collectionService = contentServiceFactory.getCollectionService();
         communityService = contentServiceFactory.getCommunityService();
     }
-
-    /**
-     * Returns list of metadata selectors used to compose the description element
-     *
-     * @return selector list - format 'schema.element[.qualifier]'
-     */
-    public static String[] getDescriptionSelectors() {
-        return (String[]) ArrayUtils.clone(descriptionFields);
-    }
-
 
     /**
      * Fills in the feed and entry-level metadata from DSpace objects.
@@ -186,15 +160,17 @@ public class SyndicationFeed {
      * @param context context
      * @param dso     the scope
      * @param items   array of objects
-     * @param labels  label map
      */
     public void populate(HttpServletRequest request, Context context, IndexableObject dso,
-                         List<IndexableObject> items, Map<String, String> labels) {
+                         List<IndexableObject> items) {
         String logoURL = null;
         String objectURL = null;
         String defaultTitle = null;
         boolean podcastFeed = false;
         this.request = request;
+
+        Map<String, String> labels = getLabels();
+
         // dso is null for the whole site, or a search without scope
         if (dso == null) {
             defaultTitle = configurationService.getProperty("dspace.name");
@@ -518,8 +494,7 @@ public class SyndicationFeed {
     protected String urlOfBitstream(HttpServletRequest request, Bitstream logo) {
         String name = logo.getName();
         return resolveURL(request, null) +
-            (uiType.equalsIgnoreCase(UITYPE_XMLUI) ? "/bitstream/id/" : "/retrieve/") +
-            logo.getID() + "/" + (name == null ? "" : name);
+            "/bitstreams/" + logo.getID() + "/download";
     }
 
     protected String baseURL = null;  // cache the result for null
@@ -536,7 +511,7 @@ public class SyndicationFeed {
      */
     protected String resolveURL(HttpServletRequest request, DSpaceObject dso) {
         // If no object given then just link to the whole repository,
-        // since no offical handle exists so we have to use local resolution.
+        // since no official handle exists so we have to use local resolution.
         if (dso == null) {
             if (baseURL == null) {
                 if (request == null) {
@@ -566,5 +541,19 @@ public class SyndicationFeed {
         List<MetadataValue> dcv = itemService.getMetadataByMetadataString(item, field);
         return (dcv.size() > 0) ? dcv.get(0).getValue() : null;
     }
-}
 
+    /**
+     * Internal method to get labels for the returned document
+     */
+    private Map<String, String> getLabels() {
+        // TODO: get strings from translation file or configuration
+        Map<String, String> labelMap = new HashMap<>();
+        labelMap.put(SyndicationFeed.MSG_UNTITLED, "notitle");
+        labelMap.put(SyndicationFeed.MSG_LOGO_TITLE, "logo.title");
+        labelMap.put(SyndicationFeed.MSG_FEED_DESCRIPTION, "general-feed.description");
+        for (String selector : descriptionFields) {
+            labelMap.put("metadata." + selector, selector);
+        }
+        return labelMap;
+    }
+}

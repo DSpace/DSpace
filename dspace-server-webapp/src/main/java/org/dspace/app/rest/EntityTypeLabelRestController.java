@@ -8,9 +8,9 @@
 package org.dspace.app.rest;
 
 import java.sql.SQLException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.model.EntityTypeRest;
 import org.dspace.app.rest.model.hateoas.EntityTypeResource;

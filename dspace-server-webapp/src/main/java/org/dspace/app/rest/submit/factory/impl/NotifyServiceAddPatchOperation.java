@@ -12,8 +12,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.ldn.NotifyPatternToTrigger;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.service.NotifyPatternToTriggerService;

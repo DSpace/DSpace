@@ -13,7 +13,7 @@
     "id": "https://overlay-journal.com/articles/00001/",
     "ietf:cite-as": "https://doi.org/10.5555/12345680",
     "type": "sorg:AboutPage",
-    "url": {
+    "ietf:item": {
         "id": "https://research-organisation.org/repository/preprint/201203/421/content.pdf",
         "mediaType": "application/pdf",
         "type": [

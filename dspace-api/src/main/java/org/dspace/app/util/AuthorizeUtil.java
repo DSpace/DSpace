@@ -9,8 +9,8 @@ package org.dspace.app.util;
 
 import java.sql.SQLException;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authorize.AuthorizeConfiguration;
@@ -624,7 +624,7 @@ public class AuthorizeUtil {
         throws SQLException {
         if (DSpaceServicesFactory.getInstance().getConfigurationService()
                                  .getBooleanProperty("user.registration", true)) {
-            // This allowSetPassword is currently the only mthod that would return true only when it's
+            // This allowSetPassword is currently the only method that would return true only when it's
             // actually expected to be returning true.
             // For example the LDAP canSelfRegister will return true due to auto-register, while that
             // does not imply a new user can register explicitly

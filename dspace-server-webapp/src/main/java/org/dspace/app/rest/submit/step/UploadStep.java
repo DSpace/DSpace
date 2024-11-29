@@ -11,8 +11,8 @@ import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Objects;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.UnprocessableEntityException;
@@ -47,8 +47,6 @@ public class UploadStep extends AbstractProcessingStep
         implements UploadableStep {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(UploadStep.class);
-
-    public static final String UPLOAD_STEP_METADATA_SECTION = "bitstream-metadata";
 
     @Override
     public DataUpload getData(SubmissionService submissionService, InProgressSubmission obj,

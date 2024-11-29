@@ -10,11 +10,11 @@ package org.dspace.content.dao.impl;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
-import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 
+import jakarta.persistence.Query;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.BitstreamFormat_;
 import org.dspace.content.dao.BitstreamFormatDAO;
@@ -119,7 +119,7 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
         );
 
 
-        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
+        List<jakarta.persistence.criteria.Order> orderList = new LinkedList<>();
         orderList.add(criteriaBuilder.desc(bitstreamFormatRoot.get(BitstreamFormat_.supportLevel)));
         orderList.add(criteriaBuilder.asc(bitstreamFormatRoot.get(BitstreamFormat_.shortDescription)));
         criteriaQuery.orderBy(orderList);
@@ -142,13 +142,10 @@ public class BitstreamFormatDAOImpl extends AbstractHibernateDAO<BitstreamFormat
     public List<BitstreamFormat> findAll(Context context, Class clazz) throws SQLException {
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
-        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, BitstreamFormat.class);
+        CriteriaQuery<BitstreamFormat> criteriaQuery = getCriteriaQuery(criteriaBuilder, BitstreamFormat.class);
         Root<BitstreamFormat> bitstreamFormatRoot = criteriaQuery.from(BitstreamFormat.class);
         criteriaQuery.select(bitstreamFormatRoot);
-
-        List<javax.persistence.criteria.Order> orderList = new LinkedList<>();
-        orderList.add(criteriaBuilder.asc(bitstreamFormatRoot.get(BitstreamFormat_.id)));
-        criteriaQuery.orderBy(orderList);
+        criteriaQuery.orderBy(criteriaBuilder.asc(bitstreamFormatRoot.get(BitstreamFormat_.id)));
 
         return list(context, criteriaQuery, false, BitstreamFormat.class, -1, -1);
     }

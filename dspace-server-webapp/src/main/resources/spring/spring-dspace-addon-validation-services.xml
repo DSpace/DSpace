@@ -27,6 +27,11 @@
         <property name="uploadConfigurationService" ref="uploadConfigurationService"/>
     </bean>
 
+    <bean name="cclicenseValidation" class="org.dspace.app.rest.submit.step.validation.CclicenseValidator">
+        <property name="itemService" ref="org.dspace.content.ItemServiceImpl"/>
+        <property name="name" value="cclicense"/>
+    </bean>
+
     <bean name="licenseValidation" class="org.dspace.app.rest.submit.step.validation.LicenseValidation">
         <property name="name" value="license"/>
     </bean>

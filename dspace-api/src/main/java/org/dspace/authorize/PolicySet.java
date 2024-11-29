@@ -137,7 +137,7 @@ public class PolicySet {
      *                      otherwise add to existing policies
      * @param clearOnly     if non-null, only process bitstreams whose names contain filter
      * @param name          policy name
-     * @param description   policy descrption
+     * @param description   policy description
      * @param startDate     policy start date
      * @param endDate       policy end date
      * @throws SQLException       if database error
@@ -229,11 +229,10 @@ public class PolicySet {
                         // before create a new policy check if an identical policy is already in place
                         if (!authorizeService.isAnIdenticalPolicyAlreadyInPlace(c, myitem, group, actionID, -1)) {
                             // now add the policy
-                            ResourcePolicy rp = resourcePolicyService.create(c);
+                            ResourcePolicy rp = resourcePolicyService.create(c, null, group);
 
                             rp.setdSpaceObject(myitem);
                             rp.setAction(actionID);
-                            rp.setGroup(group);
 
                             rp.setRpName(name);
                             rp.setRpDescription(description);
@@ -262,11 +261,10 @@ public class PolicySet {
                             // before create a new policy check if an identical policy is already in place
                             if (!authorizeService.isAnIdenticalPolicyAlreadyInPlace(c, bundle, group, actionID, -1)) {
                                 // now add the policy
-                                ResourcePolicy rp = resourcePolicyService.create(c);
+                                ResourcePolicy rp = resourcePolicyService.create(c, null, group);
 
                                 rp.setdSpaceObject(bundle);
                                 rp.setAction(actionID);
-                                rp.setGroup(group);
 
                                 rp.setRpName(name);
                                 rp.setRpDescription(description);
@@ -305,11 +303,10 @@ public class PolicySet {
                                     if (!authorizeService
                                         .isAnIdenticalPolicyAlreadyInPlace(c, bitstream, group, actionID, -1)) {
                                         // now add the policy
-                                        ResourcePolicy rp = resourcePolicyService.create(c);
+                                        ResourcePolicy rp = resourcePolicyService.create(c, null, group);
 
                                         rp.setdSpaceObject(bitstream);
                                         rp.setAction(actionID);
-                                        rp.setGroup(group);
 
                                         rp.setRpName(name);
                                         rp.setRpDescription(description);

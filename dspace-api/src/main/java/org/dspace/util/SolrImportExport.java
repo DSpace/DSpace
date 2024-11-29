@@ -293,7 +293,7 @@ public class SolrImportExport {
                                        + ") but usable space in export directory is only "
                                        + FileUtils.byteCountToDisplaySize(usableExportSpace)
                                        + ". Not continuing with reindex, please use the " + DIRECTORY_OPTION
-                                       + " option to specify an alternative export directy with sufficient space.");
+                                       + " option to specify an alternative export directly with sufficient space.");
                 return;
             }
 

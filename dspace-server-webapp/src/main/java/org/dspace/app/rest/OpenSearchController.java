@@ -9,22 +9,19 @@ package org.dspace.app.rest;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.ScopeResolver;
-import org.dspace.app.util.SyndicationFeed;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.OpenSearchService;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -200,12 +197,10 @@ public class OpenSearchController {
             log.info("opensearch done, query=\"" + query + "\",results="
                         + qResults.getTotalSearchResults());
 
-            // format and return results
-            Map<String, String> labelMap = getLabels(request);
             List<IndexableObject> dsoResults = qResults.getIndexableObjects();
             Document resultsDoc = openSearchService.getResultsDoc(context, format, query,
                 (int) qResults.getTotalSearchResults(), qResults.getStart(),
-                qResults.getMaxResults(), container, dsoResults, labelMap);
+                qResults.getMaxResults(), container, dsoResults);
             try {
                 Transformer xf = TransformerFactory.newInstance().newTransformer();
                 response.setContentType(openSearchService.getContentType(format));
@@ -273,22 +268,5 @@ public class OpenSearchController {
 
     public void setOpenSearchService(OpenSearchService oSS) {
         openSearchService = oSS;
-    }
-
-
-    /**
-     * Internal method to get labels for the returned document
-     */
-    private Map<String, String> getLabels(HttpServletRequest request) {
-        // TODO: get strings from translation file or configuration
-        Map<String, String> labelMap = new HashMap<String, String>();
-        labelMap.put(SyndicationFeed.MSG_UNTITLED, "notitle");
-        labelMap.put(SyndicationFeed.MSG_LOGO_TITLE, "logo.title");
-        labelMap.put(SyndicationFeed.MSG_FEED_DESCRIPTION, "general-feed.description");
-        labelMap.put(SyndicationFeed.MSG_UITYPE, SyndicationFeed.UITYPE_JSPUI);
-        for (String selector : SyndicationFeed.getDescriptionSelectors()) {
-            labelMap.put("metadata." + selector, selector);
-        }
-        return labelMap;
     }
 }

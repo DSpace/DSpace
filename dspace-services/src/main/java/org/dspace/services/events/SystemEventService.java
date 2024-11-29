@@ -10,8 +10,8 @@ package org.dspace.services.events;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.PreDestroy;
 
+import jakarta.annotation.PreDestroy;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

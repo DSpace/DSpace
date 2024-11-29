@@ -14,9 +14,9 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.dspace.app.rest.converter.ConverterService;
 import org.dspace.app.rest.converter.EPersonConverter;
 import org.dspace.app.rest.link.HalLinkService;
@@ -220,7 +220,7 @@ public class AuthenticationRestController implements InitializingBean {
      * @return ResponseEntity
      */
     @RequestMapping(value = "/login", method = { RequestMethod.GET, RequestMethod.PUT, RequestMethod.PATCH,
-            RequestMethod.DELETE })
+        RequestMethod.DELETE })
     public ResponseEntity login() {
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("Only POST is allowed for login requests.");
     }

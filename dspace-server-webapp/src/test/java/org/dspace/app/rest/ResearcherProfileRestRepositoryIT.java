@@ -20,6 +20,7 @@ import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadataNotEmpty;
 import static org.dspace.app.rest.matcher.ResourcePolicyMatcher.matchResourcePolicyProperties;
 import static org.dspace.builder.RelationshipTypeBuilder.createRelationshipTypeBuilder;
 import static org.dspace.profile.OrcidEntitySyncPreference.ALL;
+import static org.dspace.profile.OrcidEntitySyncPreference.DISABLED;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
@@ -2230,6 +2231,156 @@ public class ResearcherProfileRestRepositoryIT extends AbstractControllerIntegra
         assertThat(getMetadataValues(profile, "dspace.orcid.authenticated"), not(empty()));
         assertThat(getOrcidAccessToken(profile), is("3de2e370-8aa9-4bbe-8d7e-f5b1577bdad4"));
     }
+
+    @Test
+    public void testOwnerPatchToDisconnectProfileFromOrcidWithSyncSettingsRemoved() throws Exception {
+
+        configurationService.setProperty("orcid.disconnection.allowed-users", "only_owner");
+        configurationService.setProperty("orcid.disconnection.remain-sync", "false");
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+            .withCanLogin(true)
+            .withOrcid("0000-1111-2222-3333")
+            .withOrcidScope("/read")
+            .withOrcidScope("/write")
+            .withEmail("test@email.it")
+            .withPassword(password)
+            .withNameInMetadata("Test", "User")
+            .build();
+
+        OrcidTokenBuilder.create(context, ePerson, "3de2e370-8aa9-4bbe-8d7e-f5b1577bdad4").build();
+
+        Item profile = createProfile(ePerson);
+
+        assertThat(getMetadataValues(profile, "person.identifier.orcid"), not(empty()));
+        assertThat(getMetadataValues(profile, "dspace.orcid.scope"), not(empty()));
+        assertThat(getMetadataValues(profile, "dspace.orcid.authenticated"), not(empty()));
+        assertThat(getOrcidAccessToken(profile), is("3de2e370-8aa9-4bbe-8d7e-f5b1577bdad4"));
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(ePerson.getEmail(), password);
+        String ePersonId = ePerson.getID().toString();
+        List<Operation> operations = asList(new ReplaceOperation("/orcid/mode", "BATCH"),
+            new ReplaceOperation("/orcid/publications", "DISABLED"),
+            new ReplaceOperation("/orcid/fundings", "ALL"),
+            new ReplaceOperation("/orcid/profile", "BIOGRAPHICAL,IDENTIFIERS"));
+
+        getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId)
+                .content(getPatchContent(operations))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.orcidSynchronization.mode", is("BATCH")))
+            .andExpect(jsonPath("$.orcidSynchronization.profilePreferences",
+                containsInAnyOrder("IDENTIFIERS", "BIOGRAPHICAL")))
+            .andExpect(jsonPath("$.orcidSynchronization.fundingsPreference", is(ALL.name())))
+            .andExpect(jsonPath("$.orcidSynchronization.publicationsPreference", is(DISABLED.name())));
+
+        profile = context.reloadEntity(profile);
+        List<MetadataValue> metadata = profile.getMetadata();
+        assertThat(metadata, hasItem(with("dspace.orcid.sync-mode","BATCH")));
+        assertThat(metadata, hasItem(with("dspace.orcid.sync-publications",DISABLED.name())));
+        assertThat(metadata, hasItem(with("dspace.orcid.sync-fundings",ALL.name())));
+        assertThat(getMetadataValues(profile, "dspace.orcid.sync-profile"), hasSize(2));
+
+        getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId)
+                .content(getPatchContent(asList(new RemoveOperation("/orcid"))))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(ePersonId)))
+            .andExpect(jsonPath("$.visible", is(false)))
+            .andExpect(jsonPath("$.type", is("profile")))
+            .andExpect(jsonPath("$.orcid").doesNotExist())
+            .andExpect(jsonPath("$.orcidSynchronization").doesNotExist());
+
+        profile = context.reloadEntity(profile);
+
+        assertThat(getMetadataValues(profile, "person.identifier.orcid"), empty());
+        assertThat(getMetadataValues(profile, "dspace.orcid.scope"), empty());
+        assertThat(getMetadataValues(profile, "dspace.orcid.authenticated"), empty());
+        assertThat(getMetadataValues(profile, "dspace.orcid.sync-profile"), empty());
+        assertThat(getMetadataValues(profile, "dspace.orcid.sync-mode"), empty());
+        assertThat(getMetadataValues(profile, "dspace.orcid.sync-fundings"), empty());
+        assertThat(getMetadataValues(profile, "dspace.orcid.sync-publications"), empty());
+        assertThat(getOrcidAccessToken(profile), nullValue());
+    }
+
+    @Test
+    public void testOwnerPatchToDisconnectProfileFromOrcidWithSyncSettingsRemain() throws Exception {
+
+        configurationService.setProperty("orcid.disconnection.allowed-users", "only_owner");
+
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+            .withCanLogin(true)
+            .withOrcid("0000-1111-2222-3333")
+            .withOrcidScope("/read")
+            .withOrcidScope("/write")
+            .withEmail("test@email.it")
+            .withPassword(password)
+            .withNameInMetadata("Test", "User")
+            .build();
+
+        OrcidTokenBuilder.create(context, ePerson, "3de2e370-8aa9-4bbe-8d7e-f5b1577bdad4").build();
+
+        Item profile = createProfile(ePerson);
+
+        assertThat(getMetadataValues(profile, "person.identifier.orcid"), not(empty()));
+        assertThat(getMetadataValues(profile, "dspace.orcid.scope"), not(empty()));
+        assertThat(getMetadataValues(profile, "dspace.orcid.authenticated"), not(empty()));
+        assertThat(getOrcidAccessToken(profile), is("3de2e370-8aa9-4bbe-8d7e-f5b1577bdad4"));
+
+        context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(ePerson.getEmail(), password);
+        String ePersonId = ePerson.getID().toString();
+        List<Operation> operations = asList(new ReplaceOperation("/orcid/mode", "BATCH"),
+            new ReplaceOperation("/orcid/publications", "DISABLED"),
+            new ReplaceOperation("/orcid/fundings", "ALL"),
+            new ReplaceOperation("/orcid/profile", "BIOGRAPHICAL,IDENTIFIERS"));
+
+        getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId)
+                .content(getPatchContent(operations))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.orcidSynchronization.mode", is("BATCH")))
+            .andExpect(jsonPath("$.orcidSynchronization.profilePreferences",
+                containsInAnyOrder("IDENTIFIERS", "BIOGRAPHICAL")))
+            .andExpect(jsonPath("$.orcidSynchronization.fundingsPreference", is(ALL.name())))
+            .andExpect(jsonPath("$.orcidSynchronization.publicationsPreference", is(DISABLED.name())));
+
+        profile = context.reloadEntity(profile);
+        List<MetadataValue> metadata = profile.getMetadata();
+        assertThat(metadata, hasItem(with("dspace.orcid.sync-mode","BATCH")));
+        assertThat(metadata, hasItem(with("dspace.orcid.sync-publications",DISABLED.name())));
+        assertThat(metadata, hasItem(with("dspace.orcid.sync-fundings",ALL.name())));
+        assertThat(getMetadataValues(profile, "dspace.orcid.sync-profile"), hasSize(2));
+
+        getClient(authToken).perform(patch("/api/eperson/profiles/{id}", ePersonId)
+                .content(getPatchContent(asList(new RemoveOperation("/orcid"))))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(ePersonId)))
+            .andExpect(jsonPath("$.visible", is(false)))
+            .andExpect(jsonPath("$.type", is("profile")))
+            .andExpect(jsonPath("$.orcid").doesNotExist())
+            .andExpect(jsonPath("$.orcidSynchronization").doesNotExist());
+
+        profile = context.reloadEntity(profile);
+
+        assertThat(getMetadataValues(profile, "person.identifier.orcid"), empty());
+        assertThat(getMetadataValues(profile, "dspace.orcid.scope"), empty());
+        assertThat(getMetadataValues(profile, "dspace.orcid.authenticated"), empty());
+        assertThat(metadata, hasItem(with("dspace.orcid.sync-mode","BATCH")));
+        assertThat(metadata, hasItem(with("dspace.orcid.sync-publications",DISABLED.name())));
+        assertThat(metadata, hasItem(with("dspace.orcid.sync-fundings",ALL.name())));
+        assertThat(getMetadataValues(profile, "dspace.orcid.sync-profile"), hasSize(2));
+        assertThat(getOrcidAccessToken(profile), nullValue());
+    }
+
 
     @Test
     public void testCloneFromExternalProfileAlreadyAssociated() throws Exception {

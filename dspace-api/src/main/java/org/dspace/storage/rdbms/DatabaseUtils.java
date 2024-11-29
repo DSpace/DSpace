@@ -635,7 +635,7 @@ public class DatabaseUtils {
             // For DSpace, we sometimes have to insert "old" migrations in after a major release
             // if further development/bug fixes are needed in older versions. So, "Ignored" migrations are
             // nothing to worry about...you can always trigger them to run using "database migrate ignored" from CLI
-            flywayConfiguration.ignoreIgnoredMigrations(true);
+            flywayConfiguration.ignoreMigrationPatterns("*:ignored");
 
             // Set Flyway callbacks (i.e. classes which are called post-DB migration and similar)
             List<Callback> flywayCallbacks = DSpaceServicesFactory.getInstance().getServiceManager()

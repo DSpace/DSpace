@@ -9,11 +9,11 @@ package org.dspace.xmlworkflow.storedcomponents.dao.impl;
 
 import java.sql.SQLException;
 import java.util.List;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Root;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Root;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.Item_;
@@ -66,12 +66,11 @@ public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem
 
     @Override
     public int countAllInCollection(Context context, Collection collection) throws SQLException {
-
-
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
 
         Root<XmlWorkflowItem> xmlWorkflowItemRoot = criteriaQuery.from(XmlWorkflowItem.class);
+        criteriaQuery.select(criteriaBuilder.count(xmlWorkflowItemRoot));
         if (collection != null) {
             criteriaQuery.where(criteriaBuilder.equal(xmlWorkflowItemRoot.get(XmlWorkflowItem_.collection),
                                                       collection));
@@ -109,7 +108,8 @@ public class XmlWorkflowItemDAOImpl extends AbstractHibernateDAO<XmlWorkflowItem
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery(Long.class);
         Root<XmlWorkflowItem> xmlWorkflowItemRoot = criteriaQuery.from(XmlWorkflowItem.class);
-        Join<XmlWorkflowItem, Item> join = xmlWorkflowItemRoot.join("item");
+        criteriaQuery.select(criteriaBuilder.count(xmlWorkflowItemRoot));
+        Join<XmlWorkflowItem, Item> join = xmlWorkflowItemRoot.join(XmlWorkflowItem_.item);
         criteriaQuery.where(criteriaBuilder.equal(join.get(Item_.submitter), ep));
         return count(context, criteriaQuery, criteriaBuilder, xmlWorkflowItemRoot);
     }

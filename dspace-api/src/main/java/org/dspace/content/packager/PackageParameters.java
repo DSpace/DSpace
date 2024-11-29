@@ -9,7 +9,8 @@ package org.dspace.content.packager;
 
 import java.util.Enumeration;
 import java.util.Properties;
-import javax.servlet.ServletRequest;
+
+import jakarta.servlet.ServletRequest;
 
 /**
  * Parameter list for SIP and DIP packagers. It's really just

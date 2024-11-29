@@ -8,11 +8,11 @@
 package org.dspace.app.rest.security;
 
 import java.io.IOException;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,9 +41,20 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
     public void afterPropertiesSet() {
     }
 
-    public StatelessLoginFilter(String url, AuthenticationManager authenticationManager,
+    /**
+     * Initialize a StatelessLoginFilter for the given URL and HTTP method. This login filter will ONLY attempt
+     * authentication for requests that match this URL and method. The URL & method are defined in the configuration
+     * in WebSecurityConfiguration.
+     * @see org.dspace.app.rest.security.WebSecurityConfiguration
+     * @param url URL path to attempt to authenticate (e.g. "/api/authn/login")
+     * @param httpMethod HTTP method to attempt to authentication (e.g. "POST")
+     * @param authenticationManager Spring Security AuthenticationManager to use for authentication
+     * @param restAuthenticationService DSpace RestAuthenticationService to use for authentication
+     */
+    public StatelessLoginFilter(String url, String httpMethod, AuthenticationManager authenticationManager,
                                 RestAuthenticationService restAuthenticationService) {
-        super(new AntPathRequestMatcher(url));
+        // NOTE: attemptAuthentication() below will only be triggered by requests that match both this URL and method
+        super(new AntPathRequestMatcher(url, httpMethod));
         this.authenticationManager = authenticationManager;
         this.restAuthenticationService = restAuthenticationService;
     }

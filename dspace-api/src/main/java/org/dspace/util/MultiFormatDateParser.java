@@ -21,8 +21,8 @@ import java.util.Map.Entry;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import javax.inject.Inject;
 
+import jakarta.inject.Inject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.servicemanager.DSpaceKernelInit;
@@ -70,7 +70,7 @@ public class MultiFormatDateParser {
             try {
                 pattern = Pattern.compile(rule.getKey(), Pattern.CASE_INSENSITIVE);
             } catch (PatternSyntaxException ex) {
-                log.error("Skipping format with unparseable pattern '{}'",
+                log.error("Skipping format with unparsable pattern '{}'",
                         rule::getKey);
                 continue;
             }

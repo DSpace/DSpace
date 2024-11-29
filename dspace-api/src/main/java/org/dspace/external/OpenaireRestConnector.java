@@ -16,7 +16,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import javax.xml.bind.JAXBException;
 
 import eu.openaire.jaxb.helper.OpenAIREHandler;
 import eu.openaire.jaxb.model.Response;
@@ -278,7 +277,7 @@ public class OpenaireRestConnector {
         if (result != null) {
             try {
                 return OpenAIREHandler.unmarshal(result);
-            } catch (JAXBException e) {
+            } catch (Exception e) {
                 log.error("Error extracting result from request: " + queryString);
                 getGotError(e, path);
             }

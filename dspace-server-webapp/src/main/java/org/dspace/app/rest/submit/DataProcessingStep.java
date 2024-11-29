@@ -10,8 +10,8 @@ package org.dspace.app.rest.submit;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.submit.step.validation.Validation;

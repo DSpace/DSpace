@@ -11,11 +11,11 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -107,7 +107,7 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter {
 
     /**
      * This method returns an Authentication object
-     * This Authentication object will be attempted to be for the eperson with the uuid in the parameter. Incase
+     * This Authentication object will be attempted to be for the eperson with the uuid in the parameter. In case
      * this is able to be done properly, we'll be returning the EPerson Authentication.
      * If the Authentication object returned is not null, we'll be logged in as this EPerson given through from the
      * request.

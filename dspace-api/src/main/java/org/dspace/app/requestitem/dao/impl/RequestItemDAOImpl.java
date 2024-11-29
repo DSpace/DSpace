@@ -9,11 +9,11 @@ package org.dspace.app.requestitem.dao.impl;
 
 import java.sql.SQLException;
 import java.util.Iterator;
-import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 
+import jakarta.persistence.Query;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.RequestItem_;
 import org.dspace.app.requestitem.dao.RequestItemDAO;
@@ -44,8 +44,12 @@ public class RequestItemDAOImpl extends AbstractHibernateDAO<RequestItem> implem
     }
     @Override
     public Iterator<RequestItem> findByItem(Context context, Item item) throws SQLException {
-        Query query = createQuery(context, "FROM RequestItem WHERE item_id= :uuid");
-        query.setParameter("uuid", item.getID());
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, RequestItem.class);
+        Root<RequestItem> requestItemRoot = criteriaQuery.from(RequestItem.class);
+        criteriaQuery.select(requestItemRoot);
+        criteriaQuery.where(criteriaBuilder.equal(requestItemRoot.get(RequestItem_.item), item));
+        Query query = createQuery(context, criteriaQuery);
         return iterate(query);
     }
 }

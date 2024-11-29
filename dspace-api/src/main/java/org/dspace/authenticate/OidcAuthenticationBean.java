@@ -20,9 +20,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -235,7 +235,7 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
         try {
             return oidcClient.getAccessToken(code);
         } catch (Exception ex) {
-            LOGGER.error("An error occurs retriving the OIDC access_token", ex);
+            LOGGER.error("An error occurs retrieving the OIDC access_token", ex);
             return null;
         }
     }
@@ -244,7 +244,7 @@ public class OidcAuthenticationBean implements AuthenticationMethod {
         try {
             return oidcClient.getUserInfo(accessToken);
         } catch (Exception ex) {
-            LOGGER.error("An error occurs retriving the OIDC user info", ex);
+            LOGGER.error("An error occurs retrieving the OIDC user info", ex);
             return Map.of();
         }
     }

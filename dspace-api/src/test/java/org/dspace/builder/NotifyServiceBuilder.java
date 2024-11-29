@@ -88,26 +88,21 @@ public class NotifyServiceBuilder extends AbstractBuilder<NotifyServiceEntity, N
         indexingService.commit();
     }
 
-    public static NotifyServiceBuilder createNotifyServiceBuilder(Context context) {
+    public static NotifyServiceBuilder createNotifyServiceBuilder(Context context, String name) {
         NotifyServiceBuilder notifyServiceBuilder = new NotifyServiceBuilder(context);
-        return notifyServiceBuilder.create(context);
+        return notifyServiceBuilder.create(context, name);
     }
 
-    private NotifyServiceBuilder create(Context context) {
+    private NotifyServiceBuilder create(Context context, String name) {
         try {
 
             this.context = context;
-            this.notifyServiceEntity = notifyService.create(context);
+            this.notifyServiceEntity = notifyService.create(context, name);
 
         } catch (SQLException e) {
             log.warn("Failed to create the NotifyService", e);
         }
 
-        return this;
-    }
-
-    public NotifyServiceBuilder withName(String name) {
-        notifyServiceEntity.setName(name);
         return this;
     }
 
@@ -123,6 +118,11 @@ public class NotifyServiceBuilder extends AbstractBuilder<NotifyServiceEntity, N
 
     public NotifyServiceBuilder withLdnUrl(String ldnUrl) {
         notifyServiceEntity.setLdnUrl(ldnUrl);
+        return this;
+    }
+
+    public NotifyServiceBuilder withStatus(boolean enabled) {
+        notifyServiceEntity.setEnabled(enabled);
         return this;
     }
 
@@ -144,6 +144,22 @@ public class NotifyServiceBuilder extends AbstractBuilder<NotifyServiceEntity, N
     public NotifyServiceBuilder withUpperIp(String upperIp) {
         notifyServiceEntity.setUpperIp(upperIp);
         return this;
+    }
+
+    /**
+     * Delete the Test NotifyServiceEntity referred to by the given ID
+     * @param id ID of NotifyServiceEntity to delete
+     * @throws SQLException if error occurs
+     */
+    public static void deleteNotifyService(Integer id) throws SQLException {
+        try (Context c = new Context()) {
+            c.turnOffAuthorisationSystem();
+            NotifyServiceEntity notifyServiceEntity = notifyService.find(c, id);
+            if (notifyServiceEntity != null) {
+                notifyService.delete(c, notifyServiceEntity);
+            }
+            c.complete();
+        }
     }
 
 }

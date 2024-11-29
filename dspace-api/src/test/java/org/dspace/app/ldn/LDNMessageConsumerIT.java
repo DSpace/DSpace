@@ -93,8 +93,7 @@ public class LDNMessageConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyService =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -165,8 +164,7 @@ public class LDNMessageConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyService =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -242,8 +240,7 @@ public class LDNMessageConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyService =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -314,8 +311,7 @@ public class LDNMessageConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyService =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")
@@ -386,8 +382,7 @@ public class LDNMessageConsumerIT extends AbstractIntegrationTestWithDatabase {
         context.turnOffAuthorisationSystem();
 
         NotifyServiceEntity notifyService =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://service.ldn.org/about")
                                 .withLdnUrl("https://service.ldn.org/inbox")

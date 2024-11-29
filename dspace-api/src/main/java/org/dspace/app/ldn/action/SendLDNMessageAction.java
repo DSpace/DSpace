@@ -58,7 +58,7 @@ public class SendLDNMessageAction implements LDNAction {
         String url = notification.getTarget().getInbox();
 
         HttpPost httpPost = new HttpPost(url);
-        httpPost.addHeader("Content-Type", "application, ld+json");
+        httpPost.addHeader("Content-Type", "application/ld+json");
         ObjectMapper mapper = new ObjectMapper();
         httpPost.setEntity(new StringEntity(mapper.writeValueAsString(notification), "UTF-8"));
 

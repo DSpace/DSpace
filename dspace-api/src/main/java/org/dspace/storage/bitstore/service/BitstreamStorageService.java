@@ -12,8 +12,8 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
+import jakarta.annotation.Nullable;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.core.Context;
@@ -92,7 +92,7 @@ public interface BitstreamStorageService {
      * @param assetstore    The assetstore number for the bitstream to be
      *                      registered
      * @param bitstreamPath The relative path of the bitstream to be registered.
-     *                      The path is relative to the path of ths assetstore.
+     *                      The path is relative to the path of this assetstore.
      * @return The ID of the registered bitstream
      * @throws SQLException       If a problem occurs accessing the RDBMS
      * @throws IOException        if IO error

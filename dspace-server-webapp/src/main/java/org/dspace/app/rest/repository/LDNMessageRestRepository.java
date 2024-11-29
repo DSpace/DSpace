@@ -8,8 +8,8 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.ldn.LDNMessageEntity;
 import org.dspace.app.ldn.service.LDNMessageService;
 import org.dspace.app.rest.exception.MethodNotAllowedException;

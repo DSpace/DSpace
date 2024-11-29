@@ -88,7 +88,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @param collectionUuids UUIDs of the collections to search.
      *        If none are provided, the entire repository will be searched.
      * @param regexClause Syntactic expression used to query the database using a regular expression
-     *        (e.g.: "text_value ~ ?")
+     *        (e.g.: "value ~ ?")
      * @param offset The offset for the query
      * @param limit Maximum number of items to return
      * @return A list containing the items that match the provided criteria
@@ -145,7 +145,8 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @return item count
      * @throws SQLException if database error
      */
-    int countItems(Context context, Collection collection, boolean includeArchived, boolean includeWithdrawn)
+    int countItems(Context context, Collection collection, boolean includeArchived, boolean includeWithdrawn,
+                   boolean discoverable)
         throws SQLException;
 
     /**
@@ -162,7 +163,7 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @throws SQLException if database error
      */
     int countItems(Context context, List<Collection> collections, boolean includeArchived,
-                          boolean includeWithdrawn) throws SQLException;
+                          boolean includeWithdrawn, boolean discoverable) throws SQLException;
 
     /**
      * Get all Items installed or withdrawn, discoverable, and modified since a Date.
@@ -197,7 +198,8 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @return count of items
      * @throws SQLException if database error
      */
-    int countItems(Context context, boolean includeArchived, boolean includeWithdrawn) throws SQLException;
+    int countItems(Context context, boolean includeArchived, boolean includeWithdrawn,
+                   boolean discoverable) throws SQLException;
 
     /**
      * Count number of items from the specified submitter based on specific status flags
@@ -209,7 +211,8 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
      * @return count of items
      * @throws SQLException if database error
      */
-    int countItems(Context context, EPerson submitter, boolean includeArchived, boolean includeWithdrawn)
+    int countItems(Context context, EPerson submitter, boolean includeArchived, boolean includeWithdrawn,
+                   boolean discoverable)
         throws SQLException;
 
 }

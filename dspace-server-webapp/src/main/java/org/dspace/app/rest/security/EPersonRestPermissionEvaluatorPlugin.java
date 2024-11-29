@@ -11,8 +11,8 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -59,6 +59,9 @@ public class EPersonRestPermissionEvaluatorPlugin extends RestObjectPermissionEv
             return false;
         }
         if (Constants.getTypeID(targetType) != Constants.EPERSON) {
+            return false;
+        }
+        if (targetId == null) {
             return false;
         }
 

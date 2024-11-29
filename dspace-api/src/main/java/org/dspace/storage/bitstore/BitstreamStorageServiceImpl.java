@@ -15,8 +15,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
+import jakarta.annotation.Nullable;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.logging.log4j.LogManager;
@@ -148,7 +148,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
      * @param assetstore    The assetstore number for the bitstream to be
      *                      registered
      * @param bitstreamPath The relative path of the bitstream to be registered.
-     *                      The path is relative to the path of ths assetstore.
+     *                      The path is relative to the path of this assetstore.
      * @return The ID of the registered bitstream
      * @throws SQLException If a problem occurs accessing the RDBMS
      * @throws IOException  if IO error
@@ -224,7 +224,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
         int cleanedBitstreamCount = 0;
 
         int deletedBitstreamCount = bitstreamService.countDeletedBitstreams(context);
-        System.out.println("Found " + deletedBitstreamCount + " deleted bistream to cleanup");
+        System.out.println("Found " + deletedBitstreamCount + " deleted bitstream to cleanup");
 
         try {
             context.turnOffAuthorisationSystem();

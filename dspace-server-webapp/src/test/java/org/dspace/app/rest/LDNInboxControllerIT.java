@@ -73,8 +73,7 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         Item item = ItemBuilder.createItem(context, collection).build();
         String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("service url")
                                 .withLdnUrl("https://overlay-journal.com/inbox/")
@@ -109,12 +108,13 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         Item item = ItemBuilder.createItem(context, collection).build();
         InputStream announceReviewStream = getClass().getResourceAsStream("ldn_announce_review.json");
         String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
-        NotifyServiceEntity notifyServiceEntity = NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://review-service.com/inbox/about/")
                                 .withLdnUrl("https://review-service.com/inbox/")
                                 .withScore(BigDecimal.valueOf(0.6d))
+                                .withStatus(true)
                                 .withLowerIp("127.0.0.1")
                                 .withUpperIp("127.0.0.3")
                                 .build();
@@ -163,12 +163,13 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         Collection collection = CollectionBuilder.createCollection(context, community).build();
         Item item = ItemBuilder.createItem(context, collection).build();
         String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
-        NotifyServiceEntity notifyServiceEntity = NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://review-service.com/inbox/about/")
                                 .withLdnUrl("https://review-service.com/inbox/")
                                 .withScore(BigDecimal.valueOf(0.6d))
+                                .withStatus(true)
                                 .withLowerIp("127.0.0.1")
                                 .withUpperIp("127.0.0.3")
                                 .build();
@@ -220,12 +221,13 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         Item item = ItemBuilder.createItem(context, collection).build();
         InputStream announceRelationshipStream = getClass().getResourceAsStream("ldn_announce_release.json");
         String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
-        NotifyServiceEntity notifyServiceEntity = NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+        NotifyServiceEntity notifyServiceEntity =
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("https://review-service.com/inbox/about/")
                                 .withLdnUrl("https://review-service.com/inbox/")
                                 .withScore(BigDecimal.valueOf(0.6d))
+                                .withStatus(true)
                                 .withLowerIp("127.0.0.1")
                                 .withUpperIp("127.0.0.3")
                                 .build();
@@ -283,8 +285,7 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         Item item = ItemBuilder.createItem(context, collection).build();
         String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("service url")
                                 .withLdnUrl("https://overlay-journal.com/inbox/")
@@ -321,8 +322,7 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         Item item = ItemBuilder.createItem(context, collection).build();
         String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("service url")
                                 .withLdnUrl("https://overlay-journal.com/inbox/")
@@ -359,8 +359,7 @@ public class LDNInboxControllerIT extends AbstractControllerIntegrationTest {
         configurationService.setProperty("ldn.notify.inbox.block-untrusted-ip", false);
         String object = configurationService.getProperty("dspace.ui.url") + "/handle/" + item.getHandle();
         NotifyServiceEntity notifyServiceEntity =
-            NotifyServiceBuilder.createNotifyServiceBuilder(context)
-                                .withName("service name")
+            NotifyServiceBuilder.createNotifyServiceBuilder(context, "service name")
                                 .withDescription("service description")
                                 .withUrl("service url")
                                 .withLdnUrl("https://overlay-journal.com/inbox/")

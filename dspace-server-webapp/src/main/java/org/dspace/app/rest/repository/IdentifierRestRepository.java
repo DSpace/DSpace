@@ -16,10 +16,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.NotSupportedException;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.NotSupportedException;
 import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
@@ -67,7 +67,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Item REST Repository and Controller for persistent identifiers.
  * The controller annotation and endpoint registration allows the "find DSO by identifier" method which was
- * previously implmented in org.dspace.app.rest.IdentifierRestController
+ * previously implemented in org.dspace.app.rest.IdentifierRestController
  *
  * @author Kim Shepherd
  */

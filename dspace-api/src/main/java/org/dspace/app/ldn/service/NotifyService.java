@@ -43,10 +43,11 @@ public interface NotifyService {
      * create new notifyServiceEntity
      *
      * @param context the context
+     * @param name name of the service
      * @return the created NotifyServiceEntity
      * @throws SQLException if database error
      */
-    public NotifyServiceEntity create(Context context) throws SQLException;
+    public NotifyServiceEntity create(Context context, String name) throws SQLException;
 
     /**
      * update the provided notifyServiceEntity

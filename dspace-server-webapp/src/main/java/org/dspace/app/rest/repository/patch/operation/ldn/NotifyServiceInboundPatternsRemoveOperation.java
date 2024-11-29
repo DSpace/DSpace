@@ -66,6 +66,6 @@ public class NotifyServiceInboundPatternsRemoveOperation extends PatchOperation<
         String path = operation.getPath().trim();
         return (objectToMatch instanceof NotifyServiceEntity &&
             operation.getOp().trim().equalsIgnoreCase(OPERATION_REMOVE) &&
-            path.startsWith(OPERATION_PATH));
+            path.startsWith(OPERATION_PATH) && path.endsWith(OPERATION_PATH));
     }
 }

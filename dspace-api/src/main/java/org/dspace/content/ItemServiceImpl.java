@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -66,6 +67,7 @@ import org.dspace.event.Event;
 import org.dspace.harvest.HarvestedItem;
 import org.dspace.harvest.service.HarvestedItemService;
 import org.dspace.identifier.DOI;
+import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.service.DOIService;
 import org.dspace.identifier.service.IdentifierService;
@@ -97,7 +99,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     /**
      * log4j category
      */
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Item.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     @Autowired(required = true)
     protected ItemDAO itemDAO;
@@ -277,6 +279,55 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
             return template;
         }
         return collection.getTemplateItem();
+    }
+
+    @Override
+    public void populateWithTemplateItemMetadata(Context context, Collection collection, boolean template, Item item)
+        throws SQLException {
+
+        Item templateItem = collection.getTemplateItem();
+
+        Optional<MetadataValue> colEntityType = getDSpaceEntityType(collection);
+        Optional<MetadataValue> templateItemEntityType = getDSpaceEntityType(templateItem);
+
+        if (template && colEntityType.isPresent() && templateItemEntityType.isPresent() &&
+            !StringUtils.equals(colEntityType.get().getValue(), templateItemEntityType.get().getValue())) {
+            throw new IllegalStateException("The template item has entity type : (" +
+                templateItemEntityType.get().getValue() + ") different than collection entity type : " +
+                colEntityType.get().getValue());
+        }
+
+        if (template && colEntityType.isPresent() && templateItemEntityType.isEmpty()) {
+            MetadataValue original = colEntityType.get();
+            MetadataField metadataField = original.getMetadataField();
+            MetadataSchema metadataSchema = metadataField.getMetadataSchema();
+            // NOTE: dspace.entity.type = <blank> does not make sense
+            //       the collection entity type is by default blank when a collection is first created
+            if (StringUtils.isNotBlank(original.getValue())) {
+                addMetadata(context, item, metadataSchema.getName(), metadataField.getElement(),
+                    metadataField.getQualifier(), original.getLanguage(), original.getValue());
+            }
+        }
+
+        if (template && (templateItem != null)) {
+            List<MetadataValue> md = getMetadata(templateItem, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+
+            for (MetadataValue aMd : md) {
+                MetadataField metadataField = aMd.getMetadataField();
+                MetadataSchema metadataSchema = metadataField.getMetadataSchema();
+                addMetadata(context, item, metadataSchema.getName(), metadataField.getElement(),
+                    metadataField.getQualifier(), aMd.getLanguage(), aMd.getValue());
+            }
+        }
+    }
+
+    private Optional<MetadataValue> getDSpaceEntityType(DSpaceObject dSpaceObject) {
+        return Objects.nonNull(dSpaceObject) ? dSpaceObject.getMetadata()
+            .stream()
+            .filter(x -> x.getMetadataField().toString('.')
+                .equalsIgnoreCase("dspace.entity.type"))
+            .findFirst()
+            : Optional.empty();
     }
 
     @Override
@@ -801,6 +852,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         DOI doi = doiService.findDOIByDSpaceObject(context, item);
         if (doi != null) {
             doi.setDSpaceObject(null);
+            doi.setStatus(DOIIdentifierProvider.TO_BE_DELETED);
         }
 
         // remove version attached to the item
@@ -955,7 +1007,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         throws SQLException, AuthorizeException {
         // Bundles should inherit from DEFAULT_ITEM_READ so that if the item is readable, the files
         // can be listed (even if they are themselves not readable as per DEFAULT_BITSTREAM_READ or other
-        // policies or embargos applied
+        // policies or embargoes applied
         List<ResourcePolicy> defaultCollectionBundlePolicies = authorizeService
                 .getPoliciesActionFilter(context, collection, Constants.DEFAULT_ITEM_READ);
         // Bitstreams should inherit from DEFAULT_BITSTREAM_READ
@@ -1435,7 +1487,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     public List<Item> findByMetadataQuery(Context context, List<QueryPredicate> queryPredicates,
             List<UUID> collectionUuids, long offset, int limit)
             throws SQLException {
-        return itemDAO.findByMetadataQuery(context, queryPredicates, collectionUuids, "text_value ~ ?",
+        return itemDAO.findByMetadataQuery(context, queryPredicates, collectionUuids, "value ~ ?",
                 offset, limit);
     }
 
@@ -1444,7 +1496,7 @@ prevent the generation of resource policy entry values with null dspace_object a
     public long countForMetadataQuery(Context context, List<QueryPredicate> queryPredicates,
             List<UUID> collectionUuids)
             throws SQLException {
-        return itemDAO.countForMetadataQuery(context, queryPredicates, collectionUuids, "text_value ~ ?");
+        return itemDAO.countForMetadataQuery(context, queryPredicates, collectionUuids, "value ~ ?");
     }
 
     @Override
@@ -1581,13 +1633,13 @@ prevent the generation of resource policy entry values with null dspace_object a
 
     @Override
     public int countItems(Context context, Collection collection) throws SQLException {
-        return itemDAO.countItems(context, collection, true, false);
+        return itemDAO.countItems(context, collection, true, false, true);
     }
 
     @Override
     public int countAllItems(Context context, Collection collection) throws SQLException {
-        return itemDAO.countItems(context, collection, true, false) + itemDAO.countItems(context, collection,
-                                                                                         false, true);
+        return itemDAO.countItems(context, collection, true, false, true) + itemDAO.countItems(context, collection,
+                                                                                         false, true, true);
     }
 
     @Override
@@ -1596,7 +1648,7 @@ prevent the generation of resource policy entry values with null dspace_object a
         List<Collection> collections = communityService.getAllCollections(context, community);
 
         // Now, lets count unique items across that list of collections
-        return itemDAO.countItems(context, collections, true, false);
+        return itemDAO.countItems(context, collections, true, false, true);
     }
 
     @Override
@@ -1605,8 +1657,8 @@ prevent the generation of resource policy entry values with null dspace_object a
         List<Collection> collections = communityService.getAllCollections(context, community);
 
         // Now, lets count unique items across that list of collections
-        return itemDAO.countItems(context, collections, true, false) + itemDAO.countItems(context, collections,
-                                                                                          false, true);
+        return itemDAO.countItems(context, collections, true, false, true) + itemDAO.countItems(context, collections,
+                                                                                          false, false, true);
     }
 
     @Override
@@ -1649,19 +1701,19 @@ prevent the generation of resource policy entry values with null dspace_object a
     @Override
     public int countNotArchivedItems(Context context) throws SQLException {
         // return count of items not in archive and also not withdrawn
-        return itemDAO.countItems(context, false, false);
+        return itemDAO.countItems(context, false, false, true);
     }
 
     @Override
     public int countArchivedItems(Context context) throws SQLException {
         // return count of items in archive and also not withdrawn
-        return itemDAO.countItems(context, true, false);
+        return itemDAO.countItems(context, true, false, true);
     }
 
     @Override
     public int countWithdrawnItems(Context context) throws SQLException {
         // return count of items that are not in archive and withdrawn
-        return itemDAO.countItems(context, false, true);
+        return itemDAO.countItems(context, false, true, true );
     }
 
     @Override
@@ -1742,12 +1794,14 @@ prevent the generation of resource policy entry values with null dspace_object a
      */
     @Override
     protected void moveSingleMetadataValue(Context context, Item dso, int place, MetadataValue rr) {
+        // If this is a (virtual) metadata value representing a relationship,
+        // then we must also update the corresponding Relationship with the new place
         if (rr instanceof RelationshipMetadataValue) {
             try {
                 //Retrieve the applicable relationship
                 Relationship rs = relationshipService.find(context,
                         ((RelationshipMetadataValue) rr).getRelationshipId());
-                if (rs.getLeftItem() == dso) {
+                if (rs.getLeftItem().equals(dso)) {
                     rs.setLeftPlace(place);
                 } else {
                     rs.setRightPlace(place);
@@ -1757,10 +1811,10 @@ prevent the generation of resource policy entry values with null dspace_object a
                 //should not occur, otherwise metadata can't be updated either
                 log.error("An error occurred while moving " + rr.getAuthority() + " for item " + dso.getID(), e);
             }
-        } else {
-            //just move the metadata
-            rr.setPlace(place);
         }
+
+        // Update the MetadataValue object with the new place setting
+        rr.setPlace(place);
     }
 
     @Override

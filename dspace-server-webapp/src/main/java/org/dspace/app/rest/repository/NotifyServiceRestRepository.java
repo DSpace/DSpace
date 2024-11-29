@@ -13,10 +13,11 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.ldn.NotifyServiceInboundPattern;
 import org.dspace.app.ldn.service.NotifyService;
@@ -106,8 +107,7 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
                 notifyServiceRest.getLdnUrl()));
         }
 
-        NotifyServiceEntity notifyServiceEntity = notifyService.create(context);
-        notifyServiceEntity.setName(notifyServiceRest.getName());
+        NotifyServiceEntity notifyServiceEntity = notifyService.create(context, notifyServiceRest.getName());
         notifyServiceEntity.setDescription(notifyServiceRest.getDescription());
         notifyServiceEntity.setUrl(notifyServiceRest.getUrl());
         notifyServiceEntity.setLdnUrl(notifyServiceRest.getLdnUrl());
@@ -193,7 +193,10 @@ public class NotifyServiceRestRepository extends DSpaceRestRepository<NotifyServ
         Pageable pageable) {
         try {
             List<NotifyServiceEntity> notifyServiceEntities =
-                notifyService.findManualServicesByInboundPattern(obtainContext(), pattern);
+                notifyService.findManualServicesByInboundPattern(obtainContext(), pattern)
+                .stream()
+                .filter(NotifyServiceEntity::isEnabled)
+                .collect(Collectors.toList());
 
             return converter.toRestPage(notifyServiceEntities, pageable, utils.obtainProjection());
         } catch (SQLException e) {

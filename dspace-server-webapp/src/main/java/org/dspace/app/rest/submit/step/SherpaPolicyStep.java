@@ -8,8 +8,8 @@
 package org.dspace.app.rest.submit.step;
 
 import java.util.Objects;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.step.SherpaPolicy;
 import org.dspace.app.rest.submit.AbstractProcessingStep;

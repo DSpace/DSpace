@@ -20,11 +20,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.DiscoverableEndpointsService;
@@ -154,7 +154,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
         String dsoId = req.getParameter("resource");
 
         if (StringUtils.isBlank(dsoId) || StringUtils.isBlank(epersonId)) {
-            throw new UnprocessableEntityException("Both eperson than DSpaceObject uuids must be provieded!");
+            throw new UnprocessableEntityException("Both eperson than DSpaceObject uuids must be provided!");
         }
 
         try {

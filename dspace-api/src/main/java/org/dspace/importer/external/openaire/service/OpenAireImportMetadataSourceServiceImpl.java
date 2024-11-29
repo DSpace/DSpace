@@ -14,13 +14,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
-import javax.el.MethodNotFoundException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
 
+import jakarta.el.MethodNotFoundException;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Invocation;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Response;
 import org.dspace.content.Item;
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.datamodel.Query;
@@ -187,7 +187,8 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
     public void init() throws Exception {
         Client client = ClientBuilder.newClient();
         if (baseAddress == null) {
-            baseAddress = configurationService.getProperty("openaire.base.url");
+            baseAddress = configurationService.getProperty("openaire.search.url",
+                                                           "https://api.openaire.eu/search/publications");
         }
         if (queryParam == null) {
             queryParam = "title";
@@ -252,10 +253,10 @@ public class OpenAireImportMetadataSourceServiceImpl extends AbstractImportMetad
                 Document document = saxBuilder.build(new StringReader(responseString));
                 Element root = document.getRootElement();
 
-                XPathExpression<Element> xpath = XPathFactory.instance().compile("/header/total",
+                XPathExpression<Element> xpath = XPathFactory.instance().compile("//header/total",
                     Filters.element(), null);
 
-                Element totalItem = (Element) xpath.evaluateFirst(root);
+                Element totalItem = xpath.evaluateFirst(root);
                 return totalItem != null ? Integer.parseInt(totalItem.getText()) : null;
 
             } else {

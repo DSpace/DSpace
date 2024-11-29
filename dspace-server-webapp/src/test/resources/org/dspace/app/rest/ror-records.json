@@ -53,8 +53,8 @@
               "code": "US.TX.029"
             },
             "license": {
-              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
-              "license": "http://creativecommons.org/licenses/by/3.0/"
+              "attribution": "Data from geonames.org under a CC-BY 4.0 license",
+              "license": "https://creativecommons.org/licenses/by/4.0/"
             },
             "nuts_level1": {
               "name": null,
@@ -166,8 +166,8 @@
               "code": "US.TX.423"
             },
             "license": {
-              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
-              "license": "http://creativecommons.org/licenses/by/3.0/"
+              "attribution": "Data from geonames.org under a CC-BY 4.0 license",
+              "license": "https://creativecommons.org/licenses/by/4.0/"
             },
             "nuts_level1": {
               "name": null,
@@ -298,8 +298,8 @@
               "code": "US.TX.113"
             },
             "license": {
-              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
-              "license": "http://creativecommons.org/licenses/by/3.0/"
+              "attribution": "Data from geonames.org under a CC-BY 4.0 license",
+              "license": "https://creativecommons.org/licenses/by/4.0/"
             },
             "nuts_level1": {
               "name": null,
@@ -417,8 +417,8 @@
               "code": "US.TX.439"
             },
             "license": {
-              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
-              "license": "http://creativecommons.org/licenses/by/3.0/"
+              "attribution": "Data from geonames.org under a CC-BY 4.0 license",
+              "license": "https://creativecommons.org/licenses/by/4.0/"
             },
             "nuts_level1": {
               "name": null,
@@ -532,8 +532,8 @@
               "code": "US.TX.135"
             },
             "license": {
-              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
-              "license": "http://creativecommons.org/licenses/by/3.0/"
+              "attribution": "Data from geonames.org under a CC-BY 4.0 license",
+              "license": "https://creativecommons.org/licenses/by/4.0/"
             },
             "nuts_level1": {
               "name": null,
@@ -638,8 +638,8 @@
               "code": "JP.39.1850156"
             },
             "license": {
-              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
-              "license": "http://creativecommons.org/licenses/by/3.0/"
+              "attribution": "Data from geonames.org under a CC-BY 4.0 license",
+              "license": "https://creativecommons.org/licenses/by/4.0/"
             },
             "nuts_level1": {
               "name": null,
@@ -750,8 +750,8 @@
               "code": null
             },
             "license": {
-              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
-              "license": "http://creativecommons.org/licenses/by/3.0/"
+              "attribution": "Data from geonames.org under a CC-BY 4.0 license",
+              "license": "https://creativecommons.org/licenses/by/4.0/"
             },
             "nuts_level1": {
               "name": null,
@@ -855,8 +855,8 @@
               "code": "US.OK.143"
             },
             "license": {
-              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
-              "license": "http://creativecommons.org/licenses/by/3.0/"
+              "attribution": "Data from geonames.org under a CC-BY 4.0 license",
+              "license": "https://creativecommons.org/licenses/by/4.0/"
             },
             "nuts_level1": {
               "name": null,
@@ -986,8 +986,8 @@
               "code": "AU.07.24600"
             },
             "license": {
-              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
-              "license": "http://creativecommons.org/licenses/by/3.0/"
+              "attribution": "Data from geonames.org under a CC-BY 4.0 license",
+              "license": "https://creativecommons.org/licenses/by/4.0/"
             },
             "nuts_level1": {
               "name": null,
@@ -1086,8 +1086,8 @@
               "code": null
             },
             "license": {
-              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
-              "license": "http://creativecommons.org/licenses/by/3.0/"
+              "attribution": "Data from geonames.org under a CC-BY 4.0 license",
+              "license": "https://creativecommons.org/licenses/by/4.0/"
             },
             "nuts_level1": {
               "name": null,
@@ -1198,8 +1198,8 @@
               "code": "US.AL.119"
             },
             "license": {
-              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
-              "license": "http://creativecommons.org/licenses/by/3.0/"
+              "attribution": "Data from geonames.org under a CC-BY 4.0 license",
+              "license": "https://creativecommons.org/licenses/by/4.0/"
             },
             "nuts_level1": {
               "name": null,
@@ -1304,8 +1304,8 @@
               "code": "US.FL.033"
             },
             "license": {
-              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
-              "license": "http://creativecommons.org/licenses/by/3.0/"
+              "attribution": "Data from geonames.org under a CC-BY 4.0 license",
+              "license": "https://creativecommons.org/licenses/by/4.0/"
             },
             "nuts_level1": {
               "name": null,
@@ -1416,8 +1416,8 @@
               "code": "US.GA.045"
             },
             "license": {
-              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
-              "license": "http://creativecommons.org/licenses/by/3.0/"
+              "attribution": "Data from geonames.org under a CC-BY 4.0 license",
+              "license": "https://creativecommons.org/licenses/by/4.0/"
             },
             "nuts_level1": {
               "name": null,
@@ -1524,8 +1524,8 @@
               "code": "US.OR.051"
             },
             "license": {
-              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
-              "license": "http://creativecommons.org/licenses/by/3.0/"
+              "attribution": "Data from geonames.org under a CC-BY 4.0 license",
+              "license": "https://creativecommons.org/licenses/by/4.0/"
             },
             "nuts_level1": {
               "name": null,
@@ -1626,8 +1626,8 @@
               "code": "GB.ENG.F2"
             },
             "license": {
-              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
-              "license": "http://creativecommons.org/licenses/by/3.0/"
+              "attribution": "Data from geonames.org under a CC-BY 4.0 license",
+              "license": "https://creativecommons.org/licenses/by/4.0/"
             },
             "nuts_level1": {
               "name": "SOUTH EAST (ENGLAND)",
@@ -1752,8 +1752,8 @@
               "code": null
             },
             "license": {
-              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
-              "license": "http://creativecommons.org/licenses/by/3.0/"
+              "attribution": "Data from geonames.org under a CC-BY 4.0 license",
+              "license": "https://creativecommons.org/licenses/by/4.0/"
             },
             "nuts_level1": {
               "name": null,
@@ -1869,8 +1869,8 @@
               "code": null
             },
             "license": {
-              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
-              "license": "http://creativecommons.org/licenses/by/3.0/"
+              "attribution": "Data from geonames.org under a CC-BY 4.0 license",
+              "license": "https://creativecommons.org/licenses/by/4.0/"
             },
             "nuts_level1": {
               "name": null,
@@ -1984,8 +1984,8 @@
               "code": "US.WI.035"
             },
             "license": {
-              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
-              "license": "http://creativecommons.org/licenses/by/3.0/"
+              "attribution": "Data from geonames.org under a CC-BY 4.0 license",
+              "license": "https://creativecommons.org/licenses/by/4.0/"
             },
             "nuts_level1": {
               "name": null,
@@ -2099,8 +2099,8 @@
               "code": "US.WI.009"
             },
             "license": {
-              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
-              "license": "http://creativecommons.org/licenses/by/3.0/"
+              "attribution": "Data from geonames.org under a CC-BY 4.0 license",
+              "license": "https://creativecommons.org/licenses/by/4.0/"
             },
             "nuts_level1": {
               "name": null,
@@ -2208,8 +2208,8 @@
               "code": "US.WI.063"
             },
             "license": {
-              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
-              "license": "http://creativecommons.org/licenses/by/3.0/"
+              "attribution": "Data from geonames.org under a CC-BY 4.0 license",
+              "license": "https://creativecommons.org/licenses/by/4.0/"
             },
             "nuts_level1": {
               "name": null,
