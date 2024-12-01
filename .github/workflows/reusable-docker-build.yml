@@ -113,6 +113,12 @@ jobs:
       - name: Set up QEMU emulation to build for multiple architectures
         uses: docker/setup-qemu-action@v3
 
+      #------------------------------------------------------------
+      # Build & deploy steps for new commits to a branch (non-PRs)
+      #
+      # These steps build the images, push to DockerHub, and
+      # (if necessary) redeploy demo/sandbox sites.
+      #------------------------------------------------------------
       # https://github.com/docker/login-action
       - name: Login to DockerHub
         # Only login if not a PR, as PRs only trigger a Docker build and not a push
@@ -125,6 +131,7 @@ jobs:
       # https://github.com/docker/metadata-action
       # Get Metadata for docker_build_deps step below
       - name: Sync metadata (tags, labels) from GitHub to Docker for image
+        if: ${{ ! matrix.isPr }}
         id: meta_build
         uses: docker/metadata-action@v5
         with:
@@ -133,7 +140,9 @@ jobs:
           flavor: ${{ env.TAGS_FLAVOR }}
 
       # https://github.com/docker/build-push-action
-      - name: Build and push image
+      - name: Build and push image to DockerHub
+        # Only build & push if not a PR
+        if: ${{ ! matrix.isPr }}
         id: docker_build
         uses: docker/build-push-action@v5
         with:
@@ -142,9 +151,7 @@ jobs:
           context: ${{ inputs.dockerfile_context }}
           file: ${{ inputs.dockerfile_path }}
           platforms: ${{ matrix.arch }}
-          # For pull requests, we run the Docker build (to ensure no PR changes break the build),
-          # but we ONLY do an image push to DockerHub if it's NOT a PR
-          push: ${{ ! matrix.isPr }}
+          push: true
           # Use tags / labels provided by 'docker/metadata-action' above
           tags: ${{ steps.meta_build.outputs.tags }}
           labels: ${{ steps.meta_build.outputs.labels }}
@@ -189,11 +196,54 @@ jobs:
         run: |
           curl -X POST $REDEPLOY_DEMO_URL
 
+      #-------------------------------------------------------------
+      # Build steps for PRs only
+      #
+      # These steps build the images and store as a build artifact.
+      # These artifacts can then be used by later jobs to run the
+      # brand-new images for automated testing.
+      #--------------------------------------------------------------
+      # Get Metadata for docker_build_deps step below
+      - name: Create metadata (tags, labels) for local Docker image
+        if: matrix.isPr
+        id: meta_build_pr
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          # Hardcode to use custom "pr-testing" tag because that will allow us to spin up this PR
+          # for testing in docker.yml
+          tags: pr-testing
+          flavor: ${{ env.TAGS_FLAVOR }}
+      # Build local image and stores in a TAR file in /tmp directory
+      - name: Build and push image to local image
+        if: matrix.isPr
+        uses: docker/build-push-action@v5
+        with:
+          build-contexts: |
+            ${{ inputs.dockerfile_additional_contexts }}
+          context: ${{ inputs.dockerfile_context }}
+          file: ${{ inputs.dockerfile_path }}
+          platforms: ${{ matrix.arch }}
+          tags: ${{ steps.meta_build_pr.outputs.tags }}
+          labels: ${{ steps.meta_build_pr.outputs.labels }}
+          # Export image to a local TAR file
+          outputs: type=docker,dest=/tmp/${{ inputs.build_id }}.tar
+      # Upload the local docker image (in TAR file) to a build Artifact
+      - name: Upload local image to artifact
+        if: matrix.isPr
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image-${{ inputs.build_id }}
+          path: /tmp/${{ inputs.build_id }}.tar
+          if-no-files-found: error
+          retention-days: 1
+
   # Merge Docker digests (from various architectures) into a manifest.
   # This runs after all Docker builds complete above, and it tells hub.docker.com
   # that these builds should be all included in the manifest for this tag.
   # (e.g. AMD64 and ARM64 should be listed as options under the same tagged Docker image)
   docker-build_manifest:
+    # Only run if this is NOT a PR
     if: ${{ github.event_name != 'pull_request' }}
     runs-on: ubuntu-latest
     needs:
