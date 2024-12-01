@@ -46,7 +46,7 @@ public interface ClaimedTaskService extends DSpaceCRUDService<ClaimedTask> {
      * @return the single matching task, or null if none.
      * @throws SQLException passed through.
      */
-    public ClaimedTask findByFirstWorkflowItem(Context context, XmlWorkflowItem workflowItem)
+    public ClaimedTask findFirstByWorkflowItem(Context context, XmlWorkflowItem workflowItem)
         throws SQLException;
 
     public List<ClaimedTask> findByEperson(Context context, EPerson ePerson) throws SQLException;

@@ -160,6 +160,28 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
         }
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @SearchRestMethod(name = "checkIfClaimedTaskExistForItem")
+    public ClaimedTaskRest checkIfClaimedTaskExistForItem(@Parameter(value = "uuid", required = true) UUID itemUUID) {
+        ClaimedTask claimedTask = null;
+        try {
+            Context context = obtainContext();
+            Item item = itemService.find(context, itemUUID);
+            if (item == null) {
+                throw new UnprocessableEntityException("There is no Item with uuid provided, uuid:" + itemUUID);
+            }
+            XmlWorkflowItem xmlWFI = xmlWorkflowItemService.findByItem(context, item);
+            if (xmlWFI == null) {
+                return null;
+            } else {
+                claimedTask = claimedTaskService.findFirstByWorkflowItem(context, xmlWFI);
+            }
+            return converter.toRest(claimedTask, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
     @SearchRestMethod(name = "findByItem")
     @PreAuthorize("hasAuthority('AUTHENTICATED')")
     public ClaimedTaskRest findByItem(@Parameter(value = "uuid", required = true) UUID itemUUID) {
@@ -174,12 +196,7 @@ public class ClaimedTaskRestRepository extends DSpaceRestRepository<ClaimedTaskR
             if (xmlWFI == null) {
                 return null;
             } else {
-                if (authorizeService.isAdmin(context)) {
-                    claimedTask = claimedTaskService.findByFirstWorkflowItem(context, xmlWFI);
-                } else {
-                    claimedTask = claimedTaskService
-                            .findByWorkflowIdAndEPerson(context, xmlWFI, context.getCurrentUser());
-                }
+                claimedTask = claimedTaskService.findByWorkflowIdAndEPerson(context, xmlWFI, context.getCurrentUser());
             }
             if (claimedTask == null) {
                 return null;

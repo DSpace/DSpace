@@ -43,35 +43,35 @@ public class ClaimedTaskServiceImplTest extends AbstractUnitTest {
     private ClaimedTaskServiceImpl claimedTaskServiceImpl;
 
     /**
-     * Test method for {@link ClaimedTaskServiceImpl#findByFirstWorkflowItem(Context, XmlWorkflowItem)}.
+     * Test method for {@link ClaimedTaskServiceImpl#findFirstByWorkflowItem(Context, XmlWorkflowItem)}.
      * <p>
      * This test verifies that the method returns the expected ClaimedTask when it is found by the DAO.
      *
      * @throws SQLException if any SQL error occurs.
      */
     @Test
-    public void testFindByFirstWorkflowItem() throws SQLException {
+    public void testFindFirstByWorkflowItem() throws SQLException {
         ClaimedTask expectedClaimedTask = new ClaimedTask();
         when(claimedTaskDAO.findFirstByWorkflowItem(context, workflowItem)).thenReturn(expectedClaimedTask);
 
-        ClaimedTask result = claimedTaskServiceImpl.findByFirstWorkflowItem(context, workflowItem);
+        ClaimedTask result = claimedTaskServiceImpl.findFirstByWorkflowItem(context, workflowItem);
 
         assertEquals(expectedClaimedTask, result);
         verify(claimedTaskDAO, times(1)).findFirstByWorkflowItem(context, workflowItem);
     }
 
     /**
-     * Test method for {@link ClaimedTaskServiceImpl#findByFirstWorkflowItem(Context, XmlWorkflowItem)}.
+     * Test method for {@link ClaimedTaskServiceImpl#findFirstByWorkflowItem(Context, XmlWorkflowItem)}.
      * <p>
      * This test verifies that the method returns null when no ClaimedTask is found by the DAO.
      *
      * @throws SQLException if any SQL error occurs.
      */
     @Test
-    public void testFindByFirstWorkflowItemNoResult() throws SQLException {
+    public void testFindFirstByWorkflowItemNoResult() throws SQLException {
         when(claimedTaskDAO.findFirstByWorkflowItem(context, workflowItem)).thenReturn(null);
 
-        ClaimedTask result = claimedTaskServiceImpl.findByFirstWorkflowItem(context, workflowItem);
+        ClaimedTask result = claimedTaskServiceImpl.findFirstByWorkflowItem(context, workflowItem);
 
         assertNull(result);
         verify(claimedTaskDAO, times(1)).findFirstByWorkflowItem(context, workflowItem);
