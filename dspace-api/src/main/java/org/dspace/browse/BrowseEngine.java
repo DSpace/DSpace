@@ -141,12 +141,12 @@ public class BrowseEngine {
                 Collection col = (Collection) scope.getBrowseContainer();
                 dao.setContainerTable("collection2item");
                 dao.setContainerIDField("collection_id");
-                dao.setContainerID(col.getID());
+                dao.setContainer(col);
             } else if (scope.inCommunity()) {
                 Community com = (Community) scope.getBrowseContainer();
                 dao.setContainerTable("communities2item");
                 dao.setContainerIDField("community_id");
-                dao.setContainerID(com.getID());
+                dao.setContainer(com);
             }
         }
 
@@ -203,12 +203,24 @@ public class BrowseEngine {
             // get the table name that we are going to be getting our data from
             dao.setTable(browseIndex.getTableName());
 
-            if (scope.getBrowseIndex() != null && OrderFormat.TITLE.equals(scope.getBrowseIndex().getDataType())) {
-                // For browsing by title, apply the same normalization applied to indexed titles
-                dao.setStartsWith(normalizeJumpToValue(scope.getStartsWith()));
-            } else {
-                dao.setStartsWith(StringUtils.lowerCase(scope.getStartsWith()));
+            if (StringUtils.isNotBlank(scope.getStartsWith())) {
+                boolean isDateBrowse = bs.getSortOption().getType().equals("date");
+                if (!isDateBrowse) {
+                    if (scope.getBrowseIndex() != null
+                            && OrderFormat.TITLE.equals(scope.getBrowseIndex().getDataType())) {
+                        // For browsing by title, apply the same normalization applied to indexed titles
+                        dao.setStartsWith(normalizeJumpToValue(scope.getStartsWith()));
+                    } else {
+                        dao.setStartsWith(StringUtils.lowerCase(scope.getStartsWith()));
+                    }
+                } else {
+                    // For "date" sort browses ({@code webui.itemlist.sort-option.*} config):
+                    // sets a date specific filter where the startsWith query is the start date,
+                    // eg `fq=bi_sort_*_sort:+["1940-02" TO+ ]`
+                    dao.setDateStartsWith(scope.getStartsWith().trim());
+                }
             }
+
 
             // tell the browse query whether we are ascending or descending on the value
             dao.setAscending(scope.isAscending());
@@ -247,12 +259,12 @@ public class BrowseEngine {
                     Collection col = (Collection) scope.getBrowseContainer();
                     dao.setContainerTable("collection2item");
                     dao.setContainerIDField("collection_id");
-                    dao.setContainerID(col.getID());
+                    dao.setContainer(col);
                 } else if (scope.inCommunity()) {
                     Community com = (Community) scope.getBrowseContainer();
                     dao.setContainerTable("communities2item");
                     dao.setContainerIDField("community_id");
-                    dao.setContainerID(com.getID());
+                    dao.setContainer(com);
                 }
             }
 
@@ -413,12 +425,12 @@ public class BrowseEngine {
                     Collection col = (Collection) scope.getBrowseContainer();
                     dao.setContainerTable("collection2item");
                     dao.setContainerIDField("collection_id");
-                    dao.setContainerID(col.getID());
+                    dao.setContainer(col);
                 } else if (scope.inCommunity()) {
                     Community com = (Community) scope.getBrowseContainer();
                     dao.setContainerTable("communities2item");
                     dao.setContainerIDField("community_id");
-                    dao.setContainerID(com.getID());
+                    dao.setContainer(com);
                 }
             }
 
