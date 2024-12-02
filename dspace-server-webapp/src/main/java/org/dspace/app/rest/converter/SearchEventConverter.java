@@ -67,8 +67,8 @@ public class SearchEventConverter {
         if (searchEventRest.getScope() != null) {
             IndexableObject scopeObject =
                     scopeResolver.resolveScope(context, String.valueOf(searchEventRest.getScope()));
-            if (scopeObject instanceof DSpaceObject) {
-                usageSearchEvent.setScope((DSpaceObject) scopeObject);
+            if (scopeObject != null && scopeObject.getIndexedObject() instanceof DSpaceObject) {
+                usageSearchEvent.setScope((DSpaceObject) scopeObject.getIndexedObject());
             }
         }
         usageSearchEvent.setConfiguration(searchEventRest.getConfiguration());
