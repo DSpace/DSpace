@@ -1035,7 +1035,7 @@
                 <groupId>org.dspace.modules</groupId>
                 <artifactId>server</artifactId>
                 <classifier>classes</classifier>
-                <version>9.0-SNAPSHOT</version>
+                <version>8.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
