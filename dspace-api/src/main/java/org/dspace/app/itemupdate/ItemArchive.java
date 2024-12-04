@@ -128,8 +128,12 @@ public class ItemArchive {
 
     protected static DocumentBuilder getDocumentBuilder()
         throws ParserConfigurationException {
-        if (builder == null) {
-            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        if (builder == null) {    
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            // disallow DTD parsing to ensure no XXE attacks can occur.
+            // See https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
+            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            builder = factory.newDocumentBuilder();
         }
         return builder;
     }

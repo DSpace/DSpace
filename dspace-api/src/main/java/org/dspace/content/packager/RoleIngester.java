@@ -422,6 +422,9 @@ public class RoleIngester implements PackageIngester {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setIgnoringComments(true);
             dbf.setCoalescing(true);
+            // disallow DTD parsing to ensure no XXE attacks can occur.
+            // See https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
+            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
             DocumentBuilder db = dbf.newDocumentBuilder();
             document = db.parse(pkgFile);
         } catch (ParserConfigurationException e) {

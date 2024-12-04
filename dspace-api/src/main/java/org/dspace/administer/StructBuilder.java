@@ -613,8 +613,11 @@ public class StructBuilder {
      */
     private static org.w3c.dom.Document loadXML(InputStream input)
         throws IOException, ParserConfigurationException, SAXException {
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance()
-                                                        .newDocumentBuilder();
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        // disallow DTD parsing to ensure no XXE attacks can occur.
+        // See https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
+        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        DocumentBuilder builder = factory.newDocumentBuilder();
 
         org.w3c.dom.Document document = builder.parse(input);
 

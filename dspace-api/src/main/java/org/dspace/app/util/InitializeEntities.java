@@ -106,6 +106,9 @@ public class InitializeEntities {
         try {
             File fXmlFile = new File(fileLocation);
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            // disallow DTD parsing to ensure no XXE attacks can occur.
+            // See https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html
+            dbFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(fXmlFile);
 
