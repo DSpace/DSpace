@@ -10,7 +10,7 @@
 # Build from Ubuntu as it has easy Apache tooling (e.g. a2enmod script is debian only).
 # Apache & mod_shib are required for DSpace to act as an SP
 # See also https://wiki.lyrasis.org/display/DSDOC7x/Authentication+Plugins#AuthenticationPlugins-ShibbolethAuthentication
-FROM ubuntu:20.04
+FROM docker.io/ubuntu:20.04
 
 # Apache ENVs (default values)
 ENV APACHE_RUN_USER www-data

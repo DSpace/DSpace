@@ -6,7 +6,7 @@ networks:
     external: true
 services:
   dspace-cli:
-    image: "${DOCKER_OWNER:-dspace}/dspace-cli:${DSPACE_VER:-dspace-7_x}"
+    image: "${DOCKER_REGISTRY:-docker.io}/${DOCKER_OWNER:-dspace}/dspace-cli:${DSPACE_VER:-dspace-7_x}"
     container_name: dspace-cli
     build:
       context: .
