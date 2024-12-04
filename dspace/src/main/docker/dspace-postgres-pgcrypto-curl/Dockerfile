@@ -15,9 +15,9 @@ ARG POSTGRES_PASSWORD=dspace
 
 FROM docker.io/postgres:${POSTGRES_VERSION}
 
-ENV POSTGRES_DB dspace
-ENV POSTGRES_USER dspace
-ENV POSTGRES_PASSWORD ${POSTGRES_PASSWORD}
+ENV POSTGRES_DB=dspace
+ENV POSTGRES_USER=dspace
+ENV POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 
 # Install curl which is necessary to load SQL file
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
