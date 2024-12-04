@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.converter.query;
 
+import static org.dspace.app.rest.model.SearchConfigurationRest.Filter.OPERATOR_QUERY;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,10 +17,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.query.RestSearchOperator;
 import org.dspace.app.rest.parameter.SearchFilter;
 
-import static org.dspace.app.rest.model.SearchConfigurationRest.Filter.OPERATOR_QUERY;
-
 /**
- * Utility class for transforming a list of SearchFilters. Each SearchFilter with an operator set to 'query' 
+ * Utility class for transforming a list of SearchFilters. Each SearchFilter with an operator set to 'query'
  * is converted into a SearchFilter with a standard DSpace operator like 'contains'.
  */
 public class SearchQueryConverter {
