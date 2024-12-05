@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -134,7 +133,7 @@ public class RisImportMetadataSourceServiceImpl extends AbstractPlainMetadataSou
     @Override
     @SuppressWarnings("unchecked")
     @Resource(name = "risMetadataFieldMap")
-    public void setMetadataFieldMap(@SuppressWarnings("rawtypes") Map metadataFieldMap) {
+    public void setMetadataFieldMap(@SuppressWarnings("rawtypes") List metadataFieldMap) {
         super.setMetadataFieldMap(metadataFieldMap);
     }
 
