@@ -856,10 +856,10 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
         getClient(token).perform(get("/api/system/processes/" + process1.getID() + "/output"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.name",
-                                            is(process1.getName() + process1.getID() + ".log")))
+                                            is(process1.getID() + "-" + process1.getName() + ".log")))
                         .andExpect(jsonPath("$.type", is("bitstream")))
                         .andExpect(jsonPath("$.metadata['dc.title'][0].value",
-                                            is(process1.getName() + process1.getID() + ".log")))
+                                            is(process1.getID() + "-" + process1.getName() + ".log")))
                         .andExpect(jsonPath("$.metadata['dspace.process.filetype'][0].value",
                                             is("script_output")));
 
@@ -869,10 +869,10 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
                         .perform(get("/api/system/processes/" + process1.getID() + "/output"))
                         .andExpect(status().isOk())
                         .andExpect(jsonPath("$.name",
-                                            is(process1.getName() + process1.getID() + ".log")))
+                                            is(process1.getID() + "-" + process1.getName() + ".log")))
                         .andExpect(jsonPath("$.type", is("bitstream")))
                         .andExpect(jsonPath("$.metadata['dc.title'][0].value",
-                                            is(process1.getName() + process1.getID() + ".log")))
+                                            is(process1.getID() + "-" + process1.getName() + ".log")))
                         .andExpect(jsonPath("$.metadata['dspace.process.filetype'][0].value",
                                             is("script_output")));
 
