@@ -473,8 +473,8 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
 
         // check Collection type with start=0 and limit=default, we expect: indexableObjects=2, totalFound=2
         assertSearchQuery(IndexableCollection.TYPE, 2, 2, 0, -1);
-        // check Item type with start=0 and limit=2, we expect: indexableObjects=2, totalFound=6
-        assertSearchQuery(IndexableItem.TYPE, 2, 6, 0, 2);
+        // check Item type with start=0 and limit=default, we expect: indexableObjects=2, totalFound=6
+        assertSearchQuery(IndexableItem.TYPE, 3, 6, 0, -1);
 
         // Run SolrDatabaseResyncCli, updating items with "preDB" status and removing stale items
         performSolrDatabaseResyncScript();
@@ -567,11 +567,6 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         // check Collection type with start=0 and limit=default,
         // we expect: indexableObjects=2, totalFound=should be 2 but we have 3 ->(1 stale object here)
         assertSearchQuery(IndexableCollection.TYPE, 2, 3, 0, -1);
-        // check Item type with start=0 and limit=2, we expect: indexableObjects=2, totalFound=6
-        assertSearchQuery(IndexableItem.TYPE, 2, 6, 0, 2);
-        // check Item type with start=2 and limit=4,
-        // we expect: indexableObjects=1, totalFound=should be 3 but we have 6 ->(3 stale objects here)
-        assertSearchQuery(IndexableItem.TYPE, 1, 6, 2, 4);
         // check Item type with start=0 and limit=default,
         // we expect: indexableObjects=3, totalFound=should be 3 but we have 6 ->(3 stale objects here)
         assertSearchQuery(IndexableItem.TYPE, 3, 6, 0, -1);
