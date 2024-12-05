@@ -128,6 +128,14 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      */
     public String getTypeText(T dso);
 
+    /**
+     * Provide the plural text name of the type of this DSpaceObject.  It is
+     * most likely all uppercase.
+     *
+     * @param dso the object.
+     * @return plural name of the object's type.
+     */
+    public String getTypeTextPlural(T dso);
 
     /**
      * Get metadata for the DSpace Object in a chosen schema.
