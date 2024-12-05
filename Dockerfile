@@ -57,6 +57,10 @@ RUN ant init_installation update_configs update_code update_webapps
 
 # Step 3 - Start up DSpace via Runnable JAR
 FROM docker.io/eclipse-temurin:${JDK_VERSION}
+LABEL org.opencontainers.image.source="https://github.com/DSpace/DSpace"
+LABEL org.opencontainers.image.description="DSpace Backend (REST API) image. DSpace is the software of choice for \
+academic, non-profit and commercial organizations building open digital repositories around the world."
+LABEL org.opencontainers.image.licenses="BSD-3-Clause"
 # NOTE: DSPACE_INSTALL must align with the "dspace.dir" default configuration.
 ENV DSPACE_INSTALL=/dspace
 # Copy the /dspace directory from 'ant_build' container to /dspace in this container
