@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 
 import java.sql.SQLException;
 import java.time.Instant;
@@ -41,13 +42,19 @@ import org.dspace.content.EntityType;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.RelationshipType;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.orcid.consumer.OrcidQueueConsumer;
 import org.dspace.orcid.factory.OrcidServiceFactory;
 import org.dspace.orcid.service.OrcidQueueService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.utils.DSpace;
+import org.dspace.versioning.Version;
+import org.dspace.versioning.service.VersioningService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,7 +71,14 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
 
     private ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
+    private WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+
+    private InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
+
     private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    private VersioningService versioningService = new DSpace().getServiceManager()
+        .getServicesByType(VersioningService.class).get(0);
 
     private Collection profileCollection;
 
@@ -760,6 +774,177 @@ public class OrcidQueueConsumerIT extends AbstractIntegrationTestWithDatabase {
         assertThat(queueRecords, hasSize(1));
         assertThat(queueRecords.get(0), matches(profile, "KEYWORDS", "12346",
             "dc.subject::Science", "Science", DELETE));
+
+    }
+
+    @Test
+    public void testOrcidQueueRecordCreationForPublicationWithNotFoundAuthority() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item profile = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Test User")
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20", eperson)
+            .withOrcidSynchronizationPublicationsPreference(ALL)
+            .build();
+
+        Collection publicationCollection = createCollection("Publications", "Publication");
+
+        Item publication = ItemBuilder.createItem(context, publicationCollection)
+            .withTitle("Test publication")
+            .withAuthor("First User")
+            .withAuthor("Test User")
+            .build();
+
+        EntityType publicationType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType personType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+        RelationshipType isAuthorOfPublication = createRelationshipTypeBuilder(context, personType, publicationType,
+                                                                               "isAuthorOfPublication",
+                                                                               "isPublicationOfAuthor", 0, null, 0,
+                                                                               null).build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, profile, publication, isAuthorOfPublication).build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
+        assertThat(orcidQueueRecords, hasSize(1));
+        assertThat(orcidQueueRecords.get(0), matches(profile, publication, "Publication", INSERT));
+    }
+
+    @Test
+    public void testOrcidQueueWithItemVersioning() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item profile = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Test User")
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20", eperson)
+            .withOrcidSynchronizationPublicationsPreference(ALL)
+            .build();
+
+        Collection publicationCollection = createCollection("Publications", "Publication");
+
+        Item publication = ItemBuilder.createItem(context, publicationCollection)
+            .withTitle("Test publication")
+            .withAuthor("Test User")
+            .build();
+
+        EntityType publicationType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType personType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+        RelationshipType isAuthorOfPublication = createRelationshipTypeBuilder(context, personType, publicationType,
+                                                                               "isAuthorOfPublication",
+                                                                               "isPublicationOfAuthor", 0, null, 0,
+                                                                               null).build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, profile, publication, isAuthorOfPublication).build();
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
+        assertThat(orcidQueueRecords, hasSize(1));
+        assertThat(orcidQueueRecords.get(0), matches(profile, publication, "Publication", INSERT));
+
+        context.turnOffAuthorisationSystem();
+        Version newVersion = versioningService.createNewVersion(context, publication);
+        context.restoreAuthSystemState();
+        Item newPublication = newVersion.getItem();
+        assertThat(newPublication.isArchived(), is(false));
+
+        context.commit();
+
+        orcidQueueRecords = orcidQueueService.findAll(context);
+        assertThat(orcidQueueRecords, hasSize(1));
+        assertThat(orcidQueueRecords.get(0), matches(profile, publication, "Publication", INSERT));
+
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, newVersion.getItem());
+        context.turnOffAuthorisationSystem();
+
+        installItemService.installItem(context, workspaceItem);
+
+        context.restoreAuthSystemState();
+        context.commit();
+
+        orcidQueueRecords = orcidQueueService.findAll(context);
+        assertThat(orcidQueueRecords, hasSize(1));
+        assertThat(orcidQueueRecords.get(0), matches(profile, newPublication, "Publication", INSERT));
+    }
+
+    @Test
+    public void testOrcidQueueUpdateWithItemVersioning() throws Exception {
+
+        context.turnOffAuthorisationSystem();
+
+        Item profile = ItemBuilder.createItem(context, profileCollection)
+            .withTitle("Test User")
+            .withOrcidIdentifier("0000-1111-2222-3333")
+            .withOrcidAccessToken("ab4d18a0-8d9a-40f1-b601-a417255c8d20", eperson)
+            .withOrcidSynchronizationPublicationsPreference(ALL)
+            .build();
+
+        Collection publicationCollection = createCollection("Publications", "Publication");
+
+        Item publication = ItemBuilder.createItem(context, publicationCollection)
+            .withTitle("Test publication")
+            .build();
+
+        OrcidHistory orcidHistory = OrcidHistoryBuilder.createOrcidHistory(context, profile, publication)
+            .withDescription("Test publication")
+            .withOperation(OrcidOperation.INSERT)
+            .withPutCode("12345")
+            .withStatus(201)
+            .build();
+
+        addMetadata(publication, "dc", "contributor", "author", "Test User", null);
+
+        EntityType publicationType = EntityTypeBuilder.createEntityTypeBuilder(context, "Publication").build();
+        EntityType personType = EntityTypeBuilder.createEntityTypeBuilder(context, "Person").build();
+
+        RelationshipType isAuthorOfPublication =
+            createRelationshipTypeBuilder(
+                context, personType, publicationType,
+                "isAuthorOfPublication",
+                "isPublicationOfAuthor", 0, null, 0,
+                null
+            ).build();
+
+        RelationshipBuilder.createRelationshipBuilder(context, profile, publication, isAuthorOfPublication).build();
+
+        context.commit();
+
+        List<OrcidQueue> orcidQueueRecords = orcidQueueService.findAll(context);
+        assertThat(orcidQueueRecords, hasSize(1));
+        assertThat(orcidQueueRecords.get(0), matches(profile, publication, "Publication", "12345", UPDATE));
+
+        Version newVersion = versioningService.createNewVersion(context, publication);
+        Item newPublication = newVersion.getItem();
+        assertThat(newPublication.isArchived(), is(false));
+
+        context.commit();
+
+        orcidQueueRecords = orcidQueueService.findAll(context);
+        assertThat(orcidQueueRecords, hasSize(1));
+        assertThat(orcidQueueRecords.get(0), matches(profile, publication, "Publication", "12345", UPDATE));
+
+        WorkspaceItem workspaceItem = workspaceItemService.findByItem(context, newVersion.getItem());
+        installItemService.installItem(context, workspaceItem);
+
+        context.commit();
+
+        context.restoreAuthSystemState();
+
+        orcidQueueRecords = orcidQueueService.findAll(context);
+        assertThat(orcidQueueRecords, hasSize(1));
+        assertThat(orcidQueueRecords.get(0), matches(profile, newPublication, "Publication", "12345", UPDATE));
+
+        orcidHistory = context.reloadEntity(orcidHistory);
+        assertThat(orcidHistory.getEntity(), is(newPublication));
 
     }
 
