@@ -130,7 +130,7 @@ jobs:
       #------------------------------------------------------------
       # https://github.com/docker/metadata-action
       # Get Metadata for docker_build_deps step below
-      - name: Sync metadata (tags, labels) from GitHub to Docker for image
+      - name: Extract metadata (tags, labels) from GitHub for Docker image
         if: ${{ ! matrix.isPr }}
         id: meta_build
         uses: docker/metadata-action@v5
@@ -151,10 +151,23 @@ jobs:
           context: ${{ inputs.dockerfile_context }}
           file: ${{ inputs.dockerfile_path }}
           platforms: ${{ matrix.arch }}
-          push: true
           # Use tags / labels provided by 'docker/metadata-action' above
           tags: ${{ steps.meta_build.outputs.tags }}
           labels: ${{ steps.meta_build.outputs.labels }}
+          # Export image to both Docker registry & to a local TAR file
+          outputs: |
+            registry
+            type=docker,dest=/tmp/${{ inputs.build_id }}.tar
+
+      # Upload the local docker image (in TAR file) to a build Artifact
+      - name: Upload local image to artifact
+        if: ${{ ! matrix.isPr }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image-${{ inputs.build_id }}-${{ env.ARCH_NAME }}
+          path: /tmp/${{ inputs.build_id }}.tar
+          if-no-files-found: error
+          retention-days: 1
 
       # Export the digest of Docker build locally (for non PRs only)
       - name: Export Docker build digest
@@ -204,7 +217,7 @@ jobs:
       # brand-new images for automated testing.
       #--------------------------------------------------------------
       # Get Metadata for docker_build_deps step below
-      - name: Create metadata (tags, labels) for local Docker image
+      - name: Extract metadata (tags, labels) for local Docker image
         if: matrix.isPr
         id: meta_build_pr
         uses: docker/metadata-action@v5
@@ -233,7 +246,7 @@ jobs:
         if: matrix.isPr
         uses: actions/upload-artifact@v4
         with:
-          name: docker-image-${{ inputs.build_id }}
+          name: docker-image-${{ inputs.build_id }}-${{ env.ARCH_NAME }}
           path: /tmp/${{ inputs.build_id }}.tar
           if-no-files-found: error
           retention-days: 1
