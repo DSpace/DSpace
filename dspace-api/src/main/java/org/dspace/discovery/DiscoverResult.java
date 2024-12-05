@@ -32,6 +32,9 @@ public class DiscoverResult {
     private List<IndexableObject> indexableObjects;
     private Map<String, List<FacetResult>> facetResults;
 
+    // Total count of facet entries calculated for a metadata browsing query
+    private long totalEntries;
+
     /**
      * A map that contains all the documents sougth after, the key is a string representation of the Indexable Object
      */
@@ -62,6 +65,14 @@ public class DiscoverResult {
 
     public void setTotalSearchResults(long totalSearchResults) {
         this.totalSearchResults = totalSearchResults;
+    }
+
+    public long getTotalEntries() {
+        return totalEntries;
+    }
+
+    public void setTotalEntries(long totalEntries) {
+        this.totalEntries = totalEntries;
     }
 
     public int getStart() {
