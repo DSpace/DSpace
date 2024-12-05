@@ -8,6 +8,10 @@ ARG JDK_VERSION=17
 
 # Step 1 - Run Maven Build
 FROM docker.io/maven:3-eclipse-temurin-${JDK_VERSION} AS build
+LABEL org.opencontainers.image.source="https://github.com/DSpace/DSpace"
+LABEL org.opencontainers.image.description="DSpace Dependencies image. This image used in order to cache Maven \
+dependencies which are used during the backend build process."
+LABEL org.opencontainers.image.licenses="BSD-3-Clause"
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 # Create the 'dspace' user account & home directory

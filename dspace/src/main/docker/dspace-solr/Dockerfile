@@ -12,7 +12,11 @@
 
 ARG SOLR_VERSION=8.11
 
-FROM solr:${SOLR_VERSION}-slim
+FROM docker.io/solr:${SOLR_VERSION}-slim
+LABEL org.opencontainers.image.source="https://github.com/DSpace/DSpace"
+LABEL org.opencontainers.image.description="DSpace Solr image. This is a custom version of the official \
+'solr' image, which installs/initializes all the required DSpace Solr cores."
+LABEL org.opencontainers.image.licenses="BSD-3-Clause"
 
 ENV AUTHORITY_CONFIGSET_PATH=/opt/solr/server/solr/configsets/authority/conf \
     OAI_CONFIGSET_PATH=/opt/solr/server/solr/configsets/oai/conf \
