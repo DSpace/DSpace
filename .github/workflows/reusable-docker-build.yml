@@ -122,16 +122,9 @@ jobs:
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      #------------------------------------------------------------
-      # Build & deploy steps for new commits to a branch (non-PRs)
-      #
-      # These steps build the images, push to DockerHub, and
-      # (if necessary) redeploy demo/sandbox sites.
-      #------------------------------------------------------------
       # https://github.com/docker/metadata-action
-      # Get Metadata for docker_build_deps step below
+      # Extract metadata used for Docker images in all build steps below
       - name: Extract metadata (tags, labels) from GitHub for Docker image
-        if: ${{ ! matrix.isPr }}
         id: meta_build
         uses: docker/metadata-action@v5
         with:
@@ -139,6 +132,12 @@ jobs:
           tags: ${{ env.IMAGE_TAGS }}
           flavor: ${{ env.TAGS_FLAVOR }}
 
+      #------------------------------------------------------------
+      # Build & deploy steps for new commits to a branch (non-PRs)
+      #
+      # These steps build the images, push to DockerHub, and
+      # (if necessary) redeploy demo/sandbox sites.
+      #------------------------------------------------------------
       # https://github.com/docker/build-push-action
       - name: Build and push image to DockerHub
         # Only build & push if not a PR
@@ -178,32 +177,6 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-      # Build local image (again) and store in a TAR file in /tmp directory
-      # NOTE: This cannot be combined with push to DockerHub registry above as it's a different type of output.
-      - name: Build and push image to local image
-        if: ${{ ! matrix.isPr }}
-        uses: docker/build-push-action@v5
-        with:
-          build-contexts: |
-            ${{ inputs.dockerfile_additional_contexts }}
-          context: ${{ inputs.dockerfile_context }}
-          file: ${{ inputs.dockerfile_path }}
-          platforms: ${{ matrix.arch }}
-          tags: ${{ steps.meta_build.outputs.tags }}
-          labels: ${{ steps.meta_build.outputs.labels }}
-          # Export image to a local TAR file
-          outputs: type=docker,dest=/tmp/${{ inputs.build_id }}.tar
-
-      # Upload the local docker image (in TAR file) to a build Artifact
-      - name: Upload local image to artifact
-        if: ${{ ! matrix.isPr }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: docker-image-${{ inputs.build_id }}-${{ env.ARCH_NAME }}
-          path: /tmp/${{ inputs.build_id }}.tar
-          if-no-files-found: error
-          retention-days: 1
-
       # If this build is NOT a PR and passed in a REDEPLOY_SANDBOX_URL secret,
       # Then redeploy https://sandbox.dspace.org if this build is for our deployment architecture and 'main' branch.
       - name: Redeploy sandbox.dspace.org (based on main branch)
@@ -227,27 +200,19 @@ jobs:
           curl -X POST $REDEPLOY_DEMO_URL
 
       #-------------------------------------------------------------
-      # Build steps for PRs only
+      # Shared Build steps.
+      # These are used for PRs as well as new commits to a branch (non-PRs)
       #
-      # These steps build the images and store as a build artifact.
-      # These artifacts can then be used by later jobs to run the
-      # brand-new images for automated testing.
+      # These steps build the images and cache/store as a build artifact.
+      # These artifacts can then be used by later jobs to install the
+      # brand-new images for automated testing. For non-PRs, this cache is
+      # also used to avoid pulling the images we just built from DockerHub.
       #--------------------------------------------------------------
-      # Get Metadata for docker_build_deps step below
-      - name: Extract metadata (tags, labels) for local Docker image
-        if: matrix.isPr
-        id: meta_build_pr
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.IMAGE_NAME }}
-          # Hardcode to use custom "pr-testing" tag because that will allow us to spin up this PR
-          # for testing in docker.yml
-          tags: pr-testing
-          flavor: ${{ env.TAGS_FLAVOR }}
 
-      # Build local image and stores in a TAR file in /tmp directory
-      - name: Build and push image to local image
-        if: matrix.isPr
+      # Build local image (again) and store in a TAR file in /tmp directory
+      # NOTE: This build is run for both PRs and non-PRs as it's used to "cache" our built images as artifacts.
+      # NOTE #2: This cannot be combined with push to DockerHub registry above as it's a different type of output.
+      - name: Build and push image to local TAR file
         uses: docker/build-push-action@v5
         with:
           build-contexts: |
@@ -255,8 +220,8 @@ jobs:
           context: ${{ inputs.dockerfile_context }}
           file: ${{ inputs.dockerfile_path }}
           platforms: ${{ matrix.arch }}
-          tags: ${{ steps.meta_build_pr.outputs.tags }}
-          labels: ${{ steps.meta_build_pr.outputs.labels }}
+          tags: ${{ steps.meta_build.outputs.tags }}
+          labels: ${{ steps.meta_build.outputs.labels }}
           # Use GitHub cache to load cached Docker images and cache the results of this build
           # This decreases the number of images we need to fetch from DockerHub
           cache-from: type=gha
@@ -265,8 +230,7 @@ jobs:
           outputs: type=docker,dest=/tmp/${{ inputs.build_id }}.tar
 
       # Upload the local docker image (in TAR file) to a build Artifact
-      - name: Upload local image to artifact
-        if: matrix.isPr
+      - name: Upload local image TAR to artifact
         uses: actions/upload-artifact@v4
         with:
           name: docker-image-${{ inputs.build_id }}-${{ env.ARCH_NAME }}
