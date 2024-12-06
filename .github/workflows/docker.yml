@@ -170,10 +170,6 @@ jobs:
       signposting__P__enabled: true
       sword__D__server__P__enabled: true
       swordv2__D__server__P__enabled: true
-      # If this is a PR, force using "pr-testing" version of all Docker images. Otherwise, if on main branch, use the
-      # "latest" tag. Otherwise, use the branch name. NOTE: the "pr-testing" tag is a temporary tag that we assign to
-      # all PR-built docker images in reusable-docker-build.yml
-      DSPACE_VER: ${{ (github.event_name == 'pull_request' && 'pr-testing') || (github.ref_name == github.event.repository.default_branch && 'latest') || github.ref_name }}
     steps:
       # Checkout our codebase (to get access to Docker Compose scripts)
       - name: Checkout codebase
