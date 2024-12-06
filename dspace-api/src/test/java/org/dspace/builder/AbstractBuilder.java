@@ -14,6 +14,11 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.alerts.service.SystemWideAlertService;
+import org.dspace.app.ldn.factory.NotifyServiceFactory;
+import org.dspace.app.ldn.service.LDNMessageService;
+import org.dspace.app.ldn.service.NotifyPatternToTriggerService;
+import org.dspace.app.ldn.service.NotifyService;
+import org.dspace.app.ldn.service.NotifyServiceInboundPatternService;
 import org.dspace.app.requestitem.factory.RequestItemServiceFactory;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.suggestion.SolrSuggestionStorageService;
@@ -46,6 +51,8 @@ import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.eperson.service.SubscribeService;
+import org.dspace.identifier.factory.IdentifierServiceFactory;
+import org.dspace.identifier.service.DOIService;
 import org.dspace.orcid.factory.OrcidServiceFactory;
 import org.dspace.orcid.service.OrcidHistoryService;
 import org.dspace.orcid.service.OrcidQueueService;
@@ -109,6 +116,7 @@ public abstract class AbstractBuilder<T, S> {
     static ProcessService processService;
     static RequestItemService requestItemService;
     static VersioningService versioningService;
+    static DOIService doiService;
     static OrcidHistoryService orcidHistoryService;
     static OrcidQueueService orcidQueueService;
     static OrcidTokenService orcidTokenService;
@@ -116,8 +124,13 @@ public abstract class AbstractBuilder<T, S> {
     static SubmissionConfigService submissionConfigService;
     static SubscribeService subscribeService;
     static SupervisionOrderService supervisionOrderService;
+    static NotifyService notifyService;
+    static NotifyServiceInboundPatternService inboundPatternService;
+    static NotifyPatternToTriggerService notifyPatternToTriggerService;
+
     static QAEventService qaEventService;
     static SolrSuggestionStorageService solrSuggestionService;
+    static LDNMessageService ldnMessageService;
 
     protected Context context;
 
@@ -168,6 +181,7 @@ public abstract class AbstractBuilder<T, S> {
         requestItemService = RequestItemServiceFactory.getInstance().getRequestItemService();
         versioningService = DSpaceServicesFactory.getInstance().getServiceManager()
                                  .getServiceByName(VersioningService.class.getName(), VersioningService.class);
+        doiService = IdentifierServiceFactory.getInstance().getDOIService();
 
         // Temporarily disabled
         claimedTaskService = XmlWorkflowServiceFactory.getInstance().getClaimedTaskService();
@@ -186,8 +200,12 @@ public abstract class AbstractBuilder<T, S> {
         }
         subscribeService = ContentServiceFactory.getInstance().getSubscribeService();
         supervisionOrderService = SupervisionOrderServiceFactory.getInstance().getSupervisionOrderService();
+        notifyService = NotifyServiceFactory.getInstance().getNotifyService();
+        inboundPatternService = NotifyServiceFactory.getInstance().getNotifyServiceInboundPatternService();
+        notifyPatternToTriggerService = NotifyServiceFactory.getInstance().getNotifyPatternToTriggerService();
         qaEventService = new DSpace().getSingletonService(QAEventService.class);
         solrSuggestionService = new DSpace().getSingletonService(SolrSuggestionStorageService.class);
+        ldnMessageService = NotifyServiceFactory.getInstance().getLDNMessageService();
     }
 
 
@@ -220,12 +238,17 @@ public abstract class AbstractBuilder<T, S> {
         processService = null;
         requestItemService = null;
         versioningService = null;
+        doiService = null;
         orcidTokenService = null;
         systemWideAlertService = null;
         submissionConfigService = null;
         subscribeService = null;
         supervisionOrderService = null;
+        notifyService = null;
+        inboundPatternService = null;
+        notifyPatternToTriggerService = null;
         qaEventService = null;
+        ldnMessageService = null;
 
     }
 

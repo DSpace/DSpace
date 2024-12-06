@@ -7,9 +7,9 @@
  */
 package org.dspace.qaevent.script;
 
-
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.dspace.core.Constants.ITEM;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -28,10 +28,14 @@ import eu.dnetlib.broker.BrokerClient;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.QAEvent;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.handle.HandleServiceImpl;
+import org.dspace.handle.service.HandleService;
 import org.dspace.qaevent.service.OpenaireClientFactory;
 import org.dspace.qaevent.service.QAEventService;
 import org.dspace.scripts.DSpaceRunnable;
@@ -40,7 +44,7 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.utils.DSpace;
 
 /**
- * Implementation of {@link DSpaceRunnable} to perfom a QAEvents import from a
+ * Implementation of {@link DSpaceRunnable} to perform a QAEvents import from a
  * json file. The JSON file contains an array of JSON Events, where each event
  * has the following structure. The message attribute follows the structure
  * documented at
@@ -70,6 +74,8 @@ import org.dspace.utils.DSpace;
  */
 public class OpenaireEventsImport
     extends DSpaceRunnable<OpenaireEventsImportScriptConfiguration<OpenaireEventsImport>> {
+
+    private HandleService handleService;
 
     private QAEventService qaEventService;
 
@@ -103,7 +109,9 @@ public class OpenaireEventsImport
         jsonMapper = new JsonMapper();
         jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-        qaEventService = new DSpace().getSingletonService(QAEventService.class);
+        DSpace dspace = new DSpace();
+        handleService = dspace.getSingletonService(HandleServiceImpl.class);
+        qaEventService = dspace.getSingletonService(QAEventService.class);
         configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         brokerClient = OpenaireClientFactory.getInstance().getBrokerClient();
 
@@ -236,11 +244,44 @@ public class OpenaireEventsImport
     private void storeOpenaireQAEvents(List<QAEvent> events) {
         for (QAEvent event : events) {
             try {
+                final String resourceUUID = getResourceUUID(context, event.getOriginalId());
+                if (resourceUUID == null) {
+                    throw new IllegalArgumentException("Skipped event " + event.getEventId() +
+                        " related to the oai record " + event.getOriginalId() + " as the record was not found");
+                }
+                event.setTarget(resourceUUID);
                 storeOpenaireQAEvent(event);
-            } catch (RuntimeException e) {
+            } catch (RuntimeException | SQLException e) {
                 handler.logWarning("An error occurs storing the event with id "
                     + event.getEventId() + ": " + getMessage(e));
             }
+        }
+    }
+
+    private String getResourceUUID(Context context, String originalId) throws IllegalStateException, SQLException {
+        String id = getHandleFromOriginalId(originalId);
+        if (StringUtils.isNotBlank(id)) {
+            DSpaceObject dso = handleService.resolveToObject(context, id);
+            if (dso != null && dso.getType() == ITEM) {
+                Item item = (Item) dso;
+                final String itemUuid = item.getID().toString();
+                context.uncacheEntity(item);
+                return itemUuid;
+            } else {
+                return null;
+            }
+        } else {
+            throw new IllegalArgumentException("Malformed originalId " + originalId);
+        }
+    }
+
+    // oai:www.openstarts.units.it:10077/21486
+    private String getHandleFromOriginalId(String originalId) {
+        int startPosition = originalId.lastIndexOf(':');
+        if (startPosition != -1) {
+            return originalId.substring(startPosition + 1, originalId.length());
+        } else {
+            return originalId;
         }
     }
 
@@ -282,7 +323,7 @@ public class OpenaireEventsImport
         try {
             return brokerClient.listSubscriptions(openaireBrokerURL, email);
         } catch (Exception ex) {
-            throw new IllegalArgumentException("An error occurs retriving the subscriptions "
+            throw new IllegalArgumentException("An error occurs retrieving the subscriptions "
                 + "from the OPENAIRE broker: " + getMessage(ex), ex);
         }
     }

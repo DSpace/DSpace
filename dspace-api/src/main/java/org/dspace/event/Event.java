@@ -104,8 +104,10 @@ public class Event implements Serializable {
 
     protected static final int EPERSON = 1 << Constants.EPERSON; // 7
 
+    protected static final int LDN_MESSAGE = 1 << Constants.LDN_MESSAGE; // 8
+
     protected static final int ALL_OBJECTS_MASK = BITSTREAM | BUNDLE | ITEM
-        | COLLECTION | COMMUNITY | SITE | GROUP | EPERSON;
+        | COLLECTION | COMMUNITY | SITE | GROUP | EPERSON | LDN_MESSAGE;
 
     protected static Map<Integer, Integer> objTypeToMask = new HashMap<Integer, Integer>();
 
@@ -135,6 +137,9 @@ public class Event implements Serializable {
 
         objTypeToMask.put(Constants.EPERSON, EPERSON);
         objMaskToType.put(EPERSON, Constants.EPERSON);
+
+        objTypeToMask.put(Constants.LDN_MESSAGE, LDN_MESSAGE);
+        objMaskToType.put(LDN_MESSAGE, Constants.LDN_MESSAGE);
     }
 
     /** ---------- Event Fields ------------- * */
@@ -188,7 +193,7 @@ public class Event implements Serializable {
      * Contains all identifiers of the DSpaceObject that was changed (added,
      * modified, deleted, ...).
      *
-     * All events gets fired when a context that contains events gets commited.
+     * All events gets fired when a context that contains events gets committed.
      * When the delete event is fired, a deleted DSpaceObject is already gone.
      * This array contains all identifiers of the object, not only the handle
      * as the detail field does. The field may be an empty array if no

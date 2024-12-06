@@ -92,9 +92,9 @@ public class ItemImportCLIIT extends AbstractIntegrationTestWithDatabase {
     @After
     @Override
     public void destroy() throws Exception {
-        PathUtils.deleteDirectory(tempDir);
+        PathUtils.deleteOnExit(tempDir);
         for (Path path : Files.list(workDir).collect(Collectors.toList())) {
-            PathUtils.delete(path);
+            PathUtils.deleteOnExit(path);
         }
         super.destroy();
     }

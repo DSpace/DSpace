@@ -22,6 +22,7 @@ public class SuggestionSourceRest extends BaseObjectRest<String> {
     private static final long serialVersionUID = 1L;
     public static final String CATEGORY = RestAddressableModel.INTEGRATION;
     public static final String NAME = "suggestionsource";
+    public static final String PLURAL_NAME = "suggestionsources";
 
     private int total;
 
@@ -29,6 +30,11 @@ public class SuggestionSourceRest extends BaseObjectRest<String> {
     @JsonProperty(access = Access.READ_ONLY)
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     @Override

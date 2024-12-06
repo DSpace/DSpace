@@ -14,7 +14,9 @@
      <util:map id="rorMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig" value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
         <entry key-ref="ror.title" value-ref="rorTitleContrib"/>
         <entry key-ref="ror.identifier" value-ref="rorIdentifierContrib"/>
+        <entry key-ref="ror.links" value-ref="rorLinksContrib"/>
         <entry key-ref="ror.types" value-ref="rorTypesContrib"/>
+        <entry key-ref="ror.acronym" value-ref="rorAcronymContrib"/>
         <entry key-ref="ror.country" value-ref="rorCountryContrib"/>
         <entry key-ref="ror.established" value-ref="rorEstablishedContrib"/>
         <entry key-ref="ror.fundref" value-ref="rorFundRefContrib"/>
@@ -36,6 +38,22 @@
     </bean>
     <bean id="ror.identifier" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="organization.identifier.ror"/>
+    </bean>
+
+    <bean id="rorAcronymContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="ror.acronym"/>
+        <property name="query" value="/acronyms"/>
+    </bean>
+    <bean id="ror.acronym" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="organization.alternateName"/>
+    </bean>
+
+    <bean id="rorLinksContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="ror.links"/>
+        <property name="query" value="/links"/>
+    </bean>
+    <bean id="ror.links" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="organization.url"/>
     </bean>
 
     <bean id="rorTypesContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">

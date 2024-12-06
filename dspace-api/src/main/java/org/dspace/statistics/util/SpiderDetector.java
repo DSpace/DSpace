@@ -10,14 +10,13 @@ package org.dspace.statistics.util;
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.statistics.factory.StatisticsServiceFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * SpiderDetector delegates static methods to SpiderDetectorService, which is used to find IP's that are spiders...
+ * SpiderDetector delegates static methods to SpiderDetectorService,
+ * which is used to find IPs, hosts, or agents that are spiders...
  *
  * @author kevinvandevelde at atmire.com
  * @author ben at atmire.com
@@ -25,28 +24,15 @@ import org.slf4j.LoggerFactory;
  * @author frederic at atmire.com
  */
 public class SpiderDetector {
-
-    private static final Logger log = LoggerFactory.getLogger(SpiderDetector.class);
-
-    //Service where all methods get delegated to, this is instantiated by a spring-bean defined in core-services.xml
-    private static SpiderDetectorService spiderDetectorService = StatisticsServiceFactory.getInstance()
-                                                                                         .getSpiderDetectorService();
+    //Service where all methods get delegated to.  This is instantiated by a
+    // Spring bean defined in core-services.xml
+    private static final SpiderDetectorService spiderDetectorService
+            = StatisticsServiceFactory.getInstance().getSpiderDetectorService();
 
     /**
      * Default constructor
      */
     private SpiderDetector() { }
-
-    /**
-     * Get an immutable Set representing all the Spider Addresses here
-     *
-     * @return a set of IP addresses as strings
-     */
-    public static Set<String> getSpiderIpAddresses() {
-
-        spiderDetectorService.loadSpiderIpAddresses();
-        return spiderDetectorService.getTable().toSet();
-    }
 
     /**
      * Utility method which reads lines from a file & returns them in a Set.

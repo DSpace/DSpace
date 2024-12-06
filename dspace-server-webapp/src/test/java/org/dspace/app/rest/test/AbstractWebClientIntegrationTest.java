@@ -16,12 +16,12 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -51,9 +51,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ContextConfiguration(initializers = { DSpaceKernelInitializer.class, DSpaceConfigurationInitializer.class })
 // Load our src/test/resources/application-test.properties to override some settings in default application.properties
 @TestPropertySource(locations = "classpath:application-test.properties")
-// Enable our custom Logging listener to log when each test method starts/stops
-@TestExecutionListeners(listeners = {LoggingTestExecutionListener.class},
-                        mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 public class AbstractWebClientIntegrationTest extends AbstractIntegrationTestWithDatabase {
     // (Random) port chosen for test web server
     @LocalServerPort
@@ -95,6 +92,15 @@ public class AbstractWebClientIntegrationTest extends AbstractIntegrationTestWit
     }
 
     /**
+     * Perform a request (defined by RequestEntity) and return response as a String
+     * @param request RequestEntity object which defines the GET request
+     * @return ResponseEntity with a String body
+     */
+    public ResponseEntity<String> responseAsString(RequestEntity request) {
+        return getClient().exchange(request, String.class);
+    }
+
+    /**
      * Perform an authenticated (via Basic Auth) GET request and return response as a String
      * @param path path to perform GET against
      * @param username Username
@@ -107,10 +113,10 @@ public class AbstractWebClientIntegrationTest extends AbstractIntegrationTestWit
 
     /**
      * Perform an authenticated (via Basic Auth) POST request and return response as a String.
-     * @param path path to perform GET against
+     * @param path path to perform POST against
      * @param username Username (may be null to perform an unauthenticated POST)
      * @param password Password
-     * @param requestEntity unknown -- not used.
+     * @param requestEntity HttpEntity to specify content/headers to POST
      * @return ResponseEntity with a String body
      */
     public ResponseEntity<String> postResponseAsString(String path, String username, String password,

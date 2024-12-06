@@ -17,7 +17,11 @@ import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
+import org.dspace.content.DCDate;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.swordapp.server.OriginalDeposit;
@@ -27,6 +31,9 @@ import org.swordapp.server.Statement;
 public abstract class GenericStatementDisseminator
     implements SwordStatementDisseminator {
     protected SwordUrlManager urlManager;
+
+    protected ItemService itemService = ContentServiceFactory.getInstance()
+                                                             .getItemService();
 
     protected void populateStatement(Context context, Item item,
                                      Statement statement)
@@ -78,6 +85,7 @@ public abstract class GenericStatementDisseminator
                                 bitstream));
                         deposit.setMediaType(bitstream
                                                  .getFormat(context).getMIMEType());
+                        deposit.setDepositedOn(this.getDateOfDeposit(item));
                         originalDeposits.add(deposit);
                     }
                 }
@@ -172,5 +180,15 @@ public abstract class GenericStatementDisseminator
             swordBundle = "SWORD";
         }
         return swordBundle;
+    }
+
+    private Date getDateOfDeposit(Item item) {
+        List<MetadataValue> values = itemService.getMetadata(item, "dc", "date", "accessioned", Item.ANY);
+        Date date = new Date();
+        if (values != null && values.size() > 0) {
+            String strDate = values.get(0).getValue();
+            date = new DCDate(strDate).toDate();
+        }
+        return date;
     }
 }

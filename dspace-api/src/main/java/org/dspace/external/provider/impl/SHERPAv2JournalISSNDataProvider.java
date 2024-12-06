@@ -26,7 +26,7 @@ import org.dspace.external.provider.AbstractExternalDataProvider;
 
 /**
  * This class is the implementation of the ExternalDataProvider interface that will deal with SherpaJournal External
- * data lookups based on ISSN (to match functinoality offered by legacy SHERPASubmitService for policy lookups
+ * data lookups based on ISSN (to match functionality offered by legacy SHERPASubmitService for policy lookups
  * at the time of submission).
  * This provider is a refactored version of SherpaJournalDataPublisher, rewritten to work with SHERPA v2 API
  *

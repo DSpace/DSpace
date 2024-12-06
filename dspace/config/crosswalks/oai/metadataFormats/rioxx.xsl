@@ -785,7 +785,7 @@
                 <xsl:text>http://purl.org/coar/version/c_ab4af688f83e57aa</xsl:text>
             </xsl:when>
             <xsl:when test="$lc_description = 'published version' or $lc_version='vor'">
-                <xsl:text>http://purl.org/coar/resource_type/c_1162</xsl:text>
+                <xsl:text>http://purl.org/coar/version/c_970fb48d4fbd8a85</xsl:text>
             </xsl:when>
             <xsl:when test="$lc_description = 'submitted version' or $lc_version='ao'">
                 <xsl:text>http://purl.org/coar/version/c_b1a7d7d4d402bcce</xsl:text>

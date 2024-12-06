@@ -30,8 +30,22 @@
                 <ref bean="csvImportService" />
                 <ref bean="tsvImportService" />
                 <ref bean="endnoteImportService" />
+                <ref bean="DoiImportService" />
             </list>
          </property>
+    </bean>
+
+    <bean id="DoiImportService"
+          class="org.dspace.importer.external.MultipleParallelImportMetadataSourceServiceImpl" scope="singleton">
+        <constructor-arg name="innerProviders">
+            <list>
+                <ref bean="CrossRefImportService"/>
+                <ref bean="DataCiteImportService"/>
+            </list>
+        </constructor-arg>
+        <constructor-arg name="sourceName">
+            <value>doi</value>
+        </constructor-arg>
     </bean>
 
     <bean id="DataCiteImportService"

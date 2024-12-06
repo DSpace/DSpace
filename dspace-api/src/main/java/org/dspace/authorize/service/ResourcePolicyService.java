@@ -17,7 +17,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.service.DSpaceCRUDService;
 
 /**
  * Service interface class for the ResourcePolicy object.
@@ -26,7 +25,34 @@ import org.dspace.service.DSpaceCRUDService;
  *
  * @author kevinvandevelde at atmire.com
  */
-public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy> {
+public interface ResourcePolicyService {
+
+    public ResourcePolicy create(Context context, EPerson eperson, Group group) throws SQLException, AuthorizeException;
+
+    public ResourcePolicy find(Context context, int id) throws SQLException;
+
+    /**
+     * Persist a model object.
+     *
+     * @param context
+     * @param resourcePolicy object to be persisted.
+     * @throws SQLException passed through.
+     * @throws AuthorizeException passed through.
+     */
+    public void update(Context context, ResourcePolicy resourcePolicy) throws SQLException, AuthorizeException;
+
+
+    /**
+     * Persist a collection of model objects.
+     *
+     * @param context
+     * @param resourcePolicies object to be persisted.
+     * @throws SQLException passed through.
+     * @throws AuthorizeException passed through.
+     */
+    public void update(Context context, List<ResourcePolicy> resourcePolicies) throws SQLException, AuthorizeException;
+
+    public void delete(Context context, ResourcePolicy resourcePolicy) throws SQLException, AuthorizeException;
 
 
     public List<ResourcePolicy> find(Context c, DSpaceObject o) throws SQLException;

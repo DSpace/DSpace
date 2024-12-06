@@ -230,7 +230,7 @@ public class StatisticsDataVisits extends StatisticsData {
                         dataset.setRowLabel(0, getResultName(dataSetQuery.getName(), dataSetQuery, context));
                         dataset.setRowLabelAttr(0, getAttributes(dataSetQuery.getName(), dataSetQuery, context));
                     } else {
-                        // We need to get the max objects and the next part of the query on them (next part beeing
+                        // We need to get the max objects and the next part of the query on them (next part being
                         // the datasettimequery
                         ObjectCount[] maxObjectCounts = solrLoggerService
                             .queryFacetField(query, filterQuery, dataSetQuery.getFacetField(), dataSetQuery.getMax(),

@@ -13,7 +13,7 @@ package org.dspace.app.rest.utils;
  */
 public class RegexUtils {
 
-    private RegexUtils(){}
+    private RegexUtils() {}
 
     /**
      * Regular expression in the request mapping to accept UUID as identifier
@@ -26,6 +26,12 @@ public class RegexUtils {
      */
     public static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID =
         "/{uuid:" + REGEX_UUID + "}";
+
+    /**
+     * Regular expression in the request mapping to accept LDN identifiers
+     */
+    public static final String REGEX_REQUESTMAPPING_IDENTIFIER_AS_URN_UUID =
+        "/{id:^urn:uuid:" + REGEX_UUID + "}";
 
     /**
      * Regular expression in the request mapping to accept a string as identifier but not the other kind of

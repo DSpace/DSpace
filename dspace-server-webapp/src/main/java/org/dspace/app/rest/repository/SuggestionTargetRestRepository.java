@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 
-@Component(SuggestionTargetRest.CATEGORY + "." + SuggestionTargetRest.NAME)
+@Component(SuggestionTargetRest.CATEGORY + "." + SuggestionTargetRest.PLURAL_NAME)
 public class SuggestionTargetRestRepository extends DSpaceRestRepository<SuggestionTargetRest, String> {
 
     private static final Logger log = org.apache.logging.log4j.LogManager

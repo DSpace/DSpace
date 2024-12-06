@@ -10,25 +10,24 @@ package org.dspace.scripts;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.content.Bitstream;
@@ -36,7 +35,7 @@ import org.dspace.content.ProcessStatus;
 import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.hibernate.annotations.Type;
+import org.hibernate.Length;
 
 /**
  * This class is the DB Entity representation of the Process object to be stored in the Database
@@ -51,8 +50,8 @@ public class Process implements ReloadableEntity<Integer> {
     @Column(name = "process_id", unique = true, nullable = false)
     private Integer processId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private EPerson ePerson;
 
     @Column(name = "start_time")
@@ -70,9 +69,7 @@ public class Process implements ReloadableEntity<Integer> {
     @Enumerated(EnumType.STRING)
     private ProcessStatus processStatus;
 
-    @Lob
-    @Type(type = "org.hibernate.type.TextType")
-    @Column(name = "parameters")
+    @Column(name = "parameters", length = Length.LONG32)
     private String parameters;
 
     @ManyToMany(fetch = FetchType.LAZY)

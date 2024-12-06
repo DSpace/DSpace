@@ -21,6 +21,7 @@ import org.dspace.app.rest.RestResourceController;
 public class SubmissionUploadRest extends BaseObjectRest<String> {
 
     public static final String NAME = "submissionupload";
+    public static final String PLURAL_NAME = "submissionuploads";
     public static final String NAME_LINK_ON_PANEL = RestAddressableModel.CONFIGURATION;
     public static final String CATEGORY = RestAddressableModel.CONFIGURATION;
 
@@ -51,6 +52,11 @@ public class SubmissionUploadRest extends BaseObjectRest<String> {
     @Override
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     @Override

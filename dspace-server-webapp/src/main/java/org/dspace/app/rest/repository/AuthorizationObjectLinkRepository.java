@@ -8,9 +8,9 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.authorization.AuthorizationRestUtil;
 import org.dspace.app.rest.model.AuthorizationRest;
 import org.dspace.app.rest.model.BaseObjectRest;
@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "object" subresource of an individual authorization.
  */
-@Component(AuthorizationRest.CATEGORY + "." + AuthorizationRest.NAME + "." + AuthorizationRest.OBJECT)
+@Component(AuthorizationRest.CATEGORY + "." + AuthorizationRest.PLURAL_NAME + "." + AuthorizationRest.OBJECT)
 public class AuthorizationObjectLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

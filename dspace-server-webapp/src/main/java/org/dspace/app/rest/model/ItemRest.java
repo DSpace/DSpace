@@ -17,42 +17,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-        @LinkRest(
-                name = ItemRest.ACCESS_STATUS,
-                method = "getAccessStatus"
-        ),
-        @LinkRest(
-                name = ItemRest.BUNDLES,
-                method = "getBundles"
-        ),
-        @LinkRest(
-                name = ItemRest.IDENTIFIERS,
-                method = "getIdentifiers"
-        ),
-        @LinkRest(
-                name = ItemRest.MAPPED_COLLECTIONS,
-                method = "getMappedCollections"
-        ),
-        @LinkRest(
-                name = ItemRest.OWNING_COLLECTION,
-                method = "getOwningCollection"
-        ),
-        @LinkRest(
-                name = ItemRest.RELATIONSHIPS,
-                method = "getRelationships"
-        ),
-        @LinkRest(
-                name = ItemRest.VERSION,
-                method = "getItemVersion"
-        ),
-        @LinkRest(
-                name = ItemRest.TEMPLATE_ITEM_OF,
-                method = "getTemplateItemOf"
-        ),
-        @LinkRest(
-                name = ItemRest.THUMBNAIL,
-                method = "getThumbnail"
-        )
+    @LinkRest(name = ItemRest.ACCESS_STATUS, method = "getAccessStatus"),
+    @LinkRest(name = ItemRest.BUNDLES, method = "getBundles"),
+    @LinkRest(name = ItemRest.IDENTIFIERS, method = "getIdentifiers"),
+    @LinkRest(name = ItemRest.MAPPED_COLLECTIONS, method = "getMappedCollections"),
+    @LinkRest(name = ItemRest.OWNING_COLLECTION, method = "getOwningCollection"),
+    @LinkRest(name = ItemRest.RELATIONSHIPS, method = "getRelationships"),
+    @LinkRest(name = ItemRest.VERSION, method = "getItemVersion"),
+    @LinkRest(name = ItemRest.TEMPLATE_ITEM_OF, method = "getTemplateItemOf"),
+    @LinkRest(name = ItemRest.THUMBNAIL, method = "getThumbnail"),
+    @LinkRest(name = ItemRest.SUBMITTER, method = "getItemSubmitter")
 })
 public class ItemRest extends DSpaceObjectRest {
     public static final String NAME = "item";
@@ -68,6 +42,8 @@ public class ItemRest extends DSpaceObjectRest {
     public static final String VERSION = "version";
     public static final String TEMPLATE_ITEM_OF = "templateItemOf";
     public static final String THUMBNAIL = "thumbnail";
+
+    public static final String SUBMITTER = "submitter";
 
     private boolean inArchive = false;
     private boolean discoverable = false;
@@ -85,6 +61,11 @@ public class ItemRest extends DSpaceObjectRest {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     public boolean getInArchive() {

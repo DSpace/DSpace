@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.annotation.Resource;
 
+import jakarta.annotation.Resource;
 import org.dspace.importer.external.exception.FileSourceException;
 import org.dspace.importer.external.service.components.AbstractPlainMetadataSource;
 import org.dspace.importer.external.service.components.dto.PlainMetadataKeyValueItem;

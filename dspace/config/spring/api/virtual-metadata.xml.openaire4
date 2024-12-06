@@ -167,6 +167,7 @@
         <entry key="oaire.awardTitle" value-ref="publicationProject_name"/>
         <entry key="project.funder.name" value-ref="publicationProject_projectFunderName_related"/>
         <entry key="project.funder.identifier" value-ref="publicationProject_projectFunderId_related"/>
+        <entry key="project.funder.rorIdentifier" value-ref="publicationProject_projectRorId_related"/>
     </util:map>
     <bean class="org.dspace.content.virtual.Collected" id="publicationProject_name">
         <property name="fields">
@@ -208,7 +209,13 @@
         <property name="relationshipTypeString" value="isFundingAgencyOfProject"/>
         <property name="virtualMetadataConfiguration" ref="projectOrgUnit_orgId"/>
     </bean>
-    
+
+    <bean class="org.dspace.content.virtual.Related" id="publicationProject_projectRorId_related">
+        <property name="relationshipTypeString" value="isProjectOfFundingAgency"/>
+        <property name="place" value="0"/>
+        <property name="virtualMetadataConfiguration" ref="projectOrgUnit_rorId"/>
+    </bean>
+
     <!-- Config like this will tell our VirtualMetadataPopulator to include the virtual metadata field
      'project.funder.*' on the appropriate item with the values defined in the value-ref.
       This value-ref should be a bean of type VirtualMetadataConfiguration -->
@@ -228,6 +235,13 @@
         <property name="fields">
             <util:list>
                 <value>organization.identifier</value>
+            </util:list>
+        </property>
+    </bean>
+    <bean class="org.dspace.content.virtual.Collected" id="projectOrgUnit_rorId">
+        <property name="fields">
+            <util:list>
+                <value>organization.identifier.ror</value>
             </util:list>
         </property>
     </bean>

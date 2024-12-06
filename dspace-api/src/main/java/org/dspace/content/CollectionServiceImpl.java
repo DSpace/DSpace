@@ -31,7 +31,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
-import org.dspace.browse.ItemCountException;
 import org.dspace.browse.ItemCounter;
 import org.dspace.content.dao.CollectionDAO;
 import org.dspace.content.service.BitstreamService;
@@ -121,6 +120,9 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;
+
+    @Autowired
+    protected ItemCounter itemCounter;
 
     protected CollectionServiceImpl() {
         super();
@@ -1109,35 +1111,15 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         return (int) resp.getTotalSearchResults();
     }
 
-    @Override
-    @SuppressWarnings("rawtypes")
-    public List<Collection> findAllCollectionsByEntityType(Context context, String entityType)
-            throws SearchServiceException {
-        List<Collection> collectionList = new ArrayList<>();
-
-        DiscoverQuery discoverQuery = new DiscoverQuery();
-        discoverQuery.setDSpaceObjectFilter(IndexableCollection.TYPE);
-        discoverQuery.addFilterQueries("dspace.entity.type:" + entityType);
-
-        DiscoverResult discoverResult = searchService.search(context, discoverQuery);
-        List<IndexableObject> solrIndexableObjects = discoverResult.getIndexableObjects();
-
-        for (IndexableObject solrCollection : solrIndexableObjects) {
-            Collection c = ((IndexableCollection) solrCollection).getIndexedObject();
-            collectionList.add(c);
-        }
-        return collectionList;
-    }
-
     /**
      * Returns total collection archived items
      *
+     * @param context          DSpace Context
      * @param collection       Collection
      * @return                 total collection archived items
-     * @throws ItemCountException
      */
     @Override
-    public int countArchivedItems(Collection collection) throws ItemCountException {
-        return ItemCounter.getInstance().getCount(collection);
+    public int countArchivedItems(Context context, Collection collection) {
+        return itemCounter.getCount(context, collection);
     }
 }

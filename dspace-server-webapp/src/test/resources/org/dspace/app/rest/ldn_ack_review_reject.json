@@ -1,0 +1,34 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/activitystreams",
+    "https://purl.org/coar/notify"
+  ],
+  "actor": {
+    "id": "https://generic-service.com",
+    "name": "Generic Service",
+    "type": "Service"
+  },
+  "context": {
+    "id": "<<object_handle>>",
+    "ietf:cite-as": "https://doi.org/10.4598/12123487",
+    "type": "Document"
+  },
+  "id": "urn:uuid:668f26e0-2c8d-4117-a0d2-ee713523bcb4",
+  "inReplyTo": "<<ldn_offer_review_uuid>>",
+  "object": {
+    "id": "<<object_handle>>",
+    "object": "https://some-organisation.org/resource/0021",
+    "type": "Offer"
+  },
+  "origin": {
+    "id": "https://generic-service.com/system",
+    "inbox": "https://review-service.com/inbox/",
+    "type": "Service"
+  },
+  "target": {
+    "id": "https://some-organisation.org",
+    "inbox": "hop",
+    "type": "Organization"
+  },
+  "type": ["TentativeReject", "coar-notify:ReviewAction"]
+}

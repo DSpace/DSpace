@@ -8,9 +8,9 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.PoolTaskRest;
 import org.dspace.app.rest.model.WorkflowStepRest;
 import org.dspace.app.rest.projection.Projection;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repositoy for the Steps subresources of an individual PoolTask
  */
-@Component(PoolTaskRest.CATEGORY + "." + PoolTaskRest.NAME + "." + PoolTaskRest.STEP)
+@Component(PoolTaskRest.CATEGORY + "." + PoolTaskRest.PLURAL_NAME + "." + PoolTaskRest.STEP)
 public class PoolTaskStepLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     @Autowired

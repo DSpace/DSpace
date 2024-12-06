@@ -9,9 +9,9 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.UUID;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.SuggestionTargetRest;
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-@Component(SuggestionTargetRest.CATEGORY + "." + SuggestionTargetRest.NAME + "." + SuggestionTargetRest.TARGET)
+@Component(SuggestionTargetRest.CATEGORY + "." + SuggestionTargetRest.PLURAL_NAME + "." + SuggestionTargetRest.TARGET)
 public class SuggestionTargetTargetLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     @Autowired

@@ -12,6 +12,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.cli.ParseException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
@@ -23,8 +25,6 @@ import org.dspace.discovery.utils.parameter.QueryBuilderSearchFilter;
 import org.dspace.scripts.DSpaceRunnable;
 import org.dspace.sort.SortOption;
 import org.dspace.utils.DSpace;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Runner responsible to import metadata about authors from OpenAIRE to Solr.
@@ -33,13 +33,13 @@ import org.slf4j.LoggerFactory;
  * with this UUID will be used.
  * Invocation without any parameter results in massive import, processing all
  * authors registered in DSpace.
- * 
+ *
  * @author Alessandro Martelli (alessandro.martelli at 4science.it)
  */
 public class PublicationLoaderRunnable
     extends DSpaceRunnable<PublicationLoaderScriptConfiguration<PublicationLoaderRunnable>> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PublicationLoaderRunnable.class);
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private PublicationLoader oairePublicationLoader = null;
 
@@ -63,9 +63,9 @@ public class PublicationLoaderRunnable
 
         profile = commandLine.getOptionValue("s");
         if (profile == null) {
-            LOGGER.info("No argument for -s, process all profile");
+            LOGGER.info("No argument for -s, process all profiles");
         } else {
-            LOGGER.info("Process eperson item with UUID " + profile);
+            LOGGER.info("Process eperson item with UUID {}", profile);
         }
     }
 
@@ -87,7 +87,7 @@ public class PublicationLoaderRunnable
      * the researcher with this UUID will be chosen. If the uuid doesn't match any
      * researcher, the method returns an empty array list. If uuid is null, all
      * research will be return.
-     * 
+     *
      * @param  profileUUID uuid of the researcher. If null, all researcher will be
      *                     returned.
      * @return             the researcher with specified UUID or all researchers
@@ -96,10 +96,10 @@ public class PublicationLoaderRunnable
     private Iterator<Item> getResearchers(String profileUUID) {
         SearchService searchService = new DSpace().getSingletonService(SearchService.class);
         DiscoverQueryBuilder queryBuilder = SearchUtils.getQueryBuilder();
-        List<QueryBuilderSearchFilter> filters = new ArrayList<QueryBuilderSearchFilter>();
+        List<QueryBuilderSearchFilter> filters = new ArrayList<>();
         String query = "*:*";
         if (profileUUID != null) {
-            query = "search.resourceid:" + profileUUID.toString();
+            query = "search.resourceid:" + profileUUID;
         }
         try {
             DiscoverQuery discoverQuery = queryBuilder.buildQuery(context, null,

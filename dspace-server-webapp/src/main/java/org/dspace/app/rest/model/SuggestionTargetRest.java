@@ -19,11 +19,12 @@ import org.dspace.app.rest.RestResourceController;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-        @LinkRest(name = SuggestionTargetRest.TARGET, method = "getTarget")
+    @LinkRest(name = SuggestionTargetRest.TARGET, method = "getTarget")
 })
 public class SuggestionTargetRest extends BaseObjectRest<String> {
     private static final long serialVersionUID = 1L;
     public static final String NAME = "suggestiontarget";
+    public static final String PLURAL_NAME = "suggestiontargets";
     public static final String TARGET = "target";
     public static final String CATEGORY = RestAddressableModel.INTEGRATION;
 
@@ -35,6 +36,11 @@ public class SuggestionTargetRest extends BaseObjectRest<String> {
     @JsonProperty(access = Access.READ_ONLY)
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     @Override

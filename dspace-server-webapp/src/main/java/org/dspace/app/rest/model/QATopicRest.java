@@ -22,6 +22,7 @@ public class QATopicRest extends BaseObjectRest<String> {
     private static final long serialVersionUID = -7455358581579629244L;
 
     public static final String NAME = "qualityassurancetopic";
+    public static final String PLURAL_NAME = "qualityassurancetopics";
     public static final String CATEGORY = RestAddressableModel.INTEGRATION;
 
     private String id;
@@ -32,6 +33,11 @@ public class QATopicRest extends BaseObjectRest<String> {
     @Override
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     @Override

@@ -20,8 +20,8 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
@@ -179,7 +179,7 @@ public class Util {
      * @return the file size as a String
      */
     public static String formatFileSize(double in) {
-        // Work out the size of the file, and format appropriatly
+        // Work out the size of the file, and format appropriately
         // FIXME: When full i18n support is available, use the user's Locale
         // rather than the default Locale.
         NumberFormat nf = NumberFormat.getNumberInstance(Locale.getDefault());
@@ -238,7 +238,7 @@ public class Util {
         } catch (Exception e) {
             // at least log this error to make debugging easier
             // do not silently return null only.
-            log.warn("Unable to recoginze UUID from String \""
+            log.warn("Unable to recognize UUID from String \""
                          + val + "\". Will return null.", e);
             // Problem with parameter
             return null;

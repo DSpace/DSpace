@@ -185,7 +185,7 @@ public class AnonymizeStatistics {
             long total = getDocuments().getResults().getNumFound();
             printInfo(total + " documents to update");
 
-            // The documents will be processed in seperate threads.
+            // The documents will be processed in separate threads.
             ExecutorService executorService = Executors.newFixedThreadPool(threads);
 
             QueryResponse documents;

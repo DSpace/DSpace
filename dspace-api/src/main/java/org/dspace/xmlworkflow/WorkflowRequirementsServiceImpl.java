@@ -31,7 +31,7 @@ import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * A class that contains utililty methods related to the workflow
+ * A class that contains utility methods related to the workflow
  * The adding/removing from claimed users and ensuring that
  * if multiple users have to perform these steps that a count is kept
  * so that no more then the allowed user count are allowed to perform their actions
