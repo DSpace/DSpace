@@ -155,6 +155,10 @@ jobs:
           # Use tags / labels provided by 'docker/metadata-action' above
           tags: ${{ steps.meta_build.outputs.tags }}
           labels: ${{ steps.meta_build.outputs.labels }}
+          # Use GitHub cache to load cached Docker images and cache the results of this build
+          # This decreases the number of images we need to fetch from DockerHub
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       # Export the digest of Docker build locally (for non PRs only)
       - name: Export Docker build digest
@@ -240,6 +244,7 @@ jobs:
           # for testing in docker.yml
           tags: pr-testing
           flavor: ${{ env.TAGS_FLAVOR }}
+
       # Build local image and stores in a TAR file in /tmp directory
       - name: Build and push image to local image
         if: matrix.isPr
@@ -252,8 +257,13 @@ jobs:
           platforms: ${{ matrix.arch }}
           tags: ${{ steps.meta_build_pr.outputs.tags }}
           labels: ${{ steps.meta_build_pr.outputs.labels }}
+          # Use GitHub cache to load cached Docker images and cache the results of this build
+          # This decreases the number of images we need to fetch from DockerHub
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           # Export image to a local TAR file
           outputs: type=docker,dest=/tmp/${{ inputs.build_id }}.tar
+
       # Upload the local docker image (in TAR file) to a build Artifact
       - name: Upload local image to artifact
         if: matrix.isPr
