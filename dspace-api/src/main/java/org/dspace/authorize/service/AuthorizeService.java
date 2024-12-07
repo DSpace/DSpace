@@ -17,6 +17,8 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -604,4 +606,24 @@ public interface AuthorizeService {
     public void replaceAllPolicies(Context context, DSpaceObject source, DSpaceObject dest)
             throws SQLException, AuthorizeException;
 
+    /**
+     * Finds all Indexed Objects where the current user has admin rights. If the user is an super Admin,
+     * this is all Indexed Objects(community/collection). Otherwise, it includes those objects where
+     * an indexed "admin" policy lists either the eperson or one of the eperson's groups
+     *
+     * @param context                    DSpace context
+     * @param discoverQuery
+     * @param entityType                 limit the returned object(community/collection) to those related to
+     * given entity type
+     * @param community                  parent community, could be null
+     * @param q                          limit the returned collection to those with metadata values matching the query
+     *                                   terms. The terms are used to make also a prefix query on SOLR
+     *                                   so it can be used to implement an autosuggest feature over the collection name
+     * @return                           DiscoveryResult object
+     * @throws SQLException              if something goes wrong
+     * @throws SearchServiceException    if search error
+     */
+    public DiscoverResult retrieveObjectWithAdmin(Context context, DiscoverQuery discoverQuery,
+            String entityType, Community community, String q)
+            throws SQLException, SearchServiceException;
 }
