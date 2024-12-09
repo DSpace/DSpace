@@ -66,12 +66,32 @@ OPTIONALLY, you can build DSpace images using a different JDK_VERSION like this:
 ```
 docker compose -f docker-compose.yml -f docker-compose-cli.yml build --build-arg JDK_VERSION=17
 ```
-Default is Java 11, but other LTS releases (e.g. 17) are also supported.
+Default is Java 17, but other LTS releases may be supported.
 
 ## Run DSpace 8 REST from your current branch
+
+This runs the DSpace backend (REST API) in a new compose project on standard ports.
 ```
 docker compose -p d8 up -d
 ```
+
+It is also possible to run several DSpace backends at once using this same script. To do so, you MUST define
+a **different** compose project (-p), along with **different** ports and a **different** network. (If any of these 
+overlap with an existing DSpace backend, you will see conflicts / errors thrown by Docker compose.)
+
+Here's an example of running a second DSpace backend in a "ds-second" project using a different network (172.24.0.x), 
+and non-default ports for backend (8081), frontend (4001), Postgres (5433) and Solr (8984):
+```
+DSPACE_UI_PORT=4001 DSPACE_REST_PORT=8081 DSPACE_DB_PORT=5433 DSPACE_SOLR_PORT=8984 DSPACE_NETWORK_ID=172.24.0 docker compose -p d7 up -d
+```
+* **IMPORTANT:** When using non-standard ports, these environment variables will need to be passed into EVERY 
+`docker compose` command you run.  Otherwise, the default ports will be assumed.
+* _NOTE:_ The `DSPACE_UI_PORT` is only necessary if you plan to run a user interface from a non-standard port to connect to
+this backend. This env variable is simply used to set the `dspace.ui.url` config properly.
+* _NOTE:_ For Windows you MUST either set the environment variable separately, or use the `env` command provided with Git/Cygwin
+(you may already have this command if you are running Git for Windows). See https://superuser.com/a/1079563
+
+Additional environment variables can be found in the comments of `docker-compose.yml`.
 
 ## Run DSpace 8 REST and Angular from your branch
 
