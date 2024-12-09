@@ -10,11 +10,12 @@
 ##             {7} the url to the primary bitstream or the first bitstream in the ORIGINAL bundle if there is no primary bitstream. The url is 'dspace.ui.url'/bitstreams/:uuid/download
 ##             {8} the bitstream  MimeType or get User Format MimeType if getFormat is 'Unknown'
 ##             {9} id of the created LDNMessage
+##            {14} config 'dspace.ui.url'
 
 {
   "@context": [
     "https://www.w3.org/ns/activitystreams",
-    "https://purl.org/coar/notify"
+    "https://coar-notify.net/"
   ],
   "actor": {
     "id": "${params[0]}",
@@ -36,7 +37,7 @@
     }
   },
   "origin": {
-    "id": "${params[0]}",
+    "id": "${params[14]}",
     "inbox": "${params[1]}",
     "type": "Service"
   },
