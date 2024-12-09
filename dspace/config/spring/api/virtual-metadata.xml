@@ -21,6 +21,8 @@
                 <entry key="isVolumeOfJournal" value-ref="isVolumeOfJournalMap"/>
                 <entry key="isIssueOfJournalVolume" value-ref="isIssueOfJournalVolumeMap"/>
                 <entry key="isJournalIssueOfPublication" value-ref="isJournalIssueOfPublicationMap"/>
+                <entry key="isInventorOfPatent" value-ref="isInventorOfPatentMap"/>
+                <entry key="isCreatorOfProduct" value-ref="isCreatorOfProductMap"/>
             </map>
         </property>
     </bean>
@@ -217,6 +219,37 @@
             <value>, </value>
         </property>
     </bean>
+    
+    <util:map id="isInventorOfPatentMap">
+        <entry key="dc.contributor.author" value-ref="patentInventor_inventor"/>
+    </util:map>
+    <bean class="org.dspace.content.virtual.Concatenate" id="patentInventor_inventor">
+        <property name="fields">
+            <util:list>
+                <value>person.familyName</value>
+                <value>person.givenName</value>
+            </util:list>
+        </property>
+        <property name="separator">
+            <value>, </value>
+        </property>
+    </bean>
+    
+    <util:map id="isCreatorOfProductMap">
+        <entry key="dc.contributor.author" value-ref="productCreator_creator"/>
+    </util:map>
+    <bean class="org.dspace.content.virtual.Concatenate" id="productCreator_creator">
+        <property name="fields">
+            <util:list>
+                <value>person.familyName</value>
+                <value>person.givenName</value>
+            </util:list>
+        </property>
+        <property name="separator">
+            <value>, </value>
+        </property>
+    </bean>
+    
 
     <!-- This Related bean defines a relationship type that will be used on a publication.
         The publication will receive 1 virtual metadata value namely the creativeworkseries.issn to which it belongs
