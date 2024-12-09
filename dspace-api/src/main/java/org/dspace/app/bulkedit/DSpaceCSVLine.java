@@ -205,6 +205,13 @@ public class DSpaceCSVLine implements Serializable {
 
             s = str.toString();
         }
+        // Sanitise for Excel
+        s = s.replaceAll("^[\\r\\n]+", "");
+        if (s.length() > 1 && "+@=-".indexOf(s.charAt(0)) != -1) {
+            s = s.substring(1);
+        }
+
+
 
         // Replace internal quotes with two sets of quotes
         return "\"" + s.replaceAll("\"", "\"\"") + "\"";
