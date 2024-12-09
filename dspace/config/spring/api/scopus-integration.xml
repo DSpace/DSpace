@@ -128,7 +128,7 @@
         <property name="prefixToNamespaceMapping" ref="scopusPrism"/>
     </bean>
     <bean id="scopus.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier"/>
+        <constructor-arg value="dc.relation.hasversion"/>
     </bean>
 
     <bean id="scopusVolumeContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
