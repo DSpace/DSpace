@@ -13,12 +13,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.dspace.importer.external.exception.FileSourceException;
-import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.contributor.MetadataContributor;
 import org.dspace.importer.external.service.components.AbstractPlainMetadataSource;
 import org.dspace.importer.external.service.components.dto.PlainMetadataKeyValueItem;
@@ -132,7 +130,7 @@ public class EndnoteImportMetadataSourceServiceImpl extends AbstractPlainMetadat
     }
 
     @Override
-    public void setMetadataFieldMap(Map<MetadataFieldConfig,
+    public void setMetadataFieldMap(List<
         MetadataContributor<PlainMetadataSourceDto>> metadataFieldMap) {
         super.setMetadataFieldMap(metadataFieldMap);
     }
