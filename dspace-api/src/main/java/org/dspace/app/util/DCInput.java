@@ -262,7 +262,7 @@ public class DCInput {
 
     /**
      * Is this DCInput for display in the given scope? The scope should be
-     * either "workflow" or "submit", as per the input forms definition. If the
+     * either "workflow" or "submission", as per the input forms definition. If the
      * internal visibility is set to "null" then this will always return true.
      *
      * @param scope String identifying the scope that this input's visibility
