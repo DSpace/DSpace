@@ -44,6 +44,9 @@ public class LinksetRestMessageConverter {
             if (isNotBlank(linksetNode.getAnchor())) {
                 responseBody.append(format("; anchor=\"%s\" ", linksetNode.getAnchor()));
             }
+            if (isNotBlank(linksetNode.getProfile())) {
+                responseBody.append(format("; profile=\"%s\" ", linksetNode.getProfile()));
+            }
             responseBody.append(", ");
         });
         return responseBody.toString();
