@@ -44,9 +44,9 @@ public class HdlResolverRestControllerIT extends AbstractControllerIntegrationTe
     /**
      * Verifies that any mapped <code>hdlIdentifier</code> returns the
      * corresponding <code>handle URL</code>
-     * 
+     *
      * @throws Exception
-     * 
+     *
      */
     @Test
     public void givenMappedIdentifierWhenCallHdlresolverThenReturnsMappedURL() throws Exception {
@@ -69,6 +69,8 @@ public class HdlResolverRestControllerIT extends AbstractControllerIntegrationTe
 
         ResultMatcher matchHandleResponse = jsonPath("$[0]",
                 StringContains.containsString("123456789/testHdlResolver"));
+        ResultMatcher matchUUIDResponse = jsonPath("$[0]",
+                StringContains.containsString(publicItem1.getID().toString()));
         getClient()
             .perform(get(HdlResolverRestController.LISTHANDLES + publicItem1.getHandle()))
             .andExpect(status().isOk())
@@ -76,11 +78,11 @@ public class HdlResolverRestControllerIT extends AbstractControllerIntegrationTe
         getClient()
             .perform(get(HdlResolverRestController.RESOLVE  + publicItem1.getHandle()))
             .andExpect(status().isOk())
-            .andExpect(matchHandleResponse);
+            .andExpect(matchUUIDResponse);
         getClient()
             .perform(get(HdlResolverRestController.HDL_RESOLVER + publicItem1.getHandle()))
             .andExpect(status().isOk())
-            .andExpect(matchHandleResponse);
+            .andExpect(matchUUIDResponse);
         getClient()
             .perform(get("/wrongController/" + publicItem1.getHandle()))
             .andExpect(status().isNotFound());
@@ -226,12 +228,12 @@ public class HdlResolverRestControllerIT extends AbstractControllerIntegrationTe
 
     /**
      * Verifies that a null hdlIdentifier returns a
-     * 
+     *
      * <code>HttpStatus.BAD_REQUEST</code>
-     * 
+     *
      * @throws Exception
      * @throws SQLException
-     * 
+     *
      */
     @Test
     public void givenNullHdlIdentifierWhenCallHdlresolverThenReturnsBadRequest() throws Exception {
@@ -248,10 +250,10 @@ public class HdlResolverRestControllerIT extends AbstractControllerIntegrationTe
     /**
      * Verifies that an empty hdlIdentifier returns a
      * <code>HttpStatus.BAD_REQUEST</code>
-     * 
+     *
      * @throws Exception
      * @throws SQLException
-     * 
+     *
      */
     @Test
     public void givenEmptyHdlIdentifierWhenCallHdlresolverThenReturnsNull() throws Exception {
@@ -266,9 +268,9 @@ public class HdlResolverRestControllerIT extends AbstractControllerIntegrationTe
 
     /**
      * Verifies that any unmapped hdlIdentifier returns a null response
-     * 
+     *
      * @throws Exception
-     * 
+     *
      */
     @Test
     public void givenIdentifierNotMappedWhenCallHdlresolverThenReturnsNull() throws Exception {
