@@ -357,7 +357,7 @@ public class StatisticsImporter {
                 SolrInputDocument sid = new SolrInputDocument();
                 sid.addField("ip", ip);
                 sid.addField("type", dso.getType());
-                sid.addField("id", dso.getID());
+                sid.addField("id", dso.getID().toString());
                 sid.addField("time", DateFormatUtils.format(date, SolrLoggerServiceImpl.DATE_FORMAT_8601));
                 sid.addField("continent", continent);
                 sid.addField("country", country);
@@ -471,13 +471,13 @@ public class StatisticsImporter {
         boolean verbose = line.hasOption('v');
 
         // Find our solr server
-        String sserver = configurationService.getProperty("solr-statistics", "server");
+        String sserver = configurationService.getProperty("solr-statistics.server");
         if (verbose) {
             System.out.println("Writing to solr server at: " + sserver);
         }
         solr = new HttpSolrClient.Builder(sserver).build();
 
-        String dbPath = configurationService.getProperty("usage-statistics", "dbfile");
+        String dbPath = configurationService.getProperty("usage-statistics.dbfile");
         try {
             File dbFile = new File(dbPath);
             geoipLookup = new DatabaseReader.Builder(dbFile).build();
@@ -491,6 +491,11 @@ public class StatisticsImporter {
             log.error(
                 "Unable to load GeoLite Database file (" + dbPath + ")! You may need to reinstall it. See the DSpace " +
                     "installation instructions for more details.",
+                e);
+        } catch (NullPointerException e) {
+            log.error(
+                    "The value of the property usage-statistics.dbfile is null. You may need to install the GeoLite " +
+                    "Database file and/or uncomment the property in the config file!",
                 e);
         }
 
