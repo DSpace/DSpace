@@ -149,9 +149,9 @@ jobs:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
 
-  ########################################################################
-  # Test Deployment via Docker to ensure images are working properly
-  ########################################################################
+  #################################################################################
+  # Test Deployment via Docker to ensure newly built images are working properly
+  #################################################################################
   docker-deploy:
     # Ensure this job never runs on forked repos. It's only executed for 'dspace/dspace'
     if: github.repository == 'dspace/dspace'
@@ -170,27 +170,24 @@ jobs:
       signposting__P__enabled: true
       sword__D__server__P__enabled: true
       swordv2__D__server__P__enabled: true
-      # If this is a PR, force using "pr-testing" version of all Docker images. Otherwise, if on main branch, use the
-      # "latest" tag. Otherwise, use the branch name. NOTE: the "pr-testing" tag is a temporary tag that we assign to
-      # all PR-built docker images in reusabe-docker-build.yml
-      DSPACE_VER: ${{ (github.event_name == 'pull_request' && 'pr-testing') || (github.ref_name == github.event.repository.default_branch && 'latest') || github.ref_name }}
+      # If this is a PR, used the base branch name. If on main branch, use the "latest" tag. Otherwise, use branch name.
+      # NOTE: DSPACE_VER is used because our docker compose scripts default to using the "-test" image.
+      DSPACE_VER: ${{ (github.event_name == 'pull_request' && github.event.pull_request.base.ref) || (github.ref_name == github.event.repository.default_branch && 'latest') || github.ref_name }}
     steps:
       # Checkout our codebase (to get access to Docker Compose scripts)
       - name: Checkout codebase
         uses: actions/checkout@v4
-      # For PRs, download Docker image artifacts (built by reusable-docker-build.yml for all PRs)
-      - name: Download Docker image artifacts (for PRs)
-        if: github.event_name == 'pull_request'
+      # Download Docker image artifacts (which were just built by reusable-docker-build.yml)
+      - name: Download Docker image artifacts
         uses: actions/download-artifact@v4
         with:
-          # Download all Docker images (TAR files) into the /tmp/docker directory
-          pattern: docker-image-*
+          # Download all amd64 Docker images (TAR files) into the /tmp/docker directory
+          pattern: docker-image-*-linux-amd64
           path: /tmp/docker
           merge-multiple: true
-      # For PRs, load each of the images into Docker by calling "docker image load" for each.
-      # This ensures we are using the images built from this PR & not the prior versions on DockerHub
-      - name: Load all downloaded Docker images (for PRs)
-        if: github.event_name == 'pull_request'
+      # Load each of the images into Docker by calling "docker image load" for each.
+      # This ensures we are using the images just built & not any prior versions on DockerHub
+      - name: Load all downloaded Docker images
         run: |
           find /tmp/docker -type f -name "*.tar" -exec docker image load --input "{}" \;
           docker image ls -a
