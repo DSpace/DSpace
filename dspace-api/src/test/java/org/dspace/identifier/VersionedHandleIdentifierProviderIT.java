@@ -10,8 +10,10 @@ package org.dspace.identifier;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
@@ -27,10 +29,16 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.test.util.ReflectionTestUtils;
 
 public class VersionedHandleIdentifierProviderIT extends AbstractIntegrationTestWithDatabase {
+
+    private List<IdentifierProvider> originalProviders;
+
     private ServiceManager serviceManager;
     private IdentifierServiceImpl identifierService;
+    private List<Object> registeredBeans = new ArrayList<>();
 
     private String firstHandle;
 
@@ -43,60 +51,96 @@ public class VersionedHandleIdentifierProviderIT extends AbstractIntegrationTest
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        context.turnOffAuthorisationSystem();
-
         serviceManager = DSpaceServicesFactory.getInstance().getServiceManager();
         identifierService = serviceManager.getServicesByType(IdentifierServiceImpl.class).get(0);
-        // Clean out providers to avoid any being used for creation of community and collection
-        identifierService.setProviders(new ArrayList<>());
+        originalProviders = (List<IdentifierProvider>) ReflectionTestUtils.getField(identifierService, "providers");
+        context.turnOffAuthorisationSystem();
 
+        identifierService.setProviders(List.of());
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
         collection = CollectionBuilder.createCollection(context, parentCommunity)
                 .withName("Collection")
                 .build();
+
+        context.restoreAuthSystemState();
     }
 
     @After
     @Override
     public void destroy() throws Exception {
         super.destroy();
-        // After this test has finished running, refresh application context and
-        // set the expected 'default' versioned handle provider back to ensure other tests don't fail
-        DSpaceServicesFactory.getInstance().getServiceManager().getApplicationContext().refresh();
+        // restore providers
+        identifierService.setProviders(originalProviders);
+        // clean beans
+        unregisterBeans(registeredBeans);
     }
 
-    private void registerProvider(Class type) {
-        // Register our new provider
-        IdentifierProvider identifierProvider =
-                (IdentifierProvider) DSpaceServicesFactory.getInstance().getServiceManager()
-                        .getServiceByName(type.getName(), type);
-        if (identifierProvider == null) {
-            DSpaceServicesFactory.getInstance().getServiceManager().registerServiceClass(type.getName(), type);
-            identifierProvider = (IdentifierProvider) DSpaceServicesFactory.getInstance().getServiceManager()
-                    .getServiceByName(type.getName(), type);
+    private void unregisterBeans(List<Object> registeredBeans) {
+        AutowireCapableBeanFactory factory =
+            DSpaceServicesFactory.getInstance()
+                                 .getServiceManager()
+                                 .getApplicationContext()
+                                 .getAutowireCapableBeanFactory();
+        Iterator<Object> iterator = registeredBeans.iterator();
+        while (iterator.hasNext()) {
+            Object registeredBean = iterator.next();
+            factory.destroyBean(registeredBean);
+            iterator.remove();
+            registeredBeans.remove(registeredBean);
         }
-
-        // Overwrite the identifier-service's providers with the new one to ensure only this provider is used
-        identifierService = DSpaceServicesFactory.getInstance().getServiceManager()
-                .getServicesByType(IdentifierServiceImpl.class).get(0);
-        identifierService.setProviders(new ArrayList<>());
-        identifierService.setProviders(List.of(identifierProvider));
     }
+
+    private <T> T registerBean(Class<T> type)
+        throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        AutowireCapableBeanFactory factory =
+            DSpaceServicesFactory.getInstance()
+                                 .getServiceManager()
+                                 .getApplicationContext()
+                                 .getAutowireCapableBeanFactory();
+        // Define our special bean for testing the target class.
+        T bean = type.getDeclaredConstructor()
+                     .newInstance();
+
+        registeredBeans.add(bean);
+
+        factory.autowireBean(bean);
+        return bean;
+    }
+
+    private void registerSingleProvider(IdentifierProvider provider) {
+        identifierService.setProviders(List.of(provider));
+    }
+
+    private <T> T getOrProvide(Class<T> type)
+        throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        List<T> servicesByType = serviceManager.getServicesByType(type);
+        if (servicesByType == null || servicesByType.isEmpty()) {
+            servicesByType = List.of(registerBean(type));
+        }
+        return servicesByType.get(0);
+    }
+
 
     private void createVersions() throws SQLException, AuthorizeException {
+        context.turnOffAuthorisationSystem();
+
         itemV1 = ItemBuilder.createItem(context, collection)
                 .withTitle("First version")
                 .build();
         firstHandle = itemV1.getHandle();
         itemV2 = VersionBuilder.createVersion(context, itemV1, "Second version").build().getItem();
         itemV3 = VersionBuilder.createVersion(context, itemV1, "Third version").build().getItem();
+
+        context.restoreAuthSystemState();
     }
 
     @Test
     public void testDefaultVersionedHandleProvider() throws Exception {
-        registerProvider(VersionedHandleIdentifierProvider.class);
+        registerSingleProvider(
+            getOrProvide(VersionedHandleIdentifierProvider.class)
+        );
         createVersions();
 
         // Confirm the original item only has its original handle
@@ -112,7 +156,9 @@ public class VersionedHandleIdentifierProviderIT extends AbstractIntegrationTest
 
     @Test
     public void testCanonicalVersionedHandleProvider() throws Exception {
-        registerProvider(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
+        registerSingleProvider(
+            getOrProvide(VersionedHandleIdentifierProviderWithCanonicalHandles.class)
+        );
         createVersions();
 
         // Confirm the original item only has a version handle
