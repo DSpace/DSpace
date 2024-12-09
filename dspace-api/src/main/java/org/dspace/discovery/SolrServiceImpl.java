@@ -1301,7 +1301,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         try {
             SolrQuery solrQuery = new SolrQuery();
             //Set the query to handle since this is unique
-            solrQuery.setQuery(SearchUtils.RESOURCE_UNIQUE_ID + ": " + new IndexableItem(item).getUniqueIndexID());
+            solrQuery.setQuery(SearchUtils.RESOURCE_UNIQUE_ID + ":" + new IndexableItem(item).getUniqueIndexID());
             //Only return obj identifier fields in result doc
             solrQuery.setFields(SearchUtils.RESOURCE_TYPE_FIELD, SearchUtils.RESOURCE_ID_FIELD);
             //Add the more like this parameters !
