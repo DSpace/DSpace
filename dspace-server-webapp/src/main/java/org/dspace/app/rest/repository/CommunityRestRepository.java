@@ -195,7 +195,7 @@ public class CommunityRestRepository extends DSpaceObjectRestRepository<Communit
     @SearchRestMethod(name = "top")
     public Page<CommunityRest> findAllTop(Pageable pageable) {
         try {
-            Context context = obtainContext();
+            Context context = obtainReadOnlyContext();
             List<Community> topLevelCommunities = new LinkedList<Community>();
             DiscoverQuery discoverQuery = new DiscoverQuery();
             discoverQuery.setQuery("*:*");
