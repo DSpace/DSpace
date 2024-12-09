@@ -76,9 +76,9 @@ public class ItemWithdrawReplaceOperation<R> extends PatchOperation<R> {
                     return object;
                 }
             } catch (AuthorizeException e) {
-                throw new RESTAuthorizationException("Unauthorized user for item withdrawal/reinstation");
+                throw new RESTAuthorizationException("Unauthorized user for item withdraw / reinstate operation");
             } catch (SQLException e) {
-                throw new DSpaceBadRequestException("SQL exception during item withdrawal/reinstation");
+                throw new DSpaceBadRequestException("SQL exception during item withdraw / reinstate operation");
             }
         } else {
             throw new DSpaceBadRequestException("ItemWithdrawReplaceOperation does not support this operation");
