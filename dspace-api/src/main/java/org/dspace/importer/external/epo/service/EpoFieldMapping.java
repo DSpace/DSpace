@@ -7,7 +7,7 @@
  */
 package org.dspace.importer.external.epo.service;
 
-import java.util.Map;
+import java.util.List;
 import javax.annotation.Resource;
 
 import org.dspace.importer.external.metadatamapping.AbstractMetadataFieldMapping;
@@ -30,7 +30,7 @@ public class EpoFieldMapping extends AbstractMetadataFieldMapping {
      */
     @Override
     @Resource(name = "epoMetadataFieldMap")
-    public void setMetadataFieldMap(Map metadataFieldMap) {
+    public void setMetadataFieldMap(List metadataFieldMap) {
         super.setMetadataFieldMap(metadataFieldMap);
     }
 }
