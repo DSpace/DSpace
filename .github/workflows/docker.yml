@@ -32,6 +32,7 @@ jobs:
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+      GHCR_ACCESS_TOKEN: ${{ secrets.GHCR_ACCESS_TOKEN }}
 
   #######################################
   # Build/Push the 'dspace/dspace' image
@@ -53,6 +54,7 @@ jobs:
       # these sites as specified in reusable-docker-build.xml
       REDEPLOY_SANDBOX_URL: ${{ secrets.REDEPLOY_SANDBOX_URL }}
       REDEPLOY_DEMO_URL: ${{ secrets.REDEPLOY_DEMO_URL }}
+      GHCR_ACCESS_TOKEN: ${{ secrets.GHCR_ACCESS_TOKEN }}
 
   #############################################################
   # Build/Push the 'dspace/dspace' image ('-test' tag)
@@ -73,6 +75,7 @@ jobs:
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+      GHCR_ACCESS_TOKEN: ${{ secrets.GHCR_ACCESS_TOKEN }}
 
   ###########################################
   # Build/Push the 'dspace/dspace-cli' image
@@ -90,6 +93,7 @@ jobs:
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+      GHCR_ACCESS_TOKEN: ${{ secrets.GHCR_ACCESS_TOKEN }}
 
   ###########################################
   # Build/Push the 'dspace/dspace-solr' image
@@ -111,6 +115,7 @@ jobs:
       # These URLs MUST use different secrets than 'dspace/dspace' image build above as they are deployed separately.
       REDEPLOY_SANDBOX_URL: ${{ secrets.REDEPLOY_SANDBOX_SOLR_URL }}
       REDEPLOY_DEMO_URL: ${{ secrets.REDEPLOY_DEMO_SOLR_URL }}
+      GHCR_ACCESS_TOKEN: ${{ secrets.GHCR_ACCESS_TOKEN }}
 
   ###########################################################
   # Build/Push the 'dspace/dspace-postgres-pgcrypto' image
@@ -128,6 +133,7 @@ jobs:
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+      GHCR_ACCESS_TOKEN: ${{ secrets.GHCR_ACCESS_TOKEN }}
 
   ########################################################################
   # Build/Push the 'dspace/dspace-postgres-pgcrypto' image (-loadsql tag)
@@ -148,6 +154,7 @@ jobs:
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+      GHCR_ACCESS_TOKEN: ${{ secrets.GHCR_ACCESS_TOKEN }}
 
   #################################################################################
   # Test Deployment via Docker to ensure newly built images are working properly
