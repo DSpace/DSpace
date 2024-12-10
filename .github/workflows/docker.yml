@@ -169,9 +169,12 @@ jobs:
       signposting__P__enabled: true
       sword__D__server__P__enabled: true
       swordv2__D__server__P__enabled: true
-      # If this is a PR, used the base branch name. If on main branch, use the "latest" tag. Otherwise, use branch name.
+      # If this is a PR against main (default branch), use "latest".
+      # Else if this is a PR against a different branch, used the base branch name.
+      # Else if this is a commit on main (default branch), use the "latest" tag.
+      # Else, just use the branch name.
       # NOTE: DSPACE_VER is used because our docker compose scripts default to using the "-test" image.
-      DSPACE_VER: ${{ (github.event_name == 'pull_request' && github.event.pull_request.base.ref) || (github.ref_name == github.event.repository.default_branch && 'latest') || github.ref_name }}
+      DSPACE_VER: ${{ (github.event_name == 'pull_request' && github.event.pull_request.base.ref == github.event.repository.default_branch && 'latest') || (github.event_name == 'pull_request' && github.event.pull_request.base.ref) || (github.ref_name == github.event.repository.default_branch && 'latest') || github.ref_name }}
     steps:
       # Checkout our codebase (to get access to Docker Compose scripts)
       - name: Checkout codebase
