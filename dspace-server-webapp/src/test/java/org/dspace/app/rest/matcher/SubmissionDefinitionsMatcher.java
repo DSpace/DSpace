@@ -13,6 +13,7 @@ import static org.dspace.app.rest.test.AbstractControllerIntegrationTest.REST_SE
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
+import org.dspace.app.util.SubmissionConfig;
 import org.hamcrest.Matcher;
 
 /**
@@ -25,7 +26,7 @@ public class SubmissionDefinitionsMatcher {
     public static Matcher<Object> matchSubmissionDefinition(boolean isDefault, String name, String id) {
         return allOf(
                 matchProperties(isDefault, name, id),
-                matchLinks()
+                matchLinks(id)
         );
     }
 
@@ -42,8 +43,8 @@ public class SubmissionDefinitionsMatcher {
     /**
      * Gets a matcher for all expected links.
      */
-    public static Matcher<? super Object> matchLinks() {
-        return HalMatcher.matchLinks(REST_SERVER_URL + "config/submissiondefinitions/traditional",
+    public static Matcher<? super Object> matchLinks(String id) {
+        return HalMatcher.matchLinks(REST_SERVER_URL + "config/submissiondefinitions/" + id,
                 "collections",
                 "sections",
                 "self"
@@ -59,6 +60,14 @@ public class SubmissionDefinitionsMatcher {
                 hasJsonPath("$._links.self.href", is(REST_SERVER_URL + "config/submissiondefinitions/" + id)),
                 hasJsonPath("$._links.sections.href",
                         is(REST_SERVER_URL + "config/submissiondefinitions/" + id + "/sections"))
+        );
+    }
+
+    public static Matcher<? super Object> matchSubmissionConfig(SubmissionConfig config) {
+        return matchSubmissionDefinition(
+            config.isDefaultConf(),
+            config.getSubmissionName(),
+            config.getSubmissionName()
         );
     }
 }
