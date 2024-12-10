@@ -145,7 +145,7 @@ public class StatisticsDataWorkflow extends StatisticsData {
      */
     protected String getQuery() {
         String query = "statistics_type:" + SolrLoggerServiceImpl.StatisticsType.WORKFLOW.text();
-        query += " AND NOT(previousWorkflowStep: SUBMIT)";
+        query += " AND NOT(previousWorkflowStep:SUBMIT)";
         if (currentDso != null) {
             if (currentDso.getType() == Constants.COMMUNITY) {
                 query += " AND owningComm:";
