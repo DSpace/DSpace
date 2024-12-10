@@ -27,7 +27,7 @@ jobs:
     uses: ./.github/workflows/reusable-docker-build.yml
     with:
       build_id: dspace-dependencies
-      image_name: dspace/dspace-dependencies
+      image_name: tdonohue/dspace-dependencies
       dockerfile_path: ./Dockerfile.dependencies
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
@@ -44,7 +44,7 @@ jobs:
     uses: ./.github/workflows/reusable-docker-build.yml
     with:
       build_id: dspace-prod
-      image_name: dspace/dspace
+      image_name: tdonohue/dspace
       dockerfile_path: ./Dockerfile
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
@@ -65,7 +65,7 @@ jobs:
     uses: ./.github/workflows/reusable-docker-build.yml
     with:
       build_id: dspace-test
-      image_name: dspace/dspace
+      image_name: tdonohue/dspace
       dockerfile_path: ./Dockerfile.test
       # As this is a test/development image, its tags are all suffixed with "-test". Otherwise, it uses the same
       # tagging logic as the primary 'dspace/dspace' image above.
@@ -85,7 +85,7 @@ jobs:
     uses: ./.github/workflows/reusable-docker-build.yml
     with:
       build_id: dspace-cli
-      image_name: dspace/dspace-cli
+      image_name: tdonohue/dspace-cli
       dockerfile_path: ./Dockerfile.cli
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
@@ -100,7 +100,7 @@ jobs:
     uses: ./.github/workflows/reusable-docker-build.yml
     with:
       build_id: dspace-solr
-      image_name: dspace/dspace-solr
+      image_name: tdonohue/dspace-solr
       dockerfile_path: ./dspace/src/main/docker/dspace-solr/Dockerfile
       # Must pass solrconfigs to the Dockerfile so that it can find the required Solr config files
       dockerfile_additional_contexts: 'solrconfigs=./dspace/solr/'
@@ -121,7 +121,7 @@ jobs:
     uses: ./.github/workflows/reusable-docker-build.yml
     with:
       build_id: dspace-postgres-pgcrypto-prod
-      image_name: dspace/dspace-postgres-pgcrypto
+      image_name: tdonohue/dspace-postgres-pgcrypto
       # Must build out of subdirectory to have access to install script for pgcrypto.
       # NOTE: this context will build the image based on the Dockerfile in the specified directory
       dockerfile_context: ./dspace/src/main/docker/dspace-postgres-pgcrypto/
@@ -138,7 +138,7 @@ jobs:
     uses: ./.github/workflows/reusable-docker-build.yml
     with:
       build_id: dspace-postgres-pgcrypto-loadsql
-      image_name: dspace/dspace-postgres-pgcrypto
+      image_name: tdonohue/dspace-postgres-pgcrypto
       # Must build out of subdirectory to have access to install script for pgcrypto.
       # NOTE: this context will build the image based on the Dockerfile in the specified directory
       dockerfile_context: ./dspace/src/main/docker/dspace-postgres-pgcrypto-curl/
