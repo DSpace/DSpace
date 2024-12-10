@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest;
 
+import static org.dspace.app.rest.matcher.BrowseIndexMatcher.bis;
+import static org.dspace.app.rest.matcher.BrowseIndexMatcher.browseMatchers;
 import static org.dspace.app.rest.matcher.MetadataMatcher.matchMetadata;
 import static org.dspace.app.rest.model.BrowseIndexRest.BROWSE_TYPE_VALUE_LIST;
 import static org.hamcrest.Matchers.contains;
@@ -66,24 +68,18 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
                    .andExpect(content().contentType(contentType))
 
-                   //Our default Discovery config has 5 browse indexes, so we expect this to be reflected in the page
-                   // object
+                   // Dynamically obtain the total number of browse indices configured in dspace.cfg and check that the
+                   // response contains the correct number of browse indices
                    .andExpect(jsonPath("$.page.size", is(20)))
-                   .andExpect(jsonPath("$.page.totalElements", is(5)))
+                   .andExpect(jsonPath("$.page.totalElements", is(bis.length)))
                    .andExpect(jsonPath("$.page.totalPages", is(1)))
                    .andExpect(jsonPath("$.page.number", is(0)))
 
-                   //The array of browse index should have a size 5
-                   .andExpect(jsonPath("$._embedded.browses", hasSize(5)))
+                   //The array of browse index should match the size of the total number of browse indices configured
+                   .andExpect(jsonPath("$._embedded.browses", hasSize(bis.length)))
 
-                   //Check that all (and only) the default browse indexes are present
-                   .andExpect(jsonPath("$._embedded.browses", containsInAnyOrder(
-                       BrowseIndexMatcher.dateIssuedBrowseIndex("asc"),
-                       BrowseIndexMatcher.contributorBrowseIndex("asc"),
-                       BrowseIndexMatcher.titleBrowseIndex("asc"),
-                       BrowseIndexMatcher.subjectBrowseIndex("asc"),
-                       BrowseIndexMatcher.hierarchicalBrowseIndex("srsc")
-                   )))
+                   //Check that all (and only) the configured browse indexes are present
+                   .andExpect(jsonPath("$._embedded.browses", containsInAnyOrder(browseMatchers)))
         ;
     }
 
