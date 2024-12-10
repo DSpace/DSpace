@@ -124,7 +124,9 @@ public class LDNMessageEntityIndexFactoryImpl extends IndexFactoryImpl<Indexable
         doc.addField("type", ldnMessage.getType());
         addFacetIndex(doc, "activity_stream_type", ldnMessage.getActivityStreamType(),
             ldnMessage.getActivityStreamType());
-        addFacetIndex(doc, "coar_notify_type", ldnMessage.getCoarNotifyType(), ldnMessage.getCoarNotifyType());
+        if (ldnMessage.getCoarNotifyType() != null) {
+            addFacetIndex(doc, "coar_notify_type", ldnMessage.getCoarNotifyType(), ldnMessage.getCoarNotifyType());
+        }
         doc.addField("queue_attempts", ldnMessage.getQueueAttempts());
         doc.addField("queue_attempts_sort", ldnMessage.getQueueAttempts());
 
