@@ -465,6 +465,68 @@ it, please enter the types and the actual numbers or codes.</hint>
      </row>
    </form>
 
+   <form name="patentStep">
+     <row>
+       <relation-field>
+         <relationship-type>isInventorOf</relationship-type>
+         <search-configuration>person</search-configuration>
+         <repeatable>true</repeatable>
+         <label>Inventor</label>
+         <hint>Select the person who invented this patent.</hint>
+         <linked-metadata-field>
+           <dc-schema>dc</dc-schema>
+           <dc-element>contributor</dc-element>
+           <dc-qualifier>author</dc-qualifier>
+           <input-type>onebox</input-type>
+         </linked-metadata-field>
+         <externalsources>orcid</externalsources>
+       </relation-field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>title</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Title</label>
+         <input-type>onebox</input-type>
+         <hint>Enter the main title of the item.</hint>
+         <required>You must enter a main title for this item.</required>
+       </field>
+     </row>
+   </form>
+
+   <form name="productStep">
+     <row>
+       <relation-field>
+         <relationship-type>isCreatorOf</relationship-type>
+         <search-configuration>person</search-configuration>
+         <repeatable>true</repeatable>
+         <label>Creator</label>
+         <hint>Select the person who created this product.</hint>
+         <linked-metadata-field>
+           <dc-schema>dc</dc-schema>
+           <dc-element>contributor</dc-element>
+           <dc-qualifier>author</dc-qualifier>
+           <input-type>onebox</input-type>
+         </linked-metadata-field>
+         <externalsources>orcid</externalsources>
+       </relation-field>
+     </row>
+     <row>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>title</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Title</label>
+         <input-type>onebox</input-type>
+         <hint>Enter the main title of the item.</hint>
+         <required>You must enter a main title for this item.</required>
+       </field>
+     </row>
+   </form>
+
  </form-definitions>
 
 
