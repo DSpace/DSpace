@@ -13,11 +13,15 @@
 ARG POSTGRES_VERSION=15
 ARG POSTGRES_PASSWORD=dspace
 
-FROM postgres:${POSTGRES_VERSION}
+FROM docker.io/postgres:${POSTGRES_VERSION}
+LABEL org.opencontainers.image.source="https://github.com/DSpace/DSpace"
+LABEL org.opencontainers.image.description="DSpace PostgreSQL image. This is a custom version of the official \
+'postgres' image, which includes the pgcrypto extension which is required by DSpace."
+LABEL org.opencontainers.image.licenses="BSD-3-Clause"
 
-ENV POSTGRES_DB dspace
-ENV POSTGRES_USER dspace
-ENV POSTGRES_PASSWORD ${POSTGRES_PASSWORD}
+ENV POSTGRES_DB=dspace
+ENV POSTGRES_USER=dspace
+ENV POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 
 # Copy over script which will initialize database and install pgcrypto extension
 COPY install-pgcrypto.sh /docker-entrypoint-initdb.d/
