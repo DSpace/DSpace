@@ -9,8 +9,6 @@ package org.dspace.app.mediafilter;
 
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -37,6 +35,7 @@ import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.SiteService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.SelfNamedPlugin;
@@ -75,6 +74,8 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     @Autowired(required = true)
     protected ItemService itemService;
     @Autowired(required = true)
+    protected SiteService siteService;
+    @Autowired(required = true)
     protected ConfigurationService configurationService;
 
     protected DSpaceRunnableHandler handler;
@@ -96,7 +97,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     protected boolean isVerbose = false;
     protected boolean isQuiet = false;
     protected boolean isForce = false; // default to not forced
-    protected LocalDate fromDate = null;
+    protected Date fromDate = null;
 
     protected MediaFilterServiceImpl() {
 
@@ -116,6 +117,14 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
 
     @Override
     public void applyFiltersAllItems(Context context) throws Exception {
+        boolean storeLastDate = false;
+        if (fromDate == null) {
+            storeLastDate = true;
+            String lastDate = siteService.getMetadata(siteService.findSite(context), "dc.filtermedia.lastdate");
+            if (lastDate != null) {
+                fromDate = new DCDate(lastDate).toDate();
+            }
+        }
         if (skipList != null) {
             //if a skip-list exists, we need to filter community-by-community
             //so we can respect what is in the skip-list
@@ -128,7 +137,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             Iterator<Item> itemIterator =
                     itemService.findByLastModifiedSince(
                             context,
-                            Date.from(fromDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
+                            fromDate
                     );
             while (itemIterator.hasNext() && processed < max2Process) {
                 applyFiltersItem(context, itemIterator.next());
@@ -139,6 +148,14 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             while (itemIterator.hasNext() && processed < max2Process) {
                 applyFiltersItem(context, itemIterator.next());
             }
+        }
+        if (storeLastDate) {
+            siteService.clearMetadata(context, siteService.findSite(context),
+                "dc", "filtermedia", "lastdate", Item.ANY);
+            siteService.addMetadata(context, siteService.findSite(context),
+                "dc", "filtermedia", "lastdate", null,
+                new DCDate(new Date()).toString());
+            siteService.update(context, siteService.findSite(context));
         }
     }
 
@@ -172,7 +189,12 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         collection = context.reloadEntity(collection);
         //only apply filters if collection not in skip-list
         if (!inSkipList(collection.getHandle())) {
-            Iterator<Item> itemIterator = itemService.findAllByCollection(context, collection);
+            Iterator<Item> itemIterator;
+            if (fromDate != null) {
+                itemIterator = itemService.findByCollectionLastModifiedSince(context, collection, fromDate);
+            } else {
+                itemIterator = itemService.findAllByCollection(context, collection);
+            }
             while (itemIterator.hasNext() && processed < max2Process) {
                 applyFiltersItem(context, itemIterator.next());
             }
@@ -603,7 +625,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
     }
 
     @Override
-    public void setFromDate(LocalDate fromDate) {
+    public void setFromDate(Date fromDate) {
         this.fromDate = fromDate;
     }
 }
