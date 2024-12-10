@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.submit.step.validation.Validation;
@@ -63,7 +64,8 @@ public interface DataProcessingStep extends RestProcessingStep {
 
     /**
      * The method will expose the list of validation errors identified by the step. The default implementation will
-     * found a {@link Validation} spring bean in the context with the same name that the step id
+     * find a {@link Validation} spring bean in the context with the same name that the step id
+     * If no bean is found with the exact step id, it will look for beans matching the extended step id
      * 
      * @param submissionService
      * @param obj
@@ -78,8 +80,21 @@ public interface DataProcessingStep extends RestProcessingStep {
         List<Validation> validations = DSpaceServicesFactory.getInstance().getServiceManager()
                 .getServicesByType(Validation.class);
         if (validations != null) {
+            List<Validation> directValidations = new ArrayList<>();
+            List<Validation> extendedValidations = new ArrayList<>();
             for (Validation validation : validations) {
                 if (validation.getName().equals(config.getType())) {
+                    directValidations.add(validation);
+                } else if (validation.getName().equals(config.getExtendsType())) {
+                    extendedValidations.add(validation);
+                }
+            }
+            if (CollectionUtils.isNotEmpty(directValidations)) {
+                for (Validation validation : directValidations) {
+                    errors.addAll(validation.validate(submissionService, obj, config));
+                }
+            } else {
+                for (Validation validation : extendedValidations) {
                     errors.addAll(validation.validate(submissionService, obj, config));
                 }
             }
