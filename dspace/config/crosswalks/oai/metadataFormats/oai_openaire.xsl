@@ -1039,6 +1039,8 @@
     </xsl:template>
 
     <!-- This template will retrieve the type of a date based on the element name -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/vocab_datetype.html -->
+    <!-- Accepted and Issued date types are handled separately above. -->
     <xsl:template name="getDateType">
         <xsl:param name="elementName"/>
         <xsl:variable name="lc_dc_date_type">
@@ -1049,24 +1051,6 @@
         <xsl:choose>
             <xsl:when test="$lc_dc_date_type='available' or  $lc_dc_date_type = 'embargo'">
                 <xsl:text>Available</xsl:text>
-            </xsl:when>
-            <xsl:when test="$lc_dc_date_type='collected'">
-                <xsl:text>Collected</xsl:text>
-            </xsl:when>
-            <xsl:when test="$lc_dc_date_type='copyrighted' or $lc_dc_date_type='copyright'">
-                <xsl:text>Copyrighted</xsl:text>
-            </xsl:when>
-            <xsl:when test="$lc_dc_date_type='created'">
-                <xsl:text>Created</xsl:text>
-            </xsl:when>
-            <xsl:when test="$lc_dc_date_type='submitted'">
-                <xsl:text>Submitted</xsl:text>
-            </xsl:when>
-            <xsl:when test="$lc_dc_date_type='updated'">
-                <xsl:text>Updated</xsl:text>
-            </xsl:when>
-            <xsl:when test="$lc_dc_date_type='valid'">
-                <xsl:text>Valid</xsl:text>
             </xsl:when>
         </xsl:choose>
     </xsl:template>
