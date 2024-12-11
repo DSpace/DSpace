@@ -1049,7 +1049,9 @@
             </xsl:call-template>
         </xsl:variable>
         <xsl:choose>
-            <xsl:when test="$lc_dc_date_type='available' or  $lc_dc_date_type = 'embargo'">
+            <xsl:when test="$lc_dc_date_type = 'embargo'">
+                <!-- Indicates the end of the embargo period. -->
+                <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_embargoenddate.html -->
                 <xsl:text>Available</xsl:text>
             </xsl:when>
         </xsl:choose>
