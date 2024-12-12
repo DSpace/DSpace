@@ -15,6 +15,7 @@ on:
 
 permissions:
   contents: read  #  to fetch code (actions/checkout)
+  packages: write #  to write images to GitHub Container Registry (GHCR)
 
 jobs:
   ####################################################
