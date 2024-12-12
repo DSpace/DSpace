@@ -206,19 +206,25 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
         String xpathExpression = "";
         String[] textHierarchy = text.split(hierarchyDelimiter, -1);
         for (int i = 0; i < textHierarchy.length; i++) {
-            String formattedText = escapeQuotes(textHierarchy[i]);
-            xpathExpression += String.format(labelTemplate, formattedText);
+            xpathExpression += String.format(valueTemplate, textHierarchy[i]);
         }
         XPath xpath = XPathFactory.newInstance().newXPath();
         List<Choice> choices = new ArrayList<Choice>();
         try {
             NodeList results = (NodeList) xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODESET);
-            choices = getChoicesFromNodeList(results, 0, 1);
+            if (results.getLength() > 0) {
+                // If an exact match is found by ID, return it with confidence = CF_UNCERTAIN
+                choices = getChoicesFromNodeList(results, 0, 1);
+                return new Choices(choices.toArray(new Choice[choices.size()]), 0, choices.size(), Choices.CF_UNCERTAIN,
+                                   false);
+            }
         } catch (XPathExpressionException e) {
             log.warn(e.getMessage(), e);
             return new Choices(true);
         }
-        return new Choices(choices.toArray(new Choice[choices.size()]), 0, choices.size(), Choices.CF_AMBIGUOUS, false);
+        // If no exact match found, fall back to searching by label using getMatches
+        log.debug("No exact ID match found, falling back to label search");
+        return getMatches(text, 0, 1, locale);  // This will return a result based on the label, if any
     }
 
     /**
