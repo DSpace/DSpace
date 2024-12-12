@@ -63,7 +63,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
     protected static String xpathTemplate = "//node[contains(translate(@label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
         "'abcdefghijklmnopqrstuvwxyz'),%s)]";
     protected static String idTemplate = "//node[@id = '%s']";
-    protected static String labelTemplate = "//node[@label = %s]";
+    protected static String labelTemplate = "//node[@label = '%s']";
     protected static String idParentTemplate = "//node[@id = '%s']/parent::isComposedBy/parent::node";
     protected static String rootTemplate = "/node";
     protected static String idAttribute = "id";
