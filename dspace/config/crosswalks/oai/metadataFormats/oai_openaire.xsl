@@ -888,13 +888,13 @@
             <xsl:attribute name="mimeType">
             <xsl:value-of select="doc:field[@name='format']"/>
          </xsl:attribute>
-            <xsl:attribute name="objectType">
+            <!-- Currently there is no available way to identify the type of the bitstream -->
+            <!--<xsl:attribute name="objectType">
             <xsl:choose>
-                <!-- Currently there is no available way to identify the type of the bitstream -->
                 <xsl:when test="1">
                     <xsl:text>fulltext</xsl:text>
                 </xsl:when>
-                <!--xsl:when test="$type='dataset'">
+                xsl:when test="$type='dataset'">
                     <xsl:text>dataset</xsl:text>
                 </xsl:when>
                 <xsl:when test="$type='software'">
@@ -902,12 +902,12 @@
                 </xsl:when>
                 <xsl:when test="$type='article'">
                     <xsl:text>fulltext</xsl:text>
-                </xsl:when-->
+                </xsl:when
                 <xsl:otherwise>                  
                     <xsl:text>other</xsl:text>
                 </xsl:otherwise>
              </xsl:choose>
-           </xsl:attribute>
+           </xsl:attribute>-->
             <xsl:value-of select="doc:field[@name='url']"/>
         </oaire:file>
     </xsl:template>
