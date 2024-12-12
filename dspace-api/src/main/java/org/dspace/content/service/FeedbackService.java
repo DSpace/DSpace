@@ -20,7 +20,7 @@ import org.dspace.core.Context;
 public interface FeedbackService {
 
     /**
-     * This method sends the feeback email to the recipient passed as parameter
+     * This method sends the feedback email to the recipient passed as parameter
      * @param context current DSpace application context
      * @param request current servlet request
      * @param recipientEmail recipient to which mail is sent

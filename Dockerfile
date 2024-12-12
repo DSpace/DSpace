@@ -9,7 +9,7 @@ ARG JDK_VERSION=17
 ARG DSPACE_VERSION=latest
 
 # Step 1 - Run Maven Build
-FROM dspace/dspace-dependencies:${DSPACE_VERSION} as build
+FROM dspace/dspace-dependencies:${DSPACE_VERSION} AS build
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 # The dspace-installer directory will be written to /install
@@ -31,7 +31,7 @@ RUN mvn --no-transfer-progress package ${MAVEN_FLAGS} && \
 RUN rm -rf /install/webapps/server/
 
 # Step 2 - Run Ant Deploy
-FROM eclipse-temurin:${JDK_VERSION} as ant_build
+FROM eclipse-temurin:${JDK_VERSION} AS ant_build
 ARG TARGET_DIR=dspace-installer
 # COPY the /install directory from 'build' container to /dspace-src in this container
 COPY --from=build /install /dspace-src
@@ -58,8 +58,13 @@ ENV DSPACE_INSTALL=/dspace
 # Copy the /dspace directory from 'ant_build' container to /dspace in this container
 COPY --from=ant_build /dspace $DSPACE_INSTALL
 WORKDIR $DSPACE_INSTALL
-# Expose Tomcat port
-EXPOSE 8080
+# Need host command for "[dspace]/bin/make-handle-config"
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends host \
+    && apt-get purge -y --auto-remove \
+    && rm -rf /var/lib/apt/lists/*
+# Expose Tomcat port (8080) & Handle Server HTTP port (8000)
+EXPOSE 8080 8000
 # Give java extra memory (2GB)
 ENV JAVA_OPTS=-Xmx2000m
 # On startup, run DSpace Runnable JAR

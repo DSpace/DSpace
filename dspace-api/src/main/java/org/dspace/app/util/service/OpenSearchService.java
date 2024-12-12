@@ -10,7 +10,6 @@ package org.dspace.app.util.service;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
@@ -85,15 +84,13 @@ public interface OpenSearchService {
      * @param start        - start result index
      * @param pageSize     - page size
      * @param scope        - search scope, null or the community/collection
-     * @param results      the retreived DSpace objects satisfying search
-     * @param labels       labels to apply - format specific
+     * @param results      the retrieved DSpace objects satisfying search
      * @return formatted search results
      * @throws IOException if IO error
      */
     public String getResultsString(Context context, String format, String query, int totalResults, int start,
-                                   int pageSize,
-                                   IndexableObject scope, List<IndexableObject> results,
-                                   Map<String, String> labels) throws IOException;
+                                   int pageSize, IndexableObject scope, List<IndexableObject> results)
+        throws IOException;
 
     /**
      * Returns a formatted set of search results as a document
@@ -105,14 +102,12 @@ public interface OpenSearchService {
      * @param start        - start result index
      * @param pageSize     - page size
      * @param scope        - search scope, null or the community/collection
-     * @param results      the retreived DSpace objects satisfying search
-     * @param labels       labels to apply - format specific
+     * @param results      the retrieved DSpace objects satisfying search
      * @return formatted search results
      * @throws IOException if IO error
      */
     public Document getResultsDoc(Context context, String format, String query, int totalResults, int start,
-                                  int pageSize,
-                                  IndexableObject scope, List<IndexableObject> results, Map<String, String> labels)
+                                  int pageSize, IndexableObject scope, List<IndexableObject> results)
         throws IOException;
 
     public DSpaceObject resolveScope(Context context, String scope) throws SQLException;

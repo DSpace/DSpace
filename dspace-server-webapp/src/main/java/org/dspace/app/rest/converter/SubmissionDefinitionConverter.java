@@ -70,7 +70,7 @@ public class SubmissionDefinitionConverter implements DSpaceConverter<Submission
                 }
             } catch (ClassNotFoundException e) {
                 throw new IllegalStateException(
-                        "The submission configration is invalid the processing class for the step " + step.getId()
+                        "The submission configuration is invalid the processing class for the step " + step.getId()
                                 + " is not found",
                         e);
             }

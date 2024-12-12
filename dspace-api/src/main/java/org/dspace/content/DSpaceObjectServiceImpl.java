@@ -323,7 +323,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
                     }
                 }
                 metadataValue.setValue(String.valueOf(dcvalue));
-                //An update here isn't needed, this is persited upon the merge of the owning object
+                //An update here isn't needed, this is persisted upon the merge of the owning object
 //            metadataValueService.update(context, metadataValue);
                 dso.addDetails(metadataField.toString());
             }
