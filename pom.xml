@@ -297,7 +297,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>10.20.2</version>
+                            <version>10.21.0</version>
                         </dependency>
                     </dependencies>
                 </plugin>
@@ -372,7 +372,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.11.1</version>
+                    <version>3.11.2</version>
                     <configuration>
                         <!-- Never fail a build based on Javadoc errors -->
                         <failOnError>false</failOnError>
