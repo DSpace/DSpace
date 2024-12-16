@@ -27,12 +27,13 @@
             <artifactId>additions</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-server-webapp</artifactId>
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>server</artifactId>
+            <classifier>classes</classifier>
         </dependency>
         <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-solrj</artifactId>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-server-webapp</artifactId>
         </dependency>
 
         <!-- Test Dependencies -->
