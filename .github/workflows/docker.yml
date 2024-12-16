@@ -177,6 +177,9 @@ jobs:
       # Else, just use the branch name.
       # NOTE: DSPACE_VER is used because our docker compose scripts default to using the "-test" image.
       DSPACE_VER: ${{ (github.event_name == 'pull_request' && github.event.pull_request.base.ref == github.event.repository.default_branch && 'latest') || (github.event_name == 'pull_request' && github.event.pull_request.base.ref) || (github.ref_name == github.event.repository.default_branch && 'latest') || github.ref_name }}
+      # Docker Registry to use for Docker compose scripts below.
+      # We use GitHub's Container Registry to avoid aggressive rate limits at DockerHub.
+      DOCKER_REGISTRY: ghcr.io
     steps:
       # Checkout our codebase (to get access to Docker Compose scripts)
       - name: Checkout codebase
