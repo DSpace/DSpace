@@ -38,7 +38,7 @@ public class Page {
             return false;
         }
         final Page page = (Page) o;
-        return pageNumber == page.pageNumber && Objects.equals(text, page.text);
+        return Objects.equals(pageNumber, page.pageNumber) && Objects.equals(text, page.text);
     }
 
     @Override

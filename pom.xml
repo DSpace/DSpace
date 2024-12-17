@@ -1340,6 +1340,13 @@
                 <version>${asm.version}</version>
             </dependency>
 
+            <!-- Used for StructuredPdfTextExtractionFilter -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.dataformat</groupId>
+                <artifactId>jackson-dataformat-xml</artifactId>
+                <version>${jackson-dataformat.version}</version>
+            </dependency>
+
             <!-- Solr-core and Postgres disagree on versions of Checker Qual -->
             <dependency>
                 <groupId>org.checkerframework</groupId>

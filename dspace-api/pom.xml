@@ -636,15 +636,10 @@
             <artifactId>tika-parsers-standard-package</artifactId>
         </dependency>
 
+        <!-- Used for StructuredPdfTextExtractionFilter -->
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
-            <version>${jackson-dataformat.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.woodstox</groupId>
-            <artifactId>woodstox-core</artifactId>
-            <version>6.5.1</version>
         </dependency>
 
         <dependency>
