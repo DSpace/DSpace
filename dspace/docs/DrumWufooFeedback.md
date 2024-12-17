@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This page describes the DRUM Wufoo feedback functionality, as of DSpace 7.
+This page describes the DRUM Wufoo feedback functionality.
 
 The Wufoo feedback functionality replaces the stock DSpace feedback
 functionality with a Wufoo form.

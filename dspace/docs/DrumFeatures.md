@@ -1,8 +1,6 @@
 # DRUM Features
 
-This summary of DRUM enhancements to the base DSpace functionality is primarily
-derived from the Jira issues that were part of the "Upgrade DRUM to DSpace 7
-Jira epic ([LIBDRUM-645](https://umd-dit.atlassian.net/browse/LIBDRUM-645)).
+This summary of DRUM enhancements to the base DSpace functionality.
 
 Only features that required customization are indicated below. Stock DSpace
 behavior used by features is not recorded.

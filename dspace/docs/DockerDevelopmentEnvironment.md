@@ -1,7 +1,7 @@
 # Docker Development Environment
 
 This document contains instructions for building a local development instance
-of a DSpace 7-based DRUM using Docker.
+of a DSpace 8-based DRUM using Docker.
 
 ## Development Prerequisites
 
@@ -97,7 +97,7 @@ the main branch for DRUM development.
 
 5) Follow the instructions at
    [dspace/docs/DrumDBRestore.md](DrumDBRestore.md)
-   to populate the Postgres database with a DSpace 7 database dump from
+   to populate the Postgres database with a DSpace database dump from
    Kubernetes.
 
 6) Generate the HTTPS certificate for the back-end:
@@ -288,11 +288,11 @@ Docker container, with email being captured by the "MailHog" application.
 ### Dockerfile.dev-additions
 
 Add the following lines to the "Dockerfile.dev-additions" file, just after the
-`FROM tomcat:9-jdk${JDK_VERSION}` line, to include the packages needed for the
+`FROM eclipse-temurin:${JDK_VERSION}` line, to include the packages needed for the
 script and email functionality:
 
 ```text
-FROM tomcat:9-jdk${JDK_VERSION}
+FROM eclipse-temurin:${JDK_VERSION}
 
 # Dependencies for email functionality
 RUN apt-get update && \
@@ -346,7 +346,7 @@ mail.server.port = 1025
 With the above changes, the MailHog application can be run using:
 
 ```zsh
-$ docker compose -p d7 up mailhog
+$ docker compose -p d8 up mailhog
 ```
 
 The MailHog application will be accessible at <http://localhost:8025/>.
@@ -366,18 +366,18 @@ credentials.
 
 1) Download the “IP to City Lite” (in “mmdb” format) from
 <https://db-ip.com/db/download/ip-to-city-lite> and put in the “/tmp” directory,
-and extract the file, where “YYYY-MM” is the year/month of the download:
+and extract the file, where “\<YYYY-MM>” is the year/month of the download:
 
 ```zsh
 $ cd /tmp
-$ gunzip dbip-city-lite-YYYY-MM.mmdb.gz
+$ gunzip dbip-city-lite-<YYYY-MM>.mmdb.gz
 ```
 
-This will result in a file named “dbip-city-lite-YYYY-MM.mmdb”. For simplicity,
-rename the file to “dbip-city-lite.mmdb”:
+This will result in a file named “dbip-city-lite-\<YYYY-MM>.mmdb”. For
+simplicity, rename the file to “dbip-city-lite.mmdb”:
 
 ```zsh
-$ mv /tmp/dbip-city-lite-<yyyy-MM>.mmdb /tmp/dbip-city-lite.mmdb
+$ mv /tmp/dbip-city-lite-<YYYY-MM>.mmdb /tmp/dbip-city-lite.mmdb
 ```
 
 2) Copy the "/tmp/dbip-city-lite.mmdb" file into the "dspace/config/" directory:

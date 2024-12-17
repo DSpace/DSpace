@@ -3,7 +3,7 @@
 ## Introduction
 
 This page describes the DRUM Embargo functionality and other access
-restrictions, as of DSpace 7.
+restrictions.
 
 For changes to the submission form, see
 [dspace/docs/DrumSubmissionForms.md](DrumSubmissionForms.md).

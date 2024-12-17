@@ -1,7 +1,7 @@
 # CAS/LDAP Authentication
 
 This document contains information about setting up CAS/LDAP authentication for
-DSpace 7.
+DSpace.
 
 In the current implementation, CAS is used to authenticate users, while LDAP is
 used to retrieve group information and for registering news users (i.e., create
@@ -114,7 +114,7 @@ module.
 
 ## CAS Authentication, Impersonated Users and Special Groups
 
-DSpace 7 enables administrators to impersonate users by adding an
+DSpace enables administrators to impersonate users by adding an
 "X-On-Behalf-Of" header to the HTTP request. This header is handled by the
 "org.dspace.app.rest.security.StatelessAuthenticationFilter" class in the
 authentication filter chain (see the
