@@ -19,7 +19,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * OAI-PMH webapp configuration. Replaces the old web.xml
@@ -36,7 +36,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @Import(BasicConfiguration.class)
 // Scan for controllers in this package
 @ComponentScan("org.dspace.xoai.controller")
-public class OAIWebConfig extends WebMvcConfigurerAdapter implements JtwigViewResolverConfigurer {
+public class OAIWebConfig implements WebMvcConfigurer, JtwigViewResolverConfigurer {
 
     // Path where OAI is deployed. Defaults to "oai"
     // NOTE: deployment on this path is handled by org.dspace.xoai.controller.DSpaceOAIDataProvider

@@ -10,8 +10,8 @@ package org.dspace.app.rest.repository;
 import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.CommunityGroupRest;
 import org.dspace.app.rest.model.CommunityRest;
@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Mohamed Abdul Rasheed (mohideen at umd.edu)
  */
-@Component(CommunityGroupRest.CATEGORY + "." + CommunityGroupRest.NAME + "." + CommunityGroupRest.COMMUNITIES)
+@Component(CommunityGroupRest.CATEGORY + "." + CommunityGroupRest.PLURAL_NAME + "." + CommunityGroupRest.COMMUNITIES)
 public class CommunityGroupCommunityLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

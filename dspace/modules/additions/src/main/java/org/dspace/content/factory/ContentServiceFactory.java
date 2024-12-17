@@ -23,6 +23,7 @@ import org.dspace.content.service.CommunityGroupService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
 import org.dspace.content.service.DSpaceObjectService;
+import org.dspace.content.service.DuplicateDetectionService;
 import org.dspace.content.service.EntityService;
 import org.dspace.content.service.EntityTypeService;
 // UMD Customization
@@ -118,6 +119,13 @@ public abstract class ContentServiceFactory {
             return WorkflowServiceFactory.getInstance().getWorkflowItemService();
         }
     }
+
+    /**
+     * Return the implementation of the DuplicateDetectionService interface
+     *
+     * @return the DuplicateDetectionService
+     */
+    public abstract DuplicateDetectionService getDuplicateDetectionService();
 
     public <T extends DSpaceObject> DSpaceObjectService<T> getDSpaceObjectService(T dso) {
         return getDSpaceObjectService(dso.getType());

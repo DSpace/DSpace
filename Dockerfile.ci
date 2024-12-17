@@ -5,7 +5,7 @@
 # the application. It should _not_ be used for creating Docker images for use
 # in production.
 
-FROM maven:3.8.6-openjdk-11-slim
+FROM maven:3.8.6-eclipse-temurin-17
 
 # Install git, as it is needed by the Jenkinsfile
 RUN apt-get update && \

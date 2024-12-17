@@ -693,7 +693,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
             if (!duplicates.isEmpty()) {
                 policy = duplicates.get(0);
             }
-        } else {
+        } else if (group != null) {
             // if an identical policy (same Action and same Group) is already in place modify it...
             policyTemp = findByTypeGroupAction(context, dso, group, action);
         }

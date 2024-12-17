@@ -12,9 +12,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.projection.Projection;
@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "collections" subresource of an individual community.
  */
-@Component(CommunityRest.CATEGORY + "." + CommunityRest.NAME + "." + CommunityRest.COLLECTIONS)
+@Component(CommunityRest.CATEGORY + "." + CommunityRest.PLURAL_NAME + "." + CommunityRest.COLLECTIONS)
 public class CommunityCollectionLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

@@ -2,7 +2,6 @@ package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
-import static org.dspace.app.rest.test.AbstractControllerIntegrationTest.REST_SERVER_URL;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -28,9 +27,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.ws.rs.core.MediaType;
 import org.dspace.app.rest.exception.UnitNameNotProvidedException;
 import org.dspace.app.rest.matcher.HalMatcher;
 import org.dspace.app.rest.matcher.UnitMatcher;
@@ -306,7 +305,7 @@ public class UnitRestRepositoryIT extends AbstractControllerIntegrationTest {
         ;
 
         // When no projection is requested, response should include expected properties, links, and no embeds.
-        getClient(token).perform(get("/api/eperson/unit/"  + generatedUnitId))
+        getClient(token).perform(get("/api/eperson/units/" + generatedUnitId))
                    .andExpect(status().isOk())
                    .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()))
         ;

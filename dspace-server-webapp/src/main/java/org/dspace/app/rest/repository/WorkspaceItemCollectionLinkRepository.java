@@ -9,8 +9,8 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.projection.Projection;
@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for "collection" subresource of a workspace item.
  */
-@Component(WorkspaceItemRest.CATEGORY + "." + WorkspaceItemRest.NAME + "." + WorkspaceItemRest.COLLECTION)
+@Component(WorkspaceItemRest.CATEGORY + "." + WorkspaceItemRest.PLURAL_NAME + "." + WorkspaceItemRest.COLLECTION)
 public class WorkspaceItemCollectionLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

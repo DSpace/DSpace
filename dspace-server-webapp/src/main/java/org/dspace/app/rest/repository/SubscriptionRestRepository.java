@@ -20,11 +20,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.DiscoverableEndpointsService;
@@ -61,7 +61,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Mykhaylo Boychuk (mykhaylo.boychuk at 4science.com)
  */
-@Component(SubscriptionRest.CATEGORY + "." + SubscriptionRest.NAME)
+@Component(SubscriptionRest.CATEGORY + "." + SubscriptionRest.PLURAL_NAME)
 public class SubscriptionRestRepository extends DSpaceRestRepository<SubscriptionRest, Integer>
                                          implements InitializingBean {
 
@@ -278,7 +278,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
     @Override
     public void afterPropertiesSet() throws Exception {
         discoverableEndpointsService.register(this, Arrays.asList(Link.of("/api/" + SubscriptionRest.CATEGORY +
-                       "/" + SubscriptionRest.NAME_PLURAL + "/search", SubscriptionRest.NAME_PLURAL + "-search")));
+                       "/" + SubscriptionRest.PLURAL_NAME + "/search", SubscriptionRest.PLURAL_NAME + "-search")));
     }
 
 }

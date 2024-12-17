@@ -3,8 +3,8 @@ package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 import java.util.UUID;
 import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.EtdUnitRest;
 import org.dspace.app.rest.projection.Projection;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
  * Link repository for the direct "collections" subresource of an individual
  * etdunit.
  */
-@Component(EtdUnitRest.CATEGORY + "." + EtdUnitRest.NAME + "." + EtdUnitRest.COLLECTIONS)
+@Component(EtdUnitRest.CATEGORY + "." + EtdUnitRest.PLURAL_NAME + "." + EtdUnitRest.COLLECTIONS)
 public class EtdUnitCollectionLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

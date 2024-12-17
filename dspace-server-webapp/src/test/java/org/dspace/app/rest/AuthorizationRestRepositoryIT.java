@@ -1554,7 +1554,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         Supplier<MockHttpServletRequestBuilder> baseFeatureRequest = () ->
             get("/api/authz/authorizations/search/objects")
-                .param("type", "core.community")
+                .param("type", "core.communities")
                 .param("uuid", comId)
                 .param("uuid", secondComId)
                 .param("projection", "level")
@@ -1927,7 +1927,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         Supplier<MockHttpServletRequestBuilder> baseFeatureRequest = () ->
             get("/api/authz/authorizations/search/objects")
-                .param("type", "core.community")
+                .param("type", "core.communities")
                 .param("uuid", comId)
                 .param("uuid", secondComId)
                 .param("projection", "level")
@@ -2123,7 +2123,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for administrators - with eperson parameter
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.item")
+            .param("type", "core.items")
             .param("uuid", itemId)
             .param("uuid", secondItemId)
             .param("feature", alwaysFalse.getName())
@@ -2132,7 +2132,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for administrators - without eperson parameter
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.item")
+            .param("type", "core.items")
             .param("uuid", itemId)
             .param("uuid", secondItemId)
             .param("feature", alwaysFalse.getName())
@@ -2143,7 +2143,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for normal loggedin users - with eperson parameter
         getClient(epersonToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.item")
+            .param("type", "core.items")
             .param("uuid", itemId)
             .param("uuid", secondItemId)
             .param("feature", alwaysFalse.getName())
@@ -2153,7 +2153,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for normal loggedin users - without eperson parameter
         getClient(epersonToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.item")
+            .param("type", "core.items")
             .param("uuid", itemId)
             .param("uuid", secondItemId)
             .param("feature", alwaysFalse.getName())
@@ -2162,7 +2162,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for administators inspecting other users - by using the eperson parameter
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.item")
+            .param("type", "core.items")
             .param("uuid", itemId)
             .param("uuid", secondItemId)
             .param("feature", alwaysFalse.getName())
@@ -2172,7 +2172,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for administators inspecting other users - by assuming login
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.item")
+            .param("type", "core.items")
             .param("uuid", itemId)
             .param("uuid", secondItemId)
             .param("feature", alwaysFalse.getName())
@@ -2182,7 +2182,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for anonymous users
         getClient().perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.item")
+            .param("type", "core.items")
             .param("uuid", itemId)
             .param("uuid", secondItemId)
             .param("feature", alwaysFalse.getName())
@@ -2210,7 +2210,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for administrators, no result - with eperson parameter
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", alwaysTrue.getName())
             .param("eperson", admin.getID().toString()))
@@ -2218,7 +2218,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", "not-existing-feature")
             .param("eperson", admin.getID().toString()))
@@ -2226,13 +2226,13 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for administrators, no result - without eperson parameter
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", alwaysTrue.getName()))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", "not-existing-one")
             .param("feature", "not-existing-feature"))
@@ -2242,7 +2242,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for normal loggedin users - with eperson parameter
         getClient(epersonToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", "not-existing-one")
             .param("feature", alwaysTrue.getName())
@@ -2250,7 +2250,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         getClient(epersonToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", "not-existing-one")
             .param("feature", "not-existing-feature")
@@ -2259,14 +2259,14 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for normal loggedin users - without eperson parameter
         getClient(epersonToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", "not-existing-one")
             .param("feature", alwaysTrue.getName()))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         getClient(epersonToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", "not-existing-one")
             .param("feature", "not-existing-feature"))
@@ -2274,7 +2274,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for administators inspecting other users - by using the eperson parameter
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", "not-existing-one")
             .param("feature", alwaysTrue.getName())
@@ -2282,7 +2282,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", "not-existing-one")
             .param("feature", "not-existing-feature")
@@ -2291,7 +2291,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for administators inspecting other users - by assuming login
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", "not-existing-one")
             .param("feature", alwaysTrue.getName())
@@ -2299,7 +2299,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", "not-existing-one")
             .param("feature", "not-existing-feature")
@@ -2308,14 +2308,14 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for anonymous users
         getClient().perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", "not-existing-one")
             .param("feature", alwaysTrue.getName()))
             .andExpect(jsonPath("$.page.totalElements", is(0)));
 
         getClient().perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", wrongSiteId)
             .param("feature", "not-existing-one")
             .param("feature", "not-existing-feature"))
@@ -2344,7 +2344,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
             // verify that it works for administrators with an invalid or missing uuid - with eperson parameter
             getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-                .param("type", "core.item")
+                .param("type", "core.items")
                 .param("uuid", "foo")
                 .param("uuid", "")
                 .param("uuid", "invalid")
@@ -2355,7 +2355,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
             // verify that it works for administrators with an invalid or missing uuid - without eperson parameter
             getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-                .param("type", "core.item")
+                .param("type", "core.items")
                 .param("uuid", "foo")
                 .param("uuid", "")
                 .param("uuid", "invalid")
@@ -2365,7 +2365,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
             // verify that it works for normal loggedin users with an invalid or missing uuid - with eperson parameter
             getClient(epersonToken).perform(get("/api/authz/authorizations/search/objects")
-                .param("type", "core.item")
+                .param("type", "core.items")
                 .param("uuid", "foo")
                 .param("uuid", "")
                 .param("uuid", "invalid")
@@ -2377,7 +2377,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             // verify that it works for normal loggedin users with an invalid or missing
             // uuid - without eperson parameter
             getClient(epersonToken).perform(get("/api/authz/authorizations/search/objects")
-                .param("type", "core.item")
+                .param("type", "core.items")
                 .param("uuid", "foo")
                 .param("uuid", "")
                 .param("uuid", "invalid")
@@ -2388,7 +2388,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             // verify that it works for administators inspecting other users with an invalid or missing uri - by
             // using the eperson parameter
             getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-                .param("type", "core.item")
+                .param("type", "core.items")
                 .param("uuid", "foo")
                 .param("uuid", "")
                 .param("uuid", "invalid")
@@ -2400,7 +2400,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             // verify that it works for administators inspecting other users with an invalid or missing uri - by
             // assuming login
             getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-                .param("type", "core.item")
+                .param("type", "core.items")
                 .param("uuid", "foo")
                 .param("uuid", "")
                 .param("uuid", "invalid")
@@ -2411,7 +2411,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
             // verify that it works for anonymous users with an invalid or missing uri
             getClient().perform(get("/api/authz/authorizations/search/objects")
-                .param("type", "core.item")
+                .param("type", "core.items")
                 .param("uuid", "foo")
                 .param("uuid", "")
                 .param("uuid", "invalid")
@@ -2436,7 +2436,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that returns bad request for missing uuid
         getClient().perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.item")
+            .param("type", "core.items")
             .param("feature", alwaysTrue.getName()))
             .andExpect(status().isBadRequest());
     }
@@ -2457,7 +2457,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for an anonymous user inspecting an admin user - by using the eperson parameter
         getClient().perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysTrue.getName())
             .param("eperson", admin.getID().toString()))
@@ -2465,7 +2465,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for an anonymous user inspecting an admin user - by assuming login
         getClient().perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysTrue.getName())
             .header("X-On-Behalf-Of", admin.getID()))
@@ -2473,7 +2473,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for an anonymous user inspecting a normal user - by using the eperson parameter
         getClient().perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysTrue.getName())
             .param("eperson", eperson.getID().toString()))
@@ -2481,7 +2481,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for an anonymous user inspecting a normal user - by assuming login
         getClient().perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysTrue.getName())
             .header("X-On-Behalf-Of", eperson.getID()))
@@ -2510,7 +2510,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that admin cannot search the admin authorizations - by using the eperson parameter
         getClient(anotherToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysFalse.getName())
             .param("feature", alwaysTrue.getName())
@@ -2519,7 +2519,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that admin cannot search the admin authorizations - by assuming login
         getClient(anotherToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysFalse.getName())
             .param("feature", alwaysTrue.getName())
@@ -2528,7 +2528,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that eperson cannot search the authorizations of another "normal" eperson - by using the parameter
         getClient(anotherToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysFalse.getName())
             .param("feature", alwaysTrue.getName())
@@ -2537,7 +2537,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that eperson cannot search the authorizations of another "normal" eperson - by assuming login
         getClient(anotherToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysFalse.getName())
             .param("feature", alwaysTrue.getName())
@@ -2558,7 +2558,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for administrators - with eperson parameter
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysException.getName())
             .param("eperson", admin.getID().toString()))
@@ -2566,7 +2566,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for administrators - without eperson parameter
         getClient(adminToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysException.getName()))
             .andExpect(status().isInternalServerError());
@@ -2575,7 +2575,7 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for normal loggedin users - with eperson parameter
         getClient(epersonToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysException.getName())
             .param("eperson", eperson.getID().toString()))
@@ -2583,14 +2583,14 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
         // verify that it works for normal loggedin users - without eperson parameter
         getClient(epersonToken).perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysException.getName()))
             .andExpect(status().isInternalServerError());
 
         // verify that it works for anonymous users
         getClient().perform(get("/api/authz/authorizations/search/objects")
-            .param("type", "core.site")
+            .param("type", "core.sites")
             .param("uuid", siteId)
             .param("feature", alwaysException.getName()))
             .andExpect(status().isInternalServerError());

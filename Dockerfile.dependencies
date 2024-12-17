@@ -1,12 +1,12 @@
 # UMD Customization
-# This image will be published as docker.lib.umd.edu/drum-dependencies-7_x:latest
+# This image will be published as docker.lib.umd.edu/drum-dependencies-8_x:latest
 # End UMD Customization
 # The purpose of this image is to make the build for dspace/dspace run faster
 #
 
-# This Dockerfile uses JDK11 by default, but has also been tested with JDK17.
-# To build with JDK17, use "--build-arg JDK_VERSION=17"
-ARG JDK_VERSION=11
+# This Dockerfile uses JDK17 by default.
+# To build with other versions, use "--build-arg JDK_VERSION=[value]"
+ARG JDK_VERSION=17
 
 # Step 1 - Run Maven Build
 FROM maven:3-eclipse-temurin-${JDK_VERSION} as build

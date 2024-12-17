@@ -14,9 +14,9 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.exception.RESTAuthorizationException;
@@ -34,8 +34,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -48,7 +48,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID extends Serializable>
     extends AbstractDSpaceRestRepository
-    implements PagingAndSortingRepository<T, ID>, BeanNameAware {
+    implements CrudRepository<T, ID>, PagingAndSortingRepository<T, ID>, BeanNameAware {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(DSpaceRestRepository.class);
 
@@ -152,7 +152,6 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
      *            the rest object id
      * @return the REST object identified by its ID
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
     public abstract T findOne(Context context, ID id);
 
     @Override

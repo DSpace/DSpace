@@ -1,15 +1,16 @@
 # This image will be published as dspace/dspace-cli
 # See https://github.com/DSpace/DSpace/tree/main/dspace/src/main/docker for usage details
 #
-# - note: default tag for branch: dspace/dspace-cli: dspace/dspace-cli:dspace-7_x
+# - note: default tag for branch: dspace/dspace-cli: dspace/dspace-cli:latest
 
-# This Dockerfile uses JDK11 by default, but has also been tested with JDK17.
-# To build with JDK17, use "--build-arg JDK_VERSION=17"
-ARG JDK_VERSION=11
+# This Dockerfile uses JDK17 by default.
+# To build with other versions, use "--build-arg JDK_VERSION=[value]"
+ARG JDK_VERSION=17
+ARG DSPACE_VERSION=latest
 
 # Step 1 - Run Maven Build
 # UMD Customization
-FROM docker.lib.umd.edu/drum-dependencies-7_x:latest as build
+FROM docker.lib.umd.edu/drum-dependencies:${DSPACE_VERSION} as build
 # End UMD Customization
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app

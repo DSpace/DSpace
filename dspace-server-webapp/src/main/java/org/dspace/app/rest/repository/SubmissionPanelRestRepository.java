@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
-@Component(SubmissionDefinitionRest.CATEGORY + "." + SubmissionSectionRest.NAME)
+@Component(SubmissionDefinitionRest.CATEGORY + "." + SubmissionSectionRest.PLURAL_NAME)
 public class SubmissionPanelRestRepository extends DSpaceRestRepository<SubmissionSectionRest, String> {
 
     private SubmissionConfigService submissionConfigService;

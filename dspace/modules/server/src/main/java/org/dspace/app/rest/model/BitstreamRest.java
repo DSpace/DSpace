@@ -89,6 +89,11 @@ public class BitstreamRest extends DSpaceObjectRest {
         return NAME;
     }
 
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
+    }
+
     // UMD Customization
 
     /**

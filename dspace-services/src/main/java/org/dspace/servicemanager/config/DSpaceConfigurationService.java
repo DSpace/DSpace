@@ -30,9 +30,9 @@ import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.apache.commons.configuration2.event.Event;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.SimpleTypeConverter;
 import org.springframework.core.io.ClassPathResource;
 
@@ -47,7 +47,7 @@ import org.springframework.core.io.ClassPathResource;
  */
 public final class DSpaceConfigurationService implements ConfigurationService {
 
-    private static final Logger log = LoggerFactory.getLogger(DSpaceConfigurationService.class);
+    private static final Logger log = LogManager.getLogger();
 
     public static final String DSPACE = "dspace";
     public static final String EXT_CONFIG = "cfg";
@@ -153,7 +153,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         try {
             return this.configurationBuilder.getConfiguration();
         } catch (ConfigurationException ce) {
-            log.error("Unable to get configuration object based on definition at " + this.configDefinition);
+            log.error("Unable to get configuration object based on definition at {}", this.configDefinition);
             System.err.println("Unable to get configuration object based on definition at " + this.configDefinition);
             throw new RuntimeException(ce);
         }
@@ -385,7 +385,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
             if (value == null && oldValue != null) {
                 changed = true;
                 getConfiguration().clearProperty(name);
-                log.info("Cleared the configuration setting for name (" + name + ")");
+                log.info("Cleared the configuration setting for name ({})", name);
             } else if (value != null && !value.equals(oldValue)) {
                 changed = true;
                 getConfiguration().setProperty(name, value);
@@ -527,7 +527,8 @@ public final class DSpaceConfigurationService implements ConfigurationService {
                 (Event e) -> this.configurationBuilder.getReloadingController()
                                                       .checkForReloading(null));
         } catch (ConfigurationException ce) {
-            log.error("Unable to load configurations based on definition at " + this.configDefinition);
+            log.error("Unable to load configurations based on definition at {}",
+                    this.configDefinition);
             System.err.println("Unable to load configurations based on definition at " + this.configDefinition);
             throw new RuntimeException(ce);
         }
@@ -535,7 +536,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         // Finally, set any dynamic, default properties
         setDynamicProperties();
 
-        log.info("Started up configuration service and loaded settings: " + toString());
+        log.info("Started up configuration service and loaded settings: {}", this::toString);
     }
 
     /**
@@ -557,9 +558,10 @@ public final class DSpaceConfigurationService implements ConfigurationService {
             // Finally, (re)set any dynamic, default properties
             setDynamicProperties();
         } catch (ConfigurationException ce) {
-            log.error("Unable to reload configurations based on definition at " + this.configDefinition, ce);
+            log.error("Unable to reload configurations based on definition at {}",
+                    this.configDefinition, ce);
         }
-        log.info("Reloaded configuration service: " + toString());
+        log.info("Reloaded configuration service: {}", this::toString);
     }
 
     /**

@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This page describes the DRUM DOI functionality, as of DSpace 7. See
+This page describes the DRUM DOI functionality. See
 <https://wiki.lyrasis.org/display/DSDOC7x/DOI+Digital+Object+Identifier>
 for the DSpace documentation on DOI handling.
 

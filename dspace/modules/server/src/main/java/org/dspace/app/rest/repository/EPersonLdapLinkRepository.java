@@ -6,11 +6,11 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
 
 import edu.umd.lib.dspace.authenticate.LdapService;
 import edu.umd.lib.dspace.authenticate.impl.Ldap;
 import edu.umd.lib.dspace.authenticate.impl.LdapServiceImpl;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.LdapRest;
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for the direct Ldap subresource of an individual eperson.
  */
-@Component(EPersonRest.CATEGORY + "." + EPersonRest.NAME + "." + EPersonRest.LDAP)
+@Component(EPersonRest.CATEGORY + "." + EPersonRest.PLURAL_NAME + "." + EPersonRest.LDAP)
 public class EPersonLdapLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
     private static final Logger log = LoggerFactory.getLogger(EPersonLdapLinkRepository.class);

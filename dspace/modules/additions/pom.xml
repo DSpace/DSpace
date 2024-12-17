@@ -17,7 +17,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>7.6.2-drum-3-SNAPSHOT</version>
+      <version>8.0-drum-0-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -100,9 +100,9 @@
             <plugins>
                <!-- UMD Customization -->
                <!-- Unit Testing setup: This plugin unzips the
-                   'testEnvironment-additions.zip' file (created by dspace-parent POM), into
-                   the 'target/testing/' folder, to create a test
-                   install of DSpace, against which Tests can be run. -->
+                    'testEnvironment-additions.zip' file (created by dspace-parent POM), into
+                    the 'target/testing/' folder, to essentially create a test
+                    install of DSpace, against which Tests can be run. -->
                <!-- End UMD Customization -->
                <plugin>
                   <artifactId>maven-dependency-plugin</artifactId>
@@ -138,7 +138,7 @@
                      <systemPropertyVariables>
                         <!-- Specify the dspace.dir to use for test environment -->
                         <!-- This system property is loaded by AbstractDSpaceTest to initialize the test environment -->
-                        <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
+                        <dspace.dir>${agnostic.build.dir}/testing/dspace</dspace.dir>
                         <!-- Turn off any DSpace logging -->
                         <dspace.log.init.disable>true</dspace.log.init.disable>
                         <solr.install.dir>${agnostic.build.dir}/testing/dspace/solr/</solr.install.dir>
@@ -210,7 +210,7 @@
                   <configuration>
                      <systemPropertyVariables>
                         <!-- Specify the dspace.dir to use for test environment -->
-                        <dspace.dir>${agnostic.build.dir}/testing/dspace/</dspace.dir>
+                        <dspace.dir>${agnostic.build.dir}/testing/dspace</dspace.dir>
                         <!-- Turn off any DSpace logging -->
                         <dspace.log.init.disable>true</dspace.log.init.disable>
                         <solr.install.dir>${agnostic.build.dir}/testing/dspace/solr/</solr.install.dir>
@@ -256,8 +256,8 @@
           <artifactId>dspace-services</artifactId>
       </dependency>
       <dependency>
-         <groupId>javax.servlet</groupId>
-         <artifactId>javax.servlet-api</artifactId>
+         <groupId>jakarta.servlet</groupId>
+         <artifactId>jakarta.servlet-api</artifactId>
          <scope>provided</scope>
       </dependency>
       <dependency>
@@ -301,6 +301,13 @@
          <artifactId>solr-core</artifactId>
          <version>${solr.client.version}</version>
          <scope>test</scope>
+         <exclusions>
+            <!-- Later version provided by Hibernate -->
+            <exclusion>
+               <groupId>org.antlr</groupId>
+               <artifactId>antlr4-runtime</artifactId>
+            </exclusion>
+         </exclusions>
       </dependency>
       <!-- UMD Customization -->
       <dependency>

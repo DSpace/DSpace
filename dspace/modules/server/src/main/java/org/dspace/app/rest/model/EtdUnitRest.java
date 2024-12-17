@@ -13,6 +13,7 @@ import org.dspace.app.rest.RestResourceController;
 })
 public class EtdUnitRest extends DSpaceObjectRest {
     public static final String NAME = "etdunit";
+    public static final String PLURAL_NAME = "etdunits";
     public static final String CATEGORY = RestAddressableModel.CORE;
 
     public static final String ETDUNITS = "etdunits";
@@ -28,6 +29,11 @@ public class EtdUnitRest extends DSpaceObjectRest {
     @Override
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     @Override

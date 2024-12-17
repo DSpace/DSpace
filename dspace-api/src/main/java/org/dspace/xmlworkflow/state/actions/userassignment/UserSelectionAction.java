@@ -9,8 +9,8 @@ package org.dspace.xmlworkflow.state.actions.userassignment;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;

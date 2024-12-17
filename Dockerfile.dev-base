@@ -1,34 +1,32 @@
-# This image will be published as dspace/dspace
-# See https://dspace-labs.github.io/DSpace-Docker-Images/ for usage details
-#
-# This version is JDK8 compatible
-# - maven:3-jdk-8
-# - note:
-# - default tag: docker.lib.umd.edu/drum:7_x-dev-base
-#
-# Build: docker build -f Dockerfile.dev-base -t docker.lib.umd.edu/drum:7_x-dev-base .
-#
-
-ARG JDK_VERSION=11
+# UMD-provided file running DSpace as part of a "Quick Build" setup
+# This file is based on "Dockerfile.dev"
+ARG JDK_VERSION=17
+ARG DSPACE_VERSION=latest
 
 # Step 1 - Run Maven Build
-FROM docker.lib.umd.edu/drum-dependencies-7_x:latest
+# UMD Customization
+FROM docker.lib.umd.edu/drum-dependencies-8_x:${DSPACE_VERSION} as build
+# End UMD Customization
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
-
-# The dspace-install directory will be written to /install
+# The dspace-installer directory will be written to /install
 RUN mkdir /install \
-    && chown -Rv dspace: /install
-
+    && chown -Rv dspace: /install  \
+    && chown -Rv dspace: /app
 USER dspace
-
-# Copy the DSpace source code into the workdir (excluding .dockerignore contents)
+# Copy the DSpace source code (from local machine) into the workdir (excluding .dockerignore contents)
 ADD --chown=dspace . /app/
-COPY dspace/src/main/docker/local.cfg /app/local.cfg
+# Build DSpace
+# Copy the dspace-installer directory to /install.  Clean up the build to keep the docker image small
+# Maven flags here ensure that we skip building test environment and skip all code verification checks.
+# These flags speed up this compilation as much as reasonably possible.
+ENV MAVEN_FLAGS="-P-test-environment -Denforcer.skip=true -Dcheckstyle.skip=true -Dlicense.skip=true -Dxml.skip=true"
+# UMD Customization
+RUN mvn install ${MAVEN_FLAGS} && \
+  mvn clean
+# End UMD Customization
 
-# Build DSpace.
-# RUN mvn package
-RUN mvn install -Dlicense.skip=true -Dcheckstyle.skip
+# Remove the server webapp to keep image small.
+RUN rm -rf /install/webapps/server/
 
-# RUN mvn install -pl '!org.dspace.modules:additions'
-# RUN mvn package -rf org.dspace.modules:additions
+# UMD Customization - Remaining steps are handled by Dockerfile.dev-additions

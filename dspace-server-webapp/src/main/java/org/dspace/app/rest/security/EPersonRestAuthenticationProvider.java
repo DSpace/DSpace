@@ -15,10 +15,12 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.login.PostLoggedInAction;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authenticate.AuthenticationMethod;
@@ -28,8 +30,6 @@ import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.RequestService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -40,7 +40,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 /**
- * This class is responsible for authenticating a user via REST
+ * This class is responsible for authenticating a user via REST.
  *
  * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Tom Desair (tom dot desair at atmire dot com)
@@ -48,7 +48,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class EPersonRestAuthenticationProvider implements AuthenticationProvider {
 
-    private static final Logger log = LoggerFactory.getLogger(EPersonRestAuthenticationProvider.class);
+    private static final Logger log = LogManager.getLogger();
 
     public static final String MANAGE_ACCESS_GROUP = "MANAGE_ACCESS_GROUP";
 
@@ -144,9 +144,8 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
                         }
 
                     } else {
-                        log.info(LogHelper.getHeader(newContext, "failed_login", "email="
-                            + name + ", result="
-                            + authenticateResult));
+                        log.info(LogHelper.getHeader(newContext, "failed_login",
+                                "email={}, result={}"), name, authenticateResult);
                         throw new BadCredentialsException("Login failed");
                     }
                 }
@@ -155,7 +154,7 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
                     try {
                         newContext.complete();
                     } catch (SQLException e) {
-                        log.error(e.getMessage() + " occurred while trying to close", e);
+                        log.error("{} occurred while trying to close", e.getMessage(), e);
                     }
                 }
             }
@@ -182,7 +181,7 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
             return new DSpaceAuthentication(ePerson, getGrantedAuthorities(context));
 
         } else {
-            log.info(LogHelper.getHeader(context, "failed_login", "No eperson with an non-blank e-mail address found"));
+            log.info(LogHelper.getHeader(context, "failed_login", "No eperson with a non-blank e-mail address found"));
             throw new BadCredentialsException("Login failed");
         }
     }

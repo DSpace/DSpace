@@ -6,9 +6,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 /**
  * This is the repository responsible for managing the Unit Rest object
  */
-@Component(UnitRest.CATEGORY + "." + UnitRest.NAME)
+@Component(UnitRest.CATEGORY + "." + UnitRest.PLURAL_NAME)
 public class UnitRestRepository extends DSpaceObjectRestRepository<Unit, UnitRest> {
     @Autowired
     UnitService unitService;

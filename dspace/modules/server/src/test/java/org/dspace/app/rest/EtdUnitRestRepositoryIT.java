@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.ws.rs.core.MediaType;
 import org.dspace.app.rest.exception.EtdUnitNameNotProvidedException;
 import org.dspace.app.rest.matcher.EtdUnitMatcher;
 import org.dspace.app.rest.matcher.HalMatcher;
@@ -302,7 +302,7 @@ public class EtdUnitRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         // When no projection is requested, response should include expected properties,
         // links, and no embeds.
-        getClient(token).perform(get("/api/core/etdunit/" + generatedEtdUnitId))
+        getClient(token).perform(get("/api/core/etdunits/" + generatedEtdUnitId))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", HalMatcher.matchNoEmbeds()));
     }

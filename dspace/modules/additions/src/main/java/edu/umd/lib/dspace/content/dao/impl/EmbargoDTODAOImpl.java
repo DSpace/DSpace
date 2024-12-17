@@ -10,9 +10,7 @@ import org.dspace.core.Context;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.hibernate.transform.Transformers;
-import org.hibernate.type.DateType;
-import org.hibernate.type.PostgresUUIDType;
-import org.hibernate.type.StringType;
+import org.hibernate.type.StandardBasicTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +46,6 @@ public class EmbargoDTODAOImpl extends AbstractHibernateDAO<Object> implements E
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<EmbargoDTO> getEmbargoDTOList(Context context, int titleId, int advisorId, int authorId,
             int departmentId, int typeId, String groupName) throws SQLException {
 
@@ -57,15 +54,15 @@ public class EmbargoDTODAOImpl extends AbstractHibernateDAO<Object> implements E
                 authorId, departmentId, typeId, groupName);
 
         Query<EmbargoDTO> sqlQuery = (Query<EmbargoDTO>) createSQLQuery(context, sql)
-                .addScalar("handle", StringType.INSTANCE)
-                .addScalar("itemId", PostgresUUIDType.INSTANCE)
-                .addScalar("bitstreamId", PostgresUUIDType.INSTANCE)
-                .addScalar("title", StringType.INSTANCE)
-                .addScalar("advisor", StringType.INSTANCE)
-                .addScalar("author", StringType.INSTANCE)
-                .addScalar("department", StringType.INSTANCE)
-                .addScalar("type", StringType.INSTANCE)
-                .addScalar("endDate", DateType.INSTANCE)
+                .addScalar("handle", StandardBasicTypes.STRING)
+                .addScalar("itemId", StandardBasicTypes.UUID)
+                .addScalar("bitstreamId", StandardBasicTypes.UUID)
+                .addScalar("title", StandardBasicTypes.STRING)
+                .addScalar("advisor", StandardBasicTypes.STRING)
+                .addScalar("author", StandardBasicTypes.STRING)
+                .addScalar("department", StandardBasicTypes.STRING)
+                .addScalar("type", StandardBasicTypes.STRING)
+                .addScalar("endDate", StandardBasicTypes.DATE)
                 .setParameter("titleId", titleId)
                 .setParameter("advisorId", advisorId)
                 .setParameter("authorId", authorId)
@@ -77,7 +74,7 @@ public class EmbargoDTODAOImpl extends AbstractHibernateDAO<Object> implements E
         return (List<EmbargoDTO>) sqlQuery.list();
     }
 
-    private NativeQuery createSQLQuery(Context context, String query) throws SQLException {
-        return getHibernateSession(context).createSQLQuery(query);
+    private NativeQuery<EmbargoDTO> createSQLQuery(Context context, String query) throws SQLException {
+        return getHibernateSession(context).createNativeQuery(query, EmbargoDTO.class);
     }
 }

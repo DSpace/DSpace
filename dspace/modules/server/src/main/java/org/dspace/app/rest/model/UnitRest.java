@@ -16,6 +16,7 @@ import org.dspace.app.rest.RestResourceController;
 })
 public class UnitRest extends DSpaceObjectRest {
     public static final String NAME = "unit";
+    public static final String PLURAL_NAME = "units";
     public static final String CATEGORY = RestAddressableModel.EPERSON;
 
     public static final String UNITS = "units";
@@ -32,6 +33,11 @@ public class UnitRest extends DSpaceObjectRest {
     @Override
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    public String getTypePlural() {
+        return PLURAL_NAME;
     }
 
     @Override

@@ -1,10 +1,9 @@
 # DRUM Cron Tasks
 
-This document describes the tasks that run periodically using "cron", as of
-DSpace 7.
+This document describes the tasks that run periodically using "cron".
 
-DSpace provides a sample "crontab" file  at
-<https://wiki.lyrasis.org/display/DSDOC7x/Scheduled+Tasks+via+Cron>
+DSpace provides a sample "crontab" file at
+<https://wiki.lyrasis.org/display/DSDOC8x/Scheduled+Tasks+via+Cron>
 
 All of the sample tasks are performed, although sometimes on a different
 schedule, except for the following:
@@ -88,7 +87,7 @@ Updates the "oai" Solr core with new/modified documents for OAI-PMH harvesting.
     Execute the query, and verify that a single entry is found.
 
 **Note:** There is a known DSpace issue (see DSpace
-<https://github.com/DSpace/DSpace/pull/2856>) that deleted items are *not*
+< >) that deleted items are *not*
 removed from the "oai" Solr index.
 
 ----

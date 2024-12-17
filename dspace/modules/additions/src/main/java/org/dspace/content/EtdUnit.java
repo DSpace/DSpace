@@ -11,19 +11,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import javax.persistence.Cacheable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-import javax.persistence.Transient;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import org.dspace.content.service.EtdUnitService;
 import org.dspace.core.Constants;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * Class representing an ETD department as seen in the Proquest metadata element
@@ -34,9 +32,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
 @Table(name = "etdunit")
-@Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
-public class EtdUnit extends DSpaceObject implements DSpaceObjectLegacySupport {
+public class EtdUnit extends CacheableDSpaceObject implements DSpaceObjectLegacySupport {
     @Column(name = "etdunit_id", insertable = false, updatable = false)
     private Integer legacyId;
 

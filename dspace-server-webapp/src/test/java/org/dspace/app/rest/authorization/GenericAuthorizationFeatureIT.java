@@ -38,6 +38,7 @@ import org.dspace.services.ConfigurationService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.ResultActions;
 
 /**
  * Test for the following authorization features:
@@ -52,6 +53,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  *     canCreateBundle
  */
 public class GenericAuthorizationFeatureIT extends AbstractControllerIntegrationTest {
+
+    private static final int SIZE = 100;
 
     @Autowired
     ConfigurationService configurationService;
@@ -205,215 +208,163 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         String siteId = ContentServiceFactory.getInstance().getSiteService().findSite(context).getID().toString();
 
         // Verify the general admin has this feature on the site
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/sites/" + siteId))
+        getAuthorizationFeatures(adminToken, "http://localhost/api/core/sites/" + siteId)
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify community A admin doesn’t have this feature on the site
-        getClient(communityAAdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/sites/" + siteId))
+        getAuthorizationFeatures(communityAAdminToken, "http://localhost/api/core/sites/" + siteId)
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify the general admin has this feature on community A
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/communities/" + communityA.getID()))
+        getAuthorizationFeatures(adminToken,"http://localhost/api/core/communities/" + communityA.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify community A admin has this feature on community A
-        getClient(communityAAdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/communities/" + communityA.getID()))
+        getAuthorizationFeatures(communityAAdminToken, "http://localhost/api/core/communities/" + communityA.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify community A admin has this feature on community AA
-        getClient(communityAAdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/communities/" + communityAA.getID()))
+        getAuthorizationFeatures(communityAAdminToken, "http://localhost/api/core/communities/" + communityAA.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify collection X admin doesn’t have this feature on community A
-        getClient(collectionXAdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/communities/" + communityA.getID()))
+        getAuthorizationFeatures(collectionXAdminToken, "http://localhost/api/core/communities/" + communityA.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify community A admin doesn’t have this feature on community B
-        getClient(communityAAdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/communities/" + communityB.getID()))
+        getAuthorizationFeatures(communityAAdminToken, "http://localhost/api/core/communities/" + communityB.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify the general admin has this feature on collection X
-        getClient(adminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/collections/" + collectionX.getID()))
+        getAuthorizationFeatures(adminToken, "http://localhost/api/core/collections/" + collectionX.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify community A admin has this feature on collection X
-        getClient(communityAAdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/collections/" + collectionX.getID()))
+        getAuthorizationFeatures(communityAAdminToken, "http://localhost/api/core/collections/" + collectionX.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify collection X admin has this feature on collection X
-        getClient(collectionXAdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/collections/" + collectionX.getID()))
+        getAuthorizationFeatures(collectionXAdminToken, "http://localhost/api/core/collections/" + collectionX.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify item 1 admin doesn’t have this feature on collection X
-        getClient(item1AdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/collections/" + collectionX.getID()))
+        getAuthorizationFeatures(item1AdminToken, "http://localhost/api/core/collections/" + collectionX.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify collection X admin doesn’t have this feature on collection Y
-        getClient(collectionXAdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/collections/" + collectionY.getID()))
+        getAuthorizationFeatures(collectionXAdminToken, "http://localhost/api/core/collections/" + collectionY.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify the general admin has this feature on item 1
-        getClient(adminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(adminToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify community A admin has this feature on item 1
-        getClient(communityAAdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(communityAAdminToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify collection X admin has this feature on item 1
-        getClient(collectionXAdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(collectionXAdminToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify item 1 admin has this feature on item 1
-        getClient(item1AdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(item1AdminToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify item 1 admin doesn’t have this feature on item 2
-        getClient(item1AdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item2.getID()))
+        getAuthorizationFeatures(item1AdminToken, "http://localhost/api/core/items/" + item2.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify the general admin has this feature on the bundle in item 1
-        getClient(adminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(adminToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify community A admin has this feature on the bundle in item 1
-        getClient(communityAAdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(communityAAdminToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify collection X admin has this feature on the bundle in item 1
-        getClient(collectionXAdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(collectionXAdminToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify item 1 admin has this feature on the bundle in item 1
-        getClient(item1AdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(item1AdminToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify item 1 admin doesn’t have this feature on the bundle in item 2
-        getClient(item1AdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/bundles/" + bundle2.getID()))
+        getAuthorizationFeatures(item1AdminToken, "http://localhost/api/core/bundles/" + bundle2.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify the general admin has this feature on the bitstream in item 1
-        getClient(adminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/bitstreams/" + bitstream1.getID()))
+        getAuthorizationFeatures(adminToken, "http://localhost/api/core/bitstreams/" + bitstream1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify community A admin has this feature on the bitstream in item 1
-        getClient(communityAAdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/bitstreams/" + bitstream1.getID()))
+        getAuthorizationFeatures(communityAAdminToken, "http://localhost/api/core/bitstreams/" + bitstream1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify collection X admin has this feature on the bitstream in item 1
-        getClient(collectionXAdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/bitstreams/" + bitstream1.getID()))
+        getAuthorizationFeatures(collectionXAdminToken, "http://localhost/api/core/bitstreams/" + bitstream1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify item 1 admin has this feature on the bitstream in item 1
-        getClient(item1AdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/bitstreams/" + bitstream1.getID()))
+        getAuthorizationFeatures(item1AdminToken, "http://localhost/api/core/bitstreams/" + bitstream1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify item 1 admin doesn’t have this feature on the bitstream in item 2
-        getClient(item1AdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/bitstreams/" + bitstream2.getID()))
+        getAuthorizationFeatures(item1AdminToken, "http://localhost/api/core/bitstreams/" + bitstream2.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -426,41 +377,31 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         String item1AdminToken = getAuthToken(item1Admin.getEmail(), password);
 
         // Verify the general admin has this feature on item 1
-        getClient(adminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(adminToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify community A admin has this feature on item 1
-        getClient(communityAAdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(communityAAdminToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify collection X admin has this feature on item 1
-        getClient(collectionXAdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(collectionXAdminToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify item 1 admin has this feature on item 1
-        getClient(item1AdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(item1AdminToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify community A admin doesn’t have this feature on item 2
-        getClient(communityAAdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item2.getID()))
+        getAuthorizationFeatures(communityAAdminToken, "http://localhost/api/core/items/" + item2.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -475,73 +416,55 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         // Verify community A write has this feature on community A if the boolean parameter is true
         // (or doesn’t have access otherwise)
         if (hasDSOAccess) {
-            getClient(communityAWriterToken).perform(
-                get("/api/authz/authorizations/search/object?embed=feature&uri="
-                    + "http://localhost/api/core/communities/" + communityA.getID()))
+            getAuthorizationFeatures(communityAWriterToken, "http://localhost/api/core/communities/" + communityA.getID())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                     + feature + "')]").exists());
         } else {
-            getClient(communityAWriterToken).perform(
-                get("/api/authz/authorizations/search/object?embed=feature&uri="
-                    + "http://localhost/api/core/communities/" + communityA.getID()))
+            getAuthorizationFeatures(communityAWriterToken, "http://localhost/api/core/communities/" + communityA.getID())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                     + feature + "')]").doesNotExist());
         }
 
         // Verify community A write doesn’t have this feature on community AA
-        getClient(communityAWriterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/communities/" + communityAA.getID()))
+        getAuthorizationFeatures(communityAWriterToken, "http://localhost/api/core/communities/" + communityAA.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify community A write doesn’t have this feature on collection X
-        getClient(communityAWriterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/collections/" + collectionX.getID()))
+        getAuthorizationFeatures(communityAWriterToken, "http://localhost/api/core/collections/" + collectionX.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify community A write doesn’t have this feature on item 1
-        getClient(communityAWriterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(communityAWriterToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify community A write doesn’t have this feature on the bundle in item 1
-        getClient(communityAWriterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(communityAWriterToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify community A write doesn’t have this feature on the bitstream in item 1
-        getClient(communityAWriterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(communityAWriterToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify collection X write doesn’t have this feature on community A
-        getClient(collectionXWriterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/communities/" + communityA.getID()))
+        getAuthorizationFeatures(collectionXWriterToken, "http://localhost/api/core/communities/" + communityA.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify collection X write doesn’t have this feature on community AA
-        getClient(collectionXWriterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/communities/" + communityAA.getID()))
+        getAuthorizationFeatures(collectionXWriterToken, "http://localhost/api/core/communities/" + communityAA.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -549,65 +472,49 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         // Verify collection X write has this feature on collection X if the boolean parameter is true
         // (or doesn’t have access otherwise)
         if (hasDSOAccess) {
-            getClient(collectionXWriterToken).perform(
-                get("/api/authz/authorizations/search/object?embed=feature&uri="
-                    + "http://localhost/api/core/collections/" + collectionX.getID()))
+            getAuthorizationFeatures(collectionXWriterToken, "http://localhost/api/core/collections/" + collectionX.getID())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                     + feature + "')]").exists());
         } else {
-            getClient(collectionXWriterToken).perform(
-                get("/api/authz/authorizations/search/object?embed=feature&uri="
-                    + "http://localhost/api/core/collections/" + collectionX.getID()))
+            getAuthorizationFeatures(collectionXWriterToken, "http://localhost/api/core/collections/" + collectionX.getID())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                     + feature + "')]").doesNotExist());
         }
 
         // Verify collection X write doesn’t have this feature on item 1
-        getClient(collectionXWriterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(collectionXWriterToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify collection X write doesn’t have this feature on the bundle in item 1
-        getClient(collectionXWriterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(collectionXWriterToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify collection X write doesn’t have this feature on the bitstream in item 1
-        getClient(collectionXWriterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/bitstreams/" + bitstream1.getID()))
+        getAuthorizationFeatures(collectionXWriterToken, "http://localhost/api/core/bitstreams/" + bitstream1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify item 1 write doesn’t have this feature on community A
-        getClient(item1WriterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/communities/" + communityA.getID()))
+        getAuthorizationFeatures(item1WriterToken, "http://localhost/api/core/communities/" + communityA.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify item 1 write doesn’t have this feature on community AA
-        getClient(item1WriterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/communities/" + communityAA.getID()))
+        getAuthorizationFeatures(item1WriterToken, "http://localhost/api/core/communities/" + communityAA.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify item 1 write doesn’t have this feature on collection X
-        getClient(item1WriterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/collections/" + collectionX.getID()))
+        getAuthorizationFeatures(item1WriterToken, "http://localhost/api/core/collections/" + collectionX.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -615,57 +522,43 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         // Verify item 1 write has this feature on item 1 if the boolean parameter is true
         // (or doesn’t have access otherwise)
         if (hasDSOAccess) {
-            getClient(item1WriterToken).perform(
-                get("/api/authz/authorizations/search/object?embed=feature&uri="
-                    + "http://localhost/api/core/items/" + item1.getID()))
+            getAuthorizationFeatures(item1WriterToken, "http://localhost/api/core/items/" + item1.getID())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                     + feature + "')]").exists());
         } else {
-            getClient(item1WriterToken).perform(
-                get("/api/authz/authorizations/search/object?embed=feature&uri="
-                    + "http://localhost/api/core/items/" + item1.getID()))
+            getAuthorizationFeatures(item1WriterToken, "http://localhost/api/core/items/" + item1.getID())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                     + feature + "')]").doesNotExist());
         }
 
         // Verify item 1 write doesn’t have this feature on the bundle in item 1
-        getClient(item1WriterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(item1WriterToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify item 1 write doesn’t have this feature on the bitstream in item 1
-        getClient(item1WriterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/bitstreams/" + bitstream1.getID()))
+        getAuthorizationFeatures(item1WriterToken, "http://localhost/api/core/bitstreams/" + bitstream1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify community A write doesn’t have this feature on community B
-        getClient(communityAWriterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/communities/" + communityB.getID()))
+        getAuthorizationFeatures(communityAWriterToken, "http://localhost/api/core/communities/" + communityB.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify collection X write doesn’t have this feature on collection Y
-        getClient(collectionXWriterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/collections/" + collectionY.getID()))
+        getAuthorizationFeatures(collectionXWriterToken, "http://localhost/api/core/collections/" + collectionY.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify item 1 write doesn’t have this feature on item 2
-        getClient(item1WriterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item2.getID()))
+        getAuthorizationFeatures(item1WriterToken, "http://localhost/api/core/items/" + item2.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -677,17 +570,13 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         String item1WriterToken = getAuthToken(item1Writer.getEmail(), password);
 
         // Verify community A write doesn’t have this feature on item 1
-        getClient(communityAWriterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(communityAWriterToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify collection X write doesn’t have this feature on item 1
-        getClient(collectionXWriterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(collectionXWriterToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -695,25 +584,19 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         // Verify item 1 write has this feature on item 1 if the boolean parameter is true
         // (or doesn’t have access otherwise)
         if (hasDSOAccess) {
-            getClient(item1WriterToken).perform(
-                get("/api/authz/authorizations/search/object?embed=feature&uri="
-                    + "http://localhost/api/core/items/" + item1.getID()))
+            getAuthorizationFeatures(item1WriterToken, "http://localhost/api/core/items/" + item1.getID())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                     + feature + "')]").exists());
         } else {
-            getClient(item1WriterToken).perform(
-                get("/api/authz/authorizations/search/object?embed=feature&uri="
-                    + "http://localhost/api/core/items/" + item1.getID()))
+            getAuthorizationFeatures(item1WriterToken, "http://localhost/api/core/items/" + item1.getID())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                     + feature + "')]").doesNotExist());
         }
 
         // Verify item 1 write doesn’t have this feature on item 2
-        getClient(item1WriterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item2.getID()))
+        getAuthorizationFeatures(item1WriterToken, "http://localhost/api/core/items/" + item2.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -751,41 +634,31 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         final String feature = "canMove";
 
         // Verify the general admin has this feature on item 1
-        getClient(adminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(adminToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify community A admin has this feature on item 1
-        getClient(communityAAdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(communityAAdminToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify collection X admin has this feature on item 1
-        getClient(collectionXAdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(collectionXAdminToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify item 1 admin doesn’t have this feature on item 1
-        getClient(item1AdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(item1AdminToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify community A admin doesn’t have this feature on item 2
-        getClient(communityAAdminToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item2.getID()))
+        getAuthorizationFeatures(communityAAdminToken, "http://localhost/api/core/items/" + item2.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -801,9 +674,7 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
 
         // verify item 1 write has this feature on item 1
-        getClient(item1WriterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(item1WriterToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='canMove')]")
                 .exists());
@@ -823,9 +694,7 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
 
         String item1WriterToken = getAuthToken(item1Writer.getEmail(), password);
         // verify item 1 write has this feature on item 1
-        getClient(item1WriterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-                + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(item1WriterToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='canMove')]")
                 .exists());
@@ -861,29 +730,25 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         final String feature = "canDelete";
 
         // Verify the general admin doesn’t have this feature on the site
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/sites/" + siteId))
+        getAuthorizationFeatures(adminToken, "http://localhost/api/core/sites/" + siteId)
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify the general admin has this feature on community A
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/communities/" + communityA.getID()))
+        getAuthorizationFeatures(adminToken, "http://localhost/api/core/communities/" + communityA.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify community A admin has this feature on community A
-        getClient(communityAAdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/communities/" + communityA.getID()))
+        getAuthorizationFeatures(communityAAdminToken, "http://localhost/api/core/communities/" + communityA.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify community A admin has this feature on community AA
-        getClient(communityAAdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/communities/" + communityAA.getID()))
+        getAuthorizationFeatures(communityAAdminToken, "http://localhost/api/core/communities/" + communityAA.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
@@ -901,162 +766,139 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
             .build();
         context.restoreAuthSystemState();
         String communityAAAdminToken = getAuthToken(communityAAAdmin.getEmail(), password);
-        getClient(communityAAAdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/communities/" + communityAA.getID()))
+        getAuthorizationFeatures(communityAAAdminToken, "http://localhost/api/core/communities/" + communityAA.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify collection X admin doesn’t have this feature on community A
-        getClient(collectionXAdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/communities/" + communityA.getID()))
+        getAuthorizationFeatures(collectionXAdminToken, "http://localhost/api/core/communities/" + communityA.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify community A admin doesn’t have this feature on community B
-        getClient(communityAAdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/communities/" + communityB.getID()))
+        getAuthorizationFeatures(communityAAdminToken, "http://localhost/api/core/communities/" + communityB.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify the general admin has this feature on collection X
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/collections/" + collectionX.getID()))
+        getAuthorizationFeatures(adminToken, "http://localhost/api/core/collections/" + collectionX.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify community A admin has this feature on collection X
-        getClient(communityAAdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/collections/" + collectionX.getID()))
+        getAuthorizationFeatures(communityAAdminToken, "http://localhost/api/core/collections/" + collectionX.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify collection X admin doesn’t have this feature on collection X
-        getClient(collectionXAdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/collections/" + collectionX.getID()))
+        getAuthorizationFeatures(collectionXAdminToken, "http://localhost/api/core/collections/" + collectionX.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify item 1 admin doesn’t have this feature on collection X
-        getClient(item1AdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/collections/" + collectionX.getID()))
+        getAuthorizationFeatures(item1AdminToken, "http://localhost/api/core/collections/" + collectionX.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify collection X admin doesn’t have this feature on collection Y
-        getClient(collectionXAdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/collections/" + collectionY.getID()))
+        getAuthorizationFeatures(collectionXAdminToken, "http://localhost/api/core/collections/" + collectionY.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify the general admin has this feature on item 1
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(adminToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify community A admin has this feature on item 1
-        getClient(communityAAdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(communityAAdminToken,"http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify collection X admin has this feature on item 1
-        getClient(collectionXAdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(collectionXAdminToken,"http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify item 1 admin doesn’t have this feature on item 1
-        getClient(item1AdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(item1AdminToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify item 1 admin doesn’t have this feature on item 2
-        getClient(item1AdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/items/" + item2.getID()))
+        getAuthorizationFeatures(item1AdminToken, "http://localhost/api/core/items/" + item2.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify the general admin has this feature on the bundle in item 1
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(adminToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify community A admin has this feature on the bundle in item 1
-        getClient(communityAAdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(communityAAdminToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify collection X admin has this feature on the bundle in item 1
-        getClient(collectionXAdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(collectionXAdminToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify item 1 admin has this feature on the bundle in item 1
-        getClient(item1AdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(item1AdminToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify item 1 admin doesn’t have this feature on the bundle in item 2
-        getClient(item1AdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bundles/" + bundle2.getID()))
+        getAuthorizationFeatures(item1AdminToken, "http://localhost/api/core/bundles/" + bundle2.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify the general admin has this feature on the bitstream in item 1
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bitstreams/" + bitstream1.getID()))
+        getAuthorizationFeatures(adminToken, "http://localhost/api/core/bitstreams/" + bitstream1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify community A admin has this feature on the bitstream in item 1
-        getClient(communityAAdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bitstreams/" + bitstream1.getID()))
+        getAuthorizationFeatures(communityAAdminToken, "http://localhost/api/core/bitstreams/" + bitstream1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify collection X admin has this feature on the bitstream in item 1
-        getClient(collectionXAdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bitstreams/" + bitstream1.getID()))
+        getAuthorizationFeatures(collectionXAdminToken, "http://localhost/api/core/bitstreams/" + bitstream1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify item 1 admin has this feature on the bitstream in item 1
-        getClient(item1AdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bitstreams/" + bitstream1.getID()))
+        getAuthorizationFeatures(item1AdminToken, "http://localhost/api/core/bitstreams/" + bitstream1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify item 1 admin doesn’t have this feature on the bitstream in item 2
-        getClient(item1AdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bitstreams/" + bitstream2.getID()))
+        getAuthorizationFeatures(item1AdminToken, "http://localhost/api/core/bitstreams/" + bitstream2.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -1082,8 +924,7 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
         String communityAAAdminToken = getAuthToken(communityAAAdmin.getEmail(), password);
         //verify the community AA admin has this feature on community AA
-        getClient(communityAAAdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/communities/" + communityAA.getID()))
+        getAuthorizationFeatures(communityAAAdminToken, "http://localhost/api/core/communities/" + communityAA.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
@@ -1096,8 +937,7 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
             .build();
         context.restoreAuthSystemState();
         // verify collection X admin has this feature on collection X
-        getClient(collectionXAdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/collections/" + collectionX.getID()))
+        getAuthorizationFeatures(collectionXAdminToken, "http://localhost/api/core/collections/" + collectionX.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
@@ -1110,8 +950,7 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
             .build();
         context.restoreAuthSystemState();
         // verify item 1 admin has this feature on item 1
-        getClient(item1AdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(item1AdminToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
@@ -1140,14 +979,12 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
         String communityADeleterToken = getAuthToken(communityADeleter.getEmail(), password);
         // Verify the user has this feature on community A
-        getClient(communityADeleterToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/communities/" + communityA.getID()))
+        getAuthorizationFeatures(communityADeleterToken, "http://localhost/api/core/communities/" + communityA.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
         // Verify this user doesn’t have this feature on community AA
-        getClient(communityADeleterToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/communities/" + communityAA.getID()))
+        getAuthorizationFeatures(communityADeleterToken, "http://localhost/api/core/communities/" + communityAA.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -1167,20 +1004,17 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
         String communityARemoverToken = getAuthToken(communityARemover.getEmail(), password);
         // Verify the user has this feature on community AA
-        getClient(communityARemoverToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/communities/" + communityAA.getID()))
+        getAuthorizationFeatures(communityARemoverToken, "http://localhost/api/core/communities/" + communityAA.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
         // Verify this user doesn’t have this feature on community A
-        getClient(communityARemoverToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/communities/" + communityA.getID()))
+        getAuthorizationFeatures(communityARemoverToken, "http://localhost/api/core/communities/" + communityA.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
         // Verify this user doesn’t have this feature on collection X
-        getClient(communityARemoverToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/collections/" + collectionX.getID()))
+        getAuthorizationFeatures(communityARemoverToken, "http://localhost/api/core/collections/" + collectionX.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -1199,20 +1033,17 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
         String communityAARemoverToken = getAuthToken(communityAARemover.getEmail(), password);
         // Verify the user has this feature on collection X
-        getClient(communityAARemoverToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/collections/" + collectionX.getID()))
+        getAuthorizationFeatures(communityAARemoverToken, "http://localhost/api/core/collections/" + collectionX.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
         // Verify this user doesn’t have this feature on community AA
-        getClient(communityAARemoverToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/communities/" + communityAA.getID()))
+        getAuthorizationFeatures(communityAARemoverToken, "http://localhost/api/core/communities/" + communityAA.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
         // Verify this user doesn’t have this feature on item 1
-        getClient(communityAARemoverToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(communityAARemoverToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -1231,8 +1062,7 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
         String collectionXRemoverToken = getAuthToken(collectionXRemover.getEmail(), password);
         // Verify the user doesn’t have this feature on item 1
-        getClient(collectionXRemoverToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(collectionXRemoverToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -1251,8 +1081,7 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
         String item1DeleterToken = getAuthToken(item1Deleter.getEmail(), password);
         // Verify the user doesn’t have this feature on item 1
-        getClient(item1DeleterToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(item1DeleterToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -1275,23 +1104,17 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
         String collectionXRemoverItem1DeleterToken = getAuthToken(collectionXRemoverItem1Deleter.getEmail(), password);
         // Verify the user has this feature on item 1
-        getClient(collectionXRemoverItem1DeleterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(collectionXRemoverItem1DeleterToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
         // Verify this user doesn’t have this feature on collection X
-        getClient(collectionXRemoverItem1DeleterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/collections/" + collectionX.getID()))
+        getAuthorizationFeatures(collectionXRemoverItem1DeleterToken, "http://localhost/api/core/collections/" + collectionX.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
         // Verify this user doesn’t have this feature on the bundle in item 1
-        getClient(collectionXRemoverItem1DeleterToken).perform(
-            get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(collectionXRemoverItem1DeleterToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -1310,20 +1133,17 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
         String item1RemoverToken = getAuthToken(item1Remover.getEmail(), password);
         // Verify the user has this feature on the bundle in item 1
-        getClient(item1RemoverToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(item1RemoverToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
         // Verify this user doesn’t have this feature on item 1
-        getClient(item1RemoverToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(item1RemoverToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
         // Verify this user doesn’t have this feature on the bitstream in item 1
-        getClient(item1RemoverToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bitstreams/" + bitstream1.getID()))
+        getAuthorizationFeatures(item1RemoverToken, "http://localhost/api/core/bitstreams/" + bitstream1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -1342,8 +1162,7 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
         String bundle1RemoverToken = getAuthToken(bundle1Remover.getEmail(), password);
         // Verify the user doesn’t have this feature on the bitstream in item 1
-        getClient(bundle1RemoverToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bitstreams/" + bitstream1.getID()))
+        getAuthorizationFeatures(bundle1RemoverToken, "http://localhost/api/core/bitstreams/" + bitstream1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -1367,8 +1186,7 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
         String bundle1item1RemoverToken = getAuthToken(bundle1item1Remover.getEmail(), password);
         // Verify the user has this feature on the bitstream in item 1
-        getClient(bundle1item1RemoverToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bitstreams/" + bitstream1.getID()))
+        getAuthorizationFeatures(bundle1item1RemoverToken, "http://localhost/api/core/bitstreams/" + bitstream1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -1383,36 +1201,31 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         final String feature = "canReorderBitstreams";
 
         // Verify the general admin has this feature on the bundle in item 1
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(adminToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify community A admin has this feature on the bundle in item 1
-        getClient(communityAAdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(communityAAdminToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify collection X admin has this feature on the bundle in item 1
-        getClient(collectionXAdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(collectionXAdminToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify item 1 admin has this feature on the bundle in item 1
-        getClient(item1AdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(item1AdminToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify community A admin doesn’t have this feature on the bundle in item 2
-        getClient(communityAAdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bundles/" + bundle2.getID()))
+        getAuthorizationFeatures(communityAAdminToken, "http://localhost/api/core/bundles/" + bundle2.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -1426,28 +1239,24 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         final String feature = "canReorderBitstreams";
 
         // Verify community A write doesn’t have this feature on the bundle in item 1
-        getClient(communityAWriterToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(communityAWriterToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
         // Verify collection X write doesn’t have this feature on the bundle in item 1
-        getClient(collectionXWriterToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(collectionXWriterToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
         // Verify item 1 write doesn’t have this feature on the bundle in item 1
-        getClient(item1WriterToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(item1WriterToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Create a new user, grant WRITE permissions on the bundle in item 1 to this user
         // Verify the user has this feature on the bundle in item 1
-        getClient(communityAWriterToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(communityAWriterToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -1462,36 +1271,31 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         final String feature = "canCreateBitstream";
 
         // Verify the general admin has this feature on the bundle in item 1
-        getClient(adminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(adminToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify community A admin has this feature on the bundle in item 1
-        getClient(communityAAdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(communityAAdminToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify collection X admin has this feature on the bundle in item 1
-        getClient(collectionXAdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(collectionXAdminToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify item 1 admin has this feature on the bundle in item 1
-        getClient(item1AdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(item1AdminToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
 
         // Verify community A admin doesn’t have this feature on the bundle in item 2
-        getClient(communityAAdminToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bundles/" + bundle2.getID()))
+        getAuthorizationFeatures(communityAAdminToken, "http://localhost/api/core/bundles/" + bundle2.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -1505,22 +1309,19 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         final String feature = "canCreateBitstream";
 
         // Verify community A write doesn’t have this feature on the bundle in item 1
-        getClient(communityAWriterToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(communityAWriterToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify collection X write doesn’t have this feature on the bundle in item 1
-        getClient(collectionXWriterToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(collectionXWriterToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify item 1 write doesn’t have this feature on the bundle in item 1
-        getClient(item1WriterToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(item1WriterToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -1539,8 +1340,7 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
         String bundle1WriterToken = getAuthToken(bundle1Writer.getEmail(), password);
         // Verify the user doesn’t have this feature on the bundle in item 1
-        getClient(bundle1WriterToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(bundle1WriterToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -1559,8 +1359,7 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
         String bundle1AdderToken = getAuthToken(bundle1Adder.getEmail(), password);
         // Verify the user doesn’t have this feature on the bundle in item 1
-        getClient(bundle1AdderToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(bundle1AdderToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -1592,8 +1391,7 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
         String bundle1WriterAdderToken = getAuthToken(bundle1WriterAdder.getEmail(), password);
         // Verify the user has this feature on the bundle in item 1
-        getClient(bundle1WriterAdderToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/bundles/" + bundle1.getID()))
+        getAuthorizationFeatures(bundle1WriterAdderToken, "http://localhost/api/core/bundles/" + bundle1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
@@ -1612,22 +1410,19 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         final String feature = "canCreateBundle";
 
         // Verify community A write doesn’t have this feature on item 1
-        getClient(communityAWriterToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(communityAWriterToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify collection X write doesn’t have this feature on item 1
-        getClient(collectionXWriterToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(collectionXWriterToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
 
         // Verify item 1 write doesn’t have this feature on item 1
-        getClient(item1WriterToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(item1WriterToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").doesNotExist());
@@ -1650,10 +1445,23 @@ public class GenericAuthorizationFeatureIT extends AbstractControllerIntegration
         context.restoreAuthSystemState();
         String item1AdderWriterToken = getAuthToken(item1AdderWriter.getEmail(), password);
         // Verify the user has this feature on item 1
-        getClient(item1AdderWriterToken).perform(get("/api/authz/authorizations/search/object?embed=feature&uri="
-            + "http://localhost/api/core/items/" + item1.getID()))
+        getAuthorizationFeatures(item1AdderWriterToken, "http://localhost/api/core/items/" + item1.getID())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$._embedded.authorizations[?(@._embedded.feature.id=='"
                 + feature + "')]").exists());
     }
+
+    private ResultActions getAuthorizationFeatures(String adminToken, String uri) throws Exception {
+        return getAuthorizationFeatures(adminToken, uri, SIZE);
+    }
+
+    private ResultActions getAuthorizationFeatures(String adminToken, String uri, int size) throws Exception {
+        return getClient(adminToken)
+            .perform(
+                get(
+                    "/api/authz/authorizations/search/object?size=" + size + "&embed=feature&uri=" + uri
+                )
+            );
+    }
 }
+

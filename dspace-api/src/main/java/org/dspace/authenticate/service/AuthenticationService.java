@@ -10,8 +10,8 @@ package org.dspace.authenticate.service;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;

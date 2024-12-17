@@ -7,21 +7,21 @@
  */
 package org.dspace.app.rest.utils;
 
+import static jakarta.mail.internet.MimeUtility.encodeText;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static javax.mail.internet.MimeUtility.encodeText;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 
 /**
@@ -32,7 +32,7 @@ import org.springframework.http.HttpHeaders;
  */
 public class HttpHeadersInitializer {
 
-    protected final Logger log = LoggerFactory.getLogger(this.getClass());
+    protected final Logger log = LogManager.getLogger();
 
     private static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";
     private static final String CONTENT_TYPE_MULTITYPE_WITH_BOUNDARY = "multipart/byteranges; boundary=" +

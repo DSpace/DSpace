@@ -1,15 +1,16 @@
 # This image will be published as dspace/dspace
 # See https://github.com/DSpace/DSpace/tree/main/dspace/src/main/docker for usage details
 #
-# - note: default tag for branch: dspace/dspace: dspace/dspace:dspace-7_x
+# - note: default tag for branch: dspace/dspace: dspace/dspace:latest
 
-# This Dockerfile uses JDK11 by default, but has also been tested with JDK17.
-# To build with JDK17, use "--build-arg JDK_VERSION=17"
-ARG JDK_VERSION=11
+# This Dockerfile uses JDK17 by default.
+# To build with other versions, use "--build-arg JDK_VERSION=[value]"
+ARG JDK_VERSION=17
+ARG DSPACE_VERSION=latest
 
 # Step 1 - Run Maven Build
 # UMD Customization
-FROM docker.lib.umd.edu/drum-dependencies-7_x:latest as build
+FROM docker.lib.umd.edu/drum-dependencies-8_x:${DSPACE_VERSION} as build
 # End UMD Customization
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
@@ -20,7 +21,7 @@ RUN mkdir /install \
 USER dspace
 # Copy the DSpace source code (from local machine) into the workdir (excluding .dockerignore contents)
 ADD --chown=dspace . /app/
-# Build DSpace (note: this build doesn't include the optional, deprecated "dspace-rest" webapp)
+# Build DSpace
 # Copy the dspace-installer directory to /install.  Clean up the build to keep the docker image small
 # Maven flags here ensure that we skip building test environment and skip all code verification checks.
 # These flags speed up this compilation as much as reasonably possible.
@@ -28,6 +29,8 @@ ENV MAVEN_FLAGS="-P-test-environment -Denforcer.skip=true -Dcheckstyle.skip=true
 RUN mvn --no-transfer-progress package ${MAVEN_FLAGS} && \
   mv /app/dspace/target/${TARGET_DIR}/* /install && \
   mvn clean
+# Remove the server webapp to keep image small.
+RUN rm -rf /install/webapps/server/
 
 # Step 2 - Run Ant Deploy
 FROM eclipse-temurin:${JDK_VERSION} as ant_build
@@ -50,25 +53,21 @@ RUN mkdir $ANT_HOME && \
 # Run necessary 'ant' deploy scripts
 RUN ant init_installation update_configs update_code update_webapps
 
-# Step 3 - Run tomcat
-# Create a new tomcat image that does not retain the the build directory contents
-FROM tomcat:9-jdk${JDK_VERSION}
+# Step 3 - Start up DSpace via Runnable JAR
+FROM eclipse-temurin:${JDK_VERSION}
 # NOTE: DSPACE_INSTALL must align with the "dspace.dir" default configuration.
 ENV DSPACE_INSTALL=/dspace
 # Copy the /dspace directory from 'ant_build' container to /dspace in this container
 COPY --from=ant_build /dspace $DSPACE_INSTALL
-# Expose Tomcat port and AJP port
-EXPOSE 8080 8009
+WORKDIR $DSPACE_INSTALL
+# Expose Tomcat port
+EXPOSE 8080
 # Give java extra memory (2GB)
-# UMD Customization
-ENV DSPACE_INSTALL=/dspace \
-    JAVA_OPTS=-Xmx2000m \
-    TZ=America/New_York
-# End UMD Customization
+ENV JAVA_OPTS=-Xmx2000m
 
-# Link the DSpace 'server' webapp into Tomcat's webapps directory.
-# This ensures that when we start Tomcat, it runs from /server path (e.g. http://localhost:8080/server/)
 # UMD Customization
+ENV TZ=America/New_York
+
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
         rsync \
@@ -81,12 +80,7 @@ RUN apt-get update && \
         vim \
         python3-lxml && \
     mkfifo /var/spool/postfix/public/pickup && \
-    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
-    rm -rf /usr/local/tomcat/webapps/* && \
-    ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/server
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # End UMD Customization
-# If you wish to run "server" webapp off the ROOT path, then comment out the above RUN, and uncomment the below RUN.
-# You also MUST update the 'dspace.server.url' configuration to match.
-# Please note that server webapp should only run on one path at a time.
-#RUN mv /usr/local/tomcat/webapps/ROOT /usr/local/tomcat/webapps/ROOT.bk && \
-#    ln -s $DSPACE_INSTALL/webapps/server   /usr/local/tomcat/webapps/ROOT
+# On startup, run DSpace Runnable JAR
+ENTRYPOINT ["java", "-jar", "webapps/server-boot.jar", "--dspace.dir=$DSPACE_INSTALL"]

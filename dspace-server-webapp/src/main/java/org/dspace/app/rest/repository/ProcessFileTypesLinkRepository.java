@@ -9,9 +9,9 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.List;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.ProcessFileTypesRest;
 import org.dspace.app.rest.model.ProcessRest;
 import org.dspace.app.rest.projection.Projection;
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
  * It'll retrieve all the bitstreams for the given Process and return a {@link ProcessFileTypesRest} object that holds
  * a list of Strings where each String represents a unique fileType of the Bitstreams for that Process
  */
-@Component(ProcessRest.CATEGORY + "." + ProcessRest.NAME + "." + ProcessRest.FILE_TYPES)
+@Component(ProcessRest.CATEGORY + "." + ProcessRest.PLURAL_NAME + "." + ProcessRest.FILE_TYPES)
 public class ProcessFileTypesLinkRepository extends AbstractDSpaceRestRepository implements LinkRestRepository {
 
     @Autowired

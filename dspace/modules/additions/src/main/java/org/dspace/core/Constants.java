@@ -65,11 +65,16 @@ public class Constants {
     public static final int EPERSON = 7;
 
     /**
+     * Type of LDN MESSAGE objects
+     */
+    public static final int LDN_MESSAGE = 8;
+
+    /**
      * lets you look up type names from the type IDs
      */
     // UMD Customization
     public static final String[] typeText = { "BITSTREAM", "BUNDLE", "ITEM", "COLLECTION", "COMMUNITY", "SITE", "GROUP",
-        "EPERSON", "ETDUNIT", "UNIT" };
+        "EPERSON", "LDN_MESSAGE", "ETDUNIT", "UNIT" };
     // End UMD Customization
 
     /**

@@ -3,8 +3,8 @@ package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 import java.util.UUID;
 import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.UnitRest;
 import org.dspace.app.rest.projection.Projection;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 /**
  * Link repository for the direct "groups" subresource of an individual unit.
  */
-@Component(UnitRest.CATEGORY + "." + UnitRest.NAME + "." + UnitRest.GROUPS)
+@Component(UnitRest.CATEGORY + "." + UnitRest.PLURAL_NAME + "." + UnitRest.GROUPS)
 public class UnitGroupLinkRepository extends AbstractDSpaceRestRepository
         implements LinkRestRepository {
 

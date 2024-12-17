@@ -24,9 +24,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Iterator;
 import java.util.List;
-import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.matcher.RegistrationMatcher;
 import org.dspace.app.rest.model.RegistrationRest;
@@ -277,6 +277,34 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
             registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
             assertEquals(1, registrationDataList.size());
             assertTrue(StringUtils.equalsIgnoreCase(registrationDataList.get(0).getEmail(), eperson.getEmail()));
+        } finally {
+            Iterator<RegistrationData> iterator = registrationDataList.iterator();
+            while (iterator.hasNext()) {
+                RegistrationData registrationData = iterator.next();
+                registrationDataDAO.delete(context, registrationData);
+            }
+        }
+    }
+
+    @Test
+    public void testUnauthorizedForgotPasswordTest() throws Exception {
+        configurationService.setProperty("user.registration", false);
+        configurationService.setProperty("user.forgot-password", false);
+
+        List<RegistrationData> registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+        try {
+            assertEquals(0, registrationDataList.size());
+
+            ObjectMapper mapper = new ObjectMapper();
+            RegistrationRest registrationRest = new RegistrationRest();
+            registrationRest.setEmail(eperson.getEmail());
+            getClient().perform(post("/api/eperson/registrations")
+                                    .param(TYPE_QUERY_PARAM, TYPE_FORGOT)
+                                    .content(mapper.writeValueAsBytes(registrationRest))
+                                    .contentType(contentType))
+                       .andExpect(status().isUnauthorized());
+            registrationDataList = registrationDataDAO.findAll(context, RegistrationData.class);
+            assertEquals(0, registrationDataList.size());
         } finally {
             Iterator<RegistrationData> iterator = registrationDataList.iterator();
             while (iterator.hasNext()) {

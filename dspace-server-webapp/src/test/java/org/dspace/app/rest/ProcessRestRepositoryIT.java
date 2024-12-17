@@ -18,6 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -690,6 +691,78 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
+    public void searchProcessTestByUserSortedOnCreationTimeAsc() throws Exception {
+        SimpleDateFormat date = new SimpleDateFormat("dd/MM/yyyy");
+        Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            // not realistic to have creationTime after startTime,
+                                            // but proves startTime is ignored on sort
+                                            .withCreationTime(date.parse("01/01/2000"))
+                                            .withStartAndEndTime("01/01/1990", "01/01/1995").build();
+        Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withCreationTime(date.parse("01/01/2005"))
+                                            .withStartAndEndTime(null, null).build();
+        Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withCreationTime(date.parse("01/01/2010"))
+                                            .withStartAndEndTime("01/01/2015", "01/01/2020").build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/search/byProperty")
+                                     .param("userId", eperson.getID().toString())
+                                     .param("sort", "creationTime,asc"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.processes", contains(
+                            ProcessMatcher.matchProcess(newProcess1.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess1.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess2.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess2.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess3.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess3.getID(), parameters, ProcessStatus.SCHEDULED)
+                        )))
+                        .andExpect(jsonPath("$.page", is(
+                            PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3))));
+    }
+
+    @Test
+    public void searchProcessTestByUserSortedOnCreationTimeDesc() throws Exception {
+        SimpleDateFormat date = new SimpleDateFormat("dd/MM/yyyy");
+        Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            // not realistic to have creationTime after startTime,
+                                            // but proves startTime is ignored on sort
+                                            .withCreationTime(date.parse("01/01/2000"))
+                                            .withStartAndEndTime("01/01/1990", "01/01/1995").build();
+        Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withCreationTime(date.parse("01/01/2005"))
+                                            .withStartAndEndTime(null, null).build();
+        Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
+                                            .withCreationTime(date.parse("01/01/2010"))
+                                            .withStartAndEndTime("01/01/2015", "01/01/2020").build();
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/system/processes/search/byProperty")
+                                     .param("userId", eperson.getID().toString())
+                                     .param("sort", "creationTime,desc"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$._embedded.processes", contains(
+                            ProcessMatcher.matchProcess(newProcess3.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess3.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess2.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess2.getID(), parameters, ProcessStatus.SCHEDULED),
+                            ProcessMatcher.matchProcess(newProcess1.getName(),
+                                                        String.valueOf(eperson.getID().toString()),
+                                                        newProcess1.getID(), parameters, ProcessStatus.SCHEDULED)
+                        )))
+                        .andExpect(jsonPath("$.page", is(
+                            PageMatcher.pageEntryWithTotalPagesAndElements(0, 20, 1, 3))));
+    }
+
+    @Test
     public void searchProcessTestByUserSortedOnEndTimeAsc() throws Exception {
         Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
                                             .withStartAndEndTime("10/01/1990", "20/01/1990").build();
@@ -797,7 +870,7 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
     }
 
     @Test
-    public void searchProcessTestByUserSortedOnNonExistingIsSortedAsDefault() throws Exception {
+    public void searchProcessTestByUserSortedOnNonExistingBadRequest() throws Exception {
         Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
                                             .withStartAndEndTime("10/01/1990", "20/01/1990").build();
         Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)

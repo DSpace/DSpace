@@ -1,0 +1,107 @@
+{
+  "id": "https://ror.org/01sps7q28",
+  "name": "The University of Texas Health Science Center at Tyler",
+  "email_address": null,
+  "ip_addresses": [
+    
+  ],
+  "established": 1947,
+  "types": [
+    "Healthcare"
+  ],
+  "relationships": [
+    {
+      "label": "The University of Texas System",
+      "type": "Parent",
+      "id": "https://ror.org/01gek1696"
+    }
+  ],
+  "addresses": [
+    {
+      "lat": 32.426014,
+      "lng": -95.212728,
+      "state": "Texas",
+      "state_code": "US-TX",
+      "city": "Tyler",
+      "geonames_city": {
+        "id": 4738214,
+        "city": "Tyler",
+        "geonames_admin1": {
+          "name": "Texas",
+          "id": 4736286,
+          "ascii_name": "Texas",
+          "code": "US.TX"
+        },
+        "geonames_admin2": {
+          "name": "Smith County",
+          "id": 4729130,
+          "ascii_name": "Smith County",
+          "code": "US.TX.423"
+        },
+        "license": {
+          "attribution": "Data from geonames.org under a CC-BY 3.0 license",
+          "license": "https://creativecommons.org/licenses/by/3.0/"
+        },
+        "nuts_level1": {
+          "name": null,
+          "code": null
+        },
+        "nuts_level2": {
+          "name": null,
+          "code": null
+        },
+        "nuts_level3": {
+          "name": null,
+          "code": null
+        }
+      },
+      "postcode": null,
+      "primary": false,
+      "line": null,
+      "country_geonames_id": 6252001
+    }
+  ],
+  "links": [
+    "https://www.utsystem.edu/institutions/university-texas-health-science-center-tyler"
+  ],
+  "aliases": [
+    "East Texas Tuberculosis Sanitarium",
+    "UT Health Northeast"
+  ],
+  "acronyms": [
+    "UTHSCT"
+  ],
+  "status": "active",
+  "wikipedia_url": "https://en.wikipedia.org/wiki/University_of_Texas_Health_Science_Center_at_Tyler",
+  "labels": [
+    
+  ],
+  "country": {
+    "country_name": "United States",
+    "country_code": "US"
+  },
+  "external_ids": {
+    "ISNI": {
+      "preferred": null,
+      "all": [
+        "0000 0000 9704 5790"
+      ]
+    },
+    "OrgRef": {
+      "preferred": null,
+      "all": [
+        "3446655"
+      ]
+    },
+    "Wikidata": {
+      "preferred": null,
+      "all": [
+        "Q7896437"
+      ]
+    },
+    "GRID": {
+      "preferred": "grid.267310.1",
+      "all": "grid.267310.1"
+    }
+  }
+}

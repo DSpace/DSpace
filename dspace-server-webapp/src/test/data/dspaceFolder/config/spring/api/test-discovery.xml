@@ -86,10 +86,12 @@
 
                 <!-- search for an entity that can be a Person or an OrgUnit -->
                 <entry key="personOrOrgunit" value-ref="personOrOrgunit"/>
-                <!-- OpenAIRE4 guidelines - search for an OrgUnit that have a specific dc.type=FundingOrganization -->
-                <entry key="openAIREFundingAgency" value-ref="openAIREFundingAgency"/>
+                <!-- Openaire4 guidelines - search for an OrgUnit that have a specific dc.type=FundingOrganization -->
+                <entry key="openaireFundingAgency" value-ref="openaireFundingAgency"/>
                 <entry key="eperson_claims" value-ref="eperson_claims"/>
-
+                <!-- COAR NOTIFY LDN MESSAGES configuration -->
+                <entry key="NOTIFY.incoming" value-ref="NOTIFY.incoming"/>
+                <entry key="NOTIFY.outgoing" value-ref="NOTIFY.outgoing"/>
 
                 <!-- Configuration for scope based tests -->
                 <!-- See org.dspace.app.rest.DiscoveryScopeBasedRestControllerIT for more information -->
@@ -1114,5 +1116,181 @@
         <property name="pageSize" value="10"/>
         <property name="exposeMinAndMaxValue" value="true"/>
     </bean>
+
+    <bean id="ldnMessageEntityBaseConfig"
+          class="org.dspace.discovery.configuration.DiscoveryConfiguration"
+          scope="prototype">
+        <property name="id" value="ldnMessages" />
+        <!--Which sidebar facets are to be displayed -->
+        <property name="sidebarFacets">
+            <list>
+                <ref bean="searchFilterNotifyRelatedItem" />
+                <ref bean="searchFilterNotifyOrigin" />
+                <ref bean="searchFilterNotifyTarget" />
+                <ref bean="searchFilterNotifyQueueStatus" />
+                <ref bean="searchFilterNotifyActivityStreamType" />
+                <ref bean="searchFilterNotifyCoarNotifyType" />
+                <ref bean="searchFilterNotifyNotificationType" />
+            </list>
+        </property>
+        <!--The search filters which can be used on the discovery search page -->
+        <property name="searchFilters">
+            <list>
+                <ref bean="searchFilterNotifyRelatedItem" />
+                <ref bean="searchFilterNotifyOrigin" />
+                <ref bean="searchFilterNotifyTarget" />
+                <ref bean="searchFilterNotifyQueueStatus" />
+                <ref bean="searchFilterNotifyActivityStreamType" />
+                <ref bean="searchFilterNotifyCoarNotifyType" />
+                <ref bean="searchFilterNotifyNotificationType" />
+            </list>
+        </property>
+        <!--The sort filters for the discovery search-->
+        <property name="searchSortConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <property name="sortFields">
+                    <list>
+                        <ref bean="sortLastModified"/>
+                        <ref bean="sortLastModifiedAsc"/>
+                        <ref bean="sortQueueLastStartTimeDesc"/>
+                        <ref bean="sortQueueLastStartTimeAsc"/>
+                        <ref bean="sortQueueAttemptsDesc"/>
+                        <ref bean="sortQueueAttemptsAsc"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <!--Any default filter queries, these filter queries will be used for all
+            queries done by discovery for this configuration -->
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find LDNMessageEntity -->
+                <value>search.resourcetype:LDNMessageEntity</value>
+            </list>
+        </property>
+        <!--Default result per page  -->
+        <property name="defaultRpp" value="10" />
+    </bean>
+
+    <bean id="NOTIFY.incoming" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="ldnMessageEntityBaseConfig">
+        <property name="id" value="NOTIFY.incoming"/>
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find LDNMessageEntity -->
+                <value>search.resourcetype:LDNMessageEntity</value>
+                <value>notification_type_keyword:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_INCOMING}</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="NOTIFY.outgoing" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype" parent="ldnMessageEntityBaseConfig">
+        <property name="id" value="NOTIFY.outgoing"/>
+        <property name="defaultFilterQueries">
+            <list>
+                <!--Only find LDNMessageEntity -->
+                <value>search.resourcetype:LDNMessageEntity</value>
+                <value>notification_type_keyword:#{T(org.dspace.app.ldn.LDNMessageEntity).TYPE_OUTGOING}</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="searchFilterNotifyRelatedItem" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="relateditem"/>
+        <property name="metadataFields">
+            <list>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+        <property name="isOpenByDefault" value="true"/>
+        <property name="pageSize" value="10"/>
+        <property name="exposeMinAndMaxValue" value="true"/>
+    </bean>
+
+    <bean id="searchFilterNotifyOrigin" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="origin"/>
+        <property name="metadataFields">
+            <list>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+        <property name="isOpenByDefault" value="true"/>
+        <property name="pageSize" value="10"/>
+        <property name="exposeMinAndMaxValue" value="true"/>
+    </bean>
+
+    <bean id="searchFilterNotifyTarget" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="target"/>
+        <property name="metadataFields">
+            <list>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+        <property name="isOpenByDefault" value="true"/>
+        <property name="pageSize" value="10"/>
+        <property name="exposeMinAndMaxValue" value="true"/>
+    </bean>
+
+    <bean id="searchFilterNotifyQueueStatus" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="queue_status"/>
+        <property name="metadataFields">
+            <list>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+        <property name="isOpenByDefault" value="true"/>
+        <property name="pageSize" value="10"/>
+        <property name="exposeMinAndMaxValue" value="true"/>
+    </bean>
+
+    <bean id="searchFilterNotifyActivityStreamType" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="activity_stream_type"/>
+        <property name="metadataFields">
+            <list>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+        <property name="isOpenByDefault" value="true"/>
+        <property name="pageSize" value="10"/>
+        <property name="exposeMinAndMaxValue" value="true"/>
+    </bean>
+
+    <bean id="searchFilterNotifyCoarNotifyType" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="coar_notify_type"/>
+        <property name="metadataFields">
+            <list>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+        <property name="isOpenByDefault" value="true"/>
+        <property name="pageSize" value="10"/>
+        <property name="exposeMinAndMaxValue" value="true"/>
+    </bean>
+
+    <bean id="searchFilterNotifyNotificationType" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="notification_type"/>
+        <property name="metadataFields">
+            <list>
+            </list>
+        </property>
+        <property name="facetLimit" value="5"/>
+        <property name="sortOrderSidebar" value="COUNT"/>
+        <property name="sortOrderFilterPage" value="COUNT"/>
+        <property name="isOpenByDefault" value="true"/>
+        <property name="pageSize" value="10"/>
+        <property name="exposeMinAndMaxValue" value="true"/>
+    </bean>
+
 
 </beans>

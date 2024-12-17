@@ -1,0 +1,2383 @@
+{
+  "number_of_results": 200,
+  "time_taken": 12,
+  "items": [
+    {
+      "id": "https://ror.org/02f6dcw23",
+      "name": "The University of Texas",
+      "email_address": null,
+      "ip_addresses": [
+        
+      ],
+      "established": 1959,
+      "types": [
+        "Education"
+      ],
+      "relationships": [
+        {
+          "label": "Audie L. Murphy Memorial VA Hospital",
+          "type": "Related",
+          "id": "https://ror.org/035xhk118"
+        },
+        {
+          "label": "San Antonio Military Medical Center",
+          "type": "Related",
+          "id": "https://ror.org/00m1mwc36"
+        },
+        {
+          "label": "The University of Texas System",
+          "type": "Parent",
+          "id": "https://ror.org/01gek1696"
+        }
+      ],
+      "addresses": [
+        {
+          "lat": 29.508129,
+          "lng": -98.574025,
+          "state": "Texas",
+          "state_code": "US-TX",
+          "city": "San Antonio",
+          "geonames_city": {
+            "id": 4726206,
+            "city": "San Antonio",
+            "geonames_admin1": {
+              "name": "Texas",
+              "id": 4736286,
+              "ascii_name": "Texas",
+              "code": "US.TX"
+            },
+            "geonames_admin2": {
+              "name": "Bexar County",
+              "id": 4674023,
+              "ascii_name": "Bexar County",
+              "code": "US.TX.029"
+            },
+            "license": {
+              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
+              "license": "https://creativecommons.org/licenses/by/3.0/"
+            },
+            "nuts_level1": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level2": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level3": {
+              "name": null,
+              "code": null
+            }
+          },
+          "postcode": null,
+          "primary": false,
+          "line": null,
+          "country_geonames_id": 6252001
+        }
+      ],
+      "links": [
+        "http://www.uthscsa.edu/"
+      ],
+      "aliases": [
+        
+      ],
+      "acronyms": [
+        "UTHSCSA"
+      ],
+      "status": "active",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/University_of_Texas_Health_Science_Center_at_San_Antonio",
+      "labels": [
+        
+      ],
+      "country": {
+        "country_name": "United States",
+        "country_code": "US"
+      },
+      "external_ids": {
+        "ISNI": {
+          "preferred": null,
+          "all": [
+            "0000 0001 0629 5880"
+          ]
+        },
+        "FundRef": {
+          "preferred": "100008635",
+          "all": [
+            "100008635",
+            "100008636"
+          ]
+        },
+        "OrgRef": {
+          "preferred": null,
+          "all": [
+            "1593427"
+          ]
+        },
+        "Wikidata": {
+          "preferred": null,
+          "all": [
+            "Q4005868"
+          ]
+        },
+        "GRID": {
+          "preferred": "grid.267309.9",
+          "all": "grid.267309.9"
+        }
+      }
+    },
+    {
+      "id": "https://ror.org/01sps7q28",
+      "name": "The University of Texas Health Science Center at Tyler",
+      "email_address": null,
+      "ip_addresses": [
+        
+      ],
+      "established": 1947,
+      "types": [
+        "Healthcare"
+      ],
+      "relationships": [
+        {
+          "label": "The University of Texas System",
+          "type": "Parent",
+          "id": "https://ror.org/01gek1696"
+        }
+      ],
+      "addresses": [
+        {
+          "lat": 32.426014,
+          "lng": -95.212728,
+          "state": "Texas",
+          "state_code": "US-TX",
+          "city": "Tyler",
+          "geonames_city": {
+            "id": 4738214,
+            "city": "Tyler",
+            "geonames_admin1": {
+              "name": "Texas",
+              "id": 4736286,
+              "ascii_name": "Texas",
+              "code": "US.TX"
+            },
+            "geonames_admin2": {
+              "name": "Smith County",
+              "id": 4729130,
+              "ascii_name": "Smith County",
+              "code": "US.TX.423"
+            },
+            "license": {
+              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
+              "license": "https://creativecommons.org/licenses/by/3.0/"
+            },
+            "nuts_level1": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level2": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level3": {
+              "name": null,
+              "code": null
+            }
+          },
+          "postcode": null,
+          "primary": false,
+          "line": null,
+          "country_geonames_id": 6252001
+        }
+      ],
+      "links": [
+        "https://www.utsystem.edu/institutions/university-texas-health-science-center-tyler"
+      ],
+      "aliases": [
+        "East Texas Tuberculosis Sanitarium",
+        "UT Health Northeast"
+      ],
+      "acronyms": [
+        "UTHSCT"
+      ],
+      "status": "active",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/University_of_Texas_Health_Science_Center_at_Tyler",
+      "labels": [
+        
+      ],
+      "country": {
+        "country_name": "United States",
+        "country_code": "US"
+      },
+      "external_ids": {
+        "ISNI": {
+          "preferred": null,
+          "all": [
+            "0000 0000 9704 5790"
+          ]
+        },
+        "OrgRef": {
+          "preferred": null,
+          "all": [
+            "3446655"
+          ]
+        },
+        "Wikidata": {
+          "preferred": null,
+          "all": [
+            "Q7896437"
+          ]
+        },
+        "GRID": {
+          "preferred": "grid.267310.1",
+          "all": "grid.267310.1"
+        }
+      }
+    },
+    {
+      "id": "https://ror.org/05byvp690",
+      "name": "The University of Texas Southwestern Medical Center",
+      "email_address": null,
+      "ip_addresses": [
+        
+      ],
+      "established": 1943,
+      "types": [
+        "Healthcare"
+      ],
+      "relationships": [
+        {
+          "label": "Children's Medical Center",
+          "type": "Related",
+          "id": "https://ror.org/02ndk3y82"
+        },
+        {
+          "label": "Parkland Memorial Hospital",
+          "type": "Related",
+          "id": "https://ror.org/0208r0146"
+        },
+        {
+          "label": "VA North Texas Health Care System",
+          "type": "Related",
+          "id": "https://ror.org/01nzxq896"
+        },
+        {
+          "label": "The University of Texas System",
+          "type": "Parent",
+          "id": "https://ror.org/01gek1696"
+        },
+        {
+          "label": "Institute for Exercise and Environmental Medicine",
+          "type": "Child",
+          "id": "https://ror.org/03gqc7y13"
+        },
+        {
+          "label": "Texas Health Dallas",
+          "type": "Child",
+          "id": "https://ror.org/05k07p323"
+        }
+      ],
+      "addresses": [
+        {
+          "lat": 32.812185,
+          "lng": -96.840174,
+          "state": "Texas",
+          "state_code": "US-TX",
+          "city": "Dallas",
+          "geonames_city": {
+            "id": 4684888,
+            "city": "Dallas",
+            "geonames_admin1": {
+              "name": "Texas",
+              "id": 4736286,
+              "ascii_name": "Texas",
+              "code": "US.TX"
+            },
+            "geonames_admin2": {
+              "name": "Dallas County",
+              "id": 4684904,
+              "ascii_name": "Dallas County",
+              "code": "US.TX.113"
+            },
+            "license": {
+              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
+              "license": "https://creativecommons.org/licenses/by/3.0/"
+            },
+            "nuts_level1": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level2": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level3": {
+              "name": null,
+              "code": null
+            }
+          },
+          "postcode": null,
+          "primary": false,
+          "line": null,
+          "country_geonames_id": 6252001
+        }
+      ],
+      "links": [
+        "http://www.utsouthwestern.edu/"
+      ],
+      "aliases": [
+        "UT Southwestern"
+      ],
+      "acronyms": [
+        
+      ],
+      "status": "active",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/University_of_Texas_Southwestern_Medical_Center",
+      "labels": [
+        
+      ],
+      "country": {
+        "country_name": "United States",
+        "country_code": "US"
+      },
+      "external_ids": {
+        "ISNI": {
+          "preferred": null,
+          "all": [
+            "0000 0000 9482 7121"
+          ]
+        },
+        "FundRef": {
+          "preferred": "100007914",
+          "all": [
+            "100007914",
+            "100010487",
+            "100008260"
+          ]
+        },
+        "OrgRef": {
+          "preferred": null,
+          "all": [
+            "617906"
+          ]
+        },
+        "Wikidata": {
+          "preferred": null,
+          "all": [
+            "Q2725999"
+          ]
+        },
+        "GRID": {
+          "preferred": "grid.267313.2",
+          "all": "grid.267313.2"
+        }
+      }
+    },
+    {
+      "id": "https://ror.org/019kgqr73",
+      "name": "The University of Texas at Arlington",
+      "email_address": "",
+      "ip_addresses": [
+        
+      ],
+      "established": 1895,
+      "types": [
+        "Education"
+      ],
+      "relationships": [
+        {
+          "label": "VA North Texas Health Care System",
+          "type": "Related",
+          "id": "https://ror.org/01nzxq896"
+        },
+        {
+          "label": "The University of Texas System",
+          "type": "Parent",
+          "id": "https://ror.org/01gek1696"
+        }
+      ],
+      "addresses": [
+        {
+          "lat": 32.731,
+          "lng": -97.115,
+          "state": "Texas",
+          "state_code": "US-TX",
+          "city": "Arlington",
+          "geonames_city": {
+            "id": 4671240,
+            "city": "Arlington",
+            "geonames_admin1": {
+              "name": "Texas",
+              "id": 4736286,
+              "ascii_name": "Texas",
+              "code": "US.TX"
+            },
+            "geonames_admin2": {
+              "name": "Tarrant County",
+              "id": 4735638,
+              "ascii_name": "Tarrant County",
+              "code": "US.TX.439"
+            },
+            "license": {
+              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
+              "license": "https://creativecommons.org/licenses/by/3.0/"
+            },
+            "nuts_level1": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level2": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level3": {
+              "name": null,
+              "code": null
+            }
+          },
+          "postcode": null,
+          "primary": false,
+          "line": null,
+          "country_geonames_id": 6252001
+        }
+      ],
+      "links": [
+        "http://www.uta.edu/uta/"
+      ],
+      "aliases": [
+        "UT Arlington"
+      ],
+      "acronyms": [
+        "UTA"
+      ],
+      "status": "active",
+      "wikipedia_url": "http://en.wikipedia.org/wiki/University_of_Texas_at_Arlington",
+      "labels": [
+        {
+          "label": "Université du Texas à Arlington",
+          "iso639": "fr"
+        }
+      ],
+      "country": {
+        "country_name": "United States",
+        "country_code": "US"
+      },
+      "external_ids": {
+        "ISNI": {
+          "preferred": null,
+          "all": [
+            "0000 0001 2181 9515"
+          ]
+        },
+        "FundRef": {
+          "preferred": null,
+          "all": [
+            "100009497"
+          ]
+        },
+        "OrgRef": {
+          "preferred": null,
+          "all": [
+            "906409"
+          ]
+        },
+        "Wikidata": {
+          "preferred": null,
+          "all": [
+            "Q1230739"
+          ]
+        },
+        "GRID": {
+          "preferred": "grid.267315.4",
+          "all": "grid.267315.4"
+        }
+      }
+    },
+    {
+      "id": "https://ror.org/051smbs96",
+      "name": "The University of Texas of the Permian Basin",
+      "email_address": null,
+      "ip_addresses": [
+        
+      ],
+      "established": 1973,
+      "types": [
+        "Education"
+      ],
+      "relationships": [
+        {
+          "label": "The University of Texas System",
+          "type": "Parent",
+          "id": "https://ror.org/01gek1696"
+        }
+      ],
+      "addresses": [
+        {
+          "lat": 31.889444,
+          "lng": -102.329531,
+          "state": "Texas",
+          "state_code": "US-TX",
+          "city": "Odessa",
+          "geonames_city": {
+            "id": 5527554,
+            "city": "Odessa",
+            "geonames_admin1": {
+              "name": "Texas",
+              "id": 4736286,
+              "ascii_name": "Texas",
+              "code": "US.TX"
+            },
+            "geonames_admin2": {
+              "name": "Ector County",
+              "id": 5520910,
+              "ascii_name": "Ector County",
+              "code": "US.TX.135"
+            },
+            "license": {
+              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
+              "license": "https://creativecommons.org/licenses/by/3.0/"
+            },
+            "nuts_level1": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level2": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level3": {
+              "name": null,
+              "code": null
+            }
+          },
+          "postcode": null,
+          "primary": false,
+          "line": null,
+          "country_geonames_id": 6252001
+        }
+      ],
+      "links": [
+        "http://www.utpb.edu/"
+      ],
+      "aliases": [
+        "UT Permian Basin"
+      ],
+      "acronyms": [
+        "UTPB"
+      ],
+      "status": "active",
+      "wikipedia_url": "http://en.wikipedia.org/wiki/University_of_Texas_of_the_Permian_Basin",
+      "labels": [
+        
+      ],
+      "country": {
+        "country_name": "United States",
+        "country_code": "US"
+      },
+      "external_ids": {
+        "ISNI": {
+          "preferred": null,
+          "all": [
+            "0000 0000 9140 1491"
+          ]
+        },
+        "OrgRef": {
+          "preferred": null,
+          "all": [
+            "1419441"
+          ]
+        },
+        "Wikidata": {
+          "preferred": null,
+          "all": [
+            "Q2495935"
+          ]
+        },
+        "GRID": {
+          "preferred": "grid.267328.a",
+          "all": "grid.267328.a"
+        }
+      }
+    },
+    {
+      "id": "https://ror.org/044vy1d05",
+      "name": "Tokushima University",
+      "email_address": "",
+      "ip_addresses": [
+        
+      ],
+      "established": 1949,
+      "types": [
+        "Education"
+      ],
+      "relationships": [
+        {
+          "label": "Tokushima University Hospital",
+          "type": "Related",
+          "id": "https://ror.org/021ph5e41"
+        }
+      ],
+      "addresses": [
+        {
+          "lat": 34.07,
+          "lng": 134.56,
+          "state": null,
+          "state_code": null,
+          "city": "Tokushima",
+          "geonames_city": {
+            "id": 1850158,
+            "city": "Tokushima",
+            "geonames_admin1": {
+              "name": "Tokushima",
+              "id": 1850157,
+              "ascii_name": "Tokushima",
+              "code": "JP.39"
+            },
+            "geonames_admin2": {
+              "name": "Tokushima Shi",
+              "id": 1850156,
+              "ascii_name": "Tokushima Shi",
+              "code": "JP.39.1850156"
+            },
+            "license": {
+              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
+              "license": "https://creativecommons.org/licenses/by/3.0/"
+            },
+            "nuts_level1": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level2": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level3": {
+              "name": null,
+              "code": null
+            }
+          },
+          "postcode": null,
+          "primary": false,
+          "line": null,
+          "country_geonames_id": 1861060
+        }
+      ],
+      "links": [
+        "https://www.tokushima-u.ac.jp/"
+      ],
+      "aliases": [
+        "Tokushima Daigaku",
+        "University of Tokushima"
+      ],
+      "acronyms": [
+        
+      ],
+      "status": "active",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/University_of_Tokushima",
+      "labels": [
+        {
+          "label": "徳島大学",
+          "iso639": "ja"
+        }
+      ],
+      "country": {
+        "country_name": "Japan",
+        "country_code": "JP"
+      },
+      "external_ids": {
+        "ISNI": {
+          "preferred": null,
+          "all": [
+            "0000 0001 1092 3579"
+          ]
+        },
+        "FundRef": {
+          "preferred": null,
+          "all": [
+            "501100005623"
+          ]
+        },
+        "OrgRef": {
+          "preferred": null,
+          "all": [
+            "15696836"
+          ]
+        },
+        "Wikidata": {
+          "preferred": null,
+          "all": [
+            "Q1150231"
+          ]
+        },
+        "GRID": {
+          "preferred": "grid.267335.6",
+          "all": "grid.267335.6"
+        }
+      }
+    },
+    {
+      "id": "https://ror.org/03np13864",
+      "name": "University of Trinidad and Tobago",
+      "email_address": null,
+      "ip_addresses": [
+        
+      ],
+      "established": 2004,
+      "types": [
+        "Education"
+      ],
+      "relationships": [
+        
+      ],
+      "addresses": [
+        {
+          "lat": 10.616667,
+          "lng": -61.216667,
+          "state": null,
+          "state_code": null,
+          "city": "Arima",
+          "geonames_city": {
+            "id": 3575051,
+            "city": "Arima",
+            "geonames_admin1": {
+              "name": "Borough of Arima",
+              "id": 3575052,
+              "ascii_name": "Borough of Arima",
+              "code": "TT.01"
+            },
+            "geonames_admin2": {
+              "name": null,
+              "id": null,
+              "ascii_name": null,
+              "code": null
+            },
+            "license": {
+              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
+              "license": "https://creativecommons.org/licenses/by/3.0/"
+            },
+            "nuts_level1": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level2": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level3": {
+              "name": null,
+              "code": null
+            }
+          },
+          "postcode": null,
+          "primary": false,
+          "line": null,
+          "country_geonames_id": 3573591
+        }
+      ],
+      "links": [
+        "https://utt.edu.tt/"
+      ],
+      "aliases": [
+        
+      ],
+      "acronyms": [
+        "UTT"
+      ],
+      "status": "active",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/University_of_Trinidad_and_Tobago",
+      "labels": [
+        {
+          "label": "Universidad de Trinidad y Tobago",
+          "iso639": "es"
+        }
+      ],
+      "country": {
+        "country_name": "Trinidad and Tobago",
+        "country_code": "TT"
+      },
+      "external_ids": {
+        "ISNI": {
+          "preferred": null,
+          "all": [
+            "0000 0000 9490 0886"
+          ]
+        },
+        "OrgRef": {
+          "preferred": null,
+          "all": [
+            "8706288"
+          ]
+        },
+        "Wikidata": {
+          "preferred": null,
+          "all": [
+            "Q648244"
+          ]
+        },
+        "GRID": {
+          "preferred": "grid.267355.0",
+          "all": "grid.267355.0"
+        }
+      }
+    },
+    {
+      "id": "https://ror.org/04wn28048",
+      "name": "University of Tulsa",
+      "email_address": "",
+      "ip_addresses": [
+        
+      ],
+      "established": 1894,
+      "types": [
+        "Education"
+      ],
+      "relationships": [
+        
+      ],
+      "addresses": [
+        {
+          "lat": 36.152222,
+          "lng": -95.946389,
+          "state": "Oklahoma",
+          "state_code": "US-OK",
+          "city": "Tulsa",
+          "geonames_city": {
+            "id": 4553433,
+            "city": "Tulsa",
+            "geonames_admin1": {
+              "name": "Oklahoma",
+              "id": 4544379,
+              "ascii_name": "Oklahoma",
+              "code": "US.OK"
+            },
+            "geonames_admin2": {
+              "name": "Tulsa County",
+              "id": 4553440,
+              "ascii_name": "Tulsa County",
+              "code": "US.OK.143"
+            },
+            "license": {
+              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
+              "license": "https://creativecommons.org/licenses/by/3.0/"
+            },
+            "nuts_level1": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level2": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level3": {
+              "name": null,
+              "code": null
+            }
+          },
+          "postcode": null,
+          "primary": false,
+          "line": null,
+          "country_geonames_id": 6252001
+        }
+      ],
+      "links": [
+        "http://utulsa.edu/"
+      ],
+      "aliases": [
+        
+      ],
+      "acronyms": [
+        "TU"
+      ],
+      "status": "active",
+      "wikipedia_url": "http://en.wikipedia.org/wiki/University_of_Tulsa",
+      "labels": [
+        {
+          "label": "Université de tulsa",
+          "iso639": "fr"
+        }
+      ],
+      "country": {
+        "country_name": "United States",
+        "country_code": "US"
+      },
+      "external_ids": {
+        "ISNI": {
+          "preferred": null,
+          "all": [
+            "0000 0001 2160 264X"
+          ]
+        },
+        "FundRef": {
+          "preferred": "100007147",
+          "all": [
+            "100007147",
+            "100006455"
+          ]
+        },
+        "OrgRef": {
+          "preferred": null,
+          "all": [
+            "32043"
+          ]
+        },
+        "Wikidata": {
+          "preferred": null,
+          "all": [
+            "Q1848657"
+          ]
+        },
+        "GRID": {
+          "preferred": "grid.267360.6",
+          "all": "grid.267360.6"
+        }
+      }
+    },
+    {
+      "id": "https://ror.org/04scfb908",
+      "name": "Alfred Health",
+      "email_address": null,
+      "ip_addresses": [
+        
+      ],
+      "established": 1871,
+      "types": [
+        "Healthcare"
+      ],
+      "relationships": [
+        {
+          "label": "Caulfield Hospital",
+          "type": "Child",
+          "id": "https://ror.org/01fcxf261"
+        },
+        {
+          "label": "Melbourne Sexual Health Centre",
+          "type": "Child",
+          "id": "https://ror.org/013fdz725"
+        },
+        {
+          "label": "National Trauma Research Institute",
+          "type": "Child",
+          "id": "https://ror.org/048t93218"
+        },
+        {
+          "label": "The Alfred Hospital",
+          "type": "Child",
+          "id": "https://ror.org/01wddqe20"
+        }
+      ],
+      "addresses": [
+        {
+          "lat": -37.845542,
+          "lng": 144.981632,
+          "state": "Victoria",
+          "state_code": "AU-VIC",
+          "city": "Melbourne",
+          "geonames_city": {
+            "id": 2158177,
+            "city": "Melbourne",
+            "geonames_admin1": {
+              "name": "Victoria",
+              "id": 2145234,
+              "ascii_name": "Victoria",
+              "code": "AU.07"
+            },
+            "geonames_admin2": {
+              "name": "Melbourne",
+              "id": 7839805,
+              "ascii_name": "Melbourne",
+              "code": "AU.07.24600"
+            },
+            "license": {
+              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
+              "license": "https://creativecommons.org/licenses/by/3.0/"
+            },
+            "nuts_level1": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level2": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level3": {
+              "name": null,
+              "code": null
+            }
+          },
+          "postcode": null,
+          "primary": false,
+          "line": null,
+          "country_geonames_id": 2077456
+        }
+      ],
+      "links": [
+        "http://www.alfred.org.au/"
+      ],
+      "aliases": [
+        
+      ],
+      "acronyms": [
+        
+      ],
+      "status": "active",
+      "wikipedia_url": "",
+      "labels": [
+        
+      ],
+      "country": {
+        "country_name": "Australia",
+        "country_code": "AU"
+      },
+      "external_ids": {
+        "ISNI": {
+          "preferred": null,
+          "all": [
+            "0000 0004 0432 5259"
+          ]
+        },
+        "FundRef": {
+          "preferred": null,
+          "all": [
+            "501100002716"
+          ]
+        },
+        "GRID": {
+          "preferred": "grid.267362.4",
+          "all": "grid.267362.4"
+        }
+      }
+    },
+    {
+      "id": "https://ror.org/02c2f8975",
+      "name": "University of Ulsan",
+      "email_address": null,
+      "ip_addresses": [
+        
+      ],
+      "established": 1970,
+      "types": [
+        "Education"
+      ],
+      "relationships": [
+        {
+          "label": "Ulsan University Hospital",
+          "type": "Related",
+          "id": "https://ror.org/03sab2a45"
+        }
+      ],
+      "addresses": [
+        {
+          "lat": 35.542772,
+          "lng": 129.256725,
+          "state": null,
+          "state_code": null,
+          "city": "Ulsan",
+          "geonames_city": {
+            "id": 1833747,
+            "city": "Ulsan",
+            "geonames_admin1": {
+              "name": "Ulsan",
+              "id": 1833742,
+              "ascii_name": "Ulsan",
+              "code": "KR.21"
+            },
+            "geonames_admin2": {
+              "name": null,
+              "id": null,
+              "ascii_name": null,
+              "code": null
+            },
+            "license": {
+              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
+              "license": "https://creativecommons.org/licenses/by/3.0/"
+            },
+            "nuts_level1": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level2": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level3": {
+              "name": null,
+              "code": null
+            }
+          },
+          "postcode": null,
+          "primary": false,
+          "line": null,
+          "country_geonames_id": 1835841
+        }
+      ],
+      "links": [
+        "http://en.ulsan.ac.kr/contents/main/"
+      ],
+      "aliases": [
+        
+      ],
+      "acronyms": [
+        "UOU"
+      ],
+      "status": "active",
+      "wikipedia_url": "http://en.wikipedia.org/wiki/University_of_Ulsan",
+      "labels": [
+        {
+          "label": "울산대학교",
+          "iso639": "ko"
+        }
+      ],
+      "country": {
+        "country_name": "South Korea",
+        "country_code": "KR"
+      },
+      "external_ids": {
+        "ISNI": {
+          "preferred": null,
+          "all": [
+            "0000 0004 0533 4667"
+          ]
+        },
+        "FundRef": {
+          "preferred": null,
+          "all": [
+            "501100002568"
+          ]
+        },
+        "OrgRef": {
+          "preferred": "10458246",
+          "all": [
+            "10458246",
+            "15162872"
+          ]
+        },
+        "Wikidata": {
+          "preferred": null,
+          "all": [
+            "Q491717"
+          ]
+        },
+        "GRID": {
+          "preferred": "grid.267370.7",
+          "all": "grid.267370.7"
+        }
+      }
+    },
+    {
+      "id": "https://ror.org/010acrp16",
+      "name": "University of West Alabama",
+      "email_address": null,
+      "ip_addresses": [
+        
+      ],
+      "established": 1835,
+      "types": [
+        "Education"
+      ],
+      "relationships": [
+        
+      ],
+      "addresses": [
+        {
+          "lat": 32.59,
+          "lng": -88.186,
+          "state": "Alabama",
+          "state_code": "US-AL",
+          "city": "Livingston",
+          "geonames_city": {
+            "id": 4073383,
+            "city": "Livingston",
+            "geonames_admin1": {
+              "name": "Alabama",
+              "id": 4829764,
+              "ascii_name": "Alabama",
+              "code": "US.AL"
+            },
+            "geonames_admin2": {
+              "name": "Sumter County",
+              "id": 4092386,
+              "ascii_name": "Sumter County",
+              "code": "US.AL.119"
+            },
+            "license": {
+              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
+              "license": "https://creativecommons.org/licenses/by/3.0/"
+            },
+            "nuts_level1": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level2": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level3": {
+              "name": null,
+              "code": null
+            }
+          },
+          "postcode": null,
+          "primary": false,
+          "line": null,
+          "country_geonames_id": 6252001
+        }
+      ],
+      "links": [
+        "http://www.uwa.edu/"
+      ],
+      "aliases": [
+        "Livingston Female Academy"
+      ],
+      "acronyms": [
+        "UWA"
+      ],
+      "status": "active",
+      "wikipedia_url": "http://en.wikipedia.org/wiki/University_of_West_Alabama",
+      "labels": [
+        
+      ],
+      "country": {
+        "country_name": "United States",
+        "country_code": "US"
+      },
+      "external_ids": {
+        "ISNI": {
+          "preferred": null,
+          "all": [
+            "0000 0000 9963 9197"
+          ]
+        },
+        "OrgRef": {
+          "preferred": null,
+          "all": [
+            "2425212"
+          ]
+        },
+        "Wikidata": {
+          "preferred": null,
+          "all": [
+            "Q637346"
+          ]
+        },
+        "GRID": {
+          "preferred": "grid.267434.0",
+          "all": "grid.267434.0"
+        }
+      }
+    },
+    {
+      "id": "https://ror.org/002w4zy91",
+      "name": "University of West Florida",
+      "email_address": null,
+      "ip_addresses": [
+        
+      ],
+      "established": 1963,
+      "types": [
+        "Education"
+      ],
+      "relationships": [
+        {
+          "label": "State University System of Florida",
+          "type": "Parent",
+          "id": "https://ror.org/05sqd3t97"
+        }
+      ],
+      "addresses": [
+        {
+          "lat": 30.549493,
+          "lng": -87.21812,
+          "state": "Florida",
+          "state_code": "US-FL",
+          "city": "Pensacola",
+          "geonames_city": {
+            "id": 4168228,
+            "city": "Pensacola",
+            "geonames_admin1": {
+              "name": "Florida",
+              "id": 4155751,
+              "ascii_name": "Florida",
+              "code": "US.FL"
+            },
+            "geonames_admin2": {
+              "name": "Escambia County",
+              "id": 4154550,
+              "ascii_name": "Escambia County",
+              "code": "US.FL.033"
+            },
+            "license": {
+              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
+              "license": "https://creativecommons.org/licenses/by/3.0/"
+            },
+            "nuts_level1": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level2": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level3": {
+              "name": null,
+              "code": null
+            }
+          },
+          "postcode": null,
+          "primary": false,
+          "line": null,
+          "country_geonames_id": 6252001
+        }
+      ],
+      "links": [
+        "http://uwf.edu/"
+      ],
+      "aliases": [
+        
+      ],
+      "acronyms": [
+        "UWF"
+      ],
+      "status": "active",
+      "wikipedia_url": "http://en.wikipedia.org/wiki/University_of_West_Florida",
+      "labels": [
+        
+      ],
+      "country": {
+        "country_name": "United States",
+        "country_code": "US"
+      },
+      "external_ids": {
+        "ISNI": {
+          "preferred": null,
+          "all": [
+            "0000 0001 2112 2427"
+          ]
+        },
+        "FundRef": {
+          "preferred": null,
+          "all": [
+            "100009842"
+          ]
+        },
+        "OrgRef": {
+          "preferred": null,
+          "all": [
+            "750756"
+          ]
+        },
+        "Wikidata": {
+          "preferred": null,
+          "all": [
+            "Q659255"
+          ]
+        },
+        "GRID": {
+          "preferred": "grid.267436.2",
+          "all": "grid.267436.2"
+        }
+      }
+    },
+    {
+      "id": "https://ror.org/01cqxk816",
+      "name": "University of West Georgia",
+      "email_address": null,
+      "ip_addresses": [
+        
+      ],
+      "established": 1906,
+      "types": [
+        "Education"
+      ],
+      "relationships": [
+        {
+          "label": "University System of Georgia",
+          "type": "Parent",
+          "id": "https://ror.org/017wcm924"
+        }
+      ],
+      "addresses": [
+        {
+          "lat": 33.573357,
+          "lng": -85.099593,
+          "state": "Georgia",
+          "state_code": "US-GA",
+          "city": "Carrollton",
+          "geonames_city": {
+            "id": 4186416,
+            "city": "Carrollton",
+            "geonames_admin1": {
+              "name": "Georgia",
+              "id": 4197000,
+              "ascii_name": "Georgia",
+              "code": "US.GA"
+            },
+            "geonames_admin2": {
+              "name": "Carroll County",
+              "id": 4186396,
+              "ascii_name": "Carroll County",
+              "code": "US.GA.045"
+            },
+            "license": {
+              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
+              "license": "https://creativecommons.org/licenses/by/3.0/"
+            },
+            "nuts_level1": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level2": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level3": {
+              "name": null,
+              "code": null
+            }
+          },
+          "postcode": null,
+          "primary": false,
+          "line": null,
+          "country_geonames_id": 6252001
+        }
+      ],
+      "links": [
+        "http://www.westga.edu/"
+      ],
+      "aliases": [
+        
+      ],
+      "acronyms": [
+        "UWG"
+      ],
+      "status": "active",
+      "wikipedia_url": "http://en.wikipedia.org/wiki/University_of_West_Georgia",
+      "labels": [
+        
+      ],
+      "country": {
+        "country_name": "United States",
+        "country_code": "US"
+      },
+      "external_ids": {
+        "ISNI": {
+          "preferred": null,
+          "all": [
+            "0000 0001 2223 6696"
+          ]
+        },
+        "FundRef": {
+          "preferred": null,
+          "all": [
+            "100007922"
+          ]
+        },
+        "OrgRef": {
+          "preferred": null,
+          "all": [
+            "595315"
+          ]
+        },
+        "Wikidata": {
+          "preferred": null,
+          "all": [
+            "Q2495945"
+          ]
+        },
+        "GRID": {
+          "preferred": "grid.267437.3",
+          "all": "grid.267437.3"
+        }
+      }
+    },
+    {
+      "id": "https://ror.org/03c8vvr84",
+      "name": "University of Western States",
+      "email_address": null,
+      "ip_addresses": [
+        
+      ],
+      "established": 1904,
+      "types": [
+        "Education"
+      ],
+      "relationships": [
+        
+      ],
+      "addresses": [
+        {
+          "lat": 45.543351,
+          "lng": -122.523973,
+          "state": "Oregon",
+          "state_code": "US-OR",
+          "city": "Portland",
+          "geonames_city": {
+            "id": 5746545,
+            "city": "Portland",
+            "geonames_admin1": {
+              "name": "Oregon",
+              "id": 5744337,
+              "ascii_name": "Oregon",
+              "code": "US.OR"
+            },
+            "geonames_admin2": {
+              "name": "Multnomah County",
+              "id": 5742126,
+              "ascii_name": "Multnomah County",
+              "code": "US.OR.051"
+            },
+            "license": {
+              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
+              "license": "https://creativecommons.org/licenses/by/3.0/"
+            },
+            "nuts_level1": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level2": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level3": {
+              "name": null,
+              "code": null
+            }
+          },
+          "postcode": null,
+          "primary": false,
+          "line": null,
+          "country_geonames_id": 6252001
+        }
+      ],
+      "links": [
+        "http://www.uws.edu/"
+      ],
+      "aliases": [
+        "Western States Chiropractic College"
+      ],
+      "acronyms": [
+        "UWS"
+      ],
+      "status": "active",
+      "wikipedia_url": "http://en.wikipedia.org/wiki/University_of_Western_States",
+      "labels": [
+        
+      ],
+      "country": {
+        "country_name": "United States",
+        "country_code": "US"
+      },
+      "external_ids": {
+        "ISNI": {
+          "preferred": null,
+          "all": [
+            "0000 0004 0455 9493"
+          ]
+        },
+        "OrgRef": {
+          "preferred": null,
+          "all": [
+            "1655050"
+          ]
+        },
+        "Wikidata": {
+          "preferred": null,
+          "all": [
+            "Q7896612"
+          ]
+        },
+        "GRID": {
+          "preferred": "grid.267451.3",
+          "all": "grid.267451.3"
+        }
+      }
+    },
+    {
+      "id": "https://ror.org/03fmjzx88",
+      "name": "University of Winchester",
+      "email_address": null,
+      "ip_addresses": [
+        
+      ],
+      "established": 1840,
+      "types": [
+        "Education"
+      ],
+      "relationships": [
+        
+      ],
+      "addresses": [
+        {
+          "lat": 51.060338,
+          "lng": -1.325418,
+          "state": null,
+          "state_code": null,
+          "city": "Winchester",
+          "geonames_city": {
+            "id": 2633858,
+            "city": "Winchester",
+            "geonames_admin1": {
+              "name": "England",
+              "id": 6269131,
+              "ascii_name": "England",
+              "code": "GB.ENG"
+            },
+            "geonames_admin2": {
+              "name": "Hampshire",
+              "id": 2647554,
+              "ascii_name": "Hampshire",
+              "code": "GB.ENG.F2"
+            },
+            "license": {
+              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
+              "license": "https://creativecommons.org/licenses/by/3.0/"
+            },
+            "nuts_level1": {
+              "name": "SOUTH EAST (ENGLAND)",
+              "code": "UKJ"
+            },
+            "nuts_level2": {
+              "name": "Hampshire and Isle of Wight",
+              "code": "UKJ3"
+            },
+            "nuts_level3": {
+              "name": "Central Hampshire",
+              "code": "UKJ36"
+            }
+          },
+          "postcode": null,
+          "primary": false,
+          "line": null,
+          "country_geonames_id": 2635167
+        }
+      ],
+      "links": [
+        "http://www.winchester.ac.uk/pages/home.aspx"
+      ],
+      "aliases": [
+        
+      ],
+      "acronyms": [
+        
+      ],
+      "status": "active",
+      "wikipedia_url": "http://en.wikipedia.org/wiki/University_of_Winchester",
+      "labels": [
+        
+      ],
+      "country": {
+        "country_name": "United Kingdom",
+        "country_code": "GB"
+      },
+      "external_ids": {
+        "ISNI": {
+          "preferred": null,
+          "all": [
+            "0000 0000 9422 2878"
+          ]
+        },
+        "FundRef": {
+          "preferred": null,
+          "all": [
+            "100010057"
+          ]
+        },
+        "HESA": {
+          "preferred": null,
+          "all": [
+            "0021"
+          ]
+        },
+        "UCAS": {
+          "preferred": null,
+          "all": [
+            "W76"
+          ]
+        },
+        "UKPRN": {
+          "preferred": null,
+          "all": [
+            "10003614"
+          ]
+        },
+        "OrgRef": {
+          "preferred": null,
+          "all": [
+            "3140939"
+          ]
+        },
+        "Wikidata": {
+          "preferred": null,
+          "all": [
+            "Q3551690"
+          ]
+        },
+        "GRID": {
+          "preferred": "grid.267454.6",
+          "all": "grid.267454.6"
+        }
+      }
+    },
+    {
+      "id": "https://ror.org/01gw3d370",
+      "name": "University of Windsor",
+      "email_address": "",
+      "ip_addresses": [
+        
+      ],
+      "established": 1857,
+      "types": [
+        "Education"
+      ],
+      "relationships": [
+        
+      ],
+      "addresses": [
+        {
+          "lat": 42.305196,
+          "lng": -83.067483,
+          "state": "Ontario",
+          "state_code": "CA-ON",
+          "city": "Windsor",
+          "geonames_city": {
+            "id": 6182962,
+            "city": "Windsor",
+            "geonames_admin1": {
+              "name": "Ontario",
+              "id": 6093943,
+              "ascii_name": "Ontario",
+              "code": "CA.08"
+            },
+            "geonames_admin2": {
+              "name": null,
+              "id": null,
+              "ascii_name": null,
+              "code": null
+            },
+            "license": {
+              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
+              "license": "https://creativecommons.org/licenses/by/3.0/"
+            },
+            "nuts_level1": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level2": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level3": {
+              "name": null,
+              "code": null
+            }
+          },
+          "postcode": null,
+          "primary": false,
+          "line": null,
+          "country_geonames_id": 6251999
+        }
+      ],
+      "links": [
+        "http://www.uwindsor.ca/"
+      ],
+      "aliases": [
+        "UWindsor",
+        "Assumption University of Windsor"
+      ],
+      "acronyms": [
+        
+      ],
+      "status": "active",
+      "wikipedia_url": "http://en.wikipedia.org/wiki/University_of_Windsor",
+      "labels": [
+        {
+          "label": "Université de windsor",
+          "iso639": "fr"
+        }
+      ],
+      "country": {
+        "country_name": "Canada",
+        "country_code": "CA"
+      },
+      "external_ids": {
+        "ISNI": {
+          "preferred": null,
+          "all": [
+            "0000 0004 1936 9596"
+          ]
+        },
+        "FundRef": {
+          "preferred": "100009154",
+          "all": [
+            "100009154",
+            "501100000083"
+          ]
+        },
+        "OrgRef": {
+          "preferred": null,
+          "all": [
+            "342733"
+          ]
+        },
+        "Wikidata": {
+          "preferred": null,
+          "all": [
+            "Q2065769"
+          ]
+        },
+        "GRID": {
+          "preferred": "grid.267455.7",
+          "all": "grid.267455.7"
+        }
+      }
+    },
+    {
+      "id": "https://ror.org/02gdzyx04",
+      "name": "University of Winnipeg",
+      "email_address": null,
+      "ip_addresses": [
+        
+      ],
+      "established": 1871,
+      "types": [
+        "Education"
+      ],
+      "relationships": [
+        {
+          "label": "Winnipeg Institute for Theoretical Physics",
+          "type": "Child",
+          "id": "https://ror.org/010tw2j24"
+        }
+      ],
+      "addresses": [
+        {
+          "lat": 49.890122,
+          "lng": -97.153367,
+          "state": "Manitoba",
+          "state_code": "CA-MB",
+          "city": "Winnipeg",
+          "geonames_city": {
+            "id": 6183235,
+            "city": "Winnipeg",
+            "geonames_admin1": {
+              "name": "Manitoba",
+              "id": 6065171,
+              "ascii_name": "Manitoba",
+              "code": "CA.03"
+            },
+            "geonames_admin2": {
+              "name": null,
+              "id": null,
+              "ascii_name": null,
+              "code": null
+            },
+            "license": {
+              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
+              "license": "https://creativecommons.org/licenses/by/3.0/"
+            },
+            "nuts_level1": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level2": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level3": {
+              "name": null,
+              "code": null
+            }
+          },
+          "postcode": null,
+          "primary": false,
+          "line": null,
+          "country_geonames_id": 6251999
+        }
+      ],
+      "links": [
+        "http://www.uwinnipeg.ca/"
+      ],
+      "aliases": [
+        
+      ],
+      "acronyms": [
+        
+      ],
+      "status": "active",
+      "wikipedia_url": "http://en.wikipedia.org/wiki/University_of_Winnipeg",
+      "labels": [
+        {
+          "label": "Université de winnipeg",
+          "iso639": "fr"
+        }
+      ],
+      "country": {
+        "country_name": "Canada",
+        "country_code": "CA"
+      },
+      "external_ids": {
+        "ISNI": {
+          "preferred": null,
+          "all": [
+            "0000 0001 1703 4731"
+          ]
+        },
+        "FundRef": {
+          "preferred": null,
+          "all": [
+            "100009367"
+          ]
+        },
+        "OrgRef": {
+          "preferred": null,
+          "all": [
+            "587404"
+          ]
+        },
+        "Wikidata": {
+          "preferred": null,
+          "all": [
+            "Q472167"
+          ]
+        },
+        "GRID": {
+          "preferred": "grid.267457.5",
+          "all": "grid.267457.5"
+        }
+      }
+    },
+    {
+      "id": "https://ror.org/03mnm0t94",
+      "name": "University of Wisconsin–Eau Claire",
+      "email_address": "",
+      "ip_addresses": [
+        
+      ],
+      "established": 1916,
+      "types": [
+        "Education"
+      ],
+      "relationships": [
+        {
+          "label": "University of Wisconsin System",
+          "type": "Parent",
+          "id": "https://ror.org/03ydkyb10"
+        }
+      ],
+      "addresses": [
+        {
+          "lat": 44.79895,
+          "lng": -91.499346,
+          "state": "Wisconsin",
+          "state_code": "US-WI",
+          "city": "Eau Claire",
+          "geonames_city": {
+            "id": 5251436,
+            "city": "Eau Claire",
+            "geonames_admin1": {
+              "name": "Wisconsin",
+              "id": 5279468,
+              "ascii_name": "Wisconsin",
+              "code": "US.WI"
+            },
+            "geonames_admin2": {
+              "name": "Eau Claire County",
+              "id": 5251439,
+              "ascii_name": "Eau Claire County",
+              "code": "US.WI.035"
+            },
+            "license": {
+              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
+              "license": "https://creativecommons.org/licenses/by/3.0/"
+            },
+            "nuts_level1": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level2": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level3": {
+              "name": null,
+              "code": null
+            }
+          },
+          "postcode": null,
+          "primary": false,
+          "line": null,
+          "country_geonames_id": 6252001
+        }
+      ],
+      "links": [
+        "http://www.uwec.edu/"
+      ],
+      "aliases": [
+        
+      ],
+      "acronyms": [
+        "UWEC"
+      ],
+      "status": "active",
+      "wikipedia_url": "http://en.wikipedia.org/wiki/University_of_Wisconsin%E2%80%93Eau_Claire",
+      "labels": [
+        {
+          "label": "Université du Wisconsin à Eau Claire",
+          "iso639": "fr"
+        }
+      ],
+      "country": {
+        "country_name": "United States",
+        "country_code": "US"
+      },
+      "external_ids": {
+        "ISNI": {
+          "preferred": null,
+          "all": [
+            "0000 0001 2227 2494"
+          ]
+        },
+        "FundRef": {
+          "preferred": null,
+          "all": [
+            "100010315"
+          ]
+        },
+        "OrgRef": {
+          "preferred": null,
+          "all": [
+            "496729"
+          ]
+        },
+        "Wikidata": {
+          "preferred": null,
+          "all": [
+            "Q3551771"
+          ]
+        },
+        "GRID": {
+          "preferred": "grid.267460.1",
+          "all": "grid.267460.1"
+        }
+      }
+    },
+    {
+      "id": "https://ror.org/05hbexn54",
+      "name": "University of Wisconsin–Green Bay",
+      "email_address": null,
+      "ip_addresses": [
+        
+      ],
+      "established": 1965,
+      "types": [
+        "Education"
+      ],
+      "relationships": [
+        {
+          "label": "University of Wisconsin System",
+          "type": "Parent",
+          "id": "https://ror.org/03ydkyb10"
+        }
+      ],
+      "addresses": [
+        {
+          "lat": 44.533203,
+          "lng": -87.921521,
+          "state": "Wisconsin",
+          "state_code": "US-WI",
+          "city": "Green Bay",
+          "geonames_city": {
+            "id": 5254962,
+            "city": "Green Bay",
+            "geonames_admin1": {
+              "name": "Wisconsin",
+              "id": 5279468,
+              "ascii_name": "Wisconsin",
+              "code": "US.WI"
+            },
+            "geonames_admin2": {
+              "name": "Brown County",
+              "id": 5246898,
+              "ascii_name": "Brown County",
+              "code": "US.WI.009"
+            },
+            "license": {
+              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
+              "license": "https://creativecommons.org/licenses/by/3.0/"
+            },
+            "nuts_level1": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level2": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level3": {
+              "name": null,
+              "code": null
+            }
+          },
+          "postcode": null,
+          "primary": false,
+          "line": null,
+          "country_geonames_id": 6252001
+        }
+      ],
+      "links": [
+        "http://www.uwgb.edu/"
+      ],
+      "aliases": [
+        
+      ],
+      "acronyms": [
+        "UWGB"
+      ],
+      "status": "active",
+      "wikipedia_url": "http://en.wikipedia.org/wiki/University_of_Wisconsin%E2%80%93Green_Bay",
+      "labels": [
+        {
+          "label": "Université du Wisconsin–Green Bay",
+          "iso639": "fr"
+        }
+      ],
+      "country": {
+        "country_name": "United States",
+        "country_code": "US"
+      },
+      "external_ids": {
+        "ISNI": {
+          "preferred": null,
+          "all": [
+            "0000 0001 0559 7692"
+          ]
+        },
+        "OrgRef": {
+          "preferred": null,
+          "all": [
+            "1513886"
+          ]
+        },
+        "Wikidata": {
+          "preferred": null,
+          "all": [
+            "Q2378091"
+          ]
+        },
+        "GRID": {
+          "preferred": "grid.267461.0",
+          "all": "grid.267461.0"
+        }
+      }
+    },
+    {
+      "id": "https://ror.org/00x8ccz20",
+      "name": "University of Wisconsin–La Crosse",
+      "email_address": "",
+      "ip_addresses": [
+        
+      ],
+      "established": 1909,
+      "types": [
+        "Education"
+      ],
+      "relationships": [
+        {
+          "label": "University of Wisconsin System",
+          "type": "Parent",
+          "id": "https://ror.org/03ydkyb10"
+        }
+      ],
+      "addresses": [
+        {
+          "lat": 43.815576,
+          "lng": -91.233517,
+          "state": "Wisconsin",
+          "state_code": "US-WI",
+          "city": "La Crosse",
+          "geonames_city": {
+            "id": 5258957,
+            "city": "La Crosse",
+            "geonames_admin1": {
+              "name": "Wisconsin",
+              "id": 5279468,
+              "ascii_name": "Wisconsin",
+              "code": "US.WI"
+            },
+            "geonames_admin2": {
+              "name": "La Crosse County",
+              "id": 5258961,
+              "ascii_name": "La Crosse County",
+              "code": "US.WI.063"
+            },
+            "license": {
+              "attribution": "Data from geonames.org under a CC-BY 3.0 license",
+              "license": "https://creativecommons.org/licenses/by/3.0/"
+            },
+            "nuts_level1": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level2": {
+              "name": null,
+              "code": null
+            },
+            "nuts_level3": {
+              "name": null,
+              "code": null
+            }
+          },
+          "postcode": null,
+          "primary": false,
+          "line": null,
+          "country_geonames_id": 6252001
+        }
+      ],
+      "links": [
+        "http://www.uwlax.edu/Home/Future-Students/"
+      ],
+      "aliases": [
+        
+      ],
+      "acronyms": [
+        "UW–L"
+      ],
+      "status": "active",
+      "wikipedia_url": "http://en.wikipedia.org/wiki/University_of_Wisconsin%E2%80%93La_Crosse",
+      "labels": [
+        {
+          "label": "Université du Wisconsin–La Crosse",
+          "iso639": "fr"
+        }
+      ],
+      "country": {
+        "country_name": "United States",
+        "country_code": "US"
+      },
+      "external_ids": {
+        "ISNI": {
+          "preferred": null,
+          "all": [
+            "0000 0001 2169 5137"
+          ]
+        },
+        "OrgRef": {
+          "preferred": null,
+          "all": [
+            "2422287"
+          ]
+        },
+        "Wikidata": {
+          "preferred": null,
+          "all": [
+            "Q2688358"
+          ]
+        },
+        "GRID": {
+          "preferred": "grid.267462.3",
+          "all": "grid.267462.3"
+        }
+      }
+    }
+  ],
+  "meta": {
+    "types": [
+      {
+        "id": "company",
+        "title": "Company",
+        "count": 29790
+      },
+      {
+        "id": "education",
+        "title": "Education",
+        "count": 20325
+      },
+      {
+        "id": "nonprofit",
+        "title": "Nonprofit",
+        "count": 14187
+      },
+      {
+        "id": "healthcare",
+        "title": "Healthcare",
+        "count": 13107
+      },
+      {
+        "id": "facility",
+        "title": "Facility",
+        "count": 10080
+      },
+      {
+        "id": "other",
+        "title": "Other",
+        "count": 8369
+      },
+      {
+        "id": "government",
+        "title": "Government",
+        "count": 6511
+      },
+      {
+        "id": "archive",
+        "title": "Archive",
+        "count": 2967
+      }
+    ],
+    "countries": [
+      {
+        "id": "us",
+        "title": "United States",
+        "count": 31196
+      },
+      {
+        "id": "gb",
+        "title": "United Kingdom",
+        "count": 7410
+      },
+      {
+        "id": "de",
+        "title": "Germany",
+        "count": 5189
+      },
+      {
+        "id": "cn",
+        "title": "China",
+        "count": 4846
+      },
+      {
+        "id": "fr",
+        "title": "France",
+        "count": 4344
+      },
+      {
+        "id": "jp",
+        "title": "Japan",
+        "count": 3940
+      },
+      {
+        "id": "ca",
+        "title": "Canada",
+        "count": 3392
+      },
+      {
+        "id": "in",
+        "title": "India",
+        "count": 3075
+      },
+      {
+        "id": "cz",
+        "title": "Czech Republic",
+        "count": 2780
+      },
+      {
+        "id": "ru",
+        "title": "Russia",
+        "count": 2109
+      }
+    ],
+    "statuses": [
+      {
+        "id": "active",
+        "title": "active",
+        "count": 105336
+      }
+    ]
+  }
+}

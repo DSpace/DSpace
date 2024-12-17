@@ -5,14 +5,68 @@ DRUM extensions.
 
 ## Useful Resources
 
-* <https://wiki.lyrasis.org/display/DSDOC7x/Advanced+Customisation>
-* <https://wiki.lyrasis.org/display/DSDOC7x/Configuration+Reference>
-* <https://wiki.lyrasis.org/display/DSDOC7x/Storage+Layer>
+* <https://wiki.lyrasis.org/display/DSDOC8x/Advanced+Customisation>
+* <https://wiki.lyrasis.org/display/DSDOC8x/Configuration+Reference>
+* <https://wiki.lyrasis.org/display/DSDOC8x/Storage+Layer>
 
-## dspace/modules/additions
+## Dockerfile configurations
 
-All source code and resources for DRUM customizations should be placed in the
-"dspace/modules/additions" directory.
+Stock DSpace provides the following Dockerfiles for running DSpace:
+
+* Dockerfile
+* Dockerfile.cli
+* Dockerfile.dependencies
+* Dockerfile.test
+
+The "Dockerfile" is used to generate the Docker images used in production.
+
+The following Dockerfiles were added to support local development:
+
+* Dockerfile.ant - Creates the Docker image for running Apache Ant
+* Dockefile.dev - The "local development" equivalent of the "Dockerfile". This
+  Docker image fully constructs a DRUM Docker image for use by Docker Compose.
+* Dockerfile.dev-base - Used for "Quick Builds", to generate a "base" build
+  that encompasses the "dspace-api" package. Used with the
+  "Dockefile.dev-additions" file.
+* Dockerfile.dev-additions - Used for "Quick Builds", to build the "overlays"
+  consisting of the customizations in the the "dspace/modules/additions" and
+  "dspace/modules/server" directories.
+
+The intent behind the "Dockerfile.dev-base" and "Dockerfile.dev-additions" files
+is that when doing local development, changes in the "dspace/modules/additions"
+and "dspace/modules/server" directories only require the
+"Dockerfile.dev-additions" image to be regenerated, which is much faster than
+running "Dockerfile.dev".
+
+Finally, the "Dockerfile.ci" file supports generating a Docker image for use
+by Jenkins for continuous integration setup and testing.
+
+---
+
+**Note:** Starting in DSpace 8, the stock files use Spring Boot and an
+"embedded Tomcat" server to run the back-end server. This turned out to be
+incompatible with the DSpace customization mechanism, when customizations are
+added to the "dspace/modules/server" directory (see DSpace Issue 9987 -
+<https://github.com/DSpace/DSpace/issues/9987)>).
+
+A fix to restore the the "dspace/modules/server" customizations was provided
+to DSpace in DSpace Pull 10043 (<https://github.com/DSpace/DSpace/pull/10043>).
+
+These customizations can be removed when upgrading to a DSpace version that
+contains the changes.
+
+---
+
+## .github/workflows/build.yml
+
+Commented out the "codecov" task, because UMD does not have an appropriate key
+to upload code coverage results to codecov.io, which was causing builds to
+be marked as "Failed" in GitHub.
+
+## dspace/modules/[additions|server]
+
+All source code and resources for DRUM customizations should be placed in
+either the "dspace/modules/additions" or "dspace/modules/server" directory.
 
 ## dspace/config/dspace.cfg
 
