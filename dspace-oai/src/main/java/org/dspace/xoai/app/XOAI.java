@@ -334,6 +334,11 @@ public class XOAI {
                     server.add(list);
                     server.commit();
                     list.clear();
+                    try {
+                        context.uncacheEntities();
+                    } catch (SQLException ex) {
+                        log.error("Error uncaching entities", ex);
+                    }
                 }
             }
             System.out.println("Total: " + i + " items");
