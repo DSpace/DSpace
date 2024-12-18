@@ -316,4 +316,62 @@ public class OpenSearchControllerIT extends AbstractControllerIntegrationTest {
                    .andExpect(status().isOk())
                    .andExpect(xpath("feed/totalResults").string("1"));
     }
+
+    @Test
+    public void configurationFilterAuthorTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Collection collection1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, collection1)
+                .withTitle("Boars at Yellowstone")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Ballini, Andreas").withAuthor("Moriarti, Susan")
+                .build();
+        Item publicItem2 = ItemBuilder.createItem(context, collection1)
+                .withTitle("Test Filter Item 2")
+                .withIssueDate("2020-10-20")
+                .withAuthor("Test Author")
+                .build();
+
+        getClient().perform(get("/opensearch/search")
+                .param("query", "*")
+                .param("configuration", "defaultConfiguration")
+                .param("f.author", "Test Author,equals"))
+                .andExpect(status().isOk())
+                .andExpect(xpath("feed/totalResults").string("1"));
+
+    }
+
+    @Test
+    public void configurationFilterEntityTypeTest() throws Exception {
+        context.turnOffAuthorisationSystem();
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Collection collection1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1")
+                .build();
+
+        Item publicItem1 = ItemBuilder.createItem(context, collection1)
+                .withTitle("Boars at Yellowstone")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Ballini, Andreas").withAuthor("Moriarti, Susan")
+                .build();
+        Item publicItem2 = ItemBuilder.createItem(context, collection1)
+                .withTitle("Test Filter Item 2")
+                .withIssueDate("2020-10-20")
+                .withMetadata("dspace", "entity", "type", "Publication")
+                .build();
+
+        getClient().perform(get("/opensearch/search")
+                .param("query", "*")
+                .param("configuration", "defaultConfiguration")
+                .param("f.entityType", "Publication,equals"))
+                .andExpect(status().isOk())
+                .andExpect(xpath("feed/totalResults").string("1"));
+
+    }
 }
