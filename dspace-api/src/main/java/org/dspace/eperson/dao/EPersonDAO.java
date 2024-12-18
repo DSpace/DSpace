@@ -81,6 +81,23 @@ public interface EPersonDAO extends DSpaceObjectDAO<EPerson>, DSpaceObjectLegacy
                                   List<MetadataField> sortFields, int offset, int limit) throws SQLException;
 
     /**
+     * Search all EPersons via their firstname, lastname, email (fuzzy match), limited to those EPersons which are
+     * a member of the given group. This may be used to search across EPersons which are valid to add as members to the
+     * given group.
+     *
+     * @param context The DSpace context
+     * @param query the text to search EPersons for
+     * @param queryFields the metadata fields to search within (email is also included automatically)
+     * @param includeGroup Group to include results from. Members of this group will be returned only.
+     * @param offset the position of the first result to return
+     * @param limit how many results return
+     * @return EPersons matching the query (which are members of the given group)
+     * @throws SQLException if database error
+     */
+    List<EPerson> searchMember(Context context, String query, List<MetadataField> queryFields, Group includeGroup,
+                                  List<MetadataField> sortFields, int offset, int limit) throws SQLException;
+
+    /**
      * Count number of EPersons that match a given search (fuzzy match) across firstname, lastname and email. This
      * search is limited to those EPersons which are NOT a member of the given group. This may be used
      * (with searchNotMember()) to perform a paginated search across EPersons which are valid to add to the given group.
@@ -93,6 +110,21 @@ public interface EPersonDAO extends DSpaceObjectDAO<EPerson>, DSpaceObjectLegacy
      * @throws SQLException if database error
      */
     int searchNotMemberCount(Context context, String query, List<MetadataField> queryFields, Group excludeGroup)
+        throws SQLException;
+
+    /**
+     * Count number of EPersons that match a given search (fuzzy match) across firstname, lastname and email. This
+     * search is limited to those EPersons which are a member of the given group. This may be used
+     * (with searchMember()) to perform a paginated search across EPersons which are valid to add to the given group.
+     *
+     * @param context The DSpace context
+     * @param query querystring to fuzzy match against.
+     * @param queryFields the metadata fields to search within (email is also included automatically)
+     * @param includeGroup Group to include results from. Members of this group will be returned only.
+     * @return Groups matching the query (which are members of the given parent)
+     * @throws SQLException if database error
+     */
+    int searchMemberCount(Context context, String query, List<MetadataField> queryFields, Group includeGroup)
         throws SQLException;
 
     /**
