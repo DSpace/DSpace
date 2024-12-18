@@ -144,7 +144,7 @@ public interface BitstreamStorageService {
     /**
      * Clone the given bitstream to a new bitstream with a new ID.
      * Metadata of the given bitstream are also copied to the new bitstream.
-     * 
+     *
      * @param context
      *            DSpace context object
      * @param bitstream
@@ -190,5 +190,12 @@ public interface BitstreamStorageService {
      */
     @Nullable
     Long getLastModified(Bitstream bitstream) throws IOException;
+
+
+    /**
+     * Sets the number for the incoming store
+     * @param incoming
+     */
+    public void setIncomingExternal(int incoming);
 
 }
