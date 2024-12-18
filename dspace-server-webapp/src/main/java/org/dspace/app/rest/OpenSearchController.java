@@ -24,11 +24,6 @@ import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.OpenSearchService;
-import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.dspace.core.LogHelper;
 import org.dspace.core.Utils;
@@ -55,7 +50,7 @@ import org.w3c.dom.Document;
 
 /**
  * This class provides a controller for OpenSearch support.
- * It creates a namespace /opensearch in the DSpace REST webapp.
+ * It creates a namespace {@code /opensearch} in the DSpace REST webapp.
  *
  * @author Oliver Goldschmidt (o.goldschmidt at tuhh.de)
  */
@@ -67,9 +62,6 @@ public class OpenSearchController {
     private static final String errorpath = "/error";
     private List<String> searchIndices = null;
 
-    private CommunityService communityService;
-    private CollectionService collectionService;
-    private AuthorizeService authorizeService;
     private OpenSearchService openSearchService;
 
     @Autowired
@@ -84,8 +76,23 @@ public class OpenSearchController {
     private ScopeResolver scopeResolver;
 
     /**
-     * This method provides the OpenSearch query on the path /search
-     * It will pass the result as a OpenSearchDocument directly to the client
+     * This method provides the OpenSearch query on the path {@code /search}.
+     * It will pass the result as an OpenSearchDocument directly to the client.
+     *
+     * @param request current client request.
+     * @param response developing response to current request.
+     * @param query a Solr-style query.
+     * @param start index of first result to return.
+     * @param count maximum number of results returned.
+     * @param format one of the OpenSearch report formats, e.g. "atom".
+     * @param sort name of field on which to sort.
+     * @param sortDirection "ASC" or "DESC".
+     * @param dsoObject UUID of the container which is the scope of the search,
+     *                  or omitted/{@code null} for global scope.
+     * @param model not used.
+     * @throws IOException passed through.
+     * @throws ServletException if the Discovery result cannot be transformed
+     *          to an OpenSearchDocument.
      */
     @GetMapping("/search")
     public void search(HttpServletRequest request,
@@ -221,8 +228,13 @@ public class OpenSearchController {
     }
 
     /**
-     * This method provides the OpenSearch servicedescription document on the path /service
-     * It will pass the result as a OpenSearchDocument directly to the client
+     * This method provides the OpenSearch {@code servicedescription} document
+     * on the path {@code /service}.
+     * It will pass the result as an OpenSearchDocument directly to the client.
+     *
+     * @param request the current client request.
+     * @param response the developing response to the current request.
+     * @throws IOException passed through.
      */
     @GetMapping("/service")
     public void service(HttpServletRequest request,
@@ -253,7 +265,7 @@ public class OpenSearchController {
      */
     private void init() {
         if (searchIndices == null) {
-            searchIndices = new ArrayList<String>();
+            searchIndices = new ArrayList<>();
             DiscoveryConfiguration discoveryConfiguration = SearchUtils
                     .getDiscoveryConfiguration();
             searchIndices.add("any");
@@ -261,9 +273,6 @@ public class OpenSearchController {
                 searchIndices.add(sFilter.getIndexFieldName());
             }
         }
-        communityService = ContentServiceFactory.getInstance().getCommunityService();
-        collectionService = ContentServiceFactory.getInstance().getCollectionService();
-        authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     }
 
     public void setOpenSearchService(OpenSearchService oSS) {
