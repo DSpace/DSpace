@@ -88,6 +88,14 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
                                 null, authorName, authority, confidence);
     }
 
+    public ItemBuilder withPublisher(String publisher) {
+        return addMetadataValue(item, "dc", "publisher", null, publisher);
+    }
+
+    public ItemBuilder withPatentNo(String patentNo) {
+        return addMetadataValue(item, "dc", "identifier", "patentno", patentNo);
+    }
+
     public ItemBuilder withEditor(final String editorName) {
         return addMetadataValue(item, MetadataSchemaEnum.DC.getName(), "contributor", "editor", editorName);
     }
@@ -234,6 +242,22 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
         return setMetadataSingleValue(item, "dspace", "orcid", "sync-fundings", value);
     }
 
+    public ItemBuilder withOrcidSynchronizationProductsPreference(OrcidEntitySyncPreference value) {
+        return withOrcidSynchronizationProductsPreference(value.name());
+    }
+
+    public ItemBuilder withOrcidSynchronizationProductsPreference(String value) {
+        return setMetadataSingleValue(item, "dspace", "orcid", "sync-products", value);
+    }
+
+    public ItemBuilder withOrcidSynchronizationPatentsPreference(OrcidEntitySyncPreference value) {
+        return withOrcidSynchronizationPatentsPreference(value.name());
+    }
+
+    public ItemBuilder withOrcidSynchronizationPatentsPreference(String value) {
+        return setMetadataSingleValue(item, "dspace", "orcid", "sync-patents", value);
+    }
+
     public ItemBuilder withOrcidSynchronizationProfilePreference(OrcidProfileSyncPreference value) {
         return withOrcidSynchronizationProfilePreference(value.name());
     }
@@ -273,6 +297,10 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
     public ItemBuilder makeUnDiscoverable() {
         item.setDiscoverable(false);
         return this;
+    }
+
+    public ItemBuilder withFundingIdentifier(String identifier) {
+        return addMetadataValue(item, "dc", "identifier", "other",  identifier);
     }
 
     public ItemBuilder withHandle(String handle) {
@@ -350,6 +378,26 @@ public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     public ItemBuilder withOtherIdentifier(String identifier) {
         return addMetadataValue(item, "dc", "identifier", "other", identifier);
+    }
+
+    public ItemBuilder withFundingInvestigator(String investigator) {
+        return addMetadataValue(item, "crisfund", "investigators", null, investigator);
+    }
+
+    public ItemBuilder withFundingInvestigator(String investigator, String authority) {
+        return addMetadataValue(item, "crisfund", "investigators", null, null, investigator, authority, 600);
+    }
+
+    public ItemBuilder withFundingCoInvestigator(String investigator) {
+        return addMetadataValue(item, "crisfund", "coinvestigators", null, investigator);
+    }
+
+    public ItemBuilder withFundingCoInvestigator(String investigator, String authority) {
+        return addMetadataValue(item, "crisfund", "coinvestigators", null, null, investigator, authority, 600);
+    }
+
+    public ItemBuilder withFundingAwardUrl(String url) {
+        return addMetadataValue(item, "crisfund", "award", "url", url);
     }
 
     /**
