@@ -9,6 +9,7 @@
 package org.dspace.app.rest.repository;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.dspace.eperson.service.CaptchaService.REGISTER_ACTION;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -43,6 +44,8 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.InvalidReCaptchaException;
+import org.dspace.eperson.service.CaptchaService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -68,7 +71,8 @@ public class RequestItemRepository
 
     @Autowired(required = true)
     protected ItemService itemService;
-
+    @Autowired
+    private CaptchaService captchaService;
     @Autowired(required = true)
     protected RequestItemConverter requestItemConverter;
 
@@ -107,13 +111,21 @@ public class RequestItemRepository
                 .getCurrentRequest()
                 .getHttpServletRequest();
         ObjectMapper mapper = new ObjectMapper();
+        String captchaToken = req.getHeader("X-Recaptcha-Token");
+        boolean verificationEnabled = configurationService.getBooleanProperty("requestcopy.verification.enabled");
+        if (verificationEnabled) {
+            try {
+                captchaService.processResponse(captchaToken, REGISTER_ACTION);
+            } catch (InvalidReCaptchaException e) {
+                throw new InvalidReCaptchaException(e.getMessage(), e);
+            }
+        }
         RequestItemRest rir;
         try {
             rir = mapper.readValue(req.getInputStream(), RequestItemRest.class);
         } catch (IOException ex) {
             throw new UnprocessableEntityException("error parsing the body", ex);
         }
-
         // Check request.item.type:
         // "all" = anyone can request.
         // "logged" = only authenticated user can request.
