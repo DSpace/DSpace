@@ -96,7 +96,7 @@
 
     <bean id="arxivAuthorContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
         <property name="field" ref="arxiv.author.name"/>
-        <property name="query" value="ns:author/name"/>
+        <property name="query" value="ns:author/ns:name"/>
         <property name="prefixToNamespaceMapping" ref="arxivBasePrefixToNamespaceMapping"/>
     </bean>
     <bean id="arxiv.author.name" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
