@@ -31,6 +31,14 @@ public class ContextReadOnlyCache {
     private final HashMap<Triple<String, Integer, String>, Boolean> authorizedActionsCache = new HashMap<>();
 
     /**
+     * Authorized actions cache that is used when the context is in READ_ONLY mode and the authorization could be
+     * inherited.
+     * The key of the cache is: DSpace Object ID, action ID, Eperson ID.
+     */
+    private final HashMap<Triple<String, Integer, String>, Boolean> authorizedActionsWithInheritanceCache =
+        new HashMap<>();
+
+    /**
      * Group membership cache that is used when the context is in READ_ONLY mode.
      * The key of the cache is: Group Name, Eperson ID.
      */
@@ -45,8 +53,17 @@ public class ContextReadOnlyCache {
         return authorizedActionsCache.get(buildAuthorizedActionKey(dspaceObject, action, eperson));
     }
 
+    public Boolean getCachedAuthorizationResultWithInheritance(DSpaceObject dspaceObject, int action, EPerson eperson) {
+        return authorizedActionsWithInheritanceCache.get(buildAuthorizedActionKey(dspaceObject, action, eperson));
+    }
+
     public void cacheAuthorizedAction(DSpaceObject dspaceObject, int action, EPerson eperson, Boolean result) {
         authorizedActionsCache.put(buildAuthorizedActionKey(dspaceObject, action, eperson), result);
+    }
+
+    public void cacheAuthorizedActionWithInheritance(DSpaceObject dspaceObject, int action, EPerson eperson,
+                                                     Boolean result) {
+        authorizedActionsWithInheritanceCache.put(buildAuthorizedActionKey(dspaceObject, action, eperson), result);
     }
 
     public Boolean getCachedGroupMembership(Group group, EPerson eperson) {
@@ -81,6 +98,7 @@ public class ContextReadOnlyCache {
 
     public void clear() {
         authorizedActionsCache.clear();
+        authorizedActionsWithInheritanceCache.clear();
         groupMembershipCache.clear();
         allMemberGroupsCache.clear();
     }
