@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -1105,28 +1106,41 @@ public class RestResourceController implements InitializingBean {
      * @param apiCategory
      * @param model
      * @param id
+     * @param expunge
      * @return
      * @throws HttpRequestMethodNotSupportedException
      */
     @RequestMapping(method = RequestMethod.DELETE, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_DIGIT)
     public ResponseEntity<RepresentationModel<?>> delete(HttpServletRequest request, @PathVariable String apiCategory,
-                                                         @PathVariable String model, @PathVariable Integer id)
+                                                         @PathVariable String model, @PathVariable Integer id,
+                                                         @RequestParam(value = "expunge",
+                                                                 required = false,
+                                                                 defaultValue = "false")
+                                                                 boolean expunge)
         throws HttpRequestMethodNotSupportedException {
-        return deleteInternal(apiCategory, model, id);
+        return deleteInternal(apiCategory, model, id, expunge);
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_UUID)
     public ResponseEntity<RepresentationModel<?>> delete(HttpServletRequest request, @PathVariable String apiCategory,
-                                                         @PathVariable String model, @PathVariable UUID uuid)
+                                                         @PathVariable String model, @PathVariable UUID uuid,
+                                                         @RequestParam(value = "expunge",
+                                                                 required = false,
+                                                                 defaultValue = "false")
+                                                                 boolean expunge)
         throws HttpRequestMethodNotSupportedException {
-        return deleteInternal(apiCategory, model, uuid);
+        return deleteInternal(apiCategory, model, uuid, expunge);
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = REGEX_REQUESTMAPPING_IDENTIFIER_AS_STRING_VERSION_STRONG)
     public ResponseEntity<RepresentationModel<?>> delete(HttpServletRequest request, @PathVariable String apiCategory,
-                                                         @PathVariable String model, @PathVariable String id)
+                                                         @PathVariable String model, @PathVariable String id,
+                                                         @RequestParam(value = "expunge",
+                                                                 required = false,
+                                                                 defaultValue = "false")
+                                                                 boolean expunge)
         throws HttpRequestMethodNotSupportedException {
-        return deleteInternal(apiCategory, model, id);
+        return deleteInternal(apiCategory, model, id, expunge);
     }
 
     /**
@@ -1135,14 +1149,24 @@ public class RestResourceController implements InitializingBean {
      * @param apiCategory
      * @param model
      * @param id
+     * @param expunge
      * @return
      */
     private <ID extends Serializable> ResponseEntity<RepresentationModel<?>> deleteInternal(String apiCategory,
                                                                                             String model,
-                                                                                            ID id) {
+                                                                                            ID id,
+                                                                                            boolean expunge) {
         checkModelPluralForm(apiCategory, model);
         DSpaceRestRepository<RestAddressableModel, ID> repository = utils.getResourceRepository(apiCategory, model);
-        repository.deleteById(id);
+        if (expunge) {
+            try {
+                repository.expungeById(id);
+            } catch (AuthorizeException | RepositoryMethodNotImplementedException ex) {
+                java.util.logging.Logger.getLogger(RestResourceController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            repository.deleteById(id);
+        }
         return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
     }
 
