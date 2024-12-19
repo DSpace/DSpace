@@ -37,6 +37,7 @@ https://wiki.lyrasis.org/display/DSPACE/Code+Contribution+Guidelines
         * Jackson dataformat: Smile (com.fasterxml.jackson.dataformat:jackson-dataformat-smile:2.15.2 - https://github.com/FasterXML/jackson-dataformats-binary)
         * Jackson-dataformat-TOML (com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.15.2 - https://github.com/FasterXML/jackson-dataformats-text)
         * Jackson-dataformat-YAML (com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.16.2 - https://github.com/FasterXML/jackson-dataformats-text)
+        * Jackson-dataformat-xml (com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.16.0 - https://github.com/FasterXML/jackson-dataformat-xml)
         * Jackson datatype: jdk8 (com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.15.4 - https://github.com/FasterXML/jackson-modules-java8/jackson-datatype-jdk8)
         * Jackson datatype: JSR310 (com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.0 - https://github.com/FasterXML/jackson-modules-java8/jackson-datatype-jsr310)
         * Jackson Jakarta-RS: base (com.fasterxml.jackson.jakarta.rs:jackson-jakarta-rs-base:2.16.2 - https://github.com/FasterXML/jackson-jakarta-rs-providers/jackson-jakarta-rs-base)

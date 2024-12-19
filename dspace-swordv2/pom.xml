@@ -59,6 +59,11 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-stax-api_1.0_spec</artifactId>
                 </exclusion>
+                <!-- Excluded on account of the XStreamWriter2 interface conflicting with stax2 lib -->
+                <exclusion>
+                    <groupId>org.codehaus.woodstox</groupId>
+                    <artifactId>wstx-asl</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 

@@ -636,6 +636,12 @@
             <artifactId>tika-parsers-standard-package</artifactId>
         </dependency>
 
+        <!-- Used for StructuredPdfTextExtractionFilter -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.maxmind.geoip2</groupId>
             <artifactId>geoip2</artifactId>
