@@ -64,7 +64,7 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
             filterAuthority = request.getParameter("filterAuthority");
             startsWith = request.getParameter("startsWith");
         }
-        Context context = obtainContext();
+        Context context = obtainReadOnlyContext();
         BrowseEngine be = new BrowseEngine(context);
         BrowserScope bs = new BrowserScope(context);
 
