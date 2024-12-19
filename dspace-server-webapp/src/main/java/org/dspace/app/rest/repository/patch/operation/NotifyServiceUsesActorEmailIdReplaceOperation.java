@@ -49,12 +49,11 @@ public class NotifyServiceUsesActorEmailIdReplaceOperation extends PatchOperatio
 
         if (supports(notifyServiceEntity, operation)) {
             notifyServiceEntity.setUsesActorEmailId(supportsExternalActor);
-            notifyServiceEntity.setUsesActorEmailId(supportsExternalActor);
             notifyService.update(context, notifyServiceEntity);
             return notifyServiceEntity;
         } else {
             throw new DSpaceBadRequestException(
-                "NotifyServiceEnabledReplaceOperation does not support this operation");
+                "NotifyServiceUsesActorEmailIdReplaceOperation does not support this operation");
         }
     }
 

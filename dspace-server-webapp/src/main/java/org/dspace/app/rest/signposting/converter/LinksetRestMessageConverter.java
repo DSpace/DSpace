@@ -49,6 +49,11 @@ public class LinksetRestMessageConverter {
             }
             responseBody.append(", ");
         });
+
+        if (responseBody.length() >= 2 && responseBody.substring(responseBody.length() - 2).equals(", ")) {
+            responseBody.delete(responseBody.length() - 2, responseBody.length());
+        }
+
         return responseBody.toString();
     }
 }
