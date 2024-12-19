@@ -41,6 +41,7 @@ public class SubmissionSectionConverter implements DSpaceConverter<SubmissionSte
         sp.setMandatory(step.isMandatory());
         sp.setHeader(step.getHeading());
         sp.setSectionType(step.getType());
+        sp.setExtendsSectionType(step.getExtendsType());
         sp.setId(step.getId());
         sp.setScope(ScopeEnum.fromString(step.getScope()));
         sp.setVisibility(new SubmissionVisibilityRest(VisibilityEnum.fromString(step.getVisibility()),
