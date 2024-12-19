@@ -1,0 +1,120 @@
+{
+  "gender": [
+    {
+      "id": "https://d-nb.info/standards/vocab/gnd/gender#male",
+      "label": "Männlich"
+    }
+  ],
+  "oldAuthorityNumber": [
+    "(DE-588b)1111111",
+    "(DE-588c)1111111-2",
+    "(DE-588)1111111-3"
+  ],
+  "biographicalOrHistoricalInformation": [
+    "Diss. Test University, Faculty of Javascript"
+  ],
+  "affiliationAsLiteral": [
+    "The Library Code GmbH"
+  ],
+  "variantNameEntityForThePerson": [
+    {
+      "forename": [
+        "John-Michael"
+      ],
+      "surname": [
+        "Smith"
+      ]
+    }
+  ],
+  "type": [
+    "DifferentiatedPerson",
+    "Person",
+    "AuthorityResource"
+  ],
+  "@context": "http://lobid.org/gnd/context.jsonld",
+  "geographicAreaCode": [
+    {
+      "id": "https://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-DE",
+      "label": "Deutschland"
+    }
+  ],
+  "affiliation": [
+    {
+      "id": "https://d-nb.info/gnd/5053182-7",
+      "label": "Technische Universität Berlin. Universitätsbibliothek"
+    }
+  ],
+  "describedBy": {
+    "id": "https://d-nb.info/gnd/12345-Person/about",
+    "license": {
+      "id": "http://creativecommons.org/publicdomain/zero/1.0/",
+      "label": "http://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "dateModified": "2020-04-04T05:38:09.000",
+    "descriptionLevel": {
+      "id": "https://d-nb.info/standards/vocab/gnd/description-level#3",
+      "label": "Religion"
+    }
+  },
+  "gndIdentifier": "12345-Person",
+  "id": "https://d-nb.info/gnd/12345-Person",
+  "preferredName": "Smith, John-Michael",
+  "variantName": [
+    "Smith, John"
+  ],
+  "preferredNameEntityForThePerson": {
+    "forename": [
+      "John-Michael"
+    ],
+    "surname": [
+      "Smith"
+    ],
+    "prefix": [
+      "von"
+    ]
+  },
+  "sameAs": [
+    {
+      "id": "http://viaf.org/viaf/12345999000",
+      "collection": {
+        "id": "http://www.wikidata.org/entity/Q54919",
+        "abbr": "VIAF",
+        "publisher": "OCLC",
+        "icon": "http://viaf.org/viaf/images/viaf.ico",
+        "name": "Virtual International Authority File (VIAF)"
+      }
+    },
+    {
+      "collection": {
+        "abbr": "DNB",
+        "name": "Gemeinsame Normdatei (GND) im Katalog der Deutschen Nationalbibliothek",
+        "publisher": "Deutsche Nationalbibliothek",
+        "icon": "https://www.dnb.de/SiteGlobals/Frontend/DNBWeb/Images/favicon.png?__blob=normal&v=4",
+        "id": "http://www.wikidata.org/entity/Q36578"
+      },
+      "id": "https://d-nb.info/gnd/12345-Person/about"
+    },
+    {
+      "id": "https://orcid.org/0000-1234-1234-1234",
+      "collection": {
+        "id": "https://orcid.org"
+      }
+    },
+    {
+      "collection": {
+        "abbr": "DDB",
+        "name": "Deutsche Digitale Bibliothek",
+        "publisher": "Deutsche Digitale Bibliothek",
+        "icon": "https://www.deutsche-digitale-bibliothek.de/favicon.ico",
+        "id": "http://www.wikidata.org/entity/Q621630"
+      },
+      "id": "https://www.deutsche-digitale-bibliothek.de/person/gnd/12355-Person"
+    },
+    {
+      "id": "http://isni.org/isni/000000000012345",
+      "collection": {
+        "id": "http://isni.org"
+      }
+    }
+  ]
+}
