@@ -1,6 +1,6 @@
 ## generate LDN message json when request-review of an item
 ##
-## Parameters: {0} config 'dspace.ui.url'
+## Parameters: {0} config 'dspace.ui.url' or submitter email id (e.g. 'mailto:submitter-email') depending on the service configuration
 ##             {1} config 'ldn.notify.inbox'
 ##             {2} config 'dspace.name'
 ##             {3} Notify Service url

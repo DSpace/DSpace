@@ -1,6 +1,6 @@
 ## generate LDN message json when request-endorsement of an item
 ##
-## Parameters: {0} config 'dspace.ui.url' OR supplied actor=id (mailto:sample@email.org)
+## Parameters: {0} config 'dspace.ui.url' or submitter email id (e.g. 'mailto:submitter-email') depending on the service configuration
 ##             {1} config 'ldn.notify.inbox'
 ##             {2} config 'dspace.name'
 ##             {3} Notify Service url
@@ -12,7 +12,7 @@
 ##             {9} id of the created LDNMessage
 ##             {13} type of actor: Service or Person
 ##             {14} config 'dspace.ui.url'
-##             {15} for endorsement resubmissions the the URN
+##             {15} for endorsement resubmissions the inReplyTo notification URN
 
 {
   "@context": [

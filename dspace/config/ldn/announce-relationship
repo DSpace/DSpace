@@ -13,7 +13,6 @@
 ##            {10} uri of the related resource
 ##            {11} relationship type, i.e. http://purl.org/vocab/frbr/core#supplement
 ##            {12} urn:uuid of the relation (randomly generated)
-##            {14} config 'dspace.ui.url'
 
 {
   "@context": [
@@ -47,7 +46,7 @@
     "type": "Relationship"
   },
   "origin": {
-    "id": "${params[14]}",
+    "id": "${params[0]}",
     "inbox": "${params[1]}",
     "type": "Service"
   },
