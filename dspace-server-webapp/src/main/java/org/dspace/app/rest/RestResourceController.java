@@ -711,9 +711,13 @@ public class RestResourceController implements InitializingBean {
             log.error(e.getMessage(), e);
             throw e;
         }
-        DSpaceResource result = converter.toResource(modelObject);
-        //TODO manage HTTPHeader
-        return ControllerUtils.toResponseEntity(HttpStatus.OK, new HttpHeaders(), result);
+        if (modelObject != null) {
+            DSpaceResource result = converter.toResource(modelObject);
+            //TODO manage HTTPHeader
+            return ControllerUtils.toResponseEntity(HttpStatus.OK, new HttpHeaders(), result);
+        } else {
+            return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
+        }
 
     }
 
