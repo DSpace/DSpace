@@ -32,6 +32,7 @@ import org.dspace.external.OrcidRestConnector;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.provider.AbstractExternalDataProvider;
 import org.dspace.external.provider.orcid.xml.XMLtoBio;
+import org.dspace.util.ProxyUtils;
 import org.json.JSONObject;
 import org.orcid.jaxb.model.v3.release.common.OrcidIdentifier;
 import org.orcid.jaxb.model.v3.release.record.Person;
@@ -58,7 +59,7 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
 
     private String orcidUrl;
 
-    private XMLtoBio converter;
+    private final XMLtoBio converter;
 
     public static final String ORCID_ID_SYNTAX = "\\d{4}-\\d{4}-\\d{4}-(\\d{3}X|\\d{4})";
     private static final int MAX_INDEX = 10000;
@@ -87,7 +88,9 @@ public class OrcidV3AuthorDataProvider extends AbstractExternalDataProvider {
             httpPost.addHeader("Accept", "application/json");
             httpPost.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
-            HttpClient httpClient = HttpClientBuilder.create().build();
+            HttpClientBuilder builder = HttpClientBuilder.create();
+            ProxyUtils.addProxy(builder);
+            HttpClient httpClient = builder.build();
             HttpResponse getResponse = httpClient.execute(httpPost);
 
             JSONObject responseObject = null;

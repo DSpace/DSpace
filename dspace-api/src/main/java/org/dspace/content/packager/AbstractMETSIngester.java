@@ -49,6 +49,7 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.util.ProxyUtils;
 import org.dspace.workflow.WorkflowException;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.jdom2.Element;
@@ -1313,7 +1314,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester {
             try {
                 // attempt to open a connection to given URL
                 URL fileURL = new URL(path);
-                URLConnection connection = fileURL.openConnection();
+                URLConnection connection = fileURL.openConnection(ProxyUtils.getProxy());
 
                 // open stream to access file contents
                 return connection.getInputStream();
