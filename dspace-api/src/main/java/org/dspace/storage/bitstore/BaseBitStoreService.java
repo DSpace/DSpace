@@ -75,7 +75,7 @@ public abstract class BaseBitStoreService implements BitStoreService {
      * an attempt to make a path traversal attack, so ignore the path prefix. The
      * internal-ID is supposed to be just a filename, so this will not affect normal
      * operation.
-     * 
+     *
      * @param sInternalId
      * @return Sanitized id
      */
@@ -88,7 +88,7 @@ public abstract class BaseBitStoreService implements BitStoreService {
 
     /**
      * Append separator to target {@code StringBuilder}
-     * 
+     *
      * @param path
      */
     protected void appendSeparator(StringBuilder path) {
@@ -99,7 +99,7 @@ public abstract class BaseBitStoreService implements BitStoreService {
 
     /**
      * Utility that checks string ending with separator
-     * 
+     *
      * @param bufFilename
      * @return
      */
@@ -111,7 +111,7 @@ public abstract class BaseBitStoreService implements BitStoreService {
      * Splits internalId into several subpaths using {@code digitsPerLevel} that
      * indicates the folder name length, and {@code direcoryLevels} that indicates
      * the maximum number of subfolders.
-     * 
+     *
      * @param internalId bitStream identifier
      * @param path
      */
@@ -127,7 +127,7 @@ public abstract class BaseBitStoreService implements BitStoreService {
 
     /**
      * Extract substring if is in range, otherwise will truncate to length
-     * 
+     *
      * @param internalId
      * @param startIndex
      * @param endIndex
@@ -142,7 +142,7 @@ public abstract class BaseBitStoreService implements BitStoreService {
 
     /**
      * Checks if the {@code String} is longer than {@code endIndex}
-     * 
+     *
      * @param internalId
      * @param endIndex
      * @return
@@ -153,7 +153,7 @@ public abstract class BaseBitStoreService implements BitStoreService {
 
     /**
      * Retrieves a map of useful metadata about the File (size, checksum, modified)
-     * 
+     *
      * @param file The File to analyze
      * @param attrs The list of requested metadata values
      * @return Map of updated metadatas / attrs
