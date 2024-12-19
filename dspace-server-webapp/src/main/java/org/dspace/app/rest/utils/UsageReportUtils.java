@@ -128,7 +128,7 @@ public class UsageReportUtils {
     }
 
     /**
-     * Create stat usage report of the items most popular over entire site
+     * Create stat usage report of the items most popular over entire site.
      *
      * @param context DSpace context
      * @return Usage report with top most popular items
@@ -152,7 +152,7 @@ public class UsageReportUtils {
             totalVisitPoint.setType("item");
             String urlOfItem = dataset.getColLabelsAttrs().get(i).get("url");
             if (urlOfItem != null) {
-                String handle = StringUtils.substringAfterLast(urlOfItem, "handle/");
+                String handle = handleService.resolveUrlToHandle(context, urlOfItem);
                 if (handle != null) {
                     DSpaceObject dso = handleService.resolveToObject(context, handle);
                     totalVisitPoint.setId(dso != null ? dso.getID().toString() : urlOfItem);
