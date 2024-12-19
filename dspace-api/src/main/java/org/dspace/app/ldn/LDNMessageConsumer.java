@@ -177,12 +177,17 @@ public class LDNMessageConsumer implements Consumer {
         String actorID = null;
         if (service.isUsesActorEmailId()) {
             // If the service has been configured to use actorEmailId, we use the submitter's email and name
-            actorID = item.getSubmitter().getEmail();
+            if (item.getSubmitter() != null) {
+                actorID = item.getSubmitter().getEmail();
+            } else {
+                // Use configured fallback email (defaults to mail.admin property)
+                actorID = configurationService.getProperty("ldn.notification.email.submitter.fallback");
+            }
         }
         appendGeneratedMessage(ldn,
                 ldnMessage,
                 actorID,
-                actorID != null ? item.getSubmitter().getName() : null,
+                (actorID != null && item.getSubmitter() != null) ? item.getSubmitter().getName() : null,
                 resubmissionID);
 
         ObjectMapper mapper = new ObjectMapper();
