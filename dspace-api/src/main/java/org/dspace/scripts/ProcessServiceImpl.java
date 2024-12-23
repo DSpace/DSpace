@@ -47,13 +47,12 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.scripts.service.ProcessService;
 import org.dspace.services.ConfigurationService;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The implementation for the {@link ProcessService} class
  */
-public class ProcessServiceImpl implements ProcessService, InitializingBean {
+public class ProcessServiceImpl implements ProcessService {
 
     private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(ProcessService.class);
 
@@ -74,28 +73,6 @@ public class ProcessServiceImpl implements ProcessService, InitializingBean {
 
     @Autowired
     private ConfigurationService configurationService;
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        Context context = new Context();
-
-        // Processes that were running or scheduled when tomcat crashed, should be cleaned up during startup.
-        List<Process> processesToBeFailed = findByStatusAndCreationTimeOlderThan(
-            context, List.of(ProcessStatus.RUNNING, ProcessStatus.SCHEDULED), new Date());
-        for (Process process : processesToBeFailed) {
-            context.setCurrentUser(process.getEPerson());
-            // Fail the process.
-            log.info("Process with ID {} did not complete before tomcat shutdown, failing it now.", process.getID());
-            fail(context, process);
-            // But still attach its log to the process.
-            appendLog(process.getID(), process.getName(),
-                      "Process did not complete before tomcat shutdown.",
-                      ProcessLogLevel.ERROR);
-            createLogBitstream(context, process);
-        }
-
-        context.complete();
-    }
 
     @Override
     public Process create(Context context, EPerson ePerson, String scriptName,
@@ -345,6 +322,23 @@ public class ProcessServiceImpl implements ProcessService, InitializingBean {
     @Override
     public int countByUser(Context context, EPerson user) throws SQLException {
         return processDAO.countByUser(context, user);
+    }
+
+    @Override
+    public void failRunningProcesses(Context context) throws SQLException, IOException, AuthorizeException {
+        List<Process> processesToBeFailed = findByStatusAndCreationTimeOlderThan(
+                context, List.of(ProcessStatus.RUNNING, ProcessStatus.SCHEDULED), new Date());
+        for (Process process : processesToBeFailed) {
+            context.setCurrentUser(process.getEPerson());
+            // Fail the process.
+            log.info("Process with ID {} did not complete before tomcat shutdown, failing it now.", process.getID());
+            fail(context, process);
+            // But still attach its log to the process.
+            appendLog(process.getID(), process.getName(),
+                      "Process did not complete before tomcat shutdown.",
+                      ProcessLogLevel.ERROR);
+            createLogBitstream(context, process);
+        }
     }
 
     private String formatLogLine(int processId, String scriptName, String output, ProcessLogLevel processLogLevel) {
