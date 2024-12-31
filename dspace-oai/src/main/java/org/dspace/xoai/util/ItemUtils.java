@@ -21,7 +21,11 @@ import com.lyncode.xoai.util.Base64Utils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.common.SolrDocumentList;
 import org.dspace.app.util.factory.UtilServiceFactory;
+import org.dspace.authority.AuthoritySearchService;
+import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -32,6 +36,8 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
+import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
@@ -60,6 +66,13 @@ public class ItemUtils {
 
     private static final AuthorizeService authorizeService
             = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+
+
+    private static final AuthoritySearchService authoritySearchService
+            = AuthorityServiceFactory.getInstance().getAuthoritySearchService();
+
+    private static final MetadataAuthorityService metadataAuthorityService
+            = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
 
     /**
      * Default constructor
@@ -293,7 +306,39 @@ public class ItemUtils {
             if (val.getConfidence() != Choices.CF_NOVALUE) {
                 valueElem.getField().add(createValue("confidence", val.getConfidence() + ""));
             }
+            addOrcidIdentifier(valueElem, val);
         }
+    }
+
+    /**
+     * Adds a ORCID identifier field to the provided Element, if applicable.
+     */
+    private static void addOrcidIdentifier(Element valueElem, MetadataValue mdValue) {
+        // Stop if the metadata value's field isn't enabled for ORCID authorities.
+        if (!isOrcidAuthorityControlled(mdValue.getMetadataField())) {
+            return;
+        }
+
+        try {
+            // Query the authority core using the authority key on the metadata value.
+            SolrQuery query = new SolrQuery();
+            query.setQuery("id:" + mdValue.getAuthority());
+            SolrDocumentList results = authoritySearchService.search(query).getResults();
+
+            if (results.getNumFound() > 0 && results.get(0).get("orcid_id") != null) {
+                // If there is one, add the ORCID identifier to the Element.
+                valueElem.getField().add(createValue("orcid_id", (String) results.get(0).get("orcid_id")));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static boolean isOrcidAuthorityControlled(MetadataField field) {
+        String solrAuthorAuthority = configurationService.getProperty("choices.plugin." + field.toString('.'));
+        return metadataAuthorityService.isAuthorityControlled(metadataAuthorityService.makeFieldKey(field))
+                && solrAuthorAuthority != null
+                && solrAuthorAuthority.equals("SolrAuthorAuthority");
     }
 
     /**
