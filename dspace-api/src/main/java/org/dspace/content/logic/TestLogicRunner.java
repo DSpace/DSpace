@@ -10,6 +10,7 @@ package org.dspace.content.logic;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -18,6 +19,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.util.DSpaceObjectUtilsImpl;
+import org.dspace.app.util.service.DSpaceObjectUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -28,6 +31,8 @@ import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.util.UUIDUtils;
+import org.dspace.utils.DSpace;
 
 /**
  * A command-line runner used for testing a logical filter against an item, or all items
@@ -56,7 +61,7 @@ public class TestLogicRunner {
         options.addOption("h", "help", false, "Help");
         options.addOption("l", "list", false, "List filters");
         options.addOption("f", "filter", true, "Use filter <filter>");
-        options.addOption("i","item", true, "Run filter over item <handle>");
+        options.addOption("i","item", true, "Run filter over item <handle> or <uuid>");
         options.addOption("a","all", false, "Run filter over all items");
 
         // initialize parser
@@ -107,6 +112,20 @@ public class TestLogicRunner {
                 HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
                 try {
                     DSpaceObject dso = handleService.resolveToObject(c, handle);
+                    if (dso == null) {
+                        UUID uuid = null;
+                        try {
+                            uuid = UUIDUtils.fromString(handle);
+                        } catch (IllegalArgumentException ex) {
+                            // couldn't parse uuid, setting it null
+                            uuid = null;
+                        }
+                        if (uuid != null) {
+                            DSpaceObjectUtils dSpaceObjectUtils = new DSpace().getServiceManager()
+                                    .getServiceByName(DSpaceObjectUtilsImpl.class.getName(), DSpaceObjectUtilsImpl.class);
+                            dso = dSpaceObjectUtils.findDSpaceObject(c, uuid);
+                        }
+                    }
                     if (Constants.typeText[dso.getType()].equals("ITEM")) {
                         Item item = (Item) dso;
                         System.out.println(filter.getResult(c, item));
