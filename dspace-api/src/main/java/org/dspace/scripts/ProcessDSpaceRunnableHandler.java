@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.scripts.handler.impl;
+package org.dspace.scripts;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,10 +32,6 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.scripts.DSpaceCommandLineParameter;
-import org.dspace.scripts.DSpaceRunnable;
-import org.dspace.scripts.Process;
-import org.dspace.scripts.ProcessLogLevel;
 import org.dspace.scripts.factory.ScriptServiceFactory;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.scripts.service.ProcessService;
@@ -43,11 +39,11 @@ import org.dspace.utils.DSpace;
 import org.springframework.core.task.TaskExecutor;
 
 /**
- * The {@link DSpaceRunnableHandler} dealing with Scripts started from the REST api
+ * The {@link DSpaceRunnableHandler} starting Scripts as {@link Process}
  */
-public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
+public class ProcessDSpaceRunnableHandler implements DSpaceRunnableHandler {
     private static final Logger log = org.apache.logging.log4j.LogManager
-        .getLogger(RestDSpaceRunnableHandler.class);
+        .getLogger(ProcessDSpaceRunnableHandler.class);
 
     private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     private ProcessService processService = ScriptServiceFactory.getInstance().getProcessService();
@@ -65,8 +61,8 @@ public class RestDSpaceRunnableHandler implements DSpaceRunnableHandler {
      * @param specialGroups specialGroups The list of special groups related to eperson
      *                      creating process at process creation time
      */
-    public RestDSpaceRunnableHandler(EPerson ePerson, String scriptName, List<DSpaceCommandLineParameter> parameters,
-                                     final Set<Group> specialGroups) {
+    public ProcessDSpaceRunnableHandler(EPerson ePerson, String scriptName, List<DSpaceCommandLineParameter> parameters,
+                                        final Set<Group> specialGroups) {
         Context context = new Context();
         try {
             ePersonId = ePerson.getID();
