@@ -121,8 +121,8 @@ public class TestLogicRunner {
                             uuid = null;
                         }
                         if (uuid != null) {
-                            DSpaceObjectUtils dSpaceObjectUtils = new DSpace().getServiceManager()
-                                    .getServiceByName(DSpaceObjectUtilsImpl.class.getName(), DSpaceObjectUtilsImpl.class);
+                            DSpaceObjectUtils dSpaceObjectUtils = new DSpace().getServiceManager().getServiceByName(
+                                    DSpaceObjectUtilsImpl.class.getName(), DSpaceObjectUtilsImpl.class);
                             dso = dSpaceObjectUtils.findDSpaceObject(c, uuid);
                         }
                     }
