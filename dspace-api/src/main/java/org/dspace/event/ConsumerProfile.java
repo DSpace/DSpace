@@ -108,6 +108,10 @@ public class ConsumerProfile {
                 .asSubclass(Consumer.class)
                 .getDeclaredConstructor().newInstance();
 
+        if (consumer instanceof NamedConsumer) {
+            ((NamedConsumer) consumer).setName(name);
+        }
+
         // Each "filter" is <objectTypes> + <eventTypes> : ...
         filters = new ArrayList<>();
         String part[] = filterString.trim().split(":");
