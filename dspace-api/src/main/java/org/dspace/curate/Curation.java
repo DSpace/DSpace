@@ -185,7 +185,7 @@ public class Curation extends DSpaceRunnable<CurationScriptConfiguration> {
         Curator curator = new Curator(handler);
         OutputStream reporterStream;
         if (null == this.reporter) {
-            reporterStream = new NullOutputStream();
+            reporterStream = NullOutputStream.NULL_OUTPUT_STREAM;
         } else if ("-".equals(this.reporter)) {
             reporterStream = System.out;
         } else {
