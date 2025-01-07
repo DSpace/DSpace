@@ -378,14 +378,16 @@
                                 </xsl:for-each>
                             </div>
                     </div>
-                    <div class="card">
-                            <div class="card-header">
-                                <h5>Metadata</h5>
-                            </div>
-                            <div class="card-body">
-                                <xsl:apply-templates select="oai:metadata/*" />
-                            </div>
-                    </div>
+                    <xsl:if test="oai:metadata">
+	                    <div class="card">
+	                            <div class="card-header">
+	                                <h5>Metadata</h5>
+	                            </div>
+	                            <div class="card-body">
+	                                <xsl:apply-templates select="oai:metadata/*" />
+	                            </div>
+	                    </div>
+                    </xsl:if>
                 </div>
             </div>
         </xsl:for-each>
