@@ -43,7 +43,7 @@ dspace.server.url = http://localhost:8080/server
 # Additional URL of DSpace backend which could be used by DSpace frontend during SSR execution.
 # May require a port number if not using standard ports (80 or 443)
 # DO NOT end it with '/'.
-dspace.server.ssr.url =
+dspace.server.ssr.url = ${dspace.server.url}
 
 # Public URL of DSpace frontend (Angular UI). May require a port number if not using standard ports (80 or 443)
 # DO NOT end it with '/'.
