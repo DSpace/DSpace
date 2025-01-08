@@ -989,7 +989,7 @@ public class Utils {
     */
     public BaseObjectRest getBaseObjectRestFromUri(Context context, String uri) throws SQLException {
         String dspaceUrl = configurationService.getProperty("dspace.server.url");
-        String dspaceSSRUrl = configurationService.getProperty("dspace.server.ssr.url", "");
+        String dspaceSSRUrl = configurationService.getProperty("dspace.server.ssr.url", dspaceUrl);
 
         // Convert strings to URL objects.
         // Do this early to check that inputs are well-formed.
@@ -1008,8 +1008,7 @@ public class Utils {
         }
 
         // Check whether the URI could be valid.
-        if (!urlIsPrefixOf(dspaceUrl, uri) && (StringUtils.isBlank(dspaceSSRUrl) ||
-            !urlIsPrefixOf(dspaceSSRUrl, uri))) {
+        if (!urlIsPrefixOf(dspaceUrl, uri) && !urlIsPrefixOf(dspaceSSRUrl, uri)) {
             throw new IllegalArgumentException("the supplied uri is not ours: " + uri);
         }
 
@@ -1019,12 +1018,11 @@ public class Utils {
         String[] requestPath = StringUtils.split(requestUrlObject.getPath(), '/');
         String[] uriParts = Arrays.copyOfRange(requestPath, dspacePathLength,
                 requestPath.length);
-        String[] uriSSRParts = new String[0];
-        if (StringUtils.isNoneBlank(dspaceSSRUrl) && !Objects.isNull(dspaceUrlSSRObject)) {
-            int dspaceSSRPathLength = StringUtils.split(dspaceUrlSSRObject.getPath(), '/').length;
-            uriSSRParts = Arrays.copyOfRange(requestPath, dspaceSSRPathLength,
-                requestPath.length);
-        }
+
+        int dspaceSSRPathLength = StringUtils.split(dspaceUrlSSRObject.getPath(), '/').length;
+        String[] uriSSRParts = Arrays.copyOfRange(requestPath, dspaceSSRPathLength,
+            requestPath.length);
+
         if ("api".equalsIgnoreCase(uriParts[0])) {
             uriParts = Arrays.copyOfRange(uriParts, 1, uriParts.length);
         }
