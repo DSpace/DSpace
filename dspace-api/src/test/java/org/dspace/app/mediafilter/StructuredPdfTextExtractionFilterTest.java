@@ -31,7 +31,6 @@ import org.junit.Test;
 public class StructuredPdfTextExtractionFilterTest {
 
     private static final StructuredPdfTextExtractionFilter filter = new StructuredPdfTextExtractionFilter();
-    private static final XmlMapper xmlMapper = new XmlMapper();
 
     @Test
     public void testGetFilteredName() {
