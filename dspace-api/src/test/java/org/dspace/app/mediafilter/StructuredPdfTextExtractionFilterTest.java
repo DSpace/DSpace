@@ -15,6 +15,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.InputStream;
 import java.sql.SQLException;
 
@@ -61,10 +62,11 @@ public class StructuredPdfTextExtractionFilterTest {
         assertNotNull(resultStream);
 
         InputStream expectedInputStream = getExpectedXml();
-        Pages expectedPages = xmlMapper.readValue(expectedInputStream, Pages.class);
-        Pages resultPages = xmlMapper.readValue(resultStream, Pages.class);
 
-        assertEquals(expectedPages, resultPages);
+        String normalizedExpectedXml = normalizeXml(expectedInputStream);
+        String normalizedResultXml = normalizeXml(resultStream);
+
+        assertEquals(normalizedExpectedXml, normalizedResultXml);
 
         resultStream.close();
     }
@@ -91,6 +93,14 @@ public class StructuredPdfTextExtractionFilterTest {
 
     private InputStream getExpectedXml() {
         return getClass().getResourceAsStream("multipage_expected_result.xml");
+    }
+
+    private static String normalizeXml(InputStream xmlInputStream) throws Exception {
+        XmlMapper xmlMapper = new XmlMapper();
+        xmlMapper.configure(SerializationFeature.INDENT_OUTPUT, false);
+
+        Pages pages = xmlMapper.readValue(xmlInputStream, Pages.class);
+        return xmlMapper.writeValueAsString(pages);
     }
 
 }
