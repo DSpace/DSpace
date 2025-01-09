@@ -99,7 +99,7 @@ public class StructuredPdfTextExtractionFilterTest {
         xmlMapper.configure(SerializationFeature.INDENT_OUTPUT, false);
 
         Pages pages = xmlMapper.readValue(xmlInputStream, Pages.class);
-        return xmlMapper.writeValueAsString(pages);
+        return xmlMapper.writeValueAsString(pages).replace("&#xd;", "");
     }
 
 }

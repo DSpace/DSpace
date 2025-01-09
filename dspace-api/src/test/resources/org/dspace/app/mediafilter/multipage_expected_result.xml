@@ -1,27 +1,27 @@
 <pages>
   <page>
     <pageNumber>1</pageNumber>
-    <text>A Text Extraction Test Document&#xd;
-for&#xd;
-DSpace&#xd;
-This is a text. For the next sixty seconds this software will conduct a test of the DSpace text&#xd;
-extraction facility.&#xd;
-This is only a text. This is a paragraph that followed the first that lived in the document that&#xd;
-Jack built.&#xd;
-Lorem ipsum dolor sit amet. The quick brown fox jumped over the lazy dog. Yow! Are we&#xd;
-having fun yet?&#xd;
-This has been a test of the DSpace text extraction system. In the event of actual content you&#xd;
-would care what is written here&#xd;
+    <text>A Text Extraction Test Document
+for
+DSpace
+This is a text. For the next sixty seconds this software will conduct a test of the DSpace text
+extraction facility.
+This is only a text. This is a paragraph that followed the first that lived in the document that
+Jack built.
+Lorem ipsum dolor sit amet. The quick brown fox jumped over the lazy dog. Yow! Are we
+having fun yet?
+This has been a test of the DSpace text extraction system. In the event of actual content you
+would care what is written here
 </text>
   </page>
   <page>
     <pageNumber>2</pageNumber>
-    <text>This is still a text.&#xd;
-This is only a text, but on a separate page. This is a paragraph that followed the first that&#xd;
-lived in the document that Jack built.&#xd;
-Lorem ipsum dolor sit amet. The quick brown fox jumped over the lazy dog.&#xd;
-This has been a test of the DSpace structured text extraction system. In the event of actual&#xd;
-content you would care what is written here&#xd;
+    <text>This is still a text.
+This is only a text, but on a separate page. This is a paragraph that followed the first that
+lived in the document that Jack built.
+Lorem ipsum dolor sit amet. The quick brown fox jumped over the lazy dog.
+This has been a test of the DSpace structured text extraction system. In the event of actual
+content you would care what is written here
 </text>
   </page>
 </pages>
