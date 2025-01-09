@@ -15,10 +15,10 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.InputStream;
 import java.sql.SQLException;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import org.dspace.app.mediafilter.model.Pages;
 import org.dspace.content.Bitstream;
