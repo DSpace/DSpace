@@ -7,7 +7,7 @@
  */
 package org.dspace.importer.external.vufind.metadatamapping;
 
-import java.util.Map;
+import java.util.List;
 import javax.annotation.Resource;
 
 import org.dspace.importer.external.metadatamapping.AbstractMetadataFieldMapping;
@@ -32,7 +32,7 @@ public class VuFindFieldMapping extends AbstractMetadataFieldMapping {
     @Override
     @SuppressWarnings("unchecked")
     @Resource(name = "vufindMetadataFieldMap")
-    public void setMetadataFieldMap(Map metadataFieldMap) {
+    public void setMetadataFieldMap(List metadataFieldMap) {
         super.setMetadataFieldMap(metadataFieldMap);
     }
 

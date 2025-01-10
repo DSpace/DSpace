@@ -6,7 +6,7 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.importer.external.wos.service;
-import java.util.Map;
+import java.util.List;
 import javax.annotation.Resource;
 
 import org.dspace.importer.external.metadatamapping.AbstractMetadataFieldMapping;
@@ -31,7 +31,7 @@ public class WOSFieldMapping extends AbstractMetadataFieldMapping {
     @Override
     @SuppressWarnings("unchecked")
     @Resource(name = "wosMetadataFieldMap")
-    public void setMetadataFieldMap(Map metadataFieldMap) {
+    public void setMetadataFieldMap(List metadataFieldMap) {
         super.setMetadataFieldMap(metadataFieldMap);
     }
 }

@@ -13,7 +13,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
@@ -21,7 +20,6 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvException;
 import org.dspace.importer.external.exception.FileSourceException;
-import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
 import org.dspace.importer.external.metadatamapping.contributor.MetadataContributor;
 import org.dspace.importer.external.service.components.AbstractPlainMetadataSource;
 import org.dspace.importer.external.service.components.MetadataSource;
@@ -165,8 +163,7 @@ public class CharacterSeparatedImportMetadataSourceServiceImpl extends AbstractP
     }
 
     @Override
-    public void setMetadataFieldMap(Map<MetadataFieldConfig,
-        MetadataContributor<PlainMetadataSourceDto>> metadataFieldMap) {
+    public void setMetadataFieldMap(List<MetadataContributor<PlainMetadataSourceDto>> metadataFieldMap) {
         super.setMetadataFieldMap(metadataFieldMap);
     }
 

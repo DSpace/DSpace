@@ -26,7 +26,7 @@ import org.dspace.importer.external.metadatamapping.transform.MetadataProcessorS
 public abstract class AbstractMetadataFieldMapping<RecordType>
     implements MetadataFieldMapping<RecordType, MetadataContributor<RecordType>> {
 
-    private Map<MetadataFieldConfig, MetadataContributor<RecordType>> metadataFieldMap;
+    private List<MetadataContributor<RecordType>> metadataFieldMap;
 
     /**
      * log4j logger
@@ -90,7 +90,7 @@ public abstract class AbstractMetadataFieldMapping<RecordType>
      *
      * @return a map representing the metadataFieldMap
      */
-    public Map<MetadataFieldConfig, MetadataContributor<RecordType>> getMetadataFieldMap() {
+    public List<MetadataContributor<RecordType>> getMetadataFieldMap() {
         return metadataFieldMap;
     }
 
@@ -102,9 +102,9 @@ public abstract class AbstractMetadataFieldMapping<RecordType>
      * @param metadataFieldMap The map containing the link between retrieve metadata and metadata that will be set to
      *                         the item.
      */
-    public void setMetadataFieldMap(Map<MetadataFieldConfig, MetadataContributor<RecordType>> metadataFieldMap) {
+    public void setMetadataFieldMap(List<MetadataContributor<RecordType>> metadataFieldMap) {
         this.metadataFieldMap = metadataFieldMap;
-        for (MetadataContributor<RecordType> mc : metadataFieldMap.values()) {
+        for (MetadataContributor<RecordType> mc : metadataFieldMap) {
             mc.setMetadataFieldMapping(this);
         }
     }
@@ -120,7 +120,7 @@ public abstract class AbstractMetadataFieldMapping<RecordType>
     public Collection<MetadatumDTO> resultToDCValueMapping(RecordType record) {
         List<MetadatumDTO> values = new ArrayList<>();
 
-        for (MetadataContributor<RecordType> query : getMetadataFieldMap().values()) {
+        for (MetadataContributor<RecordType> query : getMetadataFieldMap()) {
             try {
                 values.addAll(query.contributeMetadata(record));
             } catch (Exception e) {
