@@ -1,0 +1,118 @@
+#-------------------
+# DSpace's dependabot rules. Enables maven updates for all dependencies on a weekly basis
+# for main and any maintenance branches. Security updates only apply to main.
+#-------------------
+version: 2
+updates:
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    # Allow up to 10 open PRs for dependencies
+    open-pull-requests-limit: 10
+    # Group together some upgrades in a single PR
+    groups:
+      # Group together all Build Tools in a single PR
+      build-tools:
+        applies-to: version-updates
+        patterns:
+        - "org.apache.maven.plugins:*"
+        - "*:*-maven-plugin"
+        - "*:maven-*-plugin"
+        - "com.github.spotbugs:spotbugs"
+        - "com.google.code.findbugs:*"
+        - "com.google.errorprone:*"
+        - "com.puppycrawl.tools:checkstyle"
+        - "org.sonatype.plugins:*"
+        exclude-patterns:
+        # Exclude anything from Spring, as that is in a separate group
+        - "org.springframework.*:*"
+        update-types:
+        - "minor"
+        - "patch"
+      test-tools:
+        applies-to: version-updates
+        patterns:
+        - "junit:*"
+        - "com.github.stefanbirker:system-rules"
+        - "com.h2database:*"
+        - "io.findify:s3mock*"
+        - "io.netty:*"
+        - "org.hamcrest:*"
+        - "org.mock-server:*"
+        - "org.mockito:*"
+        update-types:
+        - "minor"
+        - "patch"
+      # Group together all Apache Commons deps in a single PR
+      apache-commons:
+        applies-to: version-updates
+        patterns:
+        - "org.apache.commons:*"
+        - "commons-*:commons-*"
+        update-types:
+        - "minor"
+        - "patch"
+      # Group together all fasterxml deps in a single PR
+      fasterxml:
+        applies-to: version-updates
+        patterns:
+        - "com.fasterxml:*"
+        - "com.fasterxml.*:*"
+        update-types:
+        - "minor"
+        - "patch"
+       # Group together all Hibernate deps in a single PR
+      hibernate:
+        applies-to: version-updates
+        patterns:
+        - "org.hibernate.*:*"
+        update-types:
+        - "minor"
+        - "patch"
+      # Group together all Jakarta deps in a single PR
+      jakarta:
+        applies-to: version-updates
+        patterns:
+        - "jakarta.*:*"
+        - "org.eclipse.angus:jakarta.mail"
+        - "org.glassfish.jaxb:jaxb-runtime"
+        update-types:
+        - "minor"
+        - "patch"
+      # Group together all Google deps in a single PR
+      google-apis:
+        applies-to: version-updates
+        patterns:
+        - "com.google.apis:*"
+        - "com.google.api-client:*"
+        - "com.google.http-client:*"
+        - "com.google.oauth-client:*"
+        update-types:
+        - "minor"
+        - "patch"
+      # Group together all Spring deps in a single PR
+      spring:
+        applies-to: version-updates
+        patterns:
+        - "org.springframework:*"
+        - "org.springframework.*:*"
+        update-types:
+        - "minor"
+        - "patch"
+      # Group together all WebJARs deps in a single PR
+      webjars:
+        applies-to: version-updates
+        patterns:
+        - "org.webjars:*"
+        - "org.webjars.*:*"
+        update-types:
+        - "minor"
+        - "patch"
+    ignore:
+      # Don't try to auto-update any DSpace dependencies
+      - dependency-name: "org.dspace:*"
+      - dependency-name: "org.dspace.*:*"
+      # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
