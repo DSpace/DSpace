@@ -8,7 +8,7 @@
 
 package org.dspace.importer.external.pubmed.metadatamapping;
 
-import java.util.Map;
+import java.util.List;
 
 import jakarta.annotation.Resource;
 import org.dspace.importer.external.metadatamapping.AbstractMetadataFieldMapping;
@@ -31,7 +31,7 @@ public class PubmedFieldMapping extends AbstractMetadataFieldMapping {
      */
     @Override
     @Resource(name = "pubmedMetadataFieldMap")
-    public void setMetadataFieldMap(Map metadataFieldMap) {
+    public void setMetadataFieldMap(List metadataFieldMap) {
         super.setMetadataFieldMap(metadataFieldMap);
     }
 }
