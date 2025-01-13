@@ -1644,6 +1644,13 @@
                 <artifactId>log4j-jul</artifactId>
                 <version>${log4j.version}</version>
             </dependency>
+            <!-- UMD Customization -->
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-layout-template-json</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <!-- End UMD Customization -->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>jul-to-slf4j</artifactId>
