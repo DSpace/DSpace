@@ -14,9 +14,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -182,7 +181,7 @@ public class DepositServlet extends HttpServlet {
         throws ServletException, IOException {
         // Create the Deposit request
         Deposit d = new Deposit();
-        Date date = new Date();
+        Instant date = Instant.now();
         log.debug("Starting deposit processing at " + date.toString() + " by "
                       + request.getRemoteAddr());
 
@@ -389,10 +388,8 @@ public class DepositServlet extends HttpServlet {
         Title title = new Title();
         title.setContent("ERROR");
         sed.setTitle(title);
-        Calendar calendar = Calendar.getInstance();
         String utcformat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
-        SimpleDateFormat zulu = new SimpleDateFormat(utcformat);
-        String serializeddate = zulu.format(calendar.getTime());
+        String serializeddate = DateTimeFormatter.ofPattern(utcformat).format(Instant.now());
         sed.setUpdated(serializeddate);
         Summary sum = new Summary();
         sum.setContent(summary);

@@ -7,8 +7,7 @@
  */
 package org.dspace.util;
 
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.time.LocalDateTime;
 import java.util.TimeZone;
 
 /**
@@ -30,13 +29,7 @@ public class TimeHelpers {
      * @param from some date-time.
      * @return midnight UTC of the supplied date-time.
      */
-    public static Date toMidnightUTC(Date from) {
-        GregorianCalendar calendar = new GregorianCalendar(UTC);
-        calendar.setTime(from);
-        calendar.set(GregorianCalendar.HOUR_OF_DAY, 0);
-        calendar.set(GregorianCalendar.MINUTE, 0);
-        calendar.set(GregorianCalendar.SECOND, 0);
-        calendar.set(GregorianCalendar.MILLISECOND, 0);
-        return calendar.getTime();
+    public static LocalDateTime toMidnightUTC(LocalDateTime from) {
+        return from.withHour(0).withMinute(0).withSecond(0).withNano(0);
     }
 }

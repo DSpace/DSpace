@@ -10,8 +10,10 @@ package org.dspace.builder;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
 
@@ -61,15 +63,17 @@ public class ProcessBuilder extends AbstractBuilder<Process, ProcessService> {
         return this;
     }
 
-    public ProcessBuilder withCreationTime(Date creationTime) {
+    public ProcessBuilder withCreationTime(Instant creationTime) {
         process.setCreationTime(creationTime);
         return this;
     }
 
     public ProcessBuilder withStartAndEndTime(String startTime, String endTime) throws ParseException {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        process.setStartTime(startTime == null ? null : simpleDateFormat.parse(startTime));
-        process.setFinishedTime(endTime == null ? null : simpleDateFormat.parse(endTime));
+        DateTimeFormatter simpleDateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        process.setStartTime(startTime == null ? null : LocalDateTime.parse(startTime, simpleDateFormat)
+                                                                     .atZone(ZoneId.systemDefault()).toInstant());
+        process.setFinishedTime(endTime == null ? null : LocalDateTime.parse(endTime, simpleDateFormat)
+                                                                      .atZone(ZoneId.systemDefault()).toInstant());
         return this;
     }
 

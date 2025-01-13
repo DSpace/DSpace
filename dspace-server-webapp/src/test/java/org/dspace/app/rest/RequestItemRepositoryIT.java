@@ -8,7 +8,6 @@
 package org.dspace.app.rest;
 
 import static com.jayway.jsonpath.JsonPath.read;
-import static org.exparity.hamcrest.date.DateMatchers.within;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -31,8 +30,10 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
@@ -58,6 +59,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.services.ConfigurationService;
+import org.exparity.hamcrest.date.LocalDateTimeMatchers;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -513,8 +515,8 @@ public class RequestItemRepositoryIT
                 = requestItemService.findByToken(context, requestTokenRef.get());
         assertTrue("acceptRequest should be true", foundRequest.isAccept_request());
         assertThat("decision_date must be within a minute of now",
-                foundRequest.getDecision_date(),
-                within(1, ChronoUnit.MINUTES, new Date()));
+                   foundRequest.getDecision_date().atZone(ZoneOffset.UTC).toLocalDateTime(),
+                   LocalDateTimeMatchers.within(1, ChronoUnit.MINUTES, LocalDateTime.now()));
     }
 
     @Test
@@ -578,7 +580,7 @@ public class RequestItemRepositoryIT
         RequestItem itemRequest = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
                 .withAcceptRequest(false)
-                .withDecisionDate(new Date())
+                .withDecisionDate(Instant.now())
                 .build();
 
         // Try to accept it again.

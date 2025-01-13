@@ -8,7 +8,7 @@
 package org.dspace.sword2;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -308,7 +308,7 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC
         try {
             itemService.clearMetadata(context, item,
                                       info.schema, info.element, info.qualifier, Item.ANY);
-            DCDate date = new DCDate(new Date());
+            DCDate date = new DCDate(LocalDateTime.now());
             itemService.addMetadata(context, item, info.schema,
                                     info.element, info.qualifier, null, date.toString());
         } catch (SQLException e) {

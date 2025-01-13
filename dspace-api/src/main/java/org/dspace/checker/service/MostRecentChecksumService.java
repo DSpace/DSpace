@@ -8,7 +8,7 @@
 package org.dspace.checker.service;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 import org.dspace.checker.ChecksumResultCode;
@@ -29,10 +29,12 @@ public interface MostRecentChecksumService {
 
     public MostRecentChecksum findByBitstream(Context context, Bitstream bitstream) throws SQLException;
 
-    public List<MostRecentChecksum> findNotProcessedBitstreamsReport(Context context, Date startDate, Date endDate)
+    public List<MostRecentChecksum> findNotProcessedBitstreamsReport(Context context, Instant startDate,
+                                                                     Instant endDate)
         throws SQLException;
 
-    public List<MostRecentChecksum> findBitstreamResultTypeReport(Context context, Date startDate, Date endDate,
+    public List<MostRecentChecksum> findBitstreamResultTypeReport(Context context, Instant startDate,
+                                                                  Instant endDate,
                                                                   ChecksumResultCode resultCode) throws SQLException;
 
     public void updateMissingBitstreams(Context context) throws SQLException;
@@ -41,7 +43,7 @@ public interface MostRecentChecksumService {
 
     public MostRecentChecksum findOldestRecord(Context context) throws SQLException;
 
-    public MostRecentChecksum findOldestRecord(Context context, Date lessThanDate) throws SQLException;
+    public MostRecentChecksum findOldestRecord(Context context, Instant lessThanDate) throws SQLException;
 
     public List<MostRecentChecksum> findNotInHistory(Context context) throws SQLException;
 

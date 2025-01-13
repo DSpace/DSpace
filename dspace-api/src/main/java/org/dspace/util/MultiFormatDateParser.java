@@ -10,15 +10,14 @@ package org.dspace.util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TimeZone;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -29,7 +28,7 @@ import org.dspace.servicemanager.DSpaceKernelInit;
 
 /**
  * Attempt to parse date strings in a variety of formats.  This uses an external
- * list of regular expressions and associated SimpleDateFormat strings.  Inject
+ * list of regular expressions and associated DateTimeFormatter patterns.  Inject
  * the list as pairs of strings using {@link #setPatterns}.  {@link #parse} walks
  * the provided list in the order provided and tries each entry against a String.
  *
@@ -45,23 +44,7 @@ public class MultiFormatDateParser {
      */
     private static final ArrayList<Rule> rules = new ArrayList<>();
 
-    private static final TimeZone UTC_ZONE = TimeZone.getTimeZone("UTC");
-
-    /**
-     * Format for displaying a result of testing.
-     */
-    private static final ThreadLocal<DateFormat> formatter;
-
-    static {
-        formatter = new ThreadLocal<DateFormat>() {
-            @Override
-            protected DateFormat initialValue() {
-                DateFormat dateTimeInstance = SimpleDateFormat.getDateTimeInstance();
-                dateTimeInstance.setTimeZone(UTC_ZONE);
-                return dateTimeInstance;
-            }
-        };
-    }
+    private static final ZoneId UTC_ZONE = ZoneOffset.UTC;
 
     @Inject
     public void setPatterns(Map<String, String> patterns) {
@@ -75,16 +58,14 @@ public class MultiFormatDateParser {
                 continue;
             }
 
-            SimpleDateFormat format;
+            DateTimeFormatter format;
             try {
-                format = new SimpleDateFormat(rule.getValue());
+                format = DateTimeFormatter.ofPattern(rule.getValue()).withZone(UTC_ZONE);
             } catch (IllegalArgumentException ex) {
                 log.error("Skipping uninterpretable date format '{}'",
                         rule::getValue);
                 continue;
             }
-            format.setCalendar(Calendar.getInstance(UTC_ZONE));
-            format.setLenient(false);
 
             rules.add(new Rule(pattern, format));
         }
@@ -97,17 +78,17 @@ public class MultiFormatDateParser {
      * @param dateString the supposed date to be parsed.
      * @return the result of the first successful parse, or {@code null} if none.
      */
-    static public Date parse(String dateString) {
+    static public ZonedDateTime parse(String dateString) {
         for (Rule candidate : rules) {
             if (candidate.pattern.matcher(dateString).matches()) {
-                Date result;
+                ZonedDateTime result;
                 try {
                     synchronized (candidate.format) {
-                        result = candidate.format.parse(dateString);
+                        result = ZonedDateTime.parse(dateString, candidate.format);
                     }
-                } catch (ParseException ex) {
+                } catch (DateTimeParseException ex) {
                     log.info("Date string '{}' matched pattern '{}' but did not parse:  {}",
-                        () -> dateString, candidate.format::toPattern, ex::getMessage);
+                        () -> dateString, candidate.format::toString, ex::getMessage);
                     continue;
                 }
                 return result;
@@ -152,22 +133,23 @@ public class MultiFormatDateParser {
      * @param arg date-time string to be tested.
      */
     private static void testDate(String arg) {
-        Date result = parse(arg);
+        ZonedDateTime result = parse(arg);
         if (null == result) {
             System.out.println("Did not match any pattern.");
         } else {
-            System.out.println(formatter.get().format(result));
+            // NOTE: This formats dates as an instant in UTC (e.g. '2011-12-03T10:15:30Z')
+            System.out.println(result.format(DateTimeFormatter.ISO_INSTANT));
         }
     }
 
     /**
-     * Holder for a pair:  compiled regex, compiled SimpleDateFormat.
+     * Holder for a pair:  compiled regex, compiled DateTimeFormatter.
      */
     private static class Rule {
         final Pattern pattern;
-        final SimpleDateFormat format;
+        final DateTimeFormatter format;
 
-        public Rule(Pattern pattern, SimpleDateFormat format) {
+        public Rule(Pattern pattern, DateTimeFormatter format) {
             this.pattern = pattern;
             this.format = format;
         }

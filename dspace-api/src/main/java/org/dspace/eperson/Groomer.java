@@ -10,9 +10,9 @@ package org.dspace.eperson;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
@@ -35,13 +35,6 @@ import org.dspace.eperson.service.EPersonService;
  * @author mwood
  */
 public class Groomer {
-    private static final ThreadLocal<DateFormat> dateFormat = new ThreadLocal<DateFormat>() {
-        @Override
-        protected DateFormat initialValue() {
-            return DateFormat.getDateInstance(DateFormat.SHORT);
-        }
-    };
-
     private static final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
     /**
@@ -70,7 +63,7 @@ public class Groomer {
 
         options.addOption("b", "last-used-before", true,
                           "date of last login was before this (for example:  "
-                              + dateFormat.get().format(Calendar.getInstance().getTime())
+                              + DateTimeFormatter.ISO_LOCAL_DATE.format(Instant.now())
                               + ')');
         options.addOption("d", "delete", false, "delete matching epersons");
 
@@ -114,10 +107,10 @@ public class Groomer {
             System.exit(1);
         }
 
-        Date before = null;
+        Instant before = null;
         try {
-            before = dateFormat.get().parse(command.getOptionValue('b'));
-        } catch (java.text.ParseException ex) {
+            before = DateTimeFormatter.ISO_LOCAL_DATE.parse(command.getOptionValue('b'), Instant::from);
+        } catch (DateTimeParseException ex) {
             System.err.println(ex.getMessage());
             System.exit(1);
         }

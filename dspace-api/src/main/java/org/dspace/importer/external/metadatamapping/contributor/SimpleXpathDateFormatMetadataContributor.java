@@ -7,9 +7,8 @@
  */
 package org.dspace.importer.external.metadatamapping.contributor;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -35,15 +34,15 @@ import org.jdom2.xpath.XPathFactory;
  */
 public class SimpleXpathDateFormatMetadataContributor extends SimpleXpathMetadatumContributor {
 
-    private DateFormat dateFormatFrom;
-    private DateFormat dateFormatTo;
+    private DateTimeFormatter dateFormatFrom;
+    private DateTimeFormatter dateFormatTo;
 
     public void setDateFormatFrom(String dateFormatFrom) {
-        this.dateFormatFrom = new SimpleDateFormat(dateFormatFrom);
+        this.dateFormatFrom = DateTimeFormatter.ofPattern(dateFormatFrom);
     }
 
     public void setDateFormatTo(String dateFormatTo) {
-        this.dateFormatTo = new SimpleDateFormat(dateFormatTo);
+        this.dateFormatTo = DateTimeFormatter.ofPattern(dateFormatTo);
     }
 
     @Override
@@ -79,7 +78,7 @@ public class SimpleXpathDateFormatMetadataContributor extends SimpleXpathMetadat
         }
         try {
             dcValue.setValue(dateFormatTo.format(dateFormatFrom.parse(value)));
-        } catch (ParseException e) {
+        } catch (DateTimeParseException e) {
             dcValue.setValue(value);
         }
         dcValue.setElement(field.getElement());

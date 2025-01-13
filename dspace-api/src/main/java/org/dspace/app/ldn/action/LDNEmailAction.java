@@ -9,9 +9,9 @@ package org.dspace.app.ldn.action;
 
 import static java.lang.String.format;
 
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -80,7 +80,7 @@ public class LDNEmailAction implements LDNAction {
                 email.addRecipient(recipient);
             }
 
-            String date = new SimpleDateFormat(DATE_PATTERN).format(Calendar.getInstance().getTime());
+            String date = DateTimeFormatter.ofPattern(DATE_PATTERN).format(Instant.now());
 
             email.addArgument(notification.getActor().getName());
             email.addArgument(item.getName());

@@ -7,9 +7,9 @@
  */
 package org.dspace.matcher;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -22,16 +22,16 @@ import org.hamcrest.Description;
  */
 public class DateMatcher
         extends BaseMatcher<String> {
-    private static final SimpleDateFormat dateFormat
-            = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+    private static final DateTimeFormatter dateFormat
+            = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 
-    private final Date matchDate;
+    private final LocalDateTime matchDate;
 
     /**
      * Create a matcher for a given Date.
      * @param matchDate The date that tested values should match.
      */
-    public DateMatcher(Date matchDate) {
+    public DateMatcher(LocalDateTime matchDate) {
         this.matchDate = matchDate;
     }
 
@@ -53,10 +53,10 @@ public class DateMatcher
         }
 
         // Decode the string to a Date
-        Date testDateDecoded;
+        LocalDateTime testDateDecoded;
         try {
-            testDateDecoded = dateFormat.parse((String)testDate);
-        } catch (ParseException ex) {
+            testDateDecoded = LocalDateTime.parse((String) testDate, dateFormat);
+        } catch (DateTimeParseException ex) {
             throw new IllegalArgumentException("Argument '" + testDate
                     + "' is not an ISO 8601 zoned date", ex);
         }
@@ -76,7 +76,7 @@ public class DateMatcher
      * @param matchDate the date which tested values should match.
      * @return a new Matcher for matchDate.
      */
-    static public DateMatcher dateMatcher(Date matchDate) {
+    static public DateMatcher dateMatcher(LocalDateTime matchDate) {
         return new DateMatcher(matchDate);
     }
 }

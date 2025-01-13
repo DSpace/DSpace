@@ -11,11 +11,12 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,7 +107,8 @@ public class StatisticsDataWorkflow extends StatisticsData {
                 }
                 long monthDifference = 1;
                 if (getOldestWorkflowItemDate(facetMinCount) != null) {
-                    monthDifference = getMonthsDifference(new Date(), getOldestWorkflowItemDate(facetMinCount));
+                    monthDifference = getMonthsDifference(LocalDateTime.now(),
+                                                          getOldestWorkflowItemDate(facetMinCount));
                 }
 
                 dataset = new Dataset(topCounts.length, (averageMonths != -1 ? 3 : 2));
@@ -158,9 +160,9 @@ public class StatisticsDataWorkflow extends StatisticsData {
         return query;
     }
 
-    private long getMonthsDifference(Date date1, Date date2) {
-        LocalDate earlier = LocalDate.ofInstant(date1.toInstant(), ZoneOffset.UTC);
-        LocalDate later = LocalDate.ofInstant(date2.toInstant(), ZoneOffset.UTC);
+    private long getMonthsDifference(LocalDateTime date1, LocalDateTime date2) {
+        LocalDate earlier = date1.toLocalDate();
+        LocalDate later = date2.toLocalDate();
         return Period.between(earlier, later).toTotalMonths();
     }
 
@@ -185,7 +187,7 @@ public class StatisticsDataWorkflow extends StatisticsData {
         return result;
     }
 
-    protected Date getOldestWorkflowItemDate(int facetMinCount)
+    protected LocalDateTime getOldestWorkflowItemDate(int facetMinCount)
             throws SolrServerException, IOException {
         ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         String workflowStartDate = configurationService.getProperty("usage-statistics.workflow-start-date");
@@ -195,7 +197,8 @@ public class StatisticsDataWorkflow extends StatisticsData {
                 .query(getQuery(), null, null, 1, 0, null, null, null, null, "time", true, facetMinCount);
             if (0 < oldestRecord.getResults().getNumFound()) {
                 SolrDocument solrDocument = oldestRecord.getResults().get(0);
-                Date oldestDate = (Date) solrDocument.getFieldValue("time");
+                LocalDateTime oldestDate = Instant.parse((String) solrDocument.getFieldValue("time"))
+                                                  .atZone(ZoneOffset.UTC).toLocalDateTime();
                 //Store the date, we only need to retrieve this once !
                 try {
                     // Also store it in the solr-statics configuration file, the reason for this being that the sort
@@ -222,7 +225,7 @@ public class StatisticsDataWorkflow extends StatisticsData {
             }
 
         } else {
-            return new DCDate(workflowStartDate).toDate();
+            return new DCDate(workflowStartDate).toDate().toLocalDateTime();
         }
     }
 }

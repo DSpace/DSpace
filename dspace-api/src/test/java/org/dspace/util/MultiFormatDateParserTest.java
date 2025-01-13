@@ -10,15 +10,14 @@ package org.dspace.util;
 
 import static org.junit.Assert.assertEquals;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -145,10 +144,9 @@ public class MultiFormatDateParserTest {
      * Test of parse method, of class MultiFormatDateParser.
      */
     @Test
-    public void testParse() throws ParseException {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(expectedFormat);
-        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Date result = MultiFormatDateParser.parse(toParseDate);
-        assertEquals(testMessage, expectedResult, simpleDateFormat.parse(toParseDate).equals(result));
+    public void testParse() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(expectedFormat).withZone(ZoneOffset.UTC);
+        ZonedDateTime result = MultiFormatDateParser.parse(toParseDate);
+        assertEquals(testMessage, expectedResult, ZonedDateTime.parse(toParseDate, formatter).equals(result));
     }
 }

@@ -8,8 +8,8 @@
 package org.dspace.app.ldn.dao.impl;
 
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -47,7 +47,7 @@ public class LDNMessageDaoImpl extends AbstractHibernateDAO<LDNMessageEntity> im
         andPredicates
             .add(criteriaBuilder.equal(root.get(LDNMessageEntity_.queueStatus), LDNMessageEntity.QUEUE_STATUS_QUEUED));
         andPredicates.add(criteriaBuilder.lessThan(root.get(LDNMessageEntity_.queueAttempts), max_attempts));
-        andPredicates.add(criteriaBuilder.lessThan(root.get(LDNMessageEntity_.queueTimeout), new Date()));
+        andPredicates.add(criteriaBuilder.lessThan(root.get(LDNMessageEntity_.queueTimeout), Instant.now()));
         criteriaQuery.where(criteriaBuilder.and(andPredicates.toArray(new Predicate[] {})));
         List<Order> orderList = new LinkedList<>();
         orderList.add(criteriaBuilder.desc(root.get(LDNMessageEntity_.queueAttempts)));
@@ -94,7 +94,7 @@ public class LDNMessageDaoImpl extends AbstractHibernateDAO<LDNMessageEntity> im
         andPredicates.add(
             criteriaBuilder.equal(root.get(LDNMessageEntity_.queueStatus), LDNMessageEntity.QUEUE_STATUS_PROCESSING));
         andPredicates.add(criteriaBuilder.lessThanOrEqualTo(root.get(LDNMessageEntity_.queueAttempts), max_attempts));
-        andPredicates.add(criteriaBuilder.lessThan(root.get(LDNMessageEntity_.queueTimeout), new Date()));
+        andPredicates.add(criteriaBuilder.lessThan(root.get(LDNMessageEntity_.queueTimeout), Instant.now()));
         criteriaQuery.where(criteriaBuilder.and(andPredicates.toArray(new Predicate[] {})));
         List<Order> orderList = new LinkedList<>();
         orderList.add(criteriaBuilder.desc(root.get(LDNMessageEntity_.queueAttempts)));

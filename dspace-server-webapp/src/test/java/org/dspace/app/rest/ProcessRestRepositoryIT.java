@@ -18,7 +18,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -692,17 +693,20 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void searchProcessTestByUserSortedOnCreationTimeAsc() throws Exception {
-        SimpleDateFormat date = new SimpleDateFormat("dd/MM/yyyy");
+
         Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
                                             // not realistic to have creationTime after startTime,
                                             // but proves startTime is ignored on sort
-                                            .withCreationTime(date.parse("01/01/2000"))
+                                            .withCreationTime(LocalDate.of(2000, 1, 1)
+                                                                       .atStartOfDay().toInstant(ZoneOffset.UTC))
                                             .withStartAndEndTime("01/01/1990", "01/01/1995").build();
         Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withCreationTime(date.parse("01/01/2005"))
+                                            .withCreationTime(LocalDate.of(2005, 1, 1)
+                                                                       .atStartOfDay().toInstant(ZoneOffset.UTC))
                                             .withStartAndEndTime(null, null).build();
         Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withCreationTime(date.parse("01/01/2010"))
+                                            .withCreationTime(LocalDate.of(2010, 1, 1)
+                                                                       .atStartOfDay().toInstant(ZoneOffset.UTC))
                                             .withStartAndEndTime("01/01/2015", "01/01/2020").build();
 
         String token = getAuthToken(admin.getEmail(), password);
@@ -728,17 +732,19 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void searchProcessTestByUserSortedOnCreationTimeDesc() throws Exception {
-        SimpleDateFormat date = new SimpleDateFormat("dd/MM/yyyy");
         Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
                                             // not realistic to have creationTime after startTime,
                                             // but proves startTime is ignored on sort
-                                            .withCreationTime(date.parse("01/01/2000"))
+                                            .withCreationTime(LocalDate.of(2000, 1, 1)
+                                                                       .atStartOfDay().toInstant(ZoneOffset.UTC))
                                             .withStartAndEndTime("01/01/1990", "01/01/1995").build();
         Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withCreationTime(date.parse("01/01/2005"))
+                                            .withCreationTime(LocalDate.of(2005, 1, 1)
+                                                                       .atStartOfDay().toInstant(ZoneOffset.UTC))
                                             .withStartAndEndTime(null, null).build();
         Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withCreationTime(date.parse("01/01/2010"))
+                                            .withCreationTime(LocalDate.of(2010, 1, 1)
+                                                                       .atStartOfDay().toInstant(ZoneOffset.UTC))
                                             .withStartAndEndTime("01/01/2015", "01/01/2020").build();
 
         String token = getAuthToken(admin.getEmail(), password);

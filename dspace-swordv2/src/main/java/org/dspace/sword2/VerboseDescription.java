@@ -7,8 +7,8 @@
  */
 package org.dspace.sword2;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 
 public class VerboseDescription {
     private StringBuilder sb;
@@ -27,7 +27,7 @@ public class VerboseDescription {
     }
 
     private String getDatePrefix() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return "[" + sdf.format(new Date()) + "] ";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return "[" + formatter.format(Instant.now()) + "] ";
     }
 }
