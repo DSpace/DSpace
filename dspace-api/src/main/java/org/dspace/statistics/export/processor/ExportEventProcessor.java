@@ -11,9 +11,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -156,7 +156,7 @@ public abstract class ExportEventProcessor {
      * @return the current date as a string
      */
     protected String getCurrentDateString() {
-        return new DCDate(new Date()).toString();
+        return new DCDate(LocalDateTime.now()).toString();
     }
 
     /**

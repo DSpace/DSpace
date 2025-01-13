@@ -11,11 +11,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -23,7 +21,7 @@ import java.util.List;
  */
 public class BatchUpload {
 
-    private Date date;
+    private Instant date;
     private File dir;
     private boolean successful;
     private int itemsImported;
@@ -65,9 +63,7 @@ public class BatchUpload {
 
         String dirName = dir.getName();
         long timeMillis = Long.parseLong(dirName);
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTimeInMillis(timeMillis);
-        this.date = calendar.getTime();
+        this.date = Instant.ofEpochMilli(timeMillis);
 
         try {
             this.itemsImported = countLines(dir + File.separator + "mapfile");
@@ -149,7 +145,7 @@ public class BatchUpload {
      *
      * @return Date
      */
-    public Date getDate() {
+    public Instant getDate() {
         return date;
     }
 
@@ -190,14 +186,12 @@ public class BatchUpload {
     }
 
     /**
-     * Get formatted date (DD/MM/YY)
+     * Get formatted date (YYYY-MM-DDThh:mm:ssZ)
      *
      * @return date as string
      */
     public String getDateFormatted() {
-        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy - HH:mm");
-
-        return df.format(date);
+        return DateTimeFormatter.ISO_INSTANT.format(date);
     }
 
     /**

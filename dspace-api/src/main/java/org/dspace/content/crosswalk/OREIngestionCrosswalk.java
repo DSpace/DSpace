@@ -14,8 +14,8 @@ import java.net.ConnectException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.text.NumberFormat;
+import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -99,7 +99,7 @@ public class OREIngestionCrosswalk
     public void ingest(Context context, DSpaceObject dso, Element root, boolean createMissingMetadataFields)
         throws CrosswalkException, IOException, SQLException, AuthorizeException {
 
-        Date timeStart = new Date();
+        Instant timeStart = Instant.now();
 
         if (dso.getType() != Constants.ITEM) {
             throw new CrosswalkObjectNotSupported("OREIngestionCrosswalk can only crosswalk an Item.");
@@ -209,7 +209,8 @@ public class OREIngestionCrosswalk
 
         }
         log.info(
-            "OREIngest for Item " + item.getID() + " took: " + (new Date().getTime() - timeStart.getTime()) + "ms.");
+            "OREIngest for Item " + item.getID() + " took: " +
+                (Instant.now().toEpochMilli() - timeStart.toEpochMilli()) + "ms.");
     }
 
 

@@ -7,9 +7,9 @@
  */
 package org.dspace.authority.orcid;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -84,7 +84,7 @@ public class Orcidv3AuthorityValue extends PersonAuthorityValue {
         Orcidv3AuthorityValue orcidAuthorityValue = new Orcidv3AuthorityValue();
         orcidAuthorityValue.setId(UUID.randomUUID().toString());
         orcidAuthorityValue.updateLastModifiedDate();
-        orcidAuthorityValue.setCreationDate(new Date());
+        orcidAuthorityValue.setCreationDate(Instant.now());
         return orcidAuthorityValue;
     }
 

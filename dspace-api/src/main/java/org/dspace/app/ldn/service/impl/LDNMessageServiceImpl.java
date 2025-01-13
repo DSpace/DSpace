@@ -10,10 +10,11 @@ package org.dspace.app.ldn.service.impl;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -22,7 +23,6 @@ import java.util.UUID;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonSyntaxException;
-import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.ldn.LDNMessageEntity;
@@ -157,7 +157,7 @@ public class LDNMessageServiceImpl implements LDNMessageService {
                 ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_UNTRUSTED_IP);
             }
         }
-        ldnMessage.setQueueTimeout(new Date());
+        ldnMessage.setQueueTimeout(Instant.now());
 
         update(context, ldnMessage);
         return ldnMessage;
@@ -282,9 +282,9 @@ public class LDNMessageServiceImpl implements LDNMessageService {
                     msg.setQueueAttempts(msg.getQueueAttempts() + 1);
                     update(context, msg);
                 } else {
-                    msg.setQueueLastStartTime(new Date());
+                    msg.setQueueLastStartTime(Instant.now());
                     msg.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_PROCESSING);
-                    msg.setQueueTimeout(DateUtils.addMinutes(new Date(), timeoutInMinutes));
+                    msg.setQueueTimeout(Instant.now().plus(timeoutInMinutes, ChronoUnit.MINUTES));
                     update(context, msg);
                     ObjectMapper mapper = new ObjectMapper();
                     Notification notification = mapper.readValue(msg.getMessage(), Notification.class);

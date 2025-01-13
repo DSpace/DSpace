@@ -8,7 +8,7 @@
 package org.dspace.app.ldn;
 
 import java.lang.reflect.Field;
-import java.util.Date;
+import java.time.Instant;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,8 +16,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ReloadableEntity;
 
@@ -100,13 +98,11 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
     @Column(name = "queue_attempts")
     private Integer queueAttempts = 0;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "queue_last_start_time")
-    private Date queueLastStartTime = null;
+    private Instant queueLastStartTime = null;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "queue_timeout")
-    private Date queueTimeout = null;
+    private Instant queueTimeout = null;
 
     @ManyToOne
     @JoinColumn(name = "origin", referencedColumnName = "id")
@@ -259,19 +255,19 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
         this.queueAttempts = queueAttempts;
     }
 
-    public Date getQueueLastStartTime() {
+    public Instant getQueueLastStartTime() {
         return queueLastStartTime;
     }
 
-    public void setQueueLastStartTime(Date queueLastStartTime) {
+    public void setQueueLastStartTime(Instant queueLastStartTime) {
         this.queueLastStartTime = queueLastStartTime;
     }
 
-    public Date getQueueTimeout() {
+    public Instant getQueueTimeout() {
         return queueTimeout;
     }
 
-    public void setQueueTimeout(Date queueTimeout) {
+    public void setQueueTimeout(Instant queueTimeout) {
         this.queueTimeout = queueTimeout;
     }
 

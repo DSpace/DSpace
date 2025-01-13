@@ -21,8 +21,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -1533,7 +1534,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
     private List<UsageReportPointRest> getListOfVisitsPerMonthsPoints(int viewsLastMonth) {
         List<UsageReportPointRest> expectedPoints = new ArrayList<>();
         int nrOfMonthsBack = 6;
-        Calendar cal = Calendar.getInstance();
+        YearMonth month = YearMonth.now();
         for (int i = 0; i <= nrOfMonthsBack; i++) {
             UsageReportPointDateRest expectedPoint = new UsageReportPointDateRest();
             if (i > 0) {
@@ -1541,11 +1542,12 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
             } else {
                 expectedPoint.addValue("views", viewsLastMonth);
             }
-            String month = cal.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("en"));
-            expectedPoint.setId(month + " " + cal.get(Calendar.YEAR));
+            // Get month+year in long format (e.g. "February 2025") using English language
+            String monthYear = DateTimeFormatter.ofPattern("MMMM yyyy", Locale.ENGLISH).format(month);
+            expectedPoint.setId(monthYear);
 
             expectedPoints.add(expectedPoint);
-            cal.add(Calendar.MONTH, -1);
+            month = month.minusMonths(1);
         }
         return expectedPoints;
     }

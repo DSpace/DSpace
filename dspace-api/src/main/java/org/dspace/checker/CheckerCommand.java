@@ -9,7 +9,7 @@ package org.dspace.checker;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Map;
 
 import org.apache.commons.collections4.MapUtils;
@@ -61,7 +61,7 @@ public final class CheckerCommand {
     /**
      * start time for current process.
      */
-    private Date processStartDate = null;
+    private Instant processStartDate = null;
 
     /**
      * Dispatcher to be used for processing run.
@@ -201,9 +201,9 @@ public final class CheckerCommand {
      * @throws SQLException if database error
      */
     protected void processDeletedBitstream(MostRecentChecksum info) throws SQLException {
-        info.setProcessStartDate(new Date());
+        info.setProcessStartDate(Instant.now());
         info.setChecksumResult(getChecksumResultByCode(ChecksumResultCode.BITSTREAM_MARKED_DELETED));
-        info.setProcessEndDate(new Date());
+        info.setProcessEndDate(Instant.now());
         info.setToBeProcessed(false);
         checksumService.update(context, info);
         checksumHistoryService.addHistory(context, info);
@@ -220,8 +220,8 @@ public final class CheckerCommand {
      */
     protected void processNullInfoBitstream(MostRecentChecksum info) throws SQLException {
         info.setInfoFound(false);
-        info.setProcessStartDate(new Date());
-        info.setProcessEndDate(new Date());
+        info.setProcessStartDate(Instant.now());
+        info.setProcessEndDate(Instant.now());
         info.setChecksumResult(getChecksumResultByCode(ChecksumResultCode.BITSTREAM_INFO_NOT_FOUND));
     }
 
@@ -242,7 +242,7 @@ public final class CheckerCommand {
      * @throws SQLException if database error
      */
     protected void processBitstream(MostRecentChecksum info) throws SQLException {
-        info.setProcessStartDate(new Date());
+        info.setProcessStartDate(Instant.now());
 
         try {
             Map<String, Object> checksumMap = bitstreamStorageService.computeChecksum(context, info.getBitstream());
@@ -279,7 +279,7 @@ public final class CheckerCommand {
             LOG.error("Error retrieving metadata for bitstream ID "
                           + info.getBitstream().getID(), e);
         } finally {
-            info.setProcessEndDate(new Date());
+            info.setProcessEndDate(Instant.now());
 
             // record new checksum and comparison result in db
             checksumService.update(context, info);
@@ -332,8 +332,8 @@ public final class CheckerCommand {
      *
      * @return start time
      */
-    public Date getProcessStartDate() {
-        return processStartDate == null ? null : new Date(processStartDate.getTime());
+    public Instant getProcessStartDate() {
+        return processStartDate;
     }
 
     /**
@@ -341,8 +341,8 @@ public final class CheckerCommand {
      *
      * @param startDate start time
      */
-    public void setProcessStartDate(Date startDate) {
-        processStartDate = startDate == null ? null : new Date(startDate.getTime());
+    public void setProcessStartDate(Instant startDate) {
+        processStartDate = startDate;
     }
 
     /**

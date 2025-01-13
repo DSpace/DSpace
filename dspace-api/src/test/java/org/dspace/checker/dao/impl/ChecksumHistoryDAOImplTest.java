@@ -12,9 +12,8 @@ import static org.junit.Assert.assertEquals;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 import jakarta.persistence.Query;
 import org.dspace.AbstractUnitTest;
@@ -62,10 +61,7 @@ public class ChecksumHistoryDAOImplTest
     @Test
     public void testDeleteByDateAndCode()
         throws Exception {
-        System.out.println("deleteByDateAndCode");
-
-        GregorianCalendar cal = new GregorianCalendar();
-        Date retentionDate = cal.getTime();
+        Instant retentionDate = Instant.now();
         ChecksumResultCode resultCode = ChecksumResultCode.CHECKSUM_MATCH;
 
         // Create two older rows
@@ -84,8 +80,7 @@ public class ChecksumHistoryDAOImplTest
         bss.update(context, bs);
         context.restoreAuthSystemState();
 
-        cal.add(Calendar.DATE, -1);
-        Date matchDate = cal.getTime();
+        Instant matchDate = retentionDate.minus(1, ChronoUnit.DAYS);
         checkId++;
         qry.setParameter("id", checkId);
         qry.setParameter("date", matchDate);
@@ -94,8 +89,7 @@ public class ChecksumHistoryDAOImplTest
         qry.executeUpdate();
 
         // Row with nonmatching result code
-        cal.add(Calendar.DATE, -1);
-        Date noMatchDate = cal.getTime();
+        Instant noMatchDate = retentionDate.minus(2, ChronoUnit.DAYS);
         checkId++;
         qry.setParameter("id", checkId);
         qry.setParameter("date", noMatchDate);
@@ -104,11 +98,10 @@ public class ChecksumHistoryDAOImplTest
         qry.executeUpdate();
 
         // Create one newer row
-        cal.add(Calendar.DATE, +3);
-        Date futureDate = cal.getTime();
+        Instant futureDate = retentionDate.plus(3, ChronoUnit.DAYS);
         checkId++;
         qry.setParameter("id", checkId);
-        qry.setParameter("date", new java.sql.Date(futureDate.getTime()));
+        qry.setParameter("date", futureDate);
         qry.setParameter("result", ChecksumResultCode.CHECKSUM_MATCH.name());
         qry.setParameter("bitstream", bs.getID()); // FIXME identifier not being set???
         qry.executeUpdate();

@@ -10,15 +10,13 @@ package org.dspace.content;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.apache.commons.lang3.time.DateUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +33,7 @@ public class DCDateTest {
     /**
      * Object to use in the tests
      */
-    private Calendar c;
+    private LocalDateTime ldt;
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -59,7 +57,7 @@ public class DCDateTest {
     @After
     public void destroy() {
         dc = null;
-        c = null;
+        ldt = null;
     }
 
     /**
@@ -82,9 +80,8 @@ public class DCDateTest {
         assertThat("testDCDateDate 11", dc.getMinuteUTC(), equalTo(-1));
         assertThat("testDCDateDate 12", dc.getSecondUTC(), equalTo(-1));
 
-        // NB. Months begin at 0 in GregorianCalendar so 0 is January.
-        c = new GregorianCalendar(2010, 0, 1);
-        dc = new DCDate(c.getTime());
+        ldt = LocalDateTime.of(2010, 1, 1, 0, 0, 0);
+        dc = new DCDate(ldt);
 
         assertThat("testDCDateDate 1 ", dc.getYear(), equalTo(2010));
         assertThat("testDCDateDate 2 ", dc.getMonth(), equalTo(1));
@@ -100,8 +97,8 @@ public class DCDateTest {
         assertThat("testDCDateDate 11 ", dc.getMinuteUTC(), equalTo(0));
         assertThat("testDCDateDate 12 ", dc.getSecondUTC(), equalTo(0));
 
-        c = new GregorianCalendar(2009, 11, 31, 18, 30);
-        dc = new DCDate(c.getTime());
+        ldt = LocalDateTime.of(2009, 12, 31, 18, 30, 0);
+        dc = new DCDate(ldt);
 
         assertThat("testDCDateDate 13 ", dc.getYear(), equalTo(2009));
         assertThat("testDCDateDate 14 ", dc.getMonth(), equalTo(12));
@@ -338,24 +335,24 @@ public class DCDateTest {
      */
     @Test
     public void testToDate() {
-        dc = new DCDate((Date) null);
+        dc = new DCDate((LocalDateTime) null);
         assertThat("testToDate 0", dc.toDate(), nullValue());
 
-        c = new GregorianCalendar(2010, 0, 0);
-        dc = new DCDate(c.getTime());
-        assertThat("testToDate 1", dc.toDate(), equalTo(c.getTime()));
+        ldt = LocalDateTime.of(2010, 1, 1, 0, 0, 0);
+        dc = new DCDate(ldt);
+        assertThat("testToDate 1", dc.toDate().toLocalDateTime(), equalTo(ldt));
 
-        c = new GregorianCalendar(2010, 4, 0);
-        dc = new DCDate(c.getTime());
-        assertThat("testToDate 2", dc.toDate(), equalTo(c.getTime()));
+        ldt = LocalDateTime.of(2010, 5, 1, 0, 0, 0);
+        dc = new DCDate(ldt);
+        assertThat("testToDate 2", dc.toDate().toLocalDateTime(), equalTo(ldt));
 
-        c = new GregorianCalendar(2010, 4, 14);
-        dc = new DCDate(c.getTime());
-        assertThat("testToDate 3", dc.toDate(), equalTo(c.getTime()));
+        ldt = LocalDateTime.of(2010, 5, 15, 0, 0, 0);
+        dc = new DCDate(ldt);
+        assertThat("testToDate 3", dc.toDate().toLocalDateTime(), equalTo(ldt));
 
-        c = new GregorianCalendar(2010, 4, 14, 0, 0, 1);
-        dc = new DCDate(c.getTime());
-        assertThat("testToDate 4", dc.toDate(), equalTo(c.getTime()));
+        ldt = LocalDateTime.of(2010, 5, 15, 0, 0, 1);
+        dc = new DCDate(ldt);
+        assertThat("testToDate 4", dc.toDate().toLocalDateTime(), equalTo(ldt));
     }
 
 
@@ -410,10 +407,8 @@ public class DCDateTest {
      */
     @Test
     public void testGetCurrent() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
-        assertTrue("testGetCurrent 0", DateUtils.isSameDay(DCDate.getCurrent().toDate(), calendar.getTime()));
+        LocalDate today = LocalDate.now();
+        assertEquals("testGetCurrent 0", DCDate.getCurrent().toDate().toLocalDate(), today);
     }
 
 

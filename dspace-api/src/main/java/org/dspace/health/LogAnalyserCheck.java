@@ -7,7 +7,8 @@
  */
 package org.dspace.health;
 
-import java.text.SimpleDateFormat;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,7 +42,8 @@ public class LogAnalyserCheck extends Check {
             Context c = new Context();
             // parse logs
             String report = LogAnalyser.processLogs(
-                c, null, null, null, null, ri.from(), ri.till(), false);
+                c, null, null, null, null,
+                ri.from().atZone(ZoneOffset.UTC).toLocalDate(), ri.till().atZone(ZoneOffset.UTC).toLocalDate(), false);
 
             // we have to deal with string report...
             for (String line : report.split("\\r?\\n")) {
@@ -56,7 +58,7 @@ public class LogAnalyserCheck extends Check {
                 sb.append(String.format("%-20s: %s\n", info[1], info_map.get(info[0])));
             }
             sb.append(String.format("Items added since [%s] (db): %s\n",
-                                    new SimpleDateFormat("yyyy-MM-dd").format(ri.from().getTime()),
+                                    DateTimeFormatter.ISO_LOCAL_DATE.format(ri.from()),
                                     LogAnalyser.getNumItems(c)));
 
             c.complete();
