@@ -15,22 +15,10 @@ import org.dspace.app.rest.RestResourceController;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-        @LinkRest(
-                name = WorkflowItemRest.STEP,
-                method = "getStep"
-        ),
-        @LinkRest(
-                name = WorkflowItemRest.SUBMITTER,
-                method = "getWorkflowItemSubmitter"
-        ),
-        @LinkRest(
-                name = WorkflowItemRest.ITEM,
-                method = "getWorkflowItemItem"
-        ),
-        @LinkRest(
-                name = WorkflowItemRest.COLLECTION,
-                method = "getWorkflowItemCollection"
-        )
+    @LinkRest(name = WorkflowItemRest.STEP, method = "getStep"),
+    @LinkRest(name = WorkflowItemRest.SUBMITTER, method = "getWorkflowItemSubmitter"),
+    @LinkRest(name = WorkflowItemRest.ITEM, method = "getWorkflowItemItem"),
+    @LinkRest(name = WorkflowItemRest.COLLECTION, method = "getWorkflowItemCollection")
 })
 public class WorkflowItemRest extends AInprogressSubmissionRest {
     public static final String NAME = "workflowitem";
