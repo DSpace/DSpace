@@ -166,8 +166,9 @@ public class VersioningTest extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
         String handle = versionedItem.getHandle();
         versionService.removeVersion(context, versionedItem);
+        context.commit();
+        context.restoreAuthSystemState();
         assertThat("Test_version_delete", itemService.find(context, versionedItem.getID()), nullValue());
         assertThat("Test_version_handle_delete", handleService.resolveToObject(context, handle), nullValue());
-        context.restoreAuthSystemState();
     }
 }
