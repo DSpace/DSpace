@@ -12,9 +12,9 @@ Log4j2 logging framework, via the
 "org.springframework.boot:spring-boot-starter-log4j2" Maven dependency, in
 preference to the stock Spring Boot "logback" framework.
 
-## DSpace Logs
+## DRUM DSpace Logs
 
-There are two distinct log configurations:
+There are two distinct log configurations for the DRUM DSpace application:
 
 * DSpace application logs
 * Spring Boot embedded Tomcat server access logs
@@ -65,21 +65,26 @@ Kubernetes), do the following:
 
 ## Kubernetes JSON-formatted Logging
 
+### DRUM - DSpace Logs
+
 In Kubernetes, the DSpace application logs are controlled by the
 "overlays/\<NAMESPACE>/log4j2.xml" file (where "\<NAMESPACE>" is the Kubernetes
-namespace (i.e., "sandbox", "test", "qa", or "prod").
+namespace (i.e., "sandbox", "test", "qa", or "prod")).
 
 To enable JSON-formatted logging, the Log4j "Appenders" are modified to use
 the "JsonTemplateLayout", i.e.:
 
 ```xml
         <Appender name='A1'
-                  type='Console'
+                  ...
+        >
+            ...
             <JsonTemplateLayout eventTemplateUri="classpath:EcsLayout.json" />
+            ...
         </Appender>
 ```
 
-The JSON-formatted Tomcat access log in enabled by the
+The JSON-formatted Tomcat access log is enabled by the
 "umd.server.tomcat.accesslog.json.enabled" property in the
 "overlays/\<NAMESPACE>/local.cfg" file:
 
@@ -93,6 +98,28 @@ server.tomcat.accesslog.suffix=
 server.tomcat.accesslog.file-date-format=
 server.tomcat.accesslog.pattern=%h %l %u %t "%r" %s %b %D
 ```
+
+### DRUM - Solr Logs
+
+#### Solr Log4J application logs
+
+In Kubernetes, the Solr application logs are controlled by the
+"overlays/\<NAMESPACE>/solr/log4j2.xml" file (where "\<NAMESPACE>" is the
+Kubernetes namespace (i.e., "sandbox", "test", "qa", or "prod").
+
+The "log4j2.xml" file configures Log4J to use the "JsonTemplateLayout", to
+provide JSON-formatted output to Splunk.
+
+#### Solr Java garbage collection logs
+
+The command-line options provided to the JVM to run Solr are configured by the
+stock "solr" Docker image to log Java garbage collection activity in the
+"/var/solr/logs/solr_gc.log" file. This logging is *not* controlled by Log4J,
+and is *not* JSON-formatted.
+
+The command-line options that generate the "solr_gc.log" specify a rolling log
+with each file limited to 20 megabytes, and a maximum of 10 files, so the
+maximum size of the logs should be 200 megabytes.
 
 ## DRUM Customizations
 
