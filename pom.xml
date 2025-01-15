@@ -46,7 +46,7 @@
         <slf4j.version>2.0.16</slf4j.version>
         <tika.version>2.9.2</tika.version>
         <!-- Sync BouncyCastle & ASM with whatever version Tika uses -->
-        <bouncycastle.version>1.79</bouncycastle.version>
+        <bouncycastle.version>1.80</bouncycastle.version>
         <asm.version>8.0.1</asm.version>
         <!-- Jersey is used to integrate with external sources/services -->
         <jersey.version>3.1.9</jersey.version>
