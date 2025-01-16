@@ -7,6 +7,14 @@
  */
 package org.dspace.content.authority;
 
+import static org.dspace.content.authority.ChoiceAuthorityServiceImpl.CHOICES_INDEX_PREFIX;
+import static org.dspace.content.authority.ChoiceAuthorityServiceImpl.CHOICES_ORDER_PREFIX;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,14 +28,6 @@ import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.SolrSearchCore;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static org.dspace.content.authority.ChoiceAuthorityServiceImpl.CHOICES_INDEX_PREFIX;
-import static org.dspace.content.authority.ChoiceAuthorityServiceImpl.CHOICES_ORDER_PREFIX;
 
 public class LocalMetadataLookup implements ChoiceAuthority {
 
