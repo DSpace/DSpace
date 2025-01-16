@@ -101,7 +101,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService 
     final static String CHOICES_PLUGIN_PREFIX = "choices.plugin.";
     final static String CHOICES_PRESENTATION_PREFIX = "choices.presentation.";
     final static String CHOICES_CLOSED_PREFIX = "choices.closed.";
-	final static String CHOICES_ORDER_PREFIX = "choices.order.";
+    final static String CHOICES_ORDER_PREFIX = "choices.order.";
     final static String CHOICES_INDEX_PREFIX = "choices.index.";
 
     protected ChoiceAuthorityServiceImpl() {
