@@ -24,9 +24,9 @@
            The VersionedHandleIdentifierProvider creates a new versioned
            handle for every new version.
            -->
-    <bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.VersionedHandleIdentifierProvider" scope="singleton">
-        <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
-    </bean>
+<!--    <bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.VersionedHandleIdentifierProvider" scope="singleton">-->
+<!--        <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>-->
+<!--    </bean>-->
     <!--
            The VersionedHandleIdentifierProviderWithCanonicalHandles
            preserves the first handle for every new version. Whenever
@@ -35,11 +35,10 @@
            newest version, but there is no permanent handle, that
            will always keep pointing to the actual newest one.
            -->
-    <!--
+
     <bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.VersionedHandleIdentifierProviderWithCanonicalHandles" scope="singleton">
         <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
     </bean>
-    -->
 
     <!-- DOIIdentifierProvider mints and registers DOIs with DSpace.
          The DOIIdentifierProvider maintains the doi database table and handling
