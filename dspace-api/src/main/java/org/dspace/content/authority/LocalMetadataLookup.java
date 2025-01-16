@@ -137,7 +137,8 @@ public class LocalMetadataLookup implements ChoiceAuthority {
         for (Map.Entry conf : configurationService.getProperties().entrySet()) {
             if (StringUtils.startsWith((String) conf.getKey(), ChoiceAuthorityServiceImpl.CHOICES_PLUGIN_PREFIX)
                     && StringUtils.equals((String) conf.getValue(), name)) {
-                fieldName = ((String) conf.getKey()).substring(ChoiceAuthorityServiceImpl.CHOICES_PLUGIN_PREFIX.length());
+                fieldName = ((String) conf.getKey())
+                        .substring(ChoiceAuthorityServiceImpl.CHOICES_PLUGIN_PREFIX.length());
                 field = fieldName;
                 // exit the look immediately as we have found it
                 break;
