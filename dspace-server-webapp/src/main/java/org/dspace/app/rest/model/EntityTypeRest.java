@@ -15,10 +15,7 @@ import org.dspace.app.rest.RestResourceController;
  * Refer to {@link org.dspace.content.EntityType} for explanation of the properties
  */
 @LinksRest(links = {
-        @LinkRest(
-                name = EntityTypeRest.RELATION_SHIP_TYPES,
-                method = "getEntityTypeRelationship"
-        )
+    @LinkRest(name = EntityTypeRest.RELATION_SHIP_TYPES, method = "getEntityTypeRelationship")
 })
 public class EntityTypeRest extends BaseObjectRest<Integer> {
 
