@@ -350,6 +350,13 @@ updates:
       # Don't try to auto-update any DSpace dependencies
       - dependency-name: "org.dspace:*"
       - dependency-name: "org.dspace.*:*"
+      # Last version of errorprone to support JDK 11 is 2.31.0
+      - dependency-name: "com.google.errorprone:*"
+        versions: [">=2.32.0"]
+      # Spring Security 5.8 changes the behavior of CSRF Tokens in a way which is incompatible with DSpace 7
+      # See https://github.com/DSpace/DSpace/pull/9888#issuecomment-2408165545
+      - dependency-name: "org.springframework.security:*"
+        versions: [">=5.8.0"]
       # Ignore all major version updates for all dependencies. We'll only automate minor/patch updates.
       - dependency-name: "*"
         update-types: [ "version-update:semver-major" ]
