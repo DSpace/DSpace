@@ -28,6 +28,9 @@ import org.dspace.importer.external.datacite.DataCiteImportMetadataSourceService
 import org.dspace.importer.external.datamodel.ImportRecord;
 import org.dspace.importer.external.liveimportclient.service.LiveImportClientImpl;
 import org.dspace.importer.external.metadatamapping.MetadatumDTO;
+import org.dspace.kernel.ServiceManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
@@ -44,8 +47,15 @@ public class DataCiteImportMetadataSourceServiceIT extends AbstractLiveImportInt
     @Autowired
     private LiveImportClientImpl liveImportClientImpl;
 
-    @Autowired
+    //@Autowired
     private DataCiteImportMetadataSourceServiceImpl dataCiteServiceImpl;
+
+    @Before
+    public void setup() throws Exception {
+        ServiceManager serviceManager = DSpaceServicesFactory.getInstance().getServiceManager();
+        dataCiteServiceImpl = serviceManager.getServiceByName("DataCiteImportService",
+            DataCiteImportMetadataSourceServiceImpl.class);
+    }
 
     @Test
     public void dataCiteImportMetadataGetRecordsTest() throws Exception {

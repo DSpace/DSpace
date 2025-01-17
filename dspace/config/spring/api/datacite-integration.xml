@@ -59,4 +59,70 @@
         <constructor-arg value="dc.identifier.doi"/>
     </bean>
 
+    <!-- beans and mapping for project import-->
+    <util:map id="dataciteProjectMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+              value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
+        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
+            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
+            what metadatafield is generated.
+        </description>
+        <entry key-ref="datacite.title" value-ref="dataciteTitleContrib"/>
+        <entry key-ref="datacite.id.import" value-ref="dataciteIDImportContrib"/>
+        <entry key-ref="datacite.project.investigator" value-ref="dataciteProjectInvestigatorContrib"/>
+        <entry key-ref="datacite.project.description" value-ref="dataciteProjectDescriptionContrib"/>
+        <entry key-ref="datacite.project.subject" value-ref="dataciteProjectSubjectContrib"/>
+        <!-- TODO: extend your datacite project import mapping with additional MetadataContributor beans
+        matching your submission configuration here  -->
+
+    </util:map>
+
+    <!-- must be present to be imported, since it's used as the recordId.
+    Project identifier does not use the dc.identifier.doi field -->
+    <bean id="dataciteIDImportContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="datacite.id.import"/>
+        <property name="query" value="/doi"/>
+    </bean>
+    <bean id="datacite.id.import" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier"/>
+    </bean>
+
+    <bean id="dataciteProjectInvestigatorContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="metadataProcessor">
+            <bean class="org.dspace.importer.external.metadatamapping.contributor.ArrayElementAttributeProcessor">
+                <property name="pathToArray" value="/creators"/>
+                <property name="elementAttribute" value="/name"/>
+            </bean>
+        </property>
+        <property name="field" ref="datacite.project.investigator"/>
+    </bean>
+    <bean id="datacite.project.investigator" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="project.investigator"/>
+    </bean>
+
+    <bean id="dataciteProjectDescriptionContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="metadataProcessor">
+            <bean class="org.dspace.importer.external.metadatamapping.contributor.ArrayElementAttributeProcessor">
+                <property name="pathToArray" value="/descriptions"/>
+                <property name="elementAttribute" value="/description"/>
+            </bean>
+        </property>
+        <property name="field" ref="datacite.project.description"/>
+    </bean>
+    <bean id="datacite.project.description" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.description"/>
+    </bean>
+
+    <bean id="dataciteProjectSubjectContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="metadataProcessor">
+            <bean class="org.dspace.importer.external.metadatamapping.contributor.ArrayElementAttributeProcessor">
+                <property name="pathToArray" value="/subjects"/>
+                <property name="elementAttribute" value="/subject"/>
+            </bean>
+        </property>
+        <property name="field" ref="datacite.project.subject"/>
+    </bean>
+    <bean id="datacite.project.subject" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.subject"/>
+    </bean>
+
 </beans>
