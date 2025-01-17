@@ -12,14 +12,14 @@
           autowire="byType"
           scope="singleton"/>
 
-      <!-- If you enabled versioning, you should use one of the versioned
-           handle identifier provider instead of the default one.
-           The VersionedHandleIdentifierProvider creates a new versioned
-           handle for every new version.
-           -->
-<!--    <bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.VersionedHandleIdentifierProvider" scope="singleton">-->
-<!--        <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>-->
-<!--    </bean>-->
+    <!-- If you enabled versioning, you should use one of the versioned
+         handle identifier provider instead of the default one.
+         The VersionedHandleIdentifierProvider creates a new versioned
+         handle for every new version.
+         -->
+    <bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.VersionedHandleIdentifierProvider" scope="singleton">
+        <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+    </bean>
     <!--
            The VersionedHandleIdentifierProviderWithCanonicalHandles
            preserves the first handle for every new version. Whenever
@@ -28,10 +28,11 @@
            newest version, but there is no permanent handle, that
            will always keep pointing to the acutal newest one.
            -->
-
+    <!--
     <bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.VersionedHandleIdentifierProviderWithCanonicalHandles" scope="singleton">
         <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
     </bean>
+    -->
 
     <!-- provider to mint and register DOIs with DSpace.
          To mint DOIs you need a registration agency. The DOIIdentifierProvider

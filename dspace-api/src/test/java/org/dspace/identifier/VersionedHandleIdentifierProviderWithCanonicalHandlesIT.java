@@ -8,6 +8,7 @@
 package org.dspace.identifier;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -29,12 +30,13 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.Before;
 import org.junit.Test;
 
-public class VersionedHandleIdentifierProviderTest extends AbstractIntegrationTestWithDatabase {
+public class VersionedHandleIdentifierProviderWithCanonicalHandlesIT extends AbstractIntegrationTestWithDatabase {
     private ServiceManager serviceManager;
     private IdentifierServiceImpl identifierService;
 
     private String firstHandle;
     private String dspaceUrl;
+
 
     private Collection collection;
     private Item itemV1;
@@ -59,12 +61,14 @@ public class VersionedHandleIdentifierProviderTest extends AbstractIntegrationTe
         collection = CollectionBuilder.createCollection(context, parentCommunity)
                                       .withName("Collection")
                                       .build();
+
+
     }
 
     private void registerProvider(Class type) {
         // Register our new provider
-        Object service = serviceManager.getServiceByName(type.getName(), type);
-        if (service == null) {
+        List servicesByType = serviceManager.getServicesByType(type);
+        if (servicesByType.isEmpty()) {
             serviceManager.registerServiceClass(type.getName(), type);
         }
         IdentifierProvider identifierProvider =
@@ -76,32 +80,33 @@ public class VersionedHandleIdentifierProviderTest extends AbstractIntegrationTe
 
     private void createVersions() throws SQLException, AuthorizeException {
         itemV1 = ItemBuilder.createItem(context, collection)
-                .withTitle("First version")
-                .build();
+                            .withTitle("First version")
+                            .build();
         firstHandle = itemV1.getHandle();
         itemV2 = VersionBuilder.createVersion(context, itemV1, "Second version").build().getItem();
         itemV3 = VersionBuilder.createVersion(context, itemV1, "Third version").build().getItem();
     }
 
     @Test
-    public void testDefaultVersionedHandleProvider() throws Exception {
-        registerProvider(VersionedHandleIdentifierProvider.class);
+    public void testCanonicalVersionedHandleProvider() throws Exception {
+        registerProvider(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
         createVersions();
 
-        // Confirm the original item only has its original handle
-        assertEquals(firstHandle, itemV1.getHandle());
+        // Confirm the original item only has a version handle
+        assertEquals(firstHandle + ".1", itemV1.getHandle());
         assertEquals(1, itemV1.getHandles().size());
         // Confirm the second item has the correct version handle
         assertEquals(firstHandle + ".2", itemV2.getHandle());
         assertEquals(1, itemV2.getHandles().size());
-        // Confirm the last item has the correct version handle
-        assertEquals(firstHandle + ".3", itemV3.getHandle());
-        assertEquals(1, itemV3.getHandles().size());
+        // Confirm the last item has both the correct version handle and the original handle
+        assertEquals(firstHandle, itemV3.getHandle());
+        assertEquals(2, itemV3.getHandles().size());
+        containsHandle(itemV3, firstHandle + ".3");
     }
 
     @Test
     public void testCollectionHandleMetadata() {
-        registerProvider(VersionedHandleIdentifierProvider.class);
+        registerProvider(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
 
         Community testCommunity = CommunityBuilder.createCommunity(context)
                                                   .withName("Test community")
@@ -121,7 +126,7 @@ public class VersionedHandleIdentifierProviderTest extends AbstractIntegrationTe
 
     @Test
     public void testCommunityHandleMetadata() {
-        registerProvider(VersionedHandleIdentifierProvider.class);
+        registerProvider(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
 
         Community testCommunity = CommunityBuilder.createCommunity(context)
                                                   .withName("Test community")
@@ -133,5 +138,9 @@ public class VersionedHandleIdentifierProviderTest extends AbstractIntegrationTe
 
         assertEquals(1, metadata.size());
         assertEquals(dspaceUrl + "/handle/" + testCommunity.getHandle(), metadata.get(0).getValue());
+    }
+
+    private void containsHandle(Item item, String handle) {
+        assertTrue(item.getHandles().stream().anyMatch(h -> handle.equals(h.getHandle())));
     }
 }
