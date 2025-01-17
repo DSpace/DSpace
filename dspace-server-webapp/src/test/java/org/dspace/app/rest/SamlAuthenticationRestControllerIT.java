@@ -100,7 +100,7 @@ public class SamlAuthenticationRestControllerIT extends AbstractControllerIntegr
 
         getClient().perform(get("/saml2/service-provider-metadata/testrp"))
             .andExpect(status().is2xxSuccessful())
-            .andExpect(header().string("content-type", new StringStartsWith("application/xml")))
+            .andExpect(header().string("content-type", new StringStartsWith("application/samlmetadata+xml")))
             .andExpect(
                 xpath("/EntityDescriptor/SPSSODescriptor/AssertionConsumerService/@Location")
                     .string("http://localhost/saml2/assertion-consumer/testrp"))
