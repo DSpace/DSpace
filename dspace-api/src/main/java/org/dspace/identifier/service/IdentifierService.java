@@ -19,6 +19,7 @@ import org.dspace.identifier.Identifier;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
+import org.dspace.identifier.IdentifierProvider;
 
 /**
  * @author Fabio Bolognesi (fabio at atmire dot com)
@@ -194,4 +195,9 @@ public interface IdentifierService {
     void delete(Context context, DSpaceObject dso, String identifier)
         throws AuthorizeException, SQLException, IdentifierException;
 
+    /**
+     * Get List of currently enabled IdentifierProviders
+     * @return List of enabled IdentifierProvider objects.
+     */
+    List<IdentifierProvider> getProviders();
 }
