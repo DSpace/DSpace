@@ -1,0 +1,47 @@
+{
+  "relatedDdcWithDegreeOfDeterminacy3" : [ {
+    "id" : "http://dewey.info/class/700/",
+    "label" : "http://dewey.info/class/700/"
+  } ],
+  "type" : [ "SubjectHeadingSensoStricto", "SubjectHeading", "AuthorityResource" ],
+  "@context" : "http://lobid.org/gnd/context.jsonld",
+  "gndSubjectCategory" : [ {
+    "id" : "https://d-nb.info/standards/vocab/gnd/gnd-sc#13.1a",
+    "label" : "Bildende Kunst"
+  }, {
+    "id" : "https://d-nb.info/standards/vocab/gnd/gnd-sc#6.1a",
+    "label" : "Kultur, Künste allgemein"
+  } ],
+  "oldAuthorityNumber" : [ "(DE-588c)4033422-3" ],
+  "closeMatch" : [ {
+    "id" : "http://zbw.eu/stw/descriptor/15655-4",
+    "label" : "http://zbw.eu/stw/descriptor/15655-4"
+  } ],
+  "describedBy" : {
+    "id" : "https://d-nb.info/gnd/4033422-3/about",
+    "license" : {
+      "id" : "http://creativecommons.org/publicdomain/zero/1.0/",
+      "label" : "http://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "dateModified" : "2023-03-31T15:49:06.000",
+    "descriptionLevel" : {
+      "id" : "https://d-nb.info/standards/vocab/gnd/description-level#1",
+      "label" : "Allgemeines, Interdisziplinäre Allgemeinwörter"
+    }
+  },
+  "definition" : [ "Sammelbez. f. Bild. Kunst, Literatur, Film etc." ],
+  "gndIdentifier" : "4033422-3",
+  "id" : "https://d-nb.info/gnd/4033422-3",
+  "preferredName" : "Künste",
+  "variantName" : [ "Schöne Künste", "Arts", "Kunst <im weiteren Sinn>" ],
+  "sameAs" : [ {
+    "id" : "http://www.wikidata.org/entity/Q2018526",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q2013",
+      "abbr" : "WIKIDATA",
+      "publisher" : "Wikimedia Foundation Inc.",
+      "icon" : "https://www.wikidata.org/static/favicon/wikidata.ico",
+      "name" : "Wikidata"
+    }
+  } ]
+}

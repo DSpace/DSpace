@@ -1,0 +1,49 @@
+{
+  "geographicAreaCode" : [ {
+    "id" : "https://d-nb.info/standards/vocab/gnd/geographic-area-code#XD-US",
+    "label" : "USA"
+  } ],
+  "dateOfConferenceOrEvent" : [ "1989" ],
+  "describedBy" : {
+    "id" : "https://d-nb.info/gnd/3017902-6/about",
+    "license" : {
+      "id" : "http://creativecommons.org/publicdomain/zero/1.0/",
+      "label" : "http://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "dateModified" : "2013-09-18T01:38:58.000",
+    "descriptionLevel" : {
+      "id" : "https://d-nb.info/standards/vocab/gnd/description-level#1",
+      "label" : "Allgemeines, Interdisziplinäre Allgemeinwörter"
+    }
+  },
+  "gndIdentifier" : "3017902-6",
+  "id" : "https://d-nb.info/gnd/3017902-6",
+  "preferredName" : "International Film Conference (7 : 1989 : Kent, Ohio)",
+  "type" : [ "AuthorityResource", "ConferenceOrEvent" ],
+  "variantName" : [ "Annual Conference on Film (7 : 1989 : Kent, Ohio)", "Annual International Film Conference (7 : 1989 : Kent, Ohio)", "Conference on Film (7 : 1989 : Kent, Ohio)" ],
+  "@context" : "http://lobid.org/gnd/context.jsonld",
+  "oldAuthorityNumber" : [ "(DE-588b)3017902-6" ],
+  "placeOfConferenceOrEvent" : [ {
+    "id" : "https://d-nb.info/gnd/4249111-3",
+    "label" : "Kent, Ohio"
+  } ],
+  "sameAs" : [ {
+    "id" : "http://viaf.org/viaf/157807452",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q54919",
+      "abbr" : "VIAF",
+      "publisher" : "OCLC",
+      "icon" : "http://viaf.org/viaf/images/viaf.ico",
+      "name" : "Virtual International Authority File (VIAF)"
+    }
+  }, {
+    "collection" : {
+      "abbr" : "DNB",
+      "name" : "Gemeinsame Normdatei (GND) im Katalog der Deutschen Nationalbibliothek",
+      "publisher" : "Deutsche Nationalbibliothek",
+      "icon" : "https://www.dnb.de/SiteGlobals/Frontend/DNBWeb/Images/favicon.png?__blob=normal&v=4",
+      "id" : "http://www.wikidata.org/entity/Q36578"
+    },
+    "id" : "https://d-nb.info/gnd/3017902-6/about"
+  } ]
+}

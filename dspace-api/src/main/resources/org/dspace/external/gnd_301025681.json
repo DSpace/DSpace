@@ -1,0 +1,35 @@
+{
+  "describedBy" : {
+    "id" : "https://d-nb.info/gnd/301025681/about",
+    "license" : {
+      "id" : "http://creativecommons.org/publicdomain/zero/1.0/",
+      "label" : "http://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "dateModified" : "2016-10-26T17:07:41.000",
+    "descriptionLevel" : {
+      "id" : "https://d-nb.info/standards/vocab/gnd/description-level#3",
+      "label" : "Religion"
+    }
+  },
+  "firstComposer" : [ {
+    "id" : "https://d-nb.info/gnd/11861181X",
+    "label" : "Schwaen, Kurt"
+  } ],
+  "gndIdentifier" : "301025681",
+  "id" : "https://d-nb.info/gnd/301025681",
+  "preferredName" : "Für Elise",
+  "type" : [ "AuthorityResource", "Work", "MusicalWork" ],
+  "variantName" : [ "Adaptionen nach Beethoven", "Adaption nach Ludwig van Beethoven" ],
+  "@context" : "http://lobid.org/gnd/context.jsonld",
+  "oldAuthorityNumber" : [ "(DE-101c)301025681" ],
+  "sameAs" : [ {
+    "id" : "http://viaf.org/viaf/244710448",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q54919",
+      "abbr" : "VIAF",
+      "publisher" : "OCLC",
+      "icon" : "http://viaf.org/viaf/images/viaf.ico",
+      "name" : "Virtual International Authority File (VIAF)"
+    }
+  } ]
+}

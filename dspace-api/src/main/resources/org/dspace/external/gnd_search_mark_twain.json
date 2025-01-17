@@ -1,0 +1,541 @@
+{
+  "@context" : "https://lobid.org/gnd/context.jsonld",
+  "id" : "https://lobid.org/gnd/search?q=Mark%20Twain&from=0&size=2&filter=type:Person&sort=preferredName.keyword:asc&format=json",
+  "totalItems" : 92,
+  "member" : [ {
+    "professionOrOccupation" : [ {
+      "id" : "https://d-nb.info/gnd/4053311-6",
+      "label" : "Schriftstellerin"
+    }, {
+      "id" : "https://d-nb.info/gnd/7523603-5",
+      "label" : "Korrespondentin"
+    } ],
+    "placeOfBirth" : [ {
+      "id" : "https://d-nb.info/gnd/4119135-3",
+      "label" : "Wisconsin"
+    } ],
+    "gender" : [ {
+      "id" : "https://d-nb.info/standards/vocab/gnd/gender#female",
+      "label" : "Weiblich"
+    } ],
+    "dateOfDeath" : [ "1994-10-11" ],
+    "dateOfBirth" : [ "1911-10-12" ],
+    "placeOfDeath" : [ {
+      "id" : "https://d-nb.info/gnd/4433164-2",
+      "label" : "Norwalk, Conn."
+    } ],
+    "variantNameEntityForThePerson" : [ {
+      "forename" : [ "Jerry Florence" ],
+      "surname" : [ "Allen" ]
+    } ],
+    "type" : [ "DifferentiatedPerson", "AuthorityResource", "Person" ],
+    "@context" : "http://lobid.org/gnd/context.jsonld",
+    "geographicAreaCode" : [ {
+      "id" : "https://d-nb.info/standards/vocab/gnd/geographic-area-code#XD-US",
+      "label" : "USA"
+    } ],
+    "publication" : [ "The thunder and the sunshine. - 1958", "The sea years of Joseph Conrad. - 1965", "The adventures of Mark Twain. - 1954" ],
+    "describedBy" : {
+      "descriptionLevel" : {
+        "id" : "https://d-nb.info/standards/vocab/gnd/description-level#3",
+        "label" : "Religion"
+      },
+      "license" : {
+        "id" : "http://creativecommons.org/publicdomain/zero/1.0/",
+        "label" : "http://creativecommons.org/publicdomain/zero/1.0/"
+      },
+      "dateModified" : "2021-06-24T05:38:17.000",
+      "id" : "https://d-nb.info/gnd/1081001380/about"
+    },
+    "gndIdentifier" : "1081001380",
+    "id" : "https://d-nb.info/gnd/1081001380",
+    "preferredName" : "Allen, Jerry",
+    "variantName" : [ "Allen, Jerry Florence" ],
+    "preferredNameEntityForThePerson" : {
+      "forename" : [ "Jerry" ],
+      "surname" : [ "Allen" ]
+    },
+    "sameAs" : [ {
+      "id" : "http://id.loc.gov/rwo/agents/n94082393",
+      "collection" : {
+        "icon" : "http://www.loc.gov/favicon.ico",
+        "name" : "NACO Authority File",
+        "publisher" : "Library of Congress",
+        "id" : "http://www.wikidata.org/entity/Q13219454",
+        "abbr" : "LC"
+      }
+    }, {
+      "id" : "http://isni.org/isni/000000007140541X",
+      "collection" : {
+        "id" : "http://isni.org"
+      }
+    }, {
+      "id" : "http://viaf.org/viaf/17325078",
+      "collection" : {
+        "icon" : "http://viaf.org/viaf/images/viaf.ico",
+        "name" : "Virtual International Authority File (VIAF)",
+        "publisher" : "OCLC",
+        "id" : "http://www.wikidata.org/entity/Q54919",
+        "abbr" : "VIAF"
+      }
+    }, {
+      "collection" : {
+        "name" : "Gemeinsame Normdatei (GND) im Katalog der Deutschen Nationalbibliothek",
+        "icon" : "https://www.dnb.de/SiteGlobals/Frontend/DNBWeb/Images/favicon.png?__blob=normal&v=4",
+        "publisher" : "Deutsche Nationalbibliothek",
+        "id" : "http://www.wikidata.org/entity/Q36578",
+        "abbr" : "DNB"
+      },
+      "id" : "https://d-nb.info/gnd/1081001380/about"
+    }, {
+      "collection" : {
+        "name" : "Deutsche Digitale Bibliothek",
+        "icon" : "https://www.deutsche-digitale-bibliothek.de/favicon.ico",
+        "publisher" : "Deutsche Digitale Bibliothek",
+        "id" : "http://www.wikidata.org/entity/Q621630",
+        "abbr" : "DDB"
+      },
+      "id" : "https://www.deutsche-digitale-bibliothek.de/person/gnd/1081001380"
+    } ]
+  }, {
+    "gender" : [ {
+      "id" : "https://d-nb.info/standards/vocab/gnd/gender#notKnown",
+      "label" : "Unbekannt"
+    } ],
+    "variantNameEntityForThePerson" : [ {
+      "forename" : [ "Susan" ],
+      "surname" : [ "Bivin Aller" ]
+    } ],
+    "type" : [ "AuthorityResource", "DifferentiatedPerson", "Person" ],
+    "@context" : "http://lobid.org/gnd/context.jsonld",
+    "geographicAreaCode" : [ {
+      "id" : "https://d-nb.info/standards/vocab/gnd/geographic-area-code#ZZ",
+      "label" : "Land unbekannt"
+    } ],
+    "publication" : [ "J. M. Barrie. - 1994", "@Beyond little women. - 2004", "@Mark Twain. - 2001" ],
+    "describedBy" : {
+      "descriptionLevel" : {
+        "id" : "https://d-nb.info/standards/vocab/gnd/description-level#6",
+        "label" : "Kultur, Erziehung, Bildung, Wissenschaft"
+      },
+      "license" : {
+        "id" : "http://creativecommons.org/publicdomain/zero/1.0/",
+        "label" : "http://creativecommons.org/publicdomain/zero/1.0/"
+      },
+      "dateModified" : "2018-05-06T02:03:06.000",
+      "id" : "https://d-nb.info/gnd/1157928196/about"
+    },
+    "gndIdentifier" : "1157928196",
+    "id" : "https://d-nb.info/gnd/1157928196",
+    "preferredName" : "Aller, Susan Bivin",
+    "variantName" : [ "Bivin Aller, Susan" ],
+    "preferredNameEntityForThePerson" : {
+      "forename" : [ "Susan Bivin" ],
+      "surname" : [ "Aller" ]
+    },
+    "sameAs" : [ {
+      "id" : "http://viaf.org/viaf/1380152637755820220004",
+      "collection" : {
+        "icon" : "http://viaf.org/viaf/images/viaf.ico",
+        "name" : "Virtual International Authority File (VIAF)",
+        "publisher" : "OCLC",
+        "id" : "http://www.wikidata.org/entity/Q54919",
+        "abbr" : "VIAF"
+      }
+    }, {
+      "collection" : {
+        "name" : "Gemeinsame Normdatei (GND) im Katalog der Deutschen Nationalbibliothek",
+        "icon" : "https://www.dnb.de/SiteGlobals/Frontend/DNBWeb/Images/favicon.png?__blob=normal&v=4",
+        "publisher" : "Deutsche Nationalbibliothek",
+        "id" : "http://www.wikidata.org/entity/Q36578",
+        "abbr" : "DNB"
+      },
+      "id" : "https://d-nb.info/gnd/1157928196/about"
+    } ]
+  } ],
+  "aggregation" : {
+    "gndSubjectCategory.id" : [ {
+      "key" : "https://d-nb.info/standards/vocab/gnd/gnd-sc#12.2p",
+      "doc_count" : 5
+    }, {
+      "key" : "https://d-nb.info/standards/vocab/gnd/gnd-sc#12.1p",
+      "doc_count" : 4
+    }, {
+      "key" : "https://d-nb.info/standards/vocab/gnd/gnd-sc#2.2p",
+      "doc_count" : 3
+    }, {
+      "key" : "https://d-nb.info/standards/vocab/gnd/gnd-sc#00",
+      "doc_count" : 2
+    }, {
+      "key" : "https://d-nb.info/standards/vocab/gnd/gnd-sc#11.2p",
+      "doc_count" : 2
+    }, {
+      "key" : "https://d-nb.info/standards/vocab/gnd/gnd-sc#13.4p",
+      "doc_count" : 2
+    }, {
+      "key" : "https://d-nb.info/standards/vocab/gnd/gnd-sc#7.14p",
+      "doc_count" : 2
+    }, {
+      "key" : "https://d-nb.info/standards/vocab/gnd/gnd-sc#15.3p",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/standards/vocab/gnd/gnd-sc#16.5p",
+      "doc_count" : 1
+    } ],
+    "professionOrOccupation.id" : [ {
+      "key" : "https://d-nb.info/gnd/4061414-1",
+      "doc_count" : 16
+    }, {
+      "key" : "https://d-nb.info/gnd/4053309-8",
+      "doc_count" : 14
+    }, {
+      "key" : "https://d-nb.info/gnd/4028781-6",
+      "doc_count" : 11
+    }, {
+      "key" : "https://d-nb.info/gnd/4142462-1",
+      "doc_count" : 8
+    }, {
+      "key" : "https://d-nb.info/gnd/4167889-8",
+      "doc_count" : 6
+    }, {
+      "key" : "https://d-nb.info/gnd/4199236-2",
+      "doc_count" : 6
+    }, {
+      "key" : "https://d-nb.info/gnd/4013091-5",
+      "doc_count" : 5
+    }, {
+      "key" : "https://d-nb.info/gnd/4036380-6",
+      "doc_count" : 5
+    }, {
+      "key" : "https://d-nb.info/gnd/4055409-0",
+      "doc_count" : 5
+    }, {
+      "key" : "https://d-nb.info/gnd/4003982-1",
+      "doc_count" : 4
+    }, {
+      "key" : "https://d-nb.info/gnd/4025098-2",
+      "doc_count" : 4
+    }, {
+      "key" : "https://d-nb.info/gnd/4053311-6",
+      "doc_count" : 4
+    }, {
+      "key" : "https://d-nb.info/gnd/4372438-3",
+      "doc_count" : 4
+    }, {
+      "key" : "https://d-nb.info/gnd/4025243-7",
+      "doc_count" : 3
+    }, {
+      "key" : "https://d-nb.info/gnd/4159575-0",
+      "doc_count" : 3
+    }, {
+      "key" : "https://d-nb.info/gnd/4161277-2",
+      "doc_count" : 3
+    }, {
+      "key" : "https://d-nb.info/gnd/4029050-5",
+      "doc_count" : 2
+    }, {
+      "key" : "https://d-nb.info/gnd/4037215-7",
+      "doc_count" : 2
+    }, {
+      "key" : "https://d-nb.info/gnd/4046517-2",
+      "doc_count" : 2
+    }, {
+      "key" : "https://d-nb.info/gnd/4145258-6",
+      "doc_count" : 2
+    }, {
+      "key" : "https://d-nb.info/gnd/4167838-2",
+      "doc_count" : 2
+    }, {
+      "key" : "https://d-nb.info/gnd/4376263-3",
+      "doc_count" : 2
+    }, {
+      "key" : "https://d-nb.info/gnd/4430555-2",
+      "doc_count" : 2
+    }, {
+      "key" : "https://d-nb.info/gnd/4017604-6",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/4032009-1",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/4033423-5",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/4048755-6",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/4049050-6",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/4052154-0",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/4125173-8",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/4138343-6",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/4165775-5",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/4167564-2",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/4167874-6",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/4177943-5",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/4200345-3",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/4224183-2",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/4232470-1",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/4262252-9",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/4290925-9",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/4294338-3",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/4345137-8",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/4398829-5",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/4423722-4",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/4426550-5",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/4614675-1",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/4687715-0",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/7523603-5",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/gnd/7539216-1",
+      "doc_count" : 1
+    } ],
+    "geographicAreaCode.id" : [ {
+      "key" : "https://d-nb.info/standards/vocab/gnd/geographic-area-code#XD-US",
+      "doc_count" : 47
+    }, {
+      "key" : "https://d-nb.info/standards/vocab/gnd/geographic-area-code#ZZ",
+      "doc_count" : 20
+    }, {
+      "key" : "https://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-DE",
+      "doc_count" : 13
+    }, {
+      "key" : "https://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-GB",
+      "doc_count" : 5
+    }, {
+      "key" : "https://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-FR",
+      "doc_count" : 3
+    }, {
+      "key" : "https://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-AT",
+      "doc_count" : 2
+    }, {
+      "key" : "https://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-CH",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-IE",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-IT",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-RU",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/standards/vocab/gnd/geographic-area-code#XB-IL",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/standards/vocab/gnd/geographic-area-code#XD-CA",
+      "doc_count" : 1
+    }, {
+      "key" : "https://d-nb.info/standards/vocab/gnd/geographic-area-code#XE-AU",
+      "doc_count" : 1
+    } ],
+    "dateOfBirth" : [ {
+      "key" : "1835-11-30",
+      "doc_count" : 5
+    }, {
+      "key" : "1943",
+      "doc_count" : 2
+    }, {
+      "key" : "1951",
+      "doc_count" : 2
+    }, {
+      "key" : "1954",
+      "doc_count" : 2
+    }, {
+      "key" : "1960",
+      "doc_count" : 2
+    }, {
+      "key" : "1968",
+      "doc_count" : 2
+    }, {
+      "key" : "1822",
+      "doc_count" : 1
+    }, {
+      "key" : "1825",
+      "doc_count" : 1
+    }, {
+      "key" : "1840-09-27",
+      "doc_count" : 1
+    }, {
+      "key" : "1845",
+      "doc_count" : 1
+    }, {
+      "key" : "1849-11-24",
+      "doc_count" : 1
+    }, {
+      "key" : "1855",
+      "doc_count" : 1
+    }, {
+      "key" : "1869-12-30",
+      "doc_count" : 1
+    }, {
+      "key" : "1872",
+      "doc_count" : 1
+    }, {
+      "key" : "1872-07-14",
+      "doc_count" : 1
+    }, {
+      "key" : "1874",
+      "doc_count" : 1
+    }, {
+      "key" : "1876-07-25",
+      "doc_count" : 1
+    }, {
+      "key" : "1877",
+      "doc_count" : 1
+    }, {
+      "key" : "1882-05-07",
+      "doc_count" : 1
+    }, {
+      "key" : "1885-01-16",
+      "doc_count" : 1
+    }, {
+      "key" : "1886-02-16",
+      "doc_count" : 1
+    }, {
+      "key" : "1886-05-30",
+      "doc_count" : 1
+    }, {
+      "key" : "1888-03-10",
+      "doc_count" : 1
+    }, {
+      "key" : "1897",
+      "doc_count" : 1
+    }, {
+      "key" : "1897-01-11",
+      "doc_count" : 1
+    }, {
+      "key" : "1900-03-28",
+      "doc_count" : 1
+    }, {
+      "key" : "1900-04-21",
+      "doc_count" : 1
+    }, {
+      "key" : "1901",
+      "doc_count" : 1
+    }, {
+      "key" : "1902",
+      "doc_count" : 1
+    }, {
+      "key" : "1906",
+      "doc_count" : 1
+    }, {
+      "key" : "1907",
+      "doc_count" : 1
+    }, {
+      "key" : "1909",
+      "doc_count" : 1
+    }, {
+      "key" : "1910-12-14",
+      "doc_count" : 1
+    }, {
+      "key" : "1911-10-12",
+      "doc_count" : 1
+    }, {
+      "key" : "1912",
+      "doc_count" : 1
+    }, {
+      "key" : "1914-03-11",
+      "doc_count" : 1
+    }, {
+      "key" : "1915",
+      "doc_count" : 1
+    }, {
+      "key" : "1921",
+      "doc_count" : 1
+    }, {
+      "key" : "1925",
+      "doc_count" : 1
+    }, {
+      "key" : "1927",
+      "doc_count" : 1
+    }, {
+      "key" : "1928-05-28",
+      "doc_count" : 1
+    }, {
+      "key" : "1929",
+      "doc_count" : 1
+    }, {
+      "key" : "1935",
+      "doc_count" : 1
+    }, {
+      "key" : "1940",
+      "doc_count" : 1
+    }, {
+      "key" : "1941",
+      "doc_count" : 1
+    }, {
+      "key" : "1945",
+      "doc_count" : 1
+    }, {
+      "key" : "1948",
+      "doc_count" : 1
+    }, {
+      "key" : "1950",
+      "doc_count" : 1
+    }, {
+      "key" : "1952-05-20",
+      "doc_count" : 1
+    }, {
+      "key" : "1966",
+      "doc_count" : 1
+    }, {
+      "key" : "1969",
+      "doc_count" : 1
+    }, {
+      "key" : "1984",
+      "doc_count" : 1
+    } ],
+    "type" : [ {
+      "key" : "Person",
+      "doc_count" : 92
+    }, {
+      "key" : "DifferentiatedPerson",
+      "doc_count" : 91
+    }, {
+      "key" : "UndifferentiatedPerson",
+      "doc_count" : 1
+    } ]
+  }
+}
