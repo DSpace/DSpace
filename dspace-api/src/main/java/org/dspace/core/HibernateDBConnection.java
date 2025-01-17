@@ -243,6 +243,11 @@ public class HibernateDBConnection implements DBConnection<Session> {
         }
     }
 
+    @Override
+    public void uncacheEntities() throws SQLException {
+        getSession().clear();
+    }
+
     /**
      * Evict an entity from the hibernate cache.
      * <P>
@@ -335,6 +340,19 @@ public class HibernateDBConnection implements DBConnection<Session> {
                 // Remove object from Session
                 getSession().evict(entity);
             }
+        }
+    }
+
+    /**
+     * Do a manual flush. This synchronizes the in-memory state of the Session
+     * with the database (write changes to the database)
+     *
+     * @throws SQLException passed through.
+     */
+    @Override
+    public void flushSession() throws SQLException {
+        if (getSession().isDirty()) {
+            getSession().flush();
         }
     }
 }

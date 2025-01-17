@@ -13,7 +13,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.6</version>
+        <version>7.6.3-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -80,6 +80,11 @@
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-logging</artifactId>
                 </exclusion>
+                <!-- Spring JCL is unnecessary and conflicts with commons-logging when both are on classpath -->
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-jcl</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -92,9 +97,11 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
         </dependency>
+        <!-- NOTE: This log4jv1 -> log4jv2 bridge is REQUIRED because 'sword2-server' above uses log4jv1.
+             This bridge ensures our SWORDv2 webapp can startup without errors. -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-web</artifactId>
+            <artifactId>log4j-1.2-api</artifactId>
         </dependency>
 
         <!-- Replacement for Abdera (required by sword2-server dependency). Abdera is no longer maintained

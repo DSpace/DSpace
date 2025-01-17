@@ -522,15 +522,14 @@
 				<xsl:choose>
 					<xsl:when test="normalize-space($path/../oai:resumptionToken/text()) = ''">
 					<!-- on the last page of results we have to assume that @completeListSize is available -->
-						<xsl:value-of
-							select="$total - $count" />
+						<xsl:value-of select="(number($total) - $count) + 1" />
 						-
 						<xsl:value-of select="$total" />
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:value-of select="$cursor * $count" />
+						<xsl:value-of select="(number($cursor) * $count) + 1" />
 						-
-						<xsl:value-of select="($cursor+1) * $count" />
+						<xsl:value-of select="(number($cursor) + 1) * $count" />
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:when>

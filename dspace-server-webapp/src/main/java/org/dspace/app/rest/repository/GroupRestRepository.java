@@ -148,6 +148,35 @@ public class GroupRestRepository extends DSpaceObjectRestRepository<Group, Group
         }
     }
 
+    /**
+     * Find the Groups matching the query parameter which are NOT a member of the given parent Group.
+     * The search is delegated to the
+     * {@link GroupService#searchNonMembers(Context, String, Group, int, int)} method
+     *
+     * @param groupUUID the parent group UUID
+     * @param query    is the *required* query string
+     * @param pageable contains the pagination information
+     * @return a Page of GroupRest instances matching the user query
+     */
+    @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('MANAGE_ACCESS_GROUP')")
+    @SearchRestMethod(name = "isNotMemberOf")
+    public Page<GroupRest> findIsNotMemberOf(@Parameter(value = "group", required = true) UUID groupUUID,
+                                             @Parameter(value = "query", required = true) String query,
+                                             Pageable pageable) {
+
+        try {
+            Context context = obtainContext();
+            Group excludeParentGroup = gs.find(context, groupUUID);
+            long total = gs.searchNonMembersCount(context, query, excludeParentGroup);
+            List<Group> groups = gs.searchNonMembers(context, query, excludeParentGroup,
+                                                     Math.toIntExact(pageable.getOffset()),
+                                                     Math.toIntExact(pageable.getPageSize()));
+            return converter.toRestPage(groups, pageable, total, utils.obtainProjection());
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
     @Override
     public Class<GroupRest> getDomainClass() {
         return GroupRest.class;

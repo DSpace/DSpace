@@ -80,7 +80,7 @@ public class SubmissionDefinitionConverter implements DSpaceConverter<Submission
         Context context = null;
         try {
             context = ContextUtil.obtainContext(request);
-            List<Collection> collections = panelConverter.getSubmissionConfigReader()
+            List<Collection> collections = panelConverter.getSubmissionConfigService()
                                                          .getCollectionsBySubmissionConfig(context,
                                                                                            obj.getSubmissionName());
             DSpaceConverter<Collection, CollectionRest> cc = converter.getConverter(Collection.class);

@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.6</version>
+        <version>7.6.3-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -288,7 +288,7 @@
         <dependency>
             <groupId>com.flipkart.zjsonpatch</groupId>
             <artifactId>zjsonpatch</artifactId>
-            <version>0.4.6</version>
+            <version>0.4.16</version>
         </dependency>
 
         <!-- HAL Browser (via WebJars) : https://github.com/mikekelly/hal-browser -->
@@ -308,7 +308,7 @@
         <dependency>
             <groupId>org.webjars.bowergithub.jquery</groupId>
             <artifactId>jquery-dist</artifactId>
-            <version>3.6.0</version>
+            <version>3.7.1</version>
         </dependency>
         <!-- Pull in current version of Toastr (toastrjs.com) via WebJars
              Made available at: webjars/toastr/build/toastr.min.js -->
@@ -322,7 +322,7 @@
         <dependency>
             <groupId>org.webjars.bowergithub.medialize</groupId>
             <artifactId>uri.js</artifactId>
-            <version>1.19.10</version>
+            <version>1.19.11</version>
         </dependency>
         <!-- Pull in current version of Underscore.js (https://underscorejs.org/) via WebJars
              Made available at: webjars/underscore/underscore-min.js -->
@@ -345,7 +345,7 @@
         <dependency>
             <groupId>org.webjars.npm</groupId>
             <artifactId>json-editor__json-editor</artifactId>
-            <version>2.6.1</version>
+            <version>2.15.1</version>
         </dependency>
         <!-- Also pull in current version of Bootstrap via WebJars.
              This is used by BOTH our HAL Browser and our OAI-PMH interface.
@@ -354,7 +354,7 @@
         <dependency>
             <groupId>org.webjars.bowergithub.twbs</groupId>
             <artifactId>bootstrap</artifactId>
-            <version>4.6.1</version>
+            <version>4.6.2</version>
         </dependency>
 
         <!-- Add in Spring Security for AuthN and AuthZ -->
@@ -362,6 +362,36 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
             <version>${spring-boot.version}</version>
+            <exclusions>
+                <!-- Use the version of Spring Security that we specify below -->
+                <exclusion>
+                    <groupId>org.springframework.security</groupId>
+                    <artifactId>spring-security-config</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.security</groupId>
+                    <artifactId>spring-security-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.security</groupId>
+                    <artifactId>spring-security-web</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+            <version>${spring-security.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+            <version>${spring-security.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-web</artifactId>
+            <version>${spring-security.version}</version>
         </dependency>
 
         <!-- Add in log4j support by excluding default logging, and using starter-log4j -->
@@ -374,6 +404,11 @@
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+                <!-- Spring JCL is unnecessary and conflicts with commons-logging when both are on classpath -->
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-jcl</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -502,7 +537,7 @@
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-all</artifactId>
+            <artifactId>hamcrest</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -541,7 +576,7 @@
         <dependency>
             <groupId>org.exparity</groupId>
             <artifactId>hamcrest-date</artifactId>
-            <version>2.0.7</version>
+            <version>2.0.8</version>
             <scope>test</scope>
         </dependency>
         <dependency>

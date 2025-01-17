@@ -6,8 +6,8 @@
 # To build with JDK17, use "--build-arg JDK_VERSION=17"
 ARG JDK_VERSION=11
 
-# Step 1 - Run Maven Build
-FROM maven:3-openjdk-${JDK_VERSION}-slim as build
+# Step 1 - Download all Dependencies
+FROM docker.io/maven:3-eclipse-temurin-${JDK_VERSION} AS build
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 # Create the 'dspace' user account & home directory
@@ -15,22 +15,64 @@ RUN useradd dspace \
     && mkdir -p /home/dspace \
     && chown -Rv dspace: /home/dspace
 RUN chown -Rv dspace: /app
-# Need git to support buildnumber-maven-plugin, which lets us know what version of DSpace is being run.
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends git \
-    && apt-get purge -y --auto-remove \
-    && rm -rf /var/lib/apt/lists/*
 
 # Switch to dspace user & run below commands as that user
 USER dspace
 
-# Copy the DSpace source code (from local machine) into the workdir (excluding .dockerignore contents)
-ADD --chown=dspace . /app/
+# This next part may look odd, but it speeds up the build of this image *significantly*.
+# Copy ONLY the POMs to this image (from local machine). This will allow us to download all dependencies *without*
+# performing any code compilation steps.
+
+# Parent POM
+ADD --chown=dspace pom.xml /app/
+RUN mkdir -p /app/dspace
+
+# 'dspace' module POM. Includes 'additions' ONLY, as it's the only submodule that is required to exist.
+ADD --chown=dspace dspace/pom.xml /app/dspace/
+RUN mkdir -p /app/dspace/modules/
+ADD --chown=dspace dspace/modules/pom.xml /app/dspace/modules/
+RUN mkdir -p /app/dspace/modules/additions
+ADD --chown=dspace dspace/modules/additions/pom.xml /app/dspace/modules/additions/
+
+# 'dspace-api' module POM
+RUN mkdir -p /app/dspace-api
+ADD --chown=dspace dspace-api/pom.xml /app/dspace-api/
+
+# 'dspace-iiif' module POM
+RUN mkdir -p /app/dspace-iiif
+ADD --chown=dspace dspace-iiif/pom.xml /app/dspace-iiif/
+
+# 'dspace-oai' module POM
+RUN mkdir -p /app/dspace-oai
+ADD --chown=dspace dspace-oai/pom.xml /app/dspace-oai/
+
+# 'dspace-rdf' module POM
+RUN mkdir -p /app/dspace-rdf
+ADD --chown=dspace dspace-rdf/pom.xml /app/dspace-rdf/
+
+# 'dspace-server-webapp' module POM
+RUN mkdir -p /app/dspace-server-webapp
+ADD --chown=dspace dspace-server-webapp/pom.xml /app/dspace-server-webapp/
+
+# 'dspace-services' module POM
+RUN mkdir -p /app/dspace-services
+ADD --chown=dspace dspace-services/pom.xml /app/dspace-services/
+
+# 'dspace-sword' module POM
+RUN mkdir -p /app/dspace-sword
+ADD --chown=dspace dspace-sword/pom.xml /app/dspace-sword/
+
+# 'dspace-swordv2' module POM
+RUN mkdir -p /app/dspace-swordv2
+ADD --chown=dspace dspace-swordv2/pom.xml /app/dspace-swordv2/
 
 # Trigger the installation of all maven dependencies (hide download progress messages)
-RUN mvn --no-transfer-progress package
+# Maven flags here ensure that we skip final assembly, skip building test environment and skip all code verification checks.
+# These flags speed up this installation and skip tasks we cannot perform as we don't have the full source code.
+ENV MAVEN_FLAGS="-P-assembly -P-test-environment -Denforcer.skip=true -Dcheckstyle.skip=true -Dlicense.skip=true -Dxjc.skip=true -Dxml.skip=true"
+RUN mvn --no-transfer-progress verify ${MAVEN_FLAGS}
 
-# Clear the contents of the /app directory (including all maven builds), so no artifacts remain.
+# Clear the contents of the /app directory (including all maven target folders), so no artifacts remain.
 # This ensures when dspace:dspace is built, it will use the Maven local cache (~/.m2) for dependencies
 USER root
 RUN rm -rf /app/*

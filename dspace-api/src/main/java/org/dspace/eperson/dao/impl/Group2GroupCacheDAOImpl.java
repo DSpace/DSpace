@@ -8,14 +8,18 @@
 package org.dspace.eperson.dao.impl;
 
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
@@ -33,6 +37,16 @@ import org.dspace.eperson.dao.Group2GroupCacheDAO;
 public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCache> implements Group2GroupCacheDAO {
     protected Group2GroupCacheDAOImpl() {
         super();
+    }
+
+    @Override
+    public Set<Pair<UUID, UUID>> getCache(Context context) throws SQLException {
+        Query query = createQuery(
+            context,
+            "SELECT new org.apache.commons.lang3.tuple.ImmutablePair(g.parent.id, g.child.id) FROM Group2GroupCache g"
+        );
+        List<Pair<UUID, UUID>> results = query.getResultList();
+        return new HashSet<Pair<UUID, UUID>>(results);
     }
 
     @Override
@@ -89,5 +103,25 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
     @Override
     public void deleteAll(Context context) throws SQLException {
         createQuery(context, "delete from Group2GroupCache").executeUpdate();
+    }
+
+    @Override
+    public void deleteFromCache(Context context, UUID parent, UUID child) throws SQLException {
+        Query query = getHibernateSession(context).createNativeQuery(
+            "delete from group2groupcache g WHERE g.parent_id = :parent AND g.child_id = :child"
+        );
+        query.setParameter("parent", parent);
+        query.setParameter("child", child);
+        query.executeUpdate();
+    }
+
+    @Override
+    public void addToCache(Context context, UUID parent, UUID child) throws SQLException {
+        Query query = getHibernateSession(context).createNativeQuery(
+            "insert into group2groupcache (parent_id, child_id) VALUES (:parent, :child)"
+        );
+        query.setParameter("parent", parent);
+        query.setParameter("child", child);
+        query.executeUpdate();
     }
 }

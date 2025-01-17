@@ -52,9 +52,11 @@
     <bean id="indexObjectFactoryFactory" class="org.dspace.discovery.indexobject.factory.IndexObjectFactoryFactoryImpl"/>
 
     <bean id="openURLTrackerLoggerServiceFactory" class="org.dspace.statistics.export.factory.OpenURLTrackerLoggerServiceFactoryImpl"/>
-    
+
     <bean id="orcidServiceFactory" class="org.dspace.orcid.factory.OrcidServiceFactoryImpl"/>
 
     <bean id="supervisionOrderServiceFactory" class="org.dspace.supervision.factory.SupervisionOrderServiceFactoryImpl"/>
+
+    <bean id="submissionServiceFactory" class="org.dspace.submit.factory.SubmissionServiceFactoryImpl"/>
 
 </beans>

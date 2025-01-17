@@ -67,7 +67,7 @@ public class ItemConverter
      * Overrides the parent method to include virtual metadata
      * @param context The context
      * @param obj     The object of which the filtered metadata will be retrieved
-     * @return A list of object metadata (including virtual metadata) filtered based on the the hidden metadata
+     * @return A list of object metadata (including virtual metadata) filtered based on the hidden metadata
      * configuration
      */
     @Override
@@ -79,7 +79,7 @@ public class ItemConverter
                                       Objects.isNull(context.getCurrentUser()) || !authorizeService.isAdmin(context))) {
                 return new MetadataValueList(new ArrayList<MetadataValue>());
             }
-            if (context != null && authorizeService.isAdmin(context)) {
+            if (context != null && (authorizeService.isAdmin(context) || itemService.canEdit(context, obj))) {
                 return new MetadataValueList(fullList);
             }
             for (MetadataValue mv : fullList) {

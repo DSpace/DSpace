@@ -213,7 +213,7 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
     private void updateRelationshipPlace(Context context, Item dso, int place, Relationship rs) {
 
         try {
-            if (rs.getLeftItem() == dso) {
+            if (rs.getLeftItem().equals(dso)) {
                 rs.setLeftPlace(place);
             } else {
                 rs.setRightPlace(place);

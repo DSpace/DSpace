@@ -21,6 +21,8 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.MetadataExposureService;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
@@ -59,6 +61,10 @@ public class ItemUtils {
 
     private static final ConfigurationService configurationService
             = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    private static final AuthorizeService authorizeService
+        = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+
     /**
      * Default constructor
      */
@@ -103,6 +109,11 @@ public class ItemUtils {
             bundle.getElement().add(bitstreams);
             List<Bitstream> bits = b.getBitstreams();
             for (Bitstream bit : bits) {
+                // Check if bitstream is null and log the error
+                if (bit == null) {
+                    log.error("Null bitstream found, check item uuid: " + item.getID());
+                    break;
+                }
                 Element bitstream = create("bitstream");
                 bitstreams.getElement().add(bitstream);
                 String url = "";
@@ -158,13 +169,17 @@ public class ItemUtils {
             List<Bitstream> licBits = licBundle.getBitstreams();
             if (!licBits.isEmpty()) {
                 Bitstream licBit = licBits.get(0);
-                InputStream in;
+                if (authorizeService.authorizeActionBoolean(context, licBit, Constants.READ)) {
+                    InputStream in;
 
-                in = bitstreamService.retrieve(context, licBit);
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                Utils.bufferedCopy(in, out);
-                license.getField().add(createValue("bin", Base64Utils.encode(out.toString())));
-
+                    in = bitstreamService.retrieve(context, licBit);
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    Utils.bufferedCopy(in, out);
+                    license.getField().add(createValue("bin", Base64Utils.encode(out.toString())));
+                } else {
+                    log.info("Missing READ rights for license bitstream. Did not include license bitstream for item: "
+                             + item.getID() + ".");
+                }
             }
         }
         return license;

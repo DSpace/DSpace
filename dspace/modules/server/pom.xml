@@ -13,7 +13,7 @@ just adding new jar in the classloader</description>
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
-        <version>7.6</version>
+        <version>7.6.3-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -261,11 +261,6 @@ just adding new jar in the classloader</description>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-server-webapp</artifactId>
             <type>war</type>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-solrj</artifactId>
-            <version>${solr.client.version}</version>
         </dependency>
 
         <!-- Test Dependencies -->

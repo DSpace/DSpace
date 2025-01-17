@@ -729,9 +729,10 @@ public class BitstreamResource extends Resource {
     private void addPolicyToBitstream(org.dspace.core.Context context, ResourcePolicy policy,
                                       org.dspace.content.Bitstream dspaceBitstream)
         throws SQLException, AuthorizeException {
-        org.dspace.authorize.ResourcePolicy dspacePolicy = resourcePolicyService.create(context);
+        org.dspace.authorize.ResourcePolicy dspacePolicy =
+                resourcePolicyService.create(context, null,
+                                             groupService.findByIdOrLegacyId(context, policy.getGroupId()));
         dspacePolicy.setAction(policy.getActionInt());
-        dspacePolicy.setGroup(groupService.findByIdOrLegacyId(context, policy.getGroupId()));
         dspacePolicy.setdSpaceObject(dspaceBitstream);
         dspacePolicy.setStartDate(policy.getStartDate());
         dspacePolicy.setEndDate(policy.getEndDate());

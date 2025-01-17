@@ -1,4 +1,3 @@
-version: '3.7'
 networks:
   dspacenet:
     ipam:
@@ -28,14 +27,15 @@ services:
       # proxies.trusted.ipranges: This setting is required for a REST API running in Docker to trust requests
       # from the host machine. This IP range MUST correspond to the 'dspacenet' subnet defined above.
       proxies__P__trusted__P__ipranges: '172.23.0'
-    image: "${DOCKER_OWNER:-dspace}/dspace:${DSPACE_VER:-dspace-7_x-test}"
+      LOGGING_CONFIG: /dspace/config/log4j2-container.xml
+    image: "${DOCKER_REGISTRY:-docker.io}/${DOCKER_OWNER:-dspace}/dspace:${DSPACE_VER:-dspace-7_x-test}"
     build:
       context: .
       dockerfile: Dockerfile.test
     depends_on:
     - dspacedb
     networks:
-      dspacenet:
+      - dspacenet
     ports:
     - published: 8080
       target: 8080
@@ -66,7 +66,7 @@ services:
   dspacedb:
     container_name: dspacedb
     # Uses a custom Postgres image with pgcrypto installed
-    image: "${DOCKER_OWNER:-dspace}/dspace-postgres-pgcrypto:${DSPACE_VER:-dspace-7_x}"
+    image: "${DOCKER_REGISTRY:-docker.io}/${DOCKER_OWNER:-dspace}/dspace-postgres-pgcrypto:${DSPACE_VER:-dspace-7_x}"
     build:
       # Must build out of subdirectory to have access to install script for pgcrypto
       context: ./dspace/src/main/docker/dspace-postgres-pgcrypto/
@@ -86,10 +86,12 @@ services:
   # DSpace Solr container
   dspacesolr:
     container_name: dspacesolr
-    image: "${DOCKER_OWNER:-dspace}/dspace-solr:${DSPACE_VER:-dspace-7_x}"
+    image: "${DOCKER_REGISTRY:-docker.io}/${DOCKER_OWNER:-dspace}/dspace-solr:${DSPACE_VER:-dspace-7_x}"
     build:
-      context: .
-      dockerfile: ./dspace/src/main/docker/dspace-solr/Dockerfile
+      context: ./dspace/src/main/docker/dspace-solr/
+      # Provide path to Solr configs necessary to build Docker image
+      additional_contexts:
+        solrconfigs: ./dspace/solr/
       args:
         SOLR_VERSION: "${SOLR_VER:-8.11}"
     networks:

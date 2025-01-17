@@ -21,6 +21,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 import org.hibernate.annotations.Type;
@@ -143,6 +144,9 @@ public class MetadataValue implements ReloadableEntity<Integer> {
      * @param language new language
      */
     public void setLanguage(String language) {
+        if (StringUtils.equals(language, Item.ANY)) {
+            language = null;
+        }
         this.language = language;
     }
 

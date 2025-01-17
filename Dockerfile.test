@@ -8,9 +8,14 @@
 # This Dockerfile uses JDK11 by default, but has also been tested with JDK17.
 # To build with JDK17, use "--build-arg JDK_VERSION=17"
 ARG JDK_VERSION=11
+# The Docker version tag to build from
+ARG DSPACE_VERSION=dspace-7_x
+# The Docker registry to use for DSpace images. Defaults to "docker.io"
+# NOTE: non-DSpace images are hardcoded to use "docker.io" and are not impacted by this build argument
+ARG DOCKER_REGISTRY=docker.io
 
 # Step 1 - Run Maven Build
-FROM dspace/dspace-dependencies:dspace-7_x as build
+FROM ${DOCKER_REGISTRY}/dspace/dspace-dependencies:${DSPACE_VERSION} AS build
 ARG TARGET_DIR=dspace-installer
 WORKDIR /app
 # The dspace-installer directory will be written to /install
@@ -27,33 +32,36 @@ RUN mvn --no-transfer-progress package -Pdspace-rest && \
   mvn clean
 
 # Step 2 - Run Ant Deploy
-FROM openjdk:${JDK_VERSION}-slim as ant_build
+FROM docker.io/eclipse-temurin:${JDK_VERSION} AS ant_build
 ARG TARGET_DIR=dspace-installer
 # COPY the /install directory from 'build' container to /dspace-src in this container
 COPY --from=build /install /dspace-src
 WORKDIR /dspace-src
 # Create the initial install deployment using ANT
-ENV ANT_VERSION 1.10.12
-ENV ANT_HOME /tmp/ant-$ANT_VERSION
-ENV PATH $ANT_HOME/bin:$PATH
-# Need wget to install ant
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends wget \
-    && apt-get purge -y --auto-remove \
-    && rm -rf /var/lib/apt/lists/*
+ENV ANT_VERSION=1.10.12
+ENV ANT_HOME=/tmp/ant-$ANT_VERSION
+ENV PATH=$ANT_HOME/bin:$PATH
 # Download and install 'ant'
 RUN mkdir $ANT_HOME && \
-    wget -qO- "https://archive.apache.org/dist/ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz" | tar -zx --strip-components=1 -C $ANT_HOME
+    curl --silent --show-error --location --fail --retry 5 --output /tmp/apache-ant.tar.gz \
+      https://archive.apache.org/dist/ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.gz && \
+    tar -zx --strip-components=1 -f /tmp/apache-ant.tar.gz -C $ANT_HOME && \
+    rm /tmp/apache-ant.tar.gz
 # Run necessary 'ant' deploy scripts
 RUN ant init_installation update_configs update_code update_webapps
 
 # Step 3 - Run tomcat
 # Create a new tomcat image that does not retain the the build directory contents
-FROM tomcat:9-jdk${JDK_VERSION}
+FROM docker.io/tomcat:9-jdk${JDK_VERSION}
 ENV DSPACE_INSTALL=/dspace
 ENV TOMCAT_INSTALL=/usr/local/tomcat
 # Copy the /dspace directory from 'ant_build' containger to /dspace in this container
 COPY --from=ant_build /dspace $DSPACE_INSTALL
+# Need host command for "[dspace]/bin/make-handle-config"
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends host \
+    && apt-get purge -y --auto-remove \
+    && rm -rf /var/lib/apt/lists/*
 # Enable the AJP connector in Tomcat's server.xml
 # NOTE: secretRequired="false" should only be used when AJP is NOT accessible from an external network. But, secretRequired="true" isn't supported by mod_proxy_ajp until Apache 2.5
 RUN sed -i '/Service name="Catalina".*/a \\n    <Connector protocol="AJP/1.3" port="8009" address="0.0.0.0" redirectPort="8443" URIEncoding="UTF-8" secretRequired="false" />' $TOMCAT_INSTALL/conf/server.xml

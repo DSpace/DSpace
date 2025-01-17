@@ -1465,6 +1465,7 @@ public class DatabaseUtils {
                     Context context = null;
                     try {
                         context = new Context();
+                        context.setMode(Context.Mode.READ_ONLY);
                         context.turnOffAuthorisationSystem();
                         log.info(
                             "Post database migration, reindexing all content in Discovery search and browse engine");

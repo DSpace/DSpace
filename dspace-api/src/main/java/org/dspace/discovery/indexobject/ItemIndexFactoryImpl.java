@@ -154,9 +154,11 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
         doc.addField("latestVersion", isLatestVersion(context, item));
 
         EPerson submitter = item.getSubmitter();
-        if (submitter != null) {
-            addFacetIndex(doc, "submitter", submitter.getID().toString(),
-                    submitter.getFullName());
+        if (submitter != null && !(DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty(
+            "discovery.index.item.submitter.enabled", false))) {
+            doc.addField("submitter_authority", submitter.getID().toString());
+        } else if (submitter != null) {
+            addFacetIndex(doc, "submitter", submitter.getID().toString(), submitter.getFullName());
         }
 
         // Add the item metadata
@@ -172,13 +174,6 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
             addNamedResourceTypeIndex(doc, acvalue);
         }
 
-        // write the index and close the inputstreamreaders
-        try {
-            log.info("Wrote Item: " + item.getID() + " to Index");
-        } catch (RuntimeException e) {
-            log.error("Error while writing item to discovery index: " + item.getID() + " message:"
-                    + e.getMessage(), e);
-        }
         return doc;
     }
 
@@ -845,7 +840,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
     private void saveFacetPrefixParts(SolrInputDocument doc, DiscoverySearchFilter searchFilter, String value,
                                       String separator, String authority, String preferedLabel) {
         value = StringUtils.normalizeSpace(value);
-        Pattern pattern = Pattern.compile("\\b\\w+\\b", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("\\b\\w+\\b", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CHARACTER_CLASS);
         Matcher matcher = pattern.matcher(value);
         while (matcher.find()) {
             int index = matcher.start();

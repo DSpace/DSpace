@@ -206,8 +206,6 @@
             <bean class="org.dspace.content.logic.operator.And">
                 <property name="statements">
                     <list>
-                        <!-- Make sure the item is archived -->
-                        <ref bean="is-archived_condition"/>
                         <!-- Make sure the item is not withdrawn -->
                         <bean class="org.dspace.content.logic.operator.Not">
                             <property name="statements" ref="is-withdrawn_condition"/>

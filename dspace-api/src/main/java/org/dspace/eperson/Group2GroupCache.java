@@ -14,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.hibernate.proxy.HibernateProxyHelper;
 
@@ -23,7 +24,7 @@ import org.hibernate.proxy.HibernateProxyHelper;
  * @author kevinvandevelde at atmire.com
  */
 @Entity
-@Table(name = "group2groupcache")
+@Table(name = "group2groupcache", uniqueConstraints = { @UniqueConstraint(columnNames = {"parent_id", "child_id"}) })
 public class Group2GroupCache implements Serializable {
 
     @Id

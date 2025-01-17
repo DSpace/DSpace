@@ -25,7 +25,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.dspace.browse.ItemCountException;
 import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
@@ -123,6 +122,9 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
 
     void setLogo(Bitstream logo) {
         this.logo = logo;
+        if (logo != null) {
+            logo.setCommunity(this);
+        }
         setModified();
     }
 
@@ -263,18 +265,5 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
             communityService = ContentServiceFactory.getInstance().getCommunityService();
         }
         return communityService;
-    }
-
-    /**
-     * return count of the community items
-     *
-     * @return int
-     */
-    public int countArchivedItems() {
-        try {
-            return communityService.countArchivedItems(this);
-        } catch (ItemCountException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

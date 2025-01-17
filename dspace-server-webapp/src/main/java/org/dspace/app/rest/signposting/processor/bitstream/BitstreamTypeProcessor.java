@@ -11,7 +11,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.signposting.model.LinksetNode;
 import org.dspace.app.rest.signposting.model.LinksetRelationType;
 import org.dspace.content.Bitstream;
@@ -28,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class BitstreamTypeProcessor extends BitstreamSignpostingProcessor {
 
-    private static final Logger log = Logger.getLogger(BitstreamTypeProcessor.class);
+    private static final Logger log = LogManager.getLogger(BitstreamTypeProcessor.class);
 
     @Autowired
     private SimpleMapConverter mapConverterDSpaceToSchemaOrgUri;

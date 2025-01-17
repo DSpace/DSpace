@@ -10,10 +10,8 @@ package org.dspace.identifier;
 import static org.junit.Assert.assertEquals;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -24,14 +22,11 @@ import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.kernel.ServiceManager;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.Before;
 import org.junit.Test;
 
-public class VersionedHandleIdentifierProviderTest extends AbstractIntegrationTestWithDatabase {
-    private ServiceManager serviceManager;
-    private IdentifierServiceImpl identifierService;
+public class VersionedHandleIdentifierProviderIT extends AbstractIdentifierProviderIT  {
 
     private String firstHandle;
     private String dspaceUrl;
@@ -46,32 +41,13 @@ public class VersionedHandleIdentifierProviderTest extends AbstractIntegrationTe
     public void setUp() throws Exception {
         super.setUp();
         context.turnOffAuthorisationSystem();
-
-        serviceManager = DSpaceServicesFactory.getInstance().getServiceManager();
         dspaceUrl = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.ui.url");
-        identifierService = serviceManager.getServicesByType(IdentifierServiceImpl.class).get(0);
-        // Clean out providers to avoid any being used for creation of community and collection
-        identifierService.setProviders(new ArrayList<>());
-
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
         collection = CollectionBuilder.createCollection(context, parentCommunity)
                                       .withName("Collection")
                                       .build();
-    }
-
-    private void registerProvider(Class type) {
-        // Register our new provider
-        Object service = serviceManager.getServiceByName(type.getName(), type);
-        if (service == null) {
-            serviceManager.registerServiceClass(type.getName(), type);
-        }
-        IdentifierProvider identifierProvider =
-            (IdentifierProvider) serviceManager.getServiceByName(type.getName(), type);
-
-        // Overwrite the identifier-service's providers with the new one to ensure only this provider is used
-        identifierService.setProviders(List.of(identifierProvider));
     }
 
     private void createVersions() throws SQLException, AuthorizeException {
@@ -85,7 +61,6 @@ public class VersionedHandleIdentifierProviderTest extends AbstractIntegrationTe
 
     @Test
     public void testDefaultVersionedHandleProvider() throws Exception {
-        registerProvider(VersionedHandleIdentifierProvider.class);
         createVersions();
 
         // Confirm the original item only has its original handle
