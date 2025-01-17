@@ -117,9 +117,9 @@ public class Harvest {
         }
 
         if (!withdrawn) {
-            discoverQuery.addFilterQueries("archived: true OR withdrawn: false");
+            discoverQuery.addFilterQueries("archived:true OR withdrawn:false");
         } else {
-            discoverQuery.addFilterQueries("archived: true OR withdrawn: true");
+            discoverQuery.addFilterQueries("archived:true OR withdrawn:true");
         }
 
         // Order by item ID, so that for a given harvest the order will be
