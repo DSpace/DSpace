@@ -444,6 +444,18 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     }
 
     @Override
+    public Iterator<Item> findAllByCollectionLastModifiedSince(Context context, Collection collection, Date last)
+        throws SQLException {
+        Query query = createQuery(context,
+            "select i from Item i join i.collections c WHERE :collection IN c" +
+                " AND last_modified > :last_modified ORDER BY i.id");
+        query.setParameter("collection", collection);
+        query.setParameter("last_modified", last, TemporalType.TIMESTAMP);
+
+        return iterate(query);
+    }
+
+    @Override
     public int countRows(Context context) throws SQLException {
         return count(createQuery(context, "SELECT count(*) FROM Item"));
     }
