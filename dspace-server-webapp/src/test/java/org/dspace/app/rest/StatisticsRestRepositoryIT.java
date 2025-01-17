@@ -65,9 +65,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 /**
- * Integration test to test the /api/statistics/usagereports/ endpoints, see {@link UsageReportUtils} and
- * {@link StatisticsRestRepository}
+ * Integration test to test the {@code /api/statistics/usagereports/} endpoints.
  *
+ * @see UsageReportUtils
+ * @see StatisticsRestRepository
  * @author Maria Verdonck (Atmire) on 10/06/2020
  */
 public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTest {
