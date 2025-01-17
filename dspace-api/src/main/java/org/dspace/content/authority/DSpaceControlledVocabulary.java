@@ -60,9 +60,9 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
 
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DSpaceControlledVocabulary.class);
     protected static String xpathTemplate = "//node[contains(translate(@label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
-        "'abcdefghijklmnopqrstuvwxyz'),'%s')]";
+        "'abcdefghijklmnopqrstuvwxyz'),%s)]";
     protected static String idTemplate = "//node[@id = '%s']";
-    protected static String labelTemplate = "//node[@label = '%s']";
+    protected static String labelTemplate = "//node[@label = %s]";
     protected static String idParentTemplate = "//node[@id = '%s']/parent::isComposedBy/parent::node";
     protected static String rootTemplate = "/node";
     protected static String pluginNames[] = null;
@@ -165,7 +165,8 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
         String xpathExpression = "";
         String[] textHierarchy = text.split(hierarchyDelimiter, -1);
         for (int i = 0; i < textHierarchy.length; i++) {
-            xpathExpression += String.format(xpathTemplate, textHierarchy[i].replaceAll("'", "&apos;").toLowerCase());
+            String formattedText = escapeQuotes(textHierarchy[i].toLowerCase());
+            xpathExpression += String.format(xpathTemplate, formattedText);
         }
         XPath xpath = XPathFactory.newInstance().newXPath();
         int total = 0;
@@ -189,7 +190,8 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
         String xpathExpression = "";
         String[] textHierarchy = text.split(hierarchyDelimiter, -1);
         for (int i = 0; i < textHierarchy.length; i++) {
-            xpathExpression += String.format(labelTemplate, textHierarchy[i].replaceAll("'", "&apos;"));
+            String formattedText = escapeQuotes(textHierarchy[i]);
+            xpathExpression += String.format(labelTemplate, formattedText);
         }
         XPath xpath = XPathFactory.newInstance().newXPath();
         List<Choice> choices = new ArrayList<Choice>();
@@ -201,6 +203,51 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Hiera
             return new Choices(true);
         }
         return new Choices(choices.toArray(new Choice[choices.size()]), 0, choices.size(), Choices.CF_AMBIGUOUS, false);
+    }
+
+    /**
+     * - If the string doesn't contain any single quotes, it wraps the string in single quotes.
+     * - If the string contains single quotes but no double quotes, it wraps the string in double quotes.
+     * - If the string contains both single and double quotes,
+     *      it constructs an XPath expression using the concat function.
+     * The goal is to allow the string to be safely used in XPath expressions regardless of the presence of quotes.
+     * @param text
+     * @return
+     */
+    private String escapeQuotes(String text) {
+        // If we don't have any quote then enquote string in single quote
+        if (!text.contains("'")) {
+            return String.format("'%s'", text);
+        }
+
+        // If we have some quote but no apostrophe then enquote in double quote
+        if (!text.contains("\"")) {
+            return String.format("\"%s\"", text);
+        }
+
+        // If input contains both " and ' in the string so must use concat
+        // We will build the XPath like below and let the XPath evaluation handle the concatenation
+        // Example: concat('Administr"', '"ati'on')
+        StringBuilder sb = new StringBuilder("concat(");
+
+        // Looking for " as they are LESS likely than '
+        int lastPos = 0;
+        int nextPos = text.indexOf("\"");
+        while (nextPos != -1) {
+            // If this is not the first time through the loop then seperate arguments with ,
+            if (lastPos != 0) {
+                sb.append(",");
+            }
+
+            sb.append(String.format("\"%s\",'\"'", text.substring(lastPos, nextPos)));
+            lastPos = ++nextPos;
+
+            // Find next occurrence
+            nextPos = text.indexOf("\"", lastPos);
+        }
+
+        sb.append(String.format(",\"%s\")", text.substring(lastPos)));
+        return sb.toString();
     }
 
     @Override
