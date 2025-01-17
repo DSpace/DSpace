@@ -111,7 +111,7 @@
         <dependency>
             <groupId>de.digitalcollections.iiif</groupId>
             <artifactId>iiif-apis</artifactId>
-            <version>0.3.10</version>
+            <version>0.3.11</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.javassist</groupId>
