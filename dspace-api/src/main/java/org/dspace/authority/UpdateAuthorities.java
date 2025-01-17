@@ -133,11 +133,11 @@ public class UpdateAuthorities {
         if (selectedIDs != null && !selectedIDs.isEmpty()) {
             authorities = new ArrayList<>();
             for (String selectedID : selectedIDs) {
-                AuthorityValue byUID = authorityValueService.findByUID(context, selectedID);
+                AuthorityValue byUID = authorityValueService.findByUID(selectedID);
                 authorities.add(byUID);
             }
         } else {
-            authorities = authorityValueService.findAll(context);
+            authorities = authorityValueService.findAll();
         }
 
         if (authorities != null) {
@@ -168,7 +168,7 @@ public class UpdateAuthorities {
             while (itemIterator.hasNext()) {
                 Item next = itemIterator.next();
                 List<MetadataValue> metadata = itemService.getMetadata(next, authority.getField(), authority.getId());
-                authority.updateItem(context, next, metadata.get(0)); //should be only one
+                authority.updateItem(context, metadata.get(0)); //should be only one
                 List<MetadataValue> metadataAfter = itemService
                     .getMetadata(next, authority.getField(), authority.getId());
                 if (!metadata.get(0).getValue().equals(metadataAfter.get(0).getValue())) {
