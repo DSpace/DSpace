@@ -1,14 +1,39 @@
+#
+# The contents of this file are subject to the license and copyright
+# detailed in the LICENSE and NOTICE files at the root of the source
+# tree and available online at
+#
+# http://www.dspace.org/license/
+#
+
+#
+# DSpace Backend (REST API) Docker Compose script
+#
+# The following environment variables may be used to modify the behavior of this script:
+# * DSPACE_VER = version of DSpace docker images to use (default = latest & latest-test)
+# * DSPACE_NETWORK_ID = First 3 digits of subnet to use for containers (default = 172.23.0)
+# * DSPACE_REST_PROTO = Protocol to use in dspace.server.url config (default = http)
+# * DSPACE_REST_HOST = Hostname to use in dspace.server.url config (default = localhost)
+# * DSPACE_REST_PORT = Port to use in dspace.server.url config & backend container (default = 8080)
+# * DSPACE_UI_PROTO = Protocol to use in dspace.ui.url config (default = http)
+# * DSPACE_UI_HOST = Hostname to use in dspace.ui.url config (default = localhost)
+# * DSPACE_UI_PORT = Port to use in dspace.ui.url config (default = 4000)
+# * DSPACE_DB_PORT = Port to use for database container (default = 5432)
+# * DSPACE_SOLR_PORT = Port to use for Solr container (default = 8983)
+#
+# Example of running DSpace backend containers on non-default ports & network:
+# DSPACE_UI_PORT=4001 DSPACE_REST_PORT=8081 DSPACE_DB_PORT=5433 DSPACE_SOLR_PORT=8984 DSPACE_SUBNET=172.24.0 docker-compose -p d8 up -d
 networks:
   dspacenet:
     ipam:
       config:
         # Define a custom subnet for our DSpace network, so that we can easily trust requests from host to container.
         # If you customize this value, be sure to customize the 'proxies.trusted.ipranges' env variable below.
-        - subnet: 172.23.0.0/16
+        - subnet: "${DSPACE_NETWORK_ID:-172.23.0}.0/16"
 services:
   # DSpace (backend) webapp container
   dspace:
-    container_name: dspace
+    container_name: "${COMPOSE_PROJECT_NAME}_dspace"
     environment:
       # Below syntax may look odd, but it is how to override dspace.cfg settings via env variables.
       # See https://github.com/DSpace/DSpace/blob/main/dspace/config/config-definition.xml
@@ -16,17 +41,21 @@ services:
       # __D__ => "-" (e.g. google__D__metadata => google-metadata)
       # dspace.dir: Must match with Dockerfile's DSPACE_INSTALL directory.
       dspace__P__dir: /dspace
-      # Uncomment to set a non-default value for dspace.server.url or dspace.ui.url
-      # dspace__P__server__P__url: http://localhost:8080/server
-      # dspace__P__ui__P__url: http://localhost:4000
-      dspace__P__name: 'DSpace Started with Docker Compose'
+      # Set sane defaults using environment variables. This allows you to override parts of the URL
+      # using these environment vars, or the entire URL by passing in a new value for these env variables
+      dspace__P__server__P__url: "${DSPACE_REST_PROTO:-http}://${DSPACE_REST_HOST:-localhost}:${DSPACE_REST_PORT:-8080}/server"
+      dspace__P__ui__P__url: "${DSPACE_UI_PROTO:-http}://${DSPACE_UI_HOST:-localhost}:${DSPACE_UI_PORT:-4000}"
+      dspace__P__name: "DSpace via Docker Compose project ${COMPOSE_PROJECT_NAME}"
       # db.url: Ensure we are using the 'dspacedb' image for our database
-      db__P__url: 'jdbc:postgresql://dspacedb:5432/dspace'
-      # solr.server: Ensure we are using the 'dspacesolr' image for Solr
-      solr__P__server: http://dspacesolr:8983/solr
+      # Note: DB Port in this URL is the internal (target) port. So this is hardcoded.
+      db__P__url: "jdbc:postgresql://${COMPOSE_PROJECT_NAME}_dspacedb:5432/dspace"
+      # solr.server: Ensure we are using the 'dspacesolr' image for Solr.
+      # Note: Solr Port in this URL is the internal (target) port. So this is hardcoded.
+      solr__P__server: "http://${COMPOSE_PROJECT_NAME}_dspacesolr:8983/solr"
       # proxies.trusted.ipranges: This setting is required for a REST API running in Docker to trust requests
       # from the host machine. This IP range MUST correspond to the 'dspacenet' subnet defined above.
-      proxies__P__trusted__P__ipranges: '172.23.0'
+      proxies__P__trusted__P__ipranges: "${DSPACE_NETWORK_ID:-172.23.0}"
+      # Location of log4j configuration to use for this container
       LOGGING_CONFIG: /dspace/config/log4j2-container.xml
     image: "${DOCKER_REGISTRY:-docker.io}/${DOCKER_OWNER:-dspace}/dspace:${DSPACE_VER:-latest-test}"
     build:
@@ -35,12 +64,10 @@ services:
     depends_on:
     - dspacedb
     networks:
-      - dspacenet
+      dspacenet:
     ports:
-    - published: 8080
+    - published: "${DSPACE_REST_PORT:-8080}"
       target: 8080
-    - published: 8000
-      target: 8000
     stdin_open: true
     tty: true
     volumes:
@@ -62,7 +89,7 @@ services:
       java -jar /dspace/webapps/server-boot.jar --dspace.dir=/dspace
   # DSpace PostgreSQL database container
   dspacedb:
-    container_name: dspacedb
+    container_name: "${COMPOSE_PROJECT_NAME}_dspacedb"
     # Uses a custom Postgres image with pgcrypto installed
     image: "${DOCKER_REGISTRY:-docker.io}/${DOCKER_OWNER:-dspace}/dspace-postgres-pgcrypto:${DSPACE_VER:-latest}"
     build:
@@ -74,7 +101,7 @@ services:
     networks:
       dspacenet:
     ports:
-    - published: 5432
+    - published: "${DSPACE_DB_PORT:-5432}"
       target: 5432
     stdin_open: true
     tty: true
@@ -83,7 +110,7 @@ services:
     - pgdata:/pgdata
   # DSpace Solr container
   dspacesolr:
-    container_name: dspacesolr
+    container_name: "${COMPOSE_PROJECT_NAME}_dspacesolr"
     image: "${DOCKER_REGISTRY:-docker.io}/${DOCKER_OWNER:-dspace}/dspace-solr:${DSPACE_VER:-latest}"
     build:
       context: ./dspace/src/main/docker/dspace-solr/
@@ -95,7 +122,7 @@ services:
     networks:
       dspacenet:
     ports:
-    - published: 8983
+    - published: "${DSPACE_SOLR_PORT:-8983}"
       target: 8983
     stdin_open: true
     tty: true
