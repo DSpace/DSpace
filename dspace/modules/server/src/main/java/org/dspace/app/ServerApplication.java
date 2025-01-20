@@ -23,7 +23,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
  * NOTE: This extends SpringBootServletInitializer in order to allow us to build
  * a deployable WAR file with Spring Boot. See:
  * http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-create-a-deployable-war-file
- * 
+ *
  * @author Luca Giamminonni (luca.giamminonni at 4science.it)
  *
  */
@@ -39,8 +39,8 @@ public class ServerApplication extends SpringBootServletInitializer {
      * <p>
      * See: http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-create-a-deployable-war-file
      *
-     * @param application
-     * @return
+     * @param application some builder.
+     * @return the builder, configured with DSpace sources and initializers.
      */
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {

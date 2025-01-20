@@ -102,7 +102,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.4.0</version>
+                <version>3.6.0</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>
@@ -116,7 +116,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.2.1</version>
                 <configuration>
                     <revisionOnScmFailure>UNKNOWN_REVISION</revisionOnScmFailure>
                 </configuration>
@@ -177,7 +177,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jaxb2-maven-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.2.0</version>
                 <executions>
                     <execution>
                         <id>workflow-curation</id>
@@ -654,7 +654,7 @@
         <dependency>
             <groupId>dnsjava</groupId>
             <artifactId>dnsjava</artifactId>
-            <version>3.6.0</version>
+            <version>3.6.2</version>
         </dependency>
 
         <dependency>
@@ -830,7 +830,7 @@
         <dependency>
             <groupId>org.mock-server</groupId>
             <artifactId>mockserver-junit-rule</artifactId>
-            <version>5.11.2</version>
+            <version>5.15.0</version>
             <scope>test</scope>
             <exclusions>
                 <!-- Exclude snakeyaml to avoid conflicts with: spring-boot-starter-cache -->

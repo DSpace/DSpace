@@ -15,7 +15,7 @@ public class Page {
     private int pageNumber;
     private String text;
 
-    public Page(){}
+    public Page() {}
     public Page(int pageNumber, String text) {
         this.pageNumber = pageNumber;
         this.text = text;

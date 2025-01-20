@@ -23,7 +23,7 @@ public class Pages {
     @JacksonXmlElementWrapper(useWrapping = false)
     private List<Page> pageList;
 
-    public Pages(){}
+    public Pages() {}
     public Pages(final List<Page> pageList) {
         this.pageList = pageList;
     }

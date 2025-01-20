@@ -56,7 +56,7 @@ public class DSpaceConfigurationServiceTest {
         configurationService.clear();
 
         // Start fresh with out own set of configs
-        Map<String, Object> l = new HashMap<String, Object>();
+        Map<String, Object> l = new HashMap<>();
         l.put("service.name", "DSpace");
         l.put("sample.array", "itemA,itemB,itemC");
         l.put("sample.number", "123");
@@ -86,7 +86,7 @@ public class DSpaceConfigurationServiceTest {
     @Test
     public void testVariableReplacement() {
 
-        Map<String, Object> l = new HashMap<String, Object>();
+        Map<String, Object> l = new HashMap<>();
         l.put("service.name", "DSpace");
         l.put("aaronz", "Aaron Zeckoski");
         l.put("current.user", "${aaronz}");
@@ -295,7 +295,7 @@ public class DSpaceConfigurationServiceTest {
         assertEquals("itemC", array[2]);
         Integer number = configurationService.getPropertyAsType("sample.number", Integer.class);
         assertNotNull(number);
-        assertEquals(new Integer(123), number);
+        assertEquals(Integer.valueOf(123), number);
 
         Boolean bool = configurationService.getPropertyAsType("sample.boolean", Boolean.class);
         assertNotNull(bool);
@@ -306,7 +306,6 @@ public class DSpaceConfigurationServiceTest {
         assertEquals(Boolean.FALSE, bool2);
 
         boolean bool3 = configurationService.getPropertyAsType("INVALID.PROPERTY", boolean.class);
-        assertNotNull(bool3);
         assertEquals(false, bool3);
 
         assertEquals(123, (int) configurationService.getPropertyAsType("sample.number", int.class));
@@ -333,9 +332,9 @@ public class DSpaceConfigurationServiceTest {
         assertEquals("itemB", array[1]);
         assertEquals("itemC", array[2]);
 
-        Integer number = configurationService.getPropertyAsType("sample.number", new Integer(12345));
+        Integer number = configurationService.getPropertyAsType("sample.number", 12345);
         assertNotNull(number);
-        assertEquals(new Integer(123), number);
+        assertEquals(Integer.valueOf(123), number);
 
         Boolean bool = configurationService.getPropertyAsType("sample.boolean", Boolean.FALSE);
         assertNotNull(bool);
@@ -522,8 +521,11 @@ public class DSpaceConfigurationServiceTest {
     }
 
     /**
-     * Tests the ability of our ConfigurationService to automatically reload properties after a set period
-     * of time.
+     * Tests the ability of our ConfigurationService to automatically reload
+     * properties after a set period of time.
+     * @throws ConfigurationException passed through.
+     * @throws IOException if test properties file cannot be created or copied.
+     * @throws InterruptedException if sleep is interrupted.
      */
     @Test
     public void testAutomaticReload() throws ConfigurationException, IOException, InterruptedException {
