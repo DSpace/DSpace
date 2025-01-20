@@ -22,7 +22,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataDSpaceCsvExportService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.eperson.service.GroupService;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.services.ConfigurationService;
@@ -41,9 +40,6 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
 
     @Autowired
     private ConfigurationService configurationService;
-
-    @Autowired
-    private GroupService groupService;
 
     @Override
     public DSpaceCSV handleExport(Context context, boolean exportAllItems, boolean exportAllMetadata, String identifier,
@@ -117,15 +113,6 @@ public class MetadataDSpaceCsvExportServiceImpl implements MetadataDSpaceCsvExpo
                                                      DSpaceRunnableHandler handler) throws SQLException {
         int itemExportLimit = configurationService.getIntProperty(
                 "metadataexport.max.items", 500);
-        String[] ignoreLimitGroups =  configurationService.getArrayProperty(
-                "metadataexport.admin.groups");
-
-        for (String group : ignoreLimitGroups) {
-            if (groupService.isMember(context, context.getCurrentUser(), group)) {
-                itemExportLimit = Integer.MAX_VALUE;
-                break;
-            }
-        }
 
         List<Item> items = IteratorUtils.toList(toExport);
         if (items.size() > itemExportLimit) {
