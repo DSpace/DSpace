@@ -64,6 +64,13 @@ public class OrcidQueueDAOImpl extends AbstractHibernateDAO<OrcidQueue> implemen
     }
 
     @Override
+    public List<OrcidQueue> findByEntity(Context context, Item item) throws SQLException {
+        Query query = createQuery(context, "FROM OrcidQueue WHERE entity.id = :itemId");
+        query.setParameter("itemId", item.getID());
+        return query.getResultList();
+    }
+
+    @Override
     public List<OrcidQueue> findByEntityAndRecordType(Context context, Item entity, String type) throws SQLException {
         Query query = createQuery(context, "FROM OrcidQueue WHERE entity = :entity AND recordType = :type");
         query.setParameter("entity", entity);

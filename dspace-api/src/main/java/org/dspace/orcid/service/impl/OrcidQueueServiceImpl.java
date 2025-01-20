@@ -71,6 +71,11 @@ public class OrcidQueueServiceImpl implements OrcidQueueService {
     }
 
     @Override
+    public List<OrcidQueue> findByEntity(Context context, Item item) throws SQLException {
+        return orcidQueueDAO.findByEntity(context, item);
+    }
+
+    @Override
     public long countByProfileItemId(Context context, UUID profileItemId) throws SQLException {
         return orcidQueueDAO.countByProfileItemId(context, profileItemId);
     }
