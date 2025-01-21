@@ -264,10 +264,10 @@ public class DOIOrganiser {
                     }
                 }
             } catch (SQLException ex) {
-                System.err.println("Error in database connection:" + ex.getMessage());
+                System.err.format("Error in database connection:  %s%n", ex.getMessage());
                 ex.printStackTrace(System.err);
-            } catch (DOIIdentifierException ex) {
-                System.err.println("Error registering DOI identifier:" + ex.getMessage());
+            } catch (RuntimeException ex) {
+                System.err.format("Error registering DOI identifier:  %s%n", ex.getMessage());
             }
         }
 
@@ -422,12 +422,18 @@ public class DOIOrganiser {
 
     /**
      * Register DOI with the provider
-     * @param doiRow        - doi to register
-     * @param filter        - logical item filter to override
-     * @throws SQLException
-     * @throws DOIIdentifierException
+     * @param doiRow        DOI to register
+     * @param filter        logical item filter to override
+     * @throws IllegalArgumentException
+     *                      if {@link doiRow} does not name an Item.
+     * @throws IllegalStateException
+     *                      on invalid DOI.
+     * @throws RuntimeException
+     *                      on database error.
      */
-    public void register(DOI doiRow, Filter filter) throws SQLException, DOIIdentifierException {
+    public void register(DOI doiRow, Filter filter)
+            throws IllegalArgumentException, IllegalStateException,
+            RuntimeException {
         DSpaceObject dso = doiRow.getDSpaceObject();
         if (Constants.ITEM != dso.getType()) {
             throw new IllegalArgumentException("Currenty DSpace supports DOIs for Items only.");
@@ -495,11 +501,14 @@ public class DOIOrganiser {
 
     /**
      * Register DOI with the provider.
-     * @param doiRow        - doi to register
-     * @throws SQLException passed through
-     * @throws DOIIdentifierException passed through
+     * @param doiRow        DOI to register
+     * @throws IllegalArgumentException passed through.
+     * @throws IllegalStateException passed through.
+     * @throws RuntimeException passed through.
      */
-    public void register(DOI doiRow) throws SQLException, DOIIdentifierException {
+    public void register(DOI doiRow)
+            throws IllegalStateException, IllegalArgumentException,
+            RuntimeException {
         register(doiRow, this.filter);
     }
 
