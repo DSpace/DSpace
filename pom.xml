@@ -1131,7 +1131,7 @@
             <dependency>
                 <groupId>org.jboss.logging</groupId>
                 <artifactId>jboss-logging</artifactId>
-                <version>3.4.3.Final</version>
+                <version>3.6.1.Final</version>
             </dependency>
 
             <!-- Hibernate & Solr disagree on the version of antlr. So, specify the latest version -->
