@@ -54,7 +54,7 @@ public class AccessStatusRest implements RestModel {
 
     public String getEmbargoDate() {
         return embargoDate;
-     }
+    }
 
     public void setEmbargoDate(String embargoDate) {
         this.embargoDate = embargoDate;
