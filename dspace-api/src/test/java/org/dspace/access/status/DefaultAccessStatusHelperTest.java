@@ -9,6 +9,7 @@ package org.dspace.access.status;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
@@ -207,6 +208,8 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
     public void testWithNullItem() throws Exception {
         String status = helper.getAccessStatusFromItem(context, null, threshold);
         assertThat("testWithNullItem 0", status, equalTo(DefaultAccessStatusHelper.UNKNOWN));
+        String embargoDate = helper.getEmbargoFromItem(context, null, threshold);
+        assertNull("testWithNullItem 1", embargoDate);
     }
 
     /**
@@ -217,6 +220,8 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
     public void testWithoutBundle() throws Exception {
         String status = helper.getAccessStatusFromItem(context, itemWithoutBundle, threshold);
         assertThat("testWithoutBundle 0", status, equalTo(DefaultAccessStatusHelper.METADATA_ONLY));
+        String embargoDate = helper.getEmbargoFromItem(context, itemWithoutBundle, threshold);
+        assertNull("testWithoutBundle 1", embargoDate);
     }
 
     /**
@@ -230,6 +235,12 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         context.restoreAuthSystemState();
         String status = helper.getAccessStatusFromItem(context, itemWithoutBitstream, threshold);
         assertThat("testWithoutBitstream 0", status, equalTo(DefaultAccessStatusHelper.METADATA_ONLY));
+        String embargoDate = helper.getEmbargoFromItem(context, itemWithoutBitstream, threshold);
+        assertNull("testWithoutBitstream 1", embargoDate);
+        Date availabilityDate = helper.getAvailabilityDateFromBitstream(context, null, threshold);
+        assertNull("testWithoutBitstream 2", availabilityDate);
+        String bitstreamStatus = helper.getAccessStatusFromAvailabilityDate(availabilityDate, threshold);
+        assertThat("testWithoutBitstream 3", bitstreamStatus, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
     }
 
     /**
@@ -247,6 +258,12 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         context.restoreAuthSystemState();
         String status = helper.getAccessStatusFromItem(context, itemWithBitstream, threshold);
         assertThat("testWithBitstream 0", status, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+        String embargoDate = helper.getEmbargoFromItem(context, itemWithBitstream, threshold);
+        assertNull("testWithBitstream 1", embargoDate);
+        Date availabilityDate = helper.getAvailabilityDateFromBitstream(context, bitstream, threshold);
+        assertNull("testWithBitstream 2", availabilityDate);
+        String bitstreamStatus = helper.getAccessStatusFromAvailabilityDate(availabilityDate, threshold);
+        assertThat("testWithBitstream 3", bitstreamStatus, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
     }
 
     /**
@@ -266,7 +283,8 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         ResourcePolicy policy = resourcePolicyService.create(context, null, group);
         policy.setRpName("Embargo");
         policy.setAction(Constants.READ);
-        policy.setStartDate(dateFrom(9999, 12, 31));
+        Date startDate = dateFrom(9999, 12, 31);
+        policy.setStartDate(startDate);
         policies.add(policy);
         authorizeService.removeAllPolicies(context, bitstream);
         authorizeService.addPolicies(context, policies, bitstream);
@@ -274,7 +292,11 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         String status = helper.getAccessStatusFromItem(context, itemWithEmbargo, threshold);
         assertThat("testWithEmbargo 0", status, equalTo(DefaultAccessStatusHelper.EMBARGO));
         String embargoDate = helper.getEmbargoFromItem(context, itemWithEmbargo, threshold);
-        assertThat("testWithEmbargo 1", embargoDate, equalTo(policy.getStartDate().toString()));
+        assertThat("testWithEmbargo 1", embargoDate, equalTo(startDate.toString()));
+        Date availabilityDate = helper.getAvailabilityDateFromBitstream(context, bitstream, threshold);
+        assertThat("testWithEmbargo 2", availabilityDate, equalTo(startDate));
+        String bitstreamStatus = helper.getAccessStatusFromAvailabilityDate(availabilityDate, threshold);
+        assertThat("testWithEmbargo 3", bitstreamStatus, equalTo(DefaultAccessStatusHelper.EMBARGO));
     }
 
     /**
@@ -294,13 +316,20 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         ResourcePolicy policy = resourcePolicyService.create(context, null, group);
         policy.setRpName("Restriction");
         policy.setAction(Constants.READ);
-        policy.setStartDate(dateFrom(10000, 1, 1));
+        Date startDate = dateFrom(10000, 1, 1);
+        policy.setStartDate(startDate);
         policies.add(policy);
         authorizeService.removeAllPolicies(context, bitstream);
         authorizeService.addPolicies(context, policies, bitstream);
         context.restoreAuthSystemState();
         String status = helper.getAccessStatusFromItem(context, itemWithDateRestriction, threshold);
         assertThat("testWithDateRestriction 0", status, equalTo(DefaultAccessStatusHelper.RESTRICTED));
+        String embargoDate = helper.getEmbargoFromItem(context, itemWithDateRestriction, threshold);
+        assertNull("testWithDateRestriction 1", embargoDate);
+        Date availabilityDate = helper.getAvailabilityDateFromBitstream(context, bitstream, threshold);
+        assertThat("testWithDateRestriction 2", availabilityDate, equalTo(startDate));
+        String bitstreamStatus = helper.getAccessStatusFromAvailabilityDate(availabilityDate, threshold);
+        assertThat("testWithDateRestriction 3", bitstreamStatus, equalTo(DefaultAccessStatusHelper.RESTRICTED));
     }
 
     /**
@@ -326,6 +355,12 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         context.restoreAuthSystemState();
         String status = helper.getAccessStatusFromItem(context, itemWithGroupRestriction, threshold);
         assertThat("testWithGroupRestriction 0", status, equalTo(DefaultAccessStatusHelper.RESTRICTED));
+        String embargoDate = helper.getEmbargoFromItem(context, itemWithGroupRestriction, threshold);
+        assertNull("testWithGroupRestriction 1", embargoDate);
+        Date availabilityDate = helper.getAvailabilityDateFromBitstream(context, bitstream, threshold);
+        assertThat("testWithGroupRestriction 2", availabilityDate, equalTo(threshold));
+        String bitstreamStatus = helper.getAccessStatusFromAvailabilityDate(availabilityDate, threshold);
+        assertThat("testWithGroupRestriction 3", bitstreamStatus, equalTo(DefaultAccessStatusHelper.RESTRICTED));
     }
 
     /**
@@ -344,6 +379,12 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         context.restoreAuthSystemState();
         String status = helper.getAccessStatusFromItem(context, itemWithoutPolicy, threshold);
         assertThat("testWithoutPolicy 0", status, equalTo(DefaultAccessStatusHelper.RESTRICTED));
+        String embargoDate = helper.getEmbargoFromItem(context, itemWithoutPolicy, threshold);
+        assertNull("testWithoutPolicy 1", embargoDate);
+        Date availabilityDate = helper.getAvailabilityDateFromBitstream(context, bitstream, threshold);
+        assertThat("testWithoutPolicy 2", availabilityDate, equalTo(threshold));
+        String bitstreamStatus = helper.getAccessStatusFromAvailabilityDate(availabilityDate, threshold);
+        assertThat("testWithoutPolicy 3", bitstreamStatus, equalTo(DefaultAccessStatusHelper.RESTRICTED));
     }
 
     /**
@@ -360,6 +401,12 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         context.restoreAuthSystemState();
         String status = helper.getAccessStatusFromItem(context, itemWithoutPrimaryBitstream, threshold);
         assertThat("testWithoutPrimaryBitstream 0", status, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+        String embargoDate = helper.getEmbargoFromItem(context, itemWithoutPrimaryBitstream, threshold);
+        assertNull("testWithoutPrimaryBitstream 1", embargoDate);
+        Date availabilityDate = helper.getAvailabilityDateFromBitstream(context, bitstream, threshold);
+        assertNull("testWithoutPrimaryBitstream 2", availabilityDate);
+        String bitstreamStatus = helper.getAccessStatusFromAvailabilityDate(availabilityDate, threshold);
+        assertThat("testWithoutPrimaryBitstream 3", bitstreamStatus, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
     }
 
     /**
@@ -372,7 +419,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
         Bundle bundle = bundleService.create(context, itemWithPrimaryAndMultipleBitstreams,
                 Constants.CONTENT_BUNDLE_NAME);
-        bitstreamService.create(context, bundle,
+        Bitstream otherBitstream = bitstreamService.create(context, bundle,
                 new ByteArrayInputStream("1".getBytes(StandardCharsets.UTF_8)));
         Bitstream primaryBitstream = bitstreamService.create(context, bundle,
                 new ByteArrayInputStream("1".getBytes(StandardCharsets.UTF_8)));
@@ -382,7 +429,8 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         ResourcePolicy policy = resourcePolicyService.create(context, null, group);
         policy.setRpName("Embargo");
         policy.setAction(Constants.READ);
-        policy.setStartDate(dateFrom(9999, 12, 31));
+        Date startDate = dateFrom(9999, 12, 31);
+        policy.setStartDate(startDate);
         policies.add(policy);
         authorizeService.removeAllPolicies(context, primaryBitstream);
         authorizeService.addPolicies(context, policies, primaryBitstream);
@@ -390,7 +438,15 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         String status = helper.getAccessStatusFromItem(context, itemWithPrimaryAndMultipleBitstreams, threshold);
         assertThat("testWithPrimaryAndMultipleBitstreams 0", status, equalTo(DefaultAccessStatusHelper.EMBARGO));
         String embargoDate = helper.getEmbargoFromItem(context, itemWithPrimaryAndMultipleBitstreams, threshold);
-        assertThat("testWithPrimaryAndMultipleBitstreams 1", embargoDate, equalTo(policy.getStartDate().toString()));
+        assertThat("testWithPrimaryAndMultipleBitstreams 1", embargoDate, equalTo(startDate.toString()));
+        Date primaryAvailabilityDate = helper.getAvailabilityDateFromBitstream(context, primaryBitstream, threshold);
+        assertThat("testWithPrimaryAndMultipleBitstreams 2", primaryAvailabilityDate, equalTo(startDate));
+        String primaryBitstreamStatus = helper.getAccessStatusFromAvailabilityDate(primaryAvailabilityDate, threshold);
+        assertThat("testWithPrimaryAndMultipleBitstreams 3", primaryBitstreamStatus, equalTo(DefaultAccessStatusHelper.EMBARGO));
+        Date otherAvailabilityDate = helper.getAvailabilityDateFromBitstream(context, otherBitstream, threshold);
+        assertNull("testWithPrimaryAndMultipleBitstreams 4", otherAvailabilityDate);
+        String otherBitstreamStatus = helper.getAccessStatusFromAvailabilityDate(otherAvailabilityDate, threshold);
+        assertThat("testWithPrimaryAndMultipleBitstreams 5", otherBitstreamStatus, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
     }
 
     /**
@@ -403,7 +459,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
         Bundle bundle = bundleService.create(context, itemWithoutPrimaryAndMultipleBitstreams,
                 Constants.CONTENT_BUNDLE_NAME);
-        bitstreamService.create(context, bundle,
+        Bitstream firstBitstream = bitstreamService.create(context, bundle,
                 new ByteArrayInputStream("1".getBytes(StandardCharsets.UTF_8)));
         Bitstream anotherBitstream = bitstreamService.create(context, bundle,
                 new ByteArrayInputStream("1".getBytes(StandardCharsets.UTF_8)));
@@ -412,7 +468,8 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         ResourcePolicy policy = resourcePolicyService.create(context, null, group);
         policy.setRpName("Embargo");
         policy.setAction(Constants.READ);
-        policy.setStartDate(dateFrom(9999, 12, 31));
+        Date startDate = dateFrom(9999, 12, 31);
+        policy.setStartDate(startDate);
         policies.add(policy);
         authorizeService.removeAllPolicies(context, anotherBitstream);
         authorizeService.addPolicies(context, policies, anotherBitstream);
@@ -420,7 +477,15 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         String status = helper.getAccessStatusFromItem(context, itemWithoutPrimaryAndMultipleBitstreams, threshold);
         assertThat("testWithNoPrimaryAndMultipleBitstreams 0", status, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
         String embargoDate = helper.getEmbargoFromItem(context, itemWithEmbargo, threshold);
-        assertThat("testWithNoPrimaryAndMultipleBitstreams 1", embargoDate, equalTo(null));
+        assertNull("testWithNoPrimaryAndMultipleBitstreams 1", embargoDate);
+        Date firstAvailabilityDate = helper.getAvailabilityDateFromBitstream(context, firstBitstream, threshold);
+        assertNull("testWithNoPrimaryAndMultipleBitstreams 2", firstAvailabilityDate);
+        String firstBitstreamStatus = helper.getAccessStatusFromAvailabilityDate(firstAvailabilityDate, threshold);
+        assertThat("testWithNoPrimaryAndMultipleBitstreams 3", firstBitstreamStatus, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+        Date otherAvailabilityDate = helper.getAvailabilityDateFromBitstream(context, anotherBitstream, threshold);
+        assertThat("testWithNoPrimaryAndMultipleBitstreams 4", otherAvailabilityDate, equalTo(startDate));
+        String otherBitstreamStatus = helper.getAccessStatusFromAvailabilityDate(otherAvailabilityDate, threshold);
+        assertThat("testWithNoPrimaryAndMultipleBitstreams 5", otherBitstreamStatus, equalTo(DefaultAccessStatusHelper.EMBARGO));
     }
 
     /**
