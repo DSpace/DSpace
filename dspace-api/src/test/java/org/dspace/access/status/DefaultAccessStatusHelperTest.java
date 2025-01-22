@@ -442,11 +442,13 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         Date primaryAvailabilityDate = helper.getAvailabilityDateFromBitstream(context, primaryBitstream, threshold);
         assertThat("testWithPrimaryAndMultipleBitstreams 2", primaryAvailabilityDate, equalTo(startDate));
         String primaryBitstreamStatus = helper.getAccessStatusFromAvailabilityDate(primaryAvailabilityDate, threshold);
-        assertThat("testWithPrimaryAndMultipleBitstreams 3", primaryBitstreamStatus, equalTo(DefaultAccessStatusHelper.EMBARGO));
+        assertThat("testWithPrimaryAndMultipleBitstreams 3", primaryBitstreamStatus,
+                equalTo(DefaultAccessStatusHelper.EMBARGO));
         Date otherAvailabilityDate = helper.getAvailabilityDateFromBitstream(context, otherBitstream, threshold);
         assertNull("testWithPrimaryAndMultipleBitstreams 4", otherAvailabilityDate);
         String otherBitstreamStatus = helper.getAccessStatusFromAvailabilityDate(otherAvailabilityDate, threshold);
-        assertThat("testWithPrimaryAndMultipleBitstreams 5", otherBitstreamStatus, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+        assertThat("testWithPrimaryAndMultipleBitstreams 5", otherBitstreamStatus,
+                equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
     }
 
     /**
@@ -475,17 +477,20 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         authorizeService.addPolicies(context, policies, anotherBitstream);
         context.restoreAuthSystemState();
         String status = helper.getAccessStatusFromItem(context, itemWithoutPrimaryAndMultipleBitstreams, threshold);
-        assertThat("testWithNoPrimaryAndMultipleBitstreams 0", status, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+        assertThat("testWithNoPrimaryAndMultipleBitstreams 0", status,
+                equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
         String embargoDate = helper.getEmbargoFromItem(context, itemWithEmbargo, threshold);
         assertNull("testWithNoPrimaryAndMultipleBitstreams 1", embargoDate);
         Date firstAvailabilityDate = helper.getAvailabilityDateFromBitstream(context, firstBitstream, threshold);
         assertNull("testWithNoPrimaryAndMultipleBitstreams 2", firstAvailabilityDate);
         String firstBitstreamStatus = helper.getAccessStatusFromAvailabilityDate(firstAvailabilityDate, threshold);
-        assertThat("testWithNoPrimaryAndMultipleBitstreams 3", firstBitstreamStatus, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+        assertThat("testWithNoPrimaryAndMultipleBitstreams 3", firstBitstreamStatus,
+                equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
         Date otherAvailabilityDate = helper.getAvailabilityDateFromBitstream(context, anotherBitstream, threshold);
         assertThat("testWithNoPrimaryAndMultipleBitstreams 4", otherAvailabilityDate, equalTo(startDate));
         String otherBitstreamStatus = helper.getAccessStatusFromAvailabilityDate(otherAvailabilityDate, threshold);
-        assertThat("testWithNoPrimaryAndMultipleBitstreams 5", otherBitstreamStatus, equalTo(DefaultAccessStatusHelper.EMBARGO));
+        assertThat("testWithNoPrimaryAndMultipleBitstreams 5", otherBitstreamStatus,
+                equalTo(DefaultAccessStatusHelper.EMBARGO));
     }
 
     /**

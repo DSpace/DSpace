@@ -224,7 +224,8 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
      * @param threshold     the embargo threshold date
      * @return an availability date
      */
-    private Date retrieveAvailabilityDateForCurrentUser(Context context, Bitstream bitstream, Date threshold) throws SQLException {
+    private Date retrieveAvailabilityDateForCurrentUser(Context context, Bitstream bitstream, Date threshold)
+        throws SQLException {
         if (bitstream == null) {
             return null;
         }
@@ -261,7 +262,8 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
      * @param threshold     the embargo threshold date
      * @return an availability date
      */
-    private Date retrieveAvailabilityDateForAnonymousUsers(Context context, Bitstream bitstream, Date threshold) throws SQLException {
+    private Date retrieveAvailabilityDateForAnonymousUsers(Context context, Bitstream bitstream, Date threshold)
+        throws SQLException {
         // Only calculate the status for the anonymous group read policies
         List<ResourcePolicy> policies = getAnonymousReadPolicies(context, bitstream);
         return findAvailabilityDate(policies, threshold);
