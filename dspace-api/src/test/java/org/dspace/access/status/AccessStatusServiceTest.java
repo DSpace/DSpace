@@ -8,24 +8,34 @@
 package org.dspace.access.status;
 
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.util.Date;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.access.status.factory.AccessStatusServiceFactory;
 import org.dspace.access.status.service.AccessStatusService;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.core.Constants;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,6 +50,8 @@ public class AccessStatusServiceTest extends AbstractUnitTest {
     private Collection collection;
     private Community owningCommunity;
     private Item item;
+    private Bundle bundle;
+    private Bitstream bitstream;
 
     protected CommunityService communityService =
             ContentServiceFactory.getInstance().getCommunityService();
@@ -47,6 +59,10 @@ public class AccessStatusServiceTest extends AbstractUnitTest {
             ContentServiceFactory.getInstance().getCollectionService();
     protected ItemService itemService =
             ContentServiceFactory.getInstance().getItemService();
+    protected BundleService bundleService =
+            ContentServiceFactory.getInstance().getBundleService();
+    protected BitstreamService bitstreamService =
+            ContentServiceFactory.getInstance().getBitstreamService();
     protected WorkspaceItemService workspaceItemService =
             ContentServiceFactory.getInstance().getWorkspaceItemService();
     protected InstallItemService installItemService =
@@ -71,6 +87,10 @@ public class AccessStatusServiceTest extends AbstractUnitTest {
             collection = collectionService.create(context, owningCommunity);
             item = installItemService.installItem(context,
                     workspaceItemService.create(context, collection, true));
+            bundle = bundleService.create(context, item, Constants.CONTENT_BUNDLE_NAME);
+            bitstream = bitstreamService.create(context, bundle,
+                new ByteArrayInputStream("1".getBytes(StandardCharsets.UTF_8)));
+            bitstream.setName(context, "primary");
             context.restoreAuthSystemState();
         } catch (AuthorizeException ex) {
             log.error("Authorization Error in init", ex);
@@ -78,6 +98,9 @@ public class AccessStatusServiceTest extends AbstractUnitTest {
         } catch (SQLException ex) {
             log.error("SQL Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
+        } catch (IOException ex) {
+            log.error("IO Error in init", ex);
+            fail("IO Error in init: " + ex.getMessage());
         }
     }
 
@@ -92,6 +115,16 @@ public class AccessStatusServiceTest extends AbstractUnitTest {
     @Override
     public void destroy() {
         context.turnOffAuthorisationSystem();
+        try {
+            bitstreamService.delete(context, bitstream);
+        } catch (Exception e) {
+            // ignore
+        }
+        try {
+            bundleService.delete(context, bundle);
+        } catch (Exception e) {
+            // ignore
+        }
         try {
             itemService.delete(context, item);
         } catch (Exception e) {
@@ -108,6 +141,8 @@ public class AccessStatusServiceTest extends AbstractUnitTest {
             // ignore
         }
         context.restoreAuthSystemState();
+        bitstream = null;
+        bundle = null;
         item = null;
         collection = null;
         owningCommunity = null;
@@ -122,5 +157,24 @@ public class AccessStatusServiceTest extends AbstractUnitTest {
     public void testGetAccessStatus() throws Exception {
         String status = accessStatusService.getAccessStatus(context, item);
         assertNotEquals("testGetAccessStatus 0", status, DefaultAccessStatusHelper.UNKNOWN);
+    }
+
+    @Test
+    public void testGetEmbargoFromItem() throws Exception {
+        String embargo = accessStatusService.getEmbargoFromItem(context, item);
+        assertNull("testGetEmbargoFromItem 0", embargo);
+    }
+
+    @Test
+    public void testGetAvailabilityDateFromBitstream() throws Exception {
+        Date availabilityDate = accessStatusService.getAvailabilityDateFromBitstream(context, bitstream);
+        assertNull("testGetAvailabilityDateFromBitstream 0", availabilityDate);
+    }
+
+    @Test
+    public void testGetAccessStatusFromAvailabilityDate() throws Exception {
+        Date availabilityDate = accessStatusService.getAvailabilityDateFromBitstream(context, bitstream);
+        String status = accessStatusService.getAccessStatusFromAvailabilityDate(availabilityDate);
+        assertNotEquals("testGetAccessStatusFromAvailabilityDate 0", status, DefaultAccessStatusHelper.UNKNOWN);
     }
 }
