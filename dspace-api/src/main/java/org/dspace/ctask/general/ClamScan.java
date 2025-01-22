@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections4.ListUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -99,8 +100,13 @@ public class ClamScan extends AbstractCurationTask {
             }
 
             try {
-                Bundle bundle = itemService.getBundles(item, "ORIGINAL").get(0);
-                results = new ArrayList<>();
+                List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
+                if (ListUtils.emptyIfNull(bundles).isEmpty()) {
+                    setResult("No ORIGINAL bundle found for item: " + getItemHandle(item));
+                    return Curator.CURATE_SKIP;
+                }
+                Bundle bundle = bundles.get(0);
+                results = new ArrayList<String>();
                 for (Bitstream bitstream : bundle.getBitstreams()) {
                     InputStream inputstream = bitstreamService.retrieve(Curator.curationContext(), bitstream);
                     logDebugMessage("Scanning " + bitstream.getName() + " . . . ");
