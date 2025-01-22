@@ -19,11 +19,15 @@ import java.util.regex.Pattern;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.ExternalSourceRest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
+import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.ItemService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.external.model.ExternalDataObject;
 import org.dspace.external.service.ExternalDataService;
@@ -42,6 +46,11 @@ public abstract class ExternalSourceEntryItemUriListHandler<T> implements UriLis
 
     @Autowired
     private ExternalDataService externalDataService;
+
+    @Autowired
+    private ItemService itemService;
+    @Autowired
+    private WorkspaceItemService workspaceItemService;
 
     @Autowired
     private CollectionService collectionService;
@@ -99,16 +108,84 @@ public abstract class ExternalSourceEntryItemUriListHandler<T> implements UriLis
      */
     public WorkspaceItem createWorkspaceItem(Context context, HttpServletRequest request, List<String> uriList)
         throws SQLException, AuthorizeException {
-        ExternalDataObject dataObject = getExternalDataObjectFromUriList(uriList);
-
+        Object objectToMatch = getObjectFromUriList(context, uriList);
         String owningCollectionUuid = request.getParameter("owningCollection");
+        if (objectToMatch instanceof ExternalDataObject dataObject) {
+            try {
+                Collection collection = collectionService.find(context, UUID.fromString(owningCollectionUuid));
+                return externalDataService.createWorkspaceItemFromExternalDataObject(context, dataObject, collection);
+            } catch (AuthorizeException | SQLException e) {
+                log.error("An error occurred when trying to create item in collection with uuid: " +
+                        owningCollectionUuid, e);
+                throw e;
+            }
+        } else if (objectToMatch instanceof Item item) {
+            try {
+                Collection collection = collectionService.find(context, UUID.fromString(owningCollectionUuid));
+                WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, true);
+                itemService.copy(context, workspaceItem.getItem(), item);
+                return workspaceItem;
+            } catch (AuthorizeException | SQLException e) {
+                log.error("An error occurred when trying to create item in collection with uuid: " +
+                        owningCollectionUuid, e);
+                throw e;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        throw new DSpaceBadRequestException("Couldn't match an object from request: " + uriList);
+    }
+
+    /**
+     * Determines
+     * @param context
+     * @param uriList
+     * @return
+     * @throws IllegalArgumentException
+     */
+    private Object getObjectFromUriList(Context context, List<String> uriList) throws IllegalArgumentException {
+        Optional<ExternalDataObject> externalDataObject = getExternalDataObjectFromUriList(uriList);
+        if (externalDataObject.isPresent()) {
+            return externalDataObject.get();
+        }
+
+        Optional<Item> item = getItemFromUriList(context, uriList);
+        if (item.isPresent()) {
+            return item.get();
+        }
+
+        throw new IllegalArgumentException("No valid object found for the provided URI list.");
+    }
+
+    /**
+     * This method will take the first uriList string from the list and it'll perform regex logic to get the ID
+     * parameter from it to then retrieve an Item object from the service.
+     * @param context The current DSpace context
+     * @param uriList The uriList that contains the data for the Item
+     * @return The appropriate Item
+     * @throws ResourceNotFoundException if the Item was not found.
+     * @throws IllegalArgumentException if the uri from uriList strings does not match the pattern.
+     */
+    private Optional<Item> getItemFromUriList(Context context, List<String> uriList)
+        throws ResourceNotFoundException, IllegalArgumentException {
+        String inputString = uriList.get(0);
+        Pattern pattern = Pattern.compile("\\/api\\/core\\/items\\/(.*)");
+        Matcher matcher = pattern.matcher(inputString);
+
+        if (!matcher.find()) {
+            return Optional.empty();
+        }
+
+        String itemIdentifier = matcher.group(1);
+        UUID id = null;
         try {
-            Collection collection = collectionService.find(context, UUID.fromString(owningCollectionUuid));
-            return externalDataService.createWorkspaceItemFromExternalDataObject(context, dataObject, collection);
-        } catch (AuthorizeException | SQLException e) {
-            log.error("An error occurred when trying to create item in collection with uuid: " + owningCollectionUuid,
-                      e);
+            id = UUID.fromString(itemIdentifier);
+            return Optional.ofNullable(itemService.find(context, id));
+        } catch (IllegalArgumentException e) {
+            log.error("The provided URI contains an invalid UUID: {}", itemIdentifier, e);
             throw e;
+        } catch (SQLException e) {
+            throw new ResourceNotFoundException("An error occurred while trying to find the Item with ID: " + id, e);
         }
     }
 
@@ -118,20 +195,21 @@ public abstract class ExternalSourceEntryItemUriListHandler<T> implements UriLis
      * an ExternalDataObject from the service
      * @param uriList   The list of UriList strings to be parsed
      * @return The appropriate ExternalDataObject
+     * @throws ResourceNotFoundException if the ExternalSource was not found.
      */
-    private ExternalDataObject getExternalDataObjectFromUriList(List<String> uriList) {
+    private Optional<ExternalDataObject> getExternalDataObjectFromUriList(List<String> uriList)
+        throws ResourceNotFoundException, IllegalArgumentException {
         String inputString = uriList.get(0);
         Pattern pattern = Pattern.compile("api\\/integration\\/externalsources\\/(.*)\\/entryValues\\/(.*)");
         Matcher matcher = pattern.matcher(inputString);
 
-        matcher.find();
+        if (!matcher.find()) {
+            return Optional.empty();
+        }
         String externalSourceIdentifer = matcher.group(1);
         String id = matcher.group(2);
 
-        Optional<ExternalDataObject> externalDataObject = externalDataService
-            .getExternalDataObject(externalSourceIdentifer, id);
-        return externalDataObject.orElseThrow(() -> new ResourceNotFoundException(
-            "Couldn't find an ExternalSource for source: " + externalSourceIdentifer + " and ID: " + id));
+        return externalDataService.getExternalDataObject(externalSourceIdentifer, id);
     }
 
 }

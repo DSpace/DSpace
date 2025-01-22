@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.dspace.authorize.AuthorizeException;
@@ -23,6 +24,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.EntityType;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataFieldName;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.Thumbnail;
 import org.dspace.content.WorkspaceItem;
@@ -1009,4 +1011,62 @@ public interface ItemService
      */
     EntityType getEntityType(Context context, Item item) throws SQLException;
 
+    /**
+     * Clone the given item, using existing data to create a new item with a new ID. This operation includes cloning of
+     * metadata, relationships, and bundles with bitstreams.
+     * Metadata of the given item are also copied to the new item.
+     * @param context the DSpace context.
+     * @param item the item to be cloned.
+     * @return item the cloned item.
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
+     */
+    Item clone(Context context, Item item) throws SQLException, IOException, AuthorizeException;
+
+    /**
+     * Clone the given item, using existing data to create a new item with a new ID. This operation includes cloning of
+     * metadata, relationships, and bundles with bitstreams. It also moves cloned item to the new collection.
+     * Metadata of the given item are also copied to the new item.
+     * @param context the DSpace context.
+     * @param item the item to be cloned.
+     * @param collection the collection where the cloned item should belong.
+     * @return item the cloned item.
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
+     */
+    Item clone(Context context, Item item, Collection collection) throws SQLException, IOException, AuthorizeException;
+
+    /**
+     * Use the existing properties of the source item to add them to the target item. By default, this method aims
+     * to duplicate as many of item's attributes as possible, including existing metadata, relationships, and bundles
+     * with bitstreams.
+     * A copy operation is similar to creating a new version of item, but the return item acts as a standalone entity.
+     * @param context the DSpace context.
+     * @param target the target item to copy properties from.
+     * @param source the source item.
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
+     */
+    void copy(Context context, Item target, Item source) throws IOException, SQLException, AuthorizeException;
+
+    /**
+     * Use the existing properties of the source item to add them to the target item. This method adds flexibility to
+     * include or exclude a copy of existing metadata, relationships, and bundles with bitstreams.
+     * A copy operation is similar to creating a new version of item, but the return item acts as a standalone entity.
+     * @param context the DSpace context.
+     * @param target
+     * @param source
+     * @param ignoredMetadataFields , can be null
+     * @param withRelationships
+     * @param withBundlesAndBitstreams
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
+     */
+    void copy(Context context, Item target, Item source, Set<MetadataFieldName> ignoredMetadataFields,
+              boolean withRelationships, boolean withBundlesAndBitstreams, boolean withPolicies)
+        throws SQLException, AuthorizeException, IOException;
 }
