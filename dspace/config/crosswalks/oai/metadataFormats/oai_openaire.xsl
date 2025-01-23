@@ -1125,6 +1125,11 @@
                 <xsl:with-param name="field" select="$element/doc:field"/>
             </xsl:call-template>
         </xsl:variable>
+        <xsl:variable name="isURN">
+            <xsl:call-template name="isURN">
+                <xsl:with-param name="field" select="$element/doc:field"/>
+            </xsl:call-template>
+        </xsl:variable>
         <xsl:variable name="isURL">
             <xsl:call-template name="isURL">
                 <xsl:with-param name="field" select="$element/doc:field"/>
@@ -1182,8 +1187,11 @@
             <xsl:when test="$isURL = 'true' or $lc_identifier_type = 'url'">
                 <xsl:text>URL</xsl:text>
             </xsl:when>
-            <xsl:otherwise>
+            <xsl:when test="$isURN = 'true'">
                 <xsl:text>URN</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:text>N/A</xsl:text>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
@@ -1370,6 +1378,19 @@
         </xsl:choose>
     </xsl:template>
 
+    <!-- it will verify if a given field is an URN -->
+    <xsl:template name="isURN">
+        <xsl:param name="field"/>
+        <xsl:choose>
+            <xsl:when test="$field[starts-with(text(),'urn:')]">
+                <xsl:value-of select="true()"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="false()"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
     <!-- it will verify if a given field is an ORCID -->
     <xsl:template name="isORCID">
         <xsl:param name="field"/>
@@ -1420,12 +1441,20 @@
                 <xsl:with-param name="field" select="$field"/>
             </xsl:call-template>
         </xsl:variable>
+        <xsl:variable name="isURN">
+            <xsl:call-template name="isURN">
+                <xsl:with-param name="field" select="$field"/>
+            </xsl:call-template>
+        </xsl:variable>
         <xsl:choose>
             <xsl:when test="$isHandle = 'true'">
                 <xsl:text>Handle</xsl:text>
             </xsl:when>
             <xsl:when test="$isDOI = 'true'">
                 <xsl:text>DOI</xsl:text>
+            </xsl:when>
+            <xsl:when test="$isURN = 'true'">
+                <xsl:text>URN</xsl:text>
             </xsl:when>
             <xsl:when test="$isURL = 'true' and $isHandle = 'false' and $isDOI = 'false'">
                 <xsl:text>URL</xsl:text>
