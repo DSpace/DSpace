@@ -1712,12 +1712,6 @@
                 <version>2.3.232</version>
                 <scope>test</scope>
             </dependency>
-            <!-- Google Analytics -->
-            <dependency>
-                <groupId>com.google.apis</groupId>
-                <artifactId>google-api-services-analytics</artifactId>
-                <version>v3-rev145-1.23.0</version>
-            </dependency>
 
             <!-- Findbugs annotations -->
             <dependency>
