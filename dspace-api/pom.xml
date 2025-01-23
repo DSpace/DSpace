@@ -692,12 +692,6 @@
             <version>${flyway.version}</version>
         </dependency>
 
-        <!-- Google Analytics -->
-        <dependency>
-            <groupId>com.google.apis</groupId>
-            <artifactId>google-api-services-analytics</artifactId>
-        </dependency>
-
         <!-- FindBugs -->
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
