@@ -58,7 +58,7 @@
 
         <!--=== OTHER MODULE-SPECIFIC DEPENDENCIES ===-->
         <!-- Jena is used by both RDF and SWORDv2 -->
-        <jena.version>4.9.0</jena.version>
+        <jena.version>4.10.0</jena.version>
 
         <!--=== MAVEN SETTINGS ===-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

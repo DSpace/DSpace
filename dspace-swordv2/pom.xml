@@ -59,6 +59,11 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-stax-api_1.0_spec</artifactId>
                 </exclusion>
+                <!-- Exclude Jena, as later version used in dspace-api -->
+                <exclusion>
+                    <groupId>org.apache.jena</groupId>
+                    <artifactId>jena-core</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
