@@ -71,6 +71,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowItemRest, Integer> {
 
     public static final String OPERATION_PATH_SECTIONS = "sections";
+    public static final String REQUESTPARAMETER_EXPUNGE = "expunge";
 
     private static final Logger log = LogManager.getLogger();
 
@@ -239,38 +240,25 @@ public class WorkflowItemRestRepository extends DSpaceRestRepository<WorkflowIte
      * move the workflowitem back to the submitter workspace regardless to how the workflow is designed
      */
     protected void delete(Context context, Integer id) {
-        XmlWorkflowItem witem = null;
-        try {
-            witem = wis.find(context, id);
-            if (witem == null) {
-                throw new ResourceNotFoundException("WorkflowItem ID " + id + " not found");
-            }
-            wfs.abort(context, witem, context.getCurrentUser());
-        } catch (AuthorizeException e) {
-            throw new RESTAuthorizationException(e);
-        } catch (SQLException e) {
-            throw new RuntimeException("SQLException in " + this.getClass() + "#delete trying to retrieve or delete a" +
-                " workflowitem from db.", e);
-        } catch (IOException e) {
-            throw new RuntimeException("IOException in " + this.getClass() + "#delete trying to delete a workflowitem" +
-                " from db (abort).", e);
+        String expungeParam = getRequestService()
+            .getCurrentRequest()
+            .getServletRequest()
+            .getParameter(REQUESTPARAMETER_EXPUNGE);
+        boolean expunge = false;
+        if (expungeParam != null) {
+            expunge = Boolean.parseBoolean(expungeParam);
         }
-    }
-
-    @Override
-    /**
-     * This method provides support for delete workflowitems on workflow process.
-     */
-    public void expungeById(Integer id) {
-        Context context = obtainContext();
         XmlWorkflowItem witem = null;
         try {
             witem = wis.find(context, id);
             if (witem == null) {
                 throw new ResourceNotFoundException("WorkflowItem ID " + id + " not found");
             }
-            wis.delete(context, witem);
-            context.commit();
+            if (expunge) {
+                wis.delete(context, witem);
+            } else {
+                wfs.abort(context, witem, context.getCurrentUser());
+            }
         } catch (AuthorizeException e) {
             throw new RESTAuthorizationException(e);
         } catch (SQLException e) {
