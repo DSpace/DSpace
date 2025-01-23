@@ -17,6 +17,9 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
+import org.dspace.core.ProvenanceService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,8 +37,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class DSpaceObjectMetadataAddOperation<R extends DSpaceObject> extends PatchOperation<R> {
 
+    private static final Logger log = LoggerFactory.getLogger(DSpaceObjectMetadataAddOperation.class);
     @Autowired
     DSpaceObjectMetadataPatchUtils metadataPatchUtils;
+    @Autowired
+    ProvenanceService provenanceService;
 
     @Override
     public R perform(Context context, R resource, Operation operation) throws SQLException {
@@ -69,9 +75,13 @@ public class DSpaceObjectMetadataAddOperation<R extends DSpaceObject> extends Pa
             dsoService.addAndShiftRightMetadata(context, dso, metadataField.getMetadataSchema().getName(),
                     metadataField.getElement(), metadataField.getQualifier(), metadataValue.getLanguage(),
                     metadataValue.getValue(), metadataValue.getAuthority(), metadataValue.getConfidence(), indexInt);
+            provenanceService.addMetadata(context, dso, metadataField);
         } catch (SQLException e) {
-            throw new DSpaceBadRequestException("SQLException in DspaceObjectMetadataAddOperation.add trying to add " +
-                    "metadata to dso.", e);
+            String msg;
+            msg = "SQLException in DspaceObjectMetadataAddOperation.add trying to add " +
+                    "metadata to dso.";
+            log.error(msg, e);
+            throw new DSpaceBadRequestException(msg, e);
         }
     }
 

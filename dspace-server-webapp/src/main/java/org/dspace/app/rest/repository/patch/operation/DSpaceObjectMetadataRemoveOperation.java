@@ -21,6 +21,9 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
+import org.dspace.core.ProvenanceService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -41,8 +44,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class DSpaceObjectMetadataRemoveOperation<R extends DSpaceObject> extends PatchOperation<R> {
 
+    private static final Logger log = LoggerFactory.getLogger(DSpaceObjectMetadataRemoveOperation.class);
     @Autowired
     DSpaceObjectMetadataPatchUtils metadataPatchUtils;
+    @Autowired
+    ProvenanceService provenanceService;
 
     @Override
     public R perform(Context context, R resource, Operation operation) throws SQLException {
@@ -82,6 +88,7 @@ public class DSpaceObjectMetadataRemoveOperation<R extends DSpaceObject> extends
                     // remove that metadata
                     dsoService.removeMetadataValues(context, dso,
                             Arrays.asList(metadataValues.get(indexInt)));
+                    provenanceService.removeMetadataAtIndex(context, dso, metadataValues, indexInt);
                 } else {
                     throw new UnprocessableEntityException("UnprocessableEntityException - There is no metadata of " +
                             "this type at that index");
@@ -91,9 +98,9 @@ public class DSpaceObjectMetadataRemoveOperation<R extends DSpaceObject> extends
             throw new IllegalArgumentException("This index (" + index + ") is not valid number.", e);
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new UnprocessableEntityException("There is no metadata of this type at that index");
-        } catch (SQLException e) {
-            throw new DSpaceBadRequestException("SQLException in DspaceObjectMetadataRemoveOperation.remove " +
-                    "trying to remove metadata from dso.", e);
+        } catch (SQLException ex) {
+            throw new DSpaceBadRequestException("SQLException in DspaceObjectMetadataRemoveOperation.remove" +
+                    " trying to remove metadata from dso.", ex);
         }
     }
 

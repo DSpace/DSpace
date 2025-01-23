@@ -21,6 +21,9 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
+import org.dspace.core.ProvenanceService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -38,9 +41,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extends PatchOperation<R> {
-
+    private static final Logger log = LoggerFactory.getLogger(DSpaceObjectMetadataReplaceOperation.class);
     @Autowired
     DSpaceObjectMetadataPatchUtils metadataPatchUtils;
+    @Autowired
+    ProvenanceService provenanceService;
 
     @Override
     public R perform(Context context, R resource, Operation operation) throws SQLException {
@@ -91,11 +96,12 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
         }
         // replace single existing metadata value
         if (propertyOfMd == null) {
-            this.replaceSingleMetadataValue(dso, dsoService, metadataField, metadataValue, index);
+            this.replaceSingleMetadataValue(context, dso, dsoService, metadataField, metadataValue, index);
             return;
         }
         // replace single property of exiting metadata value
-        this.replaceSinglePropertyOfMdValue(dso, dsoService, metadataField, index, propertyOfMd, valueMdProperty);
+        this.replaceSinglePropertyOfMdValue(context, dso, dsoService, metadataField,
+                index, propertyOfMd, valueMdProperty);
     }
 
     /**
@@ -145,9 +151,10 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
      * @param index             index of md being replaced
      */
     // replace single existing metadata value
-    private void replaceSingleMetadataValue(DSpaceObject dso, DSpaceObjectService dsoService,
+    private void replaceSingleMetadataValue(Context context, DSpaceObject dso, DSpaceObjectService dsoService,
                                             MetadataField metadataField, MetadataValueRest metadataValue,
                                             String index) {
+        String msg;
         try {
             List<MetadataValue> metadataValues = dsoService.getMetadata(dso,
                     metadataField.getMetadataSchema().getName(), metadataField.getElement(),
@@ -157,11 +164,13 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
                     && metadataValues.get(indexInt) != null) {
                 // Alter this existing md
                 MetadataValue existingMdv = metadataValues.get(indexInt);
+                String oldMtdVal = existingMdv.getValue();
                 existingMdv.setAuthority(metadataValue.getAuthority());
                 existingMdv.setConfidence(metadataValue.getConfidence());
                 existingMdv.setLanguage(metadataValue.getLanguage());
                 existingMdv.setValue(metadataValue.getValue());
                 dsoService.setMetadataModified(dso);
+                provenanceService.replaceMetadata(context, dso, metadataField, oldMtdVal);
             } else {
                 throw new UnprocessableEntityException("There is no metadata of this type at that index");
             }
@@ -179,7 +188,7 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
      * @param propertyOfMd      property of md being replaced
      * @param valueMdProperty   new value of property of md being replaced
      */
-    private void replaceSinglePropertyOfMdValue(DSpaceObject dso, DSpaceObjectService dsoService,
+    private void replaceSinglePropertyOfMdValue(Context context, DSpaceObject dso, DSpaceObjectService dsoService,
                                                 MetadataField metadataField,
                                                 String index, String propertyOfMd, String valueMdProperty) {
         try {
@@ -190,6 +199,8 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
             if (indexInt >= 0 && metadataValues.size() > indexInt && metadataValues.get(indexInt) != null) {
                 // Alter only asked propertyOfMd
                 MetadataValue existingMdv = metadataValues.get(indexInt);
+                String oldMtdVal = existingMdv.getValue();
+
                 if (propertyOfMd.equals("authority")) {
                     existingMdv.setAuthority(valueMdProperty);
                 }
@@ -203,6 +214,7 @@ public class DSpaceObjectMetadataReplaceOperation<R extends DSpaceObject> extend
                     existingMdv.setValue(valueMdProperty);
                 }
                 dsoService.setMetadataModified(dso);
+                provenanceService.replaceMetadataSingle(context, dso, metadataField, oldMtdVal);
             } else {
                 throw new UnprocessableEntityException("There is no metadata of this type at that index");
             }

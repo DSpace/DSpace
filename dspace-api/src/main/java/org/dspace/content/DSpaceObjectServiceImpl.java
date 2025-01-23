@@ -35,6 +35,7 @@ import org.dspace.content.service.MetadataValueService;
 import org.dspace.content.service.RelationshipService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.ProvenanceService;
 import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.service.IdentifierService;
 import org.dspace.utils.DSpace;
@@ -68,6 +69,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     protected MetadataAuthorityService metadataAuthorityService;
     @Autowired(required = true)
     protected RelationshipService relationshipService;
+    @Autowired(required = true)
+    protected ProvenanceService provenanceService;
 
     public DSpaceObjectServiceImpl() {
 
@@ -405,6 +408,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             }
         }
         dso.setMetadataModified();
+        provenanceService.removeMetadata(context, dso, schema, element, qualifier);
     }
 
     @Override
