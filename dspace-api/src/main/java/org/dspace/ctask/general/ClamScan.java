@@ -15,12 +15,10 @@ import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections4.ListUtils;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
@@ -127,10 +125,11 @@ public class ClamScan extends AbstractCurationTask {
                     }
 
                 }
-            } catch (AuthorizeException authE) {
-                throw new IOException(authE.getMessage(), authE);
-            } catch (SQLException sqlE) {
-                throw new IOException(sqlE.getMessage(), sqlE);
+            } catch (Exception e) {
+                // Any exception which may occur during the performance of the task should be caught here
+                // And end the process gracefully
+                log.error("Error scanning item: " + getItemHandle(item), e);
+                status = Curator.CURATE_ERROR;
             } finally {
                 closeSession();
             }
