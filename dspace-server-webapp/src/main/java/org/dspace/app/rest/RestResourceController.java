@@ -1135,7 +1135,6 @@ public class RestResourceController implements InitializingBean {
      * @param apiCategory
      * @param model
      * @param id
-     * @param expunge
      * @return
      */
     private <ID extends Serializable> ResponseEntity<RepresentationModel<?>> deleteInternal(String apiCategory,
