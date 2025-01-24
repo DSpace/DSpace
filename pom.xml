@@ -1389,7 +1389,7 @@
             <dependency>
                 <groupId>net.cnri</groupId>
                 <artifactId>cnri-servlet-container</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.0</version>
             </dependency>
             <!-- Jetty is needed to run Handle Server (and tests in some modules)
                  Solr and Handle Server disagree on version of Jetty, so we force a specific version here. -->
@@ -1547,6 +1547,12 @@
                 <groupId>javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
                 <version>3.1.0</version>
+            </dependency>
+            <!-- Only necessary because javax.el.MethodNotFoundException is used in several classes -->
+            <dependency>
+                <groupId>javax.el</groupId>
+                <artifactId>javax.el-api</artifactId>
+                <version>3.0.0</version>
             </dependency>
 
             <!-- Jaxen is needed by xoai and sword2-server, but they disagree on the versions -->
