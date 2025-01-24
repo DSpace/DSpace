@@ -1606,7 +1606,7 @@
             <dependency>
                 <groupId>com.ibm.icu</groupId>
                 <artifactId>icu4j</artifactId>
-                <version>62.1</version>
+                <version>62.2</version>
             </dependency>
             <!-- Codebase at https://github.com/DSpace/oclc-harvester2 -->
             <dependency>
