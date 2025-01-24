@@ -1697,17 +1697,34 @@
             <dependency>
                 <groupId>com.google.api-client</groupId>
                 <artifactId>google-api-client</artifactId>
-                <version>1.23.0</version>
+                <version>1.35.2</version>
             </dependency>
             <dependency>
                 <groupId>com.google.http-client</groupId>
                 <artifactId>google-http-client</artifactId>
-                <version>1.23.0</version>
+                <version>1.45.3</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.google.errorprone</groupId>
+                        <artifactId>error_prone_annotations</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.google.j2objc</groupId>
+                        <artifactId>j2objc-annotations</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!-- This dependency is only here for dependency convergence. google-http-client pulls in
+             two versions of this, and we want the latest version. -->
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-context</artifactId>
+                <version>1.69.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.http-client</groupId>
                 <artifactId>google-http-client-jackson2</artifactId>
-                <version>1.23.0</version>
+                <version>1.45.3</version>
                 <exclusions>
                     <exclusion>
                         <artifactId>jackson-core</artifactId>
@@ -1722,7 +1739,14 @@
             <dependency>
                 <groupId>com.google.oauth-client</groupId>
                 <artifactId>google-oauth-client</artifactId>
-                <version>1.33.3</version>
+                <version>1.37.0</version>
+            </dependency>
+            <!-- This dependency is only here for dependency convergence. google-api-client & google-oauth-client
+             pulls in two different versions of this, and we want the latest version. -->
+            <dependency>
+                <groupId>com.google.http-client</groupId>
+                <artifactId>google-http-client-gson</artifactId>
+                <version>1.43.3</version>
             </dependency>
 
             <!-- Findbugs annotations -->
