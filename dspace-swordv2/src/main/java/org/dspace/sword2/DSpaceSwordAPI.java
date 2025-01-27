@@ -247,7 +247,7 @@ public class DSpaceSwordAPI {
                                Context context, VerboseDescription verboseDescription,
                                Deposit deposit, DepositResult result)
         throws DSpaceSwordException, SwordServerException {
-        // if there's an item availalble, and we want to keep the original
+        // if there's an item available, and we want to keep the original
         // then do that
         try {
             if (swordConfig.isKeepOriginal()) {

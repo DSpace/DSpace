@@ -313,7 +313,7 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
         org.hibernate.query.Query hquery = query.unwrap(org.hibernate.query.Query.class);
         Stream<T> stream = hquery.stream();
         Iterator<T> iter = stream.iterator();
-        return new AbstractIterator<T> () {
+        return new AbstractIterator<T>() {
             @Override
             protected T computeNext() {
                 return iter.hasNext() ? iter.next() : endOfData();
@@ -346,7 +346,7 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
 
     /**
      * This method will return the count of items for this query as an integer
-     * This query needs to already be in a formate that'll return one record that contains the amount
+     * This query needs to already be in a format that'll return one record that contains the amount
      *
      * @param query
      *         The query for which the amount of results will be returned.

@@ -214,7 +214,7 @@ public class LoginAsEPersonIT extends AbstractControllerIntegrationTest {
     /**
      * Test claiming of a pool task with the LoginOnBehalfOf header. Thus checking that an admin can impersonate
      * an eperson to claim a pooltask and checking later on that the owner of this claimedTask is indeed
-     * the reviwer
+     * the reviewer
      *
      * @throws Exception
      */
@@ -334,7 +334,7 @@ public class LoginAsEPersonIT extends AbstractControllerIntegrationTest {
         getClient().perform(get("/api/core/items/" + publicItem.getID()))
                    .andExpect(status().isOk());
 
-        // Check publicItem bitstream creation (shuold be stored in bundle)
+        // Check publicItem bitstream creation (should be stored in bundle)
         getClient().perform(get("/api/core/items/" + publicItem.getID() + "/bundles"))
                    .andExpect(status().isOk())
                    .andExpect(content().contentType(contentType))

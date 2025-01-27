@@ -282,7 +282,7 @@ public interface RelationshipService extends DSpaceCRUDService<Relationship> {
     List<Relationship> findByRelationshipType(Context context, RelationshipType relationshipType) throws SQLException;
 
     /**
-     * This method returns a list of Relationship objets for which the relationshipType property is equal to the given
+     * This method returns a list of Relationship objects for which the relationshipType property is equal to the given
      * RelationshipType object
      * NOTE: tilted relationships are NEVER excluded when fetching one relationship type
      * @param context           The relevant DSpace context

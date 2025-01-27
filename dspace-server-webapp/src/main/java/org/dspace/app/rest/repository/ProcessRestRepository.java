@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -65,6 +66,12 @@ public class ProcessRestRepository extends DSpaceRestRepository<ProcessRest, Int
     @Autowired
     private EPersonService epersonService;
 
+    @PostConstruct
+    public void init() throws SQLException, AuthorizeException, IOException {
+        Context context = new Context();
+        processService.failRunningProcesses(context);
+        context.complete();
+    }
 
     @Override
     @PreAuthorize("hasPermission(#id, 'PROCESS', 'READ')")
