@@ -67,8 +67,6 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.util.MultiFormatDateParser;
 import org.dspace.util.SolrUtils;
-import org.dspace.versioning.Version;
-import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.service.VersionHistoryService;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
@@ -151,12 +149,14 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
         doc.addField("withdrawn", item.isWithdrawn());
         doc.addField("discoverable", item.isDiscoverable());
         doc.addField("lastModified", SolrUtils.getDateFormatter().format(item.getLastModified()));
-        doc.addField("latestVersion", isLatestVersion(context, item));
+        doc.addField("latestVersion", itemService.isLatestVersion(context, item));
 
         EPerson submitter = item.getSubmitter();
-        if (submitter != null) {
-            addFacetIndex(doc, "submitter", submitter.getID().toString(),
-                    submitter.getFullName());
+        if (submitter != null && !(DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty(
+            "discovery.index.item.submitter.enabled", false))) {
+            doc.addField("submitter_authority", submitter.getID().toString());
+        } else if (submitter != null) {
+            addFacetIndex(doc, "submitter", submitter.getID().toString(), submitter.getFullName());
         }
 
         // Add the item metadata
@@ -173,43 +173,6 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
         }
 
         return doc;
-    }
-
-    /**
-     * Check whether the given item is the latest version.
-     * If the latest item cannot be determined, because either the version history or the latest version is not present,
-     * assume the item is latest.
-     * @param context the DSpace context.
-     * @param item the item that should be checked.
-     * @return true if the item is the latest version, false otherwise.
-     */
-    protected boolean isLatestVersion(Context context, Item item) throws SQLException {
-        VersionHistory history = versionHistoryService.findByItem(context, item);
-        if (history == null) {
-            // not all items have a version history
-            // if an item does not have a version history, it is by definition the latest version
-            return true;
-        }
-
-        // start with the very latest version of the given item (may still be in workspace)
-        Version latestVersion = versionHistoryService.getLatestVersion(context, history);
-
-        // find the latest version of the given item that is archived
-        while (latestVersion != null && !latestVersion.getItem().isArchived()) {
-            latestVersion = versionHistoryService.getPrevious(context, history, latestVersion);
-        }
-
-        // could not find an archived version of the given item
-        if (latestVersion == null) {
-            // this scenario should never happen, but let's err on the side of showing too many items vs. to little
-            // (see discovery.xml, a lot of discovery configs filter out all items that are not the latest version)
-            return true;
-        }
-
-        // sanity check
-        assert latestVersion.getItem().isArchived();
-
-        return item.equals(latestVersion.getItem());
     }
 
     @Override
@@ -704,7 +667,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
             return List.copyOf(workflowItemIndexFactory.getIndexableObjects(context, xmlWorkflowItem));
         }
 
-        if (!isLatestVersion(context, item)) {
+        if (!itemService.isLatestVersion(context, item)) {
             // the given item is an older version of another item
             return List.of(new IndexableItem(item));
         }
