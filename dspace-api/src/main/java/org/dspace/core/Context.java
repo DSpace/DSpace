@@ -951,4 +951,16 @@ public class Context implements AutoCloseable {
     public boolean isContextUserSwitched() {
         return currentUserPreviousState != null;
     }
+
+    /**
+     * Remove all entities from the cache and reload the current user entity. This is useful when batch processing
+     * a large number of entities when the calling code requires the cache to be completely cleared before continuing.
+     *
+     * @throws SQLException if a database error occurs.
+     */
+    public void uncacheEntities() throws SQLException {
+        dbConnection.uncacheEntities();
+        reloadContextBoundEntities();
+    }
+
 }

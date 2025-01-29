@@ -337,4 +337,10 @@ public class HibernateDBConnection implements DBConnection<Session> {
             }
         }
     }
+
+    @Override
+    public void uncacheEntities() throws SQLException {
+        getSession().clear();
+    }
+
 }

@@ -148,4 +148,16 @@ public interface DBConnection<T> {
      * @throws java.sql.SQLException passed through.
      */
     public <E extends ReloadableEntity> void uncacheEntity(E entity) throws SQLException;
+
+    /**
+     * Remove all entities from the session cache.
+     *
+     * <p>Entities removed from cache are not saved in any way. Therefore, if you
+     * have modified any entities, you should be sure to {@link #commit()} changes
+     * before calling this method.
+     *
+     * @throws SQLException passed through.
+     */
+    public void uncacheEntities() throws SQLException;
+
 }
