@@ -120,7 +120,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         boolean storeLastDate = false;
         if (fromDate == null) {
             storeLastDate = true;
-            String lastDate = siteService.getMetadata(siteService.findSite(context), "dc.filtermedia.lastdate");
+            String lastDate = siteService.getMetadata(siteService.findSite(context), "dspace.filtermedia.lastdate");
             if (lastDate != null) {
                 fromDate = new DCDate(lastDate).toDate();
             }
@@ -151,9 +151,9 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         }
         if (storeLastDate) {
             siteService.clearMetadata(context, siteService.findSite(context),
-                "dc", "filtermedia", "lastdate", Item.ANY);
+                "dspace", "filtermedia", "lastdate", Item.ANY);
             siteService.addMetadata(context, siteService.findSite(context),
-                "dc", "filtermedia", "lastdate", null,
+                "dspace", "filtermedia", "lastdate", null,
                 new DCDate(new Date()).toString());
             siteService.update(context, siteService.findSite(context));
         }
