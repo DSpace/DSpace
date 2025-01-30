@@ -197,13 +197,6 @@
   </dc-type>
 
   <dc-type>
-    <schema>dc</schema>
-    <element>filtermedia</element>
-    <qualifier>lastdate</qualifier>
-    <scope_note>Last date filter-media was run</scope_note>
-  </dc-type>
-
-  <dc-type>
 	<schema>dc</schema>
     <element>identifier</element>
     <!-- unqualified -->
