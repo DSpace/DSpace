@@ -24,4 +24,8 @@
         <property name="eventService" ref="org.dspace.services.EventService"/>
     </bean>
 
+    <!-- OpenAIRE Matomo tracking  -->
+    <bean class="org.dspace.statistics.matomo.openaire.OpenAIREMatomoEventListener">
+        <property name="eventService" ref="org.dspace.services.EventService"/>
+    </bean>
 </beans>
