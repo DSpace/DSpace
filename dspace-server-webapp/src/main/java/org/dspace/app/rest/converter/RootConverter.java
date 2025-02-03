@@ -31,10 +31,10 @@ public class RootConverter {
         String requestUrl = request.getRequestURL().toString();
         String dspaceUrl = configurationService.getProperty("dspace.server.url");
         String dspaceSSRUrl = configurationService.getProperty("dspace.server.ssr.url", dspaceUrl);
-        if (dspaceUrl.equals(dspaceSSRUrl) || requestUrl.startsWith(dspaceUrl)) {
-            rootRest.setDspaceServer(dspaceUrl);
-        } else {
+        if (!dspaceUrl.equals(dspaceSSRUrl) && requestUrl.startsWith(dspaceSSRUrl)) {
             rootRest.setDspaceServer(dspaceSSRUrl);
+        } else {
+            rootRest.setDspaceServer(dspaceUrl);
         }
         rootRest.setDspaceVersion("DSpace " + getSourceVersion());
         return rootRest;
