@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.UUID;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -69,7 +70,7 @@ public class ResourcePolicyAdminPermissionEvalutatorPlugin extends RestObjectPer
 
         try {
             DSpaceObject dso = null;
-            if (Utils.isConvertibleToInt(targetId.toString())) {
+            if (NumberUtils.isNumber(targetId.toString())) {
                 var id = Integer.parseInt(targetId.toString());
                 dso = getDSO(context, id);
             } else {
