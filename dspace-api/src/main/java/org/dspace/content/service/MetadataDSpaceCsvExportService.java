@@ -58,4 +58,6 @@ public interface MetadataDSpaceCsvExportService {
     public DSpaceCSV export(Context context, Community community,
                             boolean exportAll, DSpaceRunnableHandler handler) throws Exception;
 
+    int getCsvExportLimit();
+
 }
