@@ -21,7 +21,6 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.core.Utils;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.slf4j.Logger;
