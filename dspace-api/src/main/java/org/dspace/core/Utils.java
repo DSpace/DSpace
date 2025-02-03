@@ -501,27 +501,4 @@ public final class Utils {
                 .toInstant(ZoneOffset.UTC);
     }
 
-    /**
-     * Checks whether a given string can be converted to a valid {@code int} value.
-     * <p>
-     * This method returns {@code false} if the input string is {@code null}, empty,
-     * or contains only whitespace. Otherwise, it attempts to parse the string as an
-     * integer using {@link Integer#parseInt(String)}.
-     *
-     * @param str the string to check for integer convertibility
-     * @return {@code true} if the string is non-blank and can be parsed as an integer;
-     *         {@code false} otherwise
-     */
-    public static boolean isConvertibleToInt(String str) {
-        if (StringUtils.isBlank(str)) {
-            return false;
-        }
-        try {
-            Integer.parseInt(str);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
 }
