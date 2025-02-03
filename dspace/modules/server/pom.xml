@@ -63,6 +63,7 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <archiveClasses>false</archiveClasses>
+                    <attachClasses>true</attachClasses>
                     <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                     <!-- Copy any 'additions' (see m-dependency-p above) into WEB-INF/classes.
@@ -270,11 +271,6 @@
             <artifactId>spring-boot-starter-tomcat</artifactId>
             <scope>provided</scope>
             <version>${spring-boot.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-solrj</artifactId>
-            <version>${solr.client.version}</version>
         </dependency>
 
         <!-- Test Dependencies -->
