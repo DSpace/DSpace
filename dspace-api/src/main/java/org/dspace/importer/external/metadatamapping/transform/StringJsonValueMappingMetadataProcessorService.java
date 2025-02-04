@@ -30,7 +30,6 @@ import org.dspace.util.SimpleMapConverter;
  * <code>journal-article = Article<code/>
  * 
  * @author paulo-graca
- *
  */
 public class StringJsonValueMappingMetadataProcessorService implements JsonPathMetadataProcessor {
 
