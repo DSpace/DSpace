@@ -160,7 +160,7 @@
     <bean id="openairePublicationMetadataFieldMapping"
           class="org.dspace.importer.external.openaire.metadatamapping.OpenAIREPublicationFieldMapping">
     </bean>
-    
+
     <bean id="CrossRefImportService" class="org.dspace.importer.external.crossref.CrossRefImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="CrossRefMetadataFieldMapping"/>
         <property name="url" value="${crossref.url}"/>
@@ -188,7 +188,7 @@
         <property name="viewMode" value="${scopus.search-api.viewMode}"/>
     </bean>
     <bean id="scopusMetadataFieldMapping" class="org.dspace.importer.external.scopus.service.ScopusFieldMapping"/>
-    
+
     <bean id="rorImportService" class="org.dspace.importer.external.ror.service.RorImportMetadataSourceServiceImpl">
           <property name="metadataFieldMapping" ref="rorMetadataFieldMapping"/>
           <property name="url" value="${ror.orgunit-import.api-url}"/>
@@ -242,6 +242,15 @@
     <!-- Metadatafield used to check against if it's already imported or not during the JSONLookupSearcher-->
     <bean id="lookupID" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.identifier.other"/>
+    </bean>
+
+    <bean id="openalexImportServiceByTitle" class="org.dspace.importer.external.openalex.service.OpenAlexImportMetadataSourceServiceImpl">
+        <property name="metadataFieldMapping" ref="openalexPublicationMetadataFieldMapping"/>
+        <property name="url" value="${openalex.url.works}"/>
+    </bean>
+
+    <bean id="openalexPublicationMetadataFieldMapping"
+          class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexPublicationFieldMapping">
     </bean>
 
 </beans>
