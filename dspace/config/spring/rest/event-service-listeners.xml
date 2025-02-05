@@ -23,5 +23,12 @@
     <bean class="org.dspace.statistics.export.IrusExportUsageEventListener">
         <property name="eventService" ref="org.dspace.services.EventService"/>
     </bean>
+    <!--  OpenAIRE statistics tracking  -->
+    <bean class="org.dspace.statistics.export.OpenAIREUsageTracker">
+        <property name="eventService" ref="org.dspace.services.EventService"/>
+    </bean>
+
+    <!-- Matomo events recording -->
+    <bean class="org.dspace.matomo.MatomoAsyncEventListener"/>
 
 </beans>
