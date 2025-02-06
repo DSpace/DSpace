@@ -837,7 +837,6 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
             .andExpect(status().isBadRequest());
     }
 
-    @Test
     /**
      * Verify that the search by object works properly in allowed scenarios, when SSR rest url is defined, :
      * - for an administrator

@@ -9,7 +9,8 @@ package org.dspace.app.rest.converter;
 
 import static org.dspace.app.util.Util.getSourceVersion;
 
-import jakarta.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequest;
+
 import org.dspace.app.rest.model.RootRest;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
