@@ -8,6 +8,10 @@
 package org.dspace.discovery;
 
 import static org.dspace.discovery.SolrServiceWorkspaceWorkflowRestrictionPlugin.DISCOVER_WORKSPACE_CONFIGURATION_NAME;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -21,6 +25,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
 import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
@@ -98,6 +106,9 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
 
     MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory.getInstance()
                                                                                       .getMetadataAuthorityService();
+
+    MockSolrSearchCore solrSearchCore = DSpaceServicesFactory.getInstance().getServiceManager()
+        .getServiceByName(null, MockSolrSearchCore.class);
 
     @Override
     @Before
@@ -793,6 +804,104 @@ public class DiscoveryIT extends AbstractIntegrationTestWithDatabase {
         assertFalse(lastModifieds.isEmpty());
         for (int i = 1; i < lastModifieds.size() - 1; i++) {
             assertTrue(lastModifieds.get(i).compareTo(lastModifieds.get(i + 1)) >= 0);
+        }
+    }
+
+    /**
+     * Test designed to check if the submitter is not indexed in all in solr documents for items
+     * and the submitter authority is still indexed
+     * @throws SearchServiceException
+     */
+    @Test
+    public void searchWithNoSubmitterTest() throws SearchServiceException {
+
+        configurationService.setProperty("discovery.index.item.submitter.enabled", false);
+        DiscoveryConfiguration defaultConf = SearchUtils.getDiscoveryConfiguration(context, "default", null);
+
+        // Populate the testing objects: create items in eperson's workspace and perform search in it
+        int numberItems = 10;
+        context.turnOffAuthorisationSystem();
+        EPerson submitter = null;
+        try {
+            submitter = EPersonBuilder.createEPerson(context).withEmail("submitter@example.org")
+                .withNameInMetadata("Peter", "Funny").build();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        context.setCurrentUser(submitter);
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        for (int i = 0; i < numberItems; i++) {
+            ItemBuilder.createItem(context, collection)
+                .withTitle("item " + i)
+                .build();
+        }
+        context.restoreAuthSystemState();
+
+        // Build query with default parameters (except for workspaceConf)
+        QueryResponse result = null;
+        try {
+            result = solrSearchCore.getSolr().query(new SolrQuery(String.format(
+                "search.resourcetype:\"Item\"")));
+        } catch (SolrServerException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        assertEquals(result.getResults().size(), numberItems);
+        for (SolrDocument doc : result.getResults()) {
+            assertThat(doc.getFieldNames(),
+                not(hasItems("submitter_keyword", "submitter_ac", "submitter_acid", "submitter_filter")));
+            assertThat(doc.getFieldNames(), hasItem("submitter_authority"));
+        }
+    }
+
+    /**
+     * Test designed to check if the submitter is indexed in all in solr documents for items
+     * @throws SearchServiceException
+     */
+    @Test
+    public void searchWithSubmitterTest() throws SearchServiceException {
+
+        configurationService.setProperty("discovery.index.item.submitter.enabled", true);
+        DiscoveryConfiguration defaultConf = SearchUtils.getDiscoveryConfiguration(context, "default", null);
+
+        // Populate the testing objects: create items in eperson's workspace and perform search in it
+        int numberItems = 10;
+        context.turnOffAuthorisationSystem();
+        EPerson submitter = null;
+        try {
+            submitter = EPersonBuilder.createEPerson(context).withEmail("submitter@example.org")
+                .withNameInMetadata("Peter", "Funny").build();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        context.setCurrentUser(submitter);
+        Community community = CommunityBuilder.createCommunity(context).build();
+        Collection collection = CollectionBuilder.createCollection(context, community).build();
+        for (int i = 0; i < numberItems; i++) {
+            ItemBuilder.createItem(context, collection)
+                .withTitle("item " + i)
+                .build();
+        }
+        context.restoreAuthSystemState();
+
+        // Build query with default parameters (except for workspaceConf)
+        QueryResponse result = null;
+        try {
+            result = solrSearchCore.getSolr().query(new SolrQuery(String.format(
+                "search.resourcetype:\"Item\"")));
+        } catch (SolrServerException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        assertEquals(result.getResults().size(), numberItems);
+        for (SolrDocument doc : result.getResults()) {
+            for (String fieldname : doc.getFieldNames()) {
+                assertThat(doc.getFieldNames(), hasItems("submitter_keyword","submitter_ac", "submitter_filter",
+                    "submitter_authority"));
+            }
         }
     }
 

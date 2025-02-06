@@ -7,6 +7,10 @@
  */
 package org.dspace.identifier.doi;
 
+import static org.dspace.identifier.DOIIdentifierProvider.DOI_ELEMENT;
+import static org.dspace.identifier.DOIIdentifierProvider.DOI_QUALIFIER;
+import static org.dspace.identifier.DOIIdentifierProvider.MD_SCHEMA;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -15,6 +19,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -385,6 +390,10 @@ public class DataCiteConnector
             parameters.put("hostinginstitution",
                            configurationService.getProperty(CFG_HOSTINGINSTITUTION));
         }
+        parameters.put("mdSchema", MD_SCHEMA);
+        parameters.put("mdElement", DOI_ELEMENT);
+        // Pass an empty string for qualifier if the metadata field doesn't have any
+        parameters.put("mdQualifier", DOI_QUALIFIER);
 
         Element root = null;
         try {
@@ -412,7 +421,7 @@ public class DataCiteConnector
         }
 
         String metadataDOI = extractDOI(root);
-        if (null == metadataDOI) {
+        if (StringUtils.isBlank(metadataDOI)) {
             // The DOI will be saved as metadata of dso after successful
             // registration. To register a doi it has to be part of the metadata
             // sent to DataCite. So we add it to the XML we'll send to DataCite
@@ -455,6 +464,10 @@ public class DataCiteConnector
                 log.warn("While reserving the DOI {}, we got a http status code "
                              + "{} and the message \"{}\".",
                         doi, Integer.toString(resp.statusCode), resp.getContent());
+                Format format = Format.getCompactFormat();
+                format.setEncoding("UTF-8");
+                XMLOutputter xout = new XMLOutputter(format);
+                log.info("We send the following XML:\n{}", xout.outputString(root));
                 throw new DOIIdentifierException("Unable to parse an answer from "
                                                      + "DataCite API. Please have a look into DSpace logs.",
                                                  DOIIdentifierException.BAD_ANSWER);
@@ -626,6 +639,14 @@ public class DataCiteConnector
         return sendHttpRequest(httpget, doi);
     }
 
+    /**
+     * Send a DataCite metadata document to the registrar.
+     *
+     * @param doi identify the object.
+     * @param metadataRoot describe the object.  The root element of the document.
+     * @return the registrar's response.
+     * @throws DOIIdentifierException passed through.
+     */
     protected DataCiteResponse sendMetadataPostRequest(String doi, Element metadataRoot)
         throws DOIIdentifierException {
         Format format = Format.getCompactFormat();
@@ -634,6 +655,14 @@ public class DataCiteConnector
         return sendMetadataPostRequest(doi, xout.outputString(new Document(metadataRoot)));
     }
 
+    /**
+     * Send a DataCite metadata document to the registrar.
+     *
+     * @param doi identify the object.
+     * @param metadata describe the object.
+     * @return the registrar's response.
+     * @throws DOIIdentifierException passed through.
+     */
     protected DataCiteResponse sendMetadataPostRequest(String doi, String metadata)
         throws DOIIdentifierException {
         // post mds/metadata/
@@ -681,7 +710,7 @@ public class DataCiteConnector
      *            properties such as request URI and method type.
      * @param doi DOI string to operate on
      * @return response from DataCite
-     * @throws DOIIdentifierException if DOI error
+     * @throws DOIIdentifierException if registrar returns an error.
      */
     protected DataCiteResponse sendHttpRequest(HttpUriRequest req, String doi)
         throws DOIIdentifierException {

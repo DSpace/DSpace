@@ -270,6 +270,11 @@
                     <groupId>com.fasterxml.jackson.datatype</groupId>
                     <artifactId>jackson-datatype-jdk8</artifactId>
                 </exclusion>
+                <!-- We pull in a later version below -->
+                <exclusion>
+                    <groupId>net.minidev</groupId>
+                    <artifactId>json-smart</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -316,6 +321,13 @@
             <groupId>org.webjars.bowergithub.codeseven</groupId>
             <artifactId>toastr</artifactId>
             <version>2.1.4</version>
+            <exclusions>
+                <!-- We use a later version of JQuery as defined above -->
+                <exclusion>
+                    <groupId>org.webjars.bowergithub.jquery</groupId>
+                    <artifactId>jquery-dist</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Pull in current version of URI.js (https://medialize.github.io/URI.js/) via WebJars
              Made available at: webjars/urijs/src/URI.min.js -->
@@ -337,6 +349,13 @@
             <groupId>org.webjars.bowergithub.jashkenas</groupId>
             <artifactId>backbone</artifactId>
             <version>1.4.1</version>
+            <exclusions>
+                <!-- We use a later version of underscore as defined above -->
+                <exclusion>
+                    <groupId>org.webjars.bowergithub.jashkenas</groupId>
+                    <artifactId>underscore</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Pull in current version of json-editor.js (https://github.com/json-editor/json-editor) via WebJars
              Made available at: webjars/json-editor__json-editor/2.6.1/dist/jsoneditor.js
@@ -345,7 +364,7 @@
         <dependency>
             <groupId>org.webjars.npm</groupId>
             <artifactId>json-editor__json-editor</artifactId>
-            <version>2.6.1</version>
+            <version>2.15.1</version>
         </dependency>
         <!-- Also pull in current version of Bootstrap via WebJars.
              This is used by BOTH our HAL Browser and our OAI-PMH interface.
@@ -362,6 +381,36 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
             <version>${spring-boot.version}</version>
+            <exclusions>
+                <!-- Use the version of Spring Security that we specify below -->
+                <exclusion>
+                    <groupId>org.springframework.security</groupId>
+                    <artifactId>spring-security-config</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.security</groupId>
+                    <artifactId>spring-security-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.security</groupId>
+                    <artifactId>spring-security-web</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+            <version>${spring-security.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+            <version>${spring-security.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-web</artifactId>
+            <version>${spring-security.version}</version>
         </dependency>
 
         <!-- Add in log4j support by excluding default logging, and using starter-log4j -->
@@ -374,6 +423,11 @@
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+                <!-- Spring JCL is unnecessary and conflicts with commons-logging when both are on classpath -->
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-jcl</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -446,6 +500,21 @@
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
             <version>${nimbus-jose-jwt.version}</version>
+            <exclusions>
+                <!-- We pull in a later version below -->
+                <exclusion>
+                    <groupId>net.minidev</groupId>
+                    <artifactId>json-smart</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Specify the version of json-smart we want to use.
+             This solves a version mismatch between nimbus-jose-jwt and json-path below. -->
+        <dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>json-smart</artifactId>
+            <version>2.5.1</version>
         </dependency>
 
         <dependency>
@@ -489,6 +558,13 @@
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <!-- We pull in a later version above -->
+                <exclusion>
+                    <groupId>net.minidev</groupId>
+                    <artifactId>json-smart</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>

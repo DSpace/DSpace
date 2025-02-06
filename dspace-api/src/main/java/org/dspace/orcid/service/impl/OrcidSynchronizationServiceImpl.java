@@ -37,6 +37,7 @@ import org.dspace.discovery.indexobject.IndexableItem;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.orcid.OrcidToken;
+import org.dspace.orcid.client.OrcidClient;
 import org.dspace.orcid.model.OrcidEntityType;
 import org.dspace.orcid.model.OrcidTokenResponseDTO;
 import org.dspace.orcid.service.OrcidSynchronizationService;
@@ -47,6 +48,8 @@ import org.dspace.profile.OrcidProfileSyncPreference;
 import org.dspace.profile.OrcidSynchronizationMode;
 import org.dspace.profile.service.ResearcherProfileService;
 import org.dspace.services.ConfigurationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -57,6 +60,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationService {
 
+    private static final Logger log = LoggerFactory.getLogger(OrcidSynchronizationServiceImpl.class);
     @Autowired
     private ItemService itemService;
 
@@ -74,6 +78,9 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
 
     @Autowired
     private ResearcherProfileService researcherProfileService;
+
+    @Autowired
+    private OrcidClient orcidClient;
 
     @Override
     public void linkProfile(Context context, Item profile, OrcidTokenResponseDTO token) throws SQLException {
@@ -118,7 +125,14 @@ public class OrcidSynchronizationServiceImpl implements OrcidSynchronizationServ
         itemService.clearMetadata(context, profile, "dspace", "orcid", "scope", Item.ANY);
         itemService.clearMetadata(context, profile, "dspace", "orcid", "authenticated", Item.ANY);
 
+        OrcidToken profileToken = orcidTokenService.findByProfileItem(context, profile);
+        if (profileToken == null) {
+            log.warn("Cannot find any token related to the user profile: {}", profile.getID());
+            return;
+        }
+
         orcidTokenService.deleteByProfileItem(context, profile);
+        orcidClient.revokeToken(profileToken);
 
         updateItem(context, profile);
 

@@ -1055,6 +1055,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 }
                 //Resolve our facet field values
                 resolveFacetFields(context, query, result, skipLoadingResponse, solrQueryResponse);
+                //Add total entries count for metadata browsing
+                resolveEntriesCount(result, solrQueryResponse);
             }
             // If any stale entries are found in the current page of results,
             // we remove those stale entries and rerun the same query again.
@@ -1080,7 +1082,39 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         return result;
     }
 
+    /**
+     * Stores the total count of entries for metadata index browsing. The count is calculated by the
+     * <code>json.facet</code> parameter with the following value:
+     *
+     * <pre><code>
+     * {
+     *     "entries_count": {
+     *         "type": "terms",
+     *         "field": "facetNameField_filter",
+     *         "limit": 0,
+     *         "prefix": "prefix_value",
+     *         "numBuckets": true
+     *     }
+     * }
+     * </code></pre>
+     *
+     * This value is returned in the <code>facets</code> field of the Solr response.
+     *
+     * @param result DiscoverResult object where the total entries count will be stored
+     * @param solrQueryResponse QueryResponse object containing the solr response
+     */
+    private void resolveEntriesCount(DiscoverResult result, QueryResponse solrQueryResponse) {
 
+        Object facetsObj = solrQueryResponse.getResponse().get("facets");
+        if (facetsObj instanceof NamedList) {
+            NamedList<Object> facets = (NamedList<Object>) facetsObj;
+            Object bucketsInfoObj = facets.get("entries_count");
+            if (bucketsInfoObj instanceof NamedList) {
+                NamedList<Object> bucketsInfo = (NamedList<Object>) bucketsInfoObj;
+                result.setTotalEntries((int) bucketsInfo.get("numBuckets"));
+            }
+        }
+    }
 
     private void resolveFacetFields(Context context, DiscoverQuery query, DiscoverResult result,
             boolean skipLoadingResponse, QueryResponse solrQueryResponse) throws SQLException {
@@ -1411,8 +1445,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             } else {
                 return field + "_acid";
             }
-        } else if (facetFieldConfig.getType().equals(DiscoveryConfigurationParameters.TYPE_STANDARD)) {
-            return field;
         } else {
             return field;
         }

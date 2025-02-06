@@ -162,7 +162,7 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
         MetadatumDTO title = createMetadatumDTO("dc", "title", null,
                 "State of Awareness of Freshers’ Groups Chortkiv State"
                 + " Medical College of Prevention of Iodine Deficiency Diseases");
-        MetadatumDTO author = createMetadatumDTO("dc", "contributor", "author", "L.V. Senyuk");
+        MetadatumDTO author = createMetadatumDTO("dc", "contributor", "author", "Senyuk, L.V.");
         MetadatumDTO type = createMetadatumDTO("dc", "type", null, "journal-article");
         MetadatumDTO date = createMetadatumDTO("dc", "date", "issued", "2016-05-19");
         MetadatumDTO ispartof = createMetadatumDTO("dc", "relation", "ispartof",
@@ -191,7 +191,7 @@ public class CrossRefImportMetadataSourceServiceIT extends AbstractLiveImportInt
         List<MetadatumDTO> metadatums2  = new ArrayList<MetadatumDTO>();
         MetadatumDTO title2 = createMetadatumDTO("dc", "title", null,
                 "Ischemic Heart Disease and Role of Nurse of Cardiology Department");
-        MetadatumDTO author2 = createMetadatumDTO("dc", "contributor", "author", "K. І. Kozak");
+        MetadatumDTO author2 = createMetadatumDTO("dc", "contributor", "author", "Kozak, K. І.");
         MetadatumDTO type2 = createMetadatumDTO("dc", "type", null, "journal-article");
         MetadatumDTO date2 = createMetadatumDTO("dc", "date", "issued", "2016-05-19");
         MetadatumDTO ispartof2 = createMetadatumDTO("dc", "relation", "ispartof",

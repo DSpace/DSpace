@@ -13,7 +13,8 @@ import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.model.PageRest;
 import org.dspace.app.rest.model.SearchEventRest;
 import org.dspace.app.rest.model.SearchResultsRest;
@@ -31,7 +32,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SearchEventConverter {
     /* Log4j logger */
-    private static final Logger log = Logger.getLogger(SearchEventConverter.class);
+    private static final Logger log = LogManager.getLogger(SearchEventConverter.class);
 
     @Autowired
     private ScopeResolver scopeResolver;
@@ -66,8 +67,8 @@ public class SearchEventConverter {
         if (searchEventRest.getScope() != null) {
             IndexableObject scopeObject =
                     scopeResolver.resolveScope(context, String.valueOf(searchEventRest.getScope()));
-            if (scopeObject instanceof DSpaceObject) {
-                usageSearchEvent.setScope((DSpaceObject) scopeObject);
+            if (scopeObject != null && scopeObject.getIndexedObject() instanceof DSpaceObject) {
+                usageSearchEvent.setScope((DSpaceObject) scopeObject.getIndexedObject());
             }
         }
         usageSearchEvent.setConfiguration(searchEventRest.getConfiguration());
