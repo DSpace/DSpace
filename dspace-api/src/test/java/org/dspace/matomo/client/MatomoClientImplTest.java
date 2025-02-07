@@ -13,6 +13,7 @@ import java.util.List;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.dspace.AbstractUnitTest;
 import org.dspace.matomo.exception.MatomoClientException;
@@ -38,11 +39,14 @@ public class MatomoClientImplTest extends AbstractUnitTest {
     @Mock
     MatomoRequestBuilder builder;
 
+    @Mock
+    MatomoResponseReader reader;
+
     MatomoClientImpl matomoClient;
 
     @Before
     public void setUp() throws Exception {
-        matomoClient = new MatomoClientImpl("testURL", "custom-token", builder, httpClient);
+        matomoClient = new MatomoClientImpl("testURL", "custom-token", builder, reader, httpClient);
     }
 
     @Test
@@ -78,13 +82,17 @@ public class MatomoClientImplTest extends AbstractUnitTest {
                 .addParameter("test3", "value3");
 
         String json =
-            "{'auth_token': 'custom-token', 'requests': ['?test1=value1&test2=value2&test3=value3']}";
+            "{\"auth_token\": \"custom-token\", \"requests\": [\"?test1=value1&test2=value2&test3=value3\"]}";
+        String jsonResponse =
+            "{\"status\": \"success\", \"tracked\": 1, \"invalid\": 0, \"invalid_indices\": []}";
         Mockito.when(builder.buildJSON(Mockito.any())).thenReturn(json);
         StatusLine mock = Mockito.mock(StatusLine.class);
         Mockito.when(mock.getStatusCode()).thenReturn(200);
         Mockito.when(response.getStatusLine()).thenReturn(mock);
-        Mockito.when(this.httpClient.execute(Mockito.any(HttpPost.class)))
-               .thenReturn(response);
+        Mockito.when(response.getEntity()).thenReturn(new StringEntity(jsonResponse));
+        Mockito.when(reader.fromJSON(jsonResponse))
+               .thenReturn(new MatomoResponse("success", 1, 0, null));
+        Mockito.when(this.httpClient.execute(Mockito.any(HttpPost.class))).thenReturn(response);
 
         this.matomoClient.sendDetails(List.of(details));
         Mockito.verify(this.httpClient, Mockito.times(1)).execute(Mockito.any(HttpPost.class));
