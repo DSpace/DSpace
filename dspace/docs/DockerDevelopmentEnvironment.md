@@ -173,7 +173,7 @@ development:
 
 ## Debugging
 
-The `JAVA_TOOL_OPTIONS` configuration included in the Docker compose starts the
+The `JPDA_OPTS` configuration included in the Docker compose starts the
 JPDA debugger for Tomcat. The [.vscode/launch.json](/.vscode/launch.json)
 file contains the VS Code debug configuration needed to attach to Tomcat. See
 the "Visual Studio Code IDE Setup" section for the extensions needed for
