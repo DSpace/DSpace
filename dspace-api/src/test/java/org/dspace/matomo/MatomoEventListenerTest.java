@@ -17,7 +17,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
-public class MatomoAsyncEventListenerTest extends AbstractUnitTest {
+public class MatomoEventListenerTest extends AbstractUnitTest {
 
     @Mock
     MatomoAsyncDequeHandler matomoHandler1;
@@ -26,19 +26,19 @@ public class MatomoAsyncEventListenerTest extends AbstractUnitTest {
     @Mock
     ConfigurationService configurationService;
 
-    MatomoAsyncEventListener matomoAsyncEventListener;
+    MatomoEventListener matomoEventListener;
 
     @Before
     public void setUp() throws Exception {
-        matomoAsyncEventListener =
-            new MatomoAsyncEventListener(List.of(matomoHandler1, matomoHandler2), configurationService);
+        matomoEventListener =
+            new MatomoEventListener(List.of(matomoHandler1, matomoHandler2), configurationService);
     }
 
     @Test
     public void testDisabledMatomo() {
         UsageEvent event = Mockito.mock(UsageEvent.class);
 
-        matomoAsyncEventListener.receiveEvent(event);
+        matomoEventListener.receiveEvent(event);
 
         Mockito.verifyNoInteractions(matomoHandler1);
         Mockito.verifyNoInteractions(matomoHandler2);
@@ -52,7 +52,7 @@ public class MatomoAsyncEventListenerTest extends AbstractUnitTest {
         Mockito.when(configurationService.getBooleanProperty("matomo.enabled", false))
                .thenReturn(true);
 
-        matomoAsyncEventListener.receiveEvent(event);
+        matomoEventListener.receiveEvent(event);
 
         Mockito.verify(matomoHandler1, Mockito.times(1)).handleEvent(event);
         Mockito.verify(matomoHandler2, Mockito.times(1)).handleEvent(event);

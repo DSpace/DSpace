@@ -20,14 +20,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
-public class MatomoAsyncEventListener extends AbstractUsageEventListener {
+public class MatomoEventListener extends AbstractUsageEventListener {
 
-    private static final Logger log = LogManager.getLogger(MatomoAsyncEventListener.class);
+    private static final Logger log = LogManager.getLogger(MatomoEventListener.class);
 
     private final ConfigurationService configurationService;
     private final List<MatomoUsageEventHandler> matomoUsageEventHandlers;
 
-    public MatomoAsyncEventListener(
+    public MatomoEventListener(
         @Autowired List<MatomoUsageEventHandler> matomoUsageEventHandlers,
         @Autowired ConfigurationService configurationService
     ) {
