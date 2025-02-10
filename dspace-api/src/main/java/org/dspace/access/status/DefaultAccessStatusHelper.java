@@ -8,6 +8,7 @@
 package org.dspace.access.status;
 
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -26,7 +27,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
-import org.joda.time.LocalDate;
 
 /**
  * Default plugin implementation of the access status helper.
@@ -230,7 +230,7 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
                     // If the policy is not valid there is an active embargo
                     Date startDate = policy.getStartDate();
 
-                    if (startDate != null && !startDate.before(LocalDate.now().toDate())) {
+                    if (startDate != null && !startDate.before(Date.from(Instant.now()))) {
                         // There is an active embargo: aim to take the shortest embargo (account for rare cases where
                         // more than one resource policy exists)
                         if (embargoDate == null) {
