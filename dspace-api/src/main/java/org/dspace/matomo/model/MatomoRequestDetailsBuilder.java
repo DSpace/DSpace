@@ -13,6 +13,9 @@ import org.dspace.matomo.factory.MatomoRequestDetailsEnricher;
 import org.dspace.usage.UsageEvent;
 
 /**
+ * This builder can be used to create a proper request using the configured {@code List<MatomoRequestDetailsEnricher>}
+ * and the proper {@code siteId}.
+ *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
 public class MatomoRequestDetailsBuilder {

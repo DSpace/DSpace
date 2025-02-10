@@ -11,6 +11,9 @@ import org.dspace.matomo.model.MatomoRequestDetails;
 import org.dspace.usage.UsageEvent;
 
 /**
+ * This class encapsulate a functional interface that will be used to enrich the {@code MatomoRequestDetails}
+ * with parameters.
+ *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
 @FunctionalInterface

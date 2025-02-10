@@ -18,6 +18,9 @@ import org.dspace.usage.UsageEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * This EventListener handles {@code UsageEvent}s and send them to all the {@code List<MatomoUsageEventHandler>}
+ * configured
+ *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
 public class MatomoEventListener extends AbstractUsageEventListener {

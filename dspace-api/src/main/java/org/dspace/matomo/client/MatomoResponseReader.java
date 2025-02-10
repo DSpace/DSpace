@@ -14,6 +14,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
+ * This class represents a custom {@code JSONDeserializer} that converts the JSON into {@code MatomoResponse}.
+ *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
 public class MatomoResponseReader {
@@ -26,6 +28,11 @@ public class MatomoResponseReader {
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
     }
 
+    /**
+     * Converts a String response into a {@code MatomoResponse} object
+     * @param response
+     * @return
+     */
     MatomoResponse fromJSON(String response) {
         if (response == null) {
             return null;

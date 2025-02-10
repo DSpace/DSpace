@@ -13,6 +13,8 @@ import org.dspace.matomo.model.MatomoRequestDetailsBuilder;
 import org.dspace.usage.UsageEvent;
 
 /**
+ * This class represents an abstract class that will be used to handle the {@code UsageEvent}.
+ *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
 public abstract class MatomoAbstractHandler implements MatomoUsageEventHandler {
