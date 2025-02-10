@@ -89,6 +89,13 @@
                     <xsl:when test="//dspace:field[@mdschema='dc' and @element='contributor' and @qualifier='author']">
                         <xsl:apply-templates select="//dspace:field[@mdschema='dc' and @element='contributor' and @qualifier='author']" />
                     </xsl:when>
+<!-- If your repository does not have any creator/author metadata included, but you still wish to register items in
+     DataCite You may uncomment the block below which will provide "unknown" for the required field. -->
+<!--                    <xsl:otherwise>-->
+<!--                        <creator>-->
+<!--                            <creatorName>(:unkn) unknown</creatorName>-->
+<!--                        </creator>-->
+<!--                    </xsl:otherwise>-->
                 </xsl:choose>
             </creators>
 
