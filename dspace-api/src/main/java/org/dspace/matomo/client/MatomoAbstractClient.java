@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.function.BiConsumer;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.matomo.exception.MatomoClientException;
 import org.dspace.matomo.model.MatomoRequestDetails;
@@ -29,7 +30,7 @@ public abstract class MatomoAbstractClient<C, T, U> implements MatomoClient {
     protected final MatomoRequestBuilder matomoRequestBuilder;
     protected final MatomoResponseReader matomoResponseReader;
     protected final C httpClient;
-    protected Logger log;
+    protected final Logger log = LogManager.getLogger(getClass());
 
     public MatomoAbstractClient(
         String baseUrl, String token,
@@ -73,8 +74,6 @@ public abstract class MatomoAbstractClient<C, T, U> implements MatomoClient {
 
         try {
             this.executeRequest(createRequestBody(details), this::logError);
-        } catch (MatomoClientException ex) {
-            throw ex;
         } catch (Exception ex) {
             throw new MatomoClientException("An error occurs sending events to " + baseUrl, ex);
         }

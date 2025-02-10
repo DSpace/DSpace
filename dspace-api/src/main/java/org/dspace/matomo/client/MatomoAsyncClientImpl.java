@@ -15,8 +15,6 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.function.BiConsumer;
 
-import org.apache.logging.log4j.LogManager;
-
 /**
  *
  * {@code MatomoAbstractClient} implementation that handles communication with the Matomo service
@@ -47,7 +45,6 @@ public class MatomoAsyncClientImpl extends MatomoAbstractClient<HttpClient, Http
         MatomoResponseReader matomoResponseReader,
         HttpClient httpClient) {
         super(baseUrl, token, matomoRequestBuilder, matomoResponseReader, httpClient);
-        this.log = LogManager.getLogger(MatomoAsyncClientImpl.class);
     }
 
     @Override

@@ -94,6 +94,9 @@ public class MatomoRequestDetailsEnricherFactory {
     }
 
     private static String actionName(UsageEvent ue) {
+        if (ue == null || ue.getObject() == null) {
+            return null;
+        }
         try {
             if (ue.getObject().getType() == Constants.BITSTREAM) {
                 // For a bitstream download we really want to know the title of the owning item
@@ -107,8 +110,9 @@ public class MatomoRequestDetailsEnricherFactory {
             }
         } catch (SQLException e) {
             // This shouldn't merit interrupting the user's transaction so log the error and continue.
-            log.error("Error in Google Analytics recording - can't determine ParentObjectName for bitstream " +
-                      ue.getObject().getID(), e);
+            log.error("Error in Matomo Analytics recording - can't determine ParentObjectName for bitstream {}",
+                ue.getObject().getID(), e
+            );
         }
 
         return null;
