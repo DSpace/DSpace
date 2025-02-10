@@ -9,6 +9,8 @@ package org.dspace.matomo;
 
 import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,6 +28,8 @@ public class MatomoAsyncDequeHandler extends MatomoAbstractHandler {
     private static final Logger log = LogManager.getLogger(MatomoAsyncDequeHandler.class);
 
     private final LinkedBlockingDeque<MatomoRequestDetails> deque;
+    private final Lock lock = new ReentrantLock();
+
 
     public MatomoAsyncDequeHandler(
         @Autowired MatomoRequestDetailsBuilder builder,
@@ -42,18 +46,28 @@ public class MatomoAsyncDequeHandler extends MatomoAbstractHandler {
             log.error("Skipping UsageEvent is null");
             return;
         }
-        this.deque.add(this.toDetails(usageEvent));
 
-        if (this.deque.remainingCapacity() <= 1) {
-            this.sendEvents();
+        lock.lock();
+        try {
+            this.deque.add(this.toDetails(usageEvent));
+            if (this.deque.remainingCapacity() <= 1) {
+                this.sendEvents();
+            }
+        } finally {
+            lock.unlock();
         }
     }
 
     @Override
     public void sendEvents() {
-        ArrayList<MatomoRequestDetails> details = new ArrayList<>();
-        deque.drainTo(details);
-        this.matomoClient.sendDetails(details);
+        lock.lock();
+        try {
+            ArrayList<MatomoRequestDetails> details = new ArrayList<>();
+            deque.drainTo(details);
+            this.matomoClient.sendDetails(details);
+        } finally {
+            lock.unlock();
+        }
     }
 
 }

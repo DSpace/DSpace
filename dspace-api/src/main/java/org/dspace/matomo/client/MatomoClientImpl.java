@@ -18,7 +18,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.logging.log4j.LogManager;
 import org.dspace.matomo.exception.MatomoClientException;
 
 /**
@@ -33,7 +32,6 @@ public class MatomoClientImpl extends MatomoAbstractClient<CloseableHttpClient, 
         CloseableHttpClient httpClient
     ) {
         super(baseUrl, token, matomoRequestBuilder, matomoResponseReader, httpClient);
-        log = LogManager.getLogger(MatomoClientImpl.class);
     }
 
     @Override
@@ -53,7 +51,7 @@ public class MatomoClientImpl extends MatomoAbstractClient<CloseableHttpClient, 
         try {
             httpPost.setEntity(new StringEntity(requestBody));
         } catch (UnsupportedEncodingException e) {
-            throw new MatomoClientException("Cannot create request for " + requestBody, e);
+            throw new MatomoClientException("Error creating request", e);
         }
         return httpPost;
     }

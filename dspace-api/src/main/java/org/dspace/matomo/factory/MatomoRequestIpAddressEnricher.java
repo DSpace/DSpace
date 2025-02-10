@@ -29,9 +29,10 @@ public class MatomoRequestIpAddressEnricher implements MatomoRequestDetailsEnric
 
     @Override
     public MatomoRequestDetails enrich(UsageEvent usageEvent, MatomoRequestDetails matomoRequestDetails) {
-        return matomoRequestDetails.addParameter(
-            "cip",
-            StringUtils.defaultIfEmpty(clientInfoService.getClientIp(usageEvent.getRequest()), "")
-        );
+        String clientIp = "";
+        if (usageEvent != null && usageEvent.getRequest() != null) {
+            clientIp = clientInfoService.getClientIp(usageEvent.getRequest());
+        }
+        return matomoRequestDetails.addParameter("cip", StringUtils.defaultIfEmpty(clientIp, ""));
     }
 }
