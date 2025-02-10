@@ -1839,13 +1839,6 @@
                 <artifactId>javax.annotation-api</artifactId>
                 <version>${javax-annotation.version}</version>
             </dependency>
-            <!-- mockito-inline and hibernate-ehcache pull in different versions of byte-buddy. Specify which we want. -->
-            <!-- TODO: We might be able to remove this after hibernate-ehcache is replaced by hibernate-jcache -->
-            <dependency>
-                <groupId>net.bytebuddy</groupId>
-                <artifactId>byte-buddy</artifactId>
-                <version>1.16.1</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
