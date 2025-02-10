@@ -21,6 +21,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.dspace.matomo.exception.MatomoClientException;
 
 /**
+ * Simple synchronous client for Matomo that uses an {@code CloseableHttpClient} to send out
+ * requests.
+ *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
 public class MatomoClientImpl extends MatomoAbstractClient<CloseableHttpClient, HttpPost, HttpResponse> {

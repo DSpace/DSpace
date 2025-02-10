@@ -16,6 +16,8 @@ import org.dspace.matomo.model.MatomoRequestDetails;
 import org.dspace.usage.UsageEvent;
 
 /**
+ * This class adds the {@code country} parameter to the {@code MatomoRequestDetails}
+ *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
 public class MatomoRequestCountryEnricher implements MatomoRequestDetailsEnricher {

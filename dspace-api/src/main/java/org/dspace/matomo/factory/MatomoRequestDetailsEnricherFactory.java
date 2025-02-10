@@ -20,6 +20,9 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageEvent;
 
 /**
+ * This factory contains all the standard enricher that will add those parameters to the
+ * {@code MatomoRequestDetails}  request
+ *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
 public class MatomoRequestDetailsEnricherFactory {
@@ -39,6 +42,10 @@ public class MatomoRequestDetailsEnricherFactory {
 
     private static final Logger log = LogManager.getLogger(MatomoRequestDetailsEnricherFactory.class);
 
+    /**
+     * Adds the {@code user-agent} to the Matomo request
+     * @return
+     */
     public static MatomoRequestDetailsEnricher userAgentEnricher() {
         return (usageEvent, details) ->
             details.addParameter(
@@ -47,6 +54,10 @@ public class MatomoRequestDetailsEnricherFactory {
             );
     }
 
+    /**
+     * Adds the {@code action_name} to the request
+     * @return
+     */
     public static MatomoRequestDetailsEnricher actionNameEnricher() {
         return (usageEvent, details) ->
             details.addParameter(
@@ -55,11 +66,19 @@ public class MatomoRequestDetailsEnricherFactory {
             );
     }
 
+    /**
+     * Adds the {@code url} of the tracked element.
+     * @return
+     */
     public static MatomoRequestDetailsEnricher urlEnricher() {
         return (usageEvent, details) ->
             details.addParameter("url", url(usageEvent.getObject()));
     }
 
+    /**
+     * Adds the {@code download} link of the tracked bitstream
+     * @return
+     */
     public static MatomoRequestDetailsEnricher downloadEnricher() {
         return (usageEvent, details) ->
             details.addParameter(

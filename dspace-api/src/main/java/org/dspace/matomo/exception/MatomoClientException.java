@@ -8,6 +8,8 @@
 package org.dspace.matomo.exception;
 
 /**
+ * This class represents an Exception that will be used to encapsulate details coming from {@code Matomo}.
+ *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
 public class MatomoClientException extends RuntimeException {

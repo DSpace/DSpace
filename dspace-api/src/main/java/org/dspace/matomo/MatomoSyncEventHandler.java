@@ -15,6 +15,8 @@ import org.dspace.usage.UsageEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * This class represents a sync event handler that will send details one by one using the {@code MatomoClient}
+ *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
 public class MatomoSyncEventHandler extends MatomoAbstractHandler {

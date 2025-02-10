@@ -10,6 +10,8 @@ package org.dspace.matomo.client;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
+ * This record represents the response of the Matomo Tracking API.
+ *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
 record MatomoResponse(String status, int tracked, int invalid, @JsonProperty("invalid_indices") int[] invalidIndices) {

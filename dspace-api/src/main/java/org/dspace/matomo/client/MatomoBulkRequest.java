@@ -15,6 +15,8 @@ import org.dspace.matomo.model.MatomoRequestDetails;
 import org.dspace.matomo.model.MatomoRequestDetailsListConverter;
 
 /**
+ * Request that will be sent to Matomo tracking endpoint
+ *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
 record MatomoBulkRequest(

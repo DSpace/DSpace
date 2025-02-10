@@ -20,6 +20,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
+ * This class will be used to convert each {@code MatomoRequestDetails} into a proper URL that will be serialized
+ * into a valid JSON.
+ *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
 public class MatomoRequestDetailsListConverter<T extends Collection<MatomoRequestDetails>> extends JsonSerializer<T> {

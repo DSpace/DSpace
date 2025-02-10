@@ -16,6 +16,8 @@ import org.dspace.usage.UsageEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * Adds the IP address of the client to the {@code MatomoRequestDetails}.
+ *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
 public class MatomoRequestIpAddressEnricher implements MatomoRequestDetailsEnricher {

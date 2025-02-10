@@ -14,6 +14,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
+ * This class is a {@code JSONSerializer} that will convert a {@code MatomoBulkRequest} into a proper JSON
+ *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
 public class MatomoRequestBuilder {
@@ -26,6 +28,11 @@ public class MatomoRequestBuilder {
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
     }
 
+    /**
+     * This method converts a {@code MatomoBulkRequest} request into a JSON
+     * @param request a {@code MatomoBulkRequest} object
+     * @return String
+     */
     String buildJSON(MatomoBulkRequest request) {
         if (request == null) {
             return null;

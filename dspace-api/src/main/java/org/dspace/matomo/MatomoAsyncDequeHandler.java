@@ -21,6 +21,9 @@ import org.dspace.usage.UsageEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * This class groups together {@code capacity} requests that will be sent as one bulk request
+ * using the {@code MatomoClient}
+ *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
 public class MatomoAsyncDequeHandler extends MatomoAbstractHandler {
