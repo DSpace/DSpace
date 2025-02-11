@@ -43,14 +43,12 @@ WORKDIR /dspace-src
 ENV ANT_VERSION=1.10.12
 ENV ANT_HOME=/tmp/ant-$ANT_VERSION
 ENV PATH=$ANT_HOME/bin:$PATH
-# Need wget to install ant
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends wget \
-    && apt-get purge -y --auto-remove \
-    && rm -rf /var/lib/apt/lists/*
 # Download and install 'ant'
 RUN mkdir $ANT_HOME && \
-    wget -qO- "https://archive.apache.org/dist/ant/binaries/apache-ant-$ANT_VERSION-bin.tar.gz" | tar -zx --strip-components=1 -C $ANT_HOME
+    curl --silent --show-error --location --fail --retry 5 --output /tmp/apache-ant.tar.gz \
+      https://archive.apache.org/dist/ant/binaries/apache-ant-${ANT_VERSION}-bin.tar.gz && \
+    tar -zx --strip-components=1 -f /tmp/apache-ant.tar.gz -C $ANT_HOME && \
+    rm /tmp/apache-ant.tar.gz
 # Run necessary 'ant' deploy scripts
 RUN ant init_installation update_configs update_code update_webapps
 
@@ -70,7 +68,7 @@ RUN apt-get update \
 EXPOSE 8080 8000
 # Give java extra memory (2GB)
 ENV JAVA_OPTS=-Xmx2000m
-# Set up debugging
-ENV CATALINA_OPTS=-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:8000
+# enable JVM debugging via JDWP
+ENV JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000
 # On startup, run DSpace Runnable JAR
 ENTRYPOINT ["java", "-jar", "webapps/server-boot.jar", "--dspace.dir=$DSPACE_INSTALL"]
