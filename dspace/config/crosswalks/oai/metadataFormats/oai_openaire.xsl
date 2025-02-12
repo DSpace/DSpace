@@ -731,7 +731,7 @@
     <!-- datacite.date @name=issued or @name=accepted -->
     <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_publicationdate.html -->
     <xsl:template
-        match="doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='issued' or @name='accepted']"
+        match="doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name='issued']"
         mode="datacite">
         <xsl:variable name="dc_date_value" select="doc:element/doc:field[@name='value']/text()"/>
         <datacite:date dateType="Accepted">
@@ -888,13 +888,13 @@
             <xsl:attribute name="mimeType">
             <xsl:value-of select="doc:field[@name='format']"/>
          </xsl:attribute>
-            <xsl:attribute name="objectType">
+            <!-- Currently there is no available way to identify the type of the bitstream -->
+            <!--<xsl:attribute name="objectType">
             <xsl:choose>
-                <!-- Currently there is no available way to identify the type of the bitstream -->
                 <xsl:when test="1">
                     <xsl:text>fulltext</xsl:text>
                 </xsl:when>
-                <!--xsl:when test="$type='dataset'">
+                xsl:when test="$type='dataset'">
                     <xsl:text>dataset</xsl:text>
                 </xsl:when>
                 <xsl:when test="$type='software'">
@@ -902,12 +902,12 @@
                 </xsl:when>
                 <xsl:when test="$type='article'">
                     <xsl:text>fulltext</xsl:text>
-                </xsl:when-->
+                </xsl:when
                 <xsl:otherwise>                  
                     <xsl:text>other</xsl:text>
                 </xsl:otherwise>
              </xsl:choose>
-           </xsl:attribute>
+           </xsl:attribute>-->
             <xsl:value-of select="doc:field[@name='url']"/>
         </oaire:file>
     </xsl:template>
@@ -1039,6 +1039,8 @@
     </xsl:template>
 
     <!-- This template will retrieve the type of a date based on the element name -->
+    <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/vocab_datetype.html -->
+    <!-- Accepted and Issued date types are handled separately above. -->
     <xsl:template name="getDateType">
         <xsl:param name="elementName"/>
         <xsl:variable name="lc_dc_date_type">
@@ -1047,26 +1049,10 @@
             </xsl:call-template>
         </xsl:variable>
         <xsl:choose>
-            <xsl:when test="$lc_dc_date_type='available' or  $lc_dc_date_type = 'embargo'">
+            <xsl:when test="$lc_dc_date_type = 'embargo'">
+                <!-- Indicates the end of the embargo period. -->
+                <!-- https://openaire-guidelines-for-literature-repository-managers.readthedocs.io/en/v4.0.0/field_embargoenddate.html -->
                 <xsl:text>Available</xsl:text>
-            </xsl:when>
-            <xsl:when test="$lc_dc_date_type='collected'">
-                <xsl:text>Collected</xsl:text>
-            </xsl:when>
-            <xsl:when test="$lc_dc_date_type='copyrighted' or $lc_dc_date_type='copyright'">
-                <xsl:text>Copyrighted</xsl:text>
-            </xsl:when>
-            <xsl:when test="$lc_dc_date_type='created'">
-                <xsl:text>Created</xsl:text>
-            </xsl:when>
-            <xsl:when test="$lc_dc_date_type='submitted'">
-                <xsl:text>Submitted</xsl:text>
-            </xsl:when>
-            <xsl:when test="$lc_dc_date_type='updated'">
-                <xsl:text>Updated</xsl:text>
-            </xsl:when>
-            <xsl:when test="$lc_dc_date_type='valid'">
-                <xsl:text>Valid</xsl:text>
             </xsl:when>
         </xsl:choose>
     </xsl:template>
