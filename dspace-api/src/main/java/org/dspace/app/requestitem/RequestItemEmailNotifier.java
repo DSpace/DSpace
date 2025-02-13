@@ -10,6 +10,7 @@ package org.dspace.app.requestitem;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.util.List;
 
 import jakarta.annotation.ManagedBean;
@@ -174,9 +175,17 @@ public class RequestItemEmailNotifier {
             grantorAddress = grantor.getEmail();
         }
 
+        Email email;
+        // If this item has a secure access token, send the template with that link instead of attaching files
+        if (ri.isAccept_request() && ri.getAccess_token() != null) {
+            email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(),
+                    "request_item.granted_token"));
+        } else {
+            email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(),
+                    ri.isAccept_request() ? "request_item.granted" : "request_item.rejected"));
+        }
+
         // Build an email back to the requester.
-        Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(),
-                ri.isAccept_request() ? "request_item.granted" : "request_item.rejected"));
         email.addArgument(ri.getReqName()); // {0} requestor's name
         email.addArgument(handleService.getCanonicalForm(ri.getItem().getHandle())); // {1} URL of the requested Item
         email.addArgument(ri.getItem().getName()); // {2} title of the requested Item
@@ -188,34 +197,48 @@ public class RequestItemEmailNotifier {
         // Attach bitstreams.
         try {
             if (ri.isAccept_request()) {
-                if (ri.isAllfiles()) {
-                    Item item = ri.getItem();
-                    List<Bundle> bundles = item.getBundles("ORIGINAL");
-                    for (Bundle bundle : bundles) {
-                        List<Bitstream> bitstreams = bundle.getBitstreams();
-                        for (Bitstream bitstream : bitstreams) {
-                            if (!bitstream.getFormat(context).isInternal() &&
-                                    requestItemService.isRestricted(context,
-                                    bitstream)) {
-                                // #8636 Anyone receiving the email can respond to the
-                                // request without authenticating into DSpace
-                                context.turnOffAuthorisationSystem();
-                                email.addAttachment(
-                                        bitstreamService.retrieve(context, bitstream),
-                                        bitstream.getName(),
-                                        bitstream.getFormat(context).getMIMEType());
-                                context.restoreAuthSystemState();
-                            }
-                        }
+                if (ri.getAccess_token() != null) {
+                    // {6} secure access link
+                    email.addArgument(configurationService.getProperty("dspace.ui.url")
+                            + "/items/" + ri.getItem().getID()
+                            + "/access-by-token?accessToken=" + ri.getAccess_token());
+                    // {7} access end date
+                    if (ri.getAccess_period() > 0) {
+                        DateFormat dateFormat = DateFormat.getDateInstance();
+                        email.addArgument(dateFormat.format(ri.getAccessEndDate()));
+                    } else {
+                        email.addArgument(null);
                     }
                 } else {
-                    Bitstream bitstream = ri.getBitstream();
-                    // #8636 Anyone receiving the email can respond to the request without authenticating into DSpace
-                    context.turnOffAuthorisationSystem();
-                    email.addAttachment(bitstreamService.retrieve(context, bitstream),
-                            bitstream.getName(),
-                            bitstream.getFormat(context).getMIMEType());
-                    context.restoreAuthSystemState();
+                    if (ri.isAllfiles()) {
+                        Item item = ri.getItem();
+                        List<Bundle> bundles = item.getBundles("ORIGINAL");
+                        for (Bundle bundle : bundles) {
+                            List<Bitstream> bitstreams = bundle.getBitstreams();
+                            for (Bitstream bitstream : bitstreams) {
+                                if (!bitstream.getFormat(context).isInternal() &&
+                                        requestItemService.isRestricted(context,
+                                                bitstream)) {
+                                    // #8636 Anyone receiving the email can respond to the
+                                    // request without authenticating into DSpace
+                                    context.turnOffAuthorisationSystem();
+                                    email.addAttachment(
+                                            bitstreamService.retrieve(context, bitstream),
+                                            bitstream.getName(),
+                                            bitstream.getFormat(context).getMIMEType());
+                                    context.restoreAuthSystemState();
+                                }
+                            }
+                        }
+                    } else {
+                        Bitstream bitstream = ri.getBitstream();
+                        //#8636 Anyone receiving the email can respond to the request without authenticating into DSpace
+                        context.turnOffAuthorisationSystem();
+                        email.addAttachment(bitstreamService.retrieve(context, bitstream),
+                                bitstream.getName(),
+                                bitstream.getFormat(context).getMIMEType());
+                        context.restoreAuthSystemState();
+                    }
                 }
                 email.send();
             } else {
