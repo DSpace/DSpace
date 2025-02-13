@@ -15,8 +15,8 @@ import org.dspace.app.rest.projection.Projection;
 import org.dspace.content.Bitstream;
 
 /**
- * Convert between {@link org.dspace.app.requestitem.RequestItem} and
- * {@link org.dspace.app.rest.model.RequestItemRest}.
+ * Convert between {@link RequestItem} and
+ * {@link RequestItemRest}.
  *
  * @author Mark H. Wood <mwood@iupui.edu>
  */
@@ -45,6 +45,8 @@ public class RequestItemConverter
         requestItemRest.setRequestName(requestItem.getReqName());
         requestItemRest.setRequestDate(requestItem.getRequest_date());
         requestItemRest.setToken(requestItem.getToken());
+        requestItemRest.setAccessToken(requestItem.getAccess_token());
+        requestItemRest.setAccessPeriod(requestItem.getAccess_period());
         return requestItemRest;
     }
 
