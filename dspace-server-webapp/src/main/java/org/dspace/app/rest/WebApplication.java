@@ -183,7 +183,7 @@ public class WebApplication {
                             // Allow list of request preflight headers allowed to be sent to us from the client
                             .allowedHeaders("Accept", "Authorization", "Content-Type", "Origin", "X-On-Behalf-Of",
                                 "X-Requested-With", "X-XSRF-TOKEN", "X-CORRELATION-ID", "X-REFERRER",
-                                "x-recaptcha-token")
+                                "x-recaptcha-token", "x-captcha-payload")
                             // Allow list of response headers allowed to be sent by us (the server) to the client
                             .exposedHeaders("Authorization", "DSPACE-XSRF-TOKEN", "Location", "WWW-Authenticate");
                 }
@@ -195,7 +195,7 @@ public class WebApplication {
                             // Allow list of request preflight headers allowed to be sent to us from the client
                             .allowedHeaders("Accept", "Authorization", "Content-Type", "Origin", "X-On-Behalf-Of",
                                 "X-Requested-With", "X-XSRF-TOKEN", "X-CORRELATION-ID", "X-REFERRER",
-                                "x-recaptcha-token")
+                                "x-recaptcha-token", "x-captcha-payload")
                             // Allow list of response headers allowed to be sent by us (the server) to the client
                             .exposedHeaders("Authorization", "DSPACE-XSRF-TOKEN", "Location", "WWW-Authenticate");
                 }
@@ -207,7 +207,7 @@ public class WebApplication {
                             // Allow list of request preflight headers allowed to be sent to us from the client
                             .allowedHeaders("Accept", "Authorization", "Content-Type", "Origin", "X-On-Behalf-Of",
                                     "X-Requested-With", "X-XSRF-TOKEN", "X-CORRELATION-ID", "X-REFERRER",
-                                    "x-recaptcha-token", "access-control-allow-headers")
+                                    "x-recaptcha-token", "x-captcha-payload", "access-control-allow-headers")
                             // Allow list of response headers allowed to be sent by us (the server) to the client
                             .exposedHeaders("Authorization", "DSPACE-XSRF-TOKEN", "Location", "WWW-Authenticate");
                 }
