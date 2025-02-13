@@ -85,17 +85,6 @@ updates:
         update-types:
         - "minor"
         - "patch"
-      # Group together all Google deps in a single PR
-      google-apis:
-        applies-to: version-updates
-        patterns:
-        - "com.google.apis:*"
-        - "com.google.api-client:*"
-        - "com.google.http-client:*"
-        - "com.google.oauth-client:*"
-        update-types:
-        - "minor"
-        - "patch"
       # Group together all Spring deps in a single PR
       spring:
         applies-to: version-updates
@@ -198,17 +187,6 @@ updates:
           - "jakarta.*:*"
           - "org.eclipse.angus:jakarta.mail"
           - "org.glassfish.jaxb:jaxb-runtime"
-        update-types:
-          - "minor"
-          - "patch"
-      # Group together all Google deps in a single PR
-      google-apis:
-        applies-to: version-updates
-        patterns:
-          - "com.google.apis:*"
-          - "com.google.api-client:*"
-          - "com.google.http-client:*"
-          - "com.google.oauth-client:*"
         update-types:
           - "minor"
           - "patch"
@@ -318,6 +296,7 @@ updates:
           - "minor"
           - "patch"
       # Group together all Google deps in a single PR
+      # NOTE: These Google deps are only used in 7.x and have been removed in 8.x and later
       google-apis:
         applies-to: version-updates
         patterns:
