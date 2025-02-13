@@ -56,15 +56,15 @@ still exists in the Postgres "doi" table, with a null "dspace_object" field.
 This is problematic if the DOI has not been registered, as the stock DSpace
 registration process expects the associated item to be non-null.
 
+To mitigate this issue, in the "DOIOrganiser" class, the "register-all" command
+has been modified to purge any DOIs in the "doi" table with a status of
+"TO_BE_REGISTERED" that do not an associated item.
+
 This method for correcting the issue was chosen (instead of, for example,
 modifying the DSpace code to delete the DOI when the item was deleted), as it
 seemed the most straightforward, and only involved classes that UMD was already
 modifying for DRUM.
 
-To mitigate this issue, in the "DOIOrganiser" class, the "register-all" command
-has been modified to purge any DOIs in the "doi" table with a status of
-"TO_BE_REGISTERED", that do not a null associated item.
-
-See [LIBDRUM-915](https://umd-dit.atlassian.net/browse/LIBDRUM-915) and
+See [LIBDRUM-916](https://umd-dit.atlassian.net/browse/LIBDRUM-916) and
 [LIBDRUM-914](https://umd-dit.atlassian.net/browse/LIBDRUM-914).
 
