@@ -45,3 +45,26 @@ in standard DSpace, where it is assigned to the "dc.identifier.doi" field.
 We have disabled "doi-filter" filter config in the DOIIdentifierProvider in the
 [identifier-service.xml](../config/spring/api/identifier-service.xml) as it is
 not compatible with the our DOI generation workflow.
+
+## Item Deletion and DOIs
+
+DRUM has been customized to generate a DOI when an item is created, including
+placing an entry in the Postgres "doi" table.
+
+When an item is deleted, the DOI no longer has an associated item, but the entry
+still exists in the Postgres "doi" table, with a null "dspace_object" field.
+This is problematic if the DOI has not been registered, as the stock DSpace
+registration process expects the associated item to be non-null.
+
+This method for correcting the issue was chosen (instead of, for example,
+modifying the DSpace code to delete the DOI when the item was deleted), as it
+seemed the most straightforward, and only involved classes that UMD was already
+modifying for DRUM.
+
+To mitigate this issue, in the "DOIOrganiser" class, the "register-all" command
+has been modified to purge any DOIs in the "doi" table with a status of
+"TO_BE_REGISTERED", that do not a null associated item.
+
+See [LIBDRUM-915](https://umd-dit.atlassian.net/browse/LIBDRUM-915) and
+[LIBDRUM-914](https://umd-dit.atlassian.net/browse/LIBDRUM-914).
+

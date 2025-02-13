@@ -238,6 +238,9 @@ public class DOIOrganiser {
 
         if (line.hasOption('r')) {
             try {
+                // UMD Customization
+                organiser.purgeEmptyDOIsWithStatus(context, DOIIdentifierProvider.TO_BE_REGISTERED);
+                // End UMD Customization
                 List<DOI> dois = doiService
                     .getDOIsByStatus(context, Arrays.asList(DOIIdentifierProvider.TO_BE_REGISTERED));
                 if (dois.isEmpty()) {
@@ -719,6 +722,30 @@ public class DOIOrganiser {
         System.out.println("Minted new unique DOI: " +  doiRow.getDoi() + " for item with handle " +
                 doiRow.getDSpaceObject().getHandle());
 
+    }
+
+    /**
+     * Deletes any DOIs with the given status that do not have an associated
+     * DSpace object.
+     *
+     * This can occur, for example, when a DSpace object is deleted, as DOIs
+     * do not appear to be updated by DSpace object deletions.
+     *
+     * @param context the current Context
+     * @param status the DOIIdentifierProvider status to use in retrieving DOIs
+     * @throws SQLException if a database error occurs.
+     */
+    protected void purgeEmptyDOIsWithStatus(Context context, Integer status)
+        throws SQLException {
+        List<DOI> dois = doiService.getDOIsByStatus(context, Arrays.asList(status));
+        for (DOI doi: dois) {
+            if (doi.getDSpaceObject() == null) {
+                doiService.delete(context, doi);
+                context.uncacheEntity(doi);
+                System.out.println("Purged DOI: " +  doi.getDoi() +
+                    " as its associated DSpace object has been deleted.");
+            }
+        }
     }
     // End UMD Customization
 
