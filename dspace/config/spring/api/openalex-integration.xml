@@ -98,10 +98,9 @@
         <property name="field" ref="openalex.openalexId"/>
         <property name="metadataProcessor" ref="openalexOpenAlexIdMetadataProcessor"/>
     </bean>
-    <bean name="openalexOpenAlexIdMetadataProcessor" class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexIdMetadataProcessor">
-        <property name="path" value="/ids/openalex"/>
-        <property name="toBeReplaced" value="https://openalex.org/"/>
-        <property name="replacement" value=""/>
+    <bean id="openalexOpenAlexIdMetadataProcessor" class="org.dspace.importer.external.metadatamapping.contributor.RegexExtractMetadataProcessor">
+        <property name="path" value="/id" />
+        <property name="regexPattern" value="[^/]+$" />
     </bean>
     <bean id="openalex.openalexId" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.identifier.other"/>
@@ -133,6 +132,38 @@
     </bean>
     <bean id="openalex.language" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.language.iso"/>
+    </bean>
+
+    <util:map id="openalexPersonMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+              value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
+        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
+            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
+            what metadatafield is generated.
+        </description>
+        <entry key-ref="openalex.author.name" value-ref="openalexAuthorName"/>
+        <entry key-ref="openalex.author.id" value-ref="openalexAuthorId"/>
+    </util:map>
+
+    <bean id="openalex.author.name" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.title"/>
+    </bean>
+    <bean id="openalexAuthorName" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.author.name"/>
+        <property name="query" value="/display_name"/>
+    </bean>
+
+
+    <bean id="openalexAuthorId" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.author.id"/>
+        <property name="metadataProcessor" ref="openalexAuthorMetadataProcessor"/>
+    </bean>
+    <bean id="openalexAuthorMetadataProcessor" class="org.dspace.importer.external.metadatamapping.contributor.RegexExtractMetadataProcessor">
+        <property name="path" value="/id" />
+        <property name="regexPattern" value="[^/]+$" />
+    </bean>
+
+    <bean id="openalex.author.id" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier"/>
     </bean>
 
 </beans>

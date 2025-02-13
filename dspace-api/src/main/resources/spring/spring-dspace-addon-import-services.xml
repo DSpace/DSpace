@@ -249,8 +249,17 @@
         <property name="url" value="${openalex.url.works}"/>
     </bean>
 
+    <bean id="openalexImportServiceByName" class="org.dspace.importer.external.openalex.service.OpenAlexImportMetadataSourceServiceImpl">
+        <property name="metadataFieldMapping" ref="openalexPersonMetadataFieldMapping"/>
+        <property name="url" value="${openalex.url.authors}"/>
+    </bean>
+
     <bean id="openalexPublicationMetadataFieldMapping"
           class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexPublicationFieldMapping">
+    </bean>
+
+    <bean id="openalexPersonMetadataFieldMapping"
+          class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexPersonFieldMapping">
     </bean>
 
 </beans>

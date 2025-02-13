@@ -5,36 +5,45 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.importer.external.openalex.metadatamapping;
+package org.dspace.importer.external.metadatamapping.contributor;
+
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dspace.importer.external.metadatamapping.contributor.AbstractJsonPathMetadataProcessor;
 
 /**
  * @author Adamo Fapohunda (adamo.fapohunda at 4science.com)
  **/
-public class OpenAlexIdMetadataProcessor extends AbstractJsonPathMetadataProcessor {
+public class RegexExtractMetadataProcessor extends AbstractJsonPathMetadataProcessor {
 
-    private static final Logger log = LogManager.getLogger(OpenAlexIdMetadataProcessor.class);
+    private static final Logger log = LogManager.getLogger(RegexExtractMetadataProcessor.class);
 
     private String path;
-
-    private String toBeReplaced;
-
-    private String replacement;
+    private String regexPattern;
 
     @Override
     protected String getStringValue(JsonNode node) {
         if (node == null || !node.isTextual()) {
             throw new IllegalArgumentException("Input must be a non-null JsonNode containing a text value");
         }
-        String idStr = node.asText();
-        if (toBeReplaced == null || toBeReplaced.isEmpty() || replacement == null) {
-            return idStr;
+
+        String text = node.asText();
+        if (regexPattern == null || regexPattern.isEmpty()) {
+            return text;
         }
-        return idStr.replaceAll(toBeReplaced, replacement);
+
+        Pattern pattern = Pattern.compile(regexPattern);
+        Matcher matcher = pattern.matcher(text);
+
+        if (matcher.find()) {
+            return matcher.group();
+        }
+
+        return text;
     }
 
     @Override
@@ -51,11 +60,8 @@ public class OpenAlexIdMetadataProcessor extends AbstractJsonPathMetadataProcess
         this.path = path;
     }
 
-    public void setToBeReplaced(String toBeReplaced) {
-        this.toBeReplaced = toBeReplaced;
-    }
-
-    public void setReplacement(String replacement) {
-        this.replacement = replacement;
+    public void setRegexPattern(String regexPattern) {
+        this.regexPattern = regexPattern;
     }
 }
+

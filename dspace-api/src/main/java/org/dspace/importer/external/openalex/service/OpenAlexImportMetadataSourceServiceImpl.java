@@ -33,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 
 /**
- * @author adamo.fapohunda at 4science.com
+ * @author Adamo Fapohunda (adamo.fapohunda at 4science.com)
  **/
 public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<String>
     implements OpenAlexImportMetadataSourceService {

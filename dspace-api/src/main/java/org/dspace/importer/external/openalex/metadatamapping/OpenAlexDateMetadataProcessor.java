@@ -17,7 +17,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.importer.external.metadatamapping.contributor.AbstractJsonPathMetadataProcessor;
 
 /**
- * @author adamo.fapohunda at 4science.com
+ * @author Adamo Fapohunda (adamo.fapohunda at 4science.com)
  **/
 public class OpenAlexDateMetadataProcessor extends AbstractJsonPathMetadataProcessor {
 

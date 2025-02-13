@@ -10,7 +10,7 @@ package org.dspace.importer.external.openalex.service;
 import org.dspace.importer.external.service.components.QuerySource;
 
 /**
- * @author adamo.fapohunda at 4science.com
+ * @author Adamo Fapohunda (adamo.fapohunda at 4science.com)
  **/
 public interface OpenAlexImportMetadataSourceService extends QuerySource {
 }
