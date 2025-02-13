@@ -682,17 +682,19 @@ public class DOIOrganiser {
     /**
      * If the DOI is marked as TO_BE_REGISTERED or TO_BE_RESERVED locally, but it
      * already is reserved with the provider then it is possible that the randomly
-     * generated local DOI is not gloabally unique. This is possible if the
+     * generated local DOI is not globally unique. This is possible if the
      * same DOI was created with the provider external to this DSpace instance (From
      * a different application or manually)
      *
      * @see DOIIdentifierProvider#mintRandomUniqueDoi()
      * @see DOIIdentifierProvider#mintRandomGloballyUniqueDoi()
      *
-     * @param context
-     * @param doi
-     * @return
-     * @throws DOIIdentifierException
+     * @param context the current Context
+     * @param doi the DOI to check for uniqueness with the external provider
+     * @return true if the given DOI has already been reserved with the external
+     *         provider, false otherwise.
+     * @throws DOIIdentifierException if an error occurs setting the newly
+     *         minted DOi
      */
     private boolean isNonUniqueDoi(Context context, DOI doi) throws DOIIdentifierException {
         if (doi.getStatus() == null ||
@@ -710,10 +712,11 @@ public class DOIOrganiser {
     /**
      * Mint a new DOI that is unique both locally and in the provider system.
      *
-     * @param context
-     * @param doiRow
-     * @throws SQLException
-     * @throws DOIIdentifierException
+     * @param context the current Context
+     * @param doiRow the DOI to update with a globally unique DOI
+     * @throws SQLException if a database error occurs
+     * @throws DOIIdentifierException if an error occurs setting the newly
+     *         minted DOi
      */
     private void setNewDoi(Context context, DOI doiRow) throws SQLException, DOIIdentifierException {
         System.out.println("Minting new DOI for item with handle: " + doiRow.getDSpaceObject().getHandle());
