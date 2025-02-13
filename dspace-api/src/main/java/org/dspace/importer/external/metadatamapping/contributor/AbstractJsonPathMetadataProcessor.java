@@ -18,7 +18,7 @@ import org.apache.logging.log4j.Logger;
 
 
 /**
- * @author adamo.fapohunda at 4science.com
+ * @author Adamo Fapohunda (adamo.fapohunda at 4science.com)
  **/
 public abstract class AbstractJsonPathMetadataProcessor implements JsonPathMetadataProcessor {
 
