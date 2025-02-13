@@ -12,14 +12,13 @@ import java.util.Map;
 import jakarta.annotation.Resource;
 import org.dspace.importer.external.metadatamapping.AbstractMetadataFieldMapping;
 
-
 /**
  * @author Adamo Fapohunda (adamo.fapohunda at 4science.com)
  **/
-public class OpenAlexPublicationFieldMapping extends AbstractMetadataFieldMapping {
+public class OpenAlexPersonFieldMapping extends AbstractMetadataFieldMapping {
 
     @Override
-    @Resource(name = "openalexPublicationsMetadataFieldMap")
+    @Resource(name = "openalexPersonMetadataFieldMap")
     public void setMetadataFieldMap(Map metadataFieldMap) {
         super.setMetadataFieldMap(metadataFieldMap);
     }

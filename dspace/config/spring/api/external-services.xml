@@ -292,13 +292,25 @@
         </property>
     </bean>
 
-    <bean id="openalexLiveImportDataProviderByTitle" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+    <bean id="openalexPublicationLiveImportDataProviderByTitle" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="openalexImportServiceByTitle"/>
-        <property name="sourceIdentifier" value="openalex"/>
+        <property name="sourceIdentifier" value="openalexPublication"/>
         <property name="recordIdMetadata" value="dc.identifier.other"/>
         <property name="supportedEntityTypes">
             <list>
                 <value>Publication</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="openalexPersonLiveImportDataProviderByName" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="openalexImportServiceByName"/>
+        <property name="sourceIdentifier" value="openalexPerson"/>
+        <property name="recordIdMetadata" value="dc.identifier"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Person</value>
                 <value>none</value>
             </list>
         </property>
