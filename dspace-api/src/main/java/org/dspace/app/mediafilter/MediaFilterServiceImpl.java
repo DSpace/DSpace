@@ -121,7 +121,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
         if (fromDate == null) {
             storeLastDate = true;
             String lastDate = siteService.getMetadata(siteService.findSite(context), "dspace.filtermedia.lastdate");
-            if (lastDate != null) {
+            if ((lastDate != null) && (isForce == false)) {
                 fromDate = new DCDate(lastDate).toDate();
             }
         }
