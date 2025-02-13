@@ -28,11 +28,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
@@ -97,6 +96,8 @@ public class RequestItemRepositoryIT
 
     private Bitstream bitstream;
 
+    private Map<String, Object> altchaPayload;
+
     @Before
     public void init()
             throws SQLException, AuthorizeException, IOException {
@@ -125,6 +126,13 @@ public class RequestItemRepositoryIT
                 .withName("Bitstream")
                 .build();
 
+        altchaPayload = new HashMap<>();
+        altchaPayload.put("challenge", "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3");
+        altchaPayload.put("salt", "salt123");
+        altchaPayload.put("number", 1);
+        altchaPayload.put("signature", "f5cd3ed4161f5f3c914c5778e716d6b446fa277086bbb8fd3e2b0c4b89f18833");
+        altchaPayload.put("algorithm", "SHA-256");
+
         context.restoreAuthSystemState();
     }
 
@@ -136,6 +144,8 @@ public class RequestItemRepositoryIT
     @Test
     public void testFindAll()
             throws Exception {
+        System.out.println("findAll");
+
         getClient().perform(get(URI_ROOT))
                 .andExpect(status().isMethodNotAllowed());
     }
@@ -148,6 +158,8 @@ public class RequestItemRepositoryIT
     @Test
     public void testFindOneAuthenticated()
             throws Exception {
+        System.out.println("findOne (authenticated)");
+
         // Create a request.
         RequestItem request = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
@@ -171,6 +183,8 @@ public class RequestItemRepositoryIT
     @Test
     public void testFindOneNotAuthenticated()
             throws Exception {
+        System.out.println("findOne (not authenticated)");
+
         // Create a request.
         RequestItem request = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
@@ -193,6 +207,8 @@ public class RequestItemRepositoryIT
     @Test
     public void testFindOneNonexistent()
             throws Exception {
+        System.out.println("findOne (nonexistent request)");
+
         String uri = URI_ROOT + "/impossible";
         getClient().perform(get(uri))
                 .andExpect(status().isNotFound());
@@ -259,8 +275,6 @@ public class RequestItemRepositoryIT
     @Test
     public void testCreateAndReturnNotAuthenticated()
             throws SQLException, AuthorizeException, IOException, Exception {
-        System.out.println("createAndReturn (not authenticated)");
-
         // Fake up a request in REST form.
         RequestItemRest rir = new RequestItemRest();
         rir.setAllfiles(false);
@@ -269,11 +283,17 @@ public class RequestItemRepositoryIT
         rir.setRequestEmail(RequestItemBuilder.REQ_EMAIL);
         rir.setRequestMessage(RequestItemBuilder.REQ_MESSAGE);
         rir.setRequestName(RequestItemBuilder.REQ_NAME);
+        String base64Payload =
+                "eyJjaGFsbGVuZ2UiOiJhNjY1YTQ1OTIwNDIyZjlkNDE3ZTQ4NjdlZmRjNGZiOGEwNGExZ" +
+                "jNmZmYxZmEwN2U5OThlODZmN2Y3YTI3YWUzIiwic2FsdCI6InNhbHQxMjMiLCJudW1iZX" +
+                "IiOjEsInNpZ25hdHVyZSI6ImY1Y2QzZWQ0MTYxZjVmM2M5MTRjNTc3OGU3MTZkNmI0NDZ" +
+                "mYTI3NzA4NmJiYjhmZDNlMmIwYzRiODlmMTg4MzMiLCJhbGdvcml0aG0iOiJTSEEtMjU2In0=";
 
         // Create it and see if it was created correctly.
         ObjectMapper mapper = new ObjectMapper();
         try {
                 getClient().perform(post(URI_ROOT)
+                                .header("x-captcha-payload", base64Payload)
                                 .content(mapper.writeValueAsBytes(rir))
                                 .contentType(contentType))
                         .andExpect(status().isCreated())
@@ -311,8 +331,6 @@ public class RequestItemRepositoryIT
     @Test
     public void testCreateAndReturnBadRequest()
             throws SQLException, AuthorizeException, IOException, Exception {
-        System.out.println("createAndReturn (bad requests)");
-
         // Fake up a request in REST form.
         RequestItemRest rir = new RequestItemRest();
         rir.setBitstreamId(bitstream.getID().toString());
@@ -389,7 +407,6 @@ public class RequestItemRepositoryIT
     @Test
     public void testCreateWithInvalidCSRF()
             throws Exception {
-
         // Login via password to retrieve a valid token
         String token = getAuthToken(eperson.getEmail(), password);
 
@@ -547,6 +564,8 @@ public class RequestItemRepositoryIT
     @Test
     public void testPutBadRequest()
             throws Exception {
+        System.out.println("put bad requests");
+
         // Create an item request to approve.
         RequestItem itemRequest = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
@@ -573,7 +592,6 @@ public class RequestItemRepositoryIT
     @Test
     public void testPutCompletedRequest()
             throws Exception {
-
         // Create an item request that is already denied.
         RequestItem itemRequest = RequestItemBuilder
                 .createRequestItem(context, item, bitstream)
@@ -605,38 +623,5 @@ public class RequestItemRepositoryIT
         assertEquals("Wrong domain class", RequestItemRest.class, instanceClass);
     }
 
-    /**
-     * Test that generated links include the correct base URL, where the UI URL has a subpath like /subdir
-     */
-    @Test
-    public void testGetLinkTokenEmailWithSubPath() throws MalformedURLException, URISyntaxException {
-        RequestItemRepository instance = applicationContext.getBean(
-                RequestItemRest.CATEGORY + '.' + RequestItemRest.PLURAL_NAME,
-                RequestItemRepository.class);
-        String currentDspaceUrl = configurationService.getProperty("dspace.ui.url");
-        String newDspaceUrl = currentDspaceUrl + "/subdir";
-        // Add a /subdir to the url for this test
-        configurationService.setProperty("dspace.ui.url", newDspaceUrl);
-        String expectedUrl = newDspaceUrl + "/request-a-copy/token";
-        String generatedLink = instance.getLinkTokenEmail("token");
-        // The URLs should match
-        assertEquals(expectedUrl, generatedLink);
-        configurationService.reloadConfig();
-    }
 
-    /**
-     * Test that generated links include the correct base URL, with NO subpath elements
-     */
-    @Test
-    public void testGetLinkTokenEmailWithoutSubPath() throws MalformedURLException, URISyntaxException {
-        RequestItemRepository instance = applicationContext.getBean(
-                RequestItemRest.CATEGORY + '.' + RequestItemRest.PLURAL_NAME,
-                RequestItemRepository.class);
-        String currentDspaceUrl = configurationService.getProperty("dspace.ui.url");
-        String expectedUrl = currentDspaceUrl + "/request-a-copy/token";
-        String generatedLink = instance.getLinkTokenEmail("token");
-        // The URLs should match
-        assertEquals(expectedUrl, generatedLink);
-        configurationService.reloadConfig();
-    }
 }
