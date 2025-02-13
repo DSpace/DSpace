@@ -27,6 +27,11 @@
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExportSearchCli" />
     </bean>
 
+    <bean name="metadata-export-filtered-items-report" class="org.dspace.app.bulkedit.MetadataExportFilteredItemsReportCliScriptConfiguration">
+        <property name="description" value="export metadata from a Filtered Items content report execution" />
+        <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExportFilteredItemsReportCli" />
+    </bean>
+
     <bean id="curate"
           class="org.dspace.curate.CurationCliScriptConfiguration">
         <property name="description"
