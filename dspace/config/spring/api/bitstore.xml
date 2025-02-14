@@ -9,11 +9,11 @@
             <map>
                 <!-- UMD Customization -->
                 <entry key="0" value-ref="localStore"/>
-                <!--<entry key="1" value-ref="s3Store"/>-->
                 <entry key="1" value-ref="localStore1"/>
                 <entry key="2" value-ref="localStore2"/>
                 <entry key="3" value-ref="localStore3"/>
                 <entry key="4" value-ref="localStore4"/>
+                <entry key="5" value-ref="s3Store"/>
                 <!-- End UMD Customization -->
             </map>
         </property>
