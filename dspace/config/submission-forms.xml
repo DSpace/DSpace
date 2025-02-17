@@ -52,91 +52,108 @@
              often used when depositing normal Items (i.e. Items which are not Entities). -->
         <form name="traditionalpageone">
             <row>
+                    <field>
+                        <dc-schema>dc</dc-schema>
+                        <dc-element>title</dc-element>
+                        <dc-qualifier></dc-qualifier>
+                        <repeatable>false</repeatable>
+                        <label>Ação</label>
+                        <input-type>onebox</input-type>
+                        <hint>Insira o nome da ação.</hint>
+                        <required>Campo obrigatório.</required>
+                    </field>
+                
+                    <field>
+                        <dc-schema>dc</dc-schema>
+                        <dc-element>description</dc-element>
+                        <dc-qualifier>problem</dc-qualifier>
+                        <repeatable>false</repeatable>
+                        <label>Problemas</label>
+                        <input-type>onebox</input-type>
+                        <hint>Insira os problemas identificados.</hint>
+                        <required>Campo obrigatório.</required>
+                    </field>
+
+                    <field>
+                        <dc-schema>dc</dc-schema>
+                        <dc-element>subject</dc-element>
+                        <dc-qualifier></dc-qualifier>
+                        <repeatable>true</repeatable>
+                        <label>Núcleo Temático</label>
+                        <input-type>onebox</input-type>
+                        <hint>Insira o núcleo temático relacionado à ação.</hint>
+                        <required>Campo obrigatório.</required>
+                    </field>
+            </row>
+             <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>methodology</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Metodologia</label>
+                    <input-type>textarea</input-type>
+                    <hint>Descreva a metodologia utilizada.</hint>
+                    <required>Campo obrigatório.</required>
+                </field>
+            </row>
+            <row>
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>contributor</dc-element>
-                    <dc-qualifier>author</dc-qualifier>
-                    <repeatable>true</repeatable>
-                    <label>Author</label>
-                    <input-type>onebox</input-type>
-                    <hint>Enter the author's name (Family name, Given names).</hint>
-                    <required></required>
-                </field>
-            </row>
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>title</dc-element>
                     <dc-qualifier></dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Title</label>
-                    <input-type>onebox</input-type>
-                    <hint>Enter the main title of the item.</hint>
-                    <required>You must enter a main title for this item.</required>
-                </field>
-            </row>
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>title</dc-element>
-                    <dc-qualifier>alternative</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>Other Titles</label>
-                    <input-type>onebox</input-type>
-                    <hint>If the item has any alternative titles, please enter them here.</hint>
-                    <required></required>
+                    <label>Atores Principais</label>
+		    <input-type>onebox</input-type>
+                    <hint>Digite os atores.</hint>
+                    <required>Campo obrigatório.</required>
                 </field>
             </row>
             <row>
                 <field>
                     <dc-schema>dc</dc-schema>
-                    <dc-element>date</dc-element>
-                    <dc-qualifier>issued</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Date of Issue</label>
-                    <style>col-sm-4</style>
-                    <input-type>date</input-type>
-                    <hint>Please give the date of previous publication or public distribution.
-                        You can leave out the day and/or month if they aren't applicable.
-                    </hint>
-                    <required>You must enter at least the year.</required>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>objective</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>Objetivos</label>
+                    <input-type>onebox</input-type>
+                    <hint>Adicione os objetivos da ação.</hint>
+                    <required>Campo obrigatório.</required>
+                </field>
+            </row>
+	    <row>
+		<field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <label>Estado</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite o nome do estado</hint>
                 </field>
 
                 <field>
                     <dc-schema>dc</dc-schema>
-                    <dc-element>publisher</dc-element>
-                    <dc-qualifier></dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Publisher</label>
-                    <style>col-sm-8</style>
+                    <dc-element>description</dc-element>
+                    <label>Município</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the name of the publisher of the previously issued instance of this item.</hint>
-                    <required></required>
+                    <hint>Digite o nome do município</hint>
                 </field>
-            </row>
-            <row>
+
                 <field>
                     <dc-schema>dc</dc-schema>
-                    <dc-element>identifier</dc-element>
-                    <dc-qualifier>citation</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Citation</label>
+                    <dc-element>description</dc-element>
+                    <label>Latitude</label>
                     <input-type>onebox</input-type>
-                    <hint>Enter the standard citation for the previously issued instance of this item.</hint>
-                    <required></required>
+                    <hint>Coordenada preenchida automaticamente</hint>
                 </field>
-            </row>
-            <row>
+
                 <field>
                     <dc-schema>dc</dc-schema>
-                    <dc-element>relation</dc-element>
-                    <dc-qualifier>ispartofseries</dc-qualifier>
-                    <repeatable>true</repeatable>
-                    <label>Series/Report No.</label>
-                    <input-type>series</input-type>
-                    <hint>Enter the series and number assigned to this item by your community.</hint>
-                    <required></required>
+                    <dc-element>description</dc-element>
+                    <label>Longitude</label>
+                    <input-type>onebox</input-type>
+                    <hint>Coordenada preenchida automaticamente</hint>
                 </field>
+
             </row>
             <row>
                 <field>
@@ -181,6 +198,80 @@
                     <required></required>
                 </field>
             </row>
+        </form>
+        <form name="regulamentacao">
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier>regulation</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Regulamentação</label>
+                    <input-type>onebox</input-type>
+                    <hint>Não se aplica.</hint>
+                    <required>Campo obrigatório.</required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier>financial-resources</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Recursos Financeiros</label>
+                    <input-type>onebox</input-type>
+                    <hint>Não se aplica.</hint>
+                    <required>Campo obrigatório.</required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>funding-source</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Fonte de Recursos</label>
+                    <input-type>onebox</input-type>
+                    <hint>Não se aplica.</hint>
+                    <required>Campo obrigatório.</required>
+                </field>
+            </row>
+            </form>
+        <form name="contato">
+            <row>
+            
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>author</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Responsável</label>
+                    <input-type>onebox</input-type>
+                    <hint>Insira o responsável pela ação.</hint>
+                    <required>Campo obrigatório.</required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>email</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Email</label>
+                    <input-type>onebox</input-type>
+                    <hint>Insira o email do responsável.</hint>
+                    <required>Campo obrigatório.</required>
+                </field>
+
+                 <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier></dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Telefone</label>
+                    <input-type>onebox</input-type>
+                    <hint>Insira o número de telefone.</hint>
+                    <required>Campo obrigatório.</required>
+                </field>
+            </row>
+
         </form>
 
         <!-- Form which defines the second page/section of the "traditional" DSpace submission process,

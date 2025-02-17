@@ -105,6 +105,18 @@
             <processing-class>org.dspace.app.rest.submit.step.CollectionStep</processing-class>
             <type>collection</type>
         </step-definition>
+        <step-definition id="regulamentacao" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        
+        </step-definition>
+        <step-definition id="contato" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        
+        </step-definition>
 
         <!-- The following set of DescribeStep <step-definition>s all point to forms (of the same name) which are
              defined in submission-forms.xml -->
@@ -284,6 +296,8 @@
             <!--Step will be to Describe the item. -->
             <step id="traditionalpageone"/>
             <step id="traditionalpagetwo"/>
+            <step id="regulamentacao"/>
+            <step id="contato"/>
 
             <!-- Uncomment this step to allow the user to embargo or access restrict the entire item -->
             <!-- <step id="itemAccessConditions"/> -->
