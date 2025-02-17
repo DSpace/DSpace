@@ -116,7 +116,7 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
             throw new IllegalArgumentException(String.format("Needs query param '%s' with value %s or %s indicating " +
                 "what kind of registration request it is", TYPE_QUERY_PARAM, TYPE_FORGOT, TYPE_REGISTER));
         }
-        String captchaToken = request.getHeader("X-Recaptcha-Token");
+        String captchaToken = request.getHeader("x-captcha-payload");
         boolean verificationEnabled = configurationService.getBooleanProperty("registration.verification.enabled");
 
         if (verificationEnabled && !accountType.equalsIgnoreCase(TYPE_FORGOT)) {
