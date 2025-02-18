@@ -70,6 +70,7 @@
         <property name="metadataFieldMapping" ref="pubmedMetadataFieldMapping"/>
         <property name="urlFetch" value="${pubmed.url.fetch}"/>
         <property name="urlSearch" value="${pubmed.url.search}"/>
+        <property name="apiKey" value="${pubmed.apiKey}"/>
         <property name="generateQueryForItem" ref="pubmedService"></property>
         <property name="interRequestTime" value="500"/>
         <property name="supportedExtensions">
