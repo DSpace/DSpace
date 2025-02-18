@@ -44,6 +44,9 @@ public interface DataProcessingStep extends RestProcessingStep {
     public static final String UPLOAD_STEP_METADATA_PATH = "metadata";
     public static final String COARNOTIFY_STEP_PATH = "coarnotify";
 
+    public static final String UPLOAD_STEP_ALTERNATIVE_CONTENT_PATH = "alternativecontent";
+    public static final String UPLOAD_STEP_ANTERNATIVE_CONTENT_ENTRY = "bitstreamalternativecontent";
+
     /**
      * Method to expose data in the a dedicated section of the in progress submission. The step needs to return a
      * serializable object that will be included in a section with the name (id) assigned to the step in the
