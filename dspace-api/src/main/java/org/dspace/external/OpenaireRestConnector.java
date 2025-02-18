@@ -35,6 +35,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.util.Util;
+import org.dspace.util.ProxyUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -49,7 +50,7 @@ public class OpenaireRestConnector {
     /**
      * log4j logger
      */
-    private static Logger log = org.apache.logging.log4j.LogManager.getLogger(OpenaireRestConnector.class);
+    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger();
 
     /**
      * Openaire API Url
@@ -93,7 +94,7 @@ public class OpenaireRestConnector {
 
 
     /**
-     * This method grabs an accessToken an sets the expiration time Based.<br/>
+     * This method grabs an accessToken and sets the expiration time.<br>
      * Based on https://develop.openaire.eu/basic.html
      * 
      * @throws IOException
@@ -116,11 +117,13 @@ public class OpenaireRestConnector {
         httpPost.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
 
         // Request parameters and other properties.
-        List<NameValuePair> params = new ArrayList<NameValuePair>(1);
+        List<NameValuePair> params = new ArrayList<>(1);
         params.add(new BasicNameValuePair("grant_type", "client_credentials"));
         httpPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
 
-        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpClientBuilder builder = HttpClientBuilder.create();
+        ProxyUtils.addProxy(builder);
+        HttpClient httpClient = builder.build();
         HttpResponse getResponse = httpClient.execute(httpPost);
 
         JSONObject responseObject = null;
@@ -171,7 +174,9 @@ public class OpenaireRestConnector {
                 httpGet.addHeader("Authorization", "Bearer " + accessToken);
             }
 
-            HttpClient httpClient = HttpClientBuilder.create().build();
+            HttpClientBuilder builder = HttpClientBuilder.create();
+            ProxyUtils.addProxy(builder);
+            HttpClient httpClient = builder.build();
             getResponse = httpClient.execute(httpGet);
 
             StatusLine status = getResponse.getStatusLine();

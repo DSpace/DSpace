@@ -27,6 +27,7 @@ import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.SolrAuthorityInterface;
 import org.dspace.external.OrcidRestConnector;
 import org.dspace.external.provider.orcid.xml.XMLtoBio;
+import org.dspace.util.ProxyUtils;
 import org.json.JSONObject;
 import org.orcid.jaxb.model.v3.release.common.OrcidIdentifier;
 import org.orcid.jaxb.model.v3.release.record.Person;
@@ -78,7 +79,9 @@ public class Orcidv3SolrAuthorityImpl implements SolrAuthorityInterface {
                 httpPost.addHeader("Accept", "application/json");
                 httpPost.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
-                HttpClient httpClient = HttpClientBuilder.create().build();
+                HttpClientBuilder builder = HttpClientBuilder.create();
+                ProxyUtils.addProxy(builder);
+                HttpClient httpClient = builder.build();
                 HttpResponse getResponse = httpClient.execute(httpPost);
 
                 JSONObject responseObject = null;
@@ -112,7 +115,8 @@ public class Orcidv3SolrAuthorityImpl implements SolrAuthorityInterface {
     /**
      * Makes an instance of the AuthorityValue with the given information.
      * @param text search string
-     * @return List<AuthorityValue>
+     * @param max no more than this many
+     * @return all authority values found
      */
     @Override
     public List<AuthorityValue> queryAuthorities(String text, int max) {
@@ -164,7 +168,7 @@ public class Orcidv3SolrAuthorityImpl implements SolrAuthorityInterface {
      * @param text search string
      * @param start offset to use
      * @param rows how many rows to return
-     * @return List<Person>
+     * @return {@code Person}s found
      */
     public List<Person> queryBio(String text, int start, int rows) {
         init();
@@ -201,7 +205,7 @@ public class Orcidv3SolrAuthorityImpl implements SolrAuthorityInterface {
      * Retrieve a list of Person objects.
      * @param text search string
      * @param max how many rows to return
-     * @return List<Person>
+     * @return {@code Person}s found
      */
     public List<Person> queryBio(String text, int max) {
         return queryBio(text, 0, max);
