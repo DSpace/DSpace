@@ -863,7 +863,7 @@ public class DataCiteConnector
     }
 
     protected Element addDOI(String doi, Element root) {
-        if (null != extractDOI(root)) {
+        if (StringUtils.isNotBlank(extractDOI(root))) {
             return root;
         }
         Element identifier = new Element("identifier",
