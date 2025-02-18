@@ -22,14 +22,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.apache.commons.configuration2.CombinedConfiguration;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.ConfigurationConverter;
+import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.builder.ConfigurationBuilderEvent;
 import org.apache.commons.configuration2.builder.combined.ReloadingCombinedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.apache.commons.configuration2.event.Event;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.configuration2.tree.ImmutableNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.services.ConfigurationService;
@@ -157,6 +160,26 @@ public final class DSpaceConfigurationService implements ConfigurationService {
             System.err.println("Unable to get configuration object based on definition at " + this.configDefinition);
             throw new RuntimeException(ce);
         }
+    }
+
+    /**
+     * Returns all loaded properties as a HierarchicalConfiguration object.
+     *
+     * @see org.dspace.services.ConfigurationService#getHierarchicalConfiguration()
+     */
+    @Override
+    public HierarchicalConfiguration<ImmutableNode> getHierarchicalConfiguration() {
+        return (CombinedConfiguration) getConfiguration();
+    }
+
+    /**
+     * Returns all child configurations of a property.
+     *
+     * @see org.dspace.services.ConfigurationService#getChildren()
+     */
+    @Override
+    public List<HierarchicalConfiguration<ImmutableNode>> getChildren(String name) {
+        return getHierarchicalConfiguration().childConfigurationsAt(name);
     }
 
     /**
