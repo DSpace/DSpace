@@ -1,0 +1,60 @@
+{
+  "hierarchicalSuperiorOfTheConferenceOrEvent" : [ {
+    "id" : "https://d-nb.info/gnd/1173120068",
+    "label" : "Polskie Towarzystwo Biomechaniki"
+  } ],
+  "dateOfConferenceOrEvent" : [ "09.09.2021-10.09.2021" ],
+  "type" : [ "ConferenceOrEvent", "AuthorityResource" ],
+  "@context" : "http://lobid.org/gnd/context.jsonld",
+  "placeOfConferenceOrEvent" : [ {
+    "id" : "https://d-nb.info/gnd/4079048-4",
+    "label" : "Warschau"
+  } ],
+  "geographicAreaCode" : [ {
+    "id" : "https://d-nb.info/standards/vocab/gnd/geographic-area-code#ZZ",
+    "label" : "Land unbekannt"
+  }, {
+    "id" : "https://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-PL",
+    "label" : "Polen"
+  } ],
+  "biographicalOrHistoricalInformation" : [ "Die als Präsenzveranstaltung geplante Konferenz wurde online abgehalten." ],
+  "describedBy" : {
+    "id" : "https://d-nb.info/gnd/1242752749/about",
+    "license" : {
+      "id" : "http://creativecommons.org/publicdomain/zero/1.0/",
+      "label" : "http://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "dateModified" : "2022-01-24T15:49:56.000",
+    "descriptionLevel" : {
+      "id" : "https://d-nb.info/standards/vocab/gnd/description-level#1",
+      "label" : "Allgemeines, Interdisziplinäre Allgemeinwörter"
+    }
+  },
+  "gndIdentifier" : "1242752749",
+  "id" : "https://d-nb.info/gnd/1242752749",
+  "preferredName" : "BIOMECHANICS (2020 : Online)",
+  "variantName" : [ "Polskie Towarzystwo Biomechaniki. International Conference (2020 : Online)", "Polish Society of Biomechanics. International Conference (2020 : Online)", "International Conference of the Polish Society of Biomechanics (BIOMECHANICS 2020)" ],
+  "homepage" : [ {
+    "id" : "https://biomechanics2020.wum.edu.pl/en",
+    "label" : "https://biomechanics2020.wum.edu.pl/en"
+  } ],
+  "sameAs" : [ {
+    "id" : "http://viaf.org/viaf/6977163464767505680001",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q54919",
+      "abbr" : "VIAF",
+      "publisher" : "OCLC",
+      "icon" : "http://viaf.org/viaf/images/viaf.ico",
+      "name" : "Virtual International Authority File (VIAF)"
+    }
+  }, {
+    "collection" : {
+      "abbr" : "DNB",
+      "name" : "Gemeinsame Normdatei (GND) im Katalog der Deutschen Nationalbibliothek",
+      "publisher" : "Deutsche Nationalbibliothek",
+      "icon" : "https://www.dnb.de/SiteGlobals/Frontend/DNBWeb/Images/favicon.png?__blob=normal&v=4",
+      "id" : "http://www.wikidata.org/entity/Q36578"
+    },
+    "id" : "https://d-nb.info/gnd/1242752749/about"
+  } ]
+}

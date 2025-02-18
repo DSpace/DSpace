@@ -1,0 +1,29 @@
+{
+  "broaderTermGeneric" : [ {
+    "id" : "https://d-nb.info/gnd/4033422-3",
+    "label" : "Künste"
+  } ],
+  "describedBy" : {
+    "id" : "https://d-nb.info/gnd/1098433076/about",
+    "license" : {
+      "id" : "http://creativecommons.org/publicdomain/zero/1.0/",
+      "label" : "http://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "dateModified" : "2022-12-05T13:58:01.000",
+    "descriptionLevel" : {
+      "id" : "https://d-nb.info/standards/vocab/gnd/description-level#1",
+      "label" : "Allgemeines, Interdisziplinäre Allgemeinwörter"
+    }
+  },
+  "definition" : [ "Umfasst den Gesamtkomplex Science Fiction aller Genres (Literatur, Film, Musik, Kunst etc.), vgl. Oxford Dictionary of Science Fiction. Mit Ausnahme von S-F-Literatur (ggf. mit zusätzlichen Gattungsangaben), S-F-Film und S-F-Spielzeug werden keine weiteren Komposita gebildet." ],
+  "gndIdentifier" : "1098433076",
+  "id" : "https://d-nb.info/gnd/1098433076",
+  "preferredName" : "Science-Fiction",
+  "type" : [ "AuthorityResource", "SubjectHeading", "SubjectHeadingSensoStricto" ],
+  "variantName" : [ "Science Fiction", "Sciencefiction", "Utopie <Sciencefiction>" ],
+  "@context" : "http://lobid.org/gnd/context.jsonld",
+  "gndSubjectCategory" : [ {
+    "id" : "https://d-nb.info/standards/vocab/gnd/gnd-sc#6.1a",
+    "label" : "Kultur, Künste allgemein"
+  } ]
+}
