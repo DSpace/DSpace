@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -593,6 +594,55 @@ public class ScriptRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient(token).perform(post("/api/system/scripts/mock-script-invalid/processes"))
                         .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void postProcessAdminWithMultipleFilesOfSameType() throws Exception {
+        List<DSpaceCommandLineParameter> parameters = Arrays.asList(
+            new DSpaceCommandLineParameter("-r", "test"),
+            new DSpaceCommandLineParameter("-i", null),
+            new DSpaceCommandLineParameter("-f", "mock1.txt"),
+            new DSpaceCommandLineParameter("-f", "mock2.txt")
+        );
+
+        String bitstreamContent = "Hello, World!";
+        MockMultipartFile mock1 = new MockMultipartFile("file", "mock1.txt",
+            MediaType.TEXT_PLAIN_VALUE, bitstreamContent.getBytes());
+        MockMultipartFile mock2 = new MockMultipartFile("file", "mock2.txt",
+            MediaType.TEXT_PLAIN_VALUE, bitstreamContent.getBytes());
+        List<ParameterValueRest> list = parameters.stream()
+                                                  .map(param -> dSpaceRunnableParameterConverter.convert(param,
+                                                       Projection.DEFAULT))
+                                                  .collect(Collectors.toList());
+
+        String token = getAuthToken(admin.getEmail(), password);
+        List<ProcessStatus> acceptableStatuses = Arrays.asList(
+            ProcessStatus.SCHEDULED,
+            ProcessStatus.RUNNING,
+            ProcessStatus.COMPLETED
+        );
+        AtomicReference<Integer> processIdRef = new AtomicReference<>();
+        try {
+            getClient(token).perform(multipart("/api/system/scripts/mock-script/processes")
+                                .file(mock1)
+                                .file(mock2)
+                                .characterEncoding("UTF-8")
+                                .param("properties", new ObjectMapper().writeValueAsString(list)))
+                            .andExpect(status().isAccepted())
+                            .andExpect(jsonPath("$", is(
+                                ProcessMatcher.matchProcess("mock-script", String.valueOf(admin.getID()),
+                                                            parameters, acceptableStatuses))))
+                            .andDo(result -> processIdRef.set(read(result.getResponse().getContentAsString(),
+                                                                   "$.processId")));
+
+            // Verify the attached files
+            getClient(token)
+                .perform(get("/api/system/processes/" + processIdRef.get() + "/files"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.files[*].name", hasItems("mock1.txt", "mock2.txt")));
+        } finally {
+            ProcessBuilder.deleteProcess(processIdRef.get());
+        }
     }
 
     @Test
