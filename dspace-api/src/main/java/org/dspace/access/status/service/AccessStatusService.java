@@ -8,7 +8,9 @@
 package org.dspace.access.status.service;
 
 import java.sql.SQLException;
+import java.util.Date;
 
+import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 
@@ -54,4 +56,22 @@ public interface AccessStatusService {
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
     public String getEmbargoFromItem(Context context, Item item) throws SQLException;
+
+    /**
+     * Retrieve the availability date for the bitstream
+     *
+     * @param context the DSpace context
+     * @param bitstream the bitstream to check for embargo information
+     * @return an availability date
+     * @throws SQLException An exception that provides information on a database access error or other errors.
+     */
+    public Date getAvailabilityDateFromBitstream(Context context, Bitstream bitstream) throws SQLException;
+
+    /**
+     * Retrieve the access status information based on the availability date
+     *
+     * @param availabilityDate the DSpace object availability date
+     * @return an access status value
+     */
+    public String getAccessStatusFromAvailabilityDate(Date availabilityDate) throws SQLException;
 }
