@@ -263,4 +263,18 @@ public class DSBitStoreService extends BaseBitStoreService {
     public void setBaseDir(File baseDir) {
         this.baseDir = baseDir;
     }
+
+    // UMD Customization
+    // This customization was added to support migrating the asset store
+    // files in the Kubernetes "sandbox", "test" and "qa" namespaces to
+    // AWS S3 and can be removed after the AWS S3 migration is complete.
+    public boolean exists(Bitstream bitstream)
+        throws IOException {
+        File file = getFile(bitstream);
+        if (file == null) {
+            return false;
+        }
+        return file.exists();
+    }
+    // End UMD Customization
 }

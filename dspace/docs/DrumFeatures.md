@@ -148,3 +148,12 @@ with the "load-etd-nightly" script, but is usable by any script.
   bundles
 * LIBDRUM-811 - Maximum file upload size is set to 2GB for a single file
   and 15GB for a record with multiple files.
+* LIBDRUM-937 - Modified the stock DSpace bitstream migration code to skip
+  bitstreams not present in the assetstore (with a message in the log). The
+  ability to skip   bitstreams is needed to migrate the assetstores for the
+  "sandbox", "test" and "qa" DRUM instance to AWS S3, as the these instances
+  have production database snapshots, but not all of the production bitstreams
+  (the stock DSpace   migration code fails with an error if any bitstream is
+  missing).
+  It is expected that the customizations made in this issue will be removed
+  after the AWS S3 migration is complete.
