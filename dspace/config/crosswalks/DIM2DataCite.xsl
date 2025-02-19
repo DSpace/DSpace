@@ -350,6 +350,9 @@
                 <xsl:if test="starts-with(string(text()), 'http://dx.doi.org/')">
                     <xsl:value-of select="substring(., 19)"/>
                 </xsl:if>
+                <xsl:otherwise>
+                    <xsl:value-of select="."/>
+                </xsl:otherwise>
             </identifier>
         </xsl:if>
     </xsl:template>
