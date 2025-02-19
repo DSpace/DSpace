@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.suggestion.openaire;
+package org.dspace.app.suggestion.loader;
 
 import static org.dspace.app.suggestion.SuggestionUtils.getAllEntriesByMetadatum;
 import static org.dspace.app.suggestion.SuggestionUtils.getFirstEntryByMetadatum;
@@ -20,6 +20,8 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.suggestion.SolrSuggestionProvider;
 import org.dspace.app.suggestion.Suggestion;
 import org.dspace.app.suggestion.SuggestionEvidence;
+import org.dspace.app.suggestion.openaire.AuthorNamesScorer;
+import org.dspace.app.suggestion.openaire.EvidenceScorer;
 import org.dspace.content.Item;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.core.Context;
@@ -32,7 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Class responsible to load and manage ImportRecords from OpenAIRE
  *
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
- *
  */
 public class PublicationLoader extends SolrSuggestionProvider {
 
@@ -57,6 +58,7 @@ public class PublicationLoader extends SolrSuggestionProvider {
 
     /**
      * Set the pipeline of Approver
+     *
      * @param pipeline list Approver
      */
     public void setPipeline(List<EvidenceScorer> pipeline) {
@@ -66,17 +68,17 @@ public class PublicationLoader extends SolrSuggestionProvider {
     /**
      * This method filter a list of ImportRecords using a pipeline of AuthorNamesApprover
      * and return a filtered list of ImportRecords.
-     * 
-     * @see org.dspace.app.suggestion.openaire.AuthorNamesScorer
-     * @param researcher the researcher Item
+     *
+     * @param researcher    the researcher Item
      * @param importRecords List of import record
      * @return a list of filtered import records
+     * @see AuthorNamesScorer
      */
     public List<Suggestion> reduceAndTransform(Item researcher, List<ExternalDataObject> importRecords) {
         List<Suggestion> results = new ArrayList<>();
         for (ExternalDataObject r : importRecords) {
             boolean skip = false;
-            List<SuggestionEvidence> evidences = new ArrayList<SuggestionEvidence>();
+            List<SuggestionEvidence> evidences = new ArrayList<>();
             for (EvidenceScorer authorNameApprover : pipeline) {
                 SuggestionEvidence evidence = authorNameApprover.computeEvidence(researcher, r);
                 if (evidence != null) {
@@ -99,7 +101,7 @@ public class PublicationLoader extends SolrSuggestionProvider {
      * Save a List of ImportRecord into Solr.
      * ImportRecord will be translate into a SolrDocument by the method translateImportRecordToSolrDocument.
      *
-     * @param context the DSpace Context
+     * @param context    the DSpace Context
      * @param researcher a DSpace Item
      * @throws SolrServerException
      * @throws IOException
@@ -129,7 +131,8 @@ public class PublicationLoader extends SolrSuggestionProvider {
 
     /**
      * Translate an ImportRecord into a Suggestion
-     * @param item DSpace item
+     *
+     * @param item   DSpace item
      * @param record ImportRecord
      * @return Suggestion
      */
@@ -138,14 +141,16 @@ public class PublicationLoader extends SolrSuggestionProvider {
         Suggestion suggestion = new Suggestion(getSourceName(), item, openAireId);
         suggestion.setDisplay(getFirstEntryByMetadatum(record, "dc", "title", null));
         suggestion.getMetadata().add(
-                new MetadataValueDTO("dc", "title", null, null, getFirstEntryByMetadatum(record, "dc", "title", null)));
+            new MetadataValueDTO("dc", "title", null, null, getFirstEntryByMetadatum(record, "dc", "title", null)));
         suggestion.getMetadata().add(new MetadataValueDTO("dc", "date", "issued", null,
-                getFirstEntryByMetadatum(record, "dc", "date", "issued")));
+                                                          getFirstEntryByMetadatum(record, "dc", "date", "issued")));
         suggestion.getMetadata().add(new MetadataValueDTO("dc", "description", "abstract", null,
-                getFirstEntryByMetadatum(record, "dc", "description", "abstract")));
+                                                          getFirstEntryByMetadatum(record, "dc", "description",
+                                                                                   "abstract")));
         suggestion.setExternalSourceUri(configurationService.getProperty("dspace.server.url")
-                + "/api/integration/externalsources/" + primaryProvider.getSourceIdentifier() + "/entryValues/"
-                + openAireId);
+                                            + "/api/integration/externalsources/" +
+                                            primaryProvider.getSourceIdentifier() + "/entryValues/"
+                                            + openAireId);
         for (String o : getAllEntriesByMetadatum(record, "dc", "source", null)) {
             suggestion.getMetadata().add(new MetadataValueDTO("dc", "source", null, null, o));
         }
@@ -164,14 +169,14 @@ public class PublicationLoader extends SolrSuggestionProvider {
     }
 
     /**
-     * Load metadata from OpenAIRE using the import service. The service use the value
+     * Load metadata using the import service. The service use the value
      * get from metadata key defined in class level variable names as author to query OpenAIRE.
-     * 
-     * @see org.dspace.importer.external.openaire.service.OpenAireImportMetadataSourceServiceImpl
+     *
      * @param searchValues query
-     * @param limit for pagination purpose
-     * @param offset for pagination purpose
+     * @param limit        for pagination purpose
+     * @param offset       for pagination purpose
      * @return list of ImportRecord
+     * @see org.dspace.importer.external.openaire.service.OpenAireImportMetadataSourceServiceImpl
      */
     private List<ExternalDataObject> getImportRecords(List<String> searchValues,
                                                       int offset, int limit, String additionalQuery) {
@@ -212,8 +217,8 @@ public class PublicationLoader extends SolrSuggestionProvider {
     /**
      * Check if the ImportRecord is already present in the list.
      * The comparison is made on the value of metadatum with key 'dc.identifier.other'
-     * 
-     * @param dto An importRecord instance
+     *
+     * @param dto           An importRecord instance
      * @param importRecords a list of importRecord
      * @return true if dto is already present in importRecords, false otherwise
      */
@@ -233,7 +238,7 @@ public class PublicationLoader extends SolrSuggestionProvider {
 
     /**
      * Return list of Item metadata values starting from metadata keys defined in class level variable names.
-     * 
+     *
      * @param researcher DSpace item
      * @return list of metadata values
      */
@@ -254,7 +259,8 @@ public class PublicationLoader extends SolrSuggestionProvider {
             return true;
         } else if (otherProviders != null) {
             return otherProviders.stream()
-                    .anyMatch(x -> StringUtils.equals(externalDataObject.getSource(), x.getSourceIdentifier()));
+                                 .anyMatch(
+                                     x -> StringUtils.equals(externalDataObject.getSource(), x.getSourceIdentifier()));
         } else {
             return false;
         }
