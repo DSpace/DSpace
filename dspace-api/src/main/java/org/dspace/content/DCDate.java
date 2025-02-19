@@ -8,7 +8,9 @@
 package org.dspace.content;
 
 import java.text.DateFormatSymbols;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.Year;
+import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -54,7 +56,7 @@ public class DCDate {
     private ZonedDateTime calendar = null;
 
     // components of time in local zone
-    private LocalDateTime localCalendar = null;
+    private ZonedDateTime localCalendar = null;
 
     private enum DateGran { YEAR, MONTH, DAY, TIME }
 
@@ -99,7 +101,7 @@ public class DCDate {
      *
      * @param date the Java <code>Instant</code> object.
      */
-    public DCDate(LocalDateTime date) {
+    public DCDate(ZonedDateTime date) {
         if (date == null) {
             return;
         }
@@ -107,11 +109,11 @@ public class DCDate {
         // By definition a Date has a time component so always set the granularity to TIME.
         granularity = DateGran.TIME;
 
-        // Set the local calendar.
+        // Set the local calendar based on timezone of the passed in ZonedDateTime
         localCalendar = date;
 
-        // Now set the UTC equivalent. This converts local system default to UTC time.
-        calendar = date.atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneOffset.UTC);
+        // Time is assumed to be in UTC timezone because DSpace stores all dates internally as UTC
+        calendar = date.withZoneSameInstant(ZoneOffset.UTC);
     }
 
     /**
@@ -159,13 +161,12 @@ public class DCDate {
             granularity = DateGran.TIME;
         }
 
-        // Set the local calendar.
-        localCalendar = LocalDateTime.of(lyear, lmonth, lday, lhours, lminutes, lseconds);
+        // Set the local calendar based on system default timezone
+        localCalendar = ZonedDateTime.of(lyear, lmonth, lday, lhours, lminutes, lseconds, 0, ZoneId.systemDefault());
 
         if (granularity == DateGran.TIME) {
             // Now set the UTC equivalent.
-            calendar = localCalendar.atZone(ZoneId.systemDefault())
-                                    .withZoneSameInstant(ZoneOffset.UTC);
+            calendar = localCalendar.withZoneSameInstant(ZoneOffset.UTC);
         } else {
             // No Time component so just set the UTC date to be the same as the local Year, Month, and Day.
             calendar = ZonedDateTime.of(localCalendar.getYear(),
@@ -188,7 +189,9 @@ public class DCDate {
 
         // default granularity
         granularity = DateGran.TIME;
-        LocalDateTime date = tryParse(fullIso, fromDC);
+
+        // Try to parse a full date/time using various formats
+        ZonedDateTime date = tryParse(fullIso, fromDC);
         if (date == null) {
             date = tryParse(fullIso2, fromDC);
         }
@@ -201,21 +204,41 @@ public class DCDate {
         if (date == null) {
             date = tryParse(fullIsoWithMs, fromDC);
         }
+
+        // Seems there is no time component to the date, so we'll need to use specialized java.time classes
+        // to parse out the day, month or year.
+
+        // Try to parse as just a date (no time) in UTC.
         if (date == null) {
-            // Seems there is no time component to the date.
-            date = tryParse(dateIso, fromDC);
+            try {
+                date = LocalDate.parse(fromDC, dateIso).atStartOfDay(ZoneId.systemDefault());
+            } catch (DateTimeParseException e) {
+                date = null;
+            }
             if (date != null) {
                 granularity = DateGran.DAY;
             }
         }
+
+        // Try to parse as just a month & year in UTC
         if (date == null) {
-            date = tryParse(yearMonthIso, fromDC);
+            try {
+                date = YearMonth.parse(fromDC, yearMonthIso).atDay(1).atStartOfDay(ZoneId.systemDefault());
+            } catch (DateTimeParseException e) {
+                date = null;
+            }
             if (date != null) {
                 granularity = DateGran.MONTH;
             }
         }
+
+        // Try to parse as just a year in UTC
         if (date == null) {
-            date = tryParse(yearIso, fromDC);
+            try {
+                date = Year.parse(fromDC, yearIso).atMonth(1).atDay(1).atStartOfDay(ZoneId.systemDefault());
+            } catch (DateTimeParseException e) {
+                date = null;
+            }
             if (date != null) {
                 granularity = DateGran.YEAR;
             }
@@ -224,26 +247,25 @@ public class DCDate {
         if (date == null) {
             log.warn("Mangled date: " + fromDC + "  ..failed all attempts to parse as date.");
         } else {
-            // Set the UTC time.
-            calendar = date.atZone(ZoneId.systemDefault())
-                           .withZoneSameInstant(ZoneOffset.UTC);
+            // By default, we parse strings into UTC time. So the "date" object is already in UTC timezone
+            calendar = date;
 
-            // Now set the local equivalent.
+            // Now set the local equivalent based on system default timezone
             if (granularity == DateGran.TIME) {
-                localCalendar = date;
+                localCalendar = date.withZoneSameInstant(ZoneId.systemDefault());
             } else {
                 // No Time component so just set the local date to be the same as the UTC  Year, Month, and Day.
-                localCalendar = LocalDateTime.of(calendar.getYear(),
-                                                 calendar.getMonth(),
-                                                 calendar.getDayOfMonth(), 0, 0);
+                localCalendar = ZonedDateTime.of(calendar.getYear(),
+                                                 calendar.getMonth().getValue(),
+                                                 calendar.getDayOfMonth(), 0, 0, 0, 0, ZoneOffset.UTC);
             }
         }
     }
 
     // Attempt to parse, swallowing errors; return null for failure.
-    private synchronized LocalDateTime tryParse(DateTimeFormatter formatter, String source) {
+    private synchronized ZonedDateTime tryParse(DateTimeFormatter formatter, String source) {
         try {
-            return LocalDateTime.parse(source, formatter);
+            return ZonedDateTime.parse(source, formatter);
         } catch (DateTimeParseException e) {
             return null;
         }
@@ -494,12 +516,12 @@ public class DCDate {
     /**************  Some utility methods ******************/
 
     /**
-     * Get a date representing the current instant in time.
+     * Get a date representing the current instant in UTC time.
      *
      * @return a DSpaceDate object representing the current instant.
      */
     public static DCDate getCurrent() {
-        return (new DCDate(LocalDateTime.now()));
+        return new DCDate(ZonedDateTime.now(ZoneOffset.UTC));
     }
 
     /**

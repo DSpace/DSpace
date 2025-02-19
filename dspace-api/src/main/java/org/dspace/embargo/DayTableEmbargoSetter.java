@@ -9,8 +9,8 @@ package org.dspace.embargo;
 
 import java.sql.SQLException;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Properties;
 
 import org.dspace.authorize.AuthorizeException;
@@ -65,7 +65,7 @@ public class DayTableEmbargoSetter extends DefaultEmbargoSetter {
             if (days != null && days.length() > 0) {
                 long lift = Instant.now().toEpochMilli() +
                     (Long.parseLong(days) * 24 * 60 * 60 * 1000);
-                return new DCDate(LocalDateTime.ofEpochSecond(lift, 0, ZoneOffset.UTC));
+                return new DCDate(ZonedDateTime.ofInstant(Instant.ofEpochSecond(lift), ZoneOffset.UTC));
             }
         }
         return null;

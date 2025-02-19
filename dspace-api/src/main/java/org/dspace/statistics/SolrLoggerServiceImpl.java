@@ -1159,7 +1159,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             //We start with out current year
             DCDate dcStart = new DCDate(count.getValue());
             //Advance one year for the start of the next one !
-            DCDate dcEndDate = new DCDate(dcStart.toDate().plus(1, ChronoUnit.YEARS).toLocalDateTime());
+            DCDate dcEndDate = new DCDate(dcStart.toDate().plus(1, ChronoUnit.YEARS));
 
             StringBuilder filterQuery = new StringBuilder();
             filterQuery.append("time:([");

@@ -9,6 +9,7 @@ package org.dspace.versioning;
 
 import java.sql.SQLException;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -75,7 +76,7 @@ public class VersioningServiceImpl implements VersioningService {
 
                 // get dc:date.accessioned to be set as first version date...
                 List<MetadataValue> values = itemService.getMetadata(item, "dc", "date", "accessioned", Item.ANY);
-                ZonedDateTime versionDate = ZonedDateTime.now();
+                ZonedDateTime versionDate = ZonedDateTime.now(ZoneOffset.UTC);
                 if (values != null && values.size() > 0) {
                     String date = values.get(0).getValue();
                     versionDate = new DCDate(date).toDate();
@@ -86,7 +87,7 @@ public class VersioningServiceImpl implements VersioningService {
             Item itemNew = provider.createNewItemAndAddItInWorkspace(c, item);
 
             // create new version
-            Version version = createVersion(c, vh, itemNew, summary, ZonedDateTime.now());
+            Version version = createVersion(c, vh, itemNew, summary, ZonedDateTime.now(ZoneOffset.UTC));
 
             // Complete any update of the Item and new Identifier generation that needs to happen
             provider.updateItemState(c, itemNew, item);

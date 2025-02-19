@@ -13,8 +13,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -425,7 +425,7 @@ public class PDFPackager
             if (calValue != null) {
                 itemService.addMetadata(context, item, MetadataSchemaEnum.DC.getName(), "date", "created", null,
                                         new DCDate(
-                                            LocalDateTime.ofInstant(calValue.toInstant(), ZoneOffset.UTC)
+                                            ZonedDateTime.ofInstant(calValue.toInstant(), ZoneOffset.UTC)
                                         ).toString());
             }
             itemService.update(context, item);
