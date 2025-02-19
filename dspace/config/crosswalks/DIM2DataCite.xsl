@@ -336,24 +336,32 @@
 
     <!-- Add doi identifier information. -->
     <!--
-        dc.identifier.uri may contain more than one DOI, e.g. if the
-        repository contains an item that is published by a publishing 
-        company as well. We have to ensure to use URIs of our prefix
-        as primary identifiers only.
+        Given doi metadata field may contain more than one DOI (url), e.g. if the
+        repository contains an item that is published by a publishing
+        company as well. We have to ensure to use URIs of doi prefix or direct doi's (starts with 10.)
+        Don't add identifier identifierType=DOI tag if no value to put in it
     -->
     <xsl:template match="dspace:field[@mdschema=$mdSchema and @element=$mdElement and (contains(., $prefix))]">
         <xsl:if test="(($mdQualifier and $mdQualifier != '') and @qualifier=$mdQualifier) or ((not($mdQualifier) or $mdQualifier = '') and not(@qualifier))">
-            <identifier identifierType="DOI">
-                <xsl:if test="starts-with(string(text()), 'https://doi.org/')">
-                    <xsl:value-of select="substring(., 17)"/>
-                </xsl:if>
-                <xsl:if test="starts-with(string(text()), 'http://dx.doi.org/')">
-                    <xsl:value-of select="substring(., 19)"/>
-                </xsl:if>
-                <xsl:otherwise>
-                    <xsl:value-of select="."/>
-                </xsl:otherwise>
-            </identifier>
+            <xsl:variable name="doiValue">
+                <xsl:choose>
+                    <xsl:when test="starts-with(string(text()), 'https://doi.org/')">
+                        <xsl:value-of select="substring(., 17)"/>
+                    </xsl:when>
+                    <xsl:when test="starts-with(string(text()), 'http://dx.doi.org/')">
+                        <xsl:value-of select="substring(., 19)"/>
+                    </xsl:when>
+                    <xsl:when test="starts-with(string(text()), '10.')">
+                        <xsl:value-of select="."/>
+                    </xsl:when>
+                </xsl:choose>
+            </xsl:variable>
+            <!-- Only add <identifier> tag if doiValue is not empty -->
+            <xsl:if test="string-length($doiValue) &gt; 0">
+                <identifier identifierType="DOI">
+                    <xsl:value-of select="$doiValue"/>
+                </identifier>
+            </xsl:if>
         </xsl:if>
     </xsl:template>
 
