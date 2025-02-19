@@ -9,6 +9,7 @@ package org.dspace.embargo;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Iterator;
 import java.util.List;
@@ -123,7 +124,7 @@ public class EmbargoCLITool {
         try {
             context = new Context(Context.Mode.BATCH_EDIT);
             context.turnOffAuthorisationSystem();
-            ZonedDateTime now = ZonedDateTime.now();
+            ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 
             // scan items under embargo
             if (line.hasOption('i')) {
