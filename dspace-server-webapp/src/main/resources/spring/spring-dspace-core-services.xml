@@ -61,6 +61,9 @@
                         <entry key="primary">
                             <bean class="org.dspace.app.rest.submit.factory.impl.PrimaryBitstreamAddPatchOperation"/>
                         </entry>
+                        <entry key="bitstreamalternativecontent">
+                            <bean class="org.dspace.app.rest.submit.factory.impl.AlternativeContentBitstreamAddPatchOperation"/>
+                        </entry>
                     </map>
                 </entry>
                 <entry key="remove">
@@ -94,6 +97,9 @@
                         </entry>
                         <entry key="primary">
                             <bean class="org.dspace.app.rest.submit.factory.impl.PrimaryBitstreamRemovePatchOperation"/>
+                        </entry>
+                        <entry key="bitstreamalternativecontent">
+                            <bean class="org.dspace.app.rest.submit.factory.impl.AlternativeContentBitstreamRemovePatchOperation"/>
                         </entry>
                     </map>
                 </entry>
