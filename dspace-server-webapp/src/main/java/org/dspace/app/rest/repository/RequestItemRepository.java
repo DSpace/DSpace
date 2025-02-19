@@ -132,10 +132,10 @@ public class RequestItemRepository
             if (StringUtils.isBlank(captchaPayloadHeader)) {
                 throw new AuthorizeException("Valid captcha payload is required");
             }
-            // Validate and verify captcha payload and proof of work
+            // Validate and verify captcha payload token or proof of work
             // Rethrow exception as authZ exception if validation fails
             try {
-                captchaService.processResponse(captchaPayloadHeader, "validate");
+                captchaService.processResponse(captchaPayloadHeader, "request_item");
             } catch (InvalidReCaptchaException e) {
                 throw new AuthorizeException(e.getMessage());
             }
