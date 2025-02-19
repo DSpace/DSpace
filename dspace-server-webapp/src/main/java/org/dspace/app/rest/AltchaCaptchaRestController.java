@@ -71,7 +71,11 @@ public class AltchaCaptchaRestController implements InitializingBean {
     @GetMapping("/challenge")
     @PreAuthorize("permitAll()")
     public ResponseEntity getAltchaChallenge(HttpServletRequest request, HttpServletResponse response) {
-
+        // Check if captcha provider is set to altcha
+        if (!configurationService.getProperty("captcha.provider", "google").equals("altcha")) {
+            log.error("altcha is not enabled");
+            return ControllerUtils.toEmptyResponse(HttpStatus.BAD_REQUEST);
+        }
         // Set algorithm and hmac key
         // Algorithm
         String algorithm = configurationService.getProperty("altcha.algorithm", "SHA-256");
