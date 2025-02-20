@@ -31,8 +31,14 @@ import org.dspace.importer.external.liveimportclient.service.LiveImportClientImp
 import org.dspace.importer.external.service.AbstractImportMetadataSourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-
 /**
+ * Implementation of {@link OpenAlexImportMetadataSourceService} that provides
+ * metadata import functionality from OpenAlex into DSpace.
+ *
+ * This class interacts with the OpenAlex API to fetch metadata records based on
+ * queries or identifiers. It uses {@link LiveImportClient} to perform HTTP requests
+ * and processes responses to extract metadata.
+ *
  * @author Adamo Fapohunda (adamo.fapohunda at 4science.com)
  **/
 public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetadataSourceService<String>
@@ -45,11 +51,23 @@ public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetad
     @Autowired
     private LiveImportClient liveImportClient;
 
+    /**
+     * Returns the source name of the metadata provider.
+     *
+     * @return The string "openalex".
+     */
     @Override
     public String getImportSource() {
         return "openalex";
     }
 
+    /**
+     * Retrieves a metadata record by its OpenAlex identifier.
+     *
+     * @param id The identifier of the record to fetch.
+     * @return The corresponding {@link ImportRecord} or null if not found.
+     * @throws MetadataSourceException If the ID is null or an error occurs.
+     */
     @Override
     public ImportRecord getRecord(String id) throws MetadataSourceException {
         if (id == null) {
@@ -59,6 +77,13 @@ public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetad
         return CollectionUtils.isEmpty(records) ? null : records.get(0);
     }
 
+    /**
+     * Counts the number of metadata records matching a query.
+     *
+     * @param query a query string to base the search on.
+     * @return The number of matching records.
+     * @throws MetadataSourceException If the query is null or an error occurs.
+     */
     @Override
     public int getRecordsCount(String query) throws MetadataSourceException {
         if (query == null) {
@@ -67,6 +92,13 @@ public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetad
         return retry(new CountByQueryCallable(query));
     }
 
+    /**
+     * Counts the number of metadata records matching a query.
+     *
+     * @param query a query object to base the search on.
+     * @return The number of matching records.
+     * @throws MetadataSourceException If the query is null or an error occurs.
+     */
     @Override
     public int getRecordsCount(Query query) throws MetadataSourceException {
         if (query == null) {
@@ -75,6 +107,15 @@ public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetad
         return retry(new CountByQueryCallable(query));
     }
 
+    /**
+     * Retrieves a collection of metadata records based on a query with pagination.
+     *
+     * @param query a query string to base the search on.
+     * @param start The starting index for pagination.
+     * @param count The maximum number of records to return.
+     * @return A collection of matching {@link ImportRecord}.
+     * @throws MetadataSourceException If the query is null or an error occurs.
+     */
     @Override
     public Collection<ImportRecord> getRecords(String query, int start, int count) throws MetadataSourceException {
         if (query == null) {
@@ -88,6 +129,13 @@ public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetad
         throw new MethodNotFoundException("This method is not implemented for OpenAlex");
     }
 
+    /**
+     * Retrieves a metadata record by its identifier.
+     *
+     * @param query a query object containing the identifier of the record to fetch.
+     * @return The corresponding {@link ImportRecord} or null if not found.
+     * @throws MetadataSourceException If the query is null or an error occurs.
+     */
     @Override
     public ImportRecord getRecord(Query query) throws MetadataSourceException {
         if (query == null) {
@@ -107,6 +155,11 @@ public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetad
         throw new MethodNotFoundException("This method is not implemented for OpenAlex");
     }
 
+    /**
+     * Initializes the service by validating necessary configurations.
+     *
+     * @throws Exception If required properties are not properly set.
+     */
     @Override
     public void init() throws Exception {
         if (liveImportClient == null) {
@@ -117,7 +170,7 @@ public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetad
         }
     }
 
-    public Integer count(String query) throws MetadataSourceException {
+    private Integer count(String query) throws MetadataSourceException {
         if (query == null) {
             throw new MetadataSourceException("Query cannot be null");
         }
@@ -147,6 +200,12 @@ public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetad
         return 0;
     }
 
+    /**
+     * Searches for a record by its ID.
+     *
+     * @param id The identifier of the record.
+     * @return A list containing the matching {@link ImportRecord}, or empty if none found.
+     */
     private List<ImportRecord> searchById(String id) {
         List<ImportRecord> results = new ArrayList<>();
         try {
@@ -225,6 +284,11 @@ public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetad
         }
     }
 
+    /**
+     * Sets the base URL for OpenAlex API requests.
+     *
+     * @param url The OpenAlex API base URL.
+     */
     public void setUrl(String url) {
         this.url = StringUtils.trimToNull(url);
     }
