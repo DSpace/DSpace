@@ -19,6 +19,8 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * A basic link checker that is designed to be extended. By default this link checker
@@ -41,6 +43,9 @@ public class BasicLinkChecker extends AbstractCurationTask {
 
     // The log4j logger for this class
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(BasicLinkChecker.class);
+
+    protected static final ConfigurationService configurationService
+            = DSpaceServicesFactory.getInstance().getConfigurationService();
 
 
     /**
@@ -110,7 +115,8 @@ public class BasicLinkChecker extends AbstractCurationTask {
      */
     protected boolean checkURL(String url, StringBuilder results) {
         // Link check the URL
-        int httpStatus = getResponseStatus(url);
+        int redirects = 0;
+        int httpStatus = getResponseStatus(url, redirects);
 
         if ((httpStatus >= 200) && (httpStatus < 300)) {
             results.append(" - " + url + " = " + httpStatus + " - OK\n");
@@ -128,14 +134,24 @@ public class BasicLinkChecker extends AbstractCurationTask {
      * @param url The url to open
      * @return The HTTP response code (e.g. 200 / 301 / 404 / 500)
      */
-    protected int getResponseStatus(String url) {
+    protected int getResponseStatus(String url, int redirects) {
         try {
             URL theURL = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) theURL.openConnection();
-            int code = connection.getResponseCode();
-            connection.disconnect();
+            connection.setInstanceFollowRedirects(true);
+            int statusCode = connection.getResponseCode();
+            int maxRedirect = configurationService.getIntProperty("curate.checklinks.max-redirect", 0);
+            if ((statusCode == HttpURLConnection.HTTP_MOVED_TEMP || statusCode == HttpURLConnection.HTTP_MOVED_PERM ||
+                    statusCode == HttpURLConnection.HTTP_SEE_OTHER)) {
+                connection.disconnect();
+                String newUrl = connection.getHeaderField("Location");
+                if (newUrl != null && (maxRedirect >= redirects || maxRedirect == -1)) {
+                    redirects++;
+                    return getResponseStatus(newUrl, redirects);
+                }
 
-            return code;
+            }
+            return statusCode;
 
         } catch (IOException ioe) {
             // Must be a bad URL

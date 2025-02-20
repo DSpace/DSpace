@@ -1410,11 +1410,11 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .withAdminGroup(child2Admin)
                 .build();
 
-        Community ommunityChild1Child1 = CommunityBuilder.createSubCommunity(context, communityChild1)
+        Community communityChild1Child1 = CommunityBuilder.createSubCommunity(context, communityChild1)
                 .withName("Sub1 Community 1")
                 .build();
 
-        Community сommunityChild2Child1 = CommunityBuilder.createSubCommunity(context, communityChild2)
+        Community communityChild2Child1 = CommunityBuilder.createSubCommunity(context, communityChild2)
                 .withName("Sub2 Community 1")
                 .build();
 
