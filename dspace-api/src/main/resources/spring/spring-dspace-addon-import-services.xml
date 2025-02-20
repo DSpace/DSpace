@@ -256,6 +256,12 @@
         <property name="url" value="${openalex.url.authors}"/>
     </bean>
 
+    <bean id="openalexImportPublicationByAuthorIdService"
+          class="org.dspace.importer.external.openalex.service.OpenAlexImportMetadataSourceServiceImpl">
+        <property name="metadataFieldMapping" ref="openalexPublicationMetadataFieldMapping"/>
+        <property name="url" value="${openalex.url.works}"/>
+    </bean>
+
     <bean id="openalexPublicationMetadataFieldMapping"
           class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexPublicationFieldMapping">
     </bean>
