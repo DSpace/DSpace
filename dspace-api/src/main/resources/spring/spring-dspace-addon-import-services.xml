@@ -244,12 +244,14 @@
         <constructor-arg value="dc.identifier.other"/>
     </bean>
 
-    <bean id="openalexImportServiceByTitle" class="org.dspace.importer.external.openalex.service.OpenAlexImportMetadataSourceServiceImpl">
+    <bean id="openalexImportPublicationService"
+          class="org.dspace.importer.external.openalex.service.OpenAlexImportMetadataSourceServiceImpl">
         <property name="metadataFieldMapping" ref="openalexPublicationMetadataFieldMapping"/>
         <property name="url" value="${openalex.url.works}"/>
     </bean>
 
-    <bean id="openalexImportServiceByName" class="org.dspace.importer.external.openalex.service.OpenAlexImportMetadataSourceServiceImpl">
+    <bean id="openalexImportPersonService"
+          class="org.dspace.importer.external.openalex.service.OpenAlexImportMetadataSourceServiceImpl">
         <property name="metadataFieldMapping" ref="openalexPersonMetadataFieldMapping"/>
         <property name="url" value="${openalex.url.authors}"/>
     </bean>
