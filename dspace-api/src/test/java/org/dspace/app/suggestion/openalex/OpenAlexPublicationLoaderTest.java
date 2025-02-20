@@ -89,7 +89,7 @@ public class OpenAlexPublicationLoaderTest {
         // Then
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals("Author Name", result.get(0));
+        assertEquals("search_by_author=Author Name", result.get(0));
     }
 
     @Test
@@ -106,8 +106,8 @@ public class OpenAlexPublicationLoaderTest {
         // Then
         assertNotNull(result);
         assertEquals(2, result.size());
-        assertEquals("Author Name", result.get(0));
-        assertEquals("Title", result.get(1));
+        assertEquals("search_by_author=Author Name", result.get(0));
+        assertEquals("search_by_author=Title", result.get(1));
     }
 }
 
