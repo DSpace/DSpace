@@ -1,0 +1,3567 @@
+{
+  "meta": {
+    "count": 42,
+    "db_response_time_ms": 261,
+    "page": 1,
+    "per_page": 2,
+    "groups_count": null
+  },
+  "results": [
+    {
+      "id": "https://openalex.org/W3111255098",
+      "doi": "https://doi.org/10.1056/nejmoa2034577",
+      "title": "Safety and Efficacy of the BNT162b2 mRNA Covid-19 Vaccine",
+      "display_name": "Safety and Efficacy of the BNT162b2 mRNA Covid-19 Vaccine",
+      "relevance_score": 2859.2083,
+      "publication_year": 2020,
+      "publication_date": "2020-12-10",
+      "ids": {
+        "openalex": "https://openalex.org/W3111255098",
+        "doi": "https://doi.org/10.1056/nejmoa2034577",
+        "mag": "3111255098",
+        "pmid": "https://pubmed.ncbi.nlm.nih.gov/33596351",
+        "pmcid": "https://www.ncbi.nlm.nih.gov/pmc/articles/7745181"
+      },
+      "language": "en",
+      "primary_location": {
+        "is_oa": true,
+        "landing_page_url": "https://doi.org/10.1056/nejmoa2034577",
+        "pdf_url": null,
+        "source": {
+          "id": "https://openalex.org/S62468778",
+          "display_name": "New England Journal of Medicine",
+          "issn_l": "0028-4793",
+          "issn": [
+            "0028-4793",
+            "1533-4406"
+          ],
+          "is_oa": false,
+          "is_in_doaj": false,
+          "is_indexed_in_scopus": true,
+          "is_core": true,
+          "host_organization": "https://openalex.org/P4310320239",
+          "host_organization_name": "Massachusetts Medical Society",
+          "host_organization_lineage": [
+            "https://openalex.org/P4310320239"
+          ],
+          "host_organization_lineage_names": [
+            "Massachusetts Medical Society"
+          ],
+          "type": "journal"
+        },
+        "license": null,
+        "license_id": null,
+        "version": "publishedVersion",
+        "is_accepted": true,
+        "is_published": true
+      },
+      "type": "article",
+      "type_crossref": "journal-article",
+      "indexed_in": [
+        "crossref",
+        "pubmed"
+      ],
+      "open_access": {
+        "is_oa": true,
+        "oa_status": "green",
+        "oa_url": "https://doi.org/10.1056/nejmoa2034577",
+        "any_repository_has_fulltext": true
+      },
+      "authorships": [
+        {
+          "author_position": "first",
+          "author": {
+            "id": "https://openalex.org/A5001090261",
+            "display_name": "Fernando P. Polack",
+            "orcid": "https://orcid.org/0000-0002-8432-9158"
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Fernando P Polack",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5059606373",
+            "display_name": "Stephen J. Thomas",
+            "orcid": "https://orcid.org/0000-0002-8368-7682"
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Stephen J Thomas",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5014880604",
+            "display_name": "Nicholas Kitchin",
+            "orcid": "https://orcid.org/0000-0002-1808-3380"
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Nicholas Kitchin",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5087564717",
+            "display_name": "Judith Absalon",
+            "orcid": "https://orcid.org/0000-0002-1091-520X"
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Judith Absalon",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5067206456",
+            "display_name": "Alejandra Gurtman",
+            "orcid": "https://orcid.org/0000-0003-3469-1201"
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Alejandra Gurtman",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5042729050",
+            "display_name": "Stephen Lockhart",
+            "orcid": "https://orcid.org/0000-0002-0805-2193"
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Stephen Lockhart",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I20388574",
+                "https://openalex.org/I145311948"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5025483944",
+            "display_name": "John L. Perez",
+            "orcid": null
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "John L Perez",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5109595342",
+            "display_name": "Gonzalo Pérez Marc",
+            "orcid": null
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Gonzalo Pérez Marc",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5042806017",
+            "display_name": "Edson Duarte Moreira",
+            "orcid": "https://orcid.org/0000-0002-7081-8348"
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Edson D Moreira",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5091416598",
+            "display_name": "Cristiano A. F. Zerbini",
+            "orcid": "https://orcid.org/0000-0001-6269-2354"
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Cristiano Zerbini",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5102369312",
+            "display_name": "Ruth Bailey",
+            "orcid": null
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Ruth Bailey",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5023919527",
+            "display_name": "Kena A. Swanson",
+            "orcid": "https://orcid.org/0000-0002-3389-8414"
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Kena A Swanson",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5016431348",
+            "display_name": "Satrajit Roychoudhury",
+            "orcid": "https://orcid.org/0000-0003-4001-3036"
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Satrajit Roychoudhury",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5020500638",
+            "display_name": "Kenneth Koury",
+            "orcid": null
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Kenneth Koury",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5100435537",
+            "display_name": "Ping Li",
+            "orcid": null
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Ping Li",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5072923693",
+            "display_name": "Warren V. Kalina",
+            "orcid": null
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Warren V Kalina",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5101834037",
+            "display_name": "David Cooper",
+            "orcid": "https://orcid.org/0000-0002-4595-3943"
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "David Cooper",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5039460332",
+            "display_name": "Robert W. Frenck",
+            "orcid": "https://orcid.org/0000-0002-2336-526X"
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Robert W Frenck",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5107926156",
+            "display_name": "Laura L Hammitt",
+            "orcid": null
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Laura L Hammitt",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5000036560",
+            "display_name": "Özlem Türeci",
+            "orcid": "https://orcid.org/0000-0002-0623-1497"
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Özlem Türeci",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5073008232",
+            "display_name": "Haylene Nell",
+            "orcid": null
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Haylene Nell",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5111279142",
+            "display_name": "Axel Schaefer",
+            "orcid": null
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Axel Schaefer",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I20388574",
+                "https://openalex.org/I145311948"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5090594476",
+            "display_name": "Serhat Ünal",
+            "orcid": "https://orcid.org/0000-0003-1184-4711"
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Serhat Ünal",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5051925652",
+            "display_name": "Dina B Tresnan",
+            "orcid": null
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Dina B Tresnan",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5060704252",
+            "display_name": "Susan Mather",
+            "orcid": null
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Susan Mather",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5045224941",
+            "display_name": "Philip R. Dormitzer",
+            "orcid": "https://orcid.org/0000-0003-0671-6360"
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Philip R Dormitzer",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5075617216",
+            "display_name": "Uğur Şahin",
+            "orcid": "https://orcid.org/0000-0003-0363-1564"
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Uğur Şahin",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "middle",
+          "author": {
+            "id": "https://openalex.org/A5044292989",
+            "display_name": "Kathrin U. Jansen",
+            "orcid": "https://orcid.org/0000-0001-5354-4202"
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Kathrin U Jansen",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "last",
+          "author": {
+            "id": "https://openalex.org/A5086524484",
+            "display_name": "William C. Gruber",
+            "orcid": "https://orcid.org/0000-0002-6518-4547"
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I145311948",
+              "display_name": "Johns Hopkins University",
+              "ror": "https://ror.org/00za53h95",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I145311948"
+              ]
+            },
+            {
+              "id": "https://openalex.org/I20388574",
+              "display_name": "SUNY Upstate Medical University",
+              "ror": "https://ror.org/040kfrw16",
+              "country_code": "US",
+              "type": "funder",
+              "lineage": [
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ],
+          "countries": [
+            "US"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "William C Gruber",
+          "raw_affiliation_strings": [
+            "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.)."
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "From Fundacion INFANT (F.P.P.) and iTrials-Hospital Militar Central (G.P.M.), Buenos Aires; State University of New York, Upstate Medical University, Syracuse (S.J.T.), and Vaccine Research and Development, Pfizer, Pearl River (J.A., A.G., K.A.S., K.K., W.V.K., D.C., P.R.D., K.U.J., W.C.G.) - both in New York; Vaccine Research and Development, Pfizer, Hurley, United Kingdom (N.K., S.L., R.B.); Vaccine Research and Development (J.L.P., P.L.) and Worldwide Safety, Safety Surveillance and Risk Management (S.M.), Pfizer, Collegeville, PA; Associação Obras Sociais Irmã Dulce and Oswaldo Cruz Foundation, Bahia (E.D.M.), and Centro Paulista de Investigação Clinica, São Paulo (C.Z.) - both in Brazil; Global Product Development, Pfizer, Peapack, NJ (S.R.); Cincinnati Children's Hospital, Cincinnati (R.W.F.); Johns Hopkins Bloomberg School of Public Health, Baltimore (L.L.H.); BioNTech, Mainz (ÖT., U.Ş.), and Medizentrum Essen Borbeck, Essen (A.S.) - both in Germany; Tiervlei Trial Centre, Karl Bremer Hospital, Cape Town, South Africa (H.N.); Hacettepe University, Ankara, Turkey (S.Ü.); and Worldwide Safety, Safety Surveillance and Risk Management, Pfizer, Groton, CT (D.B.T.).",
+              "institution_ids": [
+                "https://openalex.org/I145311948",
+                "https://openalex.org/I20388574"
+              ]
+            }
+          ]
+        }
+      ],
+      "institution_assertions": [],
+      "countries_distinct_count": 1,
+      "institutions_distinct_count": 2,
+      "corresponding_author_ids": [],
+      "corresponding_institution_ids": [],
+      "apc_list": null,
+      "apc_paid": null,
+      "fwci": 308.436,
+      "has_fulltext": false,
+      "cited_by_count": 13600,
+      "citation_normalized_percentile": {
+        "value": 0.999958,
+        "is_in_top_1_percent": true,
+        "is_in_top_10_percent": true
+      },
+      "cited_by_percentile_year": {
+        "min": 99,
+        "max": 100
+      },
+      "biblio": {
+        "volume": "383",
+        "issue": "27",
+        "first_page": "2603",
+        "last_page": "2615"
+      },
+      "is_retracted": false,
+      "is_paratext": false,
+      "primary_topic": {
+        "id": "https://openalex.org/T10118",
+        "display_name": "SARS-CoV-2 and COVID-19 Research",
+        "score": 1.0,
+        "subfield": {
+          "id": "https://openalex.org/subfields/2725",
+          "display_name": "Infectious Diseases"
+        },
+        "field": {
+          "id": "https://openalex.org/fields/27",
+          "display_name": "Medicine"
+        },
+        "domain": {
+          "id": "https://openalex.org/domains/4",
+          "display_name": "Health Sciences"
+        }
+      },
+      "topics": [
+        {
+          "id": "https://openalex.org/T10118",
+          "display_name": "SARS-CoV-2 and COVID-19 Research",
+          "score": 1.0,
+          "subfield": {
+            "id": "https://openalex.org/subfields/2725",
+            "display_name": "Infectious Diseases"
+          },
+          "field": {
+            "id": "https://openalex.org/fields/27",
+            "display_name": "Medicine"
+          },
+          "domain": {
+            "id": "https://openalex.org/domains/4",
+            "display_name": "Health Sciences"
+          }
+        },
+        {
+          "id": "https://openalex.org/T10976",
+          "display_name": "Viral gastroenteritis research and epidemiology",
+          "score": 0.9984,
+          "subfield": {
+            "id": "https://openalex.org/subfields/2725",
+            "display_name": "Infectious Diseases"
+          },
+          "field": {
+            "id": "https://openalex.org/fields/27",
+            "display_name": "Medicine"
+          },
+          "domain": {
+            "id": "https://openalex.org/domains/4",
+            "display_name": "Health Sciences"
+          }
+        },
+        {
+          "id": "https://openalex.org/T11112",
+          "display_name": "Viral Infections and Immunology Research",
+          "score": 0.9964,
+          "subfield": {
+            "id": "https://openalex.org/subfields/2705",
+            "display_name": "Cardiology and Cardiovascular Medicine"
+          },
+          "field": {
+            "id": "https://openalex.org/fields/27",
+            "display_name": "Medicine"
+          },
+          "domain": {
+            "id": "https://openalex.org/domains/4",
+            "display_name": "Health Sciences"
+          }
+        }
+      ],
+      "keywords": [
+        {
+          "id": "https://openalex.org/keywords/2019-20-coronavirus-outbreak",
+          "display_name": "2019-20 coronavirus outbreak",
+          "score": 0.5976682
+        }
+      ],
+      "concepts": [
+        {
+          "id": "https://openalex.org/C3008058167",
+          "wikidata": "https://www.wikidata.org/wiki/Q84263196",
+          "display_name": "Coronavirus disease 2019 (COVID-19)",
+          "level": 4,
+          "score": 0.7876849
+        },
+        {
+          "id": "https://openalex.org/C3007834351",
+          "wikidata": "https://www.wikidata.org/wiki/Q82069695",
+          "display_name": "Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2)",
+          "level": 5,
+          "score": 0.66014475
+        },
+        {
+          "id": "https://openalex.org/C3006700255",
+          "wikidata": "https://www.wikidata.org/wiki/Q81068910",
+          "display_name": "2019-20 coronavirus outbreak",
+          "level": 3,
+          "score": 0.5976682
+        },
+        {
+          "id": "https://openalex.org/C159047783",
+          "wikidata": "https://www.wikidata.org/wiki/Q7215",
+          "display_name": "Virology",
+          "level": 1,
+          "score": 0.5813247
+        },
+        {
+          "id": "https://openalex.org/C144133560",
+          "wikidata": "https://www.wikidata.org/wiki/Q4830453",
+          "display_name": "Business",
+          "level": 0,
+          "score": 0.3979357
+        },
+        {
+          "id": "https://openalex.org/C71924100",
+          "wikidata": "https://www.wikidata.org/wiki/Q11190",
+          "display_name": "Medicine",
+          "level": 0,
+          "score": 0.35396558
+        },
+        {
+          "id": "https://openalex.org/C116675565",
+          "wikidata": "https://www.wikidata.org/wiki/Q3241045",
+          "display_name": "Outbreak",
+          "level": 2,
+          "score": 0.1235832
+        },
+        {
+          "id": "https://openalex.org/C126322002",
+          "wikidata": "https://www.wikidata.org/wiki/Q11180",
+          "display_name": "Internal medicine",
+          "level": 1,
+          "score": 0.074039906
+        },
+        {
+          "id": "https://openalex.org/C524204448",
+          "wikidata": "https://www.wikidata.org/wiki/Q788926",
+          "display_name": "Infectious disease (medical specialty)",
+          "level": 3,
+          "score": 0.05913073
+        },
+        {
+          "id": "https://openalex.org/C2779134260",
+          "wikidata": "https://www.wikidata.org/wiki/Q12136",
+          "display_name": "Disease",
+          "level": 2,
+          "score": 0.0
+        }
+      ],
+      "mesh": [
+        {
+          "descriptor_ui": "D000086382",
+          "descriptor_name": "COVID-19",
+          "qualifier_ui": "Q000517",
+          "qualifier_name": "prevention & control",
+          "is_major_topic": true
+        },
+        {
+          "descriptor_ui": "D000086663",
+          "descriptor_name": "COVID-19 Vaccines",
+          "qualifier_ui": "Q000276",
+          "qualifier_name": "immunology",
+          "is_major_topic": true
+        },
+        {
+          "descriptor_ui": "D000086402",
+          "descriptor_name": "SARS-CoV-2",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": true
+        },
+        {
+          "descriptor_ui": "D000293",
+          "descriptor_name": "Adolescent",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D000328",
+          "descriptor_name": "Adult",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D000368",
+          "descriptor_name": "Aged",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D000090982",
+          "descriptor_name": "BNT162 Vaccine",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D000086382",
+          "descriptor_name": "COVID-19",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D000086382",
+          "descriptor_name": "COVID-19",
+          "qualifier_ui": "Q000276",
+          "qualifier_name": "immunology",
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D000086663",
+          "descriptor_name": "COVID-19 Vaccines",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D000086663",
+          "descriptor_name": "COVID-19 Vaccines",
+          "qualifier_ui": "Q000008",
+          "qualifier_name": "administration & dosage",
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D000086663",
+          "descriptor_name": "COVID-19 Vaccines",
+          "qualifier_ui": "Q000009",
+          "qualifier_name": "adverse effects",
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D005221",
+          "descriptor_name": "Fatigue",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D005221",
+          "descriptor_name": "Fatigue",
+          "qualifier_ui": "Q000209",
+          "qualifier_name": "etiology",
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D005260",
+          "descriptor_name": "Female",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D006261",
+          "descriptor_name": "Headache",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D006261",
+          "descriptor_name": "Headache",
+          "qualifier_ui": "Q000209",
+          "qualifier_name": "etiology",
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D006801",
+          "descriptor_name": "Humans",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D007117",
+          "descriptor_name": "Immunization, Secondary",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D008297",
+          "descriptor_name": "Male",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D008875",
+          "descriptor_name": "Middle Aged",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D000086402",
+          "descriptor_name": "SARS-CoV-2",
+          "qualifier_ui": "Q000235",
+          "qualifier_name": "genetics",
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D016037",
+          "descriptor_name": "Single-Blind Method",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D016896",
+          "descriptor_name": "Treatment Outcome",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D014614",
+          "descriptor_name": "Vaccines, Synthetic",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D055815",
+          "descriptor_name": "Young Adult",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D000087503",
+          "descriptor_name": "mRNA Vaccines",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        }
+      ],
+      "locations_count": 4,
+      "locations": [
+        {
+          "is_oa": true,
+          "landing_page_url": "https://doi.org/10.1056/nejmoa2034577",
+          "pdf_url": null,
+          "source": {
+            "id": "https://openalex.org/S62468778",
+            "display_name": "New England Journal of Medicine",
+            "issn_l": "0028-4793",
+            "issn": [
+              "0028-4793",
+              "1533-4406"
+            ],
+            "is_oa": false,
+            "is_in_doaj": false,
+            "is_indexed_in_scopus": true,
+            "is_core": true,
+            "host_organization": "https://openalex.org/P4310320239",
+            "host_organization_name": "Massachusetts Medical Society",
+            "host_organization_lineage": [
+              "https://openalex.org/P4310320239"
+            ],
+            "host_organization_lineage_names": [
+              "Massachusetts Medical Society"
+            ],
+            "type": "journal"
+          },
+          "license": null,
+          "license_id": null,
+          "version": "publishedVersion",
+          "is_accepted": true,
+          "is_published": true
+        },
+        {
+          "is_oa": true,
+          "landing_page_url": "http://hdl.handle.net/10757/655958",
+          "pdf_url": "https://repositorioacademico.upc.edu.pe/bitstream/10757/655958/3/nejmoa2034577.pdf",
+          "source": {
+            "id": "https://openalex.org/S4306401415",
+            "display_name": "Repositorio Académico de la Universidad Peruana de Ciencias Aplicadas (Universidad Peruana de Ciencias Aplicadas)",
+            "issn_l": null,
+            "issn": null,
+            "is_oa": true,
+            "is_in_doaj": false,
+            "is_indexed_in_scopus": false,
+            "is_core": false,
+            "host_organization": "https://openalex.org/I1311157440",
+            "host_organization_name": "Peruvian University of Applied Sciences",
+            "host_organization_lineage": [
+              "https://openalex.org/I1311157440"
+            ],
+            "host_organization_lineage_names": [
+              "Peruvian University of Applied Sciences"
+            ],
+            "type": "repository"
+          },
+          "license": "cc-by-nc-nd",
+          "license_id": "https://openalex.org/licenses/cc-by-nc-nd",
+          "version": "publishedVersion",
+          "is_accepted": true,
+          "is_published": true
+        },
+        {
+          "is_oa": true,
+          "landing_page_url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7745181",
+          "pdf_url": null,
+          "source": {
+            "id": "https://openalex.org/S2764455111",
+            "display_name": "PubMed Central",
+            "issn_l": null,
+            "issn": null,
+            "is_oa": true,
+            "is_in_doaj": false,
+            "is_indexed_in_scopus": false,
+            "is_core": false,
+            "host_organization": "https://openalex.org/I1299303238",
+            "host_organization_name": "National Institutes of Health",
+            "host_organization_lineage": [
+              "https://openalex.org/I1299303238"
+            ],
+            "host_organization_lineage_names": [
+              "National Institutes of Health"
+            ],
+            "type": "repository"
+          },
+          "license": null,
+          "license_id": null,
+          "version": "publishedVersion",
+          "is_accepted": true,
+          "is_published": true
+        },
+        {
+          "is_oa": false,
+          "landing_page_url": "https://pubmed.ncbi.nlm.nih.gov/33301246",
+          "pdf_url": null,
+          "source": {
+            "id": "https://openalex.org/S4306525036",
+            "display_name": "PubMed",
+            "issn_l": null,
+            "issn": null,
+            "is_oa": false,
+            "is_in_doaj": false,
+            "is_indexed_in_scopus": false,
+            "is_core": false,
+            "host_organization": "https://openalex.org/I1299303238",
+            "host_organization_name": "National Institutes of Health",
+            "host_organization_lineage": [
+              "https://openalex.org/I1299303238"
+            ],
+            "host_organization_lineage_names": [
+              "National Institutes of Health"
+            ],
+            "type": "repository"
+          },
+          "license": null,
+          "license_id": null,
+          "version": null,
+          "is_accepted": false,
+          "is_published": false
+        }
+      ],
+      "best_oa_location": {
+        "is_oa": true,
+        "landing_page_url": "https://doi.org/10.1056/nejmoa2034577",
+        "pdf_url": null,
+        "source": {
+          "id": "https://openalex.org/S62468778",
+          "display_name": "New England Journal of Medicine",
+          "issn_l": "0028-4793",
+          "issn": [
+            "0028-4793",
+            "1533-4406"
+          ],
+          "is_oa": false,
+          "is_in_doaj": false,
+          "is_indexed_in_scopus": true,
+          "is_core": true,
+          "host_organization": "https://openalex.org/P4310320239",
+          "host_organization_name": "Massachusetts Medical Society",
+          "host_organization_lineage": [
+            "https://openalex.org/P4310320239"
+          ],
+          "host_organization_lineage_names": [
+            "Massachusetts Medical Society"
+          ],
+          "type": "journal"
+        },
+        "license": null,
+        "license_id": null,
+        "version": "publishedVersion",
+        "is_accepted": true,
+        "is_published": true
+      },
+      "sustainable_development_goals": [
+        {
+          "id": "https://metadata.un.org/sdg/3",
+          "display_name": "Good health and well-being",
+          "score": 0.87
+        }
+      ],
+      "grants": [
+        {
+          "funder": "https://openalex.org/F4320307765",
+          "funder_display_name": "Pfizer",
+          "award_id": null
+        }
+      ],
+      "datasets": [],
+      "versions": [],
+      "referenced_works_count": 8,
+      "referenced_works": [
+        "https://openalex.org/W1420726270",
+        "https://openalex.org/W2058647478",
+        "https://openalex.org/W2994612945",
+        "https://openalex.org/W3007643904",
+        "https://openalex.org/W3010233963",
+        "https://openalex.org/W3092921648",
+        "https://openalex.org/W3093367571",
+        "https://openalex.org/W3113031614"
+      ],
+      "related_works": [
+        "https://openalex.org/W4388896133",
+        "https://openalex.org/W4292098121",
+        "https://openalex.org/W4206669628",
+        "https://openalex.org/W4205317059",
+        "https://openalex.org/W3176864053",
+        "https://openalex.org/W3171943759",
+        "https://openalex.org/W3154141118",
+        "https://openalex.org/W3036314732",
+        "https://openalex.org/W3031607536",
+        "https://openalex.org/W3009669391"
+      ],
+      "abstract_inverted_index": {
+        "BackgroundSevere": [
+          0
+        ],
+        "acute": [
+          1
+        ],
+        "respiratory": [
+          2
+        ],
+        "syndrome": [
+          3
+        ],
+        "coronavirus": [
+          4,
+          11
+        ],
+        "2": [
+          5,
+          279
+        ],
+        "(SARS-CoV-2)": [
+          6
+        ],
+        "infection": [
+          7
+        ],
+        "and": [
+          8,
+          27,
+          104,
+          126,
+          152,
+          193,
+          216,
+          238,
+          248,
+          254,
+          292,
+          300
+        ],
+        "the": [
+          9,
+          66,
+          99,
+          109,
+          143,
+          194,
+          208,
+          234,
+          252,
+          303
+        ],
+        "resulting": [
+          10
+        ],
+        "disease": [
+          12
+        ],
+        "2019": [
+          13
+        ],
+        "(Covid-19)": [
+          14
+        ],
+        "have": [
+          15
+        ],
+        "afflicted": [
+          16
+        ],
+        "tens": [
+          17
+        ],
+        "of": [
+          18,
+          20,
+          47,
+          62,
+          98,
+          108,
+          113,
+          118,
+          134,
+          196,
+          202,
+          225,
+          242,
+          259,
+          270,
+          278,
+          285,
+          302
+        ],
+        "millions": [
+          19
+        ],
+        "people": [
+          21
+        ],
+        "in": [
+          22,
+          51,
+          164,
+          213,
+          218,
+          251,
+          266
+        ],
+        "a": [
+          23,
+          52,
+          76,
+          84,
+          106,
+          219,
+          276
+        ],
+        "worldwide": [
+          24
+        ],
+        "pandemic.": [
+          25
+        ],
+        "Safe": [
+          26
+        ],
+        "effective": [
+          28,
+          163
+        ],
+        "vaccines": [
+          29
+        ],
+        "are": [
+          30
+        ],
+        "needed": [
+          31
+        ],
+        "urgently.MethodsIn": [
+          32
+        ],
+        "an": [
+          33
+        ],
+        "ongoing": [
+          34
+        ],
+        "multinational,": [
+          35
+        ],
+        "placebo-controlled,": [
+          36
+        ],
+        "observer-blinded,": [
+          37
+        ],
+        "pivotal": [
+          38
+        ],
+        "efficacy": [
+          39,
+          97,
+          175
+        ],
+        "trial,": [
+          40
+        ],
+        "we": [
+          41
+        ],
+        "randomly": [
+          42
+        ],
+        "assigned": [
+          43,
+          148,
+          157
+        ],
+        "persons": [
+          44,
+          267
+        ],
+        "16": [
+          45,
+          268
+        ],
+        "years": [
+          46,
+          269
+        ],
+        "age": [
+          48,
+          271
+        ],
+        "or": [
+          49,
+          65,
+          272
+        ],
+        "older": [
+          50
+        ],
+        "1:1": [
+          53
+        ],
+        "ratio": [
+          54
+        ],
+        "to": [
+          55,
+          149,
+          158,
+          171,
+          178,
+          283
+        ],
+        "receive": [
+          56,
+          150
+        ],
+        "two": [
+          57
+        ],
+        "doses,": [
+          58
+        ],
+        "21": [
+          59
+        ],
+        "days": [
+          60,
+          141
+        ],
+        "apart,": [
+          61
+        ],
+        "either": [
+          63
+        ],
+        "placebo": [
+          64,
+          214,
+          255
+        ],
+        "BNT162b2": [
+          67,
+          74,
+          125,
+          151,
+          160,
+          220,
+          226,
+          260,
+          304
+        ],
+        "vaccine": [
+          68,
+          81,
+          100,
+          174,
+          253
+        ],
+        "candidate": [
+          69
+        ],
+        "(30": [
+          70
+        ],
+        "μg": [
+          71
+        ],
+        "per": [
+          72
+        ],
+        "dose).": [
+          73
+        ],
+        "is": [
+          75
+        ],
+        "lipid": [
+          77
+        ],
+        "nanoparticle–formulated,": [
+          78
+        ],
+        "nucleoside-modified": [
+          79
+        ],
+        "RNA": [
+          80
+        ],
+        "that": [
+          82,
+          284
+        ],
+        "encodes": [
+          83
+        ],
+        "prefusion": [
+          85
+        ],
+        "stabilized,": [
+          86
+        ],
+        "membrane-anchored": [
+          87
+        ],
+        "SARS-CoV-2": [
+          88
+        ],
+        "full-length": [
+          89
+        ],
+        "spike": [
+          90
+        ],
+        "protein.": [
+          91
+        ],
+        "The": [
+          92,
+          222,
+          240
+        ],
+        "primary": [
+          93
+        ],
+        "end": [
+          94
+        ],
+        "points": [
+          95
+        ],
+        "were": [
+          96,
+          131
+        ],
+        "against": [
+          101,
+          264
+        ],
+        "laboratory-confirmed": [
+          102
+        ],
+        "Covid-19": [
+          103,
+          135,
+          166,
+          204,
+          265,
+          305
+        ],
+        "safety.Download": [
+          105
+        ],
+        "PDF": [
+          107
+        ],
+        "Research": [
+          110
+        ],
+        "Summary.ResultsA": [
+          111
+        ],
+        "total": [
+          112
+        ],
+        "43,548": [
+          114
+        ],
+        "participants": [
+          115,
+          147
+        ],
+        "underwent": [
+          116
+        ],
+        "randomization,": [
+          117
+        ],
+        "whom": [
+          119
+        ],
+        "43,448": [
+          120
+        ],
+        "received": [
+          121
+        ],
+        "injections:": [
+          122
+        ],
+        "21,720": [
+          123
+        ],
+        "with": [
+          124,
+          128,
+          136,
+          205
+        ],
+        "21,728": [
+          127
+        ],
+        "placebo.": [
+          129
+        ],
+        "There": [
+          130
+        ],
+        "8": [
+          132
+        ],
+        "cases": [
+          133,
+          154,
+          201
+        ],
+        "onset": [
+          137,
+          206
+        ],
+        "at": [
+          138,
+          233
+        ],
+        "least": [
+          139
+        ],
+        "7": [
+          140
+        ],
+        "after": [
+          142,
+          207
+        ],
+        "second": [
+          144
+        ],
+        "dose": [
+          145
+        ],
+        "among": [
+          146,
+          155
+        ],
+        "162": [
+          153
+        ],
+        "those": [
+          156
+        ],
+        "placebo;": [
+          159
+        ],
+        "was": [
+          161,
+          180,
+          227,
+          246,
+          249,
+          281
+        ],
+        "95%": [
+          162,
+          262
+        ],
+        "preventing": [
+          165
+        ],
+        "(95%": [
+          167
+        ],
+        "credible": [
+          168
+        ],
+        "interval,": [
+          169
+        ],
+        "90.3": [
+          170
+        ],
+        "97.6).": [
+          172
+        ],
+        "Similar": [
+          173
+        ],
+        "(generally": [
+          176
+        ],
+        "90": [
+          177
+        ],
+        "100%)": [
+          179
+        ],
+        "observed": [
+          181
+        ],
+        "across": [
+          182
+        ],
+        "subgroups": [
+          183
+        ],
+        "defined": [
+          184
+        ],
+        "by": [
+          185,
+          229,
+          290
+        ],
+        "age,": [
+          186
+        ],
+        "sex,": [
+          187
+        ],
+        "race,": [
+          188
+        ],
+        "ethnicity,": [
+          189
+        ],
+        "baseline": [
+          190
+        ],
+        "body-mass": [
+          191
+        ],
+        "index,": [
+          192
+        ],
+        "presence": [
+          195
+        ],
+        "coexisting": [
+          197
+        ],
+        "conditions.": [
+          198
+        ],
+        "Among": [
+          199
+        ],
+        "10": [
+          200
+        ],
+        "severe": [
+          203
+        ],
+        "first": [
+          209
+        ],
+        "dose,": [
+          210
+        ],
+        "9": [
+          211
+        ],
+        "occurred": [
+          212
+        ],
+        "recipients": [
+          215
+        ],
+        "1": [
+          217
+        ],
+        "recipient.": [
+          221
+        ],
+        "safety": [
+          223
+        ],
+        "profile": [
+          224
+        ],
+        "characterized": [
+          228
+        ],
+        "short-term,": [
+          230
+        ],
+        "mild-to-moderate": [
+          231
+        ],
+        "pain": [
+          232
+        ],
+        "injection": [
+          235
+        ],
+        "site,": [
+          236
+        ],
+        "fatigue,": [
+          237
+        ],
+        "headache.": [
+          239
+        ],
+        "incidence": [
+          241
+        ],
+        "serious": [
+          243
+        ],
+        "adverse": [
+          244
+        ],
+        "events": [
+          245
+        ],
+        "low": [
+          247
+        ],
+        "similar": [
+          250,
+          282
+        ],
+        "groups.ConclusionsA": [
+          256
+        ],
+        "two-dose": [
+          257
+        ],
+        "regimen": [
+          258
+        ],
+        "conferred": [
+          261
+        ],
+        "protection": [
+          263
+        ],
+        "older.": [
+          273
+        ],
+        "Safety": [
+          274,
+          299
+        ],
+        "over": [
+          275
+        ],
+        "median": [
+          277
+        ],
+        "months": [
+          280
+        ],
+        "other": [
+          286
+        ],
+        "viral": [
+          287
+        ],
+        "vaccines.": [
+          288
+        ],
+        "(Funded": [
+          289
+        ],
+        "BioNTech": [
+          291
+        ],
+        "Pfizer;": [
+          293
+        ],
+        "ClinicalTrials.gov": [
+          294
+        ],
+        "number,": [
+          295
+        ],
+        "NCT04368728.)": [
+          296
+        ],
+        "Quick": [
+          297
+        ],
+        "Take": [
+          298
+        ],
+        "Efficacy": [
+          301
+        ],
+        "Vaccine": [
+          306
+        ],
+        "3m": [
+          307
+        ],
+        "0s": [
+          308
+        ]
+      },
+      "abstract_inverted_index_v3": null,
+      "cited_by_api_url": "https://api.openalex.org/works?filter=cites:W3111255098",
+      "counts_by_year": [
+        {
+          "year": 2025,
+          "cited_by_count": 85
+        },
+        {
+          "year": 2024,
+          "cited_by_count": 1522
+        },
+        {
+          "year": 2023,
+          "cited_by_count": 2373
+        },
+        {
+          "year": 2022,
+          "cited_by_count": 4290
+        },
+        {
+          "year": 2021,
+          "cited_by_count": 5147
+        },
+        {
+          "year": 2020,
+          "cited_by_count": 101
+        },
+        {
+          "year": 2018,
+          "cited_by_count": 1
+        }
+      ],
+      "updated_date": "2025-02-20T11:36:45.480077",
+      "created_date": "2020-12-21"
+    },
+    {
+      "id": "https://openalex.org/W3008028633",
+      "doi": "https://doi.org/10.1001/jama.2020.2648",
+      "title": "Characteristics of and Important Lessons From the Coronavirus Disease 2019 (COVID-19) Outbreak in China",
+      "display_name": "Characteristics of and Important Lessons From the Coronavirus Disease 2019 (COVID-19) Outbreak in China",
+      "relevance_score": 2793.3242,
+      "publication_year": 2020,
+      "publication_date": "2020-02-24",
+      "ids": {
+        "openalex": "https://openalex.org/W3008028633",
+        "doi": "https://doi.org/10.1001/jama.2020.2648",
+        "mag": "3008028633",
+        "pmid": "https://pubmed.ncbi.nlm.nih.gov/32091533"
+      },
+      "language": "en",
+      "primary_location": {
+        "is_oa": true,
+        "landing_page_url": "https://doi.org/10.1001/jama.2020.2648",
+        "pdf_url": null,
+        "source": {
+          "id": "https://openalex.org/S172573765",
+          "display_name": "JAMA",
+          "issn_l": "0098-7484",
+          "issn": [
+            "0098-7484",
+            "1538-3598"
+          ],
+          "is_oa": false,
+          "is_in_doaj": false,
+          "is_indexed_in_scopus": true,
+          "is_core": true,
+          "host_organization": "https://openalex.org/P4310320259",
+          "host_organization_name": "American Medical Association",
+          "host_organization_lineage": [
+            "https://openalex.org/P4310320259"
+          ],
+          "host_organization_lineage_names": [
+            "American Medical Association"
+          ],
+          "type": "journal"
+        },
+        "license": null,
+        "license_id": null,
+        "version": "publishedVersion",
+        "is_accepted": true,
+        "is_published": true
+      },
+      "type": "article",
+      "type_crossref": "journal-article",
+      "indexed_in": [
+        "crossref",
+        "pubmed"
+      ],
+      "open_access": {
+        "is_oa": false,
+        "oa_status": "closed",
+        "oa_url": "https://doi.org/10.1001/jama.2020.2648",
+        "any_repository_has_fulltext": false
+      },
+      "authorships": [
+        {
+          "author_position": "first",
+          "author": {
+            "id": "https://openalex.org/A5012397238",
+            "display_name": "Zunyou Wu",
+            "orcid": "https://orcid.org/0000-0002-0839-4548"
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I184490438",
+              "display_name": "Chinese Center For Disease Control and Prevention",
+              "ror": "https://ror.org/04wktzw65",
+              "country_code": "CN",
+              "type": "government",
+              "lineage": [
+                "https://openalex.org/I184490438",
+                "https://openalex.org/I4210127390",
+                "https://openalex.org/I4210151987"
+              ]
+            }
+          ],
+          "countries": [
+            "CN"
+          ],
+          "is_corresponding": true,
+          "raw_author_name": "Zunyou Wu",
+          "raw_affiliation_strings": [
+            "Chinese Center for Disease Control and Prevention, Beijing, China"
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Chinese Center for Disease Control and Prevention, Beijing, China",
+              "institution_ids": [
+                "https://openalex.org/I184490438"
+              ]
+            }
+          ]
+        },
+        {
+          "author_position": "last",
+          "author": {
+            "id": "https://openalex.org/A5075384865",
+            "display_name": "Jennifer M. McGoogan",
+            "orcid": null
+          },
+          "institutions": [
+            {
+              "id": "https://openalex.org/I184490438",
+              "display_name": "Chinese Center For Disease Control and Prevention",
+              "ror": "https://ror.org/04wktzw65",
+              "country_code": "CN",
+              "type": "government",
+              "lineage": [
+                "https://openalex.org/I184490438",
+                "https://openalex.org/I4210127390",
+                "https://openalex.org/I4210151987"
+              ]
+            }
+          ],
+          "countries": [
+            "CN"
+          ],
+          "is_corresponding": false,
+          "raw_author_name": "Jennifer M. McGoogan",
+          "raw_affiliation_strings": [
+            "Chinese Center for Disease Control and Prevention, Beijing, China"
+          ],
+          "affiliations": [
+            {
+              "raw_affiliation_string": "Chinese Center for Disease Control and Prevention, Beijing, China",
+              "institution_ids": [
+                "https://openalex.org/I184490438"
+              ]
+            }
+          ]
+        }
+      ],
+      "institution_assertions": [],
+      "countries_distinct_count": 1,
+      "institutions_distinct_count": 1,
+      "corresponding_author_ids": [
+        "https://openalex.org/A5012397238"
+      ],
+      "corresponding_institution_ids": [
+        "https://openalex.org/I184490438"
+      ],
+      "apc_list": null,
+      "apc_paid": null,
+      "fwci": 414.923,
+      "has_fulltext": true,
+      "fulltext_origin": "pdf",
+      "cited_by_count": 16995,
+      "citation_normalized_percentile": {
+        "value": 0.999958,
+        "is_in_top_1_percent": true,
+        "is_in_top_10_percent": true
+      },
+      "cited_by_percentile_year": {
+        "min": 99,
+        "max": 100
+      },
+      "biblio": {
+        "volume": "323",
+        "issue": "13",
+        "first_page": "1239",
+        "last_page": "1239"
+      },
+      "is_retracted": false,
+      "is_paratext": false,
+      "primary_topic": {
+        "id": "https://openalex.org/T10041",
+        "display_name": "COVID-19 Clinical Research Studies",
+        "score": 0.9984,
+        "subfield": {
+          "id": "https://openalex.org/subfields/2725",
+          "display_name": "Infectious Diseases"
+        },
+        "field": {
+          "id": "https://openalex.org/fields/27",
+          "display_name": "Medicine"
+        },
+        "domain": {
+          "id": "https://openalex.org/domains/4",
+          "display_name": "Health Sciences"
+        }
+      },
+      "topics": [
+        {
+          "id": "https://openalex.org/T10041",
+          "display_name": "COVID-19 Clinical Research Studies",
+          "score": 0.9984,
+          "subfield": {
+            "id": "https://openalex.org/subfields/2725",
+            "display_name": "Infectious Diseases"
+          },
+          "field": {
+            "id": "https://openalex.org/fields/27",
+            "display_name": "Medicine"
+          },
+          "domain": {
+            "id": "https://openalex.org/domains/4",
+            "display_name": "Health Sciences"
+          }
+        },
+        {
+          "id": "https://openalex.org/T10410",
+          "display_name": "COVID-19 epidemiological studies",
+          "score": 0.9974,
+          "subfield": {
+            "id": "https://openalex.org/subfields/2611",
+            "display_name": "Modeling and Simulation"
+          },
+          "field": {
+            "id": "https://openalex.org/fields/26",
+            "display_name": "Mathematics"
+          },
+          "domain": {
+            "id": "https://openalex.org/domains/3",
+            "display_name": "Physical Sciences"
+          }
+        },
+        {
+          "id": "https://openalex.org/T10168",
+          "display_name": "COVID-19 and Mental Health",
+          "score": 0.9953,
+          "subfield": {
+            "id": "https://openalex.org/subfields/3203",
+            "display_name": "Clinical Psychology"
+          },
+          "field": {
+            "id": "https://openalex.org/fields/32",
+            "display_name": "Psychology"
+          },
+          "domain": {
+            "id": "https://openalex.org/domains/2",
+            "display_name": "Social Sciences"
+          }
+        }
+      ],
+      "keywords": [
+        {
+          "id": "https://openalex.org/keywords/2019-20-coronavirus-outbreak",
+          "display_name": "2019-20 coronavirus outbreak",
+          "score": 0.6808506
+        },
+        {
+          "id": "https://openalex.org/keywords/coronavirus",
+          "display_name": "Coronavirus",
+          "score": 0.67846215
+        },
+        {
+          "id": "https://openalex.org/keywords/betacoronavirus",
+          "display_name": "Betacoronavirus",
+          "score": 0.5345219
+        },
+        {
+          "id": "https://openalex.org/keywords/coronavirus-infections",
+          "display_name": "Coronavirus Infections",
+          "score": 0.45745552
+        },
+        {
+          "id": "https://openalex.org/keywords/contact-tracing",
+          "display_name": "Contact tracing",
+          "score": 0.4476072
+        },
+        {
+          "id": "https://openalex.org/keywords/pandemic",
+          "display_name": "Pandemic",
+          "score": 0.43686557
+        }
+      ],
+      "concepts": [
+        {
+          "id": "https://openalex.org/C71924100",
+          "wikidata": "https://www.wikidata.org/wiki/Q11190",
+          "display_name": "Medicine",
+          "level": 0,
+          "score": 0.8905669
+        },
+        {
+          "id": "https://openalex.org/C3008058167",
+          "wikidata": "https://www.wikidata.org/wiki/Q84263196",
+          "display_name": "Coronavirus disease 2019 (COVID-19)",
+          "level": 4,
+          "score": 0.8352896
+        },
+        {
+          "id": "https://openalex.org/C116675565",
+          "wikidata": "https://www.wikidata.org/wiki/Q3241045",
+          "display_name": "Outbreak",
+          "level": 2,
+          "score": 0.8130525
+        },
+        {
+          "id": "https://openalex.org/C107029721",
+          "wikidata": "https://www.wikidata.org/wiki/Q19188",
+          "display_name": "Mainland China",
+          "level": 3,
+          "score": 0.72209585
+        },
+        {
+          "id": "https://openalex.org/C3006700255",
+          "wikidata": "https://www.wikidata.org/wiki/Q81068910",
+          "display_name": "2019-20 coronavirus outbreak",
+          "level": 3,
+          "score": 0.6808506
+        },
+        {
+          "id": "https://openalex.org/C3007834351",
+          "wikidata": "https://www.wikidata.org/wiki/Q82069695",
+          "display_name": "Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2)",
+          "level": 5,
+          "score": 0.6787465
+        },
+        {
+          "id": "https://openalex.org/C2777648638",
+          "wikidata": "https://www.wikidata.org/wiki/Q57751738",
+          "display_name": "Coronavirus",
+          "level": 5,
+          "score": 0.67846215
+        },
+        {
+          "id": "https://openalex.org/C191935318",
+          "wikidata": "https://www.wikidata.org/wiki/Q148",
+          "display_name": "China",
+          "level": 2,
+          "score": 0.6597803
+        },
+        {
+          "id": "https://openalex.org/C2778137277",
+          "wikidata": "https://www.wikidata.org/wiki/Q16532287",
+          "display_name": "Betacoronavirus",
+          "level": 5,
+          "score": 0.5345219
+        },
+        {
+          "id": "https://openalex.org/C159047783",
+          "wikidata": "https://www.wikidata.org/wiki/Q7215",
+          "display_name": "Virology",
+          "level": 1,
+          "score": 0.5330711
+        },
+        {
+          "id": "https://openalex.org/C2778137410",
+          "wikidata": "https://www.wikidata.org/wiki/Q2732820",
+          "display_name": "Government (linguistics)",
+          "level": 2,
+          "score": 0.52829504
+        },
+        {
+          "id": "https://openalex.org/C2779134260",
+          "wikidata": "https://www.wikidata.org/wiki/Q12136",
+          "display_name": "Disease",
+          "level": 2,
+          "score": 0.50962496
+        },
+        {
+          "id": "https://openalex.org/C2909376813",
+          "wikidata": "https://www.wikidata.org/wiki/Q57751738",
+          "display_name": "Coronavirus Infections",
+          "level": 5,
+          "score": 0.45745552
+        },
+        {
+          "id": "https://openalex.org/C113162765",
+          "wikidata": "https://www.wikidata.org/wiki/Q1128437",
+          "display_name": "Contact tracing",
+          "level": 5,
+          "score": 0.4476072
+        },
+        {
+          "id": "https://openalex.org/C89623803",
+          "wikidata": "https://www.wikidata.org/wiki/Q12184",
+          "display_name": "Pandemic",
+          "level": 5,
+          "score": 0.43686557
+        },
+        {
+          "id": "https://openalex.org/C99454951",
+          "wikidata": "https://www.wikidata.org/wiki/Q932068",
+          "display_name": "Environmental health",
+          "level": 1,
+          "score": 0.3968422
+        },
+        {
+          "id": "https://openalex.org/C524204448",
+          "wikidata": "https://www.wikidata.org/wiki/Q788926",
+          "display_name": "Infectious disease (medical specialty)",
+          "level": 3,
+          "score": 0.21405748
+        },
+        {
+          "id": "https://openalex.org/C142724271",
+          "wikidata": "https://www.wikidata.org/wiki/Q7208",
+          "display_name": "Pathology",
+          "level": 1,
+          "score": 0.09095377
+        },
+        {
+          "id": "https://openalex.org/C205649164",
+          "wikidata": "https://www.wikidata.org/wiki/Q1071",
+          "display_name": "Geography",
+          "level": 0,
+          "score": 0.061115116
+        },
+        {
+          "id": "https://openalex.org/C166957645",
+          "wikidata": "https://www.wikidata.org/wiki/Q23498",
+          "display_name": "Archaeology",
+          "level": 1,
+          "score": 0.0
+        },
+        {
+          "id": "https://openalex.org/C41895202",
+          "wikidata": "https://www.wikidata.org/wiki/Q8162",
+          "display_name": "Linguistics",
+          "level": 1,
+          "score": 0.0
+        },
+        {
+          "id": "https://openalex.org/C138885662",
+          "wikidata": "https://www.wikidata.org/wiki/Q5891",
+          "display_name": "Philosophy",
+          "level": 0,
+          "score": 0.0
+        }
+      ],
+      "mesh": [
+        {
+          "descriptor_ui": "D000073640",
+          "descriptor_name": "Betacoronavirus",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": true
+        },
+        {
+          "descriptor_ui": "D003140",
+          "descriptor_name": "Communicable Disease Control",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": true
+        },
+        {
+          "descriptor_ui": "D018352",
+          "descriptor_name": "Coronavirus Infections",
+          "qualifier_ui": "Q000453",
+          "qualifier_name": "epidemiology",
+          "is_major_topic": true
+        },
+        {
+          "descriptor_ui": "D011024",
+          "descriptor_name": "Pneumonia, Viral",
+          "qualifier_ui": "Q000453",
+          "qualifier_name": "epidemiology",
+          "is_major_topic": true
+        },
+        {
+          "descriptor_ui": "D000086382",
+          "descriptor_name": "COVID-19",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D002681",
+          "descriptor_name": "China",
+          "qualifier_ui": "Q000453",
+          "qualifier_name": "epidemiology",
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D002681",
+          "descriptor_name": "China",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D018352",
+          "descriptor_name": "Coronavirus Infections",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D004196",
+          "descriptor_name": "Disease Outbreaks",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D006801",
+          "descriptor_name": "Humans",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D058873",
+          "descriptor_name": "Pandemics",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D062072",
+          "descriptor_name": "Patient Acuity",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D011024",
+          "descriptor_name": "Pneumonia, Viral",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D000086402",
+          "descriptor_name": "SARS-CoV-2",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D045169",
+          "descriptor_name": "Severe Acute Respiratory Syndrome",
+          "qualifier_ui": "Q000453",
+          "qualifier_name": "epidemiology",
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D045169",
+          "descriptor_name": "Severe Acute Respiratory Syndrome",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D014944",
+          "descriptor_name": "World Health Organization",
+          "qualifier_ui": "",
+          "qualifier_name": null,
+          "is_major_topic": false
+        }
+      ],
+      "locations_count": 2,
+      "locations": [
+        {
+          "is_oa": true,
+          "landing_page_url": "https://doi.org/10.1001/jama.2020.2648",
+          "pdf_url": null,
+          "source": {
+            "id": "https://openalex.org/S172573765",
+            "display_name": "JAMA",
+            "issn_l": "0098-7484",
+            "issn": [
+              "0098-7484",
+              "1538-3598"
+            ],
+            "is_oa": false,
+            "is_in_doaj": false,
+            "is_indexed_in_scopus": true,
+            "is_core": true,
+            "host_organization": "https://openalex.org/P4310320259",
+            "host_organization_name": "American Medical Association",
+            "host_organization_lineage": [
+              "https://openalex.org/P4310320259"
+            ],
+            "host_organization_lineage_names": [
+              "American Medical Association"
+            ],
+            "type": "journal"
+          },
+          "license": null,
+          "license_id": null,
+          "version": "publishedVersion",
+          "is_accepted": true,
+          "is_published": true
+        },
+        {
+          "is_oa": false,
+          "landing_page_url": "https://pubmed.ncbi.nlm.nih.gov/32091533",
+          "pdf_url": null,
+          "source": {
+            "id": "https://openalex.org/S4306525036",
+            "display_name": "PubMed",
+            "issn_l": null,
+            "issn": null,
+            "is_oa": false,
+            "is_in_doaj": false,
+            "is_indexed_in_scopus": false,
+            "is_core": false,
+            "host_organization": "https://openalex.org/I1299303238",
+            "host_organization_name": "National Institutes of Health",
+            "host_organization_lineage": [
+              "https://openalex.org/I1299303238"
+            ],
+            "host_organization_lineage_names": [
+              "National Institutes of Health"
+            ],
+            "type": "repository"
+          },
+          "license": null,
+          "license_id": null,
+          "version": null,
+          "is_accepted": false,
+          "is_published": false
+        }
+      ],
+      "best_oa_location": {
+        "is_oa": true,
+        "landing_page_url": "https://doi.org/10.1001/jama.2020.2648",
+        "pdf_url": null,
+        "source": {
+          "id": "https://openalex.org/S172573765",
+          "display_name": "JAMA",
+          "issn_l": "0098-7484",
+          "issn": [
+            "0098-7484",
+            "1538-3598"
+          ],
+          "is_oa": false,
+          "is_in_doaj": false,
+          "is_indexed_in_scopus": true,
+          "is_core": true,
+          "host_organization": "https://openalex.org/P4310320259",
+          "host_organization_name": "American Medical Association",
+          "host_organization_lineage": [
+            "https://openalex.org/P4310320259"
+          ],
+          "host_organization_lineage_names": [
+            "American Medical Association"
+          ],
+          "type": "journal"
+        },
+        "license": null,
+        "license_id": null,
+        "version": "publishedVersion",
+        "is_accepted": true,
+        "is_published": true
+      },
+      "sustainable_development_goals": [
+        {
+          "id": "https://metadata.un.org/sdg/3",
+          "display_name": "Good health and well-being",
+          "score": 0.81
+        }
+      ],
+      "grants": [],
+      "datasets": [],
+      "versions": [],
+      "referenced_works_count": 12,
+      "referenced_works": [
+        "https://openalex.org/W3004434564",
+        "https://openalex.org/W3005409672",
+        "https://openalex.org/W3006044875",
+        "https://openalex.org/W3006320625",
+        "https://openalex.org/W3006533361",
+        "https://openalex.org/W3024919756",
+        "https://openalex.org/W3026023364",
+        "https://openalex.org/W3031410613",
+        "https://openalex.org/W3033263492",
+        "https://openalex.org/W3034094473",
+        "https://openalex.org/W3035011439",
+        "https://openalex.org/W3082757469"
+      ],
+      "related_works": [
+        "https://openalex.org/W3202542776",
+        "https://openalex.org/W3195606942",
+        "https://openalex.org/W3148870232",
+        "https://openalex.org/W3092226650",
+        "https://openalex.org/W3048705100",
+        "https://openalex.org/W3037424415",
+        "https://openalex.org/W3021591496",
+        "https://openalex.org/W3011586138",
+        "https://openalex.org/W1987655599",
+        "https://openalex.org/W1607996760"
+      ],
+      "abstract_inverted_index": {
+        "This": [
+          0
+        ],
+        "Viewpoint": [
+          1
+        ],
+        "summarizes": [
+          2
+        ],
+        "key": [
+          3
+        ],
+        "epidemiologic": [
+          4
+        ],
+        "and": [
+          5,
+          24,
+          34
+        ],
+        "clinical": [
+          6
+        ],
+        "findings": [
+          7
+        ],
+        "from": [
+          8
+        ],
+        "all": [
+          9
+        ],
+        "cases": [
+          10
+        ],
+        "of": [
+          11
+        ],
+        "coronavirus": [
+          12
+        ],
+        "disease": [
+          13
+        ],
+        "2019": [
+          14
+        ],
+        "(COVID-19)": [
+          15
+        ],
+        "reported": [
+          16
+        ],
+        "through": [
+          17
+        ],
+        "February": [
+          18
+        ],
+        "11,": [
+          19
+        ],
+        "2020,": [
+          20
+        ],
+        "in": [
+          21,
+          27
+        ],
+        "mainland": [
+          22
+        ],
+        "China,": [
+          23
+        ],
+        "case": [
+          25
+        ],
+        "trends": [
+          26
+        ],
+        "response": [
+          28
+        ],
+        "to": [
+          29,
+          32
+        ],
+        "government": [
+          30
+        ],
+        "attempts": [
+          31
+        ],
+        "control": [
+          33
+        ],
+        "contain": [
+          35
+        ],
+        "the": [
+          36
+        ],
+        "infection.": [
+          37
+        ]
+      },
+      "abstract_inverted_index_v3": null,
+      "cited_by_api_url": "https://api.openalex.org/works?filter=cites:W3008028633",
+      "counts_by_year": [
+        {
+          "year": 2025,
+          "cited_by_count": 26
+        },
+        {
+          "year": 2024,
+          "cited_by_count": 876
+        },
+        {
+          "year": 2023,
+          "cited_by_count": 1590
+        },
+        {
+          "year": 2022,
+          "cited_by_count": 2817
+        },
+        {
+          "year": 2021,
+          "cited_by_count": 4818
+        },
+        {
+          "year": 2020,
+          "cited_by_count": 6828
+        },
+        {
+          "year": 2019,
+          "cited_by_count": 9
+        },
+        {
+          "year": 2014,
+          "cited_by_count": 1
+        },
+        {
+          "year": 2012,
+          "cited_by_count": 1
+        }
+      ],
+      "updated_date": "2025-02-16T21:39:17.255747",
+      "created_date": "2020-03-06"
+    }
+  ],
+  "group_by": []
+}
