@@ -21,7 +21,7 @@
 	    <entry key="openaire" value-ref="OpenairePublicationLoader" />
 	</util:map>
 
-    <bean id="OpenairePublicationLoader" class="org.dspace.app.suggestion.openaire.PublicationLoader">
+    <bean id="OpenairePublicationLoader" class="org.dspace.app.suggestion.loader.PublicationLoader">
         <property name="sourceName" value="openaire" />
         <property name="primaryProvider" ref="openaireLiveImportDataProviderByAuthor" />
         <property name="otherProviders">
