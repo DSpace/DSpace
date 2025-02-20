@@ -10,6 +10,10 @@ package org.dspace.util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.Year;
+import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -67,8 +71,33 @@ public class MultiFormatDateParser {
                 continue;
             }
 
-            rules.add(new Rule(pattern, format));
+            // Determine the granularity of this date rule. Does it represent a year, month, day or a date/time?
+            Rule.DateGranularity granularity = getGranularity(rule.getValue());
+            rules.add(new Rule(pattern, format, granularity));
         }
+    }
+
+    /**
+     * Determine the granularity of a date pattern (e.g. YYYY-MM-DD is a "day", but YYYY-MM is a "month")
+     * @param datePattern string date pattern.
+     * @return DateGranularity value
+     */
+    private static Rule.DateGranularity getGranularity(String datePattern) {
+        Rule.DateGranularity granularity;
+        // If the rule contains "HH" symbol (represents Hour) then it is a date/time.
+        if (datePattern.contains("HH")) {
+            granularity = Rule.DateGranularity.TIME;
+        // Else if it contains a "dd" symbol (represents day of month) then it is a date (without a time).
+        } else if (datePattern.contains("dd")) {
+            granularity = Rule.DateGranularity.DAY;
+        // Else if it contains a "MM" system (represents month), then it is a month of the year.
+        } else if (datePattern.contains("MM")) {
+            granularity = Rule.DateGranularity.MONTH;
+        // At this point, we have to assume it's just a year. It has no month or day or hour.
+        } else {
+            granularity = Rule.DateGranularity.YEAR;
+        }
+        return granularity;
     }
 
     /**
@@ -81,10 +110,30 @@ public class MultiFormatDateParser {
     static public ZonedDateTime parse(String dateString) {
         for (Rule candidate : rules) {
             if (candidate.pattern.matcher(dateString).matches()) {
-                ZonedDateTime result;
+                ZonedDateTime result = null;
                 try {
-                    synchronized (candidate.format) {
-                        result = ZonedDateTime.parse(dateString, candidate.format);
+                    // Based on the granularity of this date, we need to use different java.time.* classes to parse it.
+                    switch (candidate.granularity) {
+                        case TIME:
+                            result = ZonedDateTime.parse(dateString, candidate.format);
+                            break;
+                        case DAY:
+                            // Assume start of day (in UTC time zone)
+                            result = LocalDate.parse(dateString, candidate.format)
+                                              .atStartOfDay(ZoneOffset.UTC);
+                            break;
+                        case MONTH:
+                            // Assume start of first day of month (in UTC timezone)
+                            result = YearMonth.parse(dateString, candidate.format)
+                                              .atDay(1).atStartOfDay(ZoneOffset.UTC);
+                            break;
+                        case YEAR:
+                            result = Year.parse(dateString, candidate.format)
+                                         .atMonth(1).atDay(1).atStartOfDay(ZoneOffset.UTC);
+                            break;
+                        default:
+                            // Should not occur. If it does, this will be caught & logged by the catch() below.
+                            throw new DateTimeException("Could not find a valid parser for this matched pattern.");
                     }
                 } catch (DateTimeParseException ex) {
                     log.info("Date string '{}' matched pattern '{}' but did not parse:  {}",
@@ -146,12 +195,15 @@ public class MultiFormatDateParser {
      * Holder for a pair:  compiled regex, compiled DateTimeFormatter.
      */
     private static class Rule {
+        enum DateGranularity { YEAR, MONTH, DAY, TIME }
         final Pattern pattern;
         final DateTimeFormatter format;
+        final DateGranularity granularity;
 
-        public Rule(Pattern pattern, DateTimeFormatter format) {
+        public Rule(Pattern pattern, DateTimeFormatter format, DateGranularity granularity) {
             this.pattern = pattern;
             this.format = format;
+            this.granularity = granularity;
         }
     }
 }
