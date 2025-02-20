@@ -125,7 +125,12 @@ public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetad
         Map<String, String> uriParams = new HashMap<>();
         params.put(LiveImportClientImpl.URI_PARAMETERS, uriParams);
         try {
-            uriParams.put("search", query);
+            if (query.contains("filter=authorships.author.id")) {
+                query = query.replace("filter=", "");
+                uriParams.put("filter", query);
+            } else {
+                uriParams.put("search", query);
+            }
             String resp = liveImportClient.executeHttpGetRequest(timeout, this.url, params);
             if (StringUtils.isEmpty(resp)) {
                 log.error("Got an empty response from LiveImportClient for query: {}", query);
@@ -169,7 +174,12 @@ public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetad
         params.put(LiveImportClientImpl.URI_PARAMETERS, uriParams);
 
         try {
-            uriParams.put("search", query);
+            if (query.contains("filter=authorships.author.id")) {
+                query = query.replace("filter=", "");
+                uriParams.put("filter", query);
+            } else {
+                uriParams.put("search", query);
+            }
             if (page != null) {
                 uriParams.put("page", String.valueOf(page + 1));
             }
