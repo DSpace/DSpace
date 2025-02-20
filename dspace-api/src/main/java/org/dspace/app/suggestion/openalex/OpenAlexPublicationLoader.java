@@ -40,6 +40,7 @@ public class OpenAlexPublicationLoader extends PublicationLoader {
         return names.stream()
                     .map(name -> itemService.getMetadata(researcher, name))
                     .filter(Objects::nonNull)
+                    .map(i -> "search_by_author=" + i)
                     .collect(Collectors.toList());
     }
 
