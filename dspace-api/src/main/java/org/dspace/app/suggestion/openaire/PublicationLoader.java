@@ -13,7 +13,6 @@ import static org.dspace.app.suggestion.SuggestionUtils.getFirstEntryByMetadatum
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -105,14 +104,14 @@ public class PublicationLoader extends SolrSuggestionProvider {
      * @throws IOException
      */
     @Override
-    public void importRecords(Context context, Item researcher, String additionalQuery)
+    public void importRecords(Context context, Item researcher)
         throws Exception {
         int offset = 0;
         int limit = 10;
         int loaded = limit;
         List<String> searchValues = searchMetadataValues(researcher);
         while (loaded > 0) {
-            List<ExternalDataObject> metadata = getImportRecords(searchValues, offset, limit, additionalQuery);
+            List<ExternalDataObject> metadata = getImportRecords(searchValues, researcher, offset, limit);
             if (metadata.isEmpty()) {
                 loaded = 0;
                 continue;
@@ -169,18 +168,13 @@ public class PublicationLoader extends SolrSuggestionProvider {
      * 
      * @see org.dspace.importer.external.openaire.service.OpenAireImportMetadataSourceServiceImpl
      * @param searchValues query
+     * @param researcher item to extract metadata from
      * @param limit for pagination purpose
      * @param offset for pagination purpose
      * @return list of ImportRecord
      */
     private List<ExternalDataObject> getImportRecords(List<String> searchValues,
-                                                      int offset, int limit, String additionalQuery) {
-
-        if (StringUtils.isNotBlank(additionalQuery)) {
-            searchValues = searchValues.stream()
-                                       .map(value -> StringUtils.join(new String[] {value, additionalQuery}, " "))
-                                       .collect(Collectors.toList());
-        }
+                                                      Item researcher, int offset, int limit) {
         List<ExternalDataObject> matchingRecords = new ArrayList<>();
         for (String searchValue : searchValues) {
             matchingRecords.addAll(
@@ -258,11 +252,6 @@ public class PublicationLoader extends SolrSuggestionProvider {
         } else {
             return false;
         }
-    }
-
-    @Override
-    public void importRecords(Context context, String query) throws Exception {
-        throw new UnsupportedOperationException("This operation is not supported by OAIRE loader");
     }
 
 }
