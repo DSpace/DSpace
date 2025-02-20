@@ -38,7 +38,7 @@ public class OrcidHistoryRest extends BaseObjectRest<Integer> {
 
     private String responseMessage;
 
-    public OrcidHistoryRest(){}
+    public OrcidHistoryRest() {}
 
     @Override
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)

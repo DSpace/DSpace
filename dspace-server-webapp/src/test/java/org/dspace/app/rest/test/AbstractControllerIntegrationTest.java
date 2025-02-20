@@ -39,7 +39,6 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -75,9 +74,6 @@ import org.springframework.web.context.WebApplicationContext;
 @WebAppConfiguration
 // Load our src/test/resources/application-test.properties to override some settings in default application.properties
 @TestPropertySource(locations = "classpath:application-test.properties")
-// Enable our custom Logging listener to log when each test method starts/stops
-@TestExecutionListeners(listeners = {LoggingTestExecutionListener.class},
-    mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWithDatabase {
 
     protected static final String AUTHORIZATION_HEADER = "Authorization";

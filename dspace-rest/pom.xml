@@ -3,7 +3,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-rest</artifactId>
     <packaging>war</packaging>
-    <version>7.6.3-SNAPSHOT</version>
+    <version>7.6.4-SNAPSHOT</version>
     <name>DSpace (Deprecated) REST Webapp</name>
     <description>DSpace RESTful Web Services API. NOTE: this REST API is DEPRECATED.
         Please consider using the REST API in the dspace-server-webapp instead!</description>
@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>7.6.3-SNAPSHOT</version>
+        <version>7.6.4-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -175,7 +175,7 @@
         <dependency>
             <groupId>org.atteo</groupId>
             <artifactId>evo-inflector</artifactId>
-            <version>1.2.1</version>
+            <version>1.3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
@@ -185,10 +185,6 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
         </dependency>
-	<dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-web</artifactId>
-	</dependency>
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-services</artifactId>

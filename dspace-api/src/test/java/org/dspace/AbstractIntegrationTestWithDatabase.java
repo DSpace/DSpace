@@ -17,8 +17,8 @@ import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.app.scripts.handler.impl.TestDSpaceRunnableHandler;
 import org.dspace.authority.AuthoritySearchService;
 import org.dspace.authority.MockAuthoritySolrServiceImpl;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.AbstractBuilder;
+import org.dspace.builder.EPersonBuilder;
 import org.dspace.content.Community;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
@@ -114,19 +114,16 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
             eperson = ePersonService.findByEmail(context, "test@email.com");
             if (eperson == null) {
-                // This EPerson creation should only happen once (i.e. for first test run)
-                log.info("Creating initial EPerson (email=test@email.com) for Unit Tests");
-                eperson = ePersonService.create(context);
-                eperson.setFirstName(context, "first");
-                eperson.setLastName(context, "last");
-                eperson.setEmail("test@email.com");
-                eperson.setCanLogIn(true);
-                eperson.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
-                ePersonService.setPassword(eperson, password);
-                // actually save the eperson to unit testing DB
-                ePersonService.update(context, eperson);
+                // Create test EPerson for usage in all tests
+                log.info("Creating Test EPerson (email=test@email.com) for Integration Tests");
+                eperson = EPersonBuilder.createEPerson(context)
+                                        .withNameInMetadata("first", "last")
+                                        .withEmail("test@email.com")
+                                        .withCanLogin(true)
+                                        .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                                        .withPassword(password)
+                                        .build();
             }
-
             // Set our global test EPerson as the current user in DSpace
             context.setCurrentUser(eperson);
 
@@ -135,26 +132,23 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
 
             admin = ePersonService.findByEmail(context, "admin@email.com");
             if (admin == null) {
-                // This EPerson creation should only happen once (i.e. for first test run)
-                log.info("Creating initial EPerson (email=admin@email.com) for Unit Tests");
-                admin = ePersonService.create(context);
-                admin.setFirstName(context, "first (admin)");
-                admin.setLastName(context, "last (admin)");
-                admin.setEmail("admin@email.com");
-                admin.setCanLogIn(true);
-                admin.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
-                ePersonService.setPassword(admin, password);
-                // actually save the eperson to unit testing DB
-                ePersonService.update(context, admin);
+                // Create test Administrator for usage in all tests
+                log.info("Creating Test Admin EPerson (email=admin@email.com) for Integration Tests");
+                admin = EPersonBuilder.createEPerson(context)
+                                      .withNameInMetadata("first (admin)", "last (admin)")
+                                      .withEmail("admin@email.com")
+                                      .withCanLogin(true)
+                                      .withLanguage(I18nUtil.getDefaultLocale().getLanguage())
+                                      .withPassword(password)
+                                      .build();
+
+                // Add Test Administrator to the ADMIN group in test database
                 GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
                 Group adminGroup = groupService.findByName(context, Group.ADMIN);
                 groupService.addMember(context, adminGroup, admin);
             }
 
             context.restoreAuthSystemState();
-        } catch (AuthorizeException ex) {
-            log.error("Error creating initial eperson or default groups", ex);
-            fail("Error creating initial eperson or default groups in AbstractUnitTest init()");
         } catch (SQLException ex) {
             log.error(ex.getMessage(), ex);
             fail("SQL Error on AbstractUnitTest init()");
