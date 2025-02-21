@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.discovery;
 
 import java.sql.SQLException;
@@ -17,7 +24,7 @@ import org.dspace.discovery.indexobject.IndexableItem;
 /**
  * This plugin enables the indexing of access status for the item as a filter
  * and keyword
- * @author pgraca
+ * @author paulo-graca
  *
  */
 public class SolrServiceIndexAccessStatusPlugin implements SolrServiceIndexPlugin {
