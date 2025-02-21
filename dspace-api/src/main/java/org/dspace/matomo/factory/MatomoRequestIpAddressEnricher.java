@@ -8,8 +8,6 @@
 package org.dspace.matomo.factory;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.dspace.matomo.model.MatomoRequestDetails;
 import org.dspace.service.ClientInfoService;
 import org.dspace.usage.UsageEvent;
@@ -22,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  **/
 public class MatomoRequestIpAddressEnricher implements MatomoRequestDetailsEnricher {
 
-    private static final Logger log = LogManager.getLogger(MatomoRequestIpAddressEnricher.class);
     private final ClientInfoService clientInfoService;
 
     public MatomoRequestIpAddressEnricher(@Autowired ClientInfoService clientInfoService) {

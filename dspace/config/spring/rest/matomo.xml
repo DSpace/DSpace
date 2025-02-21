@@ -16,6 +16,7 @@
                 <bean id="downloadEnricher" class="org.dspace.matomo.factory.MatomoRequestDetailsEnricherFactory" factory-method="downloadEnricher"/>
                 <bean id="ipEnricher" class="org.dspace.matomo.factory.MatomoRequestIpAddressEnricher"/>
                 <bean id="requestCountryEnricher" class="org.dspace.matomo.factory.MatomoRequestCountryEnricher"/>
+                <bean id="cookieIdEnricher" class="org.dspace.matomo.factory.MatomoRequestCookieIdentifierEnricher"/>
             </list>
         </constructor-arg>
         <constructor-arg name="siteId" value="${matomo.request.siteid:}"/>

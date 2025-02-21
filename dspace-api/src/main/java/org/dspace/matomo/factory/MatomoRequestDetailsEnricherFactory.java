@@ -27,17 +27,6 @@ import org.dspace.usage.UsageEvent;
  **/
 public class MatomoRequestDetailsEnricherFactory {
 
-/*
-    // Matomo Custom Variable for OAI-PMH ID tracking
-    Gson gson = new Gson();
-    Map<String, String[]> jsonMatomoCustomVars = new HashMap<>();
-    String[] oaipmhID =
-        new String[]{"oaipmhID", "oai:" + dspaceHostName + ":" + item.getHandle()};
-        jsonMatomoCustomVars.put("1", oaipmhID);
-        builder.addParameter("cvar", gson.toJson(jsonMatomoCustomVars));
-*/
-
-
     private MatomoRequestDetailsEnricherFactory() {}
 
     private static final Logger log = LogManager.getLogger(MatomoRequestDetailsEnricherFactory.class);
