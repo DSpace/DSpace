@@ -1235,6 +1235,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
             SearchFilterMatcher.hasFileNameInOriginalBundleFilter(),
             SearchFilterMatcher.hasFileDescriptionInOriginalBundleFilter(),
             SearchFilterMatcher.entityTypeFilter(),
+            SearchFilterMatcher.accessStatusFilter(),
             SearchFilterMatcher.isAuthorOfPublicationRelation(),
             SearchFilterMatcher.isProjectOfPublicationRelation(),
             SearchFilterMatcher.isOrgUnitOfPublicationRelation(),
