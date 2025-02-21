@@ -7,10 +7,6 @@
  */
 package org.dspace.app.suggestion.openalex;
 
-/**
- * @author Adamo Fapohunda (adamo.fapohunda at 4science.com)
- **/
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -26,12 +22,12 @@ import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.class)
+/**
+ * @author Adamo Fapohunda (adamo.fapohunda at 4science.com)
+ **/
 public class OpenAlexPublicationLoaderTest {
 
     private OpenAlexPublicationLoader loader;
@@ -65,8 +61,8 @@ public class OpenAlexPublicationLoaderTest {
     @Test
     public void testSearchMetadataValues_WithDcIdentifierOther_ReturnsFilterQuery() {
 
-        loader.setNames(Arrays.asList("dc.identifier.other", "dc.contributor.author"));
-        when(itemService.getMetadata(researcher, "dc.identifier.other")).thenReturn("ID123");
+        loader.setNames(Arrays.asList("dc.identifier", "dc.contributor.author"));
+        when(itemService.getMetadata(researcher, "dc.identifier")).thenReturn("ID123");
 
         // When
         List<String> result = loader.searchMetadataValues(researcher);
@@ -95,8 +91,8 @@ public class OpenAlexPublicationLoaderTest {
     @Test
     public void testSearchMetadataValues_MixedNullValues_IgnoresNulls() {
 
-        loader.setNames(Arrays.asList("dc.identifier.other", "dc.contributor.author", "dc.title"));
-        when(itemService.getMetadata(researcher, "dc.identifier.other")).thenReturn(null);
+        loader.setNames(Arrays.asList("dc.identifier", "dc.contributor.author", "dc.title"));
+        when(itemService.getMetadata(researcher, "dc.identifier")).thenReturn(null);
         when(itemService.getMetadata(researcher, "dc.contributor.author")).thenReturn("Author Name");
         when(itemService.getMetadata(researcher, "dc.title")).thenReturn("Title");
 
