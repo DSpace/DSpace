@@ -102,4 +102,10 @@
        <property name="dspaceRunnableClass" value="org.dspace.app.suggestion.openaire.PublicationLoaderRunnableCli"/>
     </bean>
 
+    <bean id="import-loader-suggestions"
+          class="org.dspace.app.suggestion.script.PublicationLoaderCliScriptConfiguration">
+        <property name="description" value="Imports suggestions from external providers for publication claim"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.suggestion.runnable.PublicationLoaderRunnableCli"/>
+    </bean>
+
 </beans>
