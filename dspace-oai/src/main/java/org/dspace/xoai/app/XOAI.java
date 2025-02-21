@@ -167,7 +167,8 @@ public class XOAI {
                     System.out.println("There are no indexed documents, using full import.");
                     result = this.indexAll();
                 } else {
-                    result = this.index(Instant.parse((String) results.get(0).getFieldValue("item.lastmodified")));
+                    result = this.index(((java.util.Date) results.get(0).getFieldValue("item.lastmodified"))
+                                            .toInstant());
                 }
 
             }

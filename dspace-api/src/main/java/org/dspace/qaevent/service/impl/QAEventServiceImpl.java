@@ -593,7 +593,7 @@ public class QAEventServiceImpl implements QAEventService {
         doc.addField(TOPIC, dto.getTopic());
         doc.addField(TRUST, dto.getTrust());
         doc.addField(MESSAGE, dto.getMessage());
-        doc.addField(LAST_UPDATE, Instant.now());
+        doc.addField(LAST_UPDATE, Instant.now().toString());
         String resourceUUID = getResourceUUID(context, dto.getOriginalId());
         if (resourceUUID == null) {
             resourceUUID = dto.getTarget();
@@ -635,7 +635,7 @@ public class QAEventServiceImpl implements QAEventService {
         QAEvent item = new QAEvent();
         item.setSource((String) doc.get(SOURCE));
         item.setEventId((String) doc.get(EVENT_ID));
-        item.setLastUpdate(Instant.parse((String) doc.get(LAST_UPDATE)));
+        item.setLastUpdate(((java.util.Date) doc.get(LAST_UPDATE)).toInstant());
         item.setMessage((String) doc.get(MESSAGE));
         item.setOriginalId((String) doc.get(ORIGINAL_ID));
         item.setTarget((String) doc.get(RESOURCE_UUID));

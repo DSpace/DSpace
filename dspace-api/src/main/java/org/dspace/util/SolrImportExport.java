@@ -537,7 +537,7 @@ public class SolrImportExport {
                 solrUrl, indexName, timeField, fromWhen));
             return;
         }
-        Instant earliestTimestamp = Instant.parse((String) timeFieldInfo.getMin());
+        Instant earliestTimestamp = ((java.util.Date) timeFieldInfo.getMin()).toInstant();
 
         query.setGetFieldStatistics(false);
         query.clearSorts();
