@@ -172,8 +172,8 @@ public class AuthorityValue {
         this.field = String.valueOf(document.getFieldValue("field"));
         this.value = String.valueOf(document.getFieldValue("value"));
         this.deleted = (Boolean) document.getFieldValue("deleted");
-        this.creationDate = Instant.parse((String) document.getFieldValue("creation_date"));
-        this.lastModified = Instant.parse((String) document.getFieldValue("last_modified_date"));
+        this.creationDate = ((java.util.Date) document.getFieldValue("creation_date")).toInstant();
+        this.lastModified = ((java.util.Date) document.getFieldValue("last_modified_date")).toInstant();
     }
 
     /**

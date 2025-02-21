@@ -36,7 +36,7 @@ public class DSpaceSolrItem extends DSpaceItem {
         log.debug("Creating OAI Item from Solr source");
         unparsedMD = (String) doc.getFieldValue("item.compile");
         handle = (String) doc.getFieldValue("item.handle");
-        lastMod = Instant.parse((String) doc.getFieldValue("item.lastmodified"));
+        lastMod = ((java.util.Date) doc.getFieldValue("item.lastmodified")).toInstant();
         sets = new ArrayList<>();
 
         Collection<Object> fieldValues;

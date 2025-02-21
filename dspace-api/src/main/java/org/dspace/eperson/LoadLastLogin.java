@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Properties;
@@ -135,12 +137,12 @@ public class LoadLastLogin {
                 String logDateTime = date + ' ' + time;
                 Instant stamp;
                 try {
-                    stamp = dateEncoder.parse(logDateTime, Instant::from);
+                    stamp = LocalDateTime.parse(logDateTime, dateEncoder).atZone(ZoneOffset.UTC).toInstant();
                 } catch (DateTimeParseException ex) {
                     System.err.println("Skipping log record:  " + ex.getMessage());
                     continue;
                 }
-                Instant previous = Instant.parse((String) stampDb.find(user));
+                Instant previous = ((java.util.Date) stampDb.find(user)).toInstant();
                 if (null == previous || stamp.isAfter(previous)) {
                     stampDb.insert(user, stamp, true); // Record this user's newest login so far
                 }
@@ -159,7 +161,7 @@ public class LoadLastLogin {
         while (walker.getNext(stamp)) {
             // Update an EPerson's last login
             String name = (String) stamp.getKey();
-            Instant date = Instant.parse((String) stamp.getValue());
+            Instant date = ((java.util.Date) stamp.getValue()).toInstant();
             EPerson ePerson;
             ePerson = ePersonService.findByEmail(ctx, name);
             if (null == ePerson) {

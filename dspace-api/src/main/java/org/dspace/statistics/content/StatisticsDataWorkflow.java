@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneOffset;
@@ -197,8 +196,8 @@ public class StatisticsDataWorkflow extends StatisticsData {
                 .query(getQuery(), null, null, 1, 0, null, null, null, null, "time", true, facetMinCount);
             if (0 < oldestRecord.getResults().getNumFound()) {
                 SolrDocument solrDocument = oldestRecord.getResults().get(0);
-                ZonedDateTime oldestDate = Instant.parse((String) solrDocument.getFieldValue("time"))
-                                                  .atZone(ZoneOffset.UTC);
+                ZonedDateTime oldestDate = ((java.util.Date) solrDocument.getFieldValue("time"))
+                    .toInstant().atZone(ZoneOffset.UTC);
                 //Store the date, we only need to retrieve this once !
                 try {
                     // Also store it in the solr-statics configuration file, the reason for this being that the sort
