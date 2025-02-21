@@ -341,6 +341,21 @@
                 </field>
             </row>
             <row>
+                <relation-field>
+                    <relationship-type>isDatasetOfPublication</relationship-type>
+                    <search-configuration>dataset</search-configuration>
+                    <repeatable>true</repeatable>
+                    <label>Research Data</label>
+                    <hint>Enter the datasets this publication is based on.</hint>
+                    <linked-metadata-field>
+                        <dc-schema>dc</dc-schema>
+                        <dc-element>relation</dc-element>
+                        <dc-qualifier>isBasedOn</dc-qualifier>
+                        <input-type>onebox</input-type>
+                    </linked-metadata-field>
+                </relation-field>
+            </row>
+            <row>
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>identifier</dc-element>
@@ -817,6 +832,117 @@
                 </field>
             </row>
 
+        </form>
+
+        <!-- Form which defines the *first* metadata page/section for depositing Dataset Entities.-->
+        <form name="datasetStep">
+            <row>
+                <relation-field>
+                    <relationship-type>isAuthorOfDataset</relationship-type>
+                    <search-configuration>person</search-configuration>
+                    <repeatable>true</repeatable>
+                    <label>Author</label>
+                    <hint>Enter the author's name (Family name, Given names).</hint>
+                    <linked-metadata-field>
+                        <dc-schema>dc</dc-schema>
+                        <dc-element>contributor</dc-element>
+                        <dc-qualifier>author</dc-qualifier>
+                        <input-type>onebox</input-type>
+                    </linked-metadata-field>
+                    <externalsources>orcid</externalsources>
+                </relation-field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <repeatable>false</repeatable>
+                    <label>Title</label>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the main title of the item.</hint>
+                    <required>You must enter a main title for this item.</required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier>alternative</dc-qualifier>
+                    <language value-pairs-name="common_iso_languages">true</language>
+                    <repeatable>true</repeatable>
+                    <label>Other Titles</label>
+                    <input-type>onebox</input-type>
+                    <hint>If the item has any alternative titles, please enter them here.</hint>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>date</dc-element>
+                    <dc-qualifier>issued</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Date of Issue</label>
+                    <style>col-sm-4</style>
+                    <input-type>date</input-type>
+                    <hint>Please give the date of previous publication or public distribution.
+                        You can leave out the day and/or month if they aren't applicable.
+                    </hint>
+                    <required>You must enter at least the year.</required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <repeatable>false</repeatable>
+                    <label>Publisher</label>
+                    <style>col-sm-8</style>
+                    <input-type>onebox</input-type>
+                    <hint>Enter the name of the publisher of the previously issued instance of this item.</hint>
+                </field>
+            </row>
+            <row>
+                <relation-field>
+                    <relationship-type>isPublicationOfDataset</relationship-type>
+                    <search-configuration>publication</search-configuration>
+                    <repeatable>true</repeatable>
+                    <label>Publications</label>
+                    <hint>Enter the publications referencing this dataset.</hint>
+                    <linked-metadata-field>
+                        <dc-schema>dc</dc-schema>
+                        <dc-element>relation</dc-element>
+                        <dc-qualifier>isReferencedBy</dc-qualifier>
+                        <input-type>onebox</input-type>
+                    </linked-metadata-field>
+                    <externalsources>pubmed</externalsources>
+                </relation-field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <repeatable>true</repeatable>
+                    <label>Type</label>
+                    <input-type value-pairs-name="common_types">dropdown</input-type>
+                    <hint>Select the type(s) of content of the item. To select more than one value in the list, you may
+                        have to hold down the "CTRL" or "Shift" key.
+                    </hint>
+                    <required>You must choose at least one type.</required>
+                </field>
+            </row>
+            <row>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>language</dc-element>
+                    <dc-qualifier>iso</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>Language</label>
+                    <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
+                    <hint>Select the language of the main content of the dataset. If the language does not appear in the
+                        list, please select 'Other'. If the content does not really have a language (for example, if it
+                        is a dataset or an image) please select 'N/A'.
+                    </hint>
+                </field>
+            </row>
         </form>
 
         <!-- Openaire specific forms -->
