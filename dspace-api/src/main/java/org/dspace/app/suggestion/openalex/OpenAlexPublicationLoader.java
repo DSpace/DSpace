@@ -16,18 +16,30 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.suggestion.loader.PublicationLoader;
 import org.dspace.content.Item;
 
+
 /**
+ * Implementation of {@link PublicationLoader} that retrieves metadata values
+ * from an OpenAlex external source.
+ *
  * @author Adamo Fapohunda (adamo.fapohunda at 4science.com)
  **/
 public class OpenAlexPublicationLoader extends PublicationLoader {
 
+    /**
+     * Searches for metadata values related to a given researcher item.
+     * It first checks for "dc.identifier" metadata and builds the filter accordingly.
+     * If not found, it collects available metadata values to be used in the search query.
+     *
+     * @param researcher The researcher item from which metadata values are extracted.
+     * @return A list of search query parameters for OpenAlex.
+     */
     @Override
     public List<String> searchMetadataValues(Item researcher) {
         List<String> names = getNames();
 
-        // First, check for "dc.identifier.other" and build the filter if present
+        // First, check for "dc.identifier" and build the filter if present
         List<String> authorIds = names.stream()
-                                      .filter("dc.identifier.other"::equals)
+                                      .filter("dc.identifier"::equals)
                                       .map(name -> itemService.getMetadata(researcher, name))
                                       .filter(Objects::nonNull)
                                       .collect(Collectors.toList());
