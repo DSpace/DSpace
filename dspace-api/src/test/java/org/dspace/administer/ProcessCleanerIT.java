@@ -7,7 +7,6 @@
  */
 package org.dspace.administer;
 
-import static org.apache.commons.lang.time.DateUtils.addDays;
 import static org.dspace.content.ProcessStatus.COMPLETED;
 import static org.dspace.content.ProcessStatus.FAILED;
 import static org.dspace.content.ProcessStatus.RUNNING;
@@ -19,7 +18,8 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.dspace.AbstractIntegrationTestWithDatabase;
@@ -49,9 +49,9 @@ public class ProcessCleanerIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void testWithoutProcessToDelete() throws Exception {
 
-        Process process_1 = buildProcess(COMPLETED, addDays(new Date(), -2));
-        Process process_2 = buildProcess(RUNNING, addDays(new Date(), -1));
-        Process process_3 = buildProcess(FAILED, addDays(new Date(), -3));
+        Process process_1 = buildProcess(COMPLETED, Instant.now().minus(2, ChronoUnit.DAYS));
+        Process process_2 = buildProcess(RUNNING, Instant.now().minus(1, ChronoUnit.DAYS));
+        Process process_3 = buildProcess(FAILED, Instant.now().minus(3, ChronoUnit.DAYS));
 
         configurationService.setProperty("process-cleaner.days", 5);
 
@@ -78,13 +78,13 @@ public class ProcessCleanerIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void testWithoutSpecifiedStatus() throws Exception {
 
-        Process process_1 = buildProcess(COMPLETED, addDays(new Date(), -2));
-        Process process_2 = buildProcess(RUNNING, addDays(new Date(), -1));
-        Process process_3 = buildProcess(FAILED, addDays(new Date(), -3));
-        Process process_4 = buildProcess(COMPLETED, addDays(new Date(), -6));
-        Process process_5 = buildProcess(COMPLETED, addDays(new Date(), -8));
-        Process process_6 = buildProcess(RUNNING, addDays(new Date(), -7));
-        Process process_7 = buildProcess(FAILED, addDays(new Date(), -8));
+        Process process_1 = buildProcess(COMPLETED, Instant.now().minus(2, ChronoUnit.DAYS));
+        Process process_2 = buildProcess(RUNNING, Instant.now().minus(1, ChronoUnit.DAYS));
+        Process process_3 = buildProcess(FAILED, Instant.now().minus(3, ChronoUnit.DAYS));
+        Process process_4 = buildProcess(COMPLETED, Instant.now().minus(6, ChronoUnit.DAYS));
+        Process process_5 = buildProcess(COMPLETED, Instant.now().minus(8, ChronoUnit.DAYS));
+        Process process_6 = buildProcess(RUNNING, Instant.now().minus(7, ChronoUnit.DAYS));
+        Process process_7 = buildProcess(FAILED, Instant.now().minus(8, ChronoUnit.DAYS));
 
         configurationService.setProperty("process-cleaner.days", 5);
 
@@ -115,13 +115,13 @@ public class ProcessCleanerIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void testWithCompletedStatus() throws Exception {
 
-        Process process_1 = buildProcess(COMPLETED, addDays(new Date(), -2));
-        Process process_2 = buildProcess(RUNNING, addDays(new Date(), -1));
-        Process process_3 = buildProcess(FAILED, addDays(new Date(), -3));
-        Process process_4 = buildProcess(COMPLETED, addDays(new Date(), -6));
-        Process process_5 = buildProcess(COMPLETED, addDays(new Date(), -8));
-        Process process_6 = buildProcess(RUNNING, addDays(new Date(), -7));
-        Process process_7 = buildProcess(FAILED, addDays(new Date(), -8));
+        Process process_1 = buildProcess(COMPLETED, Instant.now().minus(2, ChronoUnit.DAYS));
+        Process process_2 = buildProcess(RUNNING, Instant.now().minus(1, ChronoUnit.DAYS));
+        Process process_3 = buildProcess(FAILED, Instant.now().minus(3, ChronoUnit.DAYS));
+        Process process_4 = buildProcess(COMPLETED, Instant.now().minus(6, ChronoUnit.DAYS));
+        Process process_5 = buildProcess(COMPLETED, Instant.now().minus(8, ChronoUnit.DAYS));
+        Process process_6 = buildProcess(RUNNING, Instant.now().minus(7, ChronoUnit.DAYS));
+        Process process_7 = buildProcess(FAILED, Instant.now().minus(8, ChronoUnit.DAYS));
 
         configurationService.setProperty("process-cleaner.days", 5);
 
@@ -152,14 +152,14 @@ public class ProcessCleanerIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void testWithRunningStatus() throws Exception {
 
-        Process process_1 = buildProcess(COMPLETED, addDays(new Date(), -2));
-        Process process_2 = buildProcess(RUNNING, addDays(new Date(), -1));
-        Process process_3 = buildProcess(FAILED, addDays(new Date(), -3));
-        Process process_4 = buildProcess(COMPLETED, addDays(new Date(), -6));
-        Process process_5 = buildProcess(COMPLETED, addDays(new Date(), -8));
-        Process process_6 = buildProcess(RUNNING, addDays(new Date(), -7));
-        Process process_7 = buildProcess(FAILED, addDays(new Date(), -8));
-        Process process_8 = buildProcess(RUNNING, addDays(new Date(), -9));
+        Process process_1 = buildProcess(COMPLETED, Instant.now().minus(2, ChronoUnit.DAYS));
+        Process process_2 = buildProcess(RUNNING, Instant.now().minus(1, ChronoUnit.DAYS));
+        Process process_3 = buildProcess(FAILED, Instant.now().minus(3, ChronoUnit.DAYS));
+        Process process_4 = buildProcess(COMPLETED, Instant.now().minus(6, ChronoUnit.DAYS));
+        Process process_5 = buildProcess(COMPLETED, Instant.now().minus(8, ChronoUnit.DAYS));
+        Process process_6 = buildProcess(RUNNING, Instant.now().minus(7, ChronoUnit.DAYS));
+        Process process_7 = buildProcess(FAILED, Instant.now().minus(8, ChronoUnit.DAYS));
+        Process process_8 = buildProcess(RUNNING, Instant.now().minus(9, ChronoUnit.DAYS));
 
         configurationService.setProperty("process-cleaner.days", 5);
 
@@ -191,14 +191,14 @@ public class ProcessCleanerIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void testWithFailedStatus() throws Exception {
 
-        Process process_1 = buildProcess(COMPLETED, addDays(new Date(), -2));
-        Process process_2 = buildProcess(RUNNING, addDays(new Date(), -1));
-        Process process_3 = buildProcess(FAILED, addDays(new Date(), -3));
-        Process process_4 = buildProcess(COMPLETED, addDays(new Date(), -6));
-        Process process_5 = buildProcess(COMPLETED, addDays(new Date(), -8));
-        Process process_6 = buildProcess(RUNNING, addDays(new Date(), -7));
-        Process process_7 = buildProcess(FAILED, addDays(new Date(), -8));
-        Process process_8 = buildProcess(FAILED, addDays(new Date(), -9));
+        Process process_1 = buildProcess(COMPLETED, Instant.now().minus(2, ChronoUnit.DAYS));
+        Process process_2 = buildProcess(RUNNING, Instant.now().minus(1, ChronoUnit.DAYS));
+        Process process_3 = buildProcess(FAILED, Instant.now().minus(3, ChronoUnit.DAYS));
+        Process process_4 = buildProcess(COMPLETED, Instant.now().minus(6, ChronoUnit.DAYS));
+        Process process_5 = buildProcess(COMPLETED, Instant.now().minus(8, ChronoUnit.DAYS));
+        Process process_6 = buildProcess(RUNNING, Instant.now().minus(7, ChronoUnit.DAYS));
+        Process process_7 = buildProcess(FAILED, Instant.now().minus(8, ChronoUnit.DAYS));
+        Process process_8 = buildProcess(FAILED, Instant.now().minus(9, ChronoUnit.DAYS));
 
         configurationService.setProperty("process-cleaner.days", 5);
 
@@ -230,14 +230,14 @@ public class ProcessCleanerIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void testWithCompletedAndFailedStatus() throws Exception {
 
-        Process process_1 = buildProcess(COMPLETED, addDays(new Date(), -2));
-        Process process_2 = buildProcess(RUNNING, addDays(new Date(), -1));
-        Process process_3 = buildProcess(FAILED, addDays(new Date(), -3));
-        Process process_4 = buildProcess(COMPLETED, addDays(new Date(), -6));
-        Process process_5 = buildProcess(COMPLETED, addDays(new Date(), -8));
-        Process process_6 = buildProcess(RUNNING, addDays(new Date(), -7));
-        Process process_7 = buildProcess(FAILED, addDays(new Date(), -8));
-        Process process_8 = buildProcess(FAILED, addDays(new Date(), -9));
+        Process process_1 = buildProcess(COMPLETED, Instant.now().minus(2, ChronoUnit.DAYS));
+        Process process_2 = buildProcess(RUNNING, Instant.now().minus(1, ChronoUnit.DAYS));
+        Process process_3 = buildProcess(FAILED, Instant.now().minus(3, ChronoUnit.DAYS));
+        Process process_4 = buildProcess(COMPLETED, Instant.now().minus(6, ChronoUnit.DAYS));
+        Process process_5 = buildProcess(COMPLETED, Instant.now().minus(8, ChronoUnit.DAYS));
+        Process process_6 = buildProcess(RUNNING, Instant.now().minus(7, ChronoUnit.DAYS));
+        Process process_7 = buildProcess(FAILED, Instant.now().minus(8, ChronoUnit.DAYS));
+        Process process_8 = buildProcess(FAILED, Instant.now().minus(9, ChronoUnit.DAYS));
 
         configurationService.setProperty("process-cleaner.days", 5);
 
@@ -266,14 +266,14 @@ public class ProcessCleanerIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void testWithCompletedAndRunningStatus() throws Exception {
 
-        Process process_1 = buildProcess(COMPLETED, addDays(new Date(), -2));
-        Process process_2 = buildProcess(RUNNING, addDays(new Date(), -1));
-        Process process_3 = buildProcess(FAILED, addDays(new Date(), -3));
-        Process process_4 = buildProcess(COMPLETED, addDays(new Date(), -6));
-        Process process_5 = buildProcess(COMPLETED, addDays(new Date(), -8));
-        Process process_6 = buildProcess(RUNNING, addDays(new Date(), -7));
-        Process process_7 = buildProcess(FAILED, addDays(new Date(), -8));
-        Process process_8 = buildProcess(RUNNING, addDays(new Date(), -9));
+        Process process_1 = buildProcess(COMPLETED, Instant.now().minus(2, ChronoUnit.DAYS));
+        Process process_2 = buildProcess(RUNNING, Instant.now().minus(1, ChronoUnit.DAYS));
+        Process process_3 = buildProcess(FAILED, Instant.now().minus(3, ChronoUnit.DAYS));
+        Process process_4 = buildProcess(COMPLETED, Instant.now().minus(6, ChronoUnit.DAYS));
+        Process process_5 = buildProcess(COMPLETED, Instant.now().minus(8, ChronoUnit.DAYS));
+        Process process_6 = buildProcess(RUNNING, Instant.now().minus(7, ChronoUnit.DAYS));
+        Process process_7 = buildProcess(FAILED, Instant.now().minus(8, ChronoUnit.DAYS));
+        Process process_8 = buildProcess(RUNNING, Instant.now().minus(9, ChronoUnit.DAYS));
 
         configurationService.setProperty("process-cleaner.days", 5);
 
@@ -302,14 +302,14 @@ public class ProcessCleanerIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void testWithFailedAndRunningStatus() throws Exception {
 
-        Process process_1 = buildProcess(COMPLETED, addDays(new Date(), -2));
-        Process process_2 = buildProcess(RUNNING, addDays(new Date(), -1));
-        Process process_3 = buildProcess(FAILED, addDays(new Date(), -3));
-        Process process_4 = buildProcess(COMPLETED, addDays(new Date(), -6));
-        Process process_5 = buildProcess(COMPLETED, addDays(new Date(), -8));
-        Process process_6 = buildProcess(RUNNING, addDays(new Date(), -7));
-        Process process_7 = buildProcess(FAILED, addDays(new Date(), -8));
-        Process process_8 = buildProcess(RUNNING, addDays(new Date(), -9));
+        Process process_1 = buildProcess(COMPLETED, Instant.now().minus(2, ChronoUnit.DAYS));
+        Process process_2 = buildProcess(RUNNING, Instant.now().minus(1, ChronoUnit.DAYS));
+        Process process_3 = buildProcess(FAILED, Instant.now().minus(3, ChronoUnit.DAYS));
+        Process process_4 = buildProcess(COMPLETED, Instant.now().minus(6, ChronoUnit.DAYS));
+        Process process_5 = buildProcess(COMPLETED, Instant.now().minus(8, ChronoUnit.DAYS));
+        Process process_6 = buildProcess(RUNNING, Instant.now().minus(7, ChronoUnit.DAYS));
+        Process process_7 = buildProcess(FAILED, Instant.now().minus(8, ChronoUnit.DAYS));
+        Process process_8 = buildProcess(RUNNING, Instant.now().minus(9, ChronoUnit.DAYS));
 
         configurationService.setProperty("process-cleaner.days", 5);
 
@@ -338,14 +338,14 @@ public class ProcessCleanerIT extends AbstractIntegrationTestWithDatabase {
     @Test
     public void testWithCompletedFailedAndRunningStatus() throws Exception {
 
-        Process process_1 = buildProcess(COMPLETED, addDays(new Date(), -2));
-        Process process_2 = buildProcess(RUNNING, addDays(new Date(), -1));
-        Process process_3 = buildProcess(FAILED, addDays(new Date(), -3));
-        Process process_4 = buildProcess(COMPLETED, addDays(new Date(), -6));
-        Process process_5 = buildProcess(COMPLETED, addDays(new Date(), -8));
-        Process process_6 = buildProcess(RUNNING, addDays(new Date(), -7));
-        Process process_7 = buildProcess(FAILED, addDays(new Date(), -8));
-        Process process_8 = buildProcess(RUNNING, addDays(new Date(), -9));
+        Process process_1 = buildProcess(COMPLETED, Instant.now().minus(2, ChronoUnit.DAYS));
+        Process process_2 = buildProcess(RUNNING, Instant.now().minus(1, ChronoUnit.DAYS));
+        Process process_3 = buildProcess(FAILED, Instant.now().minus(3, ChronoUnit.DAYS));
+        Process process_4 = buildProcess(COMPLETED, Instant.now().minus(6, ChronoUnit.DAYS));
+        Process process_5 = buildProcess(COMPLETED, Instant.now().minus(8, ChronoUnit.DAYS));
+        Process process_6 = buildProcess(RUNNING, Instant.now().minus(7, ChronoUnit.DAYS));
+        Process process_7 = buildProcess(FAILED, Instant.now().minus(8, ChronoUnit.DAYS));
+        Process process_8 = buildProcess(RUNNING, Instant.now().minus(9, ChronoUnit.DAYS));
 
         configurationService.setProperty("process-cleaner.days", 5);
 
@@ -371,7 +371,7 @@ public class ProcessCleanerIT extends AbstractIntegrationTestWithDatabase {
 
     }
 
-    private Process buildProcess(ProcessStatus processStatus, Date creationTime) throws SQLException {
+    private Process buildProcess(ProcessStatus processStatus, Instant creationTime) throws SQLException {
         return ProcessBuilder.createProcess(context, admin, "test", List.of())
             .withProcessStatus(processStatus)
             .withCreationTime(creationTime)

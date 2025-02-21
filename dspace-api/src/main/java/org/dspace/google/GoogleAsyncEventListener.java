@@ -8,6 +8,7 @@
 package org.dspace.google;
 
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -265,7 +266,7 @@ public class GoogleAsyncEventListener extends AbstractUsageEventListener {
             GoogleAnalyticsEvent event = (GoogleAnalyticsEvent) iterator.next();
             eventsBuffer.remove(event);
 
-            if ((System.currentTimeMillis() - event.getTime()) < MAX_TIME_SINCE_EVENT) {
+            if ((Instant.now().toEpochMilli() - event.getTime()) < MAX_TIME_SINCE_EVENT) {
                 events.add(event);
             }
 

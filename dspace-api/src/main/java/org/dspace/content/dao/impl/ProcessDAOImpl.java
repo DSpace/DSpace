@@ -10,7 +10,7 @@ package org.dspace.content.dao.impl;
 import static org.dspace.scripts.Process_.CREATION_TIME;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -154,7 +154,7 @@ public class ProcessDAOImpl extends AbstractHibernateDAO<Process> implements Pro
 
     @Override
     public List<Process> findByStatusAndCreationTimeOlderThan(Context context, List<ProcessStatus> statuses,
-        Date date) throws SQLException {
+        Instant date) throws SQLException {
 
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery<Process> criteriaQuery = getCriteriaQuery(criteriaBuilder, Process.class);

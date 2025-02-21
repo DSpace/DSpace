@@ -7,7 +7,7 @@
  */
 package org.dspace.qaevent;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -25,7 +25,7 @@ public class QASource {
      */
     private UUID focus;
     private String name;
-    private Date lastEvent;
+    private Instant lastEvent;
     private long totalEvents;
 
     public String getName() {
@@ -44,11 +44,11 @@ public class QASource {
         this.totalEvents = totalEvents;
     }
 
-    public Date getLastEvent() {
+    public Instant getLastEvent() {
         return lastEvent;
     }
 
-    public void setLastEvent(Date lastEvent) {
+    public void setLastEvent(Instant lastEvent) {
         this.lastEvent = lastEvent;
     }
 

@@ -8,9 +8,9 @@
 package org.dspace.authenticate;
 
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -124,7 +124,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public void updateLastActiveDate(Context context) {
         EPerson me = context.getCurrentUser();
         if (me != null) {
-            me.setLastActive(new Date());
+            me.setLastActive(Instant.now());
             try {
                 ePersonService.update(context, me);
             } catch (SQLException ex) {

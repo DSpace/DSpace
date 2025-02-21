@@ -9,7 +9,7 @@
 package org.dspace.builder;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 
 import jakarta.validation.constraints.NotNull;
 import org.apache.logging.log4j.LogManager;
@@ -37,7 +37,7 @@ public class RequestItemBuilder
     private RequestItem requestItem;
     private Item item;
     private Bitstream bitstream;
-    private Date decisionDate;
+    private Instant decisionDate;
     private boolean accepted;
 
     protected RequestItemBuilder(Context context) {
@@ -70,7 +70,7 @@ public class RequestItemBuilder
      * @param date the date of the decision.
      * @return this builder.
      */
-    public RequestItemBuilder withDecisionDate(Date date) {
+    public RequestItemBuilder withDecisionDate(Instant date) {
         this.decisionDate = date;
         return this;
     }

@@ -13,6 +13,8 @@ import static org.dspace.matcher.DateMatcher.dateMatcher;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
+import java.time.ZoneOffset;
+
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.rest.RequestItemRepositoryIT;
 import org.dspace.app.rest.model.RequestItemRest;
@@ -33,10 +35,13 @@ public class RequestCopyMatcher {
                 hasJsonPath("$.requestEmail", is(request.getReqEmail())),
                 hasJsonPath("$.requestName", is(request.getReqName())),
                 hasJsonPath("$.requestMessage", is(request.getReqMessage())),
-                hasJsonPath("$.requestDate", dateMatcher(request.getRequest_date())),
+                hasJsonPath("$.requestDate", dateMatcher(request.getRequest_date()
+                                                                .atZone(ZoneOffset.UTC).toLocalDateTime())),
                 hasJsonPath("$.acceptRequest", is(request.isAccept_request())),
-                hasJsonPath("$.decisionDate", dateMatcher(request.getDecision_date())),
-                hasJsonPath("$.expires", dateMatcher(request.getExpires())),
+                hasJsonPath("$.decisionDate", dateMatcher(request.getDecision_date()
+                                                                 .atZone(ZoneOffset.UTC).toLocalDateTime())),
+                hasJsonPath("$.expires", dateMatcher(request.getExpires()
+                                                            .atZone(ZoneOffset.UTC).toLocalDateTime())),
                 hasJsonPath("$.type", is(RequestItemRest.NAME)),
                 hasJsonPath("$._links.self.href",
                         Matchers.containsString(RequestItemRepositoryIT.URI_ROOT))

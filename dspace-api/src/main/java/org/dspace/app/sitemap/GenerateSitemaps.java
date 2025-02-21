@@ -10,7 +10,6 @@ package org.dspace.app.sitemap;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
@@ -256,7 +255,6 @@ public class GenerateSitemaps {
                     } else {
                         url = uiURLStem + "items/" + doc.getID();
                     }
-                    Date lastMod = doc.getLastModified();
                     c.uncacheEntity(doc.getIndexedObject());
 
                     if (makeHTMLMap) {

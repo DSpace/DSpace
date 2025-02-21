@@ -8,7 +8,7 @@
 package org.dspace.app.requestitem;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Iterator;
 import java.util.List;
 
@@ -66,7 +66,7 @@ public class RequestItemServiceImpl implements RequestItemService {
         requestItem.setReqEmail(reqEmail);
         requestItem.setReqName(reqName);
         requestItem.setReqMessage(reqMessage);
-        requestItem.setRequest_date(new Date());
+        requestItem.setRequest_date(Instant.now());
 
         requestItemDAO.save(context, requestItem);
 

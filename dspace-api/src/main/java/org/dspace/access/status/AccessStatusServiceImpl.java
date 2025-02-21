@@ -10,7 +10,6 @@ package org.dspace.access.status;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Date;
 
 import org.dspace.access.status.service.AccessStatusService;
 import org.dspace.content.Item;
@@ -26,7 +25,7 @@ public class AccessStatusServiceImpl implements AccessStatusService {
     // Plugin implementation, set from the DSpace configuration by init().
     protected AccessStatusHelper helper = null;
 
-    protected Date forever_date = null;
+    protected LocalDate forever_date = null;
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;
@@ -56,10 +55,10 @@ public class AccessStatusServiceImpl implements AccessStatusService {
             int month = configurationService.getIntProperty("access.status.embargo.forever.month");
             int day = configurationService.getIntProperty("access.status.embargo.forever.day");
 
-            forever_date = Date.from(LocalDate.of(year, month, day)
+            forever_date = LocalDate.of(year, month, day)
                     .atStartOfDay()
                     .atZone(ZoneId.systemDefault())
-                    .toInstant());
+                    .toLocalDate();
         }
     }
 

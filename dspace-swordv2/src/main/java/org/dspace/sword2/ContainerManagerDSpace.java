@@ -9,7 +9,7 @@ package org.dspace.sword2;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -127,7 +127,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
                                           AuthCredentials authCredentials, SwordConfiguration swordConfig)
         throws SwordError, SwordServerException, SwordAuthException {
         // start the timer
-        Date start = new Date();
+        Instant start = Instant.now();
 
         // store up the verbose description, which we can then give back at the end if necessary
         this.verboseDescription.append(
@@ -202,8 +202,8 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
             DepositReceipt receipt = genny.createReceipt(
                 context, result, config);
 
-            Date finish = new Date();
-            long delta = finish.getTime() - start.getTime();
+            Instant finish = Instant.now();
+            long delta = finish.toEpochMilli() - start.toEpochMilli();
 
             this.verboseDescription.append(
                 "Total time for deposit processing: " + delta + " ms");
@@ -230,7 +230,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
                                                           SwordConfiguration swordConfig)
         throws SwordError, SwordServerException, SwordAuthException {
         // start the timer
-        Date start = new Date();
+        Instant start = Instant.now();
 
         // store up the verbose description, which we can then give back at the end if necessary
         this.verboseDescription.append(
@@ -309,8 +309,8 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
             DepositReceipt receipt = genny.createReceipt(
                 context, result, config);
 
-            Date finish = new Date();
-            long delta = finish.getTime() - start.getTime();
+            Instant finish = Instant.now();
+            long delta = finish.toEpochMilli() - start.toEpochMilli();
 
             this.verboseDescription.append(
                 "Total time for deposit processing: " + delta + " ms");
@@ -342,7 +342,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
                                       AuthCredentials authCredentials, SwordConfiguration swordConfig)
         throws SwordError, SwordServerException, SwordAuthException {
         // start the timer
-        Date start = new Date();
+        Instant start = Instant.now();
 
         // store up the verbose description, which we can then give back at the end if necessary
         this.verboseDescription.append(
@@ -417,8 +417,8 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
             DepositReceipt receipt = genny.createReceipt(
                 context, result, config);
 
-            Date finish = new Date();
-            long delta = finish.getTime() - start.getTime();
+            Instant finish = Instant.now();
+            long delta = finish.toEpochMilli() - start.toEpochMilli();
 
             this.verboseDescription.append(
                 "Total time for deposit processing: " + delta + " ms");
@@ -450,7 +450,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
                                 SwordConfiguration swordConfig)
         throws SwordError, SwordServerException, SwordAuthException {
         // start the timer
-        Date start = new Date();
+        Instant start = Instant.now();
 
         // store up the verbose description, which we can then give back at the end if necessary
         this.verboseDescription.append("Initialising verbose container delete");
@@ -504,8 +504,8 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
 
             this.doContainerDelete(sc, item, authCredentials, config);
 
-            Date finish = new Date();
-            long delta = finish.getTime() - start.getTime();
+            Instant finish = Instant.now();
+            long delta = finish.toEpochMilli() - start.toEpochMilli();
 
             this.verboseDescription.append(
                 "Total time for deposit processing: " + delta + " ms");
@@ -528,7 +528,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
                                      AuthCredentials authCredentials, SwordConfiguration swordConfig)
         throws SwordError, SwordServerException, SwordAuthException {
         // start the timer
-        Date start = new Date();
+        Instant start = Instant.now();
 
         // store up the verbose description, which we can then give back at the end if necessary
         this.verboseDescription.append(
@@ -592,8 +592,8 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
             ReceiptGenerator genny = new ReceiptGenerator();
             DepositReceipt receipt = genny.createReceipt(context, item, config);
 
-            Date finish = new Date();
-            long delta = finish.getTime() - start.getTime();
+            Instant finish = Instant.now();
+            long delta = finish.toEpochMilli() - start.toEpochMilli();
 
             this.verboseDescription.append(
                 "Total time for modify processing: " + delta + " ms");

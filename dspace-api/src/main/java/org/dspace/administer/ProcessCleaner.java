@@ -9,12 +9,12 @@ package org.dspace.administer;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.lang.time.DateUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.ProcessStatus;
 import org.dspace.core.Context;
@@ -96,7 +96,7 @@ public class ProcessCleaner extends DSpaceRunnable<ProcessCleanerConfiguration<P
     private void performDeletion(Context context) throws SQLException, IOException, AuthorizeException {
 
         List<ProcessStatus> statuses = getProcessToDeleteStatuses();
-        Date creationDate = calculateCreationDate();
+        Instant creationDate = calculateCreationDate();
 
         handler.logInfo("Searching for processes with status: " + statuses);
         List<Process> processes = processService.findByStatusAndCreationTimeOlderThan(context, statuses, creationDate);
@@ -126,8 +126,8 @@ public class ProcessCleaner extends DSpaceRunnable<ProcessCleanerConfiguration<P
         return statuses;
     }
 
-    private Date calculateCreationDate() {
-        return DateUtils.addDays(new Date(), -days);
+    private Instant calculateCreationDate() {
+        return Instant.now().minus(days, ChronoUnit.DAYS);
     }
 
     @Override

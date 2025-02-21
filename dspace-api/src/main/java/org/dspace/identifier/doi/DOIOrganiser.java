@@ -11,8 +11,8 @@ package org.dspace.identifier.doi;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -804,7 +804,7 @@ public class DOIOrganiser {
                     I18nUtil.getEmailFilename(Locale.getDefault(), "doi_maintenance_error"));
                 email.addRecipient(recipient);
                 email.addArgument(action);
-                email.addArgument(new Date());
+                email.addArgument(Instant.now());
                 email.addArgument(ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getTypeText(dso));
                 email.addArgument(dso.getID().toString());
                 email.addArgument(doi);

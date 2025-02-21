@@ -12,8 +12,8 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.time.Year;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -577,7 +577,7 @@ public class EZIDIdentifierProvider
         // Supply current year as year of publication, if the Item has none.
         if (!mapped.containsKey(DATACITE_PUBLICATION_YEAR)
             && !mapped.containsKey("datacite")) {
-            String year = String.valueOf(Calendar.getInstance().get(Calendar.YEAR));
+            String year = String.valueOf(Year.now().getValue());
             log.info("Supplying default publication year:  {}", year);
             mapped.put(DATACITE_PUBLICATION_YEAR, year);
         }

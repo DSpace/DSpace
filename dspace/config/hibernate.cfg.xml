@@ -14,6 +14,11 @@
         <property name="hibernate.connection.autocommit">false</property>
         <property name="hibernate.jdbc.batch_size">20</property>
         <property name="hibernate.current_session_context_class">org.hibernate.context.internal.ThreadLocalSessionContext</property>
+        <!-- Tell Hibernate to use UTC as the default timezone for all timestamps -->
+        <property name="hibernate.jdbc.time_zone">UTC</property>
+        <!-- Tell Hibernate to use "SqlType.TIMESTAMP" for java.time.Instant (by default it will use SqlType.TIMESTAMP_UTC)
+             Retains the current way DSpace stores timestamps. Changing it would require a database migration. -->
+        <property name="hibernate.type.preferred_instant_jdbc_type">TIMESTAMP</property>
 
         <!--Debug property that can be used to display the sql-->
         <property name="show_sql">false</property>
