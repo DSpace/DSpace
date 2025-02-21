@@ -114,7 +114,7 @@ public class SearchFilterMatcher {
 
     public static Matcher<? super Object> accessStatusFilter() {
         return allOf(
-            hasJsonPath("$.filter", is("access-status")),
+            hasJsonPath("$.filter", is("access_status")),
             hasJsonPath("$.hasFacets", is(true)),
             hasJsonPath("$.type", is("text")),
             hasJsonPath("$.openByDefault", is(false)),
