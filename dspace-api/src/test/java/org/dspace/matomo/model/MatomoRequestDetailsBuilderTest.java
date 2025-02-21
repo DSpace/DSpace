@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.dspace.AbstractUnitTest;
 import org.dspace.content.Bitstream;
@@ -26,6 +27,7 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.matomo.factory.MatomoRequestCookieIdentifierEnricher;
 import org.dspace.matomo.factory.MatomoRequestCountryEnricher;
 import org.dspace.matomo.factory.MatomoRequestDetailsEnricher;
 import org.dspace.matomo.factory.MatomoRequestDetailsEnricherFactory;
@@ -320,6 +322,80 @@ public class MatomoRequestDetailsBuilderTest extends AbstractUnitTest {
             )
         );
 
+    }
+
+    @Test
+    public void testMatomoCookieIdentifierEnricher() {
+        MatomoRequestCookieIdentifierEnricher cookieEnricher = new MatomoRequestCookieIdentifierEnricher();
+        enrichers.add(cookieEnricher);
+
+        Cookie cookie = Mockito.mock(Cookie.class);
+        Mockito.when(cookie.getName()).thenReturn("_pk_id.1.1fff");
+        Mockito.when(cookie.getValue()).thenReturn("3225aebdb98b13f9.1740076196.");
+
+        Mockito.when(request.getCookies()).thenReturn(new Cookie[] { cookie });
+        Mockito.when(usageEvent.getRequest()).thenReturn(request);
+
+        MatomoRequestDetails requestDetails = builder.build(usageEvent);
+        assertThat(
+            requestDetails.parameters,
+            Matchers.hasEntry(
+                Matchers.is("_id"),
+                Matchers.is("3225aebdb98b13f9")
+            )
+        );
+
+        Mockito.when(request.getCookies()).thenReturn(null);
+        requestDetails = builder.build(usageEvent);
+        assertThat(
+            requestDetails.parameters,
+            Matchers.not(
+                Matchers.hasEntry(
+                    Matchers.is("_id"),
+                    Matchers.any(String.class)
+                )
+            )
+        );
+
+        Mockito.when(request.getCookies()).thenReturn(new Cookie[] { });
+        requestDetails = builder.build(usageEvent);
+        assertThat(
+            requestDetails.parameters,
+            Matchers.not(
+                Matchers.hasEntry(
+                    Matchers.is("_id"),
+                    Matchers.any(String.class)
+                )
+            )
+        );
+
+        Mockito.when(cookie.getName()).thenReturn("_pk_id.1.1fff");
+        Mockito.when(cookie.getValue()).thenReturn("wrongvalue.1.2");
+        Mockito.when(request.getCookies()).thenReturn(new Cookie[] { cookie });
+        requestDetails = builder.build(usageEvent);
+        assertThat(
+            requestDetails.parameters,
+            Matchers.not(
+                Matchers.hasEntry(
+                    Matchers.is("_id"),
+                    Matchers.any(String.class)
+                )
+            )
+        );
+
+        Mockito.when(cookie.getName()).thenReturn("_pk_id.1.1fff");
+        Mockito.when(cookie.getValue()).thenReturn("");
+        Mockito.when(request.getCookies()).thenReturn(new Cookie[] { cookie });
+        requestDetails = builder.build(usageEvent);
+        assertThat(
+            requestDetails.parameters,
+            Matchers.not(
+                Matchers.hasEntry(
+                    Matchers.is("_id"),
+                    Matchers.any(String.class)
+                )
+            )
+        );
     }
 
 }
