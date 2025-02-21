@@ -75,8 +75,12 @@ public class MatomoEventListenerTest extends AbstractUnitTest {
         Mockito.when(event.getAction()).thenReturn(UsageEvent.Action.VIEW);
 
         Bitstream bitstream = Mockito.spy(Bitstream.class);
-        Mockito.when(bitstreamService.isInBundle(Mockito.eq(bitstream), Mockito.eq(Set.of(Constants.CONTENT_BUNDLE_NAME))))
-               .thenReturn(true);
+        Mockito.when(
+            bitstreamService.isInBundle(
+                Mockito.eq(bitstream),
+                Mockito.eq(Set.of(Constants.CONTENT_BUNDLE_NAME))
+            )
+        ).thenReturn(true);
 
         Mockito.when(event.getObject()).thenReturn(bitstream);
 
