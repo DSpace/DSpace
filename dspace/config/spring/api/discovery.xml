@@ -3428,6 +3428,17 @@
         <property name="pageSize" value="10"/>
     </bean>
 
+    <bean id="searchFilterIsPublicationOfDatasetRelation" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="isPublicationOfDataset"/>
+        <property name="metadataFields">
+            <list>
+                <value>relation.isPublicationOfDataset.latestForDiscovery</value>
+            </list>
+        </property>
+        <property name="isOpenByDefault" value="false"/>
+        <property name="pageSize" value="10"/>
+    </bean>
+
     <!-- Used only to READ "supervisedBy" facets -->
     <bean id="searchFilterSupervision"
           class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
