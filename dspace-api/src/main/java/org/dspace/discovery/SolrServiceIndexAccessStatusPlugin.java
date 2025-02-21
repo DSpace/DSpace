@@ -8,14 +8,11 @@
 package org.dspace.discovery;
 
 import java.sql.SQLException;
-import java.util.List;
 
 import org.apache.solr.common.SolrInputDocument;
+import org.dspace.access.status.DefaultAccessStatusHelper;
 import org.dspace.access.status.factory.AccessStatusServiceFactory;
 import org.dspace.access.status.service.AccessStatusService;
-import org.dspace.access.status.DefaultAccessStatusHelper;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.indexobject.IndexableItem;
@@ -56,7 +53,7 @@ public class SolrServiceIndexAccessStatusPlugin implements SolrServiceIndexPlugi
      * containing at least one bitstream.
      *
      * @param item to check
-     * @return String with one of the following controlled values 
+     * @return String with one of the following controlled values
         EMBARGO = "embargo"
         METADATA_ONLY = "metadata.only"
         OPEN_ACCESS = "open.access"
