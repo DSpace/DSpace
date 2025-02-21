@@ -297,4 +297,22 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
     public void setRpDescription(String description) {
         this.rpdescription = description;
     }
+
+    /**
+     * Describe the ResourcePolicy in String form. Useful for debugging ResourcePolicy issues in tests or similar.
+     * @return String representation of ResourcePolicy object
+     */
+    @Override
+    public String toString() {
+        return "ResourcePolicy{" +
+            "id='" + id + '\'' +
+            ", eperson='" + eperson + '\'' +
+            ", group='" + epersonGroup + '\'' +
+            ", type='" + rptype + '\'' +
+            ", name='" + rpname + '\'' +
+            ", description='" + rpdescription + '\'' +
+            ", start_date='" + startDate + '\'' +
+            ", end_date='" + endDate + '\'' +
+            '}';
+    }
 }
