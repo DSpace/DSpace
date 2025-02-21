@@ -648,7 +648,7 @@
         <dependency>
             <groupId>dnsjava</groupId>
             <artifactId>dnsjava</artifactId>
-            <version>3.6.2</version>
+            <version>3.6.3</version>
         </dependency>
 
         <dependency>
@@ -690,12 +690,6 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-database-postgresql</artifactId>
             <version>${flyway.version}</version>
-        </dependency>
-
-        <!-- Google Analytics -->
-        <dependency>
-            <groupId>com.google.apis</groupId>
-            <artifactId>google-api-services-analytics</artifactId>
         </dependency>
 
         <!-- FindBugs -->
@@ -741,7 +735,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.12.780</version>
+            <version>1.12.781</version>
         </dependency>
 
         <!-- TODO: This may need to be replaced with the "orcid-model" artifact once this ticket is resolved:
