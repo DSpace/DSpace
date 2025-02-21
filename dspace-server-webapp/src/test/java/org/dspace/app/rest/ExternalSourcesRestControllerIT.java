@@ -52,9 +52,15 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                                 ExternalSourceMatcher.matchExternalSource(
                                         "pubmed", "pubmed", false),
                                 ExternalSourceMatcher.matchExternalSource(
-                                        "openaireFunding", "openaireFunding", false)
+                                    "openaireFunding", "openaireFunding", false),
+                                ExternalSourceMatcher.matchExternalSource(
+                                    "openalexPublication", "openalexPublication", false),
+                                ExternalSourceMatcher.matchExternalSource(
+                                    "openalexPublicationByAuthorId", "openalexPublicationByAuthorId", false),
+                                ExternalSourceMatcher.matchExternalSource(
+                                    "openalexPerson", "openalexPerson", false)
                             )))
-                            .andExpect(jsonPath("$.page.totalElements", Matchers.is(12)));
+                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(15)));
     }
 
     @Test
