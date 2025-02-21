@@ -910,7 +910,7 @@
                     <linked-metadata-field>
                         <dc-schema>dc</dc-schema>
                         <dc-element>relation</dc-element>
-                        <dc-qualifier>isReferencedBy</dc-qualifier>
+                        <dc-qualifier>isreferencedby</dc-qualifier>
                         <input-type>onebox</input-type>
                     </linked-metadata-field>
                     <externalsources>pubmed</externalsources>

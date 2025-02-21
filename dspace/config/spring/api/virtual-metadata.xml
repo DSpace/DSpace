@@ -232,18 +232,17 @@
     </bean>
 
     <util:map id="isDatasetOfPublicationMap">
-        <entry key="dc.relation.isBasedOn" value-ref="relatedEntityIdentifier_uri"/>
+        <entry key="dc.relation.isbasedon" value-ref="relatedEntityIdentifier_uri"/>
     </util:map>
     <util:map id="isPublicationOfDatasetMap">
-        <entry key="dc.relation.isReferencedBy" value-ref="relatedEntityIdentifier_uri"/>
+        <entry key="dc.relation.isreferencedby" value-ref="relatedEntityIdentifier_uri"/>
     </util:map>
     <!-- This Collected bean will create a list of dc.identifier.uri virtual metadata fields that hold the value of
     Create new scratch file from selection, each of them in a separate metadata value.
     If the related item has:
-        dc.identifier.uri = https://demo.dspace.org/handle/123456789/123
+        dc.relation.isbasedon/isreferencedby = https://demo.dspace.org/handle/123456789/123
     Then the original item will have, in this case:
         dc.identifier.uri = https://demo.dspace.org/handle/123456789/123
-    Note that these metadata fields have the same signature of schema, element and qualifier, but that poses no problem
     -->
     <bean class="org.dspace.content.virtual.Collected" id="relatedEntityIdentifier_uri">
         <property name="fields">
