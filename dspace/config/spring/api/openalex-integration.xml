@@ -74,9 +74,10 @@
         <property name="field" ref="openalex.doi"/>
         <property name="metadataProcessor" ref="openalexDoiMetadataProcessor"/>
     </bean>
-    <bean name="openalexDoiMetadataProcessor" class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexIdMetadataProcessor">
+    <bean name="openalexDoiMetadataProcessor"
+          class="org.dspace.importer.external.metadatamapping.contributor.RegexReplacingJsonPathMetadataProcessor">
         <property name="path" value="/ids/doi"/>
-        <property name="toBeReplaced" value="https://doi.org/"/>
+        <property name="regexPattern" value="https://doi.org/"/>
         <property name="replacement" value=""/>
     </bean>
     <bean id="openalex.doi" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
@@ -87,9 +88,10 @@
         <property name="field" ref="openalex.pmid"/>
         <property name="metadataProcessor" ref="openalexPmidMetadataProcessor"/>
     </bean>
-    <bean name="openalexPmidMetadataProcessor" class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexIdMetadataProcessor">
+    <bean name="openalexPmidMetadataProcessor"
+          class="org.dspace.importer.external.metadatamapping.contributor.RegexReplacingJsonPathMetadataProcessor">
         <property name="path" value="/ids/pmid"/>
-        <property name="toBeReplaced" value="https://pubmed.ncbi.nlm.nih.gov/"/>
+        <property name="regexPattern" value="https://pubmed.ncbi.nlm.nih.gov/"/>
         <property name="replacement" value=""/>
     </bean>
     <bean id="openalex.pmid" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
@@ -100,9 +102,11 @@
         <property name="field" ref="openalex.openalexId"/>
         <property name="metadataProcessor" ref="openalexOpenAlexIdMetadataProcessor"/>
     </bean>
-    <bean id="openalexOpenAlexIdMetadataProcessor" class="org.dspace.importer.external.metadatamapping.contributor.RegexExtractMetadataProcessor">
+    <bean id="openalexOpenAlexIdMetadataProcessor"
+          class="org.dspace.importer.external.metadatamapping.contributor.RegexReplacingJsonPathMetadataProcessor">
         <property name="path" value="/id" />
-        <property name="regexPattern" value="[^/]+$" />
+        <property name="regexPattern" value="^.*/"/>
+        <property name="replacement" value=""/>
     </bean>
     <bean id="openalex.openalexId" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.identifier.other"/>
@@ -177,9 +181,9 @@
     </bean>
 
     <bean name="openalexPublishedVersionMetadataProcessor"
-          class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexIdMetadataProcessor">
+          class="org.dspace.importer.external.metadatamapping.contributor.RegexReplacingJsonPathMetadataProcessor">
         <property name="path" value="/best_oa_location/version"/>
-        <property name="toBeReplaced" value="publishedVersion"/>
+        <property name="regexPattern" value="publishedVersion"/>
         <property name="replacement" value="http://purl.org/coar/version/c_970fb48d4fbd8a85"/>
     </bean>
     <bean id="openalexPublishedVersionContrib"
@@ -189,9 +193,9 @@
     </bean>
 
     <bean name="openalexAcceptedVersionMetadataProcessor"
-          class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexIdMetadataProcessor">
+          class="org.dspace.importer.external.metadatamapping.contributor.RegexReplacingJsonPathMetadataProcessor">
         <property name="path" value="/best_oa_location/version"/>
-        <property name="toBeReplaced" value="acceptedVersion"/>
+        <property name="regexPattern" value="acceptedVersion"/>
         <property name="replacement" value="http://purl.org/coar/version/c_fa2ee174bc00049f"/>
     </bean>
     <bean id="openalexAcceptedVersionContrib"
@@ -201,9 +205,9 @@
     </bean>
 
     <bean name="openalexSubmittedVersionMetadataProcessor"
-          class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexIdMetadataProcessor">
+          class="org.dspace.importer.external.metadatamapping.contributor.RegexReplacingJsonPathMetadataProcessor">
         <property name="path" value="/best_oa_location/version"/>
-        <property name="toBeReplaced" value="submittedVersion"/>
+        <property name="regexPattern" value="submittedVersion"/>
         <property name="replacement" value="http://purl.org/coar/version/c_b1a7d7d4d402bcce"/>
     </bean>
     <bean id="openalexSubmittedVersionContrib"
@@ -282,9 +286,11 @@
         <property name="field" ref="openalex.author.id"/>
         <property name="metadataProcessor" ref="openalexAuthorMetadataProcessor"/>
     </bean>
-    <bean id="openalexAuthorMetadataProcessor" class="org.dspace.importer.external.metadatamapping.contributor.RegexExtractMetadataProcessor">
+    <bean id="openalexAuthorMetadataProcessor"
+          class="org.dspace.importer.external.metadatamapping.contributor.RegexReplacingJsonPathMetadataProcessor">
         <property name="path" value="/id" />
-        <property name="regexPattern" value="[^/]+$" />
+        <property name="regexPattern" value="^.*/"/>
+        <property name="replacement" value=""/>
     </bean>
 
     <bean id="openalex.author.id" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">

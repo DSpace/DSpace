@@ -12,8 +12,11 @@ import java.util.Map;
 import jakarta.annotation.Resource;
 import org.dspace.importer.external.metadatamapping.AbstractMetadataFieldMapping;
 
-
 /**
+ * An implementation of {@link AbstractMetadataFieldMapping} responsible for
+ * defining the mapping of the OpenAlex Works metadatum fields on the DSpace
+ * Publication metadatum fields
+ *
  * @author Adamo Fapohunda (adamo.fapohunda at 4science.com)
  **/
 public class OpenAlexPublicationFieldMapping extends AbstractMetadataFieldMapping {
