@@ -92,9 +92,82 @@ public class OpenAlexPublicationExternalSourcesIT extends AbstractControllerInte
         }
     }
 
+    @Test
+    public void findOneOpenalexPublicationExternalSourceEntriesWithQueryTest() throws Exception {
+
+        try (InputStream file = getClass().getResourceAsStream("openalex-publication-single.json")) {
+            String jsonResponse = IOUtils.toString(file, Charset.defaultCharset());
+
+            when(liveImportClient.executeHttpGetRequest(anyInt(), anyString(), anyMap()))
+                .thenReturn(jsonResponse);
+
+            getClient().perform(get("/api/integration/externalsources/openalexPublication/entries")
+                                    .param("query", "protein"))
+                       .andExpect(status().isOk())
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries", Matchers.hasSize(1)))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].id").value("W1775749144"))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].display")
+                                      .value("PROTEIN MEASUREMENT WITH THE FOLIN PHENOL REAGENT"))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].value")
+                                      .value("PROTEIN MEASUREMENT WITH THE FOLIN PHENOL REAGENT"))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].externalSource")
+                                      .value("openalexPublication"))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.contributor.author']",
+                                           Matchers.hasSize(4)))
+                       .andExpect(
+                           jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.contributor.author'][0].value")
+                               .value("OliverH. Lowry"))
+                       .andExpect(
+                           jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.contributor.author'][1].value")
+                               .value("NiraJ. Rosebrough"))
+                       .andExpect(
+                           jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.contributor.author'][2].value")
+                               .value("A. Farr"))
+                       .andExpect(
+                           jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.contributor.author'][3].value")
+                               .value("RoseJ. Randall"))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.orcid']",
+                                           Matchers.hasSize(2)))
+                       .andExpect(
+                           jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.orcid'][0].value")
+                               .value("https://orcid.org/0000-0001-6187-6610"))
+                       .andExpect(
+                           jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.orcid'][1].value")
+                               .value("https://orcid.org/0000-0001-6187-6611"))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri']",
+                                           Matchers.hasSize(2)))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri'][0]" +
+                                               ".value")
+                                      .value("https://doi.org/10.1016/s0021-9258(19)52451-6"))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri'][1]" +
+                                               ".value")
+                                      .value("https://doi.org/10.1016/s0021-9258(19)52451-6/pdf"))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.date.issued'][0].value")
+                                      .value("1951-11-01"))
+                       .andExpect(
+                           jsonPath("$._embedded.externalSourceEntries[0].metadata['oaire.version.volume'][0].value")
+                               .value("http://purl.org/coar/version/c_970fb48d4fbd8a85"))
+                       .andExpect(
+                           jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.doi'][0].value")
+                               .value("10.1016/s0021-9258(19)52451-6"))
+                       .andExpect(
+                           jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.pmid'][0].value")
+                               .value("14907713"))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.language.iso'][0].value")
+                                      .value("en"))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.title'][0].value")
+                                      .value("PROTEIN MEASUREMENT WITH THE FOLIN PHENOL REAGENT"))
+                       .andExpect(jsonPath("$.page.totalElements").value(1))
+                       .andExpect(jsonPath("$.page.totalPages").value(1))
+                       .andExpect(jsonPath("$.page.size").value(20))
+                       .andExpect(jsonPath("$.page.number").value(0));
+
+            verify(liveImportClient, times(2)).executeHttpGetRequest(anyInt(), anyString(), anyMap());
+        }
+    }
 
     @Test
-    public void findOneOpenaireFundingExternalSourceEntriesWithQueryTest() throws Exception {
+    public void findAllOpenalexPublicationExternalSourceEntriesWithQueryTest() throws Exception {
 
         try (InputStream file = getClass().getResourceAsStream("openalex-publication-multiple.json")) {
             String jsonResponse = IOUtils.toString(file, Charset.defaultCharset());
@@ -128,6 +201,5 @@ public class OpenAlexPublicationExternalSourcesIT extends AbstractControllerInte
             verify(liveImportClient, times(2)).executeHttpGetRequest(anyInt(), anyString(), anyMap());
         }
     }
-
 
 }
