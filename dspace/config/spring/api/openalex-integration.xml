@@ -33,9 +33,11 @@
         <entry key-ref="openalex.doi" value-ref="openalexDoiContrib"/>
         <entry key-ref="openalex.pmid" value-ref="openalexPmidContrib"/>
         <entry key-ref="openalex.openalexId" value-ref="openalexIdContrib"/>
-<!--        <entry key-ref="openalex.mag" value-ref="openalexMagContrib"/>-->
+        <entry key-ref="openalex.uri" value-ref="openalexUriIdentifierscContrib"/>
         <entry key-ref="openalex.author" value-ref="openalexAuthorContrib"/>
+        <entry key-ref="openalex.author.orcid" value-ref="openalexAuthorOrcidContrib"/>
         <entry key-ref="openalex.language" value-ref="openalexLanguageContrib"/>
+        <entry key-ref="openalex.publication.version" value-ref="openalexPublicationVersionContrib"/>
     </util:map>
 
     <bean id="openalexTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
@@ -120,10 +122,133 @@
     </bean>
     <bean name="openalexAuthorProcessor" class="org.dspace.importer.external.metadatamapping.contributor.ArrayElementAttributeProcessor">
         <property name="pathToArray" value="/authorships"/>
-        <property name="elementAttribute" value="/raw_author_name"/>
+        <property name="elementAttribute" value="/author/display_name"/>
     </bean>
     <bean id="openalex.author" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.contributor.author"/>
+    </bean>
+
+    <bean id="openalexAuthorOrcidContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.author.orcid"/>
+        <property name="metadataProcessor" ref="openalexAuthorOrcidProcessor"/>
+    </bean>
+    <bean name="openalexAuthorOrcidProcessor"
+          class="org.dspace.importer.external.metadatamapping.contributor.ArrayElementAttributeProcessor">
+        <property name="pathToArray" value="/authorships"/>
+        <property name="elementAttribute" value="/author/orcid"/>
+    </bean>
+    <bean id="openalex.author.orcid" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.orcid"/>
+    </bean>
+
+    <util:list id="contribList"
+               value-type="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor"
+               list-class="java.util.ArrayList">
+        <ref bean="openalexUriLandingContrib"/>
+        <ref bean="openalexUriPdfContrib"/>
+    </util:list>
+
+    <bean id="openalexUriIdentifierscContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.MultipleMetadataContributor">
+        <property name="metadatumContributors" ref="contribList"/>
+        <property name="field" ref="openalex.uri"/>
+    </bean>
+    <bean id="openalex.uri" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.uri"/>
+    </bean>
+
+    <bean id="openalexUriLandingContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.uri.landing"/>
+        <property name="query" value="/best_oa_location/landing_page_url"/>
+    </bean>
+    <bean id="openalex.uri.landing" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.uri"/>
+    </bean>
+
+    <bean id="openalexUriPdfContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.uri.pdf"/>
+        <property name="query" value="/best_oa_location/pdf_url"/>
+    </bean>
+    <bean id="openalex.uri.pdf" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.uri"/>
+    </bean>
+
+    <bean name="openalexPublishedVersionMetadataProcessor"
+          class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexIdMetadataProcessor">
+        <property name="path" value="/best_oa_location/version"/>
+        <property name="toBeReplaced" value="publishedVersion"/>
+        <property name="replacement" value="http://purl.org/coar/version/c_970fb48d4fbd8a85"/>
+    </bean>
+    <bean id="openalexPublishedVersionContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.publication.version"/>
+        <property name="metadataProcessor" ref="openalexPublishedVersionMetadataProcessor"/>
+    </bean>
+
+    <bean name="openalexAcceptedVersionMetadataProcessor"
+          class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexIdMetadataProcessor">
+        <property name="path" value="/best_oa_location/version"/>
+        <property name="toBeReplaced" value="acceptedVersion"/>
+        <property name="replacement" value="http://purl.org/coar/version/c_fa2ee174bc00049f"/>
+    </bean>
+    <bean id="openalexAcceptedVersionContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.publication.version"/>
+        <property name="metadataProcessor" ref="openalexAcceptedVersionMetadataProcessor"/>
+    </bean>
+
+    <bean name="openalexSubmittedVersionMetadataProcessor"
+          class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexIdMetadataProcessor">
+        <property name="path" value="/best_oa_location/version"/>
+        <property name="toBeReplaced" value="submittedVersion"/>
+        <property name="replacement" value="http://purl.org/coar/version/c_b1a7d7d4d402bcce"/>
+    </bean>
+    <bean id="openalexSubmittedVersionContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.publication.version"/>
+        <property name="metadataProcessor" ref="openalexSubmittedVersionMetadataProcessor"/>
+    </bean>
+
+    <bean id="openalex.publication.version" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="oaire.version.volume"/>
+    </bean>
+
+    <bean id="openalexConditionalPublishedVersionContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.ConditionEqualJsonPathMetadataContributor">
+        <property name="leftOperandProcessor" ref="openalexPublishedVersionMetadataProcessor"/>
+        <property name="rightOperand" value="http://purl.org/coar/version/c_970fb48d4fbd8a85"/>
+        <property name="metadatumContributor" ref="openalexPublishedVersionContrib"/>
+    </bean>
+
+    <bean id="openalexConditionalAcceptedVersionContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.ConditionEqualJsonPathMetadataContributor">
+        <property name="leftOperandProcessor" ref="openalexAcceptedVersionMetadataProcessor"/>
+        <property name="rightOperand" value="http://purl.org/coar/version/c_fa2ee174bc00049f"/>
+        <property name="metadatumContributor" ref="openalexAcceptedVersionContrib"/>
+    </bean>
+
+    <bean id="openalexConditionalSubmittedVersionContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.ConditionEqualJsonPathMetadataContributor">
+        <property name="leftOperandProcessor" ref="openalexSubmittedVersionMetadataProcessor"/>
+        <property name="rightOperand" value="http://purl.org/coar/version/c_b1a7d7d4d402bcce"/>
+        <property name="metadatumContributor" ref="openalexSubmittedVersionContrib"/>
+    </bean>
+
+    <util:list id="versionContribList"
+               value-type="org.dspace.importer.external.metadatamapping.contributor.ConditionEqualJsonPathMetadataContributor"
+               list-class="java.util.ArrayList">
+        <ref bean="openalexConditionalPublishedVersionContrib"/>
+        <ref bean="openalexConditionalAcceptedVersionContrib"/>
+        <ref bean="openalexConditionalSubmittedVersionContrib"/>
+    </util:list>
+
+    <bean id="openalexPublicationVersionContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.MultipleMetadataContributor">
+        <property name="metadatumContributors" ref="versionContribList"/>
+        <property name="field" ref="openalex.publication.version"/>
     </bean>
 
     <bean id="openalexLanguageContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
