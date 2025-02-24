@@ -1089,7 +1089,7 @@ public class LogAnalyser {
      * @return A string of the form YYYY-MM-DD
      */
     public static String unParseDate(LocalDate date) {
-        return DateTimeFormatter.ISO_INSTANT.format(date);
+        return DateTimeFormatter.ISO_LOCAL_DATE.format(date);
     }
 
 
