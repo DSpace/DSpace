@@ -634,11 +634,11 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void searchProcessTestByUserSortedOnStartTimeAsc() throws Exception {
         Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withStartAndEndTime("10/01/1990", "20/01/1990").build();
+                                            .withStartAndEndTime("1990-01-10", "1990-01-20").build();
         Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withStartAndEndTime("11/01/1990", "19/01/1990").build();
+                                            .withStartAndEndTime("1990-01-11", "1990-01-19").build();
         Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withStartAndEndTime("12/01/1990", "18/01/1990").build();
+                                            .withStartAndEndTime("1990-01-12", "1990-01-18").build();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -664,11 +664,11 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void searchProcessTestByUserSortedOnStartTimeDesc() throws Exception {
         Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withStartAndEndTime("10/01/1990", "20/01/1990").build();
+                                            .withStartAndEndTime("1990-01-10", "1990-01-20").build();
         Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withStartAndEndTime("11/01/1990", "19/01/1990").build();
+                                            .withStartAndEndTime("1990-01-11", "1990-01-19").build();
         Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withStartAndEndTime("12/01/1990", "18/01/1990").build();
+                                            .withStartAndEndTime("1990-01-12", "1990-01-18").build();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -699,7 +699,7 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
                                             // but proves startTime is ignored on sort
                                             .withCreationTime(LocalDate.of(2000, 1, 1)
                                                                        .atStartOfDay().toInstant(ZoneOffset.UTC))
-                                            .withStartAndEndTime("01/01/1990", "01/01/1995").build();
+                                            .withStartAndEndTime("1990-01-01", "1995-01-01").build();
         Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
                                             .withCreationTime(LocalDate.of(2005, 1, 1)
                                                                        .atStartOfDay().toInstant(ZoneOffset.UTC))
@@ -707,7 +707,7 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
         Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
                                             .withCreationTime(LocalDate.of(2010, 1, 1)
                                                                        .atStartOfDay().toInstant(ZoneOffset.UTC))
-                                            .withStartAndEndTime("01/01/2015", "01/01/2020").build();
+                                            .withStartAndEndTime("2015-01-01", "2020-01-01").build();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -737,7 +737,7 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
                                             // but proves startTime is ignored on sort
                                             .withCreationTime(LocalDate.of(2000, 1, 1)
                                                                        .atStartOfDay().toInstant(ZoneOffset.UTC))
-                                            .withStartAndEndTime("01/01/1990", "01/01/1995").build();
+                                            .withStartAndEndTime("1990-01-01", "1995-01-01").build();
         Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
                                             .withCreationTime(LocalDate.of(2005, 1, 1)
                                                                        .atStartOfDay().toInstant(ZoneOffset.UTC))
@@ -745,7 +745,7 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
         Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
                                             .withCreationTime(LocalDate.of(2010, 1, 1)
                                                                        .atStartOfDay().toInstant(ZoneOffset.UTC))
-                                            .withStartAndEndTime("01/01/2015", "01/01/2020").build();
+                                            .withStartAndEndTime("2015-01-01", "2020-01-01").build();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -771,11 +771,11 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void searchProcessTestByUserSortedOnEndTimeAsc() throws Exception {
         Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withStartAndEndTime("10/01/1990", "20/01/1990").build();
+                                            .withStartAndEndTime("1990-01-10", "1990-01-20").build();
         Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withStartAndEndTime("11/01/1990", "19/01/1990").build();
+                                            .withStartAndEndTime("1990-01-11", "1990-01-19").build();
         Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withStartAndEndTime("12/01/1990", "18/01/1990").build();
+                                            .withStartAndEndTime("1990-01-12", "1990-01-18").build();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -801,11 +801,11 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void searchProcessTestByUserSortedOnEndTimeDesc() throws Exception {
         Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withStartAndEndTime("10/01/1990", "20/01/1990").build();
+                                            .withStartAndEndTime("1990-01-10", "1990-01-20").build();
         Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withStartAndEndTime("11/01/1990", "19/01/1990").build();
+                                            .withStartAndEndTime("1990-01-11", "1990-01-19").build();
         Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withStartAndEndTime("12/01/1990", "18/01/1990").build();
+                                            .withStartAndEndTime("1990-01-12", "1990-01-18").build();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -831,11 +831,11 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void searchProcessTestByUserSortedOnMultipleBadRequest() throws Exception {
         Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withStartAndEndTime("10/01/1990", "20/01/1990").build();
+                                            .withStartAndEndTime("1990-01-10", "1990-01-20").build();
         Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withStartAndEndTime("11/01/1990", "19/01/1990").build();
+                                            .withStartAndEndTime("1990-01-11", "1990-01-19").build();
         Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withStartAndEndTime("12/01/1990", "18/01/1990").build();
+                                            .withStartAndEndTime("1990-01-12", "1990-01-18").build();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -849,11 +849,11 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void searchProcessTestByUserSortedOnDefault() throws Exception {
         Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withStartAndEndTime("10/01/1990", "20/01/1990").build();
+                                            .withStartAndEndTime("1990-01-10", "1990-01-20").build();
         Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withStartAndEndTime("11/01/1990", "19/01/1990").build();
+                                            .withStartAndEndTime("1990-01-11", "1990-01-19").build();
         Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withStartAndEndTime("12/01/1990", "18/01/1990").build();
+                                            .withStartAndEndTime("1990-01-12", "1990-01-18").build();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -878,11 +878,11 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Test
     public void searchProcessTestByUserSortedOnNonExistingBadRequest() throws Exception {
         Process newProcess1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withStartAndEndTime("10/01/1990", "20/01/1990").build();
+                                            .withStartAndEndTime("1990-01-10", "1990-01-20").build();
         Process newProcess2 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withStartAndEndTime("11/01/1990", "19/01/1990").build();
+                                            .withStartAndEndTime("1990-01-11", "1990-01-19").build();
         Process newProcess3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                                            .withStartAndEndTime("12/01/1990", "18/01/1990").build();
+                                            .withStartAndEndTime("1990-01-12", "1990-01-18").build();
 
         String token = getAuthToken(admin.getEmail(), password);
 
@@ -896,14 +896,11 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void testFindByCurrentUser() throws Exception {
 
         Process process1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-            .withStartAndEndTime("10/01/1990", "20/01/1990")
-            .build();
+                                         .withStartAndEndTime("1990-01-10", "1990-01-20").build();
         ProcessBuilder.createProcess(context, admin, "mock-script", parameters)
-            .withStartAndEndTime("11/01/1990", "19/01/1990")
-            .build();
+                      .withStartAndEndTime("1990-01-11", "1990-01-19").build();
         Process process3 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-            .withStartAndEndTime("12/01/1990", "18/01/1990")
-            .build();
+                                         .withStartAndEndTime("1990-01-12", "1990-01-18").build();
 
         String token = getAuthToken(eperson.getEmail(), password);
 
@@ -920,7 +917,7 @@ public class ProcessRestRepositoryIT extends AbstractControllerIntegrationTest {
     public void getProcessOutput() throws Exception {
         context.setCurrentUser(eperson);
         Process process1 = ProcessBuilder.createProcess(context, eperson, "mock-script", parameters)
-                .withStartAndEndTime("10/01/1990", "20/01/1990")
+                .withStartAndEndTime("1990-01-10", "1990-01-20")
                 .build();
 
         try (InputStream is = IOUtils.toInputStream("Test File For Process", CharEncoding.UTF_8)) {
