@@ -19,7 +19,6 @@ import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
 import org.apache.logging.log4j.Logger;
 
@@ -48,9 +47,6 @@ public class DCDate {
      * Logger
      */
     private static Logger log = org.apache.logging.log4j.LogManager.getLogger(DCDate.class);
-
-    // UTC timezone
-    private static final TimeZone utcZone = TimeZone.getTimeZone("UTC");
 
     // components of time in UTC
     private ZonedDateTime calendar = null;

@@ -8,7 +8,6 @@
 package org.dspace.util;
 
 import java.time.LocalDateTime;
-import java.util.TimeZone;
 
 /**
  * Various manipulations of dates and times.
@@ -16,8 +15,6 @@ import java.util.TimeZone;
  * @author mwood
  */
 public class TimeHelpers {
-    private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
-
     /**
      * Never instantiate this class.
      */

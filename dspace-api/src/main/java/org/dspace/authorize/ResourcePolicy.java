@@ -306,6 +306,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
     public String toString() {
         return "ResourcePolicy{" +
             "id='" + id + '\'' +
+            ", action_id='" + actionId + '\'' +
             ", eperson='" + eperson + '\'' +
             ", group='" + epersonGroup + '\'' +
             ", type='" + rptype + '\'' +
