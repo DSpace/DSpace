@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -153,7 +154,7 @@ public class BulkAccessControl extends DSpaceRunnable<BulkAccessControlScriptCon
         }
 
         ObjectMapper mapper = new ObjectMapper();
-        mapper.setTimeZone(TimeZone.getTimeZone("UTC"));
+        mapper.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
         BulkAccessControlInput accessControl;
         context = new Context(Context.Mode.BATCH_EDIT);
         setEPerson(context);
