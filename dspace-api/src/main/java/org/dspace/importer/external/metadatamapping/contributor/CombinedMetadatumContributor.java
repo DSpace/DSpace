@@ -77,7 +77,7 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
         LinkedList<LinkedList<MetadatumDTO>> metadatumLists = new LinkedList<>();
 
         for (MetadataContributor metadatumContributor : metadatumContributors) {
-            LinkedList<MetadatumDTO> metadatums = (LinkedList<MetadatumDTO>) metadatumContributor.contributeMetadata(t);
+            LinkedList<MetadatumDTO> metadatums = new LinkedList<>(metadatumContributor.contributeMetadata(t));
             metadatumLists.add(metadatums);
         }
 

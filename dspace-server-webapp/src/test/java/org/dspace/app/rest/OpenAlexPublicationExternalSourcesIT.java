@@ -135,15 +135,44 @@ public class OpenAlexPublicationExternalSourcesIT extends AbstractControllerInte
                            jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.orcid'][1].value")
                                .value("https://orcid.org/0000-0001-6187-6611"))
                        .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri']",
-                                           Matchers.hasSize(2)))
+                                           Matchers.hasSize(7)))
                        .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri'][0]" +
                                                ".value")
                                       .value("https://doi.org/10.1016/s0021-9258(19)52451-6"))
                        .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri'][1]" +
                                                ".value")
                                       .value("https://doi.org/10.1016/s0021-9258(19)52451-6/pdf"))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri'][2]" +
+                                               ".value")
+                                      .value("https://doi.org/10.1016/s0021-9258(19)52451-6"))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri'][3]" +
+                                               ".value")
+                                      .value("https://www.jbc.org/article/S0021-9258(19)52451-6/pdf"))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri'][4]" +
+                                               ".value")
+                                      .value("https://www.jbc.org/article/S0021-9258(19)52451-6/pdf"))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri'][5]" +
+                                               ".value")
+                                      .value("https://doi.org/10.1016/s0021-9258(19)52451-6"))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri'][6]" +
+                                               ".value")
+                                      .value("https://doi.org/10.1016/s0021-9258(19)52451-6"))
                        .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.date.issued'][0].value")
                                       .value("1951-11-01"))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier" +
+                                               ".openalex'][0].value").value("W1775749144"))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['oaire.citation.volume'][0]" +
+                                               ".value")
+                                      .value("193"))
+                       .andExpect(
+                           jsonPath("$._embedded.externalSourceEntries[0].metadata['oaire.citation.issue'][0].value")
+                               .value("1"))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['oaire.citation" +
+                                               ".startPage'][0].value")
+                                      .value("265"))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['oaire.citation" +
+                                               ".endPage'][0].value")
+                                      .value("275"))
                        .andExpect(
                            jsonPath("$._embedded.externalSourceEntries[0].metadata['oaire.version.volume'][0].value")
                                .value("http://purl.org/coar/version/c_970fb48d4fbd8a85"))
@@ -157,6 +186,17 @@ public class OpenAlexPublicationExternalSourcesIT extends AbstractControllerInte
                                       .value("en"))
                        .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.title'][0].value")
                                       .value("PROTEIN MEASUREMENT WITH THE FOLIN PHENOL REAGENT"))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.subject']",
+                                           Matchers.hasSize(13)))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.subject'][9].value")
+                                      .value("Peer Review, Research standards"))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.subject'][12].value")
+                                      .value(
+                                          "Life Sciences Biochemistry, Genetics and Molecular Biology Molecular " +
+                                              "Biology Cancer and biochemical research"))
+                       .andExpect(
+                           jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.rights.license'][0].value")
+                               .value("cc-by"))
                        .andExpect(jsonPath("$.page.totalElements").value(1))
                        .andExpect(jsonPath("$.page.totalPages").value(1))
                        .andExpect(jsonPath("$.page.size").value(20))

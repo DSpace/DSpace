@@ -38,6 +38,12 @@
         <entry key-ref="openalex.author.orcid" value-ref="openalexAuthorOrcidContrib"/>
         <entry key-ref="openalex.language" value-ref="openalexLanguageContrib"/>
         <entry key-ref="openalex.publication.version" value-ref="openalexPublicationVersionContrib"/>
+        <entry key-ref="openalex.biblio.volume" value-ref="openalexBiblioVolumeContrib"/>
+        <entry key-ref="openalex.biblio.issue" value-ref="openalexBiblioIssueContrib"/>
+        <entry key-ref="openalex.biblio.firstpage" value-ref="openalexBiblioFirstPageContrib"/>
+        <entry key-ref="openalex.biblio.lastpage" value-ref="openalexBiblioLastPageContrib"/>
+        <entry key-ref="openalex.subject" value-ref="openalexPublicationSubjectContrib"/>
+        <entry key-ref="openalex.license" value-ref="openalexLicenseContrib"/>
     </util:map>
 
     <bean id="openalexTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
@@ -109,7 +115,7 @@
         <property name="replacement" value=""/>
     </bean>
     <bean id="openalex.openalexId" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.other"/>
+        <constructor-arg value="dc.identifier.openalex"/>
     </bean>
 
     <bean id="openalexMagContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
@@ -151,6 +157,11 @@
                list-class="java.util.ArrayList">
         <ref bean="openalexUriLandingContrib"/>
         <ref bean="openalexUriPdfContrib"/>
+        <ref bean="openalexLandingPageUrlContrib"/>
+        <ref bean="openalexLocationPdfUrlContrib"/>
+        <ref bean="openalexPrimaryLocationPdfUrlContrib"/>
+        <ref bean="openalexPrimaryLocationLandingPageUrlContrib"/>
+        <ref bean="openalexOpenAccessUrlContrib"/>
     </util:list>
 
     <bean id="openalexUriIdentifierscContrib"
@@ -164,20 +175,54 @@
 
     <bean id="openalexUriLandingContrib"
           class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
-        <property name="field" ref="openalex.uri.landing"/>
+        <property name="field" ref="openalex.uri"/>
         <property name="query" value="/best_oa_location/landing_page_url"/>
-    </bean>
-    <bean id="openalex.uri.landing" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.uri"/>
     </bean>
 
     <bean id="openalexUriPdfContrib"
           class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
-        <property name="field" ref="openalex.uri.pdf"/>
+        <property name="field" ref="openalex.uri"/>
         <property name="query" value="/best_oa_location/pdf_url"/>
     </bean>
-    <bean id="openalex.uri.pdf" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.uri"/>
+
+    <bean id="openalexLandingPageUrlContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.uri"/>
+        <property name="metadataProcessor" ref="openalexLandingPageUrlProcessor"/>
+    </bean>
+    <bean name="openalexLandingPageUrlProcessor"
+          class="org.dspace.importer.external.metadatamapping.contributor.ArrayElementAttributeProcessor">
+        <property name="pathToArray" value="/locations"/>
+        <property name="elementAttribute" value="/landing_page_url"/>
+    </bean>
+
+    <bean id="openalexLocationPdfUrlContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.uri"/>
+        <property name="metadataProcessor" ref="openalexLocationPdfUrlProcessor"/>
+    </bean>
+    <bean name="openalexLocationPdfUrlProcessor"
+          class="org.dspace.importer.external.metadatamapping.contributor.ArrayElementAttributeProcessor">
+        <property name="pathToArray" value="/locations"/>
+        <property name="elementAttribute" value="/pdf_url"/>
+    </bean>
+
+    <bean id="openalexPrimaryLocationPdfUrlContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.uri"/>
+        <property name="query" value="/primary_location/landing_page_url"/>
+    </bean>
+
+    <bean id="openalexPrimaryLocationLandingPageUrlContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.uri"/>
+        <property name="query" value="/primary_location/pdf_url"/>
+    </bean>
+
+    <bean id="openalexOpenAccessUrlContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.uri"/>
+        <property name="query" value="/open_access/oa_url"/>
     </bean>
 
     <bean name="openalexPublishedVersionMetadataProcessor"
@@ -261,6 +306,166 @@
     </bean>
     <bean id="openalex.language" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
         <constructor-arg value="dc.language.iso"/>
+    </bean>
+
+    <bean id="openalexBiblioVolumeContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.biblio.volume"/>
+        <property name="query" value="/biblio/volume"/>
+    </bean>
+    <bean id="openalex.biblio.volume" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="oaire.citation.volume"/>
+    </bean>
+
+    <bean id="openalexBiblioIssueContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.biblio.issue"/>
+        <property name="query" value="/biblio/issue"/>
+    </bean>
+    <bean id="openalex.biblio.issue" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="oaire.citation.issue"/>
+    </bean>
+
+    <bean id="openalexBiblioFirstPageContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.biblio.firstpage"/>
+        <property name="query" value="/biblio/first_page"/>
+    </bean>
+    <bean id="openalex.biblio.firstpage" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="oaire.citation.startPage"/>
+    </bean>
+
+    <bean id="openalexBiblioLastPageContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.biblio.lastpage"/>
+        <property name="query" value="/biblio/last_page"/>
+    </bean>
+    <bean id="openalex.biblio.lastpage" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="oaire.citation.endPage"/>
+    </bean>
+
+    <bean id="openalex.subject" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.subject"/>
+    </bean>
+    <bean id="openalexConceptsNameContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.subject"/>
+        <property name="metadataProcessor" ref="openalexConceptsProcessor"/>
+    </bean>
+    <bean name="openalexConceptsProcessor"
+          class="org.dspace.importer.external.metadatamapping.contributor.ArrayElementAttributeProcessor">
+        <property name="pathToArray" value="/concepts"/>
+        <property name="elementAttribute" value="/display_name"/>
+    </bean>
+    <bean id="openalexKeywordsContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.subject"/>
+        <property name="metadataProcessor" ref="openalexKeywordsProcessor"/>
+    </bean>
+    <bean name="openalexKeywordsProcessor"
+          class="org.dspace.importer.external.metadatamapping.contributor.ArrayElementAttributeProcessor">
+        <property name="pathToArray" value="/keywords"/>
+        <property name="elementAttribute" value="/display_name"/>
+    </bean>
+
+    <util:list id="subjectContribList"
+               value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor"
+               list-class="java.util.ArrayList">
+        <ref bean="openalexConceptsNameContrib"/>
+        <ref bean="openalexKeywordsContrib"/>
+        <ref bean="openalexMeshContrib"/>
+        <ref bean="openalexTopicContrib"/>
+    </util:list>
+
+    <bean id="openalexPublicationSubjectContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.MultipleMetadataContributor">
+        <property name="metadatumContributors" ref="subjectContribList"/>
+        <property name="field" ref="openalex.subject"/>
+    </bean>
+
+    <bean id="openalexLicenseContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.license"/>
+        <property name="query" value="/license"/>
+    </bean>
+    <bean id="openalex.license" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.rights.license"/>
+    </bean>
+
+    <bean id="openalexMeshContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.ArrayJsonPathMetadataContributor">
+        <property name="contributor" ref="openalexMeshElementContrib"/>
+        <property name="pathToArray" value="/mesh"/>
+    </bean>
+
+    <bean id="openalexMeshElementContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.CombinedMetadatumContributor">
+        <property name="separator" value=" "/>
+        <property name="metadatumContributors" ref="combinedMeshElementList"/>
+        <property name="field" ref="openalex.subject"/>
+        <property name="metadataFieldMapping" ref="openalexPublicationMetadataFieldMapping"/>
+    </bean>
+
+    <util:list id="combinedMeshElementList"
+               value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor"
+               list-class="java.util.LinkedList">
+        <ref bean="openalexMeshNameContrib"/>
+        <ref bean="openalexMeshQualifierContrib"/>
+    </util:list>
+    <bean id="openalexMeshNameContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.subject"/>
+        <property name="query" value="/descriptor_name"/>
+    </bean>
+    <bean id="openalexMeshQualifierContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.subject"/>
+        <property name="query" value="/qualifier_name"/>
+    </bean>
+
+
+    <bean id="openalexTopicContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.ArrayJsonPathMetadataContributor">
+        <property name="contributor" ref="openalexTopicElementContrib"/>
+        <property name="pathToArray" value="/topics"/>
+    </bean>
+
+    <bean id="openalexTopicElementContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.CombinedMetadatumContributor">
+        <property name="separator" value=" "/>
+        <property name="metadatumContributors" ref="combinedTopicElementList"/>
+        <property name="field" ref="openalex.subject"/>
+        <property name="metadataFieldMapping" ref="openalexPublicationMetadataFieldMapping"/>
+    </bean>
+
+    <util:list id="combinedTopicElementList"
+               value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor"
+               list-class="java.util.LinkedList">
+        <ref bean="openalexTopicDomainContrib"/>
+        <ref bean="openalexTopicFieldContrib"/>
+        <ref bean="openalexTopicSubFieldContrib"/>
+        <ref bean="openalexTopicTitleFieldContrib"/>
+    </util:list>
+    <bean id="openalexTopicDomainContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.subject"/>
+        <property name="query" value="/domain/display_name"/>
+    </bean>
+    <bean id="openalexTopicFieldContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.subject"/>
+        <property name="query" value="/field/display_name"/>
+    </bean>
+    <bean id="openalexTopicSubFieldContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.subject"/>
+        <property name="query" value="/subfield/display_name"/>
+    </bean>
+
+    <bean id="openalexTopicTitleFieldContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.subject"/>
+        <property name="query" value="/display_name"/>
     </bean>
 
     <util:map id="openalexPersonMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
