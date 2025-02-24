@@ -78,6 +78,9 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
     @Autowired
     protected AuthorizeService authorizeService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     private Community communityNotVisited;
     private Community communityVisited;
     private Collection collectionNotVisited;
@@ -274,8 +277,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         viewEventRest.setTargetType("community");
         viewEventRest.setTargetId(communityVisited.getID());
 
-        ObjectMapper mapper = new ObjectMapper();
-
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
             .contentType(contentType))
@@ -324,8 +325,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         ViewEventRest viewEventRest = new ViewEventRest();
         viewEventRest.setTargetType("collection");
         viewEventRest.setTargetId(collectionVisited.getID());
-
-        ObjectMapper mapper = new ObjectMapper();
 
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
@@ -380,8 +379,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         ViewEventRest viewEventRest = new ViewEventRest();
         viewEventRest.setTargetType("item");
         viewEventRest.setTargetId(itemVisited.getID());
-
-        ObjectMapper mapper = new ObjectMapper();
 
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
@@ -469,8 +466,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         ViewEventRest viewEventRest = new ViewEventRest();
         viewEventRest.setTargetType("bitstream");
         viewEventRest.setTargetId(bitstreamVisited.getID());
-
-        ObjectMapper mapper = new ObjectMapper();
 
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
@@ -595,8 +590,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         viewEventRest.setTargetType("item");
         viewEventRest.setTargetId(itemVisited.getID());
 
-        ObjectMapper mapper = new ObjectMapper();
-
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
             .contentType(contentType))
@@ -679,8 +672,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         viewEventRest.setTargetType("collection");
         viewEventRest.setTargetId(collectionVisited.getID());
 
-        ObjectMapper mapper = new ObjectMapper();
-
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
             .contentType(contentType))
@@ -712,8 +703,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         ViewEventRest viewEventRest = new ViewEventRest();
         viewEventRest.setTargetType("bitstream");
         viewEventRest.setTargetId(bitstreamVisited.getID());
-
-        ObjectMapper mapper = new ObjectMapper();
 
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
@@ -780,8 +769,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         viewEventRest.setTargetType("bitstream");
         viewEventRest.setTargetId(bitstreamVisited.getID());
 
-        ObjectMapper mapper = new ObjectMapper();
-
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
             .contentType(contentType))
@@ -840,8 +827,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         ViewEventRest viewEventRest = new ViewEventRest();
         viewEventRest.setTargetType("collection");
         viewEventRest.setTargetId(collectionVisited.getID());
-
-        ObjectMapper mapper = new ObjectMapper();
 
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
@@ -911,8 +896,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         viewEventRest.setTargetType("community");
         viewEventRest.setTargetId(communityVisited.getID());
 
-        ObjectMapper mapper = new ObjectMapper();
-
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
             .contentType(contentType))
@@ -970,8 +953,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         ViewEventRest viewEventRest = new ViewEventRest();
         viewEventRest.setTargetType("item");
         viewEventRest.setTargetId(itemVisited.getID());
-
-        ObjectMapper mapper = new ObjectMapper();
 
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
@@ -1040,8 +1021,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         ViewEventRest viewEventRest = new ViewEventRest();
         viewEventRest.setTargetType("community");
         viewEventRest.setTargetId(communityVisited.getID());
-
-        ObjectMapper mapper = new ObjectMapper();
 
         getClient(loggedInToken).perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
@@ -1193,8 +1172,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         viewEventRest.setTargetType("item");
         viewEventRest.setTargetId(itemVisited.getID());
 
-        ObjectMapper mapper = new ObjectMapper();
-
         getClient().perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
             .contentType(contentType))
@@ -1204,15 +1181,13 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         viewEventRest2.setTargetType("item");
         viewEventRest2.setTargetId(itemVisited2.getID());
 
-        ObjectMapper mapper2 = new ObjectMapper();
-
         getClient().perform(post("/api/statistics/viewevents")
-            .content(mapper2.writeValueAsBytes(viewEventRest2))
+            .content(mapper.writeValueAsBytes(viewEventRest2))
             .contentType(contentType))
                    .andExpect(status().isCreated());
 
         getClient().perform(post("/api/statistics/viewevents")
-            .content(mapper2.writeValueAsBytes(viewEventRest2))
+            .content(mapper.writeValueAsBytes(viewEventRest2))
             .contentType(contentType))
                    .andExpect(status().isCreated());
 
@@ -1242,8 +1217,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         ViewEventRest viewEventRest = new ViewEventRest();
         viewEventRest.setTargetType("community");
         viewEventRest.setTargetId(communityVisited.getID());
-
-        ObjectMapper mapper = new ObjectMapper();
 
         getClient().perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
@@ -1332,8 +1305,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         viewEventRest.setTargetType("item");
         viewEventRest.setTargetId(itemVisited.getID());
 
-        ObjectMapper mapper = new ObjectMapper();
-
         getClient().perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
             .contentType(contentType))
@@ -1397,8 +1368,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         ViewEventRest viewEventRest = new ViewEventRest();
         viewEventRest.setTargetType("item");
         viewEventRest.setTargetId(itemVisited.getID());
-
-        ObjectMapper mapper = new ObjectMapper();
 
         getClient().perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))
@@ -1478,8 +1447,6 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         ViewEventRest viewEventRest = new ViewEventRest();
         viewEventRest.setTargetType("bitstream");
         viewEventRest.setTargetId(bitstreamVisited.getID());
-
-        ObjectMapper mapper = new ObjectMapper();
 
         getClient().perform(post("/api/statistics/viewevents")
             .content(mapper.writeValueAsBytes(viewEventRest))

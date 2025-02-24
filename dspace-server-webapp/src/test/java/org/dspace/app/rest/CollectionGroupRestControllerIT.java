@@ -50,6 +50,9 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Autowired
     private WorkflowService workflowService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     Collection collection;
 
     @Before
@@ -141,8 +144,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionAdminGroupCreateAdminGroupExtraMetadataSuccess() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -175,8 +176,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionAdminGroupCreateAdminGroupSuccess() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
 
@@ -204,8 +203,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionAdminGroupCreateAdminGroupDcTitleUnprocessable() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -230,8 +227,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionAdminGroupCreateAdminGroupSuccessParentCommunityAdmin() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -263,8 +258,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionAdminGroupCreateAdminGroupSuccessCollectionAdmin() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -296,8 +289,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionAdminGroupCreateAdminGroupUnAuthorized() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -318,8 +309,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionAdminGroupCreateAdminGroupForbidden() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -341,8 +330,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionAdminGroupCreateAdminGroupNotFound() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -361,8 +348,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionAdminGroupCreateAdminGroupUnProcessableName() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         groupRest.setName("Fail");
         MetadataRest metadataRest = new MetadataRest();
@@ -384,8 +369,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionAdminGroupCreateAdminGroupUnProcessablePermanent() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         groupRest.setPermanent(true);
         MetadataRest metadataRest = new MetadataRest();
@@ -584,8 +567,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionSubmitterGroupCreateSubmitterGroupExtraMetadataSuccess() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -619,8 +600,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionSubmitterGroupCreateSubmitterGroupSuccess() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -651,8 +630,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionSubmittersGroupCreateSubmittersGroupDcTitleUnprocessable() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -675,8 +652,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionSubmittersGroupCreateSubmittersGroupSuccessParentCommunityAdmin() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -709,8 +684,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionSubmittersGroupCreateSubmittersGroupSuccessCollectionAdmin() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -743,8 +716,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionSubmittersGroupCreateSubmittersGroupUnAuthorized() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -764,8 +735,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionSubmittersGroupCreateSubmittersGroupForbidden() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -788,8 +757,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionSubmittersGroupCreateSubmittersGroupNotFound() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -808,8 +775,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionSubmittersGroupCreateSubmittersGroupUnProcessableName() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         groupRest.setName("Fail");
         MetadataRest metadataRest = new MetadataRest();
@@ -832,8 +797,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionSubmittersGroupCreateSubmittersGroupUnProcessablePermanent() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         groupRest.setPermanent(true);
         MetadataRest metadataRest = new MetadataRest();
@@ -1055,8 +1018,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionDefaultItemReadGroupCreateDefaultItemReadGroupSuccess() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1087,8 +1048,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionDefaultItemReadGroupCreateDefaultItemReadGroupDcTitleUnprocessable() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1116,8 +1075,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void postCollectionDefaultItemReadGroupCreateDefaultItemReadGroupSuccessParentCommunityAdmin()
         throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1150,8 +1107,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionDefaultItemReadGroupCreateDefaultItemReadGroupSuccessCollectionAdmin() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1184,8 +1139,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionDefaultItemReadGroupCreateDefaultItemReadGroupUnAuthorized() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1211,8 +1164,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionDefaultItemReadGroupCreateDefaultItemReadGroupForbidden() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1240,8 +1191,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionDefaultItemReadGroupCreateDefaultItemReadGroupNotFound() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1260,8 +1209,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionDefaultItemReadGroupCreateDefaultItemReadGroupUnProcessableName() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         groupRest.setName("Fail");
         MetadataRest metadataRest = new MetadataRest();
@@ -1289,8 +1236,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionDefaultItemReadGroupCreateDefaultItemReadGroupUnProcessablePermanent() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         groupRest.setPermanent(true);
         MetadataRest metadataRest = new MetadataRest();
@@ -1545,8 +1490,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionDefaultBitstreamReadGroupCreateDefaultBitstreamReadGroupSuccess() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1578,8 +1521,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void postCollectionDefaultBitstreamReadGroupCreateDefaultBitstreamReadGroupDcTitleUnprocessable()
         throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1606,8 +1547,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void postCollectionDefaultBitstreamReadGroupCreateDefaultBitstreamReadGroupSuccessParentCommunityAdmin()
         throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1641,8 +1580,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void postCollectionDefaultBitstreamReadGroupCreateDefaultBitstreamReadGroupSuccessCollectionAdmin()
         throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1675,8 +1612,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionDefaultBitstreamReadGroupCreateDefaultBitstreamReadGroupUnAuthorized() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1702,8 +1637,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionDefaultBitstreamReadGroupCreateDefaultBitstreamReadGroupForbidden() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1731,8 +1664,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionDefaultBitstreamReadGroupCreateDefaultBitstreamReadGroupNotFound() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -1752,8 +1683,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void postCollectionDefaultBitstreamReadGroupCreateDefaultBitstreamReadGroupUnProcessableName()
         throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         groupRest.setName("Fail");
         MetadataRest metadataRest = new MetadataRest();
@@ -1782,8 +1711,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
     @Test
     public void postCollectionDefaultBitstreamReadGroupCreateDefaultBitstreamReadGroupUnProcessablePermanent()
         throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         groupRest.setPermanent(true);
         MetadataRest metadataRest = new MetadataRest();
@@ -2033,8 +1960,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionWorkflowGroupCreateWorkflowGroupSuccess() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
 
@@ -2063,8 +1988,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionWorkflowGroupCreateWorkflowGroupExtraMetadataSuccess() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -2098,8 +2021,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionWorkflowGroupWrongCollectionId() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -2118,8 +2039,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionWorkflowGroupCreateWorkflowGroupWrongRole() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -2139,8 +2058,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionWorkflowGroupCreateWorkflowGroupDcTitleUnprocessable() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -2163,8 +2080,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionWorkflowGroupCreateWorkflowGroupSuccessParentCommunityAdmin() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -2197,8 +2112,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionWorkflowGroupCreateWorkflowGroupSuccessCollectionAdmin() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -2231,8 +2144,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionWorkflowGroupCreateWorkflowGroupUnAuthorized() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -2254,8 +2165,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionWorkflowGroupCreateWorkflowGroupForbidden() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         MetadataRest metadataRest = new MetadataRest();
         metadataRest.put("dc.description", new MetadataValueRest("testingDescription"));
@@ -2278,8 +2187,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionWorkflowGroupCreateWorkflowGroupUnProcessableName() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         groupRest.setName("Fail");
         MetadataRest metadataRest = new MetadataRest();
@@ -2302,8 +2209,6 @@ public class CollectionGroupRestControllerIT extends AbstractControllerIntegrati
 
     @Test
     public void postCollectionWorkflowGroupCreateWorkflowGroupUnProcessablePermanent() throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
         GroupRest groupRest = new GroupRest();
         groupRest.setPermanent(true);
         MetadataRest metadataRest = new MetadataRest();

@@ -19,6 +19,7 @@ import org.dspace.app.ldn.NotifyServiceInboundPattern;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
 import org.dspace.app.rest.model.patch.JsonValueEvaluator;
 import org.dspace.app.rest.model.patch.Operation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -30,7 +31,8 @@ public final class NotifyServicePatchUtils {
 
     public static final String NOTIFY_SERVICE_INBOUND_PATTERNS = "notifyServiceInboundPatterns";
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper mapper;
 
     private NotifyServicePatchUtils() {
     }
@@ -47,10 +49,10 @@ public final class NotifyServicePatchUtils {
         try {
             if (operation.getValue() != null) {
                 if (operation.getValue() instanceof JsonValueEvaluator) {
-                    inboundPattern = objectMapper.readValue(((JsonValueEvaluator) operation.getValue())
+                    inboundPattern = mapper.readValue(((JsonValueEvaluator) operation.getValue())
                             .getValueNode().toString(), NotifyServiceInboundPattern.class);
                 } else if (operation.getValue() instanceof String) {
-                    inboundPattern = objectMapper.readValue((String) operation.getValue(),
+                    inboundPattern = mapper.readValue((String) operation.getValue(),
                         NotifyServiceInboundPattern.class);
                 }
             }
@@ -76,8 +78,8 @@ public final class NotifyServicePatchUtils {
         try {
             if (operation.getValue() != null) {
                 if (operation.getValue() instanceof String) {
-                    inboundPatterns = objectMapper.readValue((String) operation.getValue(),
-                        objectMapper.getTypeFactory().constructCollectionType(ArrayList.class,
+                    inboundPatterns = mapper.readValue((String) operation.getValue(),
+                        mapper.getTypeFactory().constructCollectionType(ArrayList.class,
                             NotifyServiceInboundPattern.class));
                 }
             }

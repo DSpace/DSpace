@@ -29,11 +29,15 @@ import org.dspace.app.rest.model.SystemWideAlertRest;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.builder.SystemWideAlertBuilder;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Test class to test the operations in the SystemWideAlertRestRepository
  */
 public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrationTest {
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Test
     public void findAllTest() throws Exception {
@@ -320,8 +324,6 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         systemWideAlertRest.setAllowSessions(AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY.getValue());
         systemWideAlertRest.setActive(true);
 
-        ObjectMapper mapper = new ObjectMapper();
-
         String authToken = getAuthToken(admin.getEmail(), password);
 
         AtomicReference<Integer> idRef = new AtomicReference<>();
@@ -369,8 +371,6 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         systemWideAlertRest.setAllowSessions(AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY.getValue());
         systemWideAlertRest.setActive(true);
 
-        ObjectMapper mapper = new ObjectMapper();
-
         String authToken = getAuthToken(eperson.getEmail(), password);
 
 
@@ -388,8 +388,6 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         systemWideAlertRest.setCountdownTo(LocalDateTime.now());
         systemWideAlertRest.setAllowSessions(AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY.getValue());
         systemWideAlertRest.setActive(true);
-
-        ObjectMapper mapper = new ObjectMapper();
 
         getClient().perform(post("/api/system/systemwidealerts/")
                                     .content(mapper.writeValueAsBytes(systemWideAlertRest))
@@ -417,8 +415,6 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         systemWideAlertRest.setCountdownTo(LocalDateTime.now());
         systemWideAlertRest.setAllowSessions(AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY.getValue());
         systemWideAlertRest.setActive(true);
-
-        ObjectMapper mapper = new ObjectMapper();
 
         String authToken = getAuthToken(admin.getEmail(), password);
 
@@ -448,8 +444,6 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         systemWideAlertRest.setCountdownTo(dateToNearestSecond);
         systemWideAlertRest.setAllowSessions(AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY.getValue());
         systemWideAlertRest.setActive(true);
-
-        ObjectMapper mapper = new ObjectMapper();
 
         String authToken = getAuthToken(admin.getEmail(), password);
 

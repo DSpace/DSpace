@@ -122,6 +122,9 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
     @Autowired
     private ConfigurationService configurationService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     private Item publication1;
     private Item author1;
     private Item author2;
@@ -2072,7 +2075,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         UUID idRef = null;
         AtomicReference<UUID> idRefNoEmbeds = new AtomicReference<>();
         try {
-        ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
         ItemRest itemRestFull = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
@@ -2169,7 +2171,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String itemUuidString = null;
         try {
-        ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
                              " A qualitative view from repository staff");
@@ -2252,7 +2253,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String itemUuidString = null;
         try {
-        ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
                              " A qualitative view from repository staff");
@@ -2331,7 +2331,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String itemUuidString = null;
         try {
-        ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
                              " A qualitative view from repository staff");
@@ -2439,7 +2438,7 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         context.restoreAuthSystemState();
         String token = getAuthToken(asUser.getEmail(), password);
 
-        new MetadataPatchSuite().runWith(getClient(token), "/api/core/items/" + item.getID(), expectedStatus);
+        new MetadataPatchSuite(mapper).runWith(getClient(token), "/api/core/items/" + item.getID(), expectedStatus);
     }
 
     /**
@@ -2464,7 +2463,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
         context.restoreAuthSystemState();
-        ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
                              " A qualitative view from repository staff");
@@ -2502,7 +2500,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
         context.restoreAuthSystemState();
-        ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
                              " A qualitative view from repository staff");
@@ -2542,7 +2539,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String itemUuidString = null;
         try {
-        ObjectMapper mapper = new ObjectMapper();
         ItemRest itemRest = new ItemRest();
         itemRest.setName("Practices of research data curation in institutional repositories:" +
                              " A qualitative view from repository staff");
@@ -2603,7 +2599,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         String itemUuidString = null;
         try {
-        ObjectMapper mapper = new ObjectMapper();
         String token = getAuthToken(admin.getEmail(), password);
         MvcResult mvcResult = getClient(token).perform(post("/api/core/items?owningCollection="
                                                                 + col1.getID().toString())

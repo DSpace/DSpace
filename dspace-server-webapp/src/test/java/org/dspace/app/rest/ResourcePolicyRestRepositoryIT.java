@@ -73,6 +73,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
     @Autowired
     ResourcePolicyService resourcePolicyService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Test
     public void findAllTest() throws Exception {
 
@@ -1007,7 +1010,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
             context.restoreAuthSystemState();
 
-            ObjectMapper mapper = new ObjectMapper();
             ResourcePolicyRest resourcePolicyRest = new ResourcePolicyRest();
 
             resourcePolicyRest.setPolicyType(ResourcePolicy.TYPE_SUBMISSION);
@@ -1066,7 +1068,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
             context.restoreAuthSystemState();
 
-            ObjectMapper mapper = new ObjectMapper();
             ResourcePolicyRest resourcePolicyRest = new ResourcePolicyRest();
 
             resourcePolicyRest.setPolicyType(ResourcePolicy.TYPE_SUBMISSION);
@@ -1114,7 +1115,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         context.restoreAuthSystemState();
 
-        ObjectMapper mapper = new ObjectMapper();
         ResourcePolicyRest resourcePolicyRest = new ResourcePolicyRest();
 
         resourcePolicyRest.setPolicyType(ResourcePolicy.TYPE_SUBMISSION);
@@ -1151,7 +1151,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         context.restoreAuthSystemState();
 
-        ObjectMapper mapper = new ObjectMapper();
         ResourcePolicyRest resourcePolicyRest = new ResourcePolicyRest();
 
         resourcePolicyRest.setPolicyType(ResourcePolicy.TYPE_SUBMISSION);
@@ -1189,7 +1188,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         context.restoreAuthSystemState();
 
-        ObjectMapper mapper = new ObjectMapper();
         ResourcePolicyRest resourcePolicyRest = new ResourcePolicyRest();
 
         resourcePolicyRest.setPolicyType(ResourcePolicy.TYPE_SUBMISSION);

@@ -108,6 +108,9 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     private List<Filter> requestFilters;
 
     @Autowired
+    private ObjectMapper mapper;
+
+    @Autowired
     void setConverters(HttpMessageConverter<?>[] converters) {
 
         this.mappingJackson2HttpMessageConverter = Arrays.asList(converters).stream().filter(
@@ -187,9 +190,8 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     }
 
     public String getPatchContent(List<Operation> ops) {
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            return objectMapper.writeValueAsString(ops);
+            return mapper.writeValueAsString(ops);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
