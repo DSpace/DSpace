@@ -119,7 +119,7 @@
           class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="openalexImportPublicationService"/>
         <property name="sourceIdentifier" value="openalexPublication"/>
-        <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="recordIdMetadata" value="dc.identifier.openalex"/>
         <property name="supportedEntityTypes">
             <list>
                 <value>Publication</value>
@@ -132,7 +132,7 @@
           class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="openalexImportPublicationByAuthorIdService"/>
         <property name="sourceIdentifier" value="openalexPublicationByAuthorId"/>
-        <property name="recordIdMetadata" value="dc.identifier.other"/>
+        <property name="recordIdMetadata" value="dc.identifier.openalex"/>
         <property name="supportedEntityTypes">
             <list>
                 <value>Publication</value>

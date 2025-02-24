@@ -318,7 +318,23 @@
           }
         }
       ],
-      "keywords": [],
+      "keywords": [
+        {
+          "id": "https://openalex.org/keywords/global-seaweed-distribution",
+          "display_name": "Global Seaweed Distribution",
+          "score": 0.559386
+        },
+        {
+          "id": "https://openalex.org/keywords/climate-change-impacts",
+          "display_name": "Climate Change Impacts",
+          "score": 0.535795
+        },
+        {
+          "id": "https://openalex.org/keywords/ecosystem-resilience",
+          "display_name": "Ecosystem Resilience",
+          "score": 0.502789
+        }
+      ],
       "concepts": [
         {
           "id": "https://openalex.org/C40875361",
@@ -356,7 +372,22 @@
           "score": 0.27057263
         }
       ],
-      "mesh": [],
+      "mesh": [
+        {
+          "descriptor_ui": "D017712",
+          "descriptor_name": "Peer Review, Research",
+          "qualifier_ui": "Q000379",
+          "qualifier_name": "methods",
+          "is_major_topic": false
+        },
+        {
+          "descriptor_ui": "D017712",
+          "descriptor_name": "Peer Review, Research",
+          "qualifier_ui": "Q000592",
+          "qualifier_name": "standards",
+          "is_major_topic": true
+        }
+      ],
       "locations_count": 2,
       "locations": [
         {
@@ -1201,7 +1232,8 @@
         }
       ],
       "updated_date": "2025-02-14T14:15:09.084261",
-      "created_date": "2016-06-24"
+      "created_date": "2016-06-24",
+      "license": "cc-by"
     }
   ],
   "group_by": []
