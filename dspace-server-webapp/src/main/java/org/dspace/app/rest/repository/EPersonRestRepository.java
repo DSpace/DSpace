@@ -84,6 +84,9 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
     @Autowired
     private GroupService groupService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     private final EPersonService es;
 
 
@@ -97,7 +100,6 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
             throws AuthorizeException {
         // this need to be revisited we should receive an EPersonRest as input
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
-        ObjectMapper mapper = new ObjectMapper();
         EPersonRest epersonRest = null;
         try {
             epersonRest = mapper.readValue(req.getInputStream(), EPersonRest.class);

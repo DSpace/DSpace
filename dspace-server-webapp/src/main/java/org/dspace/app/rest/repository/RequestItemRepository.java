@@ -78,6 +78,9 @@ public class RequestItemRepository
     @Autowired(required = true)
     protected RequestItemEmailNotifier requestItemEmailNotifier;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     /*
      * DSpaceRestRepository
      */
@@ -106,7 +109,6 @@ public class RequestItemRepository
         HttpServletRequest req = getRequestService()
                 .getCurrentRequest()
                 .getHttpServletRequest();
-        ObjectMapper mapper = new ObjectMapper();
         RequestItemRest rir;
         try {
             rir = mapper.readValue(req.getInputStream(), RequestItemRest.class);

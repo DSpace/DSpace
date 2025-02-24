@@ -118,6 +118,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     @Autowired
     private ConfigurationService configurationService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     private GroupService groupService;
 
     private Group embargoedGroups;
@@ -4341,8 +4344,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         Integer workspaceItemId = null;
         try {
-
-        ObjectMapper mapper = new ObjectMapper();
         // You have to be an admin to create an Item from an ExternalDataObject
         String token = getAuthToken(admin.getEmail(), password);
         MvcResult mvcResult = getClient(token).perform(post("/api/submission/workspaceitems?owningCollection="
@@ -4415,7 +4416,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         context.restoreAuthSystemState();
 
-        ObjectMapper mapper = new ObjectMapper();
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(post("/api/submission/workspaceitems?owningCollection="
                                           + col1.getID().toString())
