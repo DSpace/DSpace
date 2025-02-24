@@ -177,6 +177,11 @@ public class OpenAlexPublicationExternalSourcesIT extends AbstractControllerInte
                            jsonPath("$._embedded.externalSourceEntries[0].metadata['oaire.version.volume'][0].value")
                                .value("http://purl.org/coar/version/c_970fb48d4fbd8a85"))
                        .andExpect(
+                           jsonPath("$._embedded.externalSourceEntries[0].metadata['oaire.citation.title'][0].value")
+                               .value("Journal of Biological Chemistry"))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.issn']",
+                                           Matchers.hasSize(3)))
+                       .andExpect(
                            jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.doi'][0].value")
                                .value("10.1016/s0021-9258(19)52451-6"))
                        .andExpect(
