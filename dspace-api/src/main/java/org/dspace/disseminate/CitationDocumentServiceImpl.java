@@ -87,8 +87,6 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
      */
     protected List<String> citationEnabledCollectionsList;
 
-    protected File tempDir;
-
     protected String[] header1;
     protected String[] header2;
     protected String[] fields;
@@ -210,17 +208,6 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             }
         }
 
-        //Ensure a temp directory is available
-        String tempDirString = configurationService.getProperty("dspace.dir") + File.separator + "temp";
-        tempDir = new File(tempDirString);
-        if (!tempDir.exists()) {
-            boolean success = tempDir.mkdir();
-            if (success) {
-                log.info("Created temp directory at: " + tempDirString);
-            } else {
-                log.info("Unable to create temp directory at: " + tempDirString);
-            }
-        }
     }
 
 
