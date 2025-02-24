@@ -27,6 +27,7 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Year;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -987,7 +988,10 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             // Get our date
             LocalDate date = null;
             try {
-                date = LocalDate.parse(name, DateTimeFormatter.ISO_INSTANT);
+                // First parse to an instant
+                Instant instant = Instant.parse(name);
+                // Then extract the LocalDate
+                date = instant.atZone(ZoneOffset.UTC).toLocalDate();
             } catch (DateTimeParseException e) {
                 e.printStackTrace();
             }

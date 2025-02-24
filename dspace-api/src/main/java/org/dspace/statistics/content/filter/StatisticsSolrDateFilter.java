@@ -9,6 +9,7 @@ package org.dspace.statistics.content.filter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 /**
@@ -124,8 +125,8 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
 
         //Parse the dates
         DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
-        String startDateParsed = formatter.format(startDate);
-        String endDateParsed = formatter.format(endDate);
+        String startDateParsed = formatter.format(startDate.toInstant(ZoneOffset.UTC));
+        String endDateParsed = formatter.format(endDate.toInstant(ZoneOffset.UTC));
 
         //Create our string
         return "time:[" + startDateParsed + " TO " + endDateParsed + "]";
