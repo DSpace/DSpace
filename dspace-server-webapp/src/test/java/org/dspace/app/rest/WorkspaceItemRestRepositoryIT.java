@@ -4066,7 +4066,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // date in YYYY-MM-DD format
         DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
-        String startDateStr = dateFmt.format(Instant.now());
+        String startDateStr = dateFmt.format(LocalDate.now());
 
         // create a list of values to use in add operation
         List<Operation> addAccessCondition = new ArrayList<>();
@@ -4885,7 +4885,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1, "123456789/extraction-test")
                 .withName("Collection 1").build();
-        String authToken = getAuthToken(admin.getEmail(), password);
 
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                 .build();
@@ -4893,6 +4892,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withTitle("This is a test title")
                 .build();
         context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
 
         // try to add the pmid identifier
         List<Operation> addId = new ArrayList<Operation>();
@@ -5676,7 +5677,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // date in YYYY-MM-DD format
         DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
-        String endDateStr = dateFmt.format(Instant.now());
+        String endDateStr = dateFmt.format(LocalDate.now());
 
         // prepare patch body
         Map<String, String> accessCondition = new HashMap<>();
@@ -5767,7 +5768,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // date in YYYY-MM-DD format
         DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
-        String startDateStr = dateFmt.format(Instant.now());
+        String startDateStr = dateFmt.format(LocalDate.now());
 
         // prepare patch body
         Map<String, String> accessCondition = new HashMap<>();
@@ -5858,7 +5859,7 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         // date in YYYY-MM-DD format
         DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
-        String startDateStr = dateFmt.format(Instant.now());
+        String startDateStr = dateFmt.format(LocalDate.now());
 
         // prepare patch body
         Map<String, String> accessCondition = new HashMap<>();
@@ -8113,8 +8114,6 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
     public void sherpaPolicySectionCacheTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        String dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
-
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
@@ -8148,7 +8147,7 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .andDo(result -> retrievalTime.set(read(
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
-        Instant date = DateTimeFormatter.ofPattern(dateFormat).parse(retrievalTime.get(), Instant::from);
+        Instant date = Instant.parse(retrievalTime.get());
 
         // reload page, to verify that the retrievalTime is not changed
         getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
@@ -8164,7 +8163,7 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .andDo(result -> retrievalTime2.set(read(
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
-        Instant date2 = DateTimeFormatter.ofPattern(dateFormat).parse(retrievalTime2.get(), Instant::from);
+        Instant date2 = Instant.parse(retrievalTime2.get());
 
         assertTrue(date.equals(date2));
 
@@ -8189,7 +8188,7 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .andDo(result -> retrievalTime.set(read(
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
-        date = DateTimeFormatter.ofPattern(dateFormat).parse(retrievalTime.get(), Instant::from);
+        date = Instant.parse(retrievalTime.get());
 
         assertTrue(date.isAfter(date2));
 
@@ -8207,15 +8206,13 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .andDo(result -> retrievalTime2.set(read(
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
-        date2 = DateTimeFormatter.ofPattern(dateFormat).parse(retrievalTime2.get(), Instant::from);
+        date2 = Instant.parse(retrievalTime2.get());
         assertTrue(date.equals(date2));
     }
 
     @Test
     public void sherpaPolicySectionWithWrongIssnCacheTest() throws Exception {
         context.turnOffAuthorisationSystem();
-
-        String dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
 
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
@@ -8248,7 +8245,7 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .andDo(result -> retrievalTime.set(read(
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
-        Instant date = DateTimeFormatter.ofPattern(dateFormat).parse(retrievalTime.get(), Instant::from);
+        Instant date = Instant.parse(retrievalTime.get());
 
         // reload page, to verify that the retrievalTime is not changed
         getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
@@ -8262,7 +8259,7 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .andDo(result -> retrievalTime2.set(read(
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
-        Instant date2 = DateTimeFormatter.ofPattern(dateFormat).parse(retrievalTime2.get(), Instant::from);
+        Instant date2 = Instant.parse(retrievalTime2.get());
 
         assertTrue(date.equals(date2));
 
@@ -8285,7 +8282,7 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .andDo(result -> retrievalTime.set(read(
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
-        date = DateTimeFormatter.ofPattern(dateFormat).parse(retrievalTime.get(), Instant::from);
+        date = Instant.parse(retrievalTime.get());
 
         assertTrue(date.isAfter(date2));
 
@@ -8301,7 +8298,7 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .andDo(result -> retrievalTime2.set(read(
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
-        date2 = DateTimeFormatter.ofPattern(dateFormat).parse(retrievalTime2.get(), Instant::from);
+        date2 = Instant.parse(retrievalTime2.get());
         assertTrue(date.equals(date2));
     }
 
