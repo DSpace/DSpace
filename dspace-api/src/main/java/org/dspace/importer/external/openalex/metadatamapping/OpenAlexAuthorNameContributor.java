@@ -68,7 +68,7 @@ public class OpenAlexAuthorNameContributor extends SimpleJsonPathMetadataContrib
         String lastName = nameParts[nameParts.length - 1];
 
         // Check field configuration and map accordingly
-        if ("firstName".equals(field.getElement()) && StringUtils.isNotBlank(firstName)) {
+        if ("givenName".equals(field.getElement()) && StringUtils.isNotBlank(firstName)) {
             metadata.add(createMetadatum(field, firstName));
         } else if ("familyName".equals(field.getElement()) && StringUtils.isNotBlank(lastName)) {
             metadata.add(createMetadatum(field, lastName));

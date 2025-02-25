@@ -102,7 +102,7 @@ public class OpenAlexPersonExternalSourcesIT extends AbstractControllerIntegrati
                        .andExpect(
                            jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.openalex'][0].value",
                                     is("A5016721535")))
-                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['person.firstName'][0].value",
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['person.givenName'][0].value",
                                            is("Claudio Giovanni")))
                        .andExpect(
                            jsonPath("$._embedded.externalSourceEntries[0].metadata['person.familyName'][0].value",
