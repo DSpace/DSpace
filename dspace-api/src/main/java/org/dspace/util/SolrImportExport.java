@@ -12,6 +12,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
 import java.time.Instant;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -552,10 +553,10 @@ public class SolrImportExport {
         List<RangeFacet.Count> monthFacets = solr.query(query).getFacetRanges().get(0).getCounts();
 
         for (RangeFacet.Count monthFacet : monthFacets) {
-            Instant monthStartDate;
+            YearMonth monthStartDate;
             String monthStart = monthFacet.getValue();
             try {
-                monthStartDate = Instant.parse(monthStart);
+                monthStartDate = YearMonth.parse(monthStart);
             } catch (DateTimeParseException e) {
                 throw new SolrImportExportException("Could not read start of month batch as date: " + monthStart, e);
             }
@@ -645,7 +646,7 @@ public class SolrImportExport {
      * @param index        The index of the current batch.
      * @return A file name that is appropriate to use for exporting the batch of data described by the parameters.
      */
-    private static String makeExportFilename(String indexName, Instant exportStart, long totalRecords, int index) {
+    private static String makeExportFilename(String indexName, YearMonth exportStart, long totalRecords, int index) {
         String exportFileNumber = "";
         if (totalRecords > ROWS_PER_FILE) {
             exportFileNumber = StringUtils

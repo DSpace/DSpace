@@ -31,6 +31,8 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -2039,7 +2041,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     protected String generateRandomFilename(boolean hidden) {
         String filename = String.format("%s", RandomStringUtils.randomAlphanumeric(8));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm");
-        String datePart = formatter.format(Instant.now());
+        String datePart = formatter.format(LocalDateTime.now(ZoneOffset.UTC));
         filename = datePart + "_" + filename;
 
         return filename;
