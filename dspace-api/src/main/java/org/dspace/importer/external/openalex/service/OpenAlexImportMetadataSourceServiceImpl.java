@@ -181,6 +181,8 @@ public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetad
             if (query.contains("filter=authorships.author.id")) {
                 query = query.replace("filter=", "");
                 uriParams.put("filter", query);
+            } else if (url.contains("sources")) {
+                uriParams.put("filter", "type:journal,default.search:" + query);
             } else {
                 uriParams.put("search", query);
             }
@@ -236,6 +238,8 @@ public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetad
             if (query.contains("filter=authorships.author.id")) {
                 query = query.replace("filter=", "");
                 uriParams.put("filter", query);
+            } else if (url.contains("sources")) {
+                uriParams.put("filter", "type:journal,default.search:" + query);
             } else {
                 uriParams.put("search", query);
             }

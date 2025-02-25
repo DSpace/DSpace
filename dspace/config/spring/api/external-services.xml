@@ -330,4 +330,16 @@
         </property>
     </bean>
 
+    <bean id="openalexJournalLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="openalexImportJournalService"/>
+        <property name="sourceIdentifier" value="openalexJournal"/>
+        <property name="recordIdMetadata" value="dc.identifier.openalex"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Journal</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
 </beans>

@@ -594,4 +594,61 @@
         <constructor-arg value="person.givenName"/>
     </bean>
 
+
+    <util:map id="openalexJournalMetadataFieldMap"
+              key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+              value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
+        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
+            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
+            what metadatafield is generated.
+        </description>
+        <entry key-ref="dc.identifier.openalex" value-ref="openalexIdContrib"/>
+        <entry key-ref="dc.title" value-ref="openalexAuthorNameContrib"/>
+        <entry key-ref="creativeworkseries.issn" value-ref="openalexCreativeWorkSeriesISSNContrib"/>
+        <entry key-ref="dc.description" value-ref="openalexJournalDescriptionContrib"/>
+        <entry key-ref="creativework.publisher" value-ref="openalexCreativeworkPublisherTitleContrib"/>
+    </util:map>
+
+    <bean id="creativeworkseries.issn" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="creativeworkseries.issn"/>
+    </bean>
+    <bean id="openalexCreativeWorkSeriesISSNContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="creativeworkseries.issn"/>
+        <property name="query" value="/issn"/>
+    </bean>
+
+    <bean id="dc.description" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.description"/>
+    </bean>
+    <util:list id="journalDescriptionContribList"
+               value-type="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor"
+               list-class="java.util.ArrayList">
+        <ref bean="openalexJournalAbbreviatedTitleContrib"/>
+        <ref bean="openalexJournalAlternateTitlesContrib"/>
+    </util:list>
+    <bean id="openalexJournalDescriptionContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.MultipleMetadataContributor">
+        <property name="metadatumContributors" ref="journalDescriptionContribList"/>
+        <property name="field" ref="dc.description"/>
+    </bean>
+    <bean id="openalexJournalAbbreviatedTitleContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="dc.description"/>
+        <property name="query" value="/abbreviated_title"/>
+    </bean>
+    <bean id="openalexJournalAlternateTitlesContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="dc.description"/>
+        <property name="query" value="/alternate_titles"/>
+    </bean>
+    <bean id="creativework.publisher" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="creativework.publisher"/>
+    </bean>
+    <bean id="openalexCreativeworkPublisherTitleContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="creativework.publisher"/>
+        <property name="query" value="/host_organization_name"/>
+    </bean>
+
 </beans>

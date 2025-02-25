@@ -63,7 +63,7 @@ public class OpenAlexPersonExternalSourcesIT extends AbstractControllerIntegrati
     @Test
     public void findOpenalexPersonExternalSourceEntriesEmptyWithQueryTest() throws Exception {
 
-        try (InputStream file = getClass().getResourceAsStream("openalex-person-empty.json")) {
+        try (InputStream file = getClass().getResourceAsStream("openalex-empty.json")) {
             String jsonResponse = IOUtils.toString(file, Charset.defaultCharset());
             when(liveImportClient.executeHttpGetRequest(anyInt(), anyString(), anyMap()))
                 .thenReturn(jsonResponse);

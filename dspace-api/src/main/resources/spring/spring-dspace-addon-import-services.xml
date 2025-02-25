@@ -262,12 +262,22 @@
         <property name="url" value="${openalex.url.works}"/>
     </bean>
 
+    <bean id="openalexImportJournalService"
+          class="org.dspace.importer.external.openalex.service.OpenAlexImportMetadataSourceServiceImpl">
+        <property name="metadataFieldMapping" ref="openalexJournalMetadataFieldMapping"/>
+        <property name="url" value="${openalex.url.sources}"/>
+    </bean>
+
     <bean id="openalexPublicationMetadataFieldMapping"
           class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexPublicationFieldMapping">
     </bean>
 
     <bean id="openalexPersonMetadataFieldMapping"
           class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexPersonFieldMapping">
+    </bean>
+
+    <bean id="openalexJournalMetadataFieldMapping"
+          class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexJournalFieldMapping">
     </bean>
 
 </beans>

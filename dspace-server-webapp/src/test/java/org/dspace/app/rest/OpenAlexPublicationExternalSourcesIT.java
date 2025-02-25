@@ -70,7 +70,7 @@ public class OpenAlexPublicationExternalSourcesIT extends AbstractControllerInte
     @Test
     public void findOpenalexPublicationExternalSourceEntriesEmptyWithQueryTest() throws Exception {
 
-        try (InputStream file = getClass().getResourceAsStream("openalex-publication-empty.json")) {
+        try (InputStream file = getClass().getResourceAsStream("openalex-empty.json")) {
             String jsonResponse = IOUtils.toString(file, Charset.defaultCharset());
             when(liveImportClient.executeHttpGetRequest(anyInt(), anyString(), anyMap()))
                 .thenReturn(jsonResponse);
