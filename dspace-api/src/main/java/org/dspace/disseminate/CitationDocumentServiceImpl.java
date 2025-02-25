@@ -240,6 +240,8 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             }
         }
 
+        citationAsFirstPage = configurationService.getBooleanProperty("citation-page.citation_as_first_page", true);
+
         // Fields related to configuration of pdf template-based implementation
         coverPagePath = configurationService.getProperty("citation-page.template_path");
         htmlfields = Arrays.asList(configurationService.getArrayProperty("citation-page.htmlfields"));
@@ -305,10 +307,6 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     protected Boolean citationAsFirstPage = null;
 
     protected Boolean isCitationFirstPage() {
-        if (citationAsFirstPage == null) {
-            citationAsFirstPage = configurationService.getBooleanProperty("citation-page.citation_as_first_page", true);
-        }
-
         return citationAsFirstPage;
     }
 
@@ -409,13 +407,22 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
             coverTemplateReader.close();
 
             coverStream.flush();
-            PdfReader coverReader = new PdfReader(coverStream.toByteArray());
 
-            originalStamper.insertPage(1, coverReader.getPageSize(1));
+            PdfContentByte cb;
+            PdfReader coverReader = new PdfReader(coverStream.toByteArray());
             PdfImportedPage importedCoverpage = originalStamper
                     .getImportedPage(coverReader, 1);
 
-            PdfContentByte cb = originalStamper.getUnderContent(1);
+            if (isCitationFirstPage()) {
+                //citation as cover page
+                originalStamper.insertPage(1, coverReader.getPageSize(1));
+                cb = originalStamper.getUnderContent(1);
+            } else {
+                //citation as tail page
+                originalStamper.insertPage(originalReader.getNumberOfPages() + 1, coverReader.getPageSize(1));
+                cb = originalStamper.getUnderContent(originalReader.getNumberOfPages());
+            }
+
             cb.addTemplate(importedCoverpage, 0, 0);
 
             originalStamper.close();
