@@ -19,6 +19,7 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -678,7 +679,7 @@ public class ItemExportServiceImpl implements ItemExportService {
                         context.turnOffAuthorisationSystem();
 
                         String fileName = assembleFileName("item", eperson,
-                                                           Instant.now());
+                                                           LocalDate.now());
                         String workParentDir = getExportWorkDirectory()
                             + System.getProperty("file.separator")
                             + fileName;
@@ -750,7 +751,7 @@ public class ItemExportServiceImpl implements ItemExportService {
 
     @Override
     public String assembleFileName(String type, EPerson eperson,
-                                   Instant date) throws Exception {
+                                   LocalDate date) throws Exception {
         // to format the date
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MMM_dd");
         String downloadDir = getExportDownloadDirectory(eperson);

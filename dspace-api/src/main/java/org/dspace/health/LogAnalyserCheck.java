@@ -7,7 +7,6 @@
  */
 package org.dspace.health;
 
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,7 +42,7 @@ public class LogAnalyserCheck extends Check {
             // parse logs
             String report = LogAnalyser.processLogs(
                 c, null, null, null, null,
-                ri.from().atZone(ZoneOffset.UTC).toLocalDate(), ri.till().atZone(ZoneOffset.UTC).toLocalDate(), false);
+                ri.from(), ri.till(), false);
 
             // we have to deal with string report...
             for (String line : report.split("\\r?\\n")) {

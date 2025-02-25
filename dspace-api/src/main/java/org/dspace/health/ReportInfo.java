@@ -7,7 +7,8 @@
  */
 package org.dspace.health;
 
-import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 
 /**
@@ -18,11 +19,11 @@ import java.time.temporal.ChronoUnit;
 public class ReportInfo {
 
     private boolean verbose_;
-    private Instant from_;
-    private Instant till_;
+    private LocalDate from_;
+    private LocalDate till_;
 
     public ReportInfo(int for_last_n_days) {
-        till_ = Instant.now();
+        till_ = LocalDate.now(ZoneOffset.UTC);
 
         // get info from the last n days
         from_ = till_.minus(for_last_n_days, ChronoUnit.DAYS);
@@ -38,11 +39,11 @@ public class ReportInfo {
         return verbose_;
     }
 
-    public Instant from() {
+    public LocalDate from() {
         return from_;
     }
 
-    public Instant till() {
+    public LocalDate till() {
         return till_;
     }
 }
