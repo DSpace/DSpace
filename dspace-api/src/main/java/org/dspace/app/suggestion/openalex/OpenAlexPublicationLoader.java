@@ -37,9 +37,9 @@ public class OpenAlexPublicationLoader extends PublicationLoader {
     public List<String> searchMetadataValues(Item researcher) {
         List<String> names = getNames();
 
-        // First, check for "dc.identifier" and build the filter if present
+        // First, check for "dc.identifier.openalex" and build the filter if present
         List<String> authorIds = names.stream()
-                                      .filter("dc.identifier"::equals)
+                                      .filter("dc.identifier.openalex"::equals)
                                       .map(name -> itemService.getMetadata(researcher, name))
                                       .filter(Objects::nonNull)
                                       .collect(Collectors.toList());

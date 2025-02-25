@@ -144,7 +144,7 @@
     <bean id="openalexPersonLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
         <property name="metadataSource" ref="openalexImportPersonService"/>
         <property name="sourceIdentifier" value="openalexPerson"/>
-        <property name="recordIdMetadata" value="dc.identifier"/>
+        <property name="recordIdMetadata" value="dc.identifier.openalex"/>
         <property name="supportedEntityTypes">
             <list>
                 <value>Person</value>
