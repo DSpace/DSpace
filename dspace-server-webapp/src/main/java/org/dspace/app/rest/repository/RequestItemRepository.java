@@ -44,6 +44,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.InvalidReCaptchaException;
+import org.dspace.eperson.factory.CaptchaServiceFactory;
 import org.dspace.eperson.service.CaptchaService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,8 +87,8 @@ public class RequestItemRepository
     protected RequestItemEmailNotifier requestItemEmailNotifier;
     @Autowired
     protected AuthorizeService authorizeService;
-    @Autowired
-    private CaptchaService captchaService;
+
+    private CaptchaService captchaService = CaptchaServiceFactory.getInstance().getCaptchaService();
 
     private static final Logger log = LogManager.getLogger();
 
