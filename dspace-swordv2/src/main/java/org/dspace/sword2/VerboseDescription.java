@@ -7,7 +7,8 @@
  */
 package org.dspace.sword2;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 public class VerboseDescription {
@@ -28,6 +29,6 @@ public class VerboseDescription {
 
     private String getDatePrefix() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return "[" + formatter.format(Instant.now()) + "] ";
+        return "[" + formatter.format(LocalDateTime.now(ZoneOffset.UTC)) + "] ";
     }
 }

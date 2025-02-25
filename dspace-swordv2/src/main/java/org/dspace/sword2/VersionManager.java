@@ -10,6 +10,8 @@ package org.dspace.sword2;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 import java.util.List;
@@ -151,7 +153,7 @@ public class VersionManager {
     private void archiveBundle(Context context, Item item, Bundle source)
         throws SQLException, AuthorizeException, IOException {
         // get the datestamped root bundle name (YYYY-MM-DD format)
-        String oldName = "VER" + DateTimeFormatter.ISO_LOCAL_DATE.format(Instant.now());
+        String oldName = "VER" + DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.now(ZoneOffset.UTC));
         oldName = this.getNumberedName(item, oldName, 0);
 
         Bundle old = bundleService.create(context, item, oldName);
