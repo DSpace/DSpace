@@ -535,7 +535,7 @@
         <entry key-ref="person.affiliation.name" value-ref="openalexAffiliationContrib"/>
         <entry key-ref="person.identifier.orcid" value-ref="openalexOrcidContrib"/>
         <entry key-ref="person.familyName" value-ref="openalexFamilyNameContrib"/>
-        <entry key-ref="person.firstName" value-ref="openalexFirstNameContrib"/>
+        <entry key-ref="person.givenName" value-ref="openalexFirstNameContrib"/>
     </util:map>
 
     <bean id="openalexAuthorNameContrib"
@@ -587,11 +587,11 @@
 
     <bean id="openalexFirstNameContrib"
           class="org.dspace.importer.external.openalex.metadatamapping.OpenAlexAuthorNameContributor">
-        <property name="field" ref="person.firstName"/>
+        <property name="field" ref="person.givenName"/>
         <property name="query" value="/display_name"/>
     </bean>
-    <bean id="person.firstName" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="person.firstName"/>
+    <bean id="person.givenName" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="person.givenName"/>
     </bean>
 
 </beans>
