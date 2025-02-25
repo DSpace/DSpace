@@ -68,15 +68,6 @@ public class OpenAlexPublicationExternalSourcesIT extends AbstractControllerInte
     }
 
     @Test
-    public void findOneOpenalexImportPersonServiceExternalSourceTest() throws Exception {
-        getClient().perform(get("/api/integration/externalsources?size=25")).andExpect(status().isOk())
-                   .andExpect(jsonPath("$._embedded.externalsources", Matchers.hasItem(
-                       ExternalSourceMatcher.matchExternalSource("openalexPerson",
-                                                                 "openalexPerson", false))));
-    }
-
-
-    @Test
     public void findOpenalexPublicationExternalSourceEntriesEmptyWithQueryTest() throws Exception {
 
         try (InputStream file = getClass().getResourceAsStream("openalex-publication-empty.json")) {
