@@ -7,7 +7,7 @@
  */
 package org.dspace.alerts;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import jakarta.persistence.Cacheable;
 import jakarta.persistence.Column;
@@ -44,7 +44,7 @@ public class SystemWideAlert implements ReloadableEntity<Integer> {
     private String allowSessions;
 
     @Column(name = "countdown_to")
-    private LocalDateTime countdownTo;
+    private ZonedDateTime countdownTo;
 
     @Column(name = "active")
     private boolean active;
@@ -112,7 +112,7 @@ public class SystemWideAlert implements ReloadableEntity<Integer> {
      *
      * @return the date to which will be count down when the system-wide alert is active
      */
-    public LocalDateTime getCountdownTo() {
+    public ZonedDateTime getCountdownTo() {
         return countdownTo;
     }
 
@@ -121,7 +121,7 @@ public class SystemWideAlert implements ReloadableEntity<Integer> {
      *
      * @param countdownTo The date to which will be count down
      */
-    public void setCountdownTo(final LocalDateTime countdownTo) {
+    public void setCountdownTo(final ZonedDateTime countdownTo) {
         this.countdownTo = countdownTo;
     }
 

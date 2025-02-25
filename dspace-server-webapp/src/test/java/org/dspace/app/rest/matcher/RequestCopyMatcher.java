@@ -36,12 +36,12 @@ public class RequestCopyMatcher {
                 hasJsonPath("$.requestName", is(request.getReqName())),
                 hasJsonPath("$.requestMessage", is(request.getReqMessage())),
                 hasJsonPath("$.requestDate", dateMatcher(request.getRequest_date()
-                                                                .atZone(ZoneOffset.UTC).toLocalDateTime())),
+                                                                .atZone(ZoneOffset.UTC))),
                 hasJsonPath("$.acceptRequest", is(request.isAccept_request())),
                 hasJsonPath("$.decisionDate", dateMatcher(request.getDecision_date()
-                                                                 .atZone(ZoneOffset.UTC).toLocalDateTime())),
+                                                                 .atZone(ZoneOffset.UTC))),
                 hasJsonPath("$.expires", dateMatcher(request.getExpires()
-                                                            .atZone(ZoneOffset.UTC).toLocalDateTime())),
+                                                            .atZone(ZoneOffset.UTC))),
                 hasJsonPath("$.type", is(RequestItemRest.NAME)),
                 hasJsonPath("$._links.self.href",
                         Matchers.containsString(RequestItemRepositoryIT.URI_ROOT))

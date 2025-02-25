@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -43,7 +43,7 @@ public class SystemWideAlertRest extends BaseObjectRest<Integer> {
     private Integer alertId;
     private String message;
     private String allowSessions;
-    private LocalDateTime countdownTo;
+    private ZonedDateTime countdownTo;
     private boolean active;
 
     public Integer getAlertId() {
@@ -70,11 +70,11 @@ public class SystemWideAlertRest extends BaseObjectRest<Integer> {
         this.allowSessions = allowSessions;
     }
 
-    public LocalDateTime getCountdownTo() {
+    public ZonedDateTime getCountdownTo() {
         return countdownTo;
     }
 
-    public void setCountdownTo(final LocalDateTime countdownTo) {
+    public void setCountdownTo(final ZonedDateTime countdownTo) {
         this.countdownTo = countdownTo;
     }
 

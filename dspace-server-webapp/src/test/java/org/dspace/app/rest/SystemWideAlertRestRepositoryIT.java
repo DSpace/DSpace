@@ -19,7 +19,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,7 +45,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         // Create two alert entries in the db to fully test the findAll method
         // Note: It is not possible to create two alerts through the REST API
         context.turnOffAuthorisationSystem();
-        LocalDateTime date = LocalDateTime.now();
+        ZonedDateTime date = ZonedDateTime.now(ZoneOffset.UTC);
         SystemWideAlert systemWideAlert1 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 1")
                                                                  .withAllowSessions(
                                                                          AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY)
@@ -87,7 +88,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         // Create two alert entries in the db to fully test the findAll method
         // Note: It is not possible to create two alerts through the REST API
         context.turnOffAuthorisationSystem();
-        LocalDateTime countdownDate = LocalDateTime.now();
+        ZonedDateTime countdownDate = ZonedDateTime.now(ZoneOffset.UTC);
         SystemWideAlert systemWideAlert1 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 1")
                                                                  .withAllowSessions(
                                                                          AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY)
@@ -113,7 +114,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         // Create two alert entries in the db to fully test the findAll method
         // Note: It is not possible to create two alerts through the REST API
         context.turnOffAuthorisationSystem();
-        LocalDateTime countdownDate = LocalDateTime.now();
+        ZonedDateTime countdownDate = ZonedDateTime.now(ZoneOffset.UTC);
         SystemWideAlert systemWideAlert1 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 1")
                                                                  .withAllowSessions(
                                                                          AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY)
@@ -140,7 +141,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         // Create two alert entries in the db to fully test the findOne method
         // Note: It is not possible to create two alerts through the REST API
         context.turnOffAuthorisationSystem();
-        LocalDateTime dateToNearestSecond = LocalDateTime.now();
+        ZonedDateTime dateToNearestSecond = ZonedDateTime.now(ZoneOffset.UTC);
         SystemWideAlert systemWideAlert1 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 1")
                                                                  .withAllowSessions(
                                                                          AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY)
@@ -181,7 +182,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         // Create two alert entries in the db to fully test the findOne method
         // Note: It is not possible to create two alerts through the REST API
         context.turnOffAuthorisationSystem();
-        LocalDateTime dateToNearestSecond = LocalDateTime.now();
+        ZonedDateTime dateToNearestSecond = ZonedDateTime.now(ZoneOffset.UTC);
         SystemWideAlert systemWideAlert1 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 1")
                                                                  .withAllowSessions(
                                                                          AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY)
@@ -224,7 +225,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         // Create two alert entries in the db to fully test the findOne method
         // Note: It is not possible to create two alerts through the REST API
         context.turnOffAuthorisationSystem();
-        LocalDateTime dateToNearestSecond = LocalDateTime.now();
+        ZonedDateTime dateToNearestSecond = ZonedDateTime.now(ZoneOffset.UTC);
         SystemWideAlert systemWideAlert1 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 1")
                                                                  .withAllowSessions(
                                                                          AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY)
@@ -269,7 +270,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
         // Create three alert entries in the db to fully test the findActive search method
         // Note: It is not possible to create two alerts through the REST API
         context.turnOffAuthorisationSystem();
-        LocalDateTime dateToNearestSecond = LocalDateTime.now();
+        ZonedDateTime dateToNearestSecond = ZonedDateTime.now(ZoneOffset.UTC);
         SystemWideAlert systemWideAlert1 = SystemWideAlertBuilder.createSystemWideAlert(context, "Test alert 1")
                                                                  .withAllowSessions(
                                                                          AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY)
@@ -316,7 +317,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
 
     @Test
     public void createTest() throws Exception {
-        LocalDateTime dateToNearestSecond = LocalDateTime.now();
+        ZonedDateTime dateToNearestSecond = ZonedDateTime.now(ZoneOffset.UTC);
 
         SystemWideAlertRest systemWideAlertRest = new SystemWideAlertRest();
         systemWideAlertRest.setMessage("Alert test message");
@@ -367,7 +368,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
 
         SystemWideAlertRest systemWideAlertRest = new SystemWideAlertRest();
         systemWideAlertRest.setMessage("Alert test message");
-        systemWideAlertRest.setCountdownTo(LocalDateTime.now());
+        systemWideAlertRest.setCountdownTo(ZonedDateTime.now(ZoneOffset.UTC));
         systemWideAlertRest.setAllowSessions(AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY.getValue());
         systemWideAlertRest.setActive(true);
 
@@ -385,7 +386,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
 
         SystemWideAlertRest systemWideAlertRest = new SystemWideAlertRest();
         systemWideAlertRest.setMessage("Alert test message");
-        systemWideAlertRest.setCountdownTo(LocalDateTime.now());
+        systemWideAlertRest.setCountdownTo(ZonedDateTime.now(ZoneOffset.UTC));
         systemWideAlertRest.setAllowSessions(AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY.getValue());
         systemWideAlertRest.setActive(true);
 
@@ -412,7 +413,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
 
         SystemWideAlertRest systemWideAlertRest = new SystemWideAlertRest();
         systemWideAlertRest.setMessage("Alert test message");
-        systemWideAlertRest.setCountdownTo(LocalDateTime.now());
+        systemWideAlertRest.setCountdownTo(ZonedDateTime.now(ZoneOffset.UTC));
         systemWideAlertRest.setAllowSessions(AllowSessionsEnum.ALLOW_CURRENT_SESSIONS_ONLY.getValue());
         systemWideAlertRest.setActive(true);
 
@@ -436,7 +437,7 @@ public class SystemWideAlertRestRepositoryIT extends AbstractControllerIntegrati
                                                                 .build();
         context.restoreAuthSystemState();
 
-        LocalDateTime dateToNearestSecond = LocalDateTime.now();
+        ZonedDateTime dateToNearestSecond = ZonedDateTime.now(ZoneOffset.UTC);
 
         SystemWideAlertRest systemWideAlertRest = new SystemWideAlertRest();
         systemWideAlertRest.setAlertId(systemWideAlert.getID());
