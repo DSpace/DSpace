@@ -32,6 +32,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.InvalidReCaptchaException;
 import org.dspace.eperson.RegistrationData;
+import org.dspace.eperson.factory.CaptchaServiceFactory;
 import org.dspace.eperson.service.AccountService;
 import org.dspace.eperson.service.CaptchaService;
 import org.dspace.eperson.service.EPersonService;
@@ -70,8 +71,7 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
     @Autowired
     private RequestService requestService;
 
-    @Autowired
-    private CaptchaService captchaService;
+    private CaptchaService captchaService = CaptchaServiceFactory.getInstance().getCaptchaService();
 
     @Autowired
     private ConfigurationService configurationService;

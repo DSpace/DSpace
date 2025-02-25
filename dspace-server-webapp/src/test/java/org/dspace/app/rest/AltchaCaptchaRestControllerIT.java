@@ -14,6 +14,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.services.ConfigurationService;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,6 +29,16 @@ public class AltchaCaptchaRestControllerIT extends AbstractControllerIntegration
 
     @Autowired
     ConfigurationService configurationService;
+
+    @Before
+    public void setup() {
+        configurationService.setProperty("captcha.provider", "altcha");
+    }
+
+    @After
+    public void tearDown() {
+        configurationService.setProperty("captcha.provider", "google");
+    }
 
     @Test
     public void testGetAltchaChallengeAuthenticated() throws Exception {
