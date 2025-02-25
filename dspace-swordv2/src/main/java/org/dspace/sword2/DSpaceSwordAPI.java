@@ -21,6 +21,8 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -377,7 +379,7 @@ public class DSpaceSwordAPI {
             String fn = deposit.getFilename();
             if (fn == null || "".equals(fn)) {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-                fn = "sword-" + formatter.format(Instant.now());
+                fn = "sword-" + formatter.format(LocalDateTime.now(ZoneOffset.UTC));
                 if (original) {
                     fn = fn + ".original";
                 }
@@ -397,7 +399,7 @@ public class DSpaceSwordAPI {
         throws DSpaceSwordException {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-        String fn = "sword-" + formatter.format(Instant.now());
+        String fn = "sword-" + formatter.format(LocalDateTime.now(ZoneOffset.UTC));
         if (original) {
             fn = fn + ".original";
         }
