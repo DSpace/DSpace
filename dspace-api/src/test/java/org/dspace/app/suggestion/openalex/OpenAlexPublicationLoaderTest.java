@@ -61,8 +61,8 @@ public class OpenAlexPublicationLoaderTest {
     @Test
     public void testSearchMetadataValues_WithDcIdentifierOther_ReturnsFilterQuery() {
 
-        loader.setNames(Arrays.asList("dc.identifier", "dc.contributor.author"));
-        when(itemService.getMetadata(researcher, "dc.identifier")).thenReturn("ID123");
+        loader.setNames(Arrays.asList("dc.identifier.openalex", "dc.contributor.author"));
+        when(itemService.getMetadata(researcher, "dc.identifier.openalex")).thenReturn("ID123");
 
         // When
         List<String> result = loader.searchMetadataValues(researcher);
@@ -91,8 +91,8 @@ public class OpenAlexPublicationLoaderTest {
     @Test
     public void testSearchMetadataValues_MixedNullValues_IgnoresNulls() {
 
-        loader.setNames(Arrays.asList("dc.identifier", "dc.contributor.author", "dc.title"));
-        when(itemService.getMetadata(researcher, "dc.identifier")).thenReturn(null);
+        loader.setNames(Arrays.asList("dc.identifier.openalex", "dc.contributor.author", "dc.title"));
+        when(itemService.getMetadata(researcher, "dc.identifier.openalex")).thenReturn(null);
         when(itemService.getMetadata(researcher, "dc.contributor.author")).thenReturn("Author Name");
         when(itemService.getMetadata(researcher, "dc.title")).thenReturn("Title");
 
