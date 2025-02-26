@@ -342,4 +342,41 @@
         </property>
     </bean>
 
+    <bean id="openalexInstitutionLiveImportDataProvider"
+          class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="openalexImportInstitutionService"/>
+        <property name="sourceIdentifier" value="openalexInstitution"/>
+        <property name="recordIdMetadata" value="dc.identifier.openalex"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>OrgUnit</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="openalexPublisherLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="openalexImportPublisherService"/>
+        <property name="sourceIdentifier" value="openalexPublisher"/>
+        <property name="recordIdMetadata" value="dc.identifier.openalex"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>OrgUnit</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="openalexFunderLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="openalexImportFunderService"/>
+        <property name="sourceIdentifier" value="openalexFunder"/>
+        <property name="recordIdMetadata" value="dc.identifier.openalex"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>OrgUnit</value>
+                <value>none</value>
+            </list>
+        </property>
+    </bean>
+
 </beans>
