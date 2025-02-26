@@ -29,6 +29,7 @@
         <name-map collection-handle="123456789/collection-test" submission-name="collectiontest"/>
         <name-map collection-entity-type="CustomEntityType" submission-name="entitytypetest"/>
         <name-map collection-handle="123456789/test-duplicate-detection" submission-name="test-duplicate-detection"/>
+        <name-map collection-handle="123456789/collection-test-patch" submission-name="publicationTestPatch"/>
     </submission-map>
 
 
@@ -194,7 +195,11 @@
             <processing-class>org.dspace.app.rest.submit.step.NotifyStep</processing-class>
             <type>coarnotify</type>
         </step-definition>
-
+        <step-definition id="upload-no-required-metadata" mandatory="true">
+            <heading>submit.progressbar.upload-no-required-metadata</heading>
+            <processing-class>org.dspace.app.rest.submit.step.UploadStep</processing-class>
+            <type>upload</type>
+        </step-definition>
     </step-definitions>
 
     <!-- The submission-definitions map lays out the detailed definition of -->
@@ -300,6 +305,12 @@
             <step id="traditionalpageone"/>
         </submission-process>
 
+        <submission-process name="publicationTestPatch">
+            <step id="collection" />
+            <step id="traditionalpageone" />
+            <step id="upload-no-required-metadata" />
+            <step id="license" />
+        </submission-process>
     </submission-definitions>
 
 </item-submission>
