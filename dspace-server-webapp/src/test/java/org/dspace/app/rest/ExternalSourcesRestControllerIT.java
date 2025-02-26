@@ -58,9 +58,17 @@ public class ExternalSourcesRestControllerIT extends AbstractControllerIntegrati
                                 ExternalSourceMatcher.matchExternalSource(
                                     "openalexPublicationByAuthorId", "openalexPublicationByAuthorId", false),
                                 ExternalSourceMatcher.matchExternalSource(
-                                    "openalexPerson", "openalexPerson", false)
+                                    "openalexPerson", "openalexPerson", false),
+                                ExternalSourceMatcher.matchExternalSource(
+                                    "openalexInstitution", "openalexInstitution", false),
+                                ExternalSourceMatcher.matchExternalSource(
+                                    "openalexPublisher", "openalexPublisher", false),
+                                ExternalSourceMatcher.matchExternalSource(
+                                    "openalexFunder", "openalexFunder", false),
+                                ExternalSourceMatcher.matchExternalSource(
+                                    "openalexJournal", "openalexJournal", false)
                             )))
-                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(15)));
+                   .andExpect(jsonPath("$.page.totalElements", Matchers.is(19)));
     }
 
     @Test
