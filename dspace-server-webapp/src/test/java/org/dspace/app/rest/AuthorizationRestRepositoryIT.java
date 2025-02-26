@@ -839,6 +839,302 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
 
     @Test
     /**
+     * Verify that the search by object works properly in allowed scenarios, when SSR rest url is defined, :
+     * - for an administrator
+     * - for an administrator that want to inspect permission of the anonymous users or another user
+     * - for a logged-in "normal" user
+     * - for anonymous
+     *
+     * @throws Exception
+     */
+    @Test
+    public void findByObjectSSRTest() throws Exception {
+        Site site = siteService.findSite(context);
+        SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
+        String siteUri = "http://ssr.example.com/api/core/sites/" + siteRest.getId();
+
+        // disarm the alwaysThrowExceptionFeature
+        configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
+        configurationService.setProperty("dspace.server.ssr.url", "http://ssr.example.com/api");
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+
+        // verify that it works for administrator users
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                .param("uri", siteUri))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.authorizations", Matchers.hasSize(greaterThanOrEqualTo(1))))
+            .andExpect(jsonPath("$._embedded.authorizations", Matchers.everyItem(
+                        Matchers.anyOf(
+                            JsonPathMatchers.hasJsonPath("$.type", is("authorization")),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature",
+                                Matchers.allOf(
+                                    is(alwaysTrue.getName())
+                                )),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature",
+                                Matchers.not(Matchers.anyOf(
+                                        is(alwaysFalse.getName()),
+                                        is(alwaysException.getName()),
+                                        is(trueForTestUsers.getName()),
+                                        is(trueForAdmins.getName())
+                                    )
+                                )),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature.resourcetypes",
+                                Matchers.hasItem(is("authorization"))),
+                            JsonPathMatchers.hasJsonPath("$.id",
+                                Matchers.anyOf(
+                                    Matchers.startsWith(eperson.getID().toString()),
+                                    Matchers.endsWith(siteRest.getUniqueType() + "_" + siteRest.getId()))))
+                    )
+                )
+            )
+            .andExpect(jsonPath("$._links.self.href",
+                Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)));
+
+        // verify that it works for authenticated users
+        getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
+                .param("uri", siteUri))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.authorizations", Matchers.hasSize(greaterThanOrEqualTo(1))))
+            .andExpect(jsonPath("$._embedded.authorizations", Matchers.everyItem(
+                        Matchers.anyOf(
+                            JsonPathMatchers.hasJsonPath("$.type", is("authorization")),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature",
+                                Matchers.allOf(
+                                    is(alwaysTrue.getName())
+                                )),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature",
+                                Matchers.not(Matchers.anyOf(
+                                        is(alwaysFalse.getName()),
+                                        is(alwaysException.getName()),
+                                        is(trueForTestUsers.getName()),
+                                        is(trueForAdmins.getName())
+                                    )
+                                )),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature.resourcetypes",
+                                Matchers.hasItem(is("authorization"))),
+                            JsonPathMatchers.hasJsonPath("$.id",
+                                Matchers.anyOf(
+                                    Matchers.startsWith(eperson.getID().toString()),
+                                    Matchers.endsWith(siteRest.getUniqueType() + "_" + siteRest.getId()))))
+                    )
+                )
+            )
+            .andExpect(jsonPath("$._links.self.href",
+                Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)));
+
+        // verify that it works for anonymous users
+        getClient().perform(get("/api/authz/authorizations/search/object")
+                .param("uri", siteUri))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$._embedded.authorizations", Matchers.hasSize(greaterThanOrEqualTo(1))))
+            .andExpect(jsonPath("$._embedded.authorizations", Matchers.everyItem(
+                        Matchers.anyOf(
+                            JsonPathMatchers.hasJsonPath("$.type", is("authorization")),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature",
+                                Matchers.allOf(
+                                    is(alwaysTrue.getName())
+                                )),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature",
+                                Matchers.not(Matchers.anyOf(
+                                        is(alwaysFalse.getName()),
+                                        is(alwaysException.getName()),
+                                        is(trueForTestUsers.getName()),
+                                        is(trueForAdmins.getName())
+                                    )
+                                )),
+                            JsonPathMatchers.hasJsonPath("$._embedded.feature.resourcetypes",
+                                Matchers.hasItem(is("authorization"))),
+                            JsonPathMatchers.hasJsonPath("$.id",
+                                Matchers.anyOf(
+                                    Matchers.startsWith(eperson.getID().toString()),
+                                    Matchers.endsWith(siteRest.getUniqueType() + "_" + siteRest.getId()))))
+                    )
+                )
+            )
+            .andExpect(jsonPath("$._links.self.href",
+                Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", greaterThanOrEqualTo(1)));
+    }
+
+    /**
+     * Verify that the findByObject return the 400 Bad Request response for invalid or missing URI (required parameter)
+     *
+     * @throws Exception
+     */
+    @Test
+    public void findByObjectBadRequestSSRTest() throws Exception {
+        // disarm the alwaysThrowExceptionFeature
+        configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
+        configurationService.setProperty("dspace.server.ssr.url", "http://ssr.example.com/api");
+        String[] invalidUris = new String[] {
+            "invalid-uri",
+            "",
+            "http://localhost/api/wrongcategory/wrongmodel/1",
+            "http://localhost/api/core/sites/this-is-not-an-uuid"
+        };
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+        for (String invalidUri : invalidUris) {
+            log.debug("findByObjectBadRequestTest - Testing the URI: " + invalidUri);
+
+            // verify that it works for administrators with an invalid or missing uri - with eperson parameter
+            getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                    .param("uri", invalidUri)
+                    .param("eperson", admin.getID().toString()))
+                .andExpect(status().isBadRequest());
+
+            // verify that it works for administrators with an invalid or missing uri - without eperson parameter
+            getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                    .param("uri", invalidUri))
+                .andExpect(status().isBadRequest());
+
+            // verify that it works for normal loggedin users with an invalid or missing uri - with eperson parameter
+            getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
+                    .param("uri", invalidUri)
+                    .param("eperson", eperson.getID().toString()))
+                .andExpect(status().isBadRequest());
+
+            // verify that it works for normal loggedin users with an invalid or missing uri - without eperson parameter
+            getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
+                    .param("uri", invalidUri))
+                .andExpect(status().isBadRequest());
+
+            // verify that it works for administrators inspecting other users with an invalid or missing uri - by
+            // using the eperson parameter
+            getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                    .param("uri", invalidUri)
+                    .param("eperson", eperson.getID().toString()))
+                .andExpect(status().isBadRequest());
+
+            // verify that it works for administrators inspecting other users with an invalid or missing uri - by
+            // assuming login
+            getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                    .param("uri", invalidUri)
+                    .header("X-On-Behalf-Of", eperson.getID()))
+                .andExpect(status().isBadRequest());
+
+            // verify that it works for anonymous users with an invalid or missing uri
+            getClient().perform(get("/api/authz/authorizations/search/object")
+                    .param("uri", invalidUri))
+                .andExpect(status().isBadRequest());
+        }
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                .param("eperson", admin.getID().toString()))
+            .andExpect(status().isBadRequest());
+        getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
+                .param("eperson", eperson.getID().toString()))
+            .andExpect(status().isBadRequest());
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                .param("eperson", eperson.getID().toString()))
+            .andExpect(status().isBadRequest());
+        getClient().perform(get("/api/authz/authorizations/search/object"))
+            .andExpect(status().isBadRequest());
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object"))
+            .andExpect(status().isBadRequest());
+    }
+
+    /**
+     * Verify that the findByObject return an empty page when the requested object doesn't exist but the uri is
+     * potentially valid (i.e. deleted object)
+     *
+     * @throws Exception
+     */
+    @Test
+    public void findByNotExistingObjectSSSTest() throws Exception {
+        String wrongSiteUri = "http://localhost/api/core/sites/" + UUID.randomUUID();
+
+        // disarm the alwaysThrowExceptionFeature
+        configurationService.setProperty("org.dspace.app.rest.authorization.AlwaysThrowExceptionFeature.turnoff", true);
+        configurationService.setProperty("dspace.server.ssr.url", "http://ssr.example.com/api");
+
+        String adminToken = getAuthToken(admin.getEmail(), password);
+
+        // verify that it works for administrators, no result - with eperson parameter
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                .param("uri", wrongSiteUri)
+                .param("eperson", admin.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", JsonPathMatchers.hasNoJsonPath("$._embedded.authorizations")))
+            .andExpect(jsonPath("$._links.self.href",
+                Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        // verify that it works for administrators, no result - without eperson parameter
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                .param("uri", wrongSiteUri))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", JsonPathMatchers.hasNoJsonPath("$._embedded.authorizations")))
+            .andExpect(jsonPath("$._links.self.href",
+                Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        String epersonToken = getAuthToken(eperson.getEmail(), password);
+
+        // verify that it works for normal loggedin users - with eperson parameter
+        getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
+                .param("uri", wrongSiteUri)
+                .param("eperson", eperson.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", JsonPathMatchers.hasNoJsonPath("$._embedded.authorizations")))
+            .andExpect(jsonPath("$._links.self.href",
+                Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        // verify that it works for normal loggedin users - without eperson parameter
+        getClient(epersonToken).perform(get("/api/authz/authorizations/search/object")
+                .param("uri", wrongSiteUri))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", JsonPathMatchers.hasNoJsonPath("$._embedded.authorizations")))
+            .andExpect(jsonPath("$._links.self.href",
+                Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        // verify that it works for administrators inspecting other users - by using the eperson parameter
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                .param("uri", wrongSiteUri)
+                .param("eperson", eperson.getID().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", JsonPathMatchers.hasNoJsonPath("$._embedded.authorizations")))
+            .andExpect(jsonPath("$._links.self.href",
+                Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        // verify that it works for administrators inspecting other users - by assuming login
+        getClient(adminToken).perform(get("/api/authz/authorizations/search/object")
+                .param("uri", wrongSiteUri)
+                .header("X-On-Behalf-Of", eperson.getID()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", JsonPathMatchers.hasNoJsonPath("$._embedded.authorizations")))
+            .andExpect(jsonPath("$._links.self.href",
+                Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
+
+        // verify that it works for anonymous users
+        getClient().perform(get("/api/authz/authorizations/search/object")
+                .param("uri", wrongSiteUri))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", JsonPathMatchers.hasNoJsonPath("$._embedded.authorizations")))
+            .andExpect(jsonPath("$._links.self.href",
+                Matchers.containsString("/api/authz/authorizations/search/object")))
+            .andExpect(jsonPath("$.page.size", is(20)))
+            .andExpect(jsonPath("$.page.totalElements", is(0)));
+    }
+
+    /**
      * Verify that the findByObject return the 401 Unauthorized response when an eperson is involved
      * 
      * @throws Exception
