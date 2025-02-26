@@ -10,6 +10,7 @@ package org.dspace.discovery.indexobject;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -139,7 +140,8 @@ public class LDNMessageEntityIndexFactoryImpl extends IndexFactoryImpl<Indexable
 
     private void indexDateFieldForFacet(SolrInputDocument doc, Instant queueLastStartTime) {
         if (queueLastStartTime != null) {
-            String value = DateTimeFormatter.ISO_LOCAL_DATE.format(queueLastStartTime);
+            String value = DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.ofInstant(queueLastStartTime,
+                                                                                       ZoneOffset.UTC));
             addFacetIndex(doc, "queue_last_start_time", value, value);
             doc.addField("queue_last_start_time", value);
             doc.addField("queue_last_start_time_dt", queueLastStartTime);

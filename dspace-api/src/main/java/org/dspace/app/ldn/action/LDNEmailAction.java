@@ -10,7 +10,6 @@ package org.dspace.app.ldn.action;
 import static java.lang.String.format;
 
 import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,8 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class LDNEmailAction implements LDNAction {
 
     private static final Logger log = LogManager.getLogger(LDNEmailAction.class);
-
-    private final static String DATE_PATTERN = "dd-MM-yyyy HH:mm:ss";
 
     @Autowired
     private ConfigurationService configurationService;
@@ -80,7 +77,7 @@ public class LDNEmailAction implements LDNAction {
                 email.addRecipient(recipient);
             }
 
-            String date = DateTimeFormatter.ofPattern(DATE_PATTERN).format(Instant.now());
+            String date = Instant.now().toString();
 
             email.addArgument(notification.getActor().getName());
             email.addArgument(item.getName());

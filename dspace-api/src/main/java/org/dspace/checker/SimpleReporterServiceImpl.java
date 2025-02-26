@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -328,6 +330,6 @@ public class SimpleReporterServiceImpl implements SimpleReporterService {
     }
 
     protected String applyDateFormatShort(Instant thisDate) {
-        return DateTimeFormatter.ISO_LOCAL_DATE.format(thisDate);
+        return DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.ofInstant(thisDate, ZoneOffset.UTC));
     }
 }

@@ -27,6 +27,7 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Year;
+import java.time.YearMonth;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -995,18 +996,18 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             } catch (DateTimeParseException e) {
                 e.printStackTrace();
             }
-            String dateformatString = "dd-MM-yyyy";
-            if ("DAY".equals(type)) {
-                dateformatString = "dd-MM-yyyy";
-            } else if ("MONTH".equals(type)) {
-                dateformatString = "MMMM yyyy";
-
-            } else if ("YEAR".equals(type)) {
-                dateformatString = "yyyy";
-            }
-            DateTimeFormatter simpleFormat = DateTimeFormatter.ofPattern(dateformatString);
             if (date != null) {
-                name = simpleFormat.format(date);
+                String dateformatString = "dd-MM-yyyy";
+                if ("DAY".equals(type)) {
+                    DateTimeFormatter simpleFormat = DateTimeFormatter.ofPattern(dateformatString);
+                    name = simpleFormat.format(date);
+                } else if ("MONTH".equals(type)) {
+                    dateformatString = "MMMM yyyy";
+                    DateTimeFormatter simpleFormat = DateTimeFormatter.ofPattern(dateformatString);
+                    name = simpleFormat.format(YearMonth.from(date));
+                } else if ("YEAR".equals(type)) {
+                    name = String.valueOf(date.getYear());
+                }
             }
 
         }

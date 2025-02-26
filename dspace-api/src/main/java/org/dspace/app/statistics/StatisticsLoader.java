@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
@@ -103,7 +104,7 @@ public class StatisticsLoader {
         int i = 0;
         for (String date : keys) {
             try {
-                dates[i] = LocalDate.parse(date, monthlySDF.get());
+                dates[i] = YearMonth.parse(date, monthlySDF.get()).atDay(1);
             } catch (DateTimeParseException pe) {
                 //ignore
             }

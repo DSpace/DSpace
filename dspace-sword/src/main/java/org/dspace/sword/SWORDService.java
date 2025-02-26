@@ -9,6 +9,9 @@ package org.dspace.sword;
 
 import java.sql.SQLException;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -132,7 +135,7 @@ public class SWORDService {
      */
     public void message(String message) {
         // build the processing message
-        String msg = dateFormat.format(Instant.now()) + " " + message + "; \n\n";
+        String msg = dateFormat.format(LocalDateTime.now(ZoneOffset.UTC)) + " " + message + "; \n\n";
 
         // if this is a verbose deposit, then log it
         if (this.verbose) {
@@ -166,7 +169,7 @@ public class SWORDService {
             String fn = deposit.getFilename();
             if (fn == null || "".equals(fn)) {
                 // use date in YYYY-MM-DD format
-                fn = "sword-" + DateTimeFormatter.ISO_LOCAL_DATE.format(Instant.now());
+                fn = "sword-" + DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.now(ZoneOffset.UTC));
                 if (original) {
                     fn = fn + ".original";
                 }
