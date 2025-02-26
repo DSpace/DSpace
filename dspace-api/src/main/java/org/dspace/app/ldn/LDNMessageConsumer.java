@@ -89,6 +89,9 @@ public class LDNMessageConsumer implements Consumer {
         }
 
         Item item = (Item) event.getSubject(context);
+        if (item == null) {
+            return;
+        }
         createManualLDNMessages(context, item);
         createAutomaticLDNMessages(context, item);
     }
@@ -190,7 +193,7 @@ public class LDNMessageConsumer implements Consumer {
         appendGeneratedMessage(ldn,
                 ldnMessage,
                 actorID,
-                (actorID != null && item.getSubmitter() != null) ? item.getSubmitter().getFullName() : null,
+                (actorID != null && item.getSubmitter() != null) ? item.getSubmitter().getName() : null,
                 resubmissionID);
 
         ObjectMapper mapper = new ObjectMapper();
