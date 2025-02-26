@@ -89,6 +89,9 @@ public class LDNMessageConsumer implements Consumer {
         }
 
         Item item = (Item) event.getSubject(context);
+        if (item == null) {
+            return;
+        }
         createManualLDNMessages(context, item);
         createAutomaticLDNMessages(context, item);
     }
