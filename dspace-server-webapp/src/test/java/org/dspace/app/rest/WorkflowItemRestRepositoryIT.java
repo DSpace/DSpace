@@ -2253,7 +2253,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
         context.restoreAuthSystemState();
         String tokenSubmitter = getAuthToken(submitter.getEmail(), password);
         List<Operation> deleteFile = new ArrayList<>();
-        deleteFile.add(new RemoveOperation("/sections/bitstream-metadata-publication/files/0/"));
+        deleteFile.add(new RemoveOperation("/sections/upload-no-required-metadata/files/0/"));
         getClient(tokenSubmitter).perform(patch("/api/submission/workspaceitems/" + witem.getID())
                 .content(getPatchContent(deleteFile))
                 .contentType(MediaType.APPLICATION_JSON_PATCH_JSON))
@@ -2261,7 +2261,7 @@ public class WorkflowItemRestRepositoryIT extends AbstractControllerIntegrationT
         // verify that the patch removed bitstream
         getClient(tokenSubmitter).perform(get("/api/submission/workspaceitems/" + witem.getID()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.sections.bitstream-metadata-publication.files",hasSize(0)));
+            .andExpect(jsonPath("$.sections.upload-no-required-metadata.files",hasSize(0)));
     }
 
 }
