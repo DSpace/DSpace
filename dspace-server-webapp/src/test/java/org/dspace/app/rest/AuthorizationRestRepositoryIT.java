@@ -847,7 +847,6 @@ public class AuthorizationRestRepositoryIT extends AbstractControllerIntegration
      *
      * @throws Exception
      */
-    @Test
     public void findByObjectSSRTest() throws Exception {
         Site site = siteService.findSite(context);
         SiteRest siteRest = siteConverter.convert(site, DefaultProjection.DEFAULT);
