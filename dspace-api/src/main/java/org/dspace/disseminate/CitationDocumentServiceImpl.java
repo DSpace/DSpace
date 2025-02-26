@@ -34,6 +34,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -235,6 +236,14 @@ public class CitationDocumentServiceImpl implements CitationDocumentService, Ini
     @Override
     public Boolean isCitationEnabledForBitstream(Bitstream bitstream, Context context) throws SQLException {
         if (isCitationEnabledGlobally() || isCitationEnabledThroughCollection(context, bitstream)) {
+
+            // Bitstreams in DISPLAY bundle should already have a citation page
+            for (Bundle bundle : bitstream.getBundles()) {
+                // Should be same as DISPLAY_BUNDLE_NAME in CitationPage curation task
+                if (bundle.getName().equals("DISPLAY")) {
+                    return false;
+                }
+            }
 
             boolean adminUser = authorizeService.isAdmin(context);
 
