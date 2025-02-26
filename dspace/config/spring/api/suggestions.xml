@@ -71,7 +71,7 @@
         </property>
         <property name="names">
             <list>
-                <value>dc.identifier.other</value>
+                <value>dc.identifier.openalex</value>
                 <value>dc.title</value>
             </list>
         </property>
