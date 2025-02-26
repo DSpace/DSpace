@@ -1,0 +1,138 @@
+{
+  "meta": {
+    "count": 2,
+    "db_response_time_ms": 32,
+    "page": 1,
+    "per_page": 1,
+    "groups_count": null
+  },
+  "results": [
+    {
+      "id": "https://openalex.org/P4310320990",
+      "display_name": "Elsevier BV",
+      "alternate_titles": [
+        "Elsevier",
+        "elsevier.com",
+        "Elsevier Science",
+        "Uitg. Elsevier",
+        "السفیر",
+        "السویر",
+        "انتشارات الزویر",
+        "لودویک السفیر",
+        "爱思唯尔"
+      ],
+      "hierarchy_level": 0,
+      "parent_publisher": null,
+      "lineage": [
+        "https://openalex.org/P4310320990"
+      ],
+      "relevance_score": 801222.7,
+      "country_codes": [
+        "NL"
+      ],
+      "homepage_url": "https://www.elsevier.com",
+      "image_url": "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/Elsevier.svg",
+      "image_thumbnail_url": "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/Elsevier.svg&width=300",
+      "works_count": 19638060,
+      "cited_by_count": 578728463,
+      "summary_stats": {
+        "2yr_mean_citedness": 4.986726161769699,
+        "h_index": 2854,
+        "i10_index": 9308669
+      },
+      "ids": {
+        "openalex": "https://openalex.org/P4310320990",
+        "ror": "https://ror.org/02scfj030",
+        "wikidata": "https://www.wikidata.org/entity/Q746413"
+      },
+      "counts_by_year": [
+        {
+          "year": 2023,
+          "works_count": 348936,
+          "cited_by_count": 10972582
+        },
+        {
+          "year": 2022,
+          "works_count": 853008,
+          "cited_by_count": 34794353
+        },
+        {
+          "year": 2021,
+          "works_count": 853971,
+          "cited_by_count": 33715366
+        },
+        {
+          "year": 2020,
+          "works_count": 800886,
+          "cited_by_count": 29524541
+        },
+        {
+          "year": 2019,
+          "works_count": 748621,
+          "cited_by_count": 25247102
+        },
+        {
+          "year": 2018,
+          "works_count": 715810,
+          "cited_by_count": 22448053
+        },
+        {
+          "year": 2017,
+          "works_count": 741141,
+          "cited_by_count": 20648448
+        },
+        {
+          "year": 2016,
+          "works_count": 707866,
+          "cited_by_count": 19913681
+        },
+        {
+          "year": 2015,
+          "works_count": 652543,
+          "cited_by_count": 19545485
+        },
+        {
+          "year": 2014,
+          "works_count": 628755,
+          "cited_by_count": 18609252
+        },
+        {
+          "year": 2013,
+          "works_count": 608486,
+          "cited_by_count": 17374046
+        },
+        {
+          "year": 2012,
+          "works_count": 587406,
+          "cited_by_count": 15786904
+        }
+      ],
+      "roles": [
+        {
+          "role": "institution",
+          "id": "https://openalex.org/I1318003438",
+          "works_count": 2086
+        },
+        {
+          "role": "institution",
+          "id": "https://openalex.org/I4210160603",
+          "works_count": 794
+        },
+        {
+          "role": "funder",
+          "id": "https://openalex.org/F4320308305",
+          "works_count": 97
+        },
+        {
+          "role": "publisher",
+          "id": "https://openalex.org/P4310320990",
+          "works_count": 19638060
+        }
+      ],
+      "sources_api_url": "https://api.openalex.org/sources?filter=host_organization.id:P4310320990",
+      "updated_date": "2025-02-25T21:30:48.476867",
+      "created_date": "2023-01-01"
+    }
+  ],
+  "group_by": []
+}

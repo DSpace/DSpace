@@ -1,0 +1,261 @@
+{
+  "meta": {
+    "count": 1819,
+    "db_response_time_ms": 20,
+    "page": 1,
+    "per_page": 2,
+    "groups_count": null
+  },
+  "results": [
+    {
+      "id": "https://openalex.org/F4320321001",
+      "display_name": "National Natural Science Foundation of China",
+      "alternate_titles": [
+        "NNSF of China",
+        "Guójiā Zìrán Kēxué Jījīn Wěiyuánhuì",
+        "NSF of China",
+        "The National Natural Science Foundation of China",
+        "国家自然科学基金委员会",
+        "National Nature Science Foundation of China",
+        "NSFC",
+        "National Science Foundation of China",
+        "Natural Science Foundation of China",
+        "NNSFC",
+        "Chinese National Science Foundation",
+        "NNSF"
+      ],
+      "country_code": "CN",
+      "description": "Chinese government body",
+      "homepage_url": "https://www.nsfc.gov.cn",
+      "image_url": "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/National Natural Science Foundation of China (20230310102823).jpg",
+      "image_thumbnail_url": "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/National Natural Science Foundation of China (20230310102823).jpg&width=300",
+      "relevance_score": 103338.84,
+      "grants_count": 717144,
+      "works_count": 2131044,
+      "cited_by_count": 42764999,
+      "summary_stats": {
+        "2yr_mean_citedness": 5.685576743101643,
+        "h_index": 728,
+        "i10_index": 979715
+      },
+      "ids": {
+        "openalex": "https://openalex.org/F4320321001",
+        "ror": "https://ror.org/01h0zpd94",
+        "wikidata": "https://www.wikidata.org/entity/Q4501917",
+        "crossref": "501100001809",
+        "doi": "https://doi.org/10.13039/501100001809"
+      },
+      "counts_by_year": [
+        {
+          "year": 2024,
+          "works_count": 54398,
+          "cited_by_count": 1516422
+        },
+        {
+          "year": 2023,
+          "works_count": 322070,
+          "cited_by_count": 10396973
+        },
+        {
+          "year": 2022,
+          "works_count": 320019,
+          "cited_by_count": 9253945
+        },
+        {
+          "year": 2021,
+          "works_count": 289352,
+          "cited_by_count": 7210511
+        },
+        {
+          "year": 2020,
+          "works_count": 261356,
+          "cited_by_count": 5265191
+        },
+        {
+          "year": 2019,
+          "works_count": 232129,
+          "cited_by_count": 3693732
+        },
+        {
+          "year": 2018,
+          "works_count": 199734,
+          "cited_by_count": 2355502
+        },
+        {
+          "year": 2017,
+          "works_count": 150327,
+          "cited_by_count": 1424379
+        },
+        {
+          "year": 2016,
+          "works_count": 122531,
+          "cited_by_count": 821370
+        },
+        {
+          "year": 2015,
+          "works_count": 89954,
+          "cited_by_count": 412201
+        },
+        {
+          "year": 2014,
+          "works_count": 46699,
+          "cited_by_count": 196235
+        },
+        {
+          "year": 2013,
+          "works_count": 21747,
+          "cited_by_count": 110942
+        },
+        {
+          "year": 2012,
+          "works_count": 12391,
+          "cited_by_count": 64536
+        }
+      ],
+      "roles": [
+        {
+          "role": "institution",
+          "id": "https://openalex.org/I102398690",
+          "works_count": 4704
+        },
+        {
+          "role": "funder",
+          "id": "https://openalex.org/F4320321001",
+          "works_count": 2131044
+        },
+        {
+          "role": "publisher",
+          "id": "https://openalex.org/P4360969379",
+          "works_count": 1733
+        }
+      ],
+      "updated_date": "2024-02-07T17:22:26.169132",
+      "created_date": "2023-02-13"
+    },
+    {
+      "id": "https://openalex.org/F4320306076",
+      "display_name": "National Science Foundation",
+      "alternate_titles": [
+        "U.S. National Science Foundation",
+        "USA NSF",
+        "USNSF",
+        "NSF",
+        "US National Science Foundation",
+        "US NSF"
+      ],
+      "country_code": "US",
+      "description": "United States government agency",
+      "homepage_url": "https://www.nsf.gov",
+      "image_url": "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/NSF logo.png",
+      "image_thumbnail_url": "https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/NSF logo.png&width=300",
+      "relevance_score": 73597.07,
+      "grants_count": 205619,
+      "works_count": 389296,
+      "cited_by_count": 12847568,
+      "summary_stats": {
+        "2yr_mean_citedness": 4.905979890633269,
+        "h_index": 757,
+        "i10_index": 219986
+      },
+      "ids": {
+        "openalex": "https://openalex.org/F4320306076",
+        "ror": "https://ror.org/021nxhr62",
+        "wikidata": "https://www.wikidata.org/entity/Q304878",
+        "crossref": "100000001",
+        "doi": "https://doi.org/10.13039/100000001"
+      },
+      "counts_by_year": [
+        {
+          "year": 2025,
+          "works_count": 3537,
+          "cited_by_count": 233248
+        },
+        {
+          "year": 2024,
+          "works_count": 34637,
+          "cited_by_count": 1937387
+        },
+        {
+          "year": 2023,
+          "works_count": 36573,
+          "cited_by_count": 1931288
+        },
+        {
+          "year": 2022,
+          "works_count": 37120,
+          "cited_by_count": 1764790
+        },
+        {
+          "year": 2021,
+          "works_count": 40461,
+          "cited_by_count": 1719294
+        },
+        {
+          "year": 2020,
+          "works_count": 38275,
+          "cited_by_count": 1376990
+        },
+        {
+          "year": 2019,
+          "works_count": 33741,
+          "cited_by_count": 1035659
+        },
+        {
+          "year": 2018,
+          "works_count": 33570,
+          "cited_by_count": 772044
+        },
+        {
+          "year": 2017,
+          "works_count": 32492,
+          "cited_by_count": 552107
+        },
+        {
+          "year": 2016,
+          "works_count": 30486,
+          "cited_by_count": 380724
+        },
+        {
+          "year": 2015,
+          "works_count": 22923,
+          "cited_by_count": 240764
+        },
+        {
+          "year": 2014,
+          "works_count": 15079,
+          "cited_by_count": 162050
+        },
+        {
+          "year": 2013,
+          "works_count": 4800,
+          "cited_by_count": 129853
+        },
+        {
+          "year": 2012,
+          "works_count": 6030,
+          "cited_by_count": 94430
+        }
+      ],
+      "roles": [
+        {
+          "role": "institution",
+          "id": "https://openalex.org/I1311060795",
+          "works_count": 13498
+        },
+        {
+          "role": "funder",
+          "id": "https://openalex.org/F4320306076",
+          "works_count": 389296
+        },
+        {
+          "role": "publisher",
+          "id": "https://openalex.org/P4365365866",
+          "works_count": 1520
+        }
+      ],
+      "updated_date": "2025-02-25T11:46:36.123146",
+      "created_date": "2023-02-13"
+    }
+  ],
+  "group_by": []
+}
