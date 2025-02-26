@@ -424,7 +424,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                             date = MultiFormatDateParser.parse(value);
                             if (date != null) {
                                 //TODO: make this date format configurable !
-                                value = DateTimeFormatter.ISO_LOCAL_DATE.format(date);
+                                value = DateTimeFormatter.ISO_LOCAL_DATE.format(date.toLocalDateTime().toLocalDate());
                             }
                         }
                         doc.addField(searchFilter.getIndexFieldName(), value);
@@ -714,7 +714,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
         } else if (searchFilter.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)) {
             if (date != null) {
                 String indexField = searchFilter.getIndexFieldName() + ".year";
-                String yearUTC = DateTimeFormatter.ofPattern("yyyy").format(date);
+                String yearUTC = String.valueOf(date.getYear());
                 doc.addField(searchFilter.getIndexFieldName() + "_keyword", yearUTC);
                 // add the year to the autocomplete index
                 doc.addField(searchFilter.getIndexFieldName() + "_ac", yearUTC);

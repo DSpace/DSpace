@@ -15,7 +15,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -388,8 +387,7 @@ public class DepositServlet extends HttpServlet {
         Title title = new Title();
         title.setContent("ERROR");
         sed.setTitle(title);
-        String utcformat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
-        String serializeddate = DateTimeFormatter.ofPattern(utcformat).format(Instant.now());
+        String serializeddate = Instant.now().toString();
         sed.setUpdated(serializeddate);
         Summary sum = new Summary();
         sum.setContent(summary);

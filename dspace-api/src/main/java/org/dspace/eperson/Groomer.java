@@ -10,7 +10,8 @@ package org.dspace.eperson;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -63,7 +64,7 @@ public class Groomer {
 
         options.addOption("b", "last-used-before", true,
                           "date of last login was before this (for example:  "
-                              + DateTimeFormatter.ISO_LOCAL_DATE.format(Instant.now())
+                              + DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.now(ZoneOffset.UTC))
                               + ')');
         options.addOption("d", "delete", false, "delete matching epersons");
 
@@ -107,9 +108,9 @@ public class Groomer {
             System.exit(1);
         }
 
-        Instant before = null;
+        LocalDate before = null;
         try {
-            before = DateTimeFormatter.ISO_LOCAL_DATE.parse(command.getOptionValue('b'), Instant::from);
+            before = LocalDate.parse(command.getOptionValue('b'));
         } catch (DateTimeParseException ex) {
             System.err.println(ex.getMessage());
             System.exit(1);
@@ -118,7 +119,8 @@ public class Groomer {
         boolean delete = command.hasOption('d');
 
         Context myContext = new Context();
-        List<EPerson> epeople = ePersonService.findNotActiveSince(myContext, before);
+        List<EPerson> epeople = ePersonService.findNotActiveSince(myContext,
+                                                                  before.atStartOfDay().toInstant(ZoneOffset.UTC));
 
         myContext.turnOffAuthorisationSystem();
         for (EPerson account : epeople) {

@@ -12,7 +12,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 import org.apache.logging.log4j.LogManager;
@@ -114,7 +115,7 @@ public class TabFileUsageEventListener
 
         UsageEvent ue = (UsageEvent) event;
 
-        eventLog.append(dateFormat.format(Instant.now()))
+        eventLog.append(dateFormat.format(LocalDateTime.now(ZoneOffset.UTC)))
                 .append('\t').append(ue.getName()) // event type
                 .append('\t').append(Constants.typeText[ue.getObject().getType()])
                 .append('\t').append(ue.getObject().getID().toString())

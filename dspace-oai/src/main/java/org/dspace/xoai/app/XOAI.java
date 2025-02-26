@@ -20,7 +20,7 @@ import java.net.ConnectException;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -374,10 +374,10 @@ public class XOAI {
         for (ResourcePolicy policy : policies) {
             if ((policy.getGroup() != null) && (policy.getGroup().getName().equals("Anonymous"))) {
                 if (policy.getStartDate() != null) {
-                    dates.add(policy.getStartDate().atStartOfDay(ZoneId.systemDefault()).toInstant());
+                    dates.add(policy.getStartDate().atStartOfDay(ZoneOffset.UTC).toInstant());
                 }
                 if (policy.getEndDate() != null) {
-                    dates.add(policy.getEndDate().atStartOfDay(ZoneId.systemDefault()).toInstant());
+                    dates.add(policy.getEndDate().atStartOfDay(ZoneOffset.UTC).toInstant());
                 }
             }
             context.uncacheEntity(policy);
@@ -517,10 +517,10 @@ public class XOAI {
         List<ResourcePolicy> policies = authorizeService.getPoliciesActionFilter(context, item, Constants.READ);
         for (ResourcePolicy policy : policies) {
             if ((policy.getGroup() != null) && (policy.getGroup().getName().equals("Anonymous"))) {
-                if (policy.getStartDate() != null && policy.getStartDate().isAfter(LocalDate.now())) {
+                if (policy.getStartDate() != null && policy.getStartDate().isAfter(LocalDate.now(ZoneOffset.UTC))) {
                     return true;
                 }
-                if (policy.getEndDate() != null && policy.getEndDate().isAfter(LocalDate.now())) {
+                if (policy.getEndDate() != null && policy.getEndDate().isAfter(LocalDate.now(ZoneOffset.UTC))) {
                     return true;
                 }
             }

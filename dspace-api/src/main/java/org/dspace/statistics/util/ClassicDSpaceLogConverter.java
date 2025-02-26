@@ -19,7 +19,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.sql.SQLException;
 import java.text.ParsePosition;
-import java.time.format.DateTimeFormatter;
+import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,22 +70,22 @@ public class ClassicDSpaceLogConverter {
     /**
      * Date format (in) from the log line
      */
-    private final DateTimeFormatter dateFormatIn = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final SimpleDateFormat dateFormatIn = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     /**
      * Date format out (for solr)
      */
-    private final DateTimeFormatter dateFormatOut = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    private final SimpleDateFormat dateFormatOut = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     /**
      * Date format (in) from the log line for the UID
      */
-    private final DateTimeFormatter dateFormatInUID = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss,SSS");
+    private final SimpleDateFormat dateFormatInUID = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
 
     /**
      * Date format out (for uid)
      */
-    private final DateTimeFormatter dateFormatOutUID = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
+    private final SimpleDateFormat dateFormatOutUID = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 
 
     /**

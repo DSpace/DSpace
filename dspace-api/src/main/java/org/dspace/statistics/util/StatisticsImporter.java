@@ -18,7 +18,8 @@ import java.net.InetAddress;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.time.Instant;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -237,7 +238,7 @@ public class StatisticsImporter {
                 action = parts[1];
                 id = parts[2];
                 // Date format (for solr)
-                date = DateTimeFormatter.ISO_LOCAL_DATE_TIME.parse(parts[3], Instant::from);
+                date = LocalDateTime.parse(parts[3]).toInstant(ZoneOffset.UTC);
                 user = parts[4];
                 ip = parts[5];
 

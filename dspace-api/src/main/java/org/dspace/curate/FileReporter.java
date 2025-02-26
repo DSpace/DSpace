@@ -13,7 +13,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 import org.dspace.services.ConfigurationService;
@@ -41,7 +42,7 @@ public class FileReporter
             throws IOException {
         // Calculate a unique(?) file name.
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'hhmmssSSS");
-        String filename = String.format("curation-%s.report", formatter.format(Instant.now()));
+        String filename = String.format("curation-%s.report", formatter.format(LocalDateTime.now(ZoneOffset.UTC)));
 
         // Build a path to the directory which is to receive the file.
         ConfigurationService cfg = new DSpace().getConfigurationService();

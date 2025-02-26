@@ -321,7 +321,7 @@ public class DateMathParser {
     public LocalDateTime getNow() {
         if (now == null) {
             // fall back to current time if no request info set
-            now = LocalDateTime.now();
+            now = LocalDateTime.now(zone.toZoneId());
         }
         return now;
     }
@@ -422,7 +422,7 @@ public class DateMathParser {
             }
 
             if (argv.length > 1) {
-                parsed = DateMathParser.parseMath(LocalDateTime.now(), argv[1]);
+                parsed = DateMathParser.parseMath(LocalDateTime.now(ZoneOffset.UTC), argv[1]);
                 System.out.format("Applied %s to explicit current time:  %s%n",
                         argv[1], parsed.toString());
             }
