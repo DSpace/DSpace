@@ -22,8 +22,31 @@ import org.dspace.importer.external.metadatamapping.MetadatumDTO;
 import org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor;
 
 /**
+ * This class is responsible for extracting and contributing author name metadata
+ * from a JSON response using a specified query path.
+ * <p>
+ * The extracted name is split into given name and family name, and the metadata
+ * is stored based on the field configuration.
+ * </p>
+ *
+ * <p>
+ * Example JSON structure:
+ * </p>
+ * <pre>
+ * {
+ *   "author": {
+ *     "full_name": "John Doe"
+ *   }
+ * }
+ * </pre>
+ *
+ * <p>
+ * If the query path points to `author.full_name`, this class will extract
+ * "John" as the given name and "Doe" as the family name.
+ * </p>
+ *
  * @author Adamo Fapohunda (adamo.fapohunda at 4science.com)
- **/
+ */
 public class OpenAlexAuthorNameContributor extends SimpleJsonPathMetadataContributor {
 
     private final static Logger log = LogManager.getLogger();
@@ -31,16 +54,37 @@ public class OpenAlexAuthorNameContributor extends SimpleJsonPathMetadataContrib
     private String query;
     private MetadataFieldConfig field;
 
+    /**
+     * Sets the JSON query path for extracting the author name.
+     *
+     * @param query the JSON path to the author name
+     */
     @Override
     public void setQuery(String query) {
         this.query = query;
     }
 
+    /**
+     * Sets the metadata field configuration that determines where
+     * the extracted metadata should be stored.
+     *
+     * @param field the metadata field configuration
+     */
     @Override
     public void setField(MetadataFieldConfig field) {
         this.field = field;
     }
 
+    /**
+     * Extracts and contributes metadata based on the configured JSON query path and field.
+     * <p>
+     * If the extracted author name contains both given and family names, it assigns
+     * them accordingly based on the configured field.
+     * </p>
+     *
+     * @param fullJson the JSON response containing author information
+     * @return a collection of metadata entries representing the extracted name parts
+     */
     @Override
     public Collection<MetadatumDTO> contributeMetadata(String fullJson) {
         Collection<MetadatumDTO> metadata = new ArrayList<>();
