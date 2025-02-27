@@ -12,8 +12,10 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import jakarta.annotation.Nullable;
 import org.apache.commons.collections4.CollectionUtils;
@@ -495,5 +497,15 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Override
     public Long getLastModified(Bitstream bitstream) throws IOException {
         return bitstreamStorageService.getLastModified(bitstream);
+    }
+
+    @Override
+    public boolean isInBundle(Bitstream bitstream, java.util.Collection<String> bundleNames) throws SQLException {
+        Set<String> bundles =
+            bitstream.getBundles()
+                     .stream()
+                     .map(Bundle::getName)
+                     .collect(Collectors.toSet());
+        return bundleNames.stream().anyMatch(bundles::contains);
     }
 }
