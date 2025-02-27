@@ -30,6 +30,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.app.requestitem.RequestItem;
 import org.dspace.app.requestitem.service.RequestItemService;
 import org.dspace.app.util.AuthorizeUtil;
+import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
@@ -148,11 +149,13 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Autowired(required = true)
     protected RelationshipService relationshipService;
 
-    @Autowired(required = true)
-    protected VirtualMetadataPopulator virtualMetadataPopulator;
+    @Autowired
+    protected AuthorityValueService authorityValueService;
 
     @Autowired(required = true)
     private RelationshipMetadataService relationshipMetadataService;
+    @Autowired(required = true)
+    private AuthorityVirtualMetadataService authorityVirtualMetadataService;
 
     @Autowired(required = true)
     private EntityTypeService entityTypeService;
@@ -1772,12 +1775,19 @@ prevent the generation of resource policy entry values with null dspace_object a
         }
         if (item.isModifiedMetadataCache()) {
             log.debug("Called getMetadata for " + item.getID() + " with invalid cache");
-            //rebuild cache
+            // Rebuild cache
             List<MetadataValue> dbMetadataValues = item.getMetadata();
 
             List<MetadataValue> fullMetadataValueList = new LinkedList<>();
             fullMetadataValueList.addAll(relationshipMetadataService.getRelationshipMetadata(item, true));
             fullMetadataValueList.addAll(dbMetadataValues);
+
+            // Now get authority virtual metadata - note this requires the configuration property *and* the
+            // enableVirtualMetadata parameter to be true
+            if (configurationService.getBooleanProperty("authority.metadata.virtual", false)) {
+                fullMetadataValueList.addAll(authorityVirtualMetadataService
+                        .getAuthorityVirtualMetadata(item, dbMetadataValues));
+            }
 
             item.setCachedMetadata(MetadataValueComparators.sort(fullMetadataValueList));
         }
