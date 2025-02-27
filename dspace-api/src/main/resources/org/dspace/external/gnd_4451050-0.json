@@ -1,0 +1,54 @@
+{
+  "geographicAreaCode" : [ {
+    "id" : "https://d-nb.info/standards/vocab/gnd/geographic-area-code#XD-US",
+    "label" : "USA"
+  } ],
+  "describedBy" : {
+    "id" : "https://d-nb.info/gnd/4451050-0/about",
+    "license" : {
+      "id" : "http://creativecommons.org/publicdomain/zero/1.0/",
+      "label" : "http://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "dateModified" : "2016-06-07T10:55:36.000",
+    "descriptionLevel" : {
+      "id" : "https://d-nb.info/standards/vocab/gnd/description-level#1",
+      "label" : "Allgemeines, Interdisziplinäre Allgemeinwörter"
+    }
+  },
+  "gndIdentifier" : "4451050-0",
+  "id" : "https://d-nb.info/gnd/4451050-0",
+  "preferredName" : "Gödel, Escher, Bach",
+  "type" : [ "Work", "AuthorityResource" ],
+  "@context" : "http://lobid.org/gnd/context.jsonld",
+  "firstAuthor" : [ {
+    "id" : "https://d-nb.info/gnd/119440636",
+    "label" : "Hofstadter, Douglas R."
+  } ],
+  "gndSubjectCategory" : [ {
+    "id" : "https://d-nb.info/standards/vocab/gnd/gnd-sc#30p",
+    "label" : "Personen zu Informatik, Datenverarbeitung"
+  }, {
+    "id" : "https://d-nb.info/standards/vocab/gnd/gnd-sc#4.7p",
+    "label" : "Personen zu Philosophie"
+  } ],
+  "oldAuthorityNumber" : [ "(DE-588c)4451050-0" ],
+  "sameAs" : [ {
+    "id" : "http://www.wikidata.org/entity/Q831517",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q2013",
+      "abbr" : "WIKIDATA",
+      "publisher" : "Wikimedia Foundation Inc.",
+      "icon" : "https://www.wikidata.org/static/favicon/wikidata.ico",
+      "name" : "Wikidata"
+    }
+  }, {
+    "id" : "http://viaf.org/viaf/1146708184900842583",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q54919",
+      "abbr" : "VIAF",
+      "publisher" : "OCLC",
+      "icon" : "http://viaf.org/viaf/images/viaf.ico",
+      "name" : "Virtual International Authority File (VIAF)"
+    }
+  } ]
+}

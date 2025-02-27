@@ -1,0 +1,117 @@
+{
+  "exactMatch" : [ {
+    "id" : "https://zbw.eu/stw/descriptor/30103-0",
+    "label" : "https://zbw.eu/stw/descriptor/30103-0"
+  } ],
+  "type" : [ "AuthorityResource", "TerritorialCorporateBodyOrAdministrativeUnit", "PlaceOrGeographicName" ],
+  "@context" : "https://lobid.org/gnd/context.jsonld",
+  "oldAuthorityNumber" : [ "(DE-588b)1005809-6", "(DE-588c)4074335-4", "(DE-588)1073220583", "(DE-588)1005809-6" ],
+  "geographicAreaCode" : [ {
+    "id" : "https://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-GB",
+    "label" : "Großbritannien"
+  } ],
+  "hasGeometry" : [ {
+    "type" : "Point",
+    "asWKT" : [ "Point ( -000.125740 +051.508530 )" ]
+  } ],
+  "deprecatedUri" : [ "https://d-nb.info/gnd/1073220583", "https://d-nb.info/gnd/1005809-6" ],
+  "biographicalOrHistoricalInformation" : [ "Hauptstadt des Vereinigten Königreichs von Großbritannien und Nordirland, in Mittelsteinzeit besiedelt, 43 n. Chr. von Römern gegründet; das County of London war 1889-1965 Verwaltungsgrafschaft u. zeremonielle Grafschaft" ],
+  "relatedDdcWithDegreeOfDeterminacy4" : [ {
+    "id" : "http://dewey.info/class/2--421/",
+    "label" : "http://dewey.info/class/2--421/"
+  } ],
+  "describedBy" : {
+    "id" : "https://d-nb.info/gnd/4074335-4/about",
+    "license" : {
+      "id" : "http://creativecommons.org/publicdomain/zero/1.0/",
+      "label" : "http://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "dateModified" : "2023-12-08T17:26:17.000",
+    "descriptionLevel" : {
+      "id" : "https://d-nb.info/standards/vocab/gnd/description-level#z",
+      "label" : "https://d-nb.info/standards/vocab/gnd/description-level#z"
+    }
+  },
+  "gndIdentifier" : "4074335-4",
+  "id" : "https://d-nb.info/gnd/4074335-4",
+  "preferredName" : "London",
+  "variantName" : [ "Londen", "Corporation of London", "Augusta Trinobantum", "Landan", "Londres", "Londinum", "County of London", "Lundonia", "Londra", "Londyn", "Greater London", "London (Great Britain)", "Londinium", "Westminster", "Lundun" ],
+  "homepage" : [ {
+    "id" : "https://www.london.gov.uk",
+    "label" : "https://www.london.gov.uk"
+  } ],
+  "sameAs" : [ {
+    "id" : "http://viaf.org/viaf/137114155",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q54919",
+      "abbr" : "VIAF",
+      "publisher" : "OCLC",
+      "icon" : "http://viaf.org/viaf/images/viaf.ico",
+      "name" : "Virtual International Authority File (VIAF)"
+    }
+  }, {
+    "id" : "http://www.wikidata.org/entity/Q23306",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q2013",
+      "abbr" : "WIKIDATA",
+      "publisher" : "Wikimedia Foundation Inc.",
+      "icon" : "https://www.wikidata.org/static/favicon/wikidata.ico",
+      "name" : "Wikidata"
+    }
+  }, {
+    "collection" : {
+      "abbr" : "WIKIDATA",
+      "name" : "Wikidata",
+      "publisher" : "Wikimedia Foundation Inc.",
+      "icon" : "https://www.wikidata.org/static/favicon/wikidata.ico",
+      "id" : "http://www.wikidata.org/entity/Q2013"
+    },
+    "id" : "http://www.wikidata.org/entity/Q84"
+  }, {
+    "id" : "https://d-nb.info/gnd/1005809-6",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q36578",
+      "abbr" : "DNB",
+      "publisher" : "Deutsche Nationalbibliothek",
+      "icon" : "http://www.dnb.de/SiteGlobals/StyleBundles/Bilder/favicon.png?__blob=normal&v=1",
+      "name" : "Gemeinsame Normdatei (GND) im Katalog der Deutschen Nationalbibliothek"
+    }
+  }, {
+    "id" : "https://d-nb.info/gnd/1073220583",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q36578",
+      "abbr" : "DNB",
+      "publisher" : "Deutsche Nationalbibliothek",
+      "icon" : "http://www.dnb.de/SiteGlobals/StyleBundles/Bilder/favicon.png?__blob=normal&v=1",
+      "name" : "Gemeinsame Normdatei (GND) im Katalog der Deutschen Nationalbibliothek"
+    }
+  }, {
+    "collection" : {
+      "abbr" : "DNB",
+      "name" : "Gemeinsame Normdatei (GND) im Katalog der Deutschen Nationalbibliothek",
+      "publisher" : "Deutsche Nationalbibliothek",
+      "icon" : "https://www.dnb.de/SiteGlobals/Frontend/DNBWeb/Images/favicon.png?__blob=normal&v=4",
+      "id" : "http://www.wikidata.org/entity/Q36578"
+    },
+    "id" : "https://d-nb.info/gnd/4074335-4/about"
+  }, {
+    "collection" : {
+      "abbr" : "WIKISOURCE",
+      "name" : "Wikisource",
+      "publisher" : "Wikimedia Foundation Inc.",
+      "icon" : "https://wikisource.org/static/favicon/wikisource.ico",
+      "id" : "http://www.wikidata.org/entity/Q263"
+    },
+    "id" : "https://de.wikisource.org/wiki/London"
+  }, {
+    "id" : "https://sws.geonames.org/2643743",
+    "collection" : {
+      "id" : "https://sws.geonames.org"
+    }
+  } ],
+  "depiction" : [ {
+    "id" : "https://commons.wikimedia.org/wiki/Special:FilePath/London%20Montage%20L.jpg",
+    "url" : "https://commons.wikimedia.org/wiki/File:London%20Montage%20L.jpg?uselang=de",
+    "thumbnail" : "https://commons.wikimedia.org/wiki/Special:FilePath/London%20Montage%20L.jpg?width=270"
+  } ]
+}

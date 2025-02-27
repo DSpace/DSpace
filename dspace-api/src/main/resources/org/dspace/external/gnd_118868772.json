@@ -1,0 +1,80 @@
+{
+  "geographicAreaCode" : [ {
+    "id" : "https://d-nb.info/standards/vocab/gnd/geographic-area-code#XA-DE",
+    "label" : "Deutschland"
+  } ],
+  "biographicalOrHistoricalInformation" : [ "Reichsfreiherrengeschlecht" ],
+  "describedBy" : {
+    "id" : "https://d-nb.info/gnd/118868772/about",
+    "license" : {
+      "id" : "http://creativecommons.org/publicdomain/zero/1.0/",
+      "label" : "http://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "dateModified" : "2016-03-11T08:06:35.000",
+    "descriptionLevel" : {
+      "id" : "https://d-nb.info/standards/vocab/gnd/description-level#1",
+      "label" : "Allgemeines, Interdisziplinäre Allgemeinwörter"
+    }
+  },
+  "gndIdentifier" : "118868772",
+  "id" : "https://d-nb.info/gnd/118868772",
+  "preferredName" : "Guttenberg, Familie : 1148-",
+  "type" : [ "Family", "AuthorityResource" ],
+  "@context" : "https://lobid.org/gnd/context.jsonld",
+  "gndSubjectCategory" : [ {
+    "id" : "https://d-nb.info/standards/vocab/gnd/gnd-sc#16.5p",
+    "label" : "Personen der Geschichte (Politiker und historische Persönlichkeiten)"
+  } ],
+  "oldAuthorityNumber" : [ "(DE-588c)4215698-1", "(DE-588a)118868772" ],
+  "sameAs" : [ {
+    "id" : "http://viaf.org/viaf/3268582",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q54919",
+      "abbr" : "VIAF",
+      "publisher" : "OCLC",
+      "icon" : "http://viaf.org/viaf/images/viaf.ico",
+      "name" : "Virtual International Authority File (VIAF)"
+    }
+  }, {
+    "id" : "http://www.wikidata.org/entity/Q835767",
+    "collection" : {
+      "id" : "http://www.wikidata.org/entity/Q2013",
+      "abbr" : "WIKIDATA",
+      "publisher" : "Wikimedia Foundation Inc.",
+      "icon" : "https://www.wikidata.org/static/favicon/wikidata.ico",
+      "name" : "Wikidata"
+    }
+  }, {
+    "collection" : {
+      "abbr" : "DNB",
+      "name" : "Gemeinsame Normdatei (GND) im Katalog der Deutschen Nationalbibliothek",
+      "publisher" : "Deutsche Nationalbibliothek",
+      "icon" : "https://www.dnb.de/SiteGlobals/Frontend/DNBWeb/Images/favicon.png?__blob=normal&v=4",
+      "id" : "http://www.wikidata.org/entity/Q36578"
+    },
+    "id" : "https://d-nb.info/gnd/118868772/about"
+  }, {
+    "collection" : {
+      "abbr" : "NDB",
+      "name" : "Neue Deutsche Biographie (NDB)",
+      "publisher" : "Historische Kommission bei der Bayerischen Akademie der Wissenschaften und Bayerische Staatsbibliothek",
+      "icon" : "https://www.deutsche-biographie.de/favicon.ico",
+      "id" : "https://www.deutsche-biographie.de"
+    },
+    "id" : "https://www.deutsche-biographie.de/pnd118868772.html#ndbcontent"
+  }, {
+    "collection" : {
+      "abbr" : "DDB",
+      "name" : "Deutsche Digitale Bibliothek",
+      "publisher" : "Deutsche Digitale Bibliothek",
+      "icon" : "https://www.deutsche-digitale-bibliothek.de/favicon.ico",
+      "id" : "http://www.wikidata.org/entity/Q621630"
+    },
+    "id" : "https://www.deutsche-digitale-bibliothek.de/person/gnd/118868772"
+  } ],
+  "depiction" : [ {
+    "id" : "https://commons.wikimedia.org/wiki/Special:FilePath/Guttenberg-Wappen%20MK1922.jpg",
+    "url" : "https://commons.wikimedia.org/wiki/File:Guttenberg-Wappen%20MK1922.jpg?uselang=de",
+    "thumbnail" : "https://commons.wikimedia.org/wiki/Special:FilePath/Guttenberg-Wappen%20MK1922.jpg?width=270"
+  } ]
+}
