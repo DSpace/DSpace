@@ -129,4 +129,30 @@
         </rightCardinality>
         <copyToRight>true</copyToRight>
     </type>
+    <type>
+        <leftType>Product</leftType>
+        <rightType>Person</rightType>
+        <leftwardType>isCreatorOfProduct</leftwardType>
+        <rightwardType>isProductOfCreator</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+        <copyToLeft>true</copyToLeft>
+    </type>
+    <type>
+        <leftType>Patent</leftType>
+        <rightType>Person</rightType>
+        <leftwardType>isInventorOfPatent</leftwardType>
+        <rightwardType>isPatentOfInventor</rightwardType>
+        <leftCardinality>
+            <min>0</min>
+        </leftCardinality>
+        <rightCardinality>
+            <min>0</min>
+        </rightCardinality>
+        <copyToLeft>true</copyToLeft>
+    </type>
 </relationships>
