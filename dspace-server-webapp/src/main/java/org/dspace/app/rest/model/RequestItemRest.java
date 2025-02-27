@@ -53,6 +53,13 @@ public class RequestItemRest extends BaseObjectRest<Integer> {
 
     protected boolean allfiles;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    protected String accessToken;
+
+    protected int accessPeriod;
+
+    protected String decisionNote;
+
     /**
      * @return the bitstream requested.
      */
@@ -205,6 +212,34 @@ public class RequestItemRest extends BaseObjectRest<Integer> {
      */
     public void setAllfiles(boolean allfiles) {
         this.allfiles = allfiles;
+    }
+
+    /**
+     * @return the unique access token to be used by the requester. This is separate to the approval token ('token')
+     */
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    /**
+     * @param accessToken the access token to be used by the requester (not settable through JSON update)
+     */
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
+    /**
+     * @return access period (in seconds) which indicates how long this access is valid from the decision date
+     */
+    public int getAccessPeriod() {
+        return accessPeriod;
+    }
+
+    /**
+     * @param accessPeriod access period, in seconds, indicating how long this access is valid from the decision date
+     */
+    public void setAccessPeriod(int accessPeriod) {
+        this.accessPeriod = accessPeriod;
     }
 
     /*
