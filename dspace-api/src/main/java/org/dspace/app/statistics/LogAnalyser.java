@@ -234,6 +234,11 @@ public class LogAnalyser {
     private static Pattern valid14 = null;
 
     /**
+     * a pattern to match a valid version 7.0 log file line
+     */
+    private static Pattern valid70 = null;
+
+    /**
      * pattern to match valid log file names
      */
     private static Pattern logRegex = null;
@@ -899,9 +904,20 @@ public class LogAnalyser {
             ":[^:]+:([^:]+):(.*)";
         String logLine14 = "^(\\d\\d\\d\\d-\\d\\d\\-\\d\\d) \\d\\d:\\d\\d:\\d\\d,\\d\\d\\d (\\w+)\\s+\\S+ @ ([^:]+)" +
             ":[^:]+:[^:]+:([^:]+):(.*)";
+        String logLine70 = "^(\\d\\d\\d\\d-\\d\\d\\-\\d\\d)" // 1 date
+                + " \\d\\d:\\d\\d:\\d\\d,\\d\\d\\d"          // time
+                + " (\\w+)"    // 2 level
+                + "\\s+\\S+"   // correlation ID
+                + " \\S+"      // request ID
+                + " \\S+"      // class
+                + " @ ([^:]+)" // 3 user
+                + ":[^:]*"     // context extra info
+                + ":([^:]+)"   // 4 action
+                + ":(.*)";     // 5 params
         valid13 = Pattern.compile(logLine13);
         valid14 = Pattern.compile(logLine14);
         validBase = Pattern.compile(logLineBase);
+        valid70 = Pattern.compile(logLine70);
 
         // set up the pattern for validating log file names
         logRegex = Pattern.compile(fileTemplate);
@@ -1157,7 +1173,7 @@ public class LogAnalyser {
 
 
     /**
-     * split the given line into it's relevant segments if applicable (i.e. the
+     * Split the given line into its relevant segments if the
      * line matches the required regular expression.
      *
      * @param line the line to be segmented
@@ -1166,7 +1182,7 @@ public class LogAnalyser {
     public static LogLine getLogLine(String line) {
         // FIXME: consider moving this code into the LogLine class.  To do this
         // we need to much more carefully define the structure and behaviour
-        // of the LogLine class
+        // of the LogLine class.
         Matcher match;
 
         if (line.indexOf(":ip_addr") > 0) {
@@ -1184,19 +1200,30 @@ public class LogAnalyser {
                                           LogHelper.unescapeLogField(match.group(5)).trim());
 
             return logLine;
-        } else {
-            match = validBase.matcher(line);
-            if (match.matches()) {
-                LogLine logLine = new LogLine(parseDate(match.group(1).trim()),
-                                              LogHelper.unescapeLogField(match.group(2)).trim(),
-                                              null,
-                                              null,
-                                              null
-                );
-                return logLine;
-            }
-            return null;
         }
+
+        match = valid70.matcher(line);
+        if (match.matches()) {
+            // set up a new log line object
+            LogLine logLine = new LogLine(parseDate(match.group(1).trim()), // date
+                                          LogHelper.unescapeLogField(match.group(2)).trim(), // level
+                                          LogHelper.unescapeLogField(match.group(3)).trim(), // user
+                                          LogHelper.unescapeLogField(match.group(4)).trim(), // action
+                                          LogHelper.unescapeLogField(match.group(5)).trim()); // params
+            return logLine;
+        }
+
+        match = validBase.matcher(line);
+        if (match.matches()) {
+            LogLine logLine = new LogLine(parseDate(match.group(1).trim()),
+                                          LogHelper.unescapeLogField(match.group(2)).trim(),
+                                          null,
+                                          null,
+                                          null
+            );
+            return logLine;
+        }
+        return null;
     }
 
 
