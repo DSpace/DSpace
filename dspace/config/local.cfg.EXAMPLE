@@ -48,6 +48,11 @@ dspace.url = ${dspace.baseUrl}
 dspace.server.url = ${dspace.baseUrl}/server
 # End UMD Customization
 
+# Additional URL of DSpace backend which could be used by DSpace frontend during SSR execution.
+# May require a port number if not using standard ports (80 or 443)
+# DO NOT end it with '/'.
+dspace.server.ssr.url = ${dspace.server.url}
+
 # Public URL of DSpace frontend (Angular UI). May require a port number if not using standard ports (80 or 443)
 # DO NOT end it with '/'.
 # This is used by the backend to provide links in emails, RSS feeds, Sitemaps, etc.
