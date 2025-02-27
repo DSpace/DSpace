@@ -862,6 +862,21 @@
         </profile>
 
         <!--
+             Builds SAML 2 extension for DSpace
+        -->
+        <profile>
+            <id>dspace-saml2</id>
+            <activation>
+                <file>
+                    <exists>dspace-saml2/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-saml2</module>
+            </modules>
+        </profile>
+
+        <!--
             Builds IIIF extension for DSpace
         -->
         <profile>
@@ -1070,6 +1085,11 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-rdf</artifactId>
+                <version>9.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.dspace</groupId>
+                <artifactId>dspace-saml2</artifactId>
                 <version>9.0-SNAPSHOT</version>
             </dependency>
             <dependency>

@@ -50,6 +50,10 @@ ADD --chown=dspace dspace-oai/pom.xml /app/dspace-oai/
 RUN mkdir -p /app/dspace-rdf
 ADD --chown=dspace dspace-rdf/pom.xml /app/dspace-rdf/
 
+# 'dspace-saml2' module POM
+RUN mkdir -p /app/dspace-saml2
+ADD --chown=dspace dspace-saml2/pom.xml /app/dspace-saml2/
+
 # 'dspace-server-webapp' module POM
 RUN mkdir -p /app/dspace-server-webapp
 ADD --chown=dspace dspace-server-webapp/pom.xml /app/dspace-server-webapp/
