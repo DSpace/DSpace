@@ -31,6 +31,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.identifier.DOI;
 import org.dspace.identifier.IdentifierException;
+import org.dspace.util.ProxyUtils;
 
 /**
  * A request to EZID concerning a given (or expected) identifier.
@@ -87,7 +88,9 @@ public class EZIDRequest {
             this.authority = authority;
         }
 
-        client = HttpClientBuilder.create().build();
+        HttpClientBuilder builder = HttpClientBuilder.create();
+        ProxyUtils.addProxy(builder);
+        client = builder.build();
         httpContext = HttpClientContext.create();
         if (null != username) {
             URI uri = new URI(scheme, host, path, null);
@@ -124,7 +127,9 @@ public class EZIDRequest {
             this.authority = authority;
         }
 
-        client = HttpClientBuilder.create().build();
+        HttpClientBuilder builder = HttpClientBuilder.create();
+        ProxyUtils.addProxy(builder);
+        client = builder.build();
         httpContext = HttpClientContext.create();
         if (null != username) {
             CredentialsProvider credentialsProvider = new BasicCredentialsProvider();

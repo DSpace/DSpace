@@ -28,6 +28,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.eperson.service.CaptchaService;
 import org.dspace.services.ConfigurationService;
+import org.dspace.util.ProxyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
@@ -40,7 +41,7 @@ public class CaptchaServiceImpl implements CaptchaService {
 
     private static final Logger log = LogManager.getLogger(CaptchaServiceImpl.class);
 
-    private static Pattern RESPONSE_PATTERN = Pattern.compile("[A-Za-z0-9_-]+");
+    private static final Pattern RESPONSE_PATTERN = Pattern.compile("[A-Za-z0-9_-]+");
 
     private CaptchaSettings captchaSettings;
 
@@ -67,7 +68,7 @@ public class CaptchaServiceImpl implements CaptchaService {
 
         URI verifyUri = URI.create(captchaSettings.getSiteVerify());
 
-        List<NameValuePair> params = new ArrayList<NameValuePair>(3);
+        List<NameValuePair> params = new ArrayList<>(3);
         params.add(new BasicNameValuePair("secret", captchaSettings.getSecret()));
         params.add(new BasicNameValuePair("response", response));
         params.add(new BasicNameValuePair("remoteip", ""));
@@ -82,7 +83,9 @@ public class CaptchaServiceImpl implements CaptchaService {
             throw new RuntimeException(e.getMessage(), e);
         }
 
-        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpClientBuilder builder = HttpClientBuilder.create();
+        ProxyUtils.addProxy(builder);
+        HttpClient httpClient = builder.build();
         HttpResponse httpResponse;
         GoogleCaptchaResponse googleResponse;
         final ObjectMapper objectMapper = new ObjectMapper();
