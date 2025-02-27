@@ -190,7 +190,7 @@ public class LDNMessageConsumer implements Consumer {
         appendGeneratedMessage(ldn,
                 ldnMessage,
                 actorID,
-                (actorID != null && item.getSubmitter() != null) ? item.getSubmitter().getName() : null,
+                (actorID != null && item.getSubmitter() != null) ? item.getSubmitter().getFullName() : null,
                 resubmissionID);
 
         ObjectMapper mapper = new ObjectMapper();
