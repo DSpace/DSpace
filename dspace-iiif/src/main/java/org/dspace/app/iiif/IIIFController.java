@@ -108,6 +108,22 @@ public class IIIFController {
      */
     @RequestMapping(method = RequestMethod.GET, value = "/{id}/canvas/{cid}")
     public String findCanvas(@PathVariable UUID id, @PathVariable String cid) {
+        /**
+         * We have some tension here between the generated Canvases and canvases in
+         * custom manifests
+         *
+         * Canvases use its ID as a URL to make this specific request. The above
+         * variables are separated from the URL and used when generating the canvas.
+         * But for custom manifests, it's ideal to search for canvas by matching the
+         * full URL to a canvas ID.
+         *
+         * In this implementation, for custom manifests, we'll assume the
+         * {manifestId}/canvas/{canvasId} structure and do an "endsWith" comparison
+         * when searching for the canvas by ID. Since we need to assume this
+         * structure to define this RestController method anyway, perhaps it isn't
+         * a huge issue on this end and needs documentation for IIIF manifest authors
+         * in the DSpace context
+         */
         Context context = ContextUtil.obtainCurrentRequestContext();
         return iiifFacade.getCanvas(context, id, cid);
     }
