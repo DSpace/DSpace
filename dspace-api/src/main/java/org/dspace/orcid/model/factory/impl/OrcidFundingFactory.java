@@ -82,7 +82,7 @@ public class OrcidFundingFactory implements OrcidEntityFactory {
     public Activity createOrcidObject(Context context, Item item) {
         Funding funding = new Funding();
         funding.setContributors(getContributors(context, item));
-        funding.setDescription(getDescription(context, item));
+        funding.setDescription(orcidCommonObjectFactory.shortenDescription(getDescription(context, item)));
         funding.setEndDate(getEndDate(context, item));
         funding.setExternalIdentifiers(getExternalIds(context, item));
         funding.setOrganization(getOrganization(context, item));
