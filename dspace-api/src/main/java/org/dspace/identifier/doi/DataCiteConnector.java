@@ -456,6 +456,17 @@ public class DataCiteConnector
                                                      + ". Please inform your administrator or take a look "
                                                      + " into the log files.", DOIIdentifierException.BAD_REQUEST);
             }
+            // 422 -> likely invalid metadata
+            case (422): {
+                log.warn("DataCite returned 422, it understood the XML we send, but it was invalid. " +
+                        "Most likely metadata required by DataCite is missing. " +
+                        "(https://datacite-metadata-schema.readthedocs.io/en/4.5/properties/" +
+                        "overview/#mandatory-properties) " +
+                        "Resolve this in the crosswalk configuration as needed.");
+                throw new DOIIdentifierException("Unable to reserve DOI " + doi
+                        + ". Please inform your administrator or take a look "
+                        + " into the log files.", DOIIdentifierException.BAD_REQUEST);
+            }
             // Catch all other http status code in case we forgot one.
             default: {
                 log.warn("While reserving the DOI {}, we got a http status code "
