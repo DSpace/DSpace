@@ -7,7 +7,7 @@
  */
 package org.dspace.discovery.indexobject;
 
-import java.util.Date;
+import java.time.Instant;
 
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
@@ -25,7 +25,7 @@ public class IndexableItem extends IndexableDSpaceObject<Item> {
     }
 
     @Override
-    public Date getLastModified() {
+    public Instant getLastModified() {
         return getIndexedObject().getLastModified();
     }
 

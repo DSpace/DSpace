@@ -15,9 +15,7 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -65,7 +63,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
     private Item itemWithPrimaryAndMultipleBitstreams;
     private Item itemWithoutPrimaryAndMultipleBitstreams;
     private DefaultAccessStatusHelper helper;
-    private Date threshold;
+    private LocalDate threshold;
 
     protected CommunityService communityService =
             ContentServiceFactory.getInstance().getCommunityService();
@@ -130,7 +128,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
             fail("SQL Error in init: " + ex.getMessage());
         }
         helper = new DefaultAccessStatusHelper();
-        threshold = dateFrom(10000, 1, 1);
+        threshold = LocalDate.of(10000, 1, 1);
     }
 
     /**
@@ -266,7 +264,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         ResourcePolicy policy = resourcePolicyService.create(context, null, group);
         policy.setRpName("Embargo");
         policy.setAction(Constants.READ);
-        policy.setStartDate(dateFrom(9999, 12, 31));
+        policy.setStartDate(LocalDate.of(9999, 12, 31));
         policies.add(policy);
         authorizeService.removeAllPolicies(context, bitstream);
         authorizeService.addPolicies(context, policies, bitstream);
@@ -294,7 +292,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         ResourcePolicy policy = resourcePolicyService.create(context, null, group);
         policy.setRpName("Restriction");
         policy.setAction(Constants.READ);
-        policy.setStartDate(dateFrom(10000, 1, 1));
+        policy.setStartDate(LocalDate.of(10000, 1, 1));
         policies.add(policy);
         authorizeService.removeAllPolicies(context, bitstream);
         authorizeService.addPolicies(context, policies, bitstream);
@@ -382,7 +380,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         ResourcePolicy policy = resourcePolicyService.create(context, null, group);
         policy.setRpName("Embargo");
         policy.setAction(Constants.READ);
-        policy.setStartDate(dateFrom(9999, 12, 31));
+        policy.setStartDate(LocalDate.of(9999, 12, 31));
         policies.add(policy);
         authorizeService.removeAllPolicies(context, primaryBitstream);
         authorizeService.addPolicies(context, policies, primaryBitstream);
@@ -412,7 +410,7 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         ResourcePolicy policy = resourcePolicyService.create(context, null, group);
         policy.setRpName("Embargo");
         policy.setAction(Constants.READ);
-        policy.setStartDate(dateFrom(9999, 12, 31));
+        policy.setStartDate(LocalDate.of(9999, 12, 31));
         policies.add(policy);
         authorizeService.removeAllPolicies(context, anotherBitstream);
         authorizeService.addPolicies(context, policies, anotherBitstream);
@@ -421,20 +419,5 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         assertThat("testWithNoPrimaryAndMultipleBitstreams 0", status, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
         String embargoDate = helper.getEmbargoFromItem(context, itemWithEmbargo, threshold);
         assertThat("testWithNoPrimaryAndMultipleBitstreams 1", embargoDate, equalTo(null));
-    }
-
-    /**
-     * Create a Date from local year, month, day.
-     *
-     * @param year the year.
-     * @param month the month.
-     * @param day the day.
-     * @return the assembled date.
-     */
-    private Date dateFrom(int year, int month, int day) {
-        return Date.from(LocalDate.of(year, month, day)
-                .atStartOfDay()
-                .atZone(ZoneId.systemDefault())
-                .toInstant());
     }
 }

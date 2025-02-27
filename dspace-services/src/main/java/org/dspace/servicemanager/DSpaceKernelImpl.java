@@ -7,7 +7,7 @@
  */
 package org.dspace.servicemanager;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -147,8 +147,8 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean {
         }
 
         synchronized (lock) {
-            lastLoadDate = new Date();
-            long startTime = System.currentTimeMillis();
+            lastLoadDate = Instant.now();
+            long startTime = lastLoadDate.toEpochMilli();
 
             // create the configuration service and get the configuration
             DSpaceConfigurationService dsConfigService = new DSpaceConfigurationService(dspaceHome);
@@ -161,7 +161,7 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean {
             // initialize the static
 //            DSpace.initialize(serviceManagerSystem);
 
-            loadTime = System.currentTimeMillis() - startTime;
+            loadTime = Instant.now().toEpochMilli() - startTime;
 
             kernel = this;
             running = true;
@@ -274,15 +274,15 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean {
 
     // MBEAN methods
 
-    private Date lastLoadDate;
+    private Instant lastLoadDate;
 
     /**
-     * Time that this kernel was started, as a java.util.Date.
+     * Time that this kernel was started, as an Instant
      *
      * @return date object
      **/
-    public Date getLastLoadDate() {
-        return new Date(lastLoadDate.getTime());
+    public Instant getLastLoadDate() {
+        return lastLoadDate;
     }
 
     private long loadTime;
@@ -312,7 +312,7 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean {
             "getMethod=getLoadTime"});
 
         ModelMBeanAttributeInfo[] mmbai = new ModelMBeanAttributeInfo[2];
-        mmbai[0] = new ModelMBeanAttributeInfo("LastLoadDate", "java.util.Date", "Last Load Date",
+        mmbai[0] = new ModelMBeanAttributeInfo("LastLoadDate", "java.time.Instant", "Last Load Date",
                                                true, false, false, lastLoadDateDesc);
 
         mmbai[1] = new ModelMBeanAttributeInfo("LastLoadTime", "java.lang.Long", "Last Load Time",

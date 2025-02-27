@@ -8,17 +8,15 @@
 package org.dspace.statistics;
 
 import static java.util.Arrays.asList;
-import static java.util.Calendar.DAY_OF_YEAR;
-import static org.apache.commons.lang.time.DateFormatUtils.format;
 import static org.dspace.core.Constants.BITSTREAM;
 import static org.dspace.core.Constants.COLLECTION;
 import static org.dspace.core.Constants.COMMUNITY;
 import static org.dspace.core.Constants.ITEM;
-import static org.dspace.statistics.SolrLoggerServiceImpl.DATE_FORMAT_8601;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
-import java.util.Calendar;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -243,8 +241,6 @@ public class AnonymizeStatisticsIT
     }
 
     private String getTimeNDaysAgo(int daysAgo) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(DAY_OF_YEAR, -daysAgo);
-        return format(calendar, DATE_FORMAT_8601);
+        return Instant.now().minus(daysAgo, ChronoUnit.DAYS).toString();
     }
 }

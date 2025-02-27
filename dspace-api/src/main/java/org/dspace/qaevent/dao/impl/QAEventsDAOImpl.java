@@ -8,7 +8,7 @@
 package org.dspace.qaevent.dao.impl;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 import jakarta.persistence.Query;
@@ -39,7 +39,7 @@ public class QAEventsDAOImpl extends AbstractHibernateDAO<QAEventProcessed> impl
         qaEvent.setEperson(eperson);
         qaEvent.setEventId(checksum);
         qaEvent.setItem(item);
-        qaEvent.setEventTimestamp(new Date());
+        qaEvent.setEventTimestamp(Instant.now());
         try {
             create(context, qaEvent);
             return true;

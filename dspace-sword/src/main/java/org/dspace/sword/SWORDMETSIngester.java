@@ -9,7 +9,8 @@ package org.dspace.sword;
 
 import java.io.File;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.StringTokenizer;
 
 import org.apache.logging.log4j.LogManager;
@@ -196,7 +197,7 @@ public class SWORDMETSIngester implements SWORDIngester {
         try {
             itemService.clearMetadata(context, item, dc.schema, dc.element,
                                       dc.qualifier, Item.ANY);
-            DCDate date = new DCDate(new Date());
+            DCDate date = new DCDate(ZonedDateTime.now(ZoneOffset.UTC));
             itemService.addMetadata(context, item, dc.schema, dc.element,
                                     dc.qualifier, null, date.toString());
         } catch (SQLException e) {

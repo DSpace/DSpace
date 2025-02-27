@@ -8,9 +8,8 @@
 package org.dspace.health;
 
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import org.dspace.checker.CheckerCommand;
@@ -30,7 +29,7 @@ public class ChecksumCheck extends Check {
         String ret = "No md5 checks made!";
         Context context = new Context();
         CheckerCommand checker = new CheckerCommand(context);
-        Date process_start = Calendar.getInstance().getTime();
+        Instant process_start = Instant.now();
         checker.setProcessStartDate(process_start);
         checker.setDispatcher(
             new SimpleDispatcher(context, process_start, false));

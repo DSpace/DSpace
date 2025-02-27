@@ -11,7 +11,7 @@ import static org.dspace.util.MultiFormatDateParser.parse;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.eperson.EPerson;
@@ -40,13 +40,13 @@ public class ResourcePolicyMatcher extends TypeSafeMatcher<ResourcePolicy> {
 
     private final Matcher<String> description;
 
-    private final Matcher<Date> startDate;
+    private final Matcher<LocalDate> startDate;
 
-    private final Matcher<Date> endDate;
+    private final Matcher<LocalDate> endDate;
 
     public ResourcePolicyMatcher(Matcher<Integer> actionId, Matcher<EPerson> ePerson, Matcher<Group> group,
-                                 Matcher<String> rpName, Matcher<String> rptype, Matcher<Date> startDate,
-                                 Matcher<Date> endDate, Matcher<String> description) {
+                                 Matcher<String> rpName, Matcher<String> rptype, Matcher<LocalDate> startDate,
+                                 Matcher<LocalDate> endDate, Matcher<String> description) {
         this.actionId = actionId;
         this.ePerson = ePerson;
         this.group = group;
@@ -71,40 +71,40 @@ public class ResourcePolicyMatcher extends TypeSafeMatcher<ResourcePolicy> {
 
     public static ResourcePolicyMatcher matches(int actionId, EPerson ePerson, String rptype) {
         return new ResourcePolicyMatcher(is(actionId), is(ePerson), nullValue(Group.class),
-            any(String.class), is(rptype), any(Date.class), any(Date.class), any(String.class));
+            any(String.class), is(rptype), any(LocalDate.class), any(LocalDate.class), any(String.class));
     }
 
     public static ResourcePolicyMatcher matches(int actionId, EPerson ePerson, String rpName, String rptype) {
         return new ResourcePolicyMatcher(is(actionId), is(ePerson), nullValue(Group.class),
-            is(rpName), is(rptype), any(Date.class), any(Date.class), any(String.class));
+            is(rpName), is(rptype), any(LocalDate.class), any(LocalDate.class), any(String.class));
     }
 
     public static ResourcePolicyMatcher matches(int actionId, Group group, String rptype) {
         return new ResourcePolicyMatcher(is(actionId), nullValue(EPerson.class), is(group),
-            any(String.class), is(rptype), any(Date.class), any(Date.class), any(String.class));
+            any(String.class), is(rptype), any(LocalDate.class), any(LocalDate.class), any(String.class));
     }
 
     public static ResourcePolicyMatcher matches(int actionId, Group group, String rpName, String rptype) {
         return new ResourcePolicyMatcher(is(actionId), nullValue(EPerson.class), is(group), is(rpName),
-            is(rptype), any(Date.class), any(Date.class), any(String.class));
+            is(rptype), any(LocalDate.class), any(LocalDate.class), any(String.class));
     }
 
     public static ResourcePolicyMatcher matches(int actionId, Group group, String rpName, String rptype,
         String description) {
         return new ResourcePolicyMatcher(is(actionId), nullValue(EPerson.class), is(group), is(rpName),
-            is(rptype), any(Date.class), any(Date.class), is(description));
+            is(rptype), any(LocalDate.class), any(LocalDate.class), is(description));
     }
 
-    public static ResourcePolicyMatcher matches(int actionId, Group group, String rpName, String rpType, Date startDate,
-        Date endDate, String description) {
+    public static ResourcePolicyMatcher matches(int actionId, Group group, String rpName, String rpType,
+                                                LocalDate startDate, LocalDate endDate, String description) {
         return new ResourcePolicyMatcher(is(actionId), nullValue(EPerson.class), is(group), is(rpName),
             is(rpType), is(startDate), is(endDate), is(description));
     }
 
     public static ResourcePolicyMatcher matches(int actionId, Group group, String rpName, String rpType,
         String startDate, String endDate, String description) {
-        return matches(actionId, group, rpName, rpType, startDate != null ? parse(startDate) : null,
-            endDate != null ? parse(endDate) : null, description);
+        return matches(actionId, group, rpName, rpType, startDate != null ? parse(startDate).toLocalDate() : null,
+            endDate != null ? parse(endDate).toLocalDate() : null, description);
     }
 
     @Override

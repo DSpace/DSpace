@@ -8,6 +8,7 @@
 
 package org.dspace.importer.external.service.components;
 
+import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -158,7 +159,7 @@ public abstract class AbstractRemoteMetadataSource {
             try {
                 lock.lock();
                 this.error = null;
-                long time = System.currentTimeMillis() - lastRequest;
+                long time = Instant.now().toEpochMilli() - lastRequest;
                 if ((time) < interRequestTime) {
                     Thread.sleep(interRequestTime - time);
                 }
@@ -184,7 +185,7 @@ public abstract class AbstractRemoteMetadataSource {
                          operationId, retry, warning, e);
 
             } finally {
-                this.lastRequest = System.currentTimeMillis();
+                this.lastRequest = Instant.now().toEpochMilli();
                 lock.unlock();
             }
 

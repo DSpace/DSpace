@@ -58,6 +58,9 @@ public class LoginAsEPersonIT extends AbstractControllerIntegrationTest {
     @Autowired
     private GroupService groupService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Before
     public void setup() {
         configurationService.setProperty("webui.user.assumelogin", true);
@@ -198,8 +201,6 @@ public class LoginAsEPersonIT extends AbstractControllerIntegrationTest {
                                                   .andExpect(status().isCreated())
                                                   .andExpect(jsonPath("$._embedded.collection.id",
                                                                       is(col1.getID().toString()))).andReturn();
-
-        ObjectMapper mapper = new ObjectMapper();
 
         String content = mvcResult.getResponse().getContentAsString();
         Map<String,Object> map = mapper.readValue(content, Map.class);

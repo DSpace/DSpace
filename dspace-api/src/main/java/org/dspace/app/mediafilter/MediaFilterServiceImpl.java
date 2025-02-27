@@ -13,7 +13,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -128,7 +127,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             Iterator<Item> itemIterator =
                     itemService.findByLastModifiedSince(
                             context,
-                            Date.from(fromDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
+                            fromDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
                     );
             while (itemIterator.hasNext() && processed < max2Process) {
                 applyFiltersItem(context, itemIterator.next());

@@ -8,7 +8,7 @@
 package org.dspace.authorize.service;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
@@ -475,10 +475,11 @@ public interface AuthorizeService {
 
     public ResourcePolicy createResourcePolicy(Context context, DSpaceObject dso, Group group, EPerson eperson,
                                                int type, String rpType, String rpName, String rpDescription,
-                                               Date startDate, Date endDate) throws SQLException, AuthorizeException;
+                                               LocalDate startDate, LocalDate endDate)
+        throws SQLException, AuthorizeException;
 
     public ResourcePolicy createOrModifyPolicy(ResourcePolicy policy, Context context, String name, Group group,
-                                               EPerson ePerson, Date embargoDate, int action, String reason,
+                                               EPerson ePerson, LocalDate embargoDate, int action, String reason,
                                                DSpaceObject dso) throws AuthorizeException, SQLException;
 
     /**

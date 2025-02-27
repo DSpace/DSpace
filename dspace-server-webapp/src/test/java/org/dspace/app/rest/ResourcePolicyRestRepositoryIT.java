@@ -22,10 +22,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -73,6 +72,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
     @Autowired
     ResourcePolicyService resourcePolicyService;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Test
     public void findAllTest() throws Exception {
@@ -1008,7 +1010,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
             context.restoreAuthSystemState();
 
-            ObjectMapper mapper = new ObjectMapper();
             ResourcePolicyRest resourcePolicyRest = new ResourcePolicyRest();
 
             resourcePolicyRest.setPolicyType(ResourcePolicy.TYPE_SUBMISSION);
@@ -1067,7 +1068,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
             context.restoreAuthSystemState();
 
-            ObjectMapper mapper = new ObjectMapper();
             ResourcePolicyRest resourcePolicyRest = new ResourcePolicyRest();
 
             resourcePolicyRest.setPolicyType(ResourcePolicy.TYPE_SUBMISSION);
@@ -1115,7 +1115,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         context.restoreAuthSystemState();
 
-        ObjectMapper mapper = new ObjectMapper();
         ResourcePolicyRest resourcePolicyRest = new ResourcePolicyRest();
 
         resourcePolicyRest.setPolicyType(ResourcePolicy.TYPE_SUBMISSION);
@@ -1152,7 +1151,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         context.restoreAuthSystemState();
 
-        ObjectMapper mapper = new ObjectMapper();
         ResourcePolicyRest resourcePolicyRest = new ResourcePolicyRest();
 
         resourcePolicyRest.setPolicyType(ResourcePolicy.TYPE_SUBMISSION);
@@ -1190,7 +1188,6 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         context.restoreAuthSystemState();
 
-        ObjectMapper mapper = new ObjectMapper();
         ResourcePolicyRest resourcePolicyRest = new ResourcePolicyRest();
 
         resourcePolicyRest.setPolicyType(ResourcePolicy.TYPE_SUBMISSION);
@@ -1327,32 +1324,21 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.set(Calendar.YEAR, 2019);
-        calendar.set(Calendar.MONTH, 9);
-        calendar.set(Calendar.DATE, 31);
-
-        Date data = calendar.getTime();
+        LocalDate date = LocalDate.of(2019, 10, 31);
 
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
                    EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withAction(Constants.READ)
             .withDspaceObject(publicItem1)
-            .withStartDate(data)
+            .withStartDate(date)
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
         context.restoreAuthSystemState();
 
-        Calendar newCalendar = Calendar.getInstance();
-        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
+        DateTimeFormatter formatDate = DateTimeFormatter.ISO_LOCAL_DATE;
 
-        newCalendar.set(Calendar.YEAR, 2020);
-        newCalendar.set(Calendar.MONTH, 0);
-        newCalendar.set(Calendar.DATE, 1);
-
-        Date newDate = newCalendar.getTime();
+        LocalDate newDate = LocalDate.of(2020, 1, 1);
 
         List<Operation> ops = new ArrayList<Operation>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/startDate", formatDate.format(newDate));
@@ -1397,13 +1383,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
                                       .withTitle("Public item")
                                       .build();
 
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.set(Calendar.YEAR, 2019);
-        calendar.set(Calendar.MONTH, 9);
-        calendar.set(Calendar.DATE, 31);
-
-        Date date = calendar.getTime();
+        LocalDate date = LocalDate.of(2019, 10, 31);
 
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
                            EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
@@ -1415,14 +1395,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         context.restoreAuthSystemState();
 
-        Calendar newCalendar = Calendar.getInstance();
-        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
-
-        newCalendar.set(Calendar.YEAR, 2020);
-        newCalendar.set(Calendar.MONTH, 0);
-        newCalendar.set(Calendar.DATE, 1);
-
-        Date newDate = newCalendar.getTime();
+        DateTimeFormatter formatDate = DateTimeFormatter.ISO_LOCAL_DATE;
+        LocalDate newDate = LocalDate.of(2020, 1, 1);
 
         List<Operation> ops = new ArrayList<Operation>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/endDate", formatDate.format(newDate));
@@ -1476,14 +1450,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         context.restoreAuthSystemState();
 
-        Calendar newCalendar = Calendar.getInstance();
-        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
-
-        newCalendar.set(Calendar.YEAR, 2019);
-        newCalendar.set(Calendar.MONTH, 9);
-        newCalendar.set(Calendar.DATE, 31);
-
-        Date newDate = newCalendar.getTime();
+        DateTimeFormatter formatDate = DateTimeFormatter.ISO_LOCAL_DATE;
+        LocalDate newDate = LocalDate.of(2019, 10, 31);
 
         List<Operation> ops = new ArrayList<Operation>();
         AddOperation addOperation = new AddOperation("/startDate", formatDate.format(newDate));
@@ -1539,9 +1507,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         context.restoreAuthSystemState();
 
-        Calendar newCalendar = Calendar.getInstance();
-        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
-        Date newDate = new Date();
+        DateTimeFormatter formatDate = DateTimeFormatter.ISO_LOCAL_DATE;
+        LocalDate newDate = LocalDate.now();
 
         List<Operation> ops = new ArrayList<Operation>();
         AddOperation addOperation = new AddOperation("/endDate", formatDate.format(newDate));
@@ -1586,19 +1553,13 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.set(Calendar.YEAR, 2019);
-        calendar.set(Calendar.MONTH, 9);
-        calendar.set(Calendar.DATE, 31);
-
-        Date data = calendar.getTime();
+        LocalDate date = LocalDate.of(2019, 10, 31);
 
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
                        EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
             .withAction(Constants.READ)
             .withDspaceObject(publicItem1)
-            .withStartDate(data)
+            .withStartDate(date)
             .withPolicyType(ResourcePolicy.TYPE_CUSTOM)
             .build();
 
@@ -1647,13 +1608,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.set(Calendar.YEAR, 2019);
-        calendar.set(Calendar.MONTH, 9);
-        calendar.set(Calendar.DATE, 31);
-
-        Date date = calendar.getTime();
+        LocalDate date = LocalDate.of(2019, 10, 31);
 
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
                            EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
@@ -1667,7 +1622,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         context.restoreAuthSystemState();
 
         String wrongStartDate = "";
-        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
+        DateTimeFormatter formatDate = DateTimeFormatter.ISO_LOCAL_DATE;
 
         List<Operation> ops = new ArrayList<Operation>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/startDate", wrongStartDate);
@@ -1698,13 +1653,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         Item item = ItemBuilder.createItem(context, collection).build();
 
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.set(Calendar.YEAR, 2010);
-        calendar.set(Calendar.MONTH, 5);
-        calendar.set(Calendar.DATE, 15);
-
-        Date date = calendar.getTime();
+        LocalDate date = LocalDate.of(2010, 6, 15);
 
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson, null)
             .withAction(Constants.WRITE)
@@ -1715,14 +1664,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         context.restoreAuthSystemState();
 
-        Calendar calendar2 = Calendar.getInstance();
-        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
-
-        calendar2.set(Calendar.YEAR, 2021);
-        calendar2.set(Calendar.MONTH, 2);
-        calendar2.set(Calendar.DATE, 21);
-
-        Date newDate = calendar2.getTime();
+        DateTimeFormatter formatDate = DateTimeFormatter.ISO_LOCAL_DATE;
+        LocalDate newDate = LocalDate.of(2021, 3, 21);
 
         List<Operation> ops = new ArrayList<Operation>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/startDate", formatDate.format(newDate));
@@ -1760,13 +1703,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.set(Calendar.YEAR, 2019);
-        calendar.set(Calendar.MONTH, 9);
-        calendar.set(Calendar.DATE, 31);
-
-        Date date = calendar.getTime();
+        LocalDate date = LocalDate.of(2019, 10, 31);
 
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
                        EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
@@ -1778,17 +1715,11 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         context.restoreAuthSystemState();
 
-        Calendar calendar2 = Calendar.getInstance();
-        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
-
-        calendar2.set(Calendar.YEAR, 2020);
-        calendar2.set(Calendar.MONTH, 0);
-        calendar2.set(Calendar.DATE, 1);
-
-        Date newData = calendar2.getTime();
+        DateTimeFormatter formatDate = DateTimeFormatter.ISO_LOCAL_DATE;
+        LocalDate newDate = LocalDate.of(2020, 1, 1);
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation replaceOperation = new ReplaceOperation("/startDate", formatDate.format(newData));
+        ReplaceOperation replaceOperation = new ReplaceOperation("/startDate", formatDate.format(newDate));
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
 
@@ -1818,17 +1749,11 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         context.restoreAuthSystemState();
 
-        Calendar calendar2 = Calendar.getInstance();
-        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
-
-        calendar2.set(Calendar.YEAR, 2020);
-        calendar2.set(Calendar.MONTH, 0);
-        calendar2.set(Calendar.DATE, 1);
-
-        Date newData = calendar2.getTime();
+        DateTimeFormatter formatDate = DateTimeFormatter.ISO_LOCAL_DATE;
+        LocalDate newDate = LocalDate.of(2020, 1, 1);
 
         List<Operation> ops = new ArrayList<Operation>();
-        ReplaceOperation replaceOperation = new ReplaceOperation("/startDate", formatDate.format(newData));
+        ReplaceOperation replaceOperation = new ReplaceOperation("/startDate", formatDate.format(newDate));
         ops.add(replaceOperation);
         String patchBody = getPatchContent(ops);
 
@@ -1858,21 +1783,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        Calendar calendarStartDate = Calendar.getInstance();
-
-        calendarStartDate.set(Calendar.YEAR, 2019);
-        calendarStartDate.set(Calendar.MONTH, 10);
-        calendarStartDate.set(Calendar.DATE, 21);
-
-        Date startDate = calendarStartDate.getTime();
-
-        Calendar calendarEndDate = Calendar.getInstance();
-
-        calendarEndDate.set(Calendar.YEAR, 2020);
-        calendarEndDate.set(Calendar.MONTH, 10);
-        calendarEndDate.set(Calendar.DATE, 21);
-
-        Date endDate = calendarEndDate.getTime();
+        LocalDate startDate = LocalDate.of(2019, 11, 21);
+        LocalDate endDate = LocalDate.of(2020, 11, 21);
 
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, eperson1, null)
             .withAction(Constants.READ)
@@ -1884,14 +1796,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
 
         context.restoreAuthSystemState();
 
-        Calendar newEndDateCalendar = Calendar.getInstance();
-        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
-
-        newEndDateCalendar.set(Calendar.YEAR, 2018);
-        newEndDateCalendar.set(Calendar.MONTH, 10);
-        newEndDateCalendar.set(Calendar.DATE, 21);
-
-        Date newEndDate = newEndDateCalendar.getTime();
+        DateTimeFormatter formatDate = DateTimeFormatter.ISO_LOCAL_DATE;
+        LocalDate newEndDate = LocalDate.of(2018, 11, 21);
 
         List<Operation> ops = new ArrayList<Operation>();
         ReplaceOperation replaceOperation = new ReplaceOperation("/endDate", formatDate.format(newEndDate));
@@ -2978,21 +2884,8 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        Calendar calendarStartDate = Calendar.getInstance();
-
-        calendarStartDate.set(Calendar.YEAR, 2017);
-        calendarStartDate.set(Calendar.MONTH, 0);
-        calendarStartDate.set(Calendar.DATE, 1);
-
-        Date startDate = calendarStartDate.getTime();
-
-        Calendar calendarEndDate = Calendar.getInstance();
-
-        calendarEndDate.set(Calendar.YEAR, 2022);
-        calendarEndDate.set(Calendar.MONTH, 11);
-        calendarEndDate.set(Calendar.DATE, 31);
-
-        Date endDate = calendarEndDate.getTime();
+        LocalDate startDate = LocalDate.of(2017, 1, 1);
+        LocalDate endDate = LocalDate.of(2022, 12, 31);
 
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
                        EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
@@ -3019,13 +2912,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ReplaceOperation replaceNameOperation = new ReplaceOperation("/name", newName);
         ops.add(replaceNameOperation);
 
-        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
-        Calendar calendarNewStartDate = Calendar.getInstance();
-        calendarNewStartDate.set(Calendar.YEAR, 2018);
-        calendarNewStartDate.set(Calendar.MONTH, 1);
-        calendarNewStartDate.set(Calendar.DATE, 1);
+        DateTimeFormatter formatDate = DateTimeFormatter.ISO_LOCAL_DATE;
+        LocalDate newStartDate = LocalDate.of(2018, 2, 1);
 
-        Date newStartDate = calendarNewStartDate.getTime();
         ReplaceOperation replaceStartDateOperation = new ReplaceOperation("/startDate",
             formatDate.format(newStartDate));
         ops.add(replaceStartDateOperation);
@@ -3076,13 +2965,7 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
             .withTitle("Public item")
             .build();
 
-        Calendar calendarEndDate = Calendar.getInstance();
-
-        calendarEndDate.set(Calendar.YEAR, 2022);
-        calendarEndDate.set(Calendar.MONTH, 11);
-        calendarEndDate.set(Calendar.DATE, 31);
-
-        Date endDate = calendarEndDate.getTime();
+        LocalDate endDate = LocalDate.of(2022, 12, 31);
 
         ResourcePolicy resourcePolicy = ResourcePolicyBuilder.createResourcePolicy(context, null,
                        EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS))
@@ -3101,13 +2984,9 @@ public class ResourcePolicyRestRepositoryIT extends AbstractControllerIntegratio
         ReplaceOperation replaceNameOperation = new ReplaceOperation("/name", newName);
         ops.add(replaceNameOperation);
 
-        SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd");
-        Calendar calendarNewStartDate = Calendar.getInstance();
-        calendarNewStartDate.set(Calendar.YEAR, 2018);
-        calendarNewStartDate.set(Calendar.MONTH, 1);
-        calendarNewStartDate.set(Calendar.DATE, 1);
+        DateTimeFormatter formatDate = DateTimeFormatter.ISO_LOCAL_DATE;
+        LocalDate newStartDate = LocalDate.of(2018, 2, 1);
 
-        Date newStartDate = calendarNewStartDate.getTime();
         ReplaceOperation replaceStartDateOperation = new ReplaceOperation("/startDate",
             formatDate.format(newStartDate));
         ops.add(replaceStartDateOperation);

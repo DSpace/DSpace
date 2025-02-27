@@ -76,6 +76,9 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
     @Autowired
     DiscoverableEndpointsService discoverableEndpointsService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Override
     @PreAuthorize("hasPermission(#id, 'resourcepolicy', 'READ')")
     public ResourcePolicyRest findOne(Context context, Integer id) {
@@ -238,7 +241,6 @@ public class ResourcePolicyRestRepository extends DSpaceRestRepository<ResourceP
         }
 
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
-        ObjectMapper mapper = new ObjectMapper();
         ResourcePolicyRest resourcePolicyRest = null;
         ResourcePolicy resourcePolicy = null;
 

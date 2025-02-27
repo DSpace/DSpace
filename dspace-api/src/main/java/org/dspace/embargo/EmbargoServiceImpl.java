@@ -9,7 +9,7 @@ package org.dspace.embargo;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.Iterator;
 import java.util.List;
 
@@ -129,7 +129,7 @@ public class EmbargoServiceImpl implements EmbargoService {
         }
 
         // new DCDate(non-date String) means toDate() will return null
-        Date liftDate = result.toDate();
+        ZonedDateTime liftDate = result.toDate();
         if (liftDate == null) {
             throw new IllegalArgumentException(
                 "Embargo lift date is uninterpretable:  "
@@ -223,7 +223,7 @@ public class EmbargoServiceImpl implements EmbargoService {
         if (lift.size() > 0) {
             liftDate = new DCDate(lift.get(0).getValue());
             // sanity check: do not allow an embargo lift date in the past.
-            if (liftDate.toDate().before(new Date())) {
+            if (liftDate.toDate().isBefore(ZonedDateTime.now())) {
                 liftDate = null;
             }
         }

@@ -7,8 +7,8 @@
  */
 package org.dspace.iiif.canvasdimension;
 
+import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
@@ -49,7 +49,7 @@ public class CanvasDimensionCLI {
 
     public static void main(String[] argv) throws Exception {
 
-        Date startTime = new Date();
+        Instant startTime = Instant.now();
 
         boolean iiifEnabled = configurationService.getBooleanProperty("iiif.enabled");
         if (!iiifEnabled) {
@@ -223,12 +223,12 @@ public class CanvasDimensionCLI {
             context.commit();
         }
 
-        Date endTime = new Date();
-        System.out.println("Started: " + startTime.getTime());
-        System.out.println("Ended: " + endTime.getTime());
+        Instant endTime = Instant.now();
+        System.out.println("Started: " + startTime);
+        System.out.println("Ended: " + endTime);
         System.out.println(
-            "Elapsed time: " + ((endTime.getTime() - startTime.getTime()) / 1000) + " secs (" + (endTime
-                .getTime() - startTime.getTime()) + " msecs)");
+            "Elapsed time: " + ((endTime.toEpochMilli() - startTime.toEpochMilli()) / 1000) + " secs (" +
+                (endTime.toEpochMilli() - startTime.toEpochMilli()) + " msecs)");
 
         // Always print summary to standard out.
         System.out.println(processed + " IIIF items were processed.");

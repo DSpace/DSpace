@@ -79,6 +79,9 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
     @Autowired
     private RegistrationDataService registrationDataService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Override
     @PreAuthorize("permitAll()")
     public RegistrationRest findOne(Context context, Integer integer) {
@@ -93,7 +96,6 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
     @Override
     public RegistrationRest createAndReturn(Context context) {
         HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
-        ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest;
         String accountType = request.getParameter(TYPE_QUERY_PARAM);
         if (StringUtils.isBlank(accountType) ||

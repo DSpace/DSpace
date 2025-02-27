@@ -8,7 +8,7 @@
 package org.dspace.app.itemexport.service;
 
 import java.io.InputStream;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.List;
 
@@ -130,7 +130,7 @@ public interface ItemExportService {
      * @throws Exception if error
      */
     public String assembleFileName(String type, EPerson eperson,
-                                   Date date) throws Exception;
+                                   LocalDate date) throws Exception;
 
 
     /**

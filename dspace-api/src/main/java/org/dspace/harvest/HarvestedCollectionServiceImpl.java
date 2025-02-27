@@ -14,9 +14,9 @@ import static org.dspace.harvest.OAIHarvester.OAI_SET_ERROR;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
@@ -126,17 +126,8 @@ public class HarvestedCollectionServiceImpl implements HarvestedCollectionServic
             expirationInterval = 24;
         }
 
-        Date startTime;
-        Date expirationTime;
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        calendar.add(Calendar.MINUTE, -1 * harvestInterval);
-        startTime = calendar.getTime();
-
-        calendar.setTime(startTime);
-        calendar.add(Calendar.HOUR, -2 * expirationInterval);
-        expirationTime = calendar.getTime();
+        Instant startTime = Instant.now().minus(harvestInterval, ChronoUnit.MINUTES);
+        Instant expirationTime = startTime.minus(2L * expirationInterval, ChronoUnit.HOURS);
 
         int[] statuses = new int[] {HarvestedCollection.STATUS_READY, HarvestedCollection.STATUS_OAI_ERROR};
         return harvestedCollectionDAO
