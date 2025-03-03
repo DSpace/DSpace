@@ -614,9 +614,9 @@ public class SamlAuthentication implements AuthenticationMethod {
     }
 
     /**
-     * Validate Postgres Column Names
+     * Validate metadata field names
      */
-    protected final String COLUMN_NAME_REGEX = "^[_A-Za-z0-9]+$";
+    protected final String FIELD_NAME_REGEX = "^[_A-Za-z0-9]+$";
 
     /**
      * Automatically create a new metadata field for an EPerson
@@ -638,7 +638,7 @@ public class SamlAuthentication implements AuthenticationMethod {
             return true;
         }
 
-        if (!metadataName.matches(COLUMN_NAME_REGEX)) {
+        if (!metadataName.matches(FIELD_NAME_REGEX)) {
             return false;
         }
 
