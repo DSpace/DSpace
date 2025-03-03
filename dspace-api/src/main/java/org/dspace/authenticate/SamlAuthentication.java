@@ -698,18 +698,18 @@ public class SamlAuthentication implements AuthenticationMethod {
     }
 
     private String getNameIdAttributeName() {
-        return configurationService.getProperty("authentication-saml.attribute.name-id");
+        return configurationService.getProperty("authentication-saml.attribute.name-id", "org.dspace.saml.NAME_ID");
     }
 
     private String getEmailAttributeName() {
-        return configurationService.getProperty("authentication-saml.attribute.email");
+        return configurationService.getProperty("authentication-saml.attribute.email", "org.dspace.saml.EMAIL");
     }
 
     private String getFirstNameAttributeName() {
-        return configurationService.getProperty("authentication-saml.attribute.first-name");
+        return configurationService.getProperty("authentication-saml.attribute.first-name", "org.dspace.saml.GIVEN_NAME");
     }
 
     private String getLastNameAttributeName() {
-        return configurationService.getProperty("authentication-saml.attribute.last-name");
+        return configurationService.getProperty("authentication-saml.attribute.last-name", "org.dspace.saml.SURNAME");
     }
 }

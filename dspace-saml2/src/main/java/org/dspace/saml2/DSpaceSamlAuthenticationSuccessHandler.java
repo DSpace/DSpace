@@ -33,6 +33,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 public class DSpaceSamlAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
     private static final Logger logger = LoggerFactory.getLogger(DSpaceSamlAuthenticationSuccessHandler.class);
 
+    protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
     /**
      * When a SAML authentication succeeds:
      * <ul>
@@ -59,8 +61,10 @@ public class DSpaceSamlAuthenticationSuccessHandler implements AuthenticationSuc
 
         setRequestAttributesFromSamlAttributes(request, relyingPartyId, samlAttributes);
 
-        request.setAttribute("org.dspace.saml.RELYING_PARTY_ID", relyingPartyId);
-        request.setAttribute("org.dspace.saml.NAME_ID", principal.getName());
+        request.setAttribute(getRelyingPartyIdAttributeName(), relyingPartyId);
+        request.setAttribute(getNameIdAttributeName(), principal.getName());
+        
+        // Store all the attributes from the SAML assertion for debugging.
         request.setAttribute("org.dspace.saml.ATTRIBUTES", samlAttributes);
 
         request.getRequestDispatcher("/api/authn/saml")
@@ -79,8 +83,6 @@ public class DSpaceSamlAuthenticationSuccessHandler implements AuthenticationSuc
      */
     private void setRequestAttributesFromSamlAttributes(
             HttpServletRequest request, String relyingPartyId, Map<String, List<Object>> samlAttributes) {
-
-        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
         String[] attributeMappings = configurationService.getArrayProperty(
             "saml-relying-party." + relyingPartyId + ".attributes");
@@ -113,5 +115,13 @@ public class DSpaceSamlAuthenticationSuccessHandler implements AuthenticationSuc
                     logger.warn("No value found for SAML attribute {} in assertion", samlAttributeName);
                 }
             });
+    }
+
+    private String getRelyingPartyIdAttributeName() {
+        return configurationService.getProperty("authentication-saml.attribute.relying-party-id", "org.dspace.saml.RELYING_PARTY_ID");
+    }
+
+    private String getNameIdAttributeName() {
+        return configurationService.getProperty("authentication-saml.attribute.name-id", "org.dspace.saml.NAME_ID");
     }
 }
