@@ -539,7 +539,7 @@ public class SamlAuthentication implements AuthenticationMethod {
         String[] mappingString = configurationService.getArrayProperty("authentication-saml.eperson.metadata");
 
         boolean autoCreate = configurationService
-            .getBooleanProperty("authentication-saml.eperson.metadata.autocreate", true);
+            .getBooleanProperty("authentication-saml.eperson.metadata.autocreate", false);
 
         // Bail out if not set, returning an empty map.
 
