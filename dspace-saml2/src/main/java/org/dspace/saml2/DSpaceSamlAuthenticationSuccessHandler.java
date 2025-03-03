@@ -63,7 +63,7 @@ public class DSpaceSamlAuthenticationSuccessHandler implements AuthenticationSuc
 
         request.setAttribute(getRelyingPartyIdAttributeName(), relyingPartyId);
         request.setAttribute(getNameIdAttributeName(), principal.getName());
-        
+
         // Store all the attributes from the SAML assertion for debugging.
         request.setAttribute("org.dspace.saml.ATTRIBUTES", samlAttributes);
 
@@ -118,7 +118,8 @@ public class DSpaceSamlAuthenticationSuccessHandler implements AuthenticationSuc
     }
 
     private String getRelyingPartyIdAttributeName() {
-        return configurationService.getProperty("authentication-saml.attribute.relying-party-id", "org.dspace.saml.RELYING_PARTY_ID");
+        return configurationService.getProperty("authentication-saml.attribute.relying-party-id",
+            "org.dspace.saml.RELYING_PARTY_ID");
     }
 
     private String getNameIdAttributeName() {

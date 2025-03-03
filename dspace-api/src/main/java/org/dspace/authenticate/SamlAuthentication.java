@@ -701,7 +701,8 @@ public class SamlAuthentication implements AuthenticationMethod {
     }
 
     private String getFirstNameAttributeName() {
-        return configurationService.getProperty("authentication-saml.attribute.first-name", "org.dspace.saml.GIVEN_NAME");
+        return configurationService.getProperty("authentication-saml.attribute.first-name",
+            "org.dspace.saml.GIVEN_NAME");
     }
 
     private String getLastNameAttributeName() {
