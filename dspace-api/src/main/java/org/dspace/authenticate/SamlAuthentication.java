@@ -633,11 +633,6 @@ public class SamlAuthentication implements AuthenticationMethod {
             return false;
         }
 
-        // The phone is a predefined field
-        if ("phone".equals(metadataName)) {
-            return true;
-        }
-
         if (!metadataName.matches(FIELD_NAME_REGEX)) {
             return false;
         }
