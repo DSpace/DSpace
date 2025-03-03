@@ -104,5 +104,16 @@
             </list>
         </property>
     </bean>
+
+    <bean id="dataciteProjectLiveImportDataProvider" class="org.dspace.external.provider.impl.LiveImportDataProvider">
+        <property name="metadataSource" ref="DataCiteProjectImportService"/>
+        <property name="sourceIdentifier" value="dataciteProject"/>
+        <property name="recordIdMetadata" value="dc.identifier"/>
+        <property name="supportedEntityTypes">
+            <list>
+                <value>Project</value>
+            </list>
+        </property>
+    </bean>
 </beans>
 
