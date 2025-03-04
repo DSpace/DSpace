@@ -27,7 +27,7 @@ import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Action to send email to receipients provided in actionSendFilter. The email
+ * Action to send email to recipients provided in actionSendFilter. The email
  * body will be result of templating actionSendFilter.
  */
 public class LDNEmailAction implements LDNAction {
@@ -139,7 +139,13 @@ public class LDNEmailAction implements LDNAction {
         List<String> recipients = new LinkedList<String>();
 
         if (actionSendFilter.startsWith("SUBMITTER")) {
-            recipients.add(item.getSubmitter().getEmail());
+            if (item.getSubmitter() != null) {
+                recipients.add(item.getSubmitter().getEmail());
+            } else {
+                // Fallback configured option
+                recipients.add(configurationService.getProperty("ldn.notification.email.submitter.fallback"));
+            }
+
         } else if (actionSendFilter.startsWith("GROUP:")) {
             String groupName = actionSendFilter.replace("GROUP:", "");
             String property = format("email.%s.list", groupName);

@@ -14,7 +14,7 @@
     "type": "Document"
   },
   "id": "urn:uuid:668f26e0-2c8d-4117-a0d2-ee713523bcb4",
-  "inReplyTo": "<<ldn_offer_review_uuid>>",
+  "inReplyTo": "<<ldn_offer_endorsement_uuid>>",
   "object": {
     "id": "<<object_handle>>",
     "object": "https://some-organisation.org/resource/0021",
@@ -30,5 +30,5 @@
     "inbox": "hop",
     "type": "Organization"
   },
-  "type": ["TentativeReject", "coar-notify:ReviewAction"]
+  "type": ["TentativeReject"]
 }
