@@ -161,6 +161,12 @@ public class WebSecurityConfiguration {
             .addFilterBefore(new OidcLoginFilter("/api/authn/oidc", HttpMethod.GET.name(),
                                                  authenticationManager, restAuthenticationService),
                              LogoutFilter.class)
+            // Add a filter before our SAML endpoints to do the authentication based on the data in the HTTP request.
+            // This endpoint only responds to GET as the actual authentication is performed by SAML, which then
+            // forwards to this endpoint to pass the authentication data to DSpace.
+            .addFilterBefore(new SamlLoginFilter("/api/authn/saml", HttpMethod.GET.name(),
+                                                 authenticationManager, restAuthenticationService),
+                             LogoutFilter.class)
             // Add a custom Token based authentication filter based on the token previously given to the client
             // before each URL
             .addFilterBefore(new StatelessAuthenticationFilter(authenticationManager, restAuthenticationService,
