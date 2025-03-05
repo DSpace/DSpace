@@ -151,6 +151,9 @@ public class CollectionDepositManagerDSpace extends DSpaceSwordAPI
             sc.commit();
 
             return receipt;
+        } catch (SwordAuthException e) {
+            log.error("caught exception:", e);
+            throw e;
         } catch (DSpaceSwordException e) {
             log.error("caught exception:", e);
             throw new SwordServerException(
