@@ -195,7 +195,7 @@ public class NotifyRequestStatusRestControllerIT extends AbstractControllerInteg
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.notifyStatus").isArray())
             .andExpect(jsonPath("$.notifyStatus").isNotEmpty())
-            .andExpect(jsonPath("$.notifyStatus[0].status").value("REJECTED"))
+            .andExpect(jsonPath("$.notifyStatus[0].status").value("TENTATIVE_REJECT"))
             .andExpect(jsonPath("$.notifyStatus[0].serviceUrl").value("https://review-service.com/inbox/about/"))
             .andExpect(jsonPath("$.notifyStatus[0].offerType").value("Review"))
             ;

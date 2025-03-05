@@ -20,6 +20,8 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ReloadableEntity;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Class representing ldnMessages stored in the DSpace system and, when locally resolvable,
@@ -289,7 +291,11 @@ public class LDNMessageEntity implements ReloadableEntity<String> {
     }
 
     public static String getNotificationType(LDNMessageEntity ldnMessage) {
-        if (ldnMessage.getInReplyTo() != null || ldnMessage.getOrigin() != null) {
+        // Resubmission outgoing notifications have the inReplyTo, therefore it cannot be used to determine
+        // whether a notification is incoming
+        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        if (ldnMessage.getOrigin() != null && !ldnMessage.getOrigin().getLdnUrl()
+                .contains(configurationService.getProperty("dspace.ui.url"))) {
             return TYPE_INCOMING;
         }
         return TYPE_OUTGOING;
