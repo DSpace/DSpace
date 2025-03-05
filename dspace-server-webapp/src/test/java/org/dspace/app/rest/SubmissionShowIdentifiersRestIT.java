@@ -99,7 +99,7 @@ public class SubmissionShowIdentifiersRestIT extends AbstractControllerIntegrati
         WorkspaceItem workspaceItem = createWorkspaceItem("Test publication", collection);
         context.restoreAuthSystemState();
         // Expected handle
-        String expectedHandle = handleService.resolveToURL(context, workspaceItem.getItem().getHandle());
+        String expectedHandle = handleService.getCanonicalForm(workspaceItem.getItem().getHandle());
         String submitterToken = getAuthToken(submitter.getEmail(), password);
         getClient(submitterToken).perform(get("/api/submission/workspaceitems/" + workspaceItem.getID()))
                 .andExpect(status().isOk())
