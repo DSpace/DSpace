@@ -44,9 +44,9 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.scripts.handler.DSpaceRunnableHandler;
 import org.dspace.services.ConfigurationService;
-import org.dspace.util.ThrowableUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+
 
 /**
  * MediaFilterManager is the class that invokes the media/format filters over the
@@ -181,19 +181,22 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
 
     @Override
     public void applyFiltersItem(Context c, Item item) throws Exception {
-        //only apply filters if item not in skip-list
-        if (!inSkipList(item.getHandle())) {
-            //cache this item in MediaFilterManager
-            //so it can be accessed by MediaFilters as necessary
-            currentItem = item;
-
-            if (filterItem(c, item)) {
-                // increment processed count
-                ++processed;
+        try {
+            //only apply filters if item not in skip-list
+            if (!inSkipList(item.getHandle())) {
+                //cache this item in MediaFilterManager
+                //so it can be accessed by MediaFilters as necessary
+                currentItem = item;
+                if (filterItem(c, item)) {
+                    // increment processed count
+                    ++processed;
+                }
             }
-            // clear item objects from context cache and internal cache
+        } catch (Exception e) {
+            handler.logError("ERROR filtering, skipping item " + item.getID() + " " + e);
+        } finally {
+            // Always un-cache entity, and commit to release resources
             c.uncacheEntity(currentItem);
-            // commit after each item to release DB resources
             c.commit();
             currentItem = null;
         }
@@ -253,7 +256,6 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                 } catch (Exception e) {
                     // Printout helpful information to find the errored bitstream.
                     logError(formatBitstreamDetails(myItem.getHandle(), myBitstream));
-                    logError(ThrowableUtils.formatCauseChain(e));
                 }
             } else if (filterClass instanceof SelfRegisterInputFormats) {
                 // Filter implements self registration, so check to see if it should be applied
@@ -306,9 +308,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
                             filtered = true;
                         }
                     } catch (Exception e) {
-                        logError("ERROR filtering, skipping bitstream #"
-                                               + myBitstream.getID() + " " + e);
-                        e.printStackTrace();
+                        logError("ERROR filtering, skipping bitstream #" + myBitstream.getID() + " " + e);
                     }
                 }
             }
@@ -518,8 +518,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
      * @param bitstream the Bitstream to be described.
      * @return Bitstream details.
      */
-    private String formatBitstreamDetails(String itemHandle,
-            Bitstream bitstream) {
+    private String formatBitstreamDetails(String itemHandle, Bitstream bitstream) {
         List<Bundle> bundles;
         try {
             bundles = bitstream.getBundles();
@@ -528,15 +527,16 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
             bundles = Collections.EMPTY_LIST;
         }
         StringBuilder sb = new StringBuilder("ERROR filtering, skipping bitstream:\n");
-        sb.append("\tItem Handle: ").append(itemHandle);
+        sb.append("\t- Item Handle: ").append(itemHandle);
         for (Bundle bundle : bundles) {
-            sb.append("\tBundle Name: ").append(bundle.getName());
+            sb.append("\n\t- Bundle Name: ").append(bundle.getName());
         }
-        sb.append("\tFile Size: ").append(bitstream.getSizeBytes());
-        sb.append("\tChecksum: ").append(bitstream.getChecksum())
+        sb.append("\n\t- File Size: ").append(bitstream.getSizeBytes());
+        sb.append("\n\t- File Name: ").append(bitstream.getName());
+        sb.append("\n\t- Checksum: ").append(bitstream.getChecksum())
                 .append(" (").append(bitstream.getChecksumAlgorithm()).append(')');
-        sb.append("\tAsset Store: ").append(bitstream.getStoreNumber());
-        sb.append("\tInternal ID: ").append(bitstream.getInternalId());
+        sb.append("\n\t- Asset Store: ").append(bitstream.getStoreNumber());
+        sb.append("\n\t- Internal ID: ").append(bitstream.getInternalId());
         return sb.toString();
     }
 
