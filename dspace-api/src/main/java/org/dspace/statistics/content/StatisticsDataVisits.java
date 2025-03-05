@@ -644,12 +644,16 @@ public class StatisticsDataVisits extends StatisticsData {
                     // item its internal id. In the last case where the bitstream is not associated
                     // with an item (such as a community logo) then reference the bitstreamID directly.
                     String identifier;
+                    String itemName;
                     if (owningItem != null && owningItem.getHandle() != null) {
                         identifier = "handle/" + owningItem.getHandle();
+                        itemName = owningItem.getName();
                     } else if (owningItem != null) {
                         identifier = "item/" + owningItem.getID();
+                        itemName = owningItem.getName();
                     } else {
                         identifier = "id/" + bit.getID();
+                        itemName = "Name missing";
                     }
 
 
@@ -670,6 +674,7 @@ public class StatisticsDataVisits extends StatisticsData {
                     url += "?sequence=" + bit.getSequenceID();
 
                     attrs.put("url", url);
+                    attrs.put("item", itemName);
                     break;
 
                 case Constants.ITEM:

@@ -9,9 +9,13 @@ package org.dspace.app.rest;
 
 import static org.apache.commons.codec.CharEncoding.UTF_8;
 import static org.apache.commons.io.IOUtils.toInputStream;
+import static org.dspace.app.rest.utils.UsageReportUtils.TOP_BITSTREAMS_REPORT_ID;
 import static org.dspace.app.rest.utils.UsageReportUtils.TOP_CITIES_REPORT_ID;
 import static org.dspace.app.rest.utils.UsageReportUtils.TOP_COUNTRIES_REPORT_ID;
+import static org.dspace.app.rest.utils.UsageReportUtils.TOP_ITEMS_REPORT_ID;
+import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_DOWNLOADS_BITSTREAMS_REPORT_ID;
 import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_DOWNLOADS_REPORT_ID;
+import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_VISITS_ITEMS_REPORT_ID;
 import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_VISITS_PER_MONTH_REPORT_ID;
 import static org.dspace.app.rest.utils.UsageReportUtils.TOTAL_VISITS_REPORT_ID;
 import static org.hamcrest.Matchers.empty;
@@ -77,6 +81,7 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
     @Autowired
     protected AuthorizeService authorizeService;
 
+    private Community parentCommunity;
     private Community communityNotVisited;
     private Community communityVisited;
     private Collection collectionNotVisited;
@@ -107,11 +112,11 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
 
         context.turnOffAuthorisationSystem();
 
-        Community community = CommunityBuilder.createCommunity(context).build();
-        communityNotVisited = CommunityBuilder.createSubCommunity(context, community).build();
-        communityVisited = CommunityBuilder.createSubCommunity(context, community).build();
-        collectionNotVisited = CollectionBuilder.createCollection(context, community).build();
-        collectionVisited = CollectionBuilder.createCollection(context, community).build();
+        parentCommunity = CommunityBuilder.createCommunity(context).build();
+        communityNotVisited = CommunityBuilder.createSubCommunity(context, parentCommunity).build();
+        communityVisited = CommunityBuilder.createSubCommunity(context, parentCommunity).build();
+        collectionNotVisited = CollectionBuilder.createCollection(context, parentCommunity).build();
+        collectionVisited = CollectionBuilder.createCollection(context, parentCommunity).build();
         itemVisited = ItemBuilder.createItem(context, collectionNotVisited).build();
         itemNotVisitedWithBitstreams = ItemBuilder.createItem(context, collectionNotVisited).build();
         bitstreamNotVisited = BitstreamBuilder.createBitstream(context,
@@ -1095,6 +1100,376 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     @Test
+    public void totalVisitsItemsReport_Community_NotVisited() throws Exception {
+        // ** WHEN **
+        // We visit an Item
+        ViewEventRest viewEventRest = new ViewEventRest();
+        viewEventRest.setTargetType("item");
+        viewEventRest.setTargetId(itemVisited.getID());
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        getClient(loggedInToken).perform(post("/api/statistics/viewevents")
+            .content(mapper.writeValueAsBytes(viewEventRest))
+            .contentType(contentType))
+                                .andExpect(status().isCreated());
+
+        // And request that collection's TotalVisits stat report
+        getClient(adminToken).perform(
+            get("/api/statistics/usagereports/" + communityNotVisited.getID() + "_" + TOTAL_VISITS_ITEMS_REPORT_ID))
+                   // ** THEN **
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", Matchers.is(
+                       UsageReportMatcher.matchUsageReport(
+                           communityNotVisited.getID() + "_" + TOTAL_VISITS_ITEMS_REPORT_ID,
+                           TOTAL_VISITS_ITEMS_REPORT_ID,
+                           List.of(
+                               getExpectedDsoViews(communityNotVisited, 0)
+                           )
+                       )
+                   )));
+    }
+
+    @Test
+    public void totalVisitsItemsReport_Community_Visited() throws Exception {
+        // ** WHEN **
+        // We visit an Item
+        ViewEventRest viewEventRest = new ViewEventRest();
+        viewEventRest.setTargetType("item");
+        viewEventRest.setTargetId(itemVisited.getID());
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        getClient(loggedInToken).perform(post("/api/statistics/viewevents")
+            .content(mapper.writeValueAsBytes(viewEventRest))
+            .contentType(contentType))
+                                .andExpect(status().isCreated());
+
+        // And request that collection's TotalVisits stat report
+        getClient(adminToken).perform(
+            get("/api/statistics/usagereports/" + parentCommunity.getID() + "_" + TOTAL_VISITS_ITEMS_REPORT_ID))
+                   // ** THEN **
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", Matchers.is(
+                       UsageReportMatcher.matchUsageReport(
+                           parentCommunity.getID() + "_" + TOTAL_VISITS_ITEMS_REPORT_ID,
+                           TOTAL_VISITS_ITEMS_REPORT_ID,
+                           List.of(
+                               getExpectedDsoViews(parentCommunity, 1)
+                           )
+                       )
+                   )));
+    }
+
+    @Test
+    public void totalVisitsItemsReport_Collection_NotVisited() throws Exception {
+        // ** WHEN **
+        // We visit an Item
+        ViewEventRest viewEventRest = new ViewEventRest();
+        viewEventRest.setTargetType("item");
+        viewEventRest.setTargetId(itemVisited.getID());
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        getClient(loggedInToken).perform(post("/api/statistics/viewevents")
+            .content(mapper.writeValueAsBytes(viewEventRest))
+            .contentType(contentType))
+                                .andExpect(status().isCreated());
+
+        // And request that collection's TotalVisits stat report
+        getClient(adminToken).perform(
+            get("/api/statistics/usagereports/" + collectionVisited.getID() + "_" + TOTAL_VISITS_ITEMS_REPORT_ID))
+                   // ** THEN **
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", Matchers.is(
+                       UsageReportMatcher.matchUsageReport(
+                           collectionVisited.getID() + "_" + TOTAL_VISITS_ITEMS_REPORT_ID,
+                           TOTAL_VISITS_ITEMS_REPORT_ID,
+                           List.of(
+                               getExpectedDsoViews(collectionVisited, 0)
+                           )
+                       )
+                   )));
+    }
+
+    @Test
+    public void totalVisitsItemsReport_Collection_Visited() throws Exception {
+        // ** WHEN **
+        // We visit an Item
+        ViewEventRest viewEventRest = new ViewEventRest();
+        viewEventRest.setTargetType("item");
+        viewEventRest.setTargetId(itemVisited.getID());
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        getClient(loggedInToken).perform(post("/api/statistics/viewevents")
+            .content(mapper.writeValueAsBytes(viewEventRest))
+            .contentType(contentType))
+                                .andExpect(status().isCreated());
+
+        // And request that collection's TotalVisits stat report
+        getClient(adminToken).perform(
+            get("/api/statistics/usagereports/" + collectionNotVisited.getID() + "_" + TOTAL_VISITS_ITEMS_REPORT_ID))
+                   // ** THEN **
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", Matchers.is(
+                       UsageReportMatcher.matchUsageReport(
+                           collectionNotVisited.getID() + "_" + TOTAL_VISITS_ITEMS_REPORT_ID,
+                           TOTAL_VISITS_ITEMS_REPORT_ID,
+                           List.of(
+                               getExpectedDsoViews(collectionNotVisited, 1)
+                           )
+                       )
+                   )));
+    }
+
+    @Test
+    public void totalDownloadsBitstreamsReport_Community_NotVisited() throws Exception {
+        // ** WHEN **
+        ViewEventRest viewEventRest = new ViewEventRest();
+        viewEventRest.setTargetType("bitstream");
+        viewEventRest.setTargetId(bitstreamVisited.getID());
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        getClient(loggedInToken).perform(post("/api/statistics/viewevents")
+            .content(mapper.writeValueAsBytes(viewEventRest))
+            .contentType(contentType))
+                                .andExpect(status().isCreated());
+
+        // And request that collection's TotalVisits stat report
+        getClient(adminToken).perform(
+            get("/api/statistics/usagereports/" + communityNotVisited.getID() + "_"
+                + TOTAL_DOWNLOADS_BITSTREAMS_REPORT_ID))
+                   // ** THEN **
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", Matchers.is(
+                       UsageReportMatcher.matchUsageReport(
+                           communityNotVisited.getID() + "_" + TOTAL_DOWNLOADS_BITSTREAMS_REPORT_ID,
+                           TOTAL_DOWNLOADS_BITSTREAMS_REPORT_ID,
+                           List.of(
+                               getExpectedDsoViews(communityNotVisited, 0)
+                           )
+                       )
+                   )));
+    }
+
+    @Test
+    public void totalDownloadsBitstreamsReport_Community_Visited() throws Exception {
+        // ** WHEN **
+        ViewEventRest viewEventRest = new ViewEventRest();
+        viewEventRest.setTargetType("bitstream");
+        viewEventRest.setTargetId(bitstreamVisited.getID());
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        getClient(loggedInToken).perform(post("/api/statistics/viewevents")
+            .content(mapper.writeValueAsBytes(viewEventRest))
+            .contentType(contentType))
+                                .andExpect(status().isCreated());
+
+        // And request that collection's TotalVisits stat report
+        getClient(adminToken).perform(
+            get("/api/statistics/usagereports/" + parentCommunity.getID() + "_"
+                + TOTAL_DOWNLOADS_BITSTREAMS_REPORT_ID))
+                   // ** THEN **
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", Matchers.is(
+                       UsageReportMatcher.matchUsageReport(
+                           parentCommunity.getID() + "_" + TOTAL_DOWNLOADS_BITSTREAMS_REPORT_ID,
+                           TOTAL_DOWNLOADS_BITSTREAMS_REPORT_ID,
+                           List.of(
+                               getExpectedDsoViews(parentCommunity, 1)
+                           )
+                       )
+                   )));
+    }
+
+    @Test
+    public void totalDownloadsBitstreamsReport_Collection_NotVisited() throws Exception {
+        // ** WHEN **
+        ViewEventRest viewEventRest = new ViewEventRest();
+        viewEventRest.setTargetType("bitstream");
+        viewEventRest.setTargetId(bitstreamVisited.getID());
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        getClient(loggedInToken).perform(post("/api/statistics/viewevents")
+            .content(mapper.writeValueAsBytes(viewEventRest))
+            .contentType(contentType))
+                                .andExpect(status().isCreated());
+
+        // And request that collection's TotalVisits stat report
+        getClient(adminToken).perform(
+            get("/api/statistics/usagereports/" + collectionVisited.getID() + "_"
+                + TOTAL_DOWNLOADS_BITSTREAMS_REPORT_ID))
+                   // ** THEN **
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", Matchers.is(
+                       UsageReportMatcher.matchUsageReport(
+                           collectionVisited.getID() + "_" + TOTAL_DOWNLOADS_BITSTREAMS_REPORT_ID,
+                           TOTAL_DOWNLOADS_BITSTREAMS_REPORT_ID,
+                           List.of(
+                               getExpectedDsoViews(collectionVisited, 0)
+                           )
+                       )
+                   )));
+    }
+
+    @Test
+    public void totalDownloadsBitstreamsReport_Collection_Visited() throws Exception {
+        // ** WHEN **
+        ViewEventRest viewEventRest = new ViewEventRest();
+        viewEventRest.setTargetType("bitstream");
+        viewEventRest.setTargetId(bitstreamVisited.getID());
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        getClient(loggedInToken).perform(post("/api/statistics/viewevents")
+            .content(mapper.writeValueAsBytes(viewEventRest))
+            .contentType(contentType))
+                                .andExpect(status().isCreated());
+
+        // And request that collection's TotalVisits stat report
+        getClient(adminToken).perform(
+            get("/api/statistics/usagereports/" + collectionNotVisited.getID() + "_"
+                + TOTAL_DOWNLOADS_BITSTREAMS_REPORT_ID))
+                   // ** THEN **
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", Matchers.is(
+                       UsageReportMatcher.matchUsageReport(
+                           collectionNotVisited.getID() + "_" + TOTAL_DOWNLOADS_BITSTREAMS_REPORT_ID,
+                           TOTAL_DOWNLOADS_BITSTREAMS_REPORT_ID,
+                           List.of(
+                               getExpectedDsoViews(collectionNotVisited, 1)
+                           )
+                       )
+                   )));
+    }
+
+    @Test
+    public void topItemsReport_Community_Visited() throws Exception {
+        // ** WHEN **
+        // We visit an Item
+        ViewEventRest viewEventRest = new ViewEventRest();
+        viewEventRest.setTargetType("item");
+        viewEventRest.setTargetId(itemVisited.getID());
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        getClient(loggedInToken).perform(post("/api/statistics/viewevents")
+            .content(mapper.writeValueAsBytes(viewEventRest))
+            .contentType(contentType))
+                                .andExpect(status().isCreated());
+
+        // And request that collection's TotalVisits stat report
+        getClient(adminToken).perform(
+            get("/api/statistics/usagereports/" + parentCommunity.getID() + "_" + TOP_ITEMS_REPORT_ID))
+                   // ** THEN **
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", Matchers.is(
+                       UsageReportMatcher.matchUsageReport(
+                           parentCommunity.getID() + "_" + TOP_ITEMS_REPORT_ID,
+                           TOP_ITEMS_REPORT_ID,
+                           List.of(
+                               getExpectedDsoViews(itemVisited, 1)
+                           )
+                       )
+                   )));
+    }
+
+    @Test
+    public void topItemsReport_Collection_Visited() throws Exception {
+        // ** WHEN **
+        // We visit an Item
+        ViewEventRest viewEventRest = new ViewEventRest();
+        viewEventRest.setTargetType("item");
+        viewEventRest.setTargetId(itemVisited.getID());
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        getClient(loggedInToken).perform(post("/api/statistics/viewevents")
+            .content(mapper.writeValueAsBytes(viewEventRest))
+            .contentType(contentType))
+                                .andExpect(status().isCreated());
+
+        // And request that collection's TotalVisits stat report
+        getClient(adminToken).perform(
+            get("/api/statistics/usagereports/" + collectionNotVisited.getID() + "_" + TOP_ITEMS_REPORT_ID))
+                   // ** THEN **
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", Matchers.is(
+                       UsageReportMatcher.matchUsageReport(
+                           collectionNotVisited.getID() + "_" + TOP_ITEMS_REPORT_ID,
+                           TOP_ITEMS_REPORT_ID,
+                           List.of(
+                               getExpectedDsoViews(itemVisited, 1)
+                           )
+                       )
+                   )));
+    }
+
+    @Test
+    public void topBitstreamsReport_Community_Visited() throws Exception {
+        // ** WHEN **
+        ViewEventRest viewEventRest = new ViewEventRest();
+        viewEventRest.setTargetType("bitstream");
+        viewEventRest.setTargetId(bitstreamVisited.getID());
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        getClient(loggedInToken).perform(post("/api/statistics/viewevents")
+            .content(mapper.writeValueAsBytes(viewEventRest))
+            .contentType(contentType))
+                                .andExpect(status().isCreated());
+
+        // And request that collection's TotalVisits stat report
+        getClient(adminToken).perform(
+            get("/api/statistics/usagereports/" + parentCommunity.getID() + "_" + TOP_BITSTREAMS_REPORT_ID))
+                   // ** THEN **
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", Matchers.is(
+                       UsageReportMatcher.matchUsageReport(
+                           parentCommunity.getID() + "_" + TOP_BITSTREAMS_REPORT_ID,
+                           TOP_BITSTREAMS_REPORT_ID,
+                           List.of(
+                               getExpectedBitstreamsViews(bitstreamVisited, itemNotVisitedWithBitstreams, 1)
+                           )
+                       )
+                   )));
+    }
+
+    @Test
+    public void topBitstreamsReport_Collection_Visited() throws Exception {
+        // ** WHEN **
+        ViewEventRest viewEventRest = new ViewEventRest();
+        viewEventRest.setTargetType("bitstream");
+        viewEventRest.setTargetId(bitstreamVisited.getID());
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        getClient(loggedInToken).perform(post("/api/statistics/viewevents")
+            .content(mapper.writeValueAsBytes(viewEventRest))
+            .contentType(contentType))
+                                .andExpect(status().isCreated());
+
+        // And request that collection's TotalVisits stat report
+        getClient(adminToken).perform(
+            get("/api/statistics/usagereports/" + collectionNotVisited.getID() + "_" + TOP_BITSTREAMS_REPORT_ID))
+                   // ** THEN **
+                   .andExpect(status().isOk())
+                   .andExpect(jsonPath("$", Matchers.is(
+                       UsageReportMatcher.matchUsageReport(
+                           collectionNotVisited.getID() + "_" + TOP_BITSTREAMS_REPORT_ID,
+                           TOP_BITSTREAMS_REPORT_ID,
+                           List.of(
+                               getExpectedBitstreamsViews(bitstreamVisited, itemNotVisitedWithBitstreams, 1)
+                           )
+                       )
+                   )));
+    }
+
+    @Test
     public void usagereportsSearch_notProperURI_Exception() throws Exception {
         getClient(adminToken).perform(get("/api/statistics/usagereports/search/object?uri=BadUri"))
                    .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
@@ -1265,6 +1640,30 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                     )
                 ),
                 UsageReportMatcher.matchUsageReport(
+                    communityVisited.getID() + "_" + TOP_ITEMS_REPORT_ID,
+                    TOP_ITEMS_REPORT_ID,
+                    List.of()
+                ),
+                UsageReportMatcher.matchUsageReport(
+                    communityVisited.getID() + "_" + TOP_BITSTREAMS_REPORT_ID,
+                    TOP_BITSTREAMS_REPORT_ID,
+                    List.of()
+                ),
+                UsageReportMatcher.matchUsageReport(
+                    communityVisited.getID() + "_" + TOTAL_VISITS_ITEMS_REPORT_ID,
+                    TOTAL_VISITS_ITEMS_REPORT_ID,
+                    List.of(
+                        getExpectedDsoViews(communityVisited, 0)
+                    )
+                ),
+                UsageReportMatcher.matchUsageReport(
+                    communityVisited.getID() + "_" + TOTAL_DOWNLOADS_BITSTREAMS_REPORT_ID,
+                    TOTAL_DOWNLOADS_BITSTREAMS_REPORT_ID,
+                    List.of(
+                        getExpectedDsoViews(communityVisited, 0)
+                    )
+                ),
+                UsageReportMatcher.matchUsageReport(
                     communityVisited.getID() + "_" + TOTAL_VISITS_PER_MONTH_REPORT_ID,
                     TOTAL_VISITS_PER_MONTH_REPORT_ID,
                     this.getListOfVisitsPerMonthsPoints(1)
@@ -1301,6 +1700,30 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
                 UsageReportMatcher.matchUsageReport(
                     collectionNotVisited.getID() + "_" + TOTAL_VISITS_REPORT_ID,
                     TOTAL_VISITS_REPORT_ID,
+                    List.of(
+                        getExpectedDsoViews(collectionNotVisited, 0)
+                    )
+                ),
+                UsageReportMatcher.matchUsageReport(
+                    collectionNotVisited.getID() + "_" + TOP_ITEMS_REPORT_ID,
+                    TOP_ITEMS_REPORT_ID,
+                    List.of()
+                ),
+                UsageReportMatcher.matchUsageReport(
+                    collectionNotVisited.getID() + "_" + TOP_BITSTREAMS_REPORT_ID,
+                    TOP_BITSTREAMS_REPORT_ID,
+                    List.of()
+                ),
+                UsageReportMatcher.matchUsageReport(
+                    collectionNotVisited.getID() + "_" + TOTAL_VISITS_ITEMS_REPORT_ID,
+                    TOTAL_VISITS_ITEMS_REPORT_ID,
+                    List.of(
+                        getExpectedDsoViews(collectionNotVisited, 0)
+                    )
+                ),
+                UsageReportMatcher.matchUsageReport(
+                    collectionNotVisited.getID() + "_" + TOTAL_DOWNLOADS_BITSTREAMS_REPORT_ID,
+                    TOTAL_DOWNLOADS_BITSTREAMS_REPORT_ID,
                     List.of(
                         getExpectedDsoViews(collectionNotVisited, 0)
                     )
@@ -1529,10 +1952,10 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
             )));
     }
 
-    // Create expected points from -6 months to now, with given number of views in current month
+    // Create expected points from -5 months to now, with given number of views in current month
     private List<UsageReportPointRest> getListOfVisitsPerMonthsPoints(int viewsLastMonth) {
         List<UsageReportPointRest> expectedPoints = new ArrayList<>();
-        int nrOfMonthsBack = 6;
+        int nrOfMonthsBack = 5;
         Calendar cal = Calendar.getInstance();
         for (int i = 0; i <= nrOfMonthsBack; i++) {
             UsageReportPointDateRest expectedPoint = new UsageReportPointDateRest();
@@ -1557,6 +1980,19 @@ public class StatisticsRestRepositoryIT extends AbstractControllerIntegrationTes
         point.setType(StringUtils.lowerCase(Constants.typeText[dso.getType()]));
         point.setId(dso.getID().toString());
         point.setLabel(dso.getName());
+
+        return point;
+    }
+
+    private UsageReportPointDsoTotalVisitsRest getExpectedBitstreamsViews(DSpaceObject dso,
+                                                                            DSpaceObject itemDso, int views) {
+        UsageReportPointDsoTotalVisitsRest point = new UsageReportPointDsoTotalVisitsRest();
+
+        point.addValue("views", views);
+        point.setType(StringUtils.lowerCase(Constants.typeText[dso.getType()]));
+        point.setId(dso.getID().toString());
+        point.setLabel(dso.getName());
+        point.setLabel(dso.getName() + "(" + "Item: " + itemDso.getName() + ")");
 
         return point;
     }
