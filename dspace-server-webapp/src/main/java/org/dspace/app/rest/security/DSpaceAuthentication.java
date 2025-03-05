@@ -7,8 +7,8 @@
  */
 package org.dspace.app.rest.security;
 
+import java.time.Instant;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import org.dspace.eperson.EPerson;
@@ -24,7 +24,7 @@ import org.springframework.security.core.GrantedAuthority;
 public class DSpaceAuthentication implements Authentication {
 
 
-    private Date previousLoginDate;
+    private Instant previousLoginDate;
     private String username;
     private String password;
     private List<GrantedAuthority> authorities;
@@ -99,7 +99,7 @@ public class DSpaceAuthentication implements Authentication {
         return username;
     }
 
-    public Date getPreviousLoginDate() {
+    public Instant getPreviousLoginDate() {
         return previousLoginDate;
     }
 }

@@ -103,6 +103,10 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
     @Autowired
     MockSolrSearchCore mockSolrSearchCore;
+
+    @Autowired
+    private ObjectMapper mapper;
+
     protected Community parentCommunity;
     protected Community child1;
 
@@ -648,7 +652,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
 
         Map<String, String> map = new HashMap<>();
         map.put("leftwardValue", leftwardValue);
-        String json = new ObjectMapper().writeValueAsString(map);
+        String json = mapper.writeValueAsString(map);
 
         // Add leftwardValue
         getClient(token).perform(put("/api/core/relationships/" + idRef)
@@ -708,7 +712,7 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
         Map<String, String> map = new HashMap<>();
         map.put("leftwardValue", leftwardValue);
         map.put("rightwardValue", rightwardValue);
-        String json = new ObjectMapper().writeValueAsString(map);
+        String json = mapper.writeValueAsString(map);
 
         // Add leftwardValue and rightwardValue
         getClient(token).perform(put("/api/core/relationships/" + idRef)
@@ -2641,7 +2645,6 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                                               .andExpect(status().isCreated())
                                               .andReturn();
 
-        ObjectMapper mapper = new ObjectMapper();
         String content = mvcResult.getResponse().getContentAsString();
         Map<String, Object> map = mapper.readValue(content, Map.class);
         String id = String.valueOf(map.get("id"));
@@ -2689,7 +2692,6 @@ public class RelationshipRestRepositoryIT extends AbstractEntityIntegrationTest 
                 .andExpect(status().isCreated())
                 .andReturn();
 
-            ObjectMapper mapper = new ObjectMapper();
             String content = mvcResult.getResponse().getContentAsString();
             Map<String, Object> map = mapper.readValue(content, Map.class);
             String id = String.valueOf(map.get("id"));

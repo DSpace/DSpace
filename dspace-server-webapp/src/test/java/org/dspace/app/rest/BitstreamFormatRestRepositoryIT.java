@@ -56,6 +56,9 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
     @Autowired
     private BitstreamFormatConverter bitstreamFormatConverter;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     private final int DEFAULT_AMOUNT_FORMATS = 86;
 
     @Test
@@ -135,7 +138,6 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
 
     @Test
     public void createAdminAccess() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         BitstreamFormatRest bitstreamFormatRest = this.createRandomMockBitstreamRest(false);
 
         //Create bitstream format
@@ -182,7 +184,6 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
 
     @Test
     public void createNonValidSupportLevel() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         BitstreamFormatRest bitstreamFormatRest = this.createRandomMockBitstreamRest(false);
         bitstreamFormatRest.setSupportLevel("NONVALID SUPPORT LVL");
         //Attempt to create bitstream with a non-valid support lvl
@@ -199,7 +200,6 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
 
     @Test
     public void createNoAccess() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         BitstreamFormatRest bitstreamFormatRest = this.createRandomMockBitstreamRest(false);
 
         //Try to create bitstreamFormat without auth token
@@ -215,7 +215,6 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
 
     @Test
     public void createNonAdminAccess() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         BitstreamFormatRest bitstreamFormatRest = this.createRandomMockBitstreamRest(false);
         context.turnOffAuthorisationSystem();
         EPerson user = EPersonBuilder.createEPerson(context)
@@ -239,7 +238,6 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
 
     @Test
     public void createAlreadyExisting() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         BitstreamFormatRest bitstreamFormatRest = this.createRandomMockBitstreamRest(true);
 
         // Capture the Id of the created BitstreamFormat (see andDo() below)
@@ -275,7 +273,6 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
 
     @Test
     public void updateAdminAccess() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         //Create bitstream format
         context.turnOffAuthorisationSystem();
         BitstreamFormat bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context)
@@ -306,7 +303,6 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
 
     @Test
     public void updateNonValidSupportLevel() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         //Create bitstream format
         context.turnOffAuthorisationSystem();
         BitstreamFormat bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context)
@@ -341,7 +337,6 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
 
     @Test
     public void updateNonExistingIDInURLAndJSON() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         //Create bitstream format
         context.turnOffAuthorisationSystem();
         BitstreamFormat bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context)
@@ -378,7 +373,6 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
 
     @Test
     public void updateNonExistingIDInJustURL() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         //Create bitstream format
         context.turnOffAuthorisationSystem();
         BitstreamFormat bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context)
@@ -414,7 +408,6 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
 
     @Test
     public void updateNonExistingIDInJSONButValidInURL() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         //Create bitstream format
         context.turnOffAuthorisationSystem();
         BitstreamFormat bitstreamFormat = BitstreamFormatBuilder
@@ -451,7 +444,6 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
 
     @Test
     public void updateNotMatchingIDsInJSONAndURL() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         //Create bitstream format
         context.turnOffAuthorisationSystem();
         BitstreamFormat bitstreamFormat1 = BitstreamFormatBuilder.createBitstreamFormat(context)
@@ -489,7 +481,6 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
 
     @Test
     public void updateNoAccess() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         //Create bitstream format
         context.turnOffAuthorisationSystem();
         BitstreamFormat bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context)
@@ -520,7 +511,6 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
 
     @Test
     public void updateNonAdminAccess() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         //Create bitstream format
         context.turnOffAuthorisationSystem();
         BitstreamFormat bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context)
@@ -547,7 +537,6 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
 
     @Test
     public void deleteAdminAccess() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         //Create bitstream format
         context.turnOffAuthorisationSystem();
         BitstreamFormat bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context)
@@ -568,7 +557,6 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
 
     @Test
     public void deleteNonExistingID() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         //Create bitstream format
         context.turnOffAuthorisationSystem();
         BitstreamFormat bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context)
@@ -587,7 +575,6 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
 
     @Test
     public void deleteNoAccess() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         //Create bitstream format
         context.turnOffAuthorisationSystem();
         BitstreamFormat bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context)
@@ -614,7 +601,6 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
 
     @Test
     public void deleteNonAdminAccess() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         //Create bitstream format
         context.turnOffAuthorisationSystem();
         BitstreamFormat bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context)

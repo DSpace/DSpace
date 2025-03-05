@@ -8,8 +8,7 @@
 package org.dspace.access.status;
 
 import java.sql.SQLException;
-import java.time.Instant;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -70,7 +69,7 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
      * @return an access status value
      */
     @Override
-    public String getAccessStatusFromItem(Context context, Item item, Date threshold)
+    public String getAccessStatusFromItem(Context context, Item item, LocalDate threshold)
             throws SQLException {
         if (item == null) {
             return UNKNOWN;
@@ -110,7 +109,7 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
      * @param threshold   the embargo threshold date
      * @return an access status value
      */
-    private String calculateAccessStatusForDso(Context context, DSpaceObject dso, Date threshold)
+    private String calculateAccessStatusForDso(Context context, DSpaceObject dso, LocalDate threshold)
             throws SQLException {
         if (dso == null) {
             return METADATA_ONLY;
@@ -137,8 +136,8 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
                     // to the bitstream.
                     openAccessCount++;
                 } else {
-                    Date startDate = policy.getStartDate();
-                    if (startDate != null && !startDate.before(threshold)) {
+                    LocalDate startDate = policy.getStartDate();
+                    if (startDate != null && !startDate.isBefore(threshold)) {
                         // If the policy start date have a value and if this value
                         // is equal or superior to the configured forever date, the
                         // access status is also restricted.
@@ -173,9 +172,9 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
      * @return an access status value
      */
     @Override
-    public String getEmbargoFromItem(Context context, Item item, Date threshold)
+    public String getEmbargoFromItem(Context context, Item item, LocalDate threshold)
             throws SQLException {
-        Date embargoDate;
+        LocalDate embargoDate;
 
         // If Item status is not "embargo" then return a null embargo date.
         String accessStatus = getAccessStatusFromItem(context, item, threshold);
@@ -213,8 +212,8 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
     /**
      *
      */
-    private Date retrieveShortestEmbargo(Context context, Bitstream bitstream) throws SQLException {
-        Date embargoDate = null;
+    private LocalDate retrieveShortestEmbargo(Context context, Bitstream bitstream) throws SQLException {
+        LocalDate embargoDate = null;
         // Only consider read policies.
         List<ResourcePolicy> policies = authorizeService
                 .getPoliciesActionFilter(context, bitstream, Constants.READ);
@@ -228,15 +227,15 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
                 // Only calculate the status for the anonymous group.
                 if (!isValid) {
                     // If the policy is not valid there is an active embargo
-                    Date startDate = policy.getStartDate();
+                    LocalDate startDate = policy.getStartDate();
 
-                    if (startDate != null && !startDate.before(Date.from(Instant.now()))) {
+                    if (startDate != null && !startDate.isBefore(LocalDate.now())) {
                         // There is an active embargo: aim to take the shortest embargo (account for rare cases where
                         // more than one resource policy exists)
                         if (embargoDate == null) {
                             embargoDate = startDate;
                         } else {
-                            embargoDate = startDate.before(embargoDate) ? startDate : embargoDate;
+                            embargoDate = startDate.isBefore(embargoDate) ? startDate : embargoDate;
                         }
                     }
                 }

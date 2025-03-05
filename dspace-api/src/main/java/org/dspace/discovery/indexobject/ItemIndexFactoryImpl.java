@@ -11,8 +11,9 @@ import static org.dspace.discovery.SolrServiceImpl.SOLR_FIELD_SUFFIX_FACET_PREFI
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -27,7 +28,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
@@ -413,7 +413,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                     }
 
                     for (DiscoverySearchFilter searchFilter : searchFilterConfigs) {
-                        Date date = null;
+                        ZonedDateTime date = null;
                         String separator = DSpaceServicesFactory.getInstance().getConfigurationService()
                                 .getProperty("discovery.solr.facets.split.char");
                         if (separator == null) {
@@ -424,7 +424,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                             date = MultiFormatDateParser.parse(value);
                             if (date != null) {
                                 //TODO: make this date format configurable !
-                                value = DateFormatUtils.formatUTC(date, "yyyy-MM-dd");
+                                value = DateTimeFormatter.ISO_LOCAL_DATE.format(date.toLocalDateTime().toLocalDate());
                             }
                         }
                         doc.addField(searchFilter.getIndexFieldName(), value);
@@ -501,7 +501,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
                     }
 
                     if (type.equals(DiscoveryConfigurationParameters.TYPE_DATE)) {
-                        Date date = MultiFormatDateParser.parse(value);
+                        ZonedDateTime date = MultiFormatDateParser.parse(value);
                         if (date != null) {
                             String stringDate = SolrUtils.getDateFormatter().format(date);
                             doc.addField(field + "_dt", stringDate);
@@ -688,13 +688,13 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
      * @param doc the solr document
      * @param searchFilter the discoverySearchFilter
      * @param value the metadata value
-     * @param date Date object
+     * @param date ZonedDateTime object
      * @param authority the authority key
      * @param preferedLabel the preferred label for metadata field
      * @param separator the separator being used to separate lowercase and regular case
      */
     private void indexIfFilterTypeFacet(SolrInputDocument doc, DiscoverySearchFilter searchFilter, String value,
-                                   Date date, String authority, String preferedLabel, String separator) {
+                                   ZonedDateTime date, String authority, String preferedLabel, String separator) {
         if (searchFilter.getType().equals(DiscoveryConfigurationParameters.TYPE_TEXT)) {
             //Add a special filter
             //We use a separator to split up the lowercase and regular case, this is needed to
@@ -714,7 +714,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
         } else if (searchFilter.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)) {
             if (date != null) {
                 String indexField = searchFilter.getIndexFieldName() + ".year";
-                String yearUTC = DateFormatUtils.formatUTC(date, "yyyy");
+                String yearUTC = String.valueOf(date.getYear());
                 doc.addField(searchFilter.getIndexFieldName() + "_keyword", yearUTC);
                 // add the year to the autocomplete index
                 doc.addField(searchFilter.getIndexFieldName() + "_ac", yearUTC);

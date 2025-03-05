@@ -8,15 +8,14 @@
 package org.dspace.content.dao.impl;
 
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
 import jakarta.persistence.Query;
-import jakarta.persistence.TemporalType;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaBuilder.In;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -103,7 +102,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
 
     @Override
     public Iterator<Item> findAll(Context context, boolean archived,
-                                  boolean withdrawn, boolean discoverable, Date lastModified)
+                                  boolean withdrawn, boolean discoverable, Instant lastModified)
         throws SQLException {
         StringBuilder queryStr = new StringBuilder();
         queryStr.append("SELECT i.id FROM Item i");
@@ -120,7 +119,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         query.setParameter("withdrawn", withdrawn);
         query.setParameter("discoverable", discoverable);
         if (lastModified != null) {
-            query.setParameter("last_modified", lastModified, TemporalType.TIMESTAMP);
+            query.setParameter("last_modified", lastModified);
         }
         @SuppressWarnings("unchecked")
         List<UUID> uuids = query.getResultList();
@@ -438,11 +437,11 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
     }
 
     @Override
-    public Iterator<Item> findByLastModifiedSince(Context context, Date since)
+    public Iterator<Item> findByLastModifiedSince(Context context, Instant since)
         throws SQLException {
         Query query = createQuery(context,
                 "SELECT i.id FROM Item i WHERE lastModified > :last_modified ORDER BY id");
-        query.setParameter("last_modified", since, TemporalType.TIMESTAMP);
+        query.setParameter("last_modified", since);
         @SuppressWarnings("unchecked")
         List<UUID> uuids = query.getResultList();
         return new UUIDIterator<Item>(context, uuids, Item.class, this);

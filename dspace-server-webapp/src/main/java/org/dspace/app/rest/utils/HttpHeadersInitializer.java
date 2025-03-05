@@ -12,6 +12,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
@@ -149,7 +150,7 @@ public class HttpHeadersInitializer {
         }
         httpHeaders.put(LAST_MODIFIED, Collections.singletonList(FastHttpDateFormat.formatDate(lastModified)));
         httpHeaders.put(EXPIRES, Collections.singletonList(FastHttpDateFormat.formatDate(
-            System.currentTimeMillis() + DEFAULT_EXPIRE_TIME)));
+            Instant.now().toEpochMilli() + DEFAULT_EXPIRE_TIME)));
 
         //No-cache so that we can log every download
         httpHeaders.put(CACHE_CONTROL, Collections.singletonList(CACHE_CONTROL_SETTING));

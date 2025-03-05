@@ -8,11 +8,8 @@
 package org.dspace.builder;
 
 import java.sql.SQLException;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
-import java.time.ZoneId;
-import java.util.Date;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -126,12 +123,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
     protected <B extends AbstractDSpaceObjectBuilder<T>> B setEmbargo(Period embargoPeriod, DSpaceObject dso) {
         // add policy just for anonymous
         try {
-            Instant embargoInstant = LocalDate.now()
-                    .plus(embargoPeriod)
-                    .atStartOfDay()
-                    .atZone(ZoneId.systemDefault())
-                    .toInstant();
-            Date embargoDate = Date.from(embargoInstant);
+            LocalDate embargoDate = LocalDate.now().plus(embargoPeriod);
 
             return setOnlyReadPermission(dso, groupService.findByName(context, Group.ANONYMOUS), embargoDate);
         } catch (Exception e) {
@@ -155,7 +147,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
      *            object only for the specified group.
      */
     protected <B extends AbstractDSpaceObjectBuilder<T>> B setOnlyReadPermission(DSpaceObject dso, Group group,
-                                                                                 Date startDate) {
+                                                                                 LocalDate startDate) {
         // add policy just for anonymous
         try {
             authorizeService.removeAllPolicies(context, dso);
@@ -187,7 +179,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
      *            additional admin permission.
      */
     protected <B extends AbstractDSpaceObjectBuilder<T>> B setAdminPermission(DSpaceObject dso, EPerson eperson,
-                                                                                 Date startDate) {
+                                                                              LocalDate startDate) {
         try {
 
             ResourcePolicy rp = authorizeService.createOrModifyPolicy(null, context, null, null,
@@ -217,7 +209,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
      */
     protected <B extends AbstractDSpaceObjectBuilder<T>> B setRemovePermissionForEperson(DSpaceObject dso,
                                                                                          EPerson eperson,
-                                                                                         Date startDate) {
+                                                                                         LocalDate startDate) {
         try {
 
             ResourcePolicy rp = authorizeService.createOrModifyPolicy(null, context, null, null,
@@ -247,7 +239,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
      */
     protected <B extends AbstractDSpaceObjectBuilder<T>> B setAddPermissionForEperson(DSpaceObject dso,
                                                                                       EPerson eperson,
-                                                                                      Date startDate) {
+                                                                                      LocalDate startDate) {
         try {
 
             ResourcePolicy rp = authorizeService.createOrModifyPolicy(null, context, null, null,
@@ -277,7 +269,7 @@ public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject>
      */
     protected <B extends AbstractDSpaceObjectBuilder<T>> B setWritePermissionForEperson(DSpaceObject dso,
                                                                                         EPerson eperson,
-                                                                                        Date startDate) {
+                                                                                        LocalDate startDate) {
         try {
 
             ResourcePolicy rp = authorizeService.createOrModifyPolicy(null, context, null, null,

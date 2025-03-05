@@ -37,10 +37,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +52,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.matchers.JsonPathMatchers;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.dspace.app.ldn.NotifyServiceEntity;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
@@ -117,6 +117,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
     private ItemService itemService;
     @Autowired
     private ConfigurationService configurationService;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     private GroupService groupService;
 
@@ -4061,10 +4064,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         context.restoreAuthSystemState();
 
-        // date
-        SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
-        Date startDate = new Date();
-        String startDateStr = dateFmt.format(startDate);
+        // date in YYYY-MM-DD format
+        DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
+        String startDateStr = dateFmt.format(LocalDate.now());
 
         // create a list of values to use in add operation
         List<Operation> addAccessCondition = new ArrayList<>();
@@ -4342,8 +4344,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         Integer workspaceItemId = null;
         try {
-
-        ObjectMapper mapper = new ObjectMapper();
         // You have to be an admin to create an Item from an ExternalDataObject
         String token = getAuthToken(admin.getEmail(), password);
         MvcResult mvcResult = getClient(token).perform(post("/api/submission/workspaceitems?owningCollection="
@@ -4416,7 +4416,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
 
         context.restoreAuthSystemState();
 
-        ObjectMapper mapper = new ObjectMapper();
         String token = getAuthToken(eperson.getEmail(), password);
         getClient(token).perform(post("/api/submission/workspaceitems?owningCollection="
                                           + col1.getID().toString())
@@ -4886,7 +4885,6 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                                            .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1, "123456789/extraction-test")
                 .withName("Collection 1").build();
-        String authToken = getAuthToken(admin.getEmail(), password);
 
         WorkspaceItem witem = WorkspaceItemBuilder.createWorkspaceItem(context, col1)
                 .build();
@@ -4894,6 +4892,8 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
                 .withTitle("This is a test title")
                 .build();
         context.restoreAuthSystemState();
+
+        String authToken = getAuthToken(admin.getEmail(), password);
 
         // try to add the pmid identifier
         List<Operation> addId = new ArrayList<Operation>();
@@ -5675,10 +5675,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // auth
         String authToken = getAuthToken(eperson.getEmail(), password);
 
-        // date
-        SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
-        Date endDate = new Date();
-        String endDateStr = dateFmt.format(endDate);
+        // date in YYYY-MM-DD format
+        DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
+        String endDateStr = dateFmt.format(LocalDate.now());
 
         // prepare patch body
         Map<String, String> accessCondition = new HashMap<>();
@@ -5723,12 +5722,10 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // auth
         String authToken = getAuthToken(eperson.getEmail(), password);
 
-        // date
-        SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
-        Date endDate = DateUtils.addDays(
-            // lease ends 1 day too late
-            DateUtils.addMonths(new Date(), 6), 1
-        );
+        // date in YYYY-MM-DD format
+        DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
+        // lease ends 1 day too late
+        LocalDate endDate = LocalDate.now().plus(6, ChronoUnit.MONTHS).plus(1, ChronoUnit.DAYS);
         String endDateStr = dateFmt.format(endDate);
 
         // prepare patch body
@@ -5769,10 +5766,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // auth
         String authToken = getAuthToken(eperson.getEmail(), password);
 
-        // date
-        SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
-        Date startDate = new Date();
-        String startDateStr = dateFmt.format(startDate);
+        // date in YYYY-MM-DD format
+        DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
+        String startDateStr = dateFmt.format(LocalDate.now());
 
         // prepare patch body
         Map<String, String> accessCondition = new HashMap<>();
@@ -5817,12 +5813,10 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // auth
         String authToken = getAuthToken(eperson.getEmail(), password);
 
-        // date
-        SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
-        Date startDate = DateUtils.addDays(
-            // embargo ends 1 day too late
-            DateUtils.addMonths(new Date(), 36), 1
-        );
+        // date in YYYY-MM-DD format
+        DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
+        // embargo ends 1 day too late
+        LocalDate startDate = LocalDate.now().plus(36, ChronoUnit.MONTHS).plus(1, ChronoUnit.DAYS);
         String startDateStr = dateFmt.format(startDate);
 
         // prepare patch body
@@ -5863,10 +5857,9 @@ public class WorkspaceItemRestRepositoryIT extends AbstractControllerIntegration
         // auth
         String authToken = getAuthToken(eperson.getEmail(), password);
 
-        // date
-        SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
-        Date startDate = new Date();
-        String startDateStr = dateFmt.format(startDate);
+        // date in YYYY-MM-DD format
+        DateTimeFormatter dateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
+        String startDateStr = dateFmt.format(LocalDate.now());
 
         // prepare patch body
         Map<String, String> accessCondition = new HashMap<>();
@@ -7151,19 +7144,13 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                      .withName("administrator")
                      .build();
 
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.set(Calendar.YEAR, 2020);
-        calendar.set(Calendar.MONTH, 1);
-        calendar.set(Calendar.DATE, 1);
-
-        Date data = calendar.getTime();
+        LocalDate date = LocalDate.of(2020, 2, 1);
 
         ResourcePolicyBuilder.createResourcePolicy(context, null, embargoedGroup1)
                              .withDspaceObject(witem.getItem())
                              .withPolicyType(TYPE_CUSTOM)
                              .withName("embargoed")
-                             .withStartDate(data)
+                             .withStartDate(date)
                              .build();
 
         context.restoreAuthSystemState();
@@ -7490,19 +7477,13 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                              .withName("openaccess")
                              .build();
 
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.set(Calendar.YEAR, 2020);
-        calendar.set(Calendar.MONTH, 1);
-        calendar.set(Calendar.DATE, 1);
-
-        Date data = calendar.getTime();
+        LocalDate date = LocalDate.of(2020, 2, 1);
 
         ResourcePolicyBuilder.createResourcePolicy(context, null, embargoedGroup1)
                              .withDspaceObject(witem.getItem())
                              .withPolicyType(TYPE_CUSTOM)
                              .withName("embargo")
-                             .withStartDate(data)
+                             .withStartDate(date)
                              .build();
 
         context.restoreAuthSystemState();
@@ -8133,8 +8114,6 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
     public void sherpaPolicySectionCacheTest() throws Exception {
         context.turnOffAuthorisationSystem();
 
-        String dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
-
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
                                           .build();
@@ -8168,7 +8147,7 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .andDo(result -> retrievalTime.set(read(
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
-        Date date = new SimpleDateFormat(dateFormat).parse(retrievalTime.get());
+        Instant date = Instant.parse(retrievalTime.get());
 
         // reload page, to verify that the retrievalTime is not changed
         getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
@@ -8184,7 +8163,7 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .andDo(result -> retrievalTime2.set(read(
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
-        Date date2 = new SimpleDateFormat(dateFormat).parse(retrievalTime2.get());
+        Instant date2 = Instant.parse(retrievalTime2.get());
 
         assertTrue(date.equals(date2));
 
@@ -8209,9 +8188,9 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .andDo(result -> retrievalTime.set(read(
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
-        date = new SimpleDateFormat(dateFormat).parse(retrievalTime.get());
+        date = Instant.parse(retrievalTime.get());
 
-        assertTrue(date.after(date2));
+        assertTrue(date.isAfter(date2));
 
         // reload page, to verify that the retrievalTime is not changed
         getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
@@ -8227,15 +8206,13 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .andDo(result -> retrievalTime2.set(read(
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
-        date2 = new SimpleDateFormat(dateFormat).parse(retrievalTime2.get());
+        date2 = Instant.parse(retrievalTime2.get());
         assertTrue(date.equals(date2));
     }
 
     @Test
     public void sherpaPolicySectionWithWrongIssnCacheTest() throws Exception {
         context.turnOffAuthorisationSystem();
-
-        String dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
 
         parentCommunity = CommunityBuilder.createCommunity(context)
                                           .withName("Parent Community")
@@ -8268,7 +8245,7 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .andDo(result -> retrievalTime.set(read(
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
-        Date date = new SimpleDateFormat(dateFormat).parse(retrievalTime.get());
+        Instant date = Instant.parse(retrievalTime.get());
 
         // reload page, to verify that the retrievalTime is not changed
         getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
@@ -8282,7 +8259,7 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .andDo(result -> retrievalTime2.set(read(
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
-        Date date2 = new SimpleDateFormat(dateFormat).parse(retrievalTime2.get());
+        Instant date2 = Instant.parse(retrievalTime2.get());
 
         assertTrue(date.equals(date2));
 
@@ -8305,9 +8282,9 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .andDo(result -> retrievalTime.set(read(
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
-        date = new SimpleDateFormat(dateFormat).parse(retrievalTime.get());
+        date = Instant.parse(retrievalTime.get());
 
-        assertTrue(date.after(date2));
+        assertTrue(date.isAfter(date2));
 
         // reload page, to verify that the retrievalTime is not changed
         getClient(token).perform(get("/api/submission/workspaceitems/" + witem.getID()))
@@ -8321,7 +8298,7 @@ ResourcePolicyBuilder.createResourcePolicy(context, null, adminGroup)
                         .andDo(result -> retrievalTime2.set(read(
                                result.getResponse().getContentAsString(), "$.sections.sherpaPolicies.retrievalTime")));
 
-        date2 = new SimpleDateFormat(dateFormat).parse(retrievalTime2.get());
+        date2 = Instant.parse(retrievalTime2.get());
         assertTrue(date.equals(date2));
     }
 

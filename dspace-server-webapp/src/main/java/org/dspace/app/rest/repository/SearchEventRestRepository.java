@@ -34,12 +34,14 @@ public class SearchEventRestRepository extends AbstractDSpaceRestRepository {
     @Autowired
     private SearchEventConverter searchEventConverter;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     public SearchEventRest createSearchEvent() {
 
         Context context = obtainContext();
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
 
-        ObjectMapper mapper = new ObjectMapper();
         SearchEventRest searchEventRest = null;
         try {
             ServletInputStream input = req.getInputStream();

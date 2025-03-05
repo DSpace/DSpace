@@ -41,6 +41,9 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
     @Autowired
     BitstreamFormatService bitstreamFormatService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Override
     @PreAuthorize("permitAll()")
     public BitstreamFormatRest findOne(Context context, Integer id) {
@@ -70,7 +73,6 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
     @PreAuthorize("hasAuthority('ADMIN')")
     protected BitstreamFormatRest createAndReturn(Context context) throws AuthorizeException {
         HttpServletRequest req = getRequestService().getCurrentRequest().getHttpServletRequest();
-        ObjectMapper mapper = new ObjectMapper();
         BitstreamFormatRest bitstreamFormatRest = null;
         try {
             ServletInputStream input = req.getInputStream();
@@ -98,7 +100,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
                                       Integer id, JsonNode jsonNode) throws SQLException, AuthorizeException {
         BitstreamFormatRest bitstreamFormatRest = null;
         try {
-            bitstreamFormatRest = new ObjectMapper().readValue(jsonNode.toString(), BitstreamFormatRest.class);
+            bitstreamFormatRest = mapper.readValue(jsonNode.toString(), BitstreamFormatRest.class);
         } catch (IOException e) {
             throw new UnprocessableEntityException("Error parsing collection json: " + e.getMessage());
         }

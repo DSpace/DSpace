@@ -8,10 +8,9 @@
 
 package org.dspace.util;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.TimeZone;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Common constants and static methods for working with Solr.
@@ -20,7 +19,7 @@ import java.util.TimeZone;
  */
 public class SolrUtils {
     /** Solr uses UTC always. */
-    public static final TimeZone SOLR_TIME_ZONE = TimeZone.getTimeZone(ZoneOffset.UTC);
+    public static final ZoneId SOLR_TIME_ZONE = ZoneOffset.UTC;
 
     /** Restricted ISO 8601 format used by Solr. */
     public static final String SOLR_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
@@ -30,13 +29,12 @@ public class SolrUtils {
 
     /**
      * Create a formatter configured for Solr-style date strings and the UTC time zone.
-     * @see SOLR_DATE_FORMAT
+     * @see #SOLR_DATE_FORMAT
      *
      * @return date formatter compatible with Solr.
      */
-    public static DateFormat getDateFormatter() {
-        DateFormat formatter = new SimpleDateFormat(SolrUtils.SOLR_DATE_FORMAT);
-        formatter.setTimeZone(SOLR_TIME_ZONE);
-        return formatter;
+    public static DateTimeFormatter getDateFormatter() {
+        // TODO: Can this be replaced with DateTimeFormatter.ISO_INSTANT?
+        return DateTimeFormatter.ofPattern(SOLR_DATE_FORMAT).withZone(SOLR_TIME_ZONE);
     }
 }

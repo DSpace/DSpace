@@ -7,8 +7,6 @@
  */
 package org.dspace.xoai.services.impl.xoai;
 
-import java.util.Date;
-
 import com.lyncode.xoai.dataprovider.core.ResumptionToken;
 import com.lyncode.xoai.dataprovider.exceptions.BadResumptionToken;
 import com.lyncode.xoai.dataprovider.services.api.ResumptionTokenFormatter;
@@ -38,8 +36,8 @@ public class DSpaceResumptionTokenFormatter implements ResumptionTokenFormatter 
                 int offset = Integer.parseInt(res[4]);
                 String prefix = (res[0].equals("")) ? null : res[0];
                 String set = (res[3].equals("")) ? null : res[3];
-                Date from = (res[1].equals("")) ? null : DateUtils.parse(res[1]);
-                Date until = res[2].equals("") ? null : DateUtils.parse(res[2]);
+                java.util.Date from = (res[1].equals("")) ? null : java.util.Date.from(DateUtils.parse(res[1]));
+                java.util.Date until = res[2].equals("") ? null : java.util.Date.from(DateUtils.parse(res[2]));
                 return new ResumptionToken(offset, prefix, set, from, until);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
@@ -57,11 +55,11 @@ public class DSpaceResumptionTokenFormatter implements ResumptionTokenFormatter 
         }
         result += "/";
         if (resumptionToken.hasFrom()) {
-            result += DateUtils.format(resumptionToken.getFrom());
+            result += DateUtils.format(resumptionToken.getFrom().toInstant());
         }
         result += "/";
         if (resumptionToken.hasUntil()) {
-            result += DateUtils.format(resumptionToken.getUntil());
+            result += DateUtils.format(resumptionToken.getUntil().toInstant());
         }
         result += "/";
         if (resumptionToken.hasSet()) {

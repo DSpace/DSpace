@@ -65,6 +65,9 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
     @Autowired
     private NotifyService notifyService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Test
     public void findAllUnAuthorizedTest() throws Exception {
         getClient().perform(get("/api/ldn/ldnservices"))
@@ -147,7 +150,6 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
     @Test
     public void createForbiddenTest() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
         NotifyServiceRest notifyServiceRest = new NotifyServiceRest();
         String authToken = getAuthToken(eperson.getEmail(), password);
         getClient(authToken).perform(post("/api/ldn/ldnservices")
@@ -158,8 +160,6 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
     @Test
     public void createTestScoreFail() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-
         NotifyServiceInboundPatternRest inboundPatternRestOne = new NotifyServiceInboundPatternRest();
         inboundPatternRestOne.setPattern("patternA");
         inboundPatternRestOne.setConstraint("itemFilterA");
@@ -188,8 +188,6 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
 
     @Test
     public void createTest() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-
         NotifyServiceInboundPatternRest inboundPatternRestOne = new NotifyServiceInboundPatternRest();
         inboundPatternRestOne.setPattern("patternA");
         inboundPatternRestOne.setConstraint("itemFilterA");

@@ -9,7 +9,7 @@ package org.dspace.alerts;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.apache.logging.log4j.Logger;
@@ -39,7 +39,7 @@ public class SystemWideAlertServiceImpl implements SystemWideAlertService {
     @Override
     public SystemWideAlert create(final Context context, final String message,
                                   final AllowSessionsEnum allowSessionsType,
-                                  final Date countdownTo, final boolean active) throws SQLException,
+                                  final ZonedDateTime countdownTo, final boolean active) throws SQLException,
             AuthorizeException {
         if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(

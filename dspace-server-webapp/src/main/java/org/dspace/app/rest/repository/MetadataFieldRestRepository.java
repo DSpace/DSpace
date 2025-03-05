@@ -71,6 +71,9 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
     @Autowired
     private SearchService searchService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Override
     @PreAuthorize("permitAll()")
     public MetadataFieldRest findOne(Context context, Integer id) {
@@ -239,7 +242,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
         // parse request body
         MetadataFieldRest metadataFieldRest;
         try {
-            metadataFieldRest = new ObjectMapper().readValue(
+            metadataFieldRest = mapper.readValue(
                 getRequestService().getCurrentRequest().getHttpServletRequest().getInputStream(),
                 MetadataFieldRest.class
                                                             );
@@ -319,7 +322,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
 
         MetadataFieldRest metadataFieldRest;
         try {
-            metadataFieldRest = new ObjectMapper().readValue(jsonNode.toString(), MetadataFieldRest.class);
+            metadataFieldRest = mapper.readValue(jsonNode.toString(), MetadataFieldRest.class);
         } catch (JsonProcessingException e) {
             throw new DSpaceBadRequestException("Cannot parse JSON in request body", e);
         }

@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -78,6 +78,9 @@ public class RequestItemRepository
     @Autowired(required = true)
     protected RequestItemEmailNotifier requestItemEmailNotifier;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     /*
      * DSpaceRestRepository
      */
@@ -106,7 +109,6 @@ public class RequestItemRepository
         HttpServletRequest req = getRequestService()
                 .getCurrentRequest()
                 .getHttpServletRequest();
-        ObjectMapper mapper = new ObjectMapper();
         RequestItemRest rir;
         try {
             rir = mapper.readValue(req.getInputStream(), RequestItemRest.class);
@@ -228,7 +230,7 @@ public class RequestItemRepository
         }
 
         // Do not permit updates after a decision has been given.
-        Date decisionDate = ri.getDecision_date();
+        Instant decisionDate = ri.getDecision_date();
         if (null != decisionDate) {
             throw new UnprocessableEntityException("Request was "
                     + (ri.isAccept_request() ? "granted" : "denied")
@@ -254,7 +256,7 @@ public class RequestItemRepository
         if (responseSubjectNode != null && !responseSubjectNode.isNull()) {
             subject = responseSubjectNode.asText();
         }
-        ri.setDecision_date(new Date());
+        ri.setDecision_date(Instant.now());
         requestItemService.update(context, ri);
 
         // Send the response email

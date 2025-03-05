@@ -7,7 +7,7 @@
  */
 package org.dspace.harvest;
 
-import java.util.Date;
+import java.time.Instant;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,8 +19,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.persistence.Transient;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
@@ -62,12 +60,10 @@ public class HarvestedCollection implements ReloadableEntity<Integer> {
     private int harvestStatus;
 
     @Column(name = "harvest_start_time", columnDefinition = "timestamp with time zone")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date harvestStartTime;
+    private Instant harvestStartTime;
 
     @Column(name = "last_harvested", columnDefinition = "timestamp with time zone")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date lastHarvested;
+    private Instant lastHarvested;
 
     @Transient
     public static final int TYPE_NONE = 0;
@@ -157,7 +153,7 @@ public class HarvestedCollection implements ReloadableEntity<Integer> {
         this.metadataConfigId = mdConfigId;
     }
 
-    public void setLastHarvested(Date lastHarvested) {
+    public void setLastHarvested(Instant lastHarvested) {
         this.lastHarvested = lastHarvested;
     }
 
@@ -165,7 +161,7 @@ public class HarvestedCollection implements ReloadableEntity<Integer> {
         this.harvestMessage = message;
     }
 
-    public void setHarvestStartTime(Date date) {
+    public void setHarvestStartTime(Instant date) {
         this.harvestStartTime = date;
     }
 
@@ -203,11 +199,11 @@ public class HarvestedCollection implements ReloadableEntity<Integer> {
         return harvestMessage;
     }
 
-    public Date getHarvestDate() {
+    public Instant getHarvestDate() {
         return lastHarvested;
     }
 
-    public Date getHarvestStartTime() {
+    public Instant getHarvestStartTime() {
         return harvestStartTime;
     }
 }

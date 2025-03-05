@@ -81,6 +81,9 @@ public class ItemImportIT extends AbstractEntityIntegrationTest {
     private ProcessService processService;
     @Autowired
     private DSpaceRunnableParameterConverter dSpaceRunnableParameterConverter;
+    @Autowired
+    private ObjectMapper mapper;
+
     private Collection collection;
     private Path workDir;
     private static final String TEMP_DIR = ItemImport.TEMP_DIR;
@@ -232,7 +235,7 @@ public class ItemImportIT extends AbstractEntityIntegrationTest {
             getClient(getAuthToken(admin.getEmail(), password))
                 .perform(multipart("/api/system/scripts/import/processes")
                         .file(bitstreamFile)
-                        .param("properties", new ObjectMapper().writeValueAsString(list)))
+                        .param("properties", mapper.writeValueAsString(list)))
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$", is(
                         ProcessMatcher.matchProcess("import",

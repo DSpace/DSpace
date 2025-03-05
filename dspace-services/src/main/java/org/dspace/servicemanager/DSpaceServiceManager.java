@@ -11,6 +11,7 @@ import static org.apache.logging.log4j.Level.DEBUG;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -257,7 +258,7 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
             }
         }
 
-        long startTime = System.currentTimeMillis();
+        long startTime = Instant.now().toEpochMilli();
         try {
             // have to put this at the top because otherwise initializing beans will die when they try to use the SMS
             this.running = true;
@@ -294,7 +295,7 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
             throw new RuntimeException(message, e);
         }
 
-        long totalTime = System.currentTimeMillis() - startTime;
+        long totalTime = Instant.now().toEpochMilli() - startTime;
         log.info("Service Manager started up in {} ms with {} services...",
                 totalTime, applicationContext.getBeanDefinitionCount());
     }
