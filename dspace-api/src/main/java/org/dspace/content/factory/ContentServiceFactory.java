@@ -9,6 +9,7 @@ package org.dspace.content.factory;
 
 import java.util.List;
 
+import org.dspace.content.AuthorityVirtualMetadataService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.RelationshipMetadataService;
@@ -83,6 +84,7 @@ public abstract class ContentServiceFactory {
      */
     public abstract RelationshipTypeService getRelationshipTypeService();
 
+    public abstract AuthorityVirtualMetadataService getAuthorityVirtualMetadataService();
     /**
      * Return the implementation of the RelationshipService interface
      *

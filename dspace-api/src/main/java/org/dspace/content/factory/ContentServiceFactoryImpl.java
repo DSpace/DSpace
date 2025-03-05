@@ -9,6 +9,7 @@ package org.dspace.content.factory;
 
 import java.util.List;
 
+import org.dspace.content.AuthorityVirtualMetadataService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.RelationshipMetadataService;
 import org.dspace.content.service.BitstreamFormatService;
@@ -78,6 +79,8 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     private RelationshipTypeService relationshipTypeService;
     @Autowired(required = true)
     private RelationshipMetadataService relationshipMetadataService;
+    @Autowired(required = true)
+    private AuthorityVirtualMetadataService authorityVirtualMetadataService;
     @Autowired(required = true)
     private EntityTypeService entityTypeService;
     @Autowired(required = true)
@@ -183,6 +186,11 @@ public class ContentServiceFactoryImpl extends ContentServiceFactory {
     @Override
     public RelationshipMetadataService getRelationshipMetadataService() {
         return relationshipMetadataService;
+    }
+
+    @Override
+    public AuthorityVirtualMetadataService getAuthorityVirtualMetadataService() {
+        return authorityVirtualMetadataService;
     }
 
     @Override

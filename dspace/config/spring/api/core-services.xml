@@ -57,6 +57,7 @@
     <bean class="org.dspace.content.EntityServiceImpl"/>
     <bean class="org.dspace.content.RelationshipTypeServiceImpl"/>
     <bean class="org.dspace.content.RelationshipMetadataServiceImpl"/>
+    <bean class="org.dspace.content.AuthorityVirtualMetadataServiceImpl"/>
     <bean class="org.dspace.content.FeedbackServiceImpl"/>
     <bean class="org.dspace.content.DuplicateDetectionServiceImpl"/>
 
