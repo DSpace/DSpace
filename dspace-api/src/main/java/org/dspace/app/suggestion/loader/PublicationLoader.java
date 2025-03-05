@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.suggestion.openaire;
+package org.dspace.app.suggestion.loader;
 
 import static org.dspace.app.suggestion.SuggestionUtils.getAllEntriesByMetadatum;
 import static org.dspace.app.suggestion.SuggestionUtils.getFirstEntryByMetadatum;
@@ -19,6 +19,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.suggestion.SolrSuggestionProvider;
 import org.dspace.app.suggestion.Suggestion;
 import org.dspace.app.suggestion.SuggestionEvidence;
+import org.dspace.app.suggestion.openaire.EvidenceScorer;
 import org.dspace.content.Item;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.core.Context;
@@ -35,16 +36,16 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class PublicationLoader extends SolrSuggestionProvider {
 
-    private List<String> names;
+    protected List<String> names;
 
-    private ExternalDataProvider primaryProvider;
+    protected ExternalDataProvider primaryProvider;
 
-    private List<ExternalDataProvider> otherProviders;
+    protected List<ExternalDataProvider> otherProviders;
 
     @Autowired
-    private ConfigurationService configurationService;
+    protected ConfigurationService configurationService;
 
-    private List<EvidenceScorer> pipeline;
+    protected List<EvidenceScorer> pipeline;
 
     public void setPrimaryProvider(ExternalDataProvider primaryProvider) {
         this.primaryProvider = primaryProvider;
@@ -65,7 +66,7 @@ public class PublicationLoader extends SolrSuggestionProvider {
     /**
      * This method filter a list of ImportRecords using a pipeline of AuthorNamesApprover
      * and return a filtered list of ImportRecords.
-     * 
+     *
      * @see org.dspace.app.suggestion.openaire.AuthorNamesScorer
      * @param researcher the researcher Item
      * @param importRecords List of import record
@@ -103,8 +104,9 @@ public class PublicationLoader extends SolrSuggestionProvider {
      * @throws SolrServerException
      * @throws IOException
      */
-    public void importAuthorRecords(Context context, Item researcher)
-            throws SolrServerException, IOException {
+    @Override
+    public void importRecords(Context context, Item researcher)
+        throws Exception {
         int offset = 0;
         int limit = 10;
         int loaded = limit;
@@ -136,14 +138,16 @@ public class PublicationLoader extends SolrSuggestionProvider {
         Suggestion suggestion = new Suggestion(getSourceName(), item, openAireId);
         suggestion.setDisplay(getFirstEntryByMetadatum(record, "dc", "title", null));
         suggestion.getMetadata().add(
-                new MetadataValueDTO("dc", "title", null, null, getFirstEntryByMetadatum(record, "dc", "title", null)));
+            new MetadataValueDTO("dc", "title", null, null, getFirstEntryByMetadatum(record, "dc", "title", null)));
         suggestion.getMetadata().add(new MetadataValueDTO("dc", "date", "issued", null,
-                getFirstEntryByMetadatum(record, "dc", "date", "issued")));
+                                                          getFirstEntryByMetadatum(record, "dc", "date", "issued")));
         suggestion.getMetadata().add(new MetadataValueDTO("dc", "description", "abstract", null,
-                getFirstEntryByMetadatum(record, "dc", "description", "abstract")));
+                                                          getFirstEntryByMetadatum(record, "dc", "description",
+                                                                                   "abstract")));
         suggestion.setExternalSourceUri(configurationService.getProperty("dspace.server.url")
-                + "/api/integration/externalsources/" + primaryProvider.getSourceIdentifier() + "/entryValues/"
-                + openAireId);
+                                            + "/api/integration/externalsources/" +
+                                            primaryProvider.getSourceIdentifier() + "/entryValues/"
+                                            + openAireId);
         for (String o : getAllEntriesByMetadatum(record, "dc", "source", null)) {
             suggestion.getMetadata().add(new MetadataValueDTO("dc", "source", null, null, o));
         }
@@ -164,7 +168,7 @@ public class PublicationLoader extends SolrSuggestionProvider {
     /**
      * Load metadata from OpenAIRE using the import service. The service use the value
      * get from metadata key defined in class level variable names as author to query OpenAIRE.
-     * 
+     *
      * @see org.dspace.importer.external.openaire.service.OpenAireImportMetadataSourceServiceImpl
      * @param searchValues query
      * @param researcher item to extract metadata from
@@ -173,7 +177,7 @@ public class PublicationLoader extends SolrSuggestionProvider {
      * @return list of ImportRecord
      */
     private List<ExternalDataObject> getImportRecords(List<String> searchValues,
-        Item researcher, int offset, int limit) {
+                                                      Item researcher, int offset, int limit) {
         List<ExternalDataObject> matchingRecords = new ArrayList<>();
         for (String searchValue : searchValues) {
             matchingRecords.addAll(
@@ -205,7 +209,7 @@ public class PublicationLoader extends SolrSuggestionProvider {
     /**
      * Check if the ImportRecord is already present in the list.
      * The comparison is made on the value of metadatum with key 'dc.identifier.other'
-     * 
+     *
      * @param dto An importRecord instance
      * @param importRecords a list of importRecord
      * @return true if dto is already present in importRecords, false otherwise
@@ -230,7 +234,7 @@ public class PublicationLoader extends SolrSuggestionProvider {
      * @param researcher DSpace item
      * @return list of metadata values
      */
-    private List<String> searchMetadataValues(Item researcher) {
+    public List<String> searchMetadataValues(Item researcher) {
         List<String> authors = new ArrayList<String>();
         for (String name : names) {
             String value = itemService.getMetadata(researcher, name);
@@ -247,7 +251,8 @@ public class PublicationLoader extends SolrSuggestionProvider {
             return true;
         } else if (otherProviders != null) {
             return otherProviders.stream()
-                    .anyMatch(x -> StringUtils.equals(externalDataObject.getSource(), x.getSourceIdentifier()));
+                                 .anyMatch(
+                                     x -> StringUtils.equals(externalDataObject.getSource(), x.getSourceIdentifier()));
         } else {
             return false;
         }
