@@ -117,14 +117,11 @@ public class OpenAlexPublicationExternalSourcesIT extends AbstractControllerInte
                        .andExpect(
                            jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.contributor.author'][3].value")
                                .value("RoseJ. Randall"))
-                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.orcid']",
-                                           Matchers.hasSize(2)))
+                       .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.other']",
+                                           Matchers.hasSize(1)))
                        .andExpect(
-                           jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.orcid'][0].value")
-                               .value("https://orcid.org/0000-0001-6187-6610"))
-                       .andExpect(
-                           jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.orcid'][1].value")
-                               .value("https://orcid.org/0000-0001-6187-6611"))
+                           jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.other'][0].value")
+                               .value("https://pubmed.ncbi.nlm.nih.gov/14907713"))
                        .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri']",
                                            Matchers.hasSize(7)))
                        .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.uri'][0]" +
@@ -165,7 +162,7 @@ public class OpenAlexPublicationExternalSourcesIT extends AbstractControllerInte
                                                ".endPage'][0].value")
                                       .value("275"))
                        .andExpect(
-                           jsonPath("$._embedded.externalSourceEntries[0].metadata['oaire.version.volume'][0].value")
+                           jsonPath("$._embedded.externalSourceEntries[0].metadata['oaire.version'][0].value")
                                .value("http://purl.org/coar/version/c_970fb48d4fbd8a85"))
                        .andExpect(
                            jsonPath("$._embedded.externalSourceEntries[0].metadata['oaire.citation.title'][0].value")
@@ -175,9 +172,6 @@ public class OpenAlexPublicationExternalSourcesIT extends AbstractControllerInte
                        .andExpect(
                            jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.doi'][0].value")
                                .value("10.1016/s0021-9258(19)52451-6"))
-                       .andExpect(
-                           jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.identifier.pmid'][0].value")
-                               .value("14907713"))
                        .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.language.iso'][0].value")
                                       .value("en"))
                        .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.title'][0].value")
@@ -193,6 +187,9 @@ public class OpenAlexPublicationExternalSourcesIT extends AbstractControllerInte
                        .andExpect(
                            jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.rights.license'][0].value")
                                .value("cc-by"))
+                       .andExpect(
+                           jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.type'][0].value")
+                               .value("Article"))
                        .andExpect(jsonPath("$.page.totalElements").value(1))
                        .andExpect(jsonPath("$.page.totalPages").value(1))
                        .andExpect(jsonPath("$.page.size").value(20))
