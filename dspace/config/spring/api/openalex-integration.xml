@@ -31,11 +31,10 @@
         <entry key-ref="openalex.abstract" value-ref="openalexAbstractContrib"/>
         <entry key-ref="openalex.publication.date" value-ref="openalexDateContrib"/>
         <entry key-ref="openalex.doi" value-ref="openalexDoiContrib"/>
-        <entry key-ref="openalex.pmid" value-ref="openalexPmidContrib"/>
+        <entry key-ref="dc.identifier.other" value-ref="openalexPublicationIdentifierOtherContrib"/>
         <entry key-ref="dc.identifier.openalex" value-ref="openalexIdContrib"/>
         <entry key-ref="openalex.uri" value-ref="openalexUriIdentifierscContrib"/>
         <entry key-ref="openalex.author" value-ref="openalexAuthorContrib"/>
-        <entry key-ref="openalex.author.orcid" value-ref="openalexAuthorOrcidContrib"/>
         <entry key-ref="openalex.language" value-ref="openalexLanguageContrib"/>
         <entry key-ref="openalex.publication.version" value-ref="openalexPublicationVersionContrib"/>
         <entry key-ref="openalex.biblio.volume" value-ref="openalexBiblioVolumeContrib"/>
@@ -46,6 +45,7 @@
         <entry key-ref="openalex.license" value-ref="openalexLicenseContrib"/>
         <entry key-ref="oaire.citation.title" value-ref="openalexConditionalPrimaryLocationTitleContrib"/>
         <entry key-ref="dc.identifier.issn" value-ref="openalexConditionalPrimaryLocationISSNContrib"/>
+        <entry key-ref="openalex.type" value-ref="openalexTypeContrib"/>
     </util:map>
 
     <bean id="openalexTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
@@ -92,18 +92,13 @@
         <constructor-arg value="dc.identifier.doi"/>
     </bean>
 
+    <bean id="dc.identifier.other" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.other"/>
+    </bean>
+
     <bean id="openalexPmidContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
-        <property name="field" ref="openalex.pmid"/>
-        <property name="metadataProcessor" ref="openalexPmidMetadataProcessor"/>
-    </bean>
-    <bean name="openalexPmidMetadataProcessor"
-          class="org.dspace.importer.external.metadatamapping.contributor.RegexReplacingJsonPathMetadataProcessor">
-        <property name="path" value="/ids/pmid"/>
-        <property name="regexPattern" value="https://pubmed.ncbi.nlm.nih.gov/"/>
-        <property name="replacement" value=""/>
-    </bean>
-    <bean id="openalex.pmid" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.pmid"/>
+        <property name="field" ref="dc.identifier.other"/>
+        <property name="query" value="/ids/pmid"/>
     </bean>
 
     <bean id="openalexIdContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
@@ -140,18 +135,16 @@
         <constructor-arg value="dc.contributor.author"/>
     </bean>
 
-    <bean id="openalexAuthorOrcidContrib"
-          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
-        <property name="field" ref="openalex.author.orcid"/>
-        <property name="metadataProcessor" ref="openalexAuthorOrcidProcessor"/>
-    </bean>
-    <bean name="openalexAuthorOrcidProcessor"
-          class="org.dspace.importer.external.metadatamapping.contributor.ArrayElementAttributeProcessor">
-        <property name="pathToArray" value="/authorships"/>
-        <property name="elementAttribute" value="/author/orcid"/>
-    </bean>
-    <bean id="openalex.author.orcid" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="dc.identifier.orcid"/>
+    <util:list id="publicationIdentifierOtherContribList"
+               value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor"
+               list-class="java.util.ArrayList">
+        <ref bean="openalexPmidContrib"/>
+    </util:list>
+
+    <bean id="openalexPublicationIdentifierOtherContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.MultipleMetadataContributor">
+        <property name="metadatumContributors" ref="publicationIdentifierOtherContribList"/>
+        <property name="field" ref="dc.identifier.other"/>
     </bean>
 
     <util:list id="contribList"
@@ -264,7 +257,7 @@
     </bean>
 
     <bean id="openalex.publication.version" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
-        <constructor-arg value="oaire.version.volume"/>
+        <constructor-arg value="oaire.version"/>
     </bean>
 
     <bean id="openalexConditionalPublishedVersionContrib"
@@ -521,6 +514,27 @@
           class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
         <property name="field" ref="dc.identifier.issn"/>
         <property name="query" value="/primary_location/source/issn"/>
+    </bean>
+
+    <bean name="mapConverterOpenAlexToDSpacePublicationType" class="org.dspace.util.SimpleMapConverter"
+          init-method="init">
+        <property name="converterNameFile" value="mapConverter-opealex-works-to-dspace-publication-type.properties"/>
+        <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+        <property name="defaultValue" value="Other"/>
+    </bean>
+    <bean id="openalexTypeValueMapping"
+          class="org.dspace.importer.external.metadatamapping.transform.StringJsonValueMappingMetadataProcessorService">
+        <property name="valueMapConverter" ref="mapConverterOpenAlexToDSpacePublicationType"/>
+        <property name="path" value="/type"/>
+    </bean>
+    <bean id="openalexTypeContrib"
+          class="org.dspace.importer.external.metadatamapping.contributor.SimpleJsonPathMetadataContributor">
+        <property name="field" ref="openalex.type"/>
+        <property name="query" value="/type"/>
+        <property name="metadataProcessor" ref="openalexTypeValueMapping"/>
+    </bean>
+    <bean id="openalex.type" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.type"/>
     </bean>
 
 
