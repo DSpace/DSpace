@@ -10,13 +10,8 @@ package org.dspace.identifier;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
-import org.dspace.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.builder.CollectionBuilder;
 import org.dspace.builder.CommunityBuilder;
@@ -24,21 +19,10 @@ import org.dspace.builder.ItemBuilder;
 import org.dspace.builder.VersionBuilder;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.kernel.ServiceManager;
-import org.dspace.services.factory.DSpaceServicesFactory;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.test.util.ReflectionTestUtils;
 
-public class VersionedHandleIdentifierProviderIT extends AbstractIntegrationTestWithDatabase {
-
-    private List<IdentifierProvider> originalProviders;
-
-    private ServiceManager serviceManager;
-    private IdentifierServiceImpl identifierService;
-    private List<Object> registeredBeans = new ArrayList<>();
+public class VersionedHandleIdentifierProviderIT extends AbstractIdentifierProviderIT  {
 
     private String firstHandle;
 
@@ -51,12 +35,8 @@ public class VersionedHandleIdentifierProviderIT extends AbstractIntegrationTest
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        serviceManager = DSpaceServicesFactory.getInstance().getServiceManager();
-        identifierService = serviceManager.getServicesByType(IdentifierServiceImpl.class).get(0);
-        originalProviders = (List<IdentifierProvider>) ReflectionTestUtils.getField(identifierService, "providers");
         context.turnOffAuthorisationSystem();
 
-        identifierService.setProviders(List.of());
         parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
@@ -66,62 +46,6 @@ public class VersionedHandleIdentifierProviderIT extends AbstractIntegrationTest
 
         context.restoreAuthSystemState();
     }
-
-    @After
-    @Override
-    public void destroy() throws Exception {
-        super.destroy();
-        // restore providers
-        identifierService.setProviders(originalProviders);
-        // clean beans
-        unregisterBeans(registeredBeans);
-    }
-
-    private void unregisterBeans(List<Object> registeredBeans) {
-        AutowireCapableBeanFactory factory =
-            DSpaceServicesFactory.getInstance()
-                                 .getServiceManager()
-                                 .getApplicationContext()
-                                 .getAutowireCapableBeanFactory();
-        Iterator<Object> iterator = registeredBeans.iterator();
-        while (iterator.hasNext()) {
-            Object registeredBean = iterator.next();
-            factory.destroyBean(registeredBean);
-            iterator.remove();
-            registeredBeans.remove(registeredBean);
-        }
-    }
-
-    private <T> T registerBean(Class<T> type)
-        throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        AutowireCapableBeanFactory factory =
-            DSpaceServicesFactory.getInstance()
-                                 .getServiceManager()
-                                 .getApplicationContext()
-                                 .getAutowireCapableBeanFactory();
-        // Define our special bean for testing the target class.
-        T bean = type.getDeclaredConstructor()
-                     .newInstance();
-
-        registeredBeans.add(bean);
-
-        factory.autowireBean(bean);
-        return bean;
-    }
-
-    private void registerSingleProvider(IdentifierProvider provider) {
-        identifierService.setProviders(List.of(provider));
-    }
-
-    private <T> T getOrProvide(Class<T> type)
-        throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        List<T> servicesByType = serviceManager.getServicesByType(type);
-        if (servicesByType == null || servicesByType.isEmpty()) {
-            servicesByType = List.of(registerBean(type));
-        }
-        return servicesByType.get(0);
-    }
-
 
     private void createVersions() throws SQLException, AuthorizeException {
         context.turnOffAuthorisationSystem();
@@ -138,9 +62,6 @@ public class VersionedHandleIdentifierProviderIT extends AbstractIntegrationTest
 
     @Test
     public void testDefaultVersionedHandleProvider() throws Exception {
-        registerSingleProvider(
-            getOrProvide(VersionedHandleIdentifierProvider.class)
-        );
         createVersions();
 
         // Confirm the original item only has its original handle
@@ -156,9 +77,7 @@ public class VersionedHandleIdentifierProviderIT extends AbstractIntegrationTest
 
     @Test
     public void testCanonicalVersionedHandleProvider() throws Exception {
-        registerSingleProvider(
-            getOrProvide(VersionedHandleIdentifierProviderWithCanonicalHandles.class)
-        );
+        registerProvider(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
         createVersions();
 
         // Confirm the original item only has a version handle
@@ -171,6 +90,11 @@ public class VersionedHandleIdentifierProviderIT extends AbstractIntegrationTest
         assertEquals(firstHandle, itemV3.getHandle());
         assertEquals(2, itemV3.getHandles().size());
         containsHandle(itemV3, firstHandle + ".3");
+
+        // Unregister this non-default provider
+        unregisterProvider(VersionedHandleIdentifierProviderWithCanonicalHandles.class);
+        // Re-register the default provider (for later tests)
+        registerProvider(VersionedHandleIdentifierProvider.class);
     }
 
     private void containsHandle(Item item, String handle) {
