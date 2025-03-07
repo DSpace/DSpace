@@ -51,9 +51,19 @@
     <bean id="DataCiteImportService"
           class="org.dspace.importer.external.datacite.DataCiteImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="DataCiteMetadataFieldMapping"/>
+        <property name="entityFilterQuery" value="${datacite.publicationimport.entityfilterquery}" />
     </bean>
     <bean id="DataCiteMetadataFieldMapping"
           class="org.dspace.importer.external.datacite.DataCiteFieldMapping">
+    </bean>
+
+    <bean id="DataCiteProjectImportService"
+          class="org.dspace.importer.external.datacite.DataCiteProjectImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="DataCiteProjectMetadataFieldMapping"/>
+        <property name="entityFilterQuery" value="${datacite.projectimport.entityfilterquery}" />
+    </bean>
+    <bean id="DataCiteProjectMetadataFieldMapping"
+          class="org.dspace.importer.external.datacite.DataCiteProjectFieldMapping">
     </bean>
 
     <bean id="ArXivImportService"

@@ -123,9 +123,9 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
                     Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))))
             );
 
-        // verify that the property core.authorization.collection-admin.item.reinstatiate = false is respected
+        // verify that the property core.authorization.collection-admin.item.reinstate = false is respected
         // the community admins should be still authorized
-        configurationService.setProperty("core.authorization.collection-admin.item.reinstatiate", false);
+        configurationService.setProperty("core.authorization.collection-admin.item.reinstate", false);
         getClient(comAdminToken).perform(get("/api/authz/authorizations/" + authAdminWithdraw.getID()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",
@@ -140,11 +140,11 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
                         Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))))
         );
 
-        // now verify that the property core.authorization.community-admin.item.reinstatiate = false is respected
+        // now verify that the property core.authorization.community-admin.item.reinstate = false is respected
         // and also community admins are blocked
         // Please note that set to false the configuration for community keeping true for collection don't
         // make any sense as a community admin is always also a collection admin
-        configurationService.setProperty("core.authorization.community-admin.item.reinstatiate", false);
+        configurationService.setProperty("core.authorization.community-admin.item.reinstate", false);
         getClient(comAdminToken).perform(get("/api/authz/authorizations/" + authAdminWithdraw.getID()))
                     .andExpect(status().isNotFound());
 
@@ -183,8 +183,8 @@ public class ReinstateFeatureRestIT extends AbstractControllerIntegrationTest {
             .andExpect(jsonPath("$._embedded.authorizations", contains(
                     Matchers.is(AuthorizationMatcher.matchAuthorization(authAdminWithdraw))))
             );
-        // verify that the property core.authorization.collection-admin.item.reinstatiate = false is respected
-        configurationService.setProperty("core.authorization.collection-admin.item.reinstatiate", false);
+        // verify that the property core.authorization.collection-admin.item.reinstate = false is respected
+        configurationService.setProperty("core.authorization.collection-admin.item.reinstate", false);
         getClient(colAdminToken).perform(get("/api/authz/authorizations/" + authAdminWithdraw.getID()))
                     .andExpect(status().isNotFound());
 

@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,6 +40,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.workflow.MockWorkflowItem;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -468,4 +470,14 @@ public class WorkspaceItemTest extends AbstractUnitTest {
         assertTrue("testSetPublishedBefore 0", wi.isPublishedBefore());
     }
 
+    @Test
+    public void testDuplicateItemID() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Item item = wi.getItem();
+        MockWorkflowItem wfItem = new MockWorkflowItem();
+        wfItem.item = item;
+        wfItem.collection = collection;
+        assertThrows(IllegalArgumentException.class, () -> workspaceItemService.create(context, wfItem));
+        context.restoreAuthSystemState();
+    }
 }

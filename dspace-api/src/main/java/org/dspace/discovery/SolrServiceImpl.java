@@ -41,6 +41,8 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.json.BucketBasedJsonFacet;
+import org.apache.solr.client.solrj.response.json.NestableJsonFacet;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -1055,6 +1057,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 }
                 //Resolve our facet field values
                 resolveFacetFields(context, query, result, skipLoadingResponse, solrQueryResponse);
+                //Add total entries count for metadata browsing
+                resolveEntriesCount(result, solrQueryResponse);
             }
             // If any stale entries are found in the current page of results,
             // we remove those stale entries and rerun the same query again.
@@ -1080,7 +1084,37 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         return result;
     }
 
+    /**
+     * Stores the total count of entries for metadata index browsing. The count is calculated by the
+     * <code>json.facet</code> parameter with the following value:
+     *
+     * <pre><code>
+     * {
+     *     "entries_count": {
+     *         "type": "terms",
+     *         "field": "facetNameField_filter",
+     *         "limit": 0,
+     *         "prefix": "prefix_value",
+     *         "numBuckets": true
+     *     }
+     * }
+     * </code></pre>
+     *
+     * This value is returned in the <code>facets</code> field of the Solr response.
+     *
+     * @param result DiscoverResult object where the total entries count will be stored
+     * @param solrQueryResponse QueryResponse object containing the solr response
+     */
+    private void resolveEntriesCount(DiscoverResult result, QueryResponse solrQueryResponse) {
 
+        NestableJsonFacet response = solrQueryResponse.getJsonFacetingResponse();
+        if (response != null) {
+            BucketBasedJsonFacet facet = response.getBucketBasedFacets("entries_count");
+            if (facet != null) {
+                result.setTotalEntries(facet.getNumBucketsCount());
+            }
+        }
+    }
 
     private void resolveFacetFields(Context context, DiscoverQuery query, DiscoverResult result,
             boolean skipLoadingResponse, QueryResponse solrQueryResponse) throws SQLException {
@@ -1411,8 +1445,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             } else {
                 return field + "_acid";
             }
-        } else if (facetFieldConfig.getType().equals(DiscoveryConfigurationParameters.TYPE_STANDARD)) {
-            return field;
         } else {
             return field;
         }

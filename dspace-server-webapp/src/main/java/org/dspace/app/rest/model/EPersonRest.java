@@ -20,10 +20,7 @@ import org.dspace.app.rest.RestResourceController;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @LinksRest(links = {
-        @LinkRest(
-                name = EPersonRest.GROUPS,
-                method = "getGroups"
-        )
+    @LinkRest(name = EPersonRest.GROUPS, method = "getGroups")
 })
 public class EPersonRest extends DSpaceObjectRest {
     public static final String NAME = "eperson";
