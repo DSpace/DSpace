@@ -1770,6 +1770,8 @@
                 <artifactId>jackson-datatype-jsr310</artifactId>
                 <version>${jackson-databind.version}</version>
             </dependency>
+
+            <!-- guava is needed by OAuth, Guice, Mockserver, ORCID, s3mock, Solr, JClouds -->
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
@@ -1782,6 +1784,7 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
             <dependency>
                 <groupId>xom</groupId>
                 <artifactId>xom</artifactId>
