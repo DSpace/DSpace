@@ -230,6 +230,7 @@ public class AccountServiceImpl implements AccountService {
         registrationDataService.deleteByToken(context, token);
     }
 
+    @Override
     public EPerson mergeRegistration(Context context, UUID personId, String token, List<String> overrides)
         throws AuthorizeException, SQLException {
 
@@ -301,9 +302,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private boolean isSameContextEPerson(Context context, EPerson eperson) {
-        return eperson.equals(context.getCurrentUser());
+        return context.getCurrentUser().equals(eperson);
     }
-
 
     @Override
     public RegistrationData renewRegistrationForEmail(
@@ -312,7 +312,7 @@ public class AccountServiceImpl implements AccountService {
         try {
             RegistrationData newRegistration = registrationDataService.clone(context, registrationDataPatch);
             registrationDataService.delete(context, registrationDataPatch.getOldRegistration());
-            fillAndSendEmail(context, newRegistration);
+            sendRegistationLinkByEmail(context, newRegistration);
             return newRegistration;
         } catch (SQLException | MessagingException | IOException e) {
             log.error(e);
@@ -353,6 +353,18 @@ public class AccountServiceImpl implements AccountService {
     }
 
 
+    /**
+     * Updates Eperson using the provided {@link RegistrationData}.<br/>
+     * Tries to replace {@code metadata} already set inside the {@link EPerson} with the ones
+     * listed inside the {@code overrides} field by taking the value from the {@link RegistrationData}. <br/>
+     * Updates the empty values inside the {@link EPerson} by taking them directly from the {@link RegistrationData},
+     * according to the method {@link AccountServiceImpl#getUpdateActions(Context, EPerson, RegistrationData)}
+     *
+     * @param context The DSpace context
+     * @param eperson The EPerson that should be updated
+     * @param registrationData The RegistrationData related to that EPerson
+     * @param overrides List of metadata that will be overwritten inside the EPerson
+     */
     protected void updateValuesFromRegistration(
         Context context, EPerson eperson, RegistrationData registrationData, List<String> overrides
     ) {
@@ -369,6 +381,21 @@ public class AccountServiceImpl implements AccountService {
         return overrides.stream().map(f -> mergeField(f, registrationData));
     }
 
+    /**
+     * This methods tries to fullfill missing values inside the {@link EPerson} by taking them directly from the
+     * {@link RegistrationData}. <br/>
+     * Returns a {@link Stream} of consumers that will be evaluated on an {@link EPerson}, this stream contains
+     * the following actions:
+     * <ul>
+     *     <li>Copies {@code netId} and {@code email} to the {@link EPerson} <br/></li>
+     *     <li>Copies any {@link RegistrationData#metadata} inside {@link EPerson#metadata} if isn't already set.</li>
+     * </ul>
+     *
+     * @param context DSpace context
+     * @param eperson EPerson that will be evaluated
+     * @param registrationData RegistrationData used as a base to copy value from.
+     * @return a stream of consumers to be evaluated on EPerson.
+     */
     protected Stream<Consumer<EPerson>> getUpdateActions(
         Context context, EPerson eperson, RegistrationData registrationData
     ) {
@@ -404,6 +431,14 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
+    /**
+     * This method returns a Consumer that will override a given {@link MetadataValue} of the {@link EPerson} by taking
+     * that directly from the {@link RegistrationData}.
+     *
+     * @param field             The metadatafield
+     * @param registrationData  The RegistrationData where the metadata wil be taken
+     * @return a Consumer of the person that will replace that field
+     */
     protected Consumer<EPerson> mergeField(String field, RegistrationData registrationData) {
         return person ->
             allowedMergeArguments.getOrDefault(
@@ -412,6 +447,14 @@ public class AccountServiceImpl implements AccountService {
             ).accept(registrationData, person);
     }
 
+    /**
+     * This method returns a {@link BiConsumer} that can be evaluated on any {@link RegistrationData} and
+     * {@link EPerson} in order to replace the value of the metadata {@code field} placed on the {@link EPerson}
+     * by taking the value directly from the {@link RegistrationData}.
+     *
+     * @param field The metadata that will be overwritten inside the {@link EPerson}
+     * @return a BiConsumer
+     */
     protected BiConsumer<RegistrationData, EPerson> mergeRegistrationMetadata(String field) {
         return (registrationData, person) -> {
             RegistrationDataMetadata registrationMetadata = getMetadataOrThrow(registrationData, field);
@@ -545,6 +588,15 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
+    /**
+     * This method returns a link that will point to the Angular UI that will be used by the user to complete the
+     * registration process.
+     *
+     * @param base is the UI url of DSpace
+     * @param rd is the RegistrationData related to the user
+     * @param subPath is the specific page that will be loaded on the FE
+     * @return String that represents that link
+     */
     private static String getSpecialLink(String base, RegistrationData rd, String subPath) {
         return new StringBuffer(base)
             .append(base.endsWith("/") ? "" : "/")
@@ -554,7 +606,15 @@ public class AccountServiceImpl implements AccountService {
             .toString();
     }
 
-    protected void fillAndSendEmail(
+    /**
+     * Fills out a given email template obtained starting from the {@link RegistrationTypeEnum}.
+     *
+     * @param context The DSpace Context
+     * @param rd The RegistrationData that will be used as a registration.
+     * @throws MessagingException
+     * @throws IOException
+     */
+    protected void sendRegistationLinkByEmail(
         Context context, RegistrationData rd
     ) throws MessagingException, IOException {
         String base = configurationService.getProperty("dspace.ui.url");
@@ -571,6 +631,15 @@ public class AccountServiceImpl implements AccountService {
         log.info(LogMessage.of(() -> "Sent " + rd.getRegistrationType().getLink() + " link to " + rd.getEmail()));
     }
 
+    /**
+     * This method fills out the given email with all the fields and sends out the email.
+     *
+     * @param email - The recipient
+     * @param emailFilename The name of the email
+     * @param specialLink - The link that will be set inside the email
+     * @throws IOException
+     * @throws MessagingException
+     */
     protected void fillAndSendEmail(String email, String emailFilename, String specialLink)
         throws IOException, MessagingException {
         Email bean = Email.getEmail(emailFilename);

@@ -66,7 +66,7 @@ public class RegistrationDataMetadataServiceImpl implements RegistrationDataMeta
 
     @Override
     public RegistrationDataMetadata find(Context context, int id) throws SQLException {
-        return registrationDataMetadataDAO.findByID(context, RegistrationData.class, id);
+        return registrationDataMetadataDAO.findByID(context, RegistrationDataMetadata.class, id);
     }
 
     @Override

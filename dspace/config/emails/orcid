@@ -19,4 +19,4 @@ If you need assistance with your account, please email
 or call us at ${phone}.
 #end
 
-The DSpace-CRIS Team
+The ${config.get("dspace.name")} Team

@@ -22,6 +22,9 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
+ * Singleton that encapsulates the configuration of each different token {@link RegistrationTypeEnum} duration. <br/>
+ * Contains also utility methods to compute the expiration date of the registered token.
+ *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
 public class RegistrationDataExpirationConfiguration {
@@ -61,10 +64,22 @@ public class RegistrationDataExpirationConfiguration {
         return Duration.parse(MessageFormat.format(DURATION_FORMAT, typeValue));
     }
 
+    /**
+     * Retrieves the {@link Duration} configuration of a given {@link RegistrationTypeEnum}.
+     *
+     * @param type is the type of the given registration token
+     * @return the {@link Duration} of that specific token.
+     */
     public Duration getExpiration(RegistrationTypeEnum type) {
         return expirationMap.get(type);
     }
 
+    /**
+     * Retrieves the expiration date of the given {@link RegistrationTypeEnum}.
+     *
+     * @param type is the RegistrationTypeEnum of the token
+     * @return a Date that represents the expiration date.
+     */
     public Date computeExpirationDate(RegistrationTypeEnum type) {
 
         if (type == null) {

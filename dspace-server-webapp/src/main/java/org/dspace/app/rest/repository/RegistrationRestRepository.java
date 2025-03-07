@@ -28,6 +28,7 @@ import org.dspace.app.rest.exception.UnprocessableEntityException;
 import org.dspace.app.rest.model.RegistrationRest;
 import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.repository.patch.ResourcePatch;
+import org.dspace.app.rest.repository.patch.operation.RegistrationEmailPatchOperation;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authenticate.service.AuthenticationService;
@@ -211,6 +212,25 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
         return converter.toRest(registrationData, utils.obtainProjection());
     }
 
+    private void validateToken(Context context, String token) {
+        try {
+            RegistrationData registrationData =
+                registrationDataService.findByToken(context, token);
+            if (registrationData == null || !registrationDataService.isValid(registrationData)) {
+                throw new AccessDeniedException("The token is invalid");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * This method can be used to update a {@link RegistrationData} with a given {@code id} that has a valid
+     * {@code token} with the actions described in the {@link Patch} object.
+     * This method is used to patch the email value, and will generate a completely new {@code token} that will be
+     * sent with an email {@link RegistrationEmailPatchOperation}.
+     *
+     */
     @Override
     public RegistrationRest patch(
         HttpServletRequest request, String apiCategory, String model, Integer id, Patch patch
@@ -236,18 +256,6 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
             throw new RuntimeException(e.getMessage(), e);
         }
         return null;
-    }
-
-    private void validateToken(Context context, String token) {
-        try {
-            RegistrationData registrationData =
-                registrationDataService.findByToken(context, token);
-            if (registrationData == null || !registrationDataService.isValid(registrationData)) {
-                throw new AccessDeniedException("The token is invalid");
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public void setCaptchaService(CaptchaService captchaService) {

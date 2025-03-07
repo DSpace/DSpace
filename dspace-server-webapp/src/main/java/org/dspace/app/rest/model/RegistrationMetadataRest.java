@@ -10,6 +10,9 @@ package org.dspace.app.rest.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
+ * This POJO represents a {@link MetadataValueRest} that will be placed inside a given
+ * {@link org.dspace.eperson.RegistrationData} that is coming directly from the REST controller.
+ *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
 public class RegistrationMetadataRest extends MetadataValueRest {

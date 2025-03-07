@@ -28,6 +28,7 @@ import org.dspace.eperson.dto.RegistrationDataPatch;
 import org.dspace.eperson.service.AccountService;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.hamcrest.Matchers;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -98,13 +99,22 @@ public class EPersonRegistrationRestControllerIT extends AbstractControllerInteg
         customPassword = "vins-01";
         customEPerson =
             EPersonBuilder.createEPerson(context)
-                          .withEmail("vincenzo.mecca@4science.com")
+                          .withEmail("vins-01@fake.mail")
                           .withNameInMetadata("Vins", "4Science")
                           .withPassword(customPassword)
                           .withCanLogin(true)
                           .build();
 
         context.restoreAuthSystemState();
+    }
+
+    @After
+    public void destroy() throws Exception {
+        RegistrationData found = context.reloadEntity(orcidRegistration);
+        if (found != null) {
+            this.registrationDataService.delete(context, found);
+        }
+        super.destroy();
     }
 
 
@@ -159,12 +169,19 @@ public class EPersonRegistrationRestControllerIT extends AbstractControllerInteg
             registrationDataService.create(context, "0000-0000-0000-0000", RegistrationTypeEnum.VALIDATION_ORCID);
         context.restoreAuthSystemState();
 
-        String tokenAdmin = getAuthToken(admin.getEmail(), password);
+        try {
+            String tokenAdmin = getAuthToken(admin.getEmail(), password);
 
-        getClient(tokenAdmin).perform(
-            post("/api/eperson/epersons/" + customEPerson.getID())
-                .param("token", validationRegistration.getToken())
-        ).andExpect(status().isForbidden());
+            getClient(tokenAdmin).perform(
+                post("/api/eperson/epersons/" + customEPerson.getID())
+                    .param("token", validationRegistration.getToken())
+            ).andExpect(status().isForbidden());
+        } finally {
+            RegistrationData found = context.reloadEntity(validationRegistration);
+            if (found != null) {
+                this.registrationDataService.delete(context, found);
+            }
+        }
 
     }
 
@@ -178,19 +195,27 @@ public class EPersonRegistrationRestControllerIT extends AbstractControllerInteg
 
         context.turnOffAuthorisationSystem();
         RegistrationDataChanges changes =
-            new RegistrationDataChanges("vincenzo.mecca@4science.com", RegistrationTypeEnum.VALIDATION_ORCID);
+            new RegistrationDataChanges("vins-01@fake.mail", RegistrationTypeEnum.VALIDATION_ORCID);
         RegistrationData validationRegistration =
             this.accountService.renewRegistrationForEmail(
                 context, new RegistrationDataPatch(orcidRegistration, changes)
             );
         context.restoreAuthSystemState();
 
-        String customToken = getAuthToken(customEPerson.getEmail(), customPassword);
+        try {
+            String customToken = getAuthToken(customEPerson.getEmail(), customPassword);
 
-        getClient(customToken).perform(
-            post("/api/eperson/epersons/" + customEPerson.getID())
-                .param("token", validationRegistration.getToken())
-        ).andExpect(status().isCreated());
+            getClient(customToken).perform(
+                post("/api/eperson/epersons/" + customEPerson.getID())
+                    .param("token", validationRegistration.getToken())
+            ).andExpect(status().isCreated());
+
+        } finally {
+            RegistrationData found = context.reloadEntity(validationRegistration);
+            if (found != null) {
+                this.registrationDataService.delete(context, found);
+            }
+        }
 
     }
 
@@ -204,20 +229,29 @@ public class EPersonRegistrationRestControllerIT extends AbstractControllerInteg
 
         context.turnOffAuthorisationSystem();
         RegistrationDataChanges changes =
-            new RegistrationDataChanges("vincenzo.mecca@4science.com", RegistrationTypeEnum.VALIDATION_ORCID);
+            new RegistrationDataChanges("vins-01@fake.mail", RegistrationTypeEnum.VALIDATION_ORCID);
         RegistrationData validationRegistration =
             this.accountService.renewRegistrationForEmail(
                 context, new RegistrationDataPatch(orcidRegistration, changes)
             );
         context.restoreAuthSystemState();
 
-        String customToken = getAuthToken(customEPerson.getEmail(), customPassword);
+        try {
 
-        getClient(customToken).perform(
-            post("/api/eperson/epersons/" + customEPerson.getID())
-                .param("token", validationRegistration.getToken())
-                .param("override", "eperson.firstname,eperson.lastname")
-        ).andExpect(status().isCreated());
+            String customToken = getAuthToken(customEPerson.getEmail(), customPassword);
+
+            getClient(customToken).perform(
+                post("/api/eperson/epersons/" + customEPerson.getID())
+                    .param("token", validationRegistration.getToken())
+                    .param("override", "eperson.firstname,eperson.lastname")
+            ).andExpect(status().isCreated());
+
+        } finally {
+            RegistrationData found = context.reloadEntity(validationRegistration);
+            if (found != null) {
+                this.registrationDataService.delete(context, found);
+            }
+        }
 
     }
 
@@ -231,31 +265,39 @@ public class EPersonRegistrationRestControllerIT extends AbstractControllerInteg
 
         context.turnOffAuthorisationSystem();
         RegistrationDataChanges changes =
-            new RegistrationDataChanges("vincenzo.mecca@4science.com", RegistrationTypeEnum.VALIDATION_ORCID);
+            new RegistrationDataChanges("vins-01@fake.mail", RegistrationTypeEnum.VALIDATION_ORCID);
         RegistrationData validationRegistration =
             this.accountService.renewRegistrationForEmail(
                 context, new RegistrationDataPatch(orcidRegistration, changes)
             );
         context.restoreAuthSystemState();
 
-        String customToken = getAuthToken(customEPerson.getEmail(), customPassword);
+        try {
+            String customToken = getAuthToken(customEPerson.getEmail(), customPassword);
 
-        getClient(customToken).perform(
-            post("/api/eperson/epersons/" + customEPerson.getID())
-                .param("token", validationRegistration.getToken())
-        ).andExpect(status().isCreated())
-        .andExpect(
-            jsonPath("$.netid", equalTo("0000-0000-0000-0000"))
-        )
-        .andExpect(
-            jsonPath("$.metadata",
-                 Matchers.allOf(
-                     MetadataMatcher.matchMetadata("eperson.firstname", "Vins"),
-                     MetadataMatcher.matchMetadata("eperson.lastname", "4Science"),
-                     MetadataMatcher.matchMetadata("eperson.orcid", "0000-0000-0000-0000")
-                 )
-            )
-        );
+            getClient(customToken).perform(
+                                      post("/api/eperson/epersons/" + customEPerson.getID())
+                                          .param("token", validationRegistration.getToken())
+                                  ).andExpect(status().isCreated())
+                                  .andExpect(
+                                      jsonPath("$.netid", equalTo("0000-0000-0000-0000"))
+                                  )
+                                  .andExpect(
+                                      jsonPath("$.metadata",
+                                               Matchers.allOf(
+                                                   MetadataMatcher.matchMetadata("eperson.firstname", "Vins"),
+                                                   MetadataMatcher.matchMetadata("eperson.lastname", "4Science"),
+                                                   MetadataMatcher.matchMetadata("eperson.orcid", "0000-0000-0000-0000")
+                                               )
+                                      )
+                                  );
+        } finally {
+            RegistrationData found = context.reloadEntity(validationRegistration);
+            if (found != null) {
+                this.registrationDataService.delete(context, found);
+            }
+        }
+
 
     }
 
@@ -269,32 +311,41 @@ public class EPersonRegistrationRestControllerIT extends AbstractControllerInteg
 
         context.turnOffAuthorisationSystem();
         RegistrationDataChanges changes =
-            new RegistrationDataChanges("vincenzo.mecca@4science.com", RegistrationTypeEnum.VALIDATION_ORCID);
+            new RegistrationDataChanges("vins-01@fake.mail", RegistrationTypeEnum.VALIDATION_ORCID);
         RegistrationData validationRegistration =
             this.accountService.renewRegistrationForEmail(
                 context, new RegistrationDataPatch(orcidRegistration, changes)
             );
         context.restoreAuthSystemState();
 
-        String customToken = getAuthToken(customEPerson.getEmail(), customPassword);
+        try {
+            String customToken = getAuthToken(customEPerson.getEmail(), customPassword);
 
-        getClient(customToken).perform(
-              post("/api/eperson/epersons/" + customEPerson.getID())
-                  .param("token", validationRegistration.getToken())
-                  .param("override", "eperson.firstname,eperson.lastname")
-          ).andExpect(status().isCreated())
-          .andExpect(
-              jsonPath("$.netid", equalTo("0000-0000-0000-0000"))
-          )
-          .andExpect(
-              jsonPath("$.metadata",
-                       Matchers.allOf(
-                           MetadataMatcher.matchMetadata("eperson.firstname", "Vincenzo"),
-                           MetadataMatcher.matchMetadata("eperson.lastname", "Mecca"),
-                           MetadataMatcher.matchMetadata("eperson.orcid", "0000-0000-0000-0000")
-                       )
-              )
-          );
+            getClient(customToken).perform(
+                                      post("/api/eperson/epersons/" + customEPerson.getID())
+                                          .param("token", validationRegistration.getToken())
+                                          .param("override", "eperson.firstname,eperson.lastname")
+                                  )
+                                  .andExpect(status().isCreated())
+                                  .andExpect(
+                                      jsonPath("$.netid", equalTo("0000-0000-0000-0000"))
+                                  )
+                                  .andExpect(
+                                      jsonPath("$.metadata",
+                                               Matchers.allOf(
+                                                   MetadataMatcher.matchMetadata("eperson.firstname", "Vincenzo"),
+                                                   MetadataMatcher.matchMetadata("eperson.lastname", "Mecca"),
+                                                   MetadataMatcher.matchMetadata("eperson.orcid", "0000-0000-0000-0000")
+                                               )
+                                      )
+                                  );
+
+        } finally {
+            RegistrationData found = context.reloadEntity(validationRegistration);
+            if (found != null) {
+                this.registrationDataService.delete(context, found);
+            }
+        }
 
     }
 
@@ -308,35 +359,45 @@ public class EPersonRegistrationRestControllerIT extends AbstractControllerInteg
 
         context.turnOffAuthorisationSystem();
         RegistrationDataChanges changes =
-            new RegistrationDataChanges("vincenzo.mecca@4science.com", RegistrationTypeEnum.VALIDATION_ORCID);
+            new RegistrationDataChanges("vins-01@fake.mail", RegistrationTypeEnum.VALIDATION_ORCID);
         RegistrationData validationRegistration =
             this.accountService.renewRegistrationForEmail(
                 context, new RegistrationDataPatch(orcidRegistration, changes)
             );
-        context.restoreAuthSystemState();
 
-        String customToken = getAuthToken(customEPerson.getEmail(), customPassword);
+        try {
 
-        getClient(customToken).perform(
-                                  post("/api/eperson/epersons/" + customEPerson.getID())
-                                      .param("token", validationRegistration.getToken())
-                                      .param("override", "eperson.phone")
-                              ).andExpect(status().isBadRequest());
+            context.restoreAuthSystemState();
 
-        context.turnOffAuthorisationSystem();
-        MetadataField phoneMf =
-            metadataFieldService.findByElement(context, "eperson", "phone", null);
+            String customToken = getAuthToken(customEPerson.getEmail(), customPassword);
 
-        registrationDataService.addMetadata(
-            context, validationRegistration, phoneMf, "1234567890"
-        );
-        context.restoreAuthSystemState();
+            getClient(customToken).perform(
+                post("/api/eperson/epersons/" + customEPerson.getID())
+                    .param("token", validationRegistration.getToken())
+                    .param("override", "eperson.phone")
+            ).andExpect(status().isBadRequest());
 
-        getClient(customToken).perform(
-            post("/api/eperson/epersons/" + customEPerson.getID())
-                .param("token", validationRegistration.getToken())
-                .param("override", "eperson.phone")
-        ).andExpect(status().isBadRequest());
+            context.turnOffAuthorisationSystem();
+            MetadataField phoneMf =
+                metadataFieldService.findByElement(context, "eperson", "phone", null);
+
+            registrationDataService.addMetadata(
+                context, validationRegistration, phoneMf, "1234567890"
+            );
+            context.restoreAuthSystemState();
+
+            getClient(customToken).perform(
+                post("/api/eperson/epersons/" + customEPerson.getID())
+                    .param("token", validationRegistration.getToken())
+                    .param("override", "eperson.phone")
+            ).andExpect(status().isBadRequest());
+
+        } finally {
+            RegistrationData found = context.reloadEntity(validationRegistration);
+            if (found != null) {
+                this.registrationDataService.delete(context, found);
+            }
+        }
 
     }
 

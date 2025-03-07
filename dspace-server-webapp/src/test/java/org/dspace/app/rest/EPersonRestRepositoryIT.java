@@ -3208,7 +3208,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.turnOffAuthorisationSystem();
 
-        String registrationEmail = "vincenzo.mecca@4science.com";
+        String registrationEmail = "vins-01@fake.mail";
         RegistrationData orcidRegistration =
             createRegistrationData(RegistrationTypeEnum.ORCID, registrationEmail);
 
@@ -3249,7 +3249,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         context.turnOffAuthorisationSystem();
 
-        String registrationEmail = "vincenzo.mecca@4science.com";
+        String registrationEmail = "vins-01@fake.mail";
         RegistrationData orcidRegistration =
             createRegistrationData(RegistrationTypeEnum.VALIDATION_ORCID, registrationEmail);
 

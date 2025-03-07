@@ -31,6 +31,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * This controller is responsible to handle {@link org.dspace.eperson.RegistrationData}
+ * of a given {@link org.dspace.eperson.EPerson}
+ *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
 @RestController

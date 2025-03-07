@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.rest.DiscoverableEndpointsService;
+import org.dspace.app.rest.EPersonRegistrationRestController;
 import org.dspace.app.rest.Parameter;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.exception.DSpaceBadRequestException;
@@ -382,6 +383,17 @@ public class EPersonRestRepository extends DSpaceObjectRestRepository<EPerson, E
         return EPersonRest.class;
     }
 
+    /**
+     * This method tries to merge the details coming from the {@link EPersonRegistrationRestController} of a given
+     * {@code uuid} eperson. <br/>
+     *
+     * @param context - The Dspace Context
+     * @param uuid - The uuid of the eperson
+     * @param token - A valid registration token
+     * @param override - An optional list of metadata fields that will be overwritten
+     * @return a EPersonRest entity updated with the registration data.
+     * @throws AuthorizeException
+     */
     public EPersonRest mergeFromRegistrationData(
         Context context, UUID uuid, String token, List<String> override
     ) throws AuthorizeException {

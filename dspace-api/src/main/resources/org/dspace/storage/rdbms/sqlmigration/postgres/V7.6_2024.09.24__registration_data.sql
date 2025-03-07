@@ -12,11 +12,11 @@
 
 DO $$
 	BEGIN
-	EXECUTE 'ALTER TABLE registrationdata DROP CONSTRAINT ' ||
+	EXECUTE 'ALTER TABLE registrationdata DROP CONSTRAINT IF EXISTS ' ||
 		QUOTE_IDENT((
 			SELECT CONSTRAINT_NAME
 			FROM information_schema.key_column_usage
-			WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = 'registrationdata' AND COLUMN_NAME = 'email'
+			WHERE TABLE_NAME = 'registrationdata' AND COLUMN_NAME = 'email'
 	  ));
 	end
 $$;

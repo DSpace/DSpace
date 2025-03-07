@@ -684,7 +684,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         assertThat(registrationData.getToken(), not(emptyOrNullString()));
 
         String token = registrationData.getToken();
-        String newMail = "vincenzo.mecca@4science.com";
+        String newMail = "vins-01@fake.mail";
         String patchContent = getPatchContent(
             List.of(new ReplaceOperation("/email", newMail))
         );
@@ -709,7 +709,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         assertThat(registrationData.getToken(), not(emptyOrNullString()));
 
         String token = registrationData.getToken();
-        String newMail = "vincenzo.mecca@4science.com";
+        String newMail = "vins-01@fake.mail";
         String patchContent = getPatchContent(
             List.of(new AddOperation("/email", newMail))
         );
@@ -746,7 +746,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         assertThat(registrationData.getToken(), not(emptyOrNullString()));
 
         String token = registrationData.getToken();
-        String newMail = "vincenzo.mecca@4science.com";
+        String newMail = "vins-01@fake.mail";
         String patchContent = getPatchContent(
             List.of(new ReplaceOperation("/email", newMail))
         );
@@ -780,7 +780,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         assertThat(registrationData.getToken(), not(emptyOrNullString()));
 
         String token = registrationData.getToken();
-        String newMail = "vincenzo.mecca@4science.com";
+        String newMail = "vins-01@fake.mail";
         String patchContent = getPatchContent(
             List.of(new AddOperation("/email", newMail))
         );
@@ -814,7 +814,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         assertThat(registrationData.getToken(), not(emptyOrNullString()));
 
         String token = registrationData.getToken();
-        String newMail = "vincenzo.mecca@4science.com";
+        String newMail = "vins-01@fake.mail";
         String patchContent = getPatchContent(
             List.of(new AddOperation("/email", newMail))
         );
@@ -878,7 +878,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         assertThat(registrationData.getToken(), not(emptyOrNullString()));
 
         token = registrationData.getToken();
-        newMail = "vincenzo.mecca@4science.com";
+        newMail = "vins-01@fake.mail";
         patchContent = getPatchContent(
             List.of(new ReplaceOperation("/email", newMail))
         );
@@ -929,7 +929,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         context.turnOffAuthorisationSystem();
         final EPerson vins =
             EPersonBuilder.createEPerson(context)
-                          .withEmail("vincenzo.mecca@4science.com")
+                          .withEmail("vins-01@fake.mail")
                           .withNameInMetadata("Vincenzo", "Mecca")
                           .withOrcid("0101-0101-0101-0101")
                           .build();
@@ -974,7 +974,7 @@ public class RegistrationRestRepositoryIT extends AbstractControllerIntegrationT
         context.turnOffAuthorisationSystem();
         final EPerson vins =
             EPersonBuilder.createEPerson(context)
-                          .withEmail("vincenzo.mecca@4science.com")
+                          .withEmail("vins-01@fake.mail")
                           .withNameInMetadata("Vincenzo", "Mecca")
                           .withOrcid("0101-0101-0101-0101")
                           .build();

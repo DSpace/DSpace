@@ -10,6 +10,8 @@ package org.dspace.eperson.dto;
 import org.dspace.eperson.RegistrationData;
 
 /**
+ * This POJO encapsulates the details of the PATCH request that updates the {@link RegistrationData}.
+ * 
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
 public class RegistrationDataPatch {
@@ -22,10 +24,20 @@ public class RegistrationDataPatch {
         this.changes = changes;
     }
 
+    /**
+     * Returns the value of the previous registration
+     *
+     * @return RegistrationData
+     */
     public RegistrationData getOldRegistration() {
         return oldRegistration;
     }
 
+    /**
+     * Returns the changes related to the registration
+     *
+     * @return RegistrationDataChanges
+     */
     public RegistrationDataChanges getChanges() {
         return changes;
     }

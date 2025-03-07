@@ -10,13 +10,14 @@ package org.dspace.eperson.dto;
 import org.dspace.eperson.RegistrationTypeEnum;
 
 /**
+ * Class that embeds a change done for the {@link org.dspace.eperson.RegistrationData}
+ *
  * @author Vincenzo Mecca (vins01-4science - vincenzo.mecca at 4science.com)
  **/
 public class RegistrationDataChanges {
 
-    private static final String EMAIL_PATTERN =
-        "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)" +
-            "+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?";
+    @SuppressWarnings("checkstyle:LineLength")
+    private static final String EMAIL_PATTERN = "^[a-zA-Z0-9.!#$%&'*+\\\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$";
 
     private final String email;
     private final RegistrationTypeEnum registrationType;
@@ -35,14 +36,28 @@ public class RegistrationDataChanges {
         this.registrationType = type;
     }
 
+    /**
+     * Checks if the email is valid using the EMAIL_PATTERN.
+     * @return true if valid, false otherwise
+     */
     public boolean isValidEmail() {
         return email.matches(EMAIL_PATTERN);
     }
 
+    /**
+     * Returns the email of change.
+     *
+     * @return the email of the change
+     */
     public String getEmail() {
         return email;
     }
 
+    /**
+     * Returns the {@link RegistrationTypeEnum} of the registration.
+     *
+     * @return the type of the change
+     */
     public RegistrationTypeEnum getRegistrationType() {
         return registrationType;
     }
