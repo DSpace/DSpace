@@ -208,7 +208,7 @@ public class LoginAsEPersonIT extends AbstractControllerIntegrationTest {
             getClient(authToken).perform(get("/api/submission/workspaceitems/" + wsi.get())
                                             .param("embed", "submitter"))
                                 .andExpect(jsonPath("$._embedded.submitter",
-                                                    EPersonMatcher.matchEPersonOnEmail(eperson.getEmail())));
+                                                    EPersonMatcher.matchProperties(eperson)));
 
         } finally {
             WorkspaceItemBuilder.deleteWorkspaceItem(wsi.get());
