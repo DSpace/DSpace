@@ -159,7 +159,7 @@ public class ItemIndexFactoryImpl extends DSpaceObjectIndexFactoryImpl<Indexable
             "discovery.index.item.submitter.enabled", false))) {
             doc.addField("submitter_authority", submitter.getID().toString());
         } else if (submitter != null) {
-            addFacetIndex(doc, "submitter", submitter.getID().toString(), submitter.getFullName());
+            addFacetIndex(doc, "submitter", submitter.getID().toString(), epersonService.getFullName(submitter));
         }
 
         // Add the item metadata

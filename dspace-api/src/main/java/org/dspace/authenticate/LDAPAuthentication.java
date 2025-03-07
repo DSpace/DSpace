@@ -387,10 +387,10 @@ public class LDAPAuthentication implements AuthenticationMethod {
             eperson.setEmail(ldap.ldapEmail);
         }
         if (StringUtils.isNotEmpty(ldap.ldapGivenName)) {
-            eperson.setFirstName(context, ldap.ldapGivenName);
+            ePersonService.setFirstName(context, eperson, ldap.ldapGivenName);
         }
         if (StringUtils.isNotEmpty(ldap.ldapSurname)) {
-            eperson.setLastName(context, ldap.ldapSurname);
+            ePersonService.setLastName(context, eperson, ldap.ldapSurname);
         }
         if (StringUtils.isNotEmpty(ldap.ldapPhone)) {
             ePersonService.setMetadataSingleValue(context, eperson, MD_PHONE, ldap.ldapPhone, null);
