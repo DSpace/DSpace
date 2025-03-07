@@ -89,11 +89,12 @@ public interface AccountService {
     ) throws AuthorizeException, SQLException;
 
     /**
+     * This method creates a fresh new {@link RegistrationData} based on the {@link RegistrationDataPatch} requested
+     * by a given user.
      *
-     *
-     * @param context
-     * @param registrationDataPatch
-     * @return
+     * @param context - The DSapce Context
+     * @param registrationDataPatch - Details of the patch request coming from the Controller
+     * @return a newly created {@link RegistrationData}
      * @throws AuthorizeException
      */
     RegistrationData renewRegistrationForEmail(
