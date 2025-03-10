@@ -140,22 +140,6 @@ public class MetadataExportFilteredItemsReportIT extends AbstractIntegrationTest
             .toArray(Item[]::new);
     }
 
-    /*private Item[] itemsForAuthor(String author) {
-        return items.entrySet().stream()
-            .filter(e -> Objects.equals(author, e.getKey().author()))
-            .map(Map.Entry::getValue)
-            .flatMap(List::stream)
-            .toArray(Item[]::new);
-    }
-
-    private Item[] itemsForSubjectAndAuthor(String subject, String author) {
-        return items.entrySet().stream()
-            .filter(e -> Objects.equals(subject, e.getKey().subject()) && Objects.equals(author, e.getKey().author()))
-            .map(Map.Entry::getValue)
-            .flatMap(List::stream)
-            .toArray(Item[]::new);
-    }*/
-
     @Test
     public void metadataExportFindAllTest() throws Exception {
         int result = runDSpaceScript("metadata-export-filtered-items-report", "-n", filename);

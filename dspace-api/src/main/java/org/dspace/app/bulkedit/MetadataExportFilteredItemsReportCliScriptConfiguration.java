@@ -22,8 +22,8 @@ public class MetadataExportFilteredItemsReportCliScriptConfiguration
     @Override
     public Options getOptions() {
         Options options = super.getOptions();
-        options.addOption("n", "filename", true, "the filename to export to");
-        return super.getOptions();
+        options.addOption("n", "filename", true, "the filename to export to (default: filtered-items-export.csv)");
+        return options;
     }
 
 }

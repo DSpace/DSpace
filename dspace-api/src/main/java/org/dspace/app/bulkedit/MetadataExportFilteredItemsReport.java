@@ -117,8 +117,6 @@ public class MetadataExportFilteredItemsReport extends DSpaceRunnable
         List<QueryPredicate> predicates = List.of();
         if (queryPredicates != null) {
             predicates = arrayToStream(queryPredicates)
-                    .map(preds -> preds.split("[,; ]"))
-                    .flatMap(Arrays::stream)
                     .filter(StringUtils::isNotBlank)
                     .map(pred -> buildPredicate(context, pred))
                     .collect(Collectors.toList());
@@ -148,7 +146,7 @@ public class MetadataExportFilteredItemsReport extends DSpaceRunnable
     }
 
     protected void loghelpinfo() {
-        handler.logInfo("metadata-export");
+        handler.logInfo("metadata-export-filtered-items-report");
     }
 
     protected String getFileNameOrExportFile() {

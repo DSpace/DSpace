@@ -8,6 +8,10 @@
 
 package org.dspace.app.bulkedit;
 
+import java.util.Optional;
+
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * The CLI version of the {@link MetadataExportFilteredItemsReport} script
  *
@@ -17,7 +21,9 @@ public class MetadataExportFilteredItemsReportCli extends MetadataExportFiltered
 
     @Override
     protected String getFileNameOrExportFile() {
-        return commandLine.getOptionValue('n');
+        return Optional.ofNullable(commandLine.getOptionValue('n'))
+                .filter(StringUtils::isNotBlank)
+                .orElse("filtered-items-export.csv");
     }
 
 }

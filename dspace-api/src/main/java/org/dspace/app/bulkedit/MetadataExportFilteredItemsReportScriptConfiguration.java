@@ -36,10 +36,10 @@ public class MetadataExportFilteredItemsReportScriptConfiguration<T extends Meta
         if (options == null) {
             Options options = new Options();
             options.addOption("c", "collections", true,
-                "Collections to search for eligible records");
+                "UUIDs of collections to search for eligible records");
             options.getOption("c").setType(String.class);
             options.addOption("qp", "queryPredicates", true,
-                "Predicates used as criteria to filter records");
+                "Predicates or field queries used as criteria to filter records");
             options.getOption("qp").setType(String.class);
             options.addOption("f", "filters", true, """
                 Filters from the org.dspace.contentreport.Filter enumeration
