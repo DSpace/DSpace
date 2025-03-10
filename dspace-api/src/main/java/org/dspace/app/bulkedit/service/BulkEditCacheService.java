@@ -10,6 +10,7 @@ import org.dspace.app.bulkedit.MetadataImportException;
 import org.dspace.core.Context;
 
 public interface BulkEditCacheService {
+    void resetCache();
     void populateRefAndRowMap(Map<String, List<String>> values, Integer row, @Nullable UUID uuid);
     void populateEntityRelationMap(String refUUID, String relationField, String originId);
     Set<UUID> getMatchingCSVUUIDs(String mdValueRef);

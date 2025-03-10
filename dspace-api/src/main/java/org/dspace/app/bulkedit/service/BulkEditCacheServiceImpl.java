@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
@@ -41,24 +42,32 @@ public class BulkEditCacheServiceImpl implements BulkEditCacheService {
     /**
      * Map of field:value to csv row number, used to resolve indirect entity target references.
      */
-    protected Map<String, Set<Integer>> csvRefMap = new HashMap<>();
+    protected Map<String, Set<Integer>> csvRefMap = new ConcurrentHashMap<>();
 
     /**
      * Map of csv row number to UUID, used to resolve indirect entity target references.
      */
-    protected HashMap<Integer, UUID> csvRowMap = new HashMap<>();
+    protected Map<Integer, UUID> csvRowMap = new ConcurrentHashMap<>();
 
     /**
      * Map of UUIDs to their entity types.
      */
-    protected HashMap<UUID, String> entityTypeMap = new HashMap<>();
+    protected Map<UUID, String> entityTypeMap = new ConcurrentHashMap<>();
 
     /**
      * Map of UUIDs to their relations that are referenced within any import with their referrers.
      */
-    protected HashMap<String, HashMap<String, ArrayList<String>>> entityRelationMap = new HashMap<>();
+    protected Map<String, HashMap<String, ArrayList<String>>> entityRelationMap = new ConcurrentHashMap<>();
 
     protected ArrayList<String> relationValidationErrors = new ArrayList<>();
+
+    @Override
+    public void resetCache() {
+        csvRefMap = new ConcurrentHashMap<>();
+        csvRowMap = new ConcurrentHashMap<>();
+        entityTypeMap = new ConcurrentHashMap<>();
+        entityRelationMap = new ConcurrentHashMap<>();
+    }
 
     /**
      * Populates the csvRefMap, csvRowMap, and entityTypeMap for the given csv line.
