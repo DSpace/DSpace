@@ -49,7 +49,8 @@ public class PublicationLoaderRunnableCli extends PublicationLoaderRunnable {
         // in case of CLI we show the help prompt
         if (commandLine.hasOption('h')) {
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("Import Researcher Suggestions", getScriptConfiguration().getOptions());
+            formatter.printHelp("Imports suggestions from external providers for publication claim",
+                                getScriptConfiguration().getOptions());
             System.exit(0);
         }
     }
