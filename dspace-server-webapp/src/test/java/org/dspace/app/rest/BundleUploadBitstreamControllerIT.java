@@ -48,6 +48,9 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
     @Autowired
     private AuthorizeService authorizeService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     @Test
     public void uploadBitstreamAllPossibleFieldsProperties() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -99,7 +102,6 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
         metadataRest.put("dc.title", title);
 
         bitstreamRest.setMetadata(metadataRest);
-        ObjectMapper mapper = new ObjectMapper();
 
         context.restoreAuthSystemState();
         MvcResult mvcResult = getClient(token).perform(
@@ -175,8 +177,6 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
                 .andExpect(jsonPath("$.sequenceId", is(1)))
                 .andReturn();
 
-        ObjectMapper mapper = new ObjectMapper();
-
         String content = mvcResult.getResponse().getContentAsString();
         Map<String, Object> map = mapper.readValue(content, Map.class);
         String bitstreamId = String.valueOf(map.get("id"));
@@ -227,8 +227,6 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
                                                .file(file))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.uuid", notNullValue())).andReturn();
-
-        ObjectMapper mapper = new ObjectMapper();
 
         String content = mvcResult.getResponse().getContentAsString();
         Map<String, Object> map = mapper.readValue(content, Map.class);
@@ -361,9 +359,6 @@ public class BundleUploadBitstreamControllerIT extends AbstractEntityIntegration
                                                        input.getBytes());
 
         BitstreamRest bitstreamRest = new BitstreamRest();
-
-        ObjectMapper mapper = new ObjectMapper();
-
 
         context.restoreAuthSystemState();
         MvcResult mvcResult = getClient(token)

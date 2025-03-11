@@ -7,7 +7,7 @@
  */
 package org.dspace.eperson;
 
-import java.util.Date;
+import java.time.Instant;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,8 +16,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 
@@ -43,8 +41,7 @@ public class RegistrationData implements ReloadableEntity<Integer> {
     private String token;
 
     @Column(name = "expires")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date expires;
+    private Instant expires;
 
     /**
      * Protected constructor, create object using:
@@ -74,11 +71,11 @@ public class RegistrationData implements ReloadableEntity<Integer> {
         this.token = token;
     }
 
-    public Date getExpires() {
+    public Instant getExpires() {
         return expires;
     }
 
-    void setExpires(Date expires) {
+    void setExpires(Instant expires) {
         this.expires = expires;
     }
 }
