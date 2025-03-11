@@ -22,12 +22,13 @@ public interface AccessStatusHelper {
      * Calculate the access status for the item.
      *
      * @param context the DSpace context
-     * @param item    the item
+     * @param item the item
      * @param threshold the embargo threshold date
+     * @param type the type of calculation
      * @return an access status value
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public String getAccessStatusFromItem(Context context, Item item, LocalDate threshold)
+    public String getAccessStatusFromItem(Context context, Item item, LocalDate threshold, String type)
         throws SQLException;
 
     /**
@@ -47,10 +48,11 @@ public interface AccessStatusHelper {
      * @param context the DSpace context
      * @param bitstream the bitstream to check for embargo information
      * @param threshold the embargo threshold date
+     * @param type the type of calculation
      * @return an availability date
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public LocalDate getAvailabilityDateFromBitstream(Context context, Bitstream bitstream, LocalDate threshold)
+    public LocalDate getAvailabilityDateFromBitstream(Context context, Bitstream bitstream, LocalDate threshold, String type)
         throws SQLException;
 
     /**
