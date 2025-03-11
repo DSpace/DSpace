@@ -75,16 +75,20 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
      * @param context     the DSpace context
      * @param item        the item to check for embargoes
      * @param threshold   the embargo threshold date
+     * @param type        the type of calculation
      * @return an access status value
      */
     @Override
-    public String getAccessStatusFromItem(Context context, Item item, LocalDate threshold)
+    public String getAccessStatusFromItem(Context context, Item item, LocalDate threshold, String type)
             throws SQLException {
         if (item == null) {
             return UNKNOWN;
         }
         Bitstream bitstream = getPrimaryOrFirstBitstreamInOriginalBundle(item);
-        return calculateAccessStatusForDso(context, bitstream, threshold);
+        if (bitstream == null) {
+            return METADATA_ONLY;
+        }
+        return calculateAccessStatusForDso(context, bitstream, threshold, type);
     }
 
     /**
@@ -102,13 +106,9 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
      * @param threshold   the embargo threshold date
      * @return an access status value
      */
-    private String calculateAccessStatusForDso(Context context, DSpaceObject dso, LocalDate threshold)
+    private String calculateAccessStatusForDso(Context context, DSpaceObject dso, LocalDate threshold, String type)
             throws SQLException {
-        if (dso == null) {
-            return METADATA_ONLY;
-        }
-        // Only calculate the status for the anonymous group read policies
-        List<ResourcePolicy> policies = getAnonymousReadPolicies(context, dso);
+        List<ResourcePolicy> policies = getReadPolicies(context, dso, type);
         LocalDate availabilityDate = findAvailabilityDate(policies, threshold);
         // Get the access status based on the availability date
         return getAccessStatusFromAvailabilityDate(availabilityDate, threshold);
@@ -163,7 +163,9 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
         if (bitstream == null) {
             return null;
         }
-        LocalDate availabilityDate = retrieveAvailabilityDateForAnonymousUsers(context, bitstream, threshold);
+        // Only calculate the status for the anonymous group read policies
+        List<ResourcePolicy> policies = getAnonymousReadPolicies(context, bitstream);
+        LocalDate availabilityDate = findAvailabilityDate(policies, threshold);
         // If the date is null, it's an open access
         // If the date is equal of after the threshold, it's a restriction
         if (availabilityDate == null || !availabilityDate.isBefore(threshold)) {
@@ -175,15 +177,28 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
     /**
      * Look at the current user bitstream policies to retrieve its availability date.
      *
+     * If the bitstream is null, simply returns no date.
+     * 
      * @param context       the DSpace context
      * @param bitstream     the bitstream
      * @param threshold     the embargo threshold date
+     * @param type          the type of calculation
      * @return an availability date
      */
     @Override
-    public LocalDate getAvailabilityDateFromBitstream(Context context, Bitstream bitstream, LocalDate threshold)
-            throws SQLException {
-        return retrieveAvailabilityDateForCurrentUser(context, bitstream, threshold);
+    public LocalDate getAvailabilityDateFromBitstream(Context context, Bitstream bitstream,
+            LocalDate threshold, String type) throws SQLException {
+        if (bitstream == null) {
+            return null;
+        }
+        // First, look if the user can read the bitstream
+        boolean canRead = authorizeService.authorizeActionBoolean(context, bitstream, Constants.READ);
+        // If the current user can read the bitstream, it can't be an embargo
+        if (canRead) {
+            return null;
+        }
+        List<ResourcePolicy> readPolicies = getReadPolicies(context, bitstream, type);
+        return findAvailabilityDate(readPolicies, threshold);
     }
 
     /**
@@ -215,28 +230,35 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
     }
 
     /**
-     * Look at the current user bitstream policies to retrieve its availability date.
+     * Retrieves the anonymous read policies for a DSpace object
      *
-     * If the bitstream is null, simply returns no date.
-     * 
-     * @param context       the DSpace context
-     * @param bitstream     the bitstream
-     * @param threshold     the embargo threshold date
-     * @return an availability date
+     * @param context   the DSpace context
+     * @param dso       the DSpace object
+     * @return a list of policies
      */
-    private LocalDate retrieveAvailabilityDateForCurrentUser(Context context, Bitstream bitstream, LocalDate threshold)
+    private List<ResourcePolicy> getAnonymousReadPolicies(Context context, DSpaceObject dso)
             throws SQLException {
-        if (bitstream == null) {
-            return null;
-        }
-        // First, look if the user can read the bitstream
-        boolean canRead = authorizeService.authorizeActionBoolean(context, bitstream, Constants.READ);
-        // If the current user can read the bitstream, it can't be an embargo
-        if (canRead) {
-            return null;
-        }
+        // Only consider read policies. Use the find without a group
+        // as it's not returning all expected values
+        List<ResourcePolicy> readPolicies = resourcePolicyService.find(context, dso, Constants.READ);
+        // Filter the policies with the anonymous group
+        List<ResourcePolicy> filteredPolicies = readPolicies.stream()
+            .filter(p -> StringUtils.equals(p.getGroup().getName(), Group.ANONYMOUS))
+            .collect(Collectors.toList());
+        return filteredPolicies;
+    }
+
+    /**
+     * Retrieves the current user read policies for a DSpace object
+     *
+     * @param context   the DSpace context
+     * @param dso       the DSpace object
+     * @return a list of policies
+     */
+    private List<ResourcePolicy> getCurrentUserReadPolicies(Context context, DSpaceObject dso)
+            throws SQLException {
         // Only consider read policies
-        List<ResourcePolicy> policies = resourcePolicyService.find(context, bitstream, Constants.READ);
+        List<ResourcePolicy> policies = resourcePolicyService.find(context, dso, Constants.READ);
         // Only calculate the embargo date for the current user
         EPerson currentUser = context.getCurrentUser();
         List<ResourcePolicy> readPolicies = new ArrayList<ResourcePolicy>();
@@ -251,40 +273,28 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
                 readPolicies.add(policy);
             }
         }
-        return findAvailabilityDate(readPolicies, threshold);
+        return readPolicies;
     }
 
     /**
-     * Look at the anonymous policies of the bitstream retrieve its availability date
-     *
-     * @param context       the DSpace context
-     * @param bitstream     the bitstream
-     * @param threshold     the embargo threshold date
-     * @return an availability date
-     */
-    private LocalDate retrieveAvailabilityDateForAnonymousUsers(Context context, Bitstream bitstream, LocalDate threshold)
-            throws SQLException {
-        // Only calculate the status for the anonymous group read policies
-        List<ResourcePolicy> policies = getAnonymousReadPolicies(context, bitstream);
-        return findAvailabilityDate(policies, threshold);
-    }
-
-    /**
-     * Retrieves the anonymous read policies for a DSpace object
+     * Retrieves the read policies for a DSpace object based on the type
+     * 
+     * If the type is current, consider the current logged in user
+     * If the type is anonymous, only consider the anonymous group
      *
      * @param context   the DSpace context
      * @param dso       the DSpace object
+     * @param type      the type of calculation
      * @return a list of policies
      */
-    private List<ResourcePolicy> getAnonymousReadPolicies(Context context, DSpaceObject dso) throws SQLException {
-        // Only consider read policies. Use the find without a group
-        // as it's not returning all expected values
-        List<ResourcePolicy> readPolicies = resourcePolicyService.find(context, dso, Constants.READ);
-        // Filter the policies with the anonymous group
-        List<ResourcePolicy> filteredPolicies = readPolicies.stream()
-            .filter(p -> StringUtils.equals(p.getGroup().getName(), Group.ANONYMOUS))
-            .collect(Collectors.toList());
-        return filteredPolicies;
+    private List<ResourcePolicy> getReadPolicies(Context context, DSpaceObject dso, String type)
+            throws SQLException {
+        if (StringUtils.equalsIgnoreCase(type, "current")) {
+            return getCurrentUserReadPolicies(context, dso);
+        } else {
+            // Only calculate the status for the anonymous group read policies
+            return getAnonymousReadPolicies(context, dso);
+        }
     }
 
     /**
