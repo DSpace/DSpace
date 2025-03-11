@@ -19,7 +19,8 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.suggestion.SolrSuggestionProvider;
 import org.dspace.app.suggestion.Suggestion;
 import org.dspace.app.suggestion.SuggestionEvidence;
-import org.dspace.app.suggestion.openaire.EvidenceScorer;
+import org.dspace.app.suggestion.scorer.AuthorNamesScorer;
+import org.dspace.app.suggestion.scorer.EvidenceScorer;
 import org.dspace.content.Item;
 import org.dspace.content.dto.MetadataValueDTO;
 import org.dspace.core.Context;
@@ -29,7 +30,7 @@ import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Class responsible to load and manage ImportRecords from OpenAIRE
+ * Class responsible to load and manage ImportRecords from external sources
  *
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
  *
@@ -67,7 +68,7 @@ public class PublicationLoader extends SolrSuggestionProvider {
      * This method filter a list of ImportRecords using a pipeline of AuthorNamesApprover
      * and return a filtered list of ImportRecords.
      *
-     * @see org.dspace.app.suggestion.openaire.AuthorNamesScorer
+     * @see AuthorNamesScorer
      * @param researcher the researcher Item
      * @param importRecords List of import record
      * @return a list of filtered import records
@@ -134,8 +135,8 @@ public class PublicationLoader extends SolrSuggestionProvider {
      * @return Suggestion
      */
     private Suggestion translateImportRecordToSuggestion(Item item, ExternalDataObject record) {
-        String openAireId = record.getId();
-        Suggestion suggestion = new Suggestion(getSourceName(), item, openAireId);
+        String recordId = record.getId();
+        Suggestion suggestion = new Suggestion(getSourceName(), item, recordId);
         suggestion.setDisplay(getFirstEntryByMetadatum(record, "dc", "title", null));
         suggestion.getMetadata().add(
             new MetadataValueDTO("dc", "title", null, null, getFirstEntryByMetadatum(record, "dc", "title", null)));
@@ -147,7 +148,7 @@ public class PublicationLoader extends SolrSuggestionProvider {
         suggestion.setExternalSourceUri(configurationService.getProperty("dspace.server.url")
                                             + "/api/integration/externalsources/" +
                                             primaryProvider.getSourceIdentifier() + "/entryValues/"
-                                            + openAireId);
+                                            + recordId);
         for (String o : getAllEntriesByMetadatum(record, "dc", "source", null)) {
             suggestion.getMetadata().add(new MetadataValueDTO("dc", "source", null, null, o));
         }
@@ -166,10 +167,10 @@ public class PublicationLoader extends SolrSuggestionProvider {
     }
 
     /**
-     * Load metadata from OpenAIRE using the import service. The service use the value
-     * get from metadata key defined in class level variable names as author to query OpenAIRE.
+     * Load metadata from external source using the import service. The service use the value
+     * get from metadata key defined in class level variable names as author to query external source.
      *
-     * @see org.dspace.importer.external.openaire.service.OpenAireImportMetadataSourceServiceImpl
+     * @see org.dspace.importer.external.service.AbstractImportMetadataSourceService
      * @param searchValues query
      * @param researcher item to extract metadata from
      * @param limit for pagination purpose

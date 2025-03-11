@@ -38,7 +38,7 @@
         <property name="pipeline">
             <list>
                 <bean
-                    class="org.dspace.app.suggestion.openaire.AuthorNamesScorer">
+                        class="org.dspace.app.suggestion.scorer.AuthorNamesScorer">
                     <property name="contributorMetadata">
                         <list>
                             <value>dc.contributor.author</value>
@@ -51,7 +51,7 @@
                     </property>
                 </bean>
                 <bean
-                    class="org.dspace.app.suggestion.openaire.DateScorer">
+                        class="org.dspace.app.suggestion.scorer.DateScorer">
                     <property name="birthDateMetadata" value="person.birthDate" />
                     <property name="publicationDateMetadata" value="dc.date.issued" />
                 </bean>    
@@ -77,7 +77,7 @@
         </property>
         <property name="pipeline">
             <list>
-                <bean class="org.dspace.app.suggestion.openaire.AuthorNamesScorer">
+                <bean class="org.dspace.app.suggestion.scorer.AuthorNamesScorer">
                     <property name="contributorMetadata">
                         <list>
                             <value>dc.contributor.author</value>
