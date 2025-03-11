@@ -16,8 +16,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import javax.inject.Inject;
 
+import jakarta.inject.Inject;
 import org.dspace.scripts.DSpaceRunnable;
 import org.json.JSONObject;
 import org.json.JSONTokener;
