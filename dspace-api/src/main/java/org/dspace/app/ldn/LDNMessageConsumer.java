@@ -11,9 +11,9 @@ import static java.lang.String.format;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -126,7 +126,7 @@ public class LDNMessageConsumer implements Consumer {
         ldnMessage.setObject(item);
         ldnMessage.setTarget(service);
         ldnMessage.setQueueStatus(LDNMessageEntity.QUEUE_STATUS_QUEUED);
-        ldnMessage.setQueueTimeout(new Date());
+        ldnMessage.setQueueTimeout(Instant.now());
 
         appendGeneratedMessage(ldn, ldnMessage, pattern);
 

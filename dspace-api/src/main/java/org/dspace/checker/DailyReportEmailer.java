@@ -11,8 +11,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 import jakarta.mail.MessagingException;
 import org.apache.commons.cli.CommandLine;
@@ -148,14 +148,9 @@ public class DailyReportEmailer {
 
         DailyReportEmailer emailer = new DailyReportEmailer();
 
-        // get dates for yesterday and tomorrow
-        GregorianCalendar calendar = new GregorianCalendar();
-        calendar.add(GregorianCalendar.DAY_OF_YEAR, -1);
-
-        Date yesterday = calendar.getTime();
-        calendar.add(GregorianCalendar.DAY_OF_YEAR, 2);
-
-        Date tomorrow = calendar.getTime();
+        // get dates for yesterday and tomorrow (start of day for both)
+        Instant yesterday = Instant.now().minus(1, ChronoUnit.DAYS).truncatedTo(ChronoUnit.DAYS);
+        Instant tomorrow = Instant.now().plus(1, ChronoUnit.DAYS).truncatedTo(ChronoUnit.DAYS);
 
         File report = null;
         FileWriter writer = null;

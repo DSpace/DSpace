@@ -305,7 +305,7 @@ public class OrcidQueueConsumer implements Consumer {
         }
 
         return findDeletedHistoryRecordsBySignature(records, historyRecord.getMetadata())
-            .anyMatch(record -> record.getTimestamp().after(historyRecord.getTimestamp()));
+            .anyMatch(record -> record.getTimestamp().isAfter(historyRecord.getTimestamp()));
     }
 
     private Stream<OrcidHistory> findDeletedHistoryRecordsBySignature(List<OrcidHistory> records, String signature) {

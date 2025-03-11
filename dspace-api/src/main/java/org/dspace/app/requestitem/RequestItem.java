@@ -7,7 +7,7 @@
  */
 package org.dspace.app.requestitem;
 
-import java.util.Date;
+import java.time.Instant;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,8 +19,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -63,16 +61,13 @@ public class RequestItem implements ReloadableEntity<Integer> {
     private boolean allfiles;
 
     @Column(name = "decision_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date decision_date = null;
+    private Instant decision_date = null;
 
     @Column(name = "expires")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date expires = null;
+    private Instant expires = null;
 
     @Column(name = "request_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date request_date = null;
+    private Instant request_date = null;
 
     @Column(name = "accept_request")
     private boolean accept_request;
@@ -161,11 +156,11 @@ public class RequestItem implements ReloadableEntity<Integer> {
         return bitstream;
     }
 
-    public Date getDecision_date() {
+    public Instant getDecision_date() {
         return decision_date;
     }
 
-    public void setDecision_date(Date decision_date) {
+    public void setDecision_date(Instant decision_date) {
         this.decision_date = decision_date;
     }
 
@@ -177,19 +172,19 @@ public class RequestItem implements ReloadableEntity<Integer> {
         this.accept_request = accept_request;
     }
 
-    public Date getExpires() {
+    public Instant getExpires() {
         return expires;
     }
 
-    void setExpires(Date expires) {
+    void setExpires(Instant expires) {
         this.expires = expires;
     }
 
-    public Date getRequest_date() {
+    public Instant getRequest_date() {
         return request_date;
     }
 
-    void setRequest_date(Date request_date) {
+    void setRequest_date(Instant request_date) {
         this.request_date = request_date;
     }
 }

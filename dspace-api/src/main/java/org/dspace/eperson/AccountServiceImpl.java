@@ -163,11 +163,6 @@ public class AccountServiceImpl implements AccountService {
             return null;
         }
 
-        /*
-         * ignore the expiration date on tokens Date expires =
-         * rd.getDateColumn("expires"); if (expires != null) { if ((new
-         * java.util.Date()).after(expires)) return null; }
-         */
         return registrationData.getEmail();
     }
 
