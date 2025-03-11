@@ -105,7 +105,7 @@ public class RestRepositoryUtils {
      */
     public Method getSearchMethod(String searchMethodName, DSpaceRestRepository repository) {
         Method searchMethod = null;
-        // DSpaceRestRepository is possibly enhanced with a Spring AOP proxy. Therefor use ClassUtils to determine
+        // DSpaceRestRepository is possibly enhanced with a Spring AOP proxy. Therefore use ClassUtils to determine
         // the underlying implementation class.
         Method[] methods = ClassUtils.getUserClass(repository.getClass()).getMethods();
         for (Method method : methods) {

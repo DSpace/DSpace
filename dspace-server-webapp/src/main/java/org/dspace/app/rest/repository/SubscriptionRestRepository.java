@@ -154,7 +154,7 @@ public class SubscriptionRestRepository extends DSpaceRestRepository<Subscriptio
         String dsoId = req.getParameter("resource");
 
         if (StringUtils.isBlank(dsoId) || StringUtils.isBlank(epersonId)) {
-            throw new UnprocessableEntityException("Both eperson than DSpaceObject uuids must be provieded!");
+            throw new UnprocessableEntityException("Both eperson than DSpaceObject uuids must be provided!");
         }
 
         try {

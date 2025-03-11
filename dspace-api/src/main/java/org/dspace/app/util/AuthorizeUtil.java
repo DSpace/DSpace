@@ -523,9 +523,9 @@ public class AuthorizeUtil {
 
         for (Collection coll : colls) {
             if (!AuthorizeConfiguration
-                .canCollectionAdminPerformItemReinstatiate()) {
+                .canCollectionAdminPerformItemReinstate()) {
                 if (AuthorizeConfiguration
-                    .canCommunityAdminPerformItemReinstatiate()
+                    .canCommunityAdminPerformItemReinstate()
                     && authorizeService.authorizeActionBoolean(context,
                                                                coll.getCommunities().get(0), Constants.ADMIN)) {
                     // authorized
@@ -624,7 +624,7 @@ public class AuthorizeUtil {
         throws SQLException {
         if (DSpaceServicesFactory.getInstance().getConfigurationService()
                                  .getBooleanProperty("user.registration", true)) {
-            // This allowSetPassword is currently the only mthod that would return true only when it's
+            // This allowSetPassword is currently the only method that would return true only when it's
             // actually expected to be returning true.
             // For example the LDAP canSelfRegister will return true due to auto-register, while that
             // does not imply a new user can register explicitly

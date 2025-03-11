@@ -22,7 +22,7 @@ public interface SuggestionService {
     /** find a {@link SuggestionTarget } by source name and suggestion id */
     public SuggestionTarget find(Context context, String source, UUID id);
 
-    /** count all suggetion targets by suggestion source */
+    /** count all suggestion targets by suggestion source */
     public long countAll(Context context, String source);
 
     /** find all suggestion targets by source (paged) */

@@ -174,7 +174,7 @@ public class EPerson extends CacheableDSpaceObject implements DSpaceObjectLegacy
     /**
      * Set the EPerson's language.  Value is expected to be a Unix/POSIX
      * Locale specification of the form {language} or {language}_{territory},
-     * e.g. "en", "en_US", "pt_BR" (the latter is Brazilian Portugese).
+     * e.g. "en", "en_US", "pt_BR" (the latter is Brazilian Portuguese).
      *
      * @param context  The relevant DSpace Context.
      * @param language language code

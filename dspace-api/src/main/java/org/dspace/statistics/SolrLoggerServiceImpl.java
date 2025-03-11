@@ -833,7 +833,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
         processor.execute(query);
 
-        // Add the new (updated onces
+        // Add the new (updated once
         for (int i = 0; i < docsToUpdate.size(); i++) {
             SolrInputDocument solrDocument = docsToUpdate.get(i);
 
@@ -1087,7 +1087,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         // performance and ensure the search result ordering will
         // not be influenced
 
-        // Choose to filter by isBot field, may be overriden in future
+        // Choose to filter by isBot field, may be overridden in future
         // to allow views on stats based on bots.
         if (defaultFilterQueries && configurationService.getBooleanProperty(
                 "solr-statistics.query.filter.isBot", true)) {
@@ -1226,7 +1226,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 try ( CloseableHttpClient hc = HttpClientBuilder.create().build(); ) {
                     HttpResponse response = hc.execute(get);
                     csvInputstream = response.getEntity().getContent();
-                    //Write the csv ouput to a file !
+                    //Write the csv output to a file !
                     FileUtils.copyInputStreamToFile(csvInputstream, csvFile);
                 }
                 filesToUpload.add(csvFile);
@@ -1573,7 +1573,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
      * The statistics shards should not be initialized until all tomcat webapps
      * are fully initialized.  DS-3457 uncovered an issue in DSpace 6x in which
      * this code triggered Tomcat to hang when statistics shards are present.
-     * This code is synchonized in the event that 2 threads trigger the
+     * This code is synchronized in the event that 2 threads trigger the
      * initialization at the same time.
      */
     protected synchronized void initSolrYearCores() {

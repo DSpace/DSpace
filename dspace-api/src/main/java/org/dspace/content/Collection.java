@@ -155,7 +155,7 @@ public class Collection extends CacheableDSpaceObject implements DSpaceObjectLeg
     /**
      * Set the default group of submitters
      *
-     * Package protected in order to preven unauthorized calls to this method
+     * Package protected in order to prevent unauthorized calls to this method
      *
      * @param submitters the group of submitters
      */
@@ -229,7 +229,7 @@ public class Collection extends CacheableDSpaceObject implements DSpaceObjectLeg
      * @throws SQLException if database error
      */
     public void setLicense(Context context, String license) throws SQLException {
-        getCollectionService().setMetadataSingleValue(context, this, MD_LICENSE, Item.ANY, license);
+        getCollectionService().setMetadataSingleValue(context, this, MD_LICENSE, null, license);
     }
 
     /**

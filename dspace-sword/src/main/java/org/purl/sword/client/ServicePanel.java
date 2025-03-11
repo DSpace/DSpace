@@ -429,7 +429,7 @@ public class ServicePanel extends JPanel
         String maxSize = "";
 
         // Commented out the following code as the client code is out of step with the
-        // Sword 'base' library and wont compile. - Robin Taylor.
+        // Sword 'base' library and won't compile. - Robin Taylor.
         //if ( service.maxUploadIsDefined() )
         //{
         //    maxSize = "" + service.getMaxUploadSize() + "kB";

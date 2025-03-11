@@ -32,7 +32,7 @@ public class AuthorityValueTest {
 
         // Test an invalid date.
         actual = AuthorityValue.stringToDate("not a date");
-        assertNull("Unparseable date should return null", actual);
+        assertNull("Unparsable date should return null", actual);
 
         // Test a date-time without zone or offset.
         expected = Date.from(LocalDateTime.of(1957, 01, 27, 01, 23, 45)

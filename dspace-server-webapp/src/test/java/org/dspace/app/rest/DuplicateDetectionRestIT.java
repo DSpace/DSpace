@@ -307,7 +307,7 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
     public void submissionSectionWorkspaceItemVisibilityTest() throws Exception {
         // Test publication
         context.turnOffAuthorisationSystem();
-        // Create a new collection with handle that maps to teh test-duplicate-detection submission config
+        // Create a new collection with handle that maps to the test-duplicate-detection submission config
         col = CollectionBuilder.createCollection(context, parentCommunity, "123456789/test-duplicate-detection")
                 .withName("Test Collection with Duplicate Detection")
                 .withWorkflowGroup(1, admin)
@@ -354,7 +354,7 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
 
     /**
      * If there is a potential duplicate that is also in workflow, it will
-     * ONLY be shown if the current user is in a worflow group for step 1, 2, or 3, or is an admin, or otherwise
+     * ONLY be shown if the current user is in a workflow group for step 1, 2, or 3, or is an admin, or otherwise
      * has READ permission
      *
      * @throws Exception
@@ -363,7 +363,7 @@ public class DuplicateDetectionRestIT extends AbstractControllerIntegrationTest 
     public void submissionSectionWorkflowItemVisibilityTest() throws Exception {
 
         context.turnOffAuthorisationSystem();
-        // Create a new collection with handle that maps to teh test-duplicate-detection submission config
+        // Create a new collection with handle that maps to the test-duplicate-detection submission config
         parentCommunity = CommunityBuilder.createCommunity(context).withName("Parent Community").build();
         Collection workflowCol = CollectionBuilder.createCollection(context, parentCommunity)
                 .withName("Test Collection with Duplicate Detection")

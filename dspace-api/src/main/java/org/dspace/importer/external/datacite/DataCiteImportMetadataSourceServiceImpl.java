@@ -36,7 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Implements a data source for querying Datacite
  * Mainly copied from CrossRefImportMetadataSourceServiceImpl.
  *
- * optional Affiliation informations are not part of the API request.
+ * optional Affiliation information are not part of the API request.
  * https://support.datacite.org/docs/can-i-see-more-detailed-affiliation-information-in-the-rest-api
  *
  * @author Pasquale Cavallo (pasquale.cavallo at 4science dot it)
@@ -52,6 +52,16 @@ public class DataCiteImportMetadataSourceServiceImpl
 
     @Autowired
     private ConfigurationService configurationService;
+
+    private String entityFilterQuery;
+
+    public String getEntityFilterQuery() {
+        return entityFilterQuery;
+    }
+
+    public void setEntityFilterQuery(String entityFilterQuery) {
+        this.entityFilterQuery = entityFilterQuery;
+    }
 
     @Override
     public String getImportSource() {
@@ -79,6 +89,9 @@ public class DataCiteImportMetadataSourceServiceImpl
         params.put("uriParameters", uriParameters);
         if (StringUtils.isBlank(id)) {
             id = query;
+        }
+        if (StringUtils.isNotBlank(getEntityFilterQuery())) {
+            id = id + " " + getEntityFilterQuery();
         }
         uriParameters.put("query", id);
         uriParameters.put("page[size]", "1");
@@ -117,6 +130,9 @@ public class DataCiteImportMetadataSourceServiceImpl
         params.put("uriParameters", uriParameters);
         if (StringUtils.isBlank(id)) {
             id = query;
+        }
+        if (StringUtils.isNotBlank(getEntityFilterQuery())) {
+            id = id + " " + getEntityFilterQuery();
         }
         uriParameters.put("query", id);
         // start = current dspace page / datacite page number starting with 1

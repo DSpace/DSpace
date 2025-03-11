@@ -193,7 +193,7 @@ public class Event implements Serializable {
      * Contains all identifiers of the DSpaceObject that was changed (added,
      * modified, deleted, ...).
      *
-     * All events gets fired when a context that contains events gets commited.
+     * All events gets fired when a context that contains events gets committed.
      * When the delete event is fired, a deleted DSpaceObject is already gone.
      * This array contains all identifiers of the object, not only the handle
      * as the detail field does. The field may be an empty array if no
