@@ -8,7 +8,6 @@
 package org.dspace.access.status;
 
 import java.sql.SQLException;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -310,7 +309,7 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
             return threshold;
         }
         LocalDate availabilityDate = null;
-        LocalDate currentDate = LocalDate.from(Instant.now());
+        LocalDate currentDate = LocalDate.now();
         boolean takeMostRecentDate = true;
         // Looks at all read policies
         for (ResourcePolicy policy : readPolicies) {

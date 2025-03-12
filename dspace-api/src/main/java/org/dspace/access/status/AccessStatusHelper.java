@@ -52,8 +52,8 @@ public interface AccessStatusHelper {
      * @return an availability date
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public LocalDate getAvailabilityDateFromBitstream(Context context, Bitstream bitstream, LocalDate threshold, String type)
-        throws SQLException;
+    public LocalDate getAvailabilityDateFromBitstream(Context context,
+        Bitstream bitstream, LocalDate threshold, String type) throws SQLException;
 
     /**
      * Look at the DSpace object availability date to determine an access status value.

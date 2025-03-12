@@ -9,7 +9,7 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.UUID;
 
 import jakarta.annotation.Nullable;
@@ -54,7 +54,7 @@ public class BitstreamAccessStatusLinkRepository extends AbstractDSpaceRestRepos
                 throw new ResourceNotFoundException("No such bitstream: " + bitstreamId);
             }
             AccessStatusRest accessStatusRest = new AccessStatusRest();
-            Date availabilityDate = accessStatusService.getAvailabilityDateFromBitstream(context, bitstream);
+            LocalDate availabilityDate = accessStatusService.getAvailabilityDateFromBitstream(context, bitstream);
             String status = accessStatusService.getAccessStatusFromAvailabilityDate(availabilityDate);
             if (status == DefaultAccessStatusHelper.EMBARGO) {
                 String embargoDate = availabilityDate.toString();
