@@ -190,12 +190,6 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
         if (bitstream == null) {
             return null;
         }
-        // First, look if the user can read the bitstream
-        boolean canRead = authorizeService.authorizeActionBoolean(context, bitstream, Constants.READ);
-        // If the current user can read the bitstream, it can't be an embargo
-        if (canRead) {
-            return null;
-        }
         List<ResourcePolicy> readPolicies = getReadPolicies(context, bitstream, type);
         return findAvailabilityDate(readPolicies, threshold);
     }
@@ -256,6 +250,13 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
      */
     private List<ResourcePolicy> getCurrentUserReadPolicies(Context context, DSpaceObject dso)
             throws SQLException {
+        // First, look if the current user can read the object
+        boolean canRead = authorizeService.authorizeActionBoolean(context, dso, Constants.READ);
+        // If it's true, it can't be an embargo or a restriction, shortcircuit the process
+        // and return a null value (indicating an open access)
+        if (canRead) {
+            return null;
+        }
         // Only consider read policies
         List<ResourcePolicy> policies = resourcePolicyService.find(context, dso, Constants.READ);
         // Only calculate the embargo date for the current user
@@ -304,6 +305,10 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
      * @return an availability date
      */
     private LocalDate findAvailabilityDate(List<ResourcePolicy> readPolicies, LocalDate threshold) {
+        // If the list is null, the object is readable
+        if (readPolicies == null) {
+            return null;
+        }
         // If there's no policies, return the threshold date (restriction)
         if (readPolicies.size() == 0) {
             return threshold;
@@ -314,7 +319,7 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
         // Looks at all read policies
         for (ResourcePolicy policy : readPolicies) {
             boolean isValid = resourcePolicyService.isDateValid(policy);
-            // If any policy is valid, the bitstream is accessible
+            // If any policy is valid, the object is accessible
             if (isValid) {
                 return null;
             }
