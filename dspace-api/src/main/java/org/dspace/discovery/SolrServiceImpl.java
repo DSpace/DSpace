@@ -41,6 +41,8 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.json.BucketBasedJsonFacet;
+import org.apache.solr.client.solrj.response.json.NestableJsonFacet;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -1105,13 +1107,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
      */
     private void resolveEntriesCount(DiscoverResult result, QueryResponse solrQueryResponse) {
 
-        Object facetsObj = solrQueryResponse.getResponse().get("facets");
-        if (facetsObj instanceof NamedList) {
-            NamedList<Object> facets = (NamedList<Object>) facetsObj;
-            Object bucketsInfoObj = facets.get("entries_count");
-            if (bucketsInfoObj instanceof NamedList) {
-                NamedList<Object> bucketsInfo = (NamedList<Object>) bucketsInfoObj;
-                result.setTotalEntries((int) bucketsInfo.get("numBuckets"));
+        NestableJsonFacet response = solrQueryResponse.getJsonFacetingResponse();
+        if (response != null) {
+            BucketBasedJsonFacet facet = response.getBucketBasedFacets("entries_count");
+            if (facet != null) {
+                result.setTotalEntries(facet.getNumBucketsCount());
             }
         }
     }
