@@ -149,8 +149,11 @@ public class LDNMessageDaoImpl extends AbstractHibernateDAO<LDNMessageEntity> im
         Predicate activityPredicate = null;
         andPredicates.add(
             criteriaBuilder.equal(root.get(LDNMessageEntity_.queueStatus), LDNMessageEntity.QUEUE_STATUS_PROCESSED));
+        // Added OR with object or context - inbound notifications make use of the context item to provide information
+        // about the repository item the notification refers to
         andPredicates.add(
-            criteriaBuilder.equal(root.get(LDNMessageEntity_.object), item));
+                criteriaBuilder.or(criteriaBuilder.equal(root.get(LDNMessageEntity_.object), item),
+                        criteriaBuilder.equal(root.get(LDNMessageEntity_.context), item)));
         if (activities != null && activities.length > 0) {
             activityPredicate = root.get(LDNMessageEntity_.activityStreamType).in(activities);
             andPredicates.add(activityPredicate);
