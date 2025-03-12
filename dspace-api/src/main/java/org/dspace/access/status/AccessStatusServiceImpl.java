@@ -11,7 +11,11 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dspace.access.status.service.AccessStatusService;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.service.PluginService;
@@ -22,10 +26,15 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Implementation for the access status calculation service.
  */
 public class AccessStatusServiceImpl implements AccessStatusService {
+    private static final Logger log = LogManager.getLogger(AccessStatusServiceImpl.class);
+
     // Plugin implementation, set from the DSpace configuration by init().
     protected AccessStatusHelper helper = null;
 
     protected LocalDate forever_date = null;
+
+    protected String itemCalculationType = null;
+    protected String bitstreamCalculationType = null;
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;
@@ -59,16 +68,40 @@ public class AccessStatusServiceImpl implements AccessStatusService {
                     .atStartOfDay()
                     .atZone(ZoneId.systemDefault())
                     .toLocalDate();
+
+            itemCalculationType = getAccessStatusCalculationType("access.status.for-user.item");
+            bitstreamCalculationType = getAccessStatusCalculationType("access.status.for-user.bitstream");
         }
     }
 
     @Override
     public String getAccessStatus(Context context, Item item) throws SQLException {
-        return helper.getAccessStatusFromItem(context, item, forever_date);
+        return helper.getAccessStatusFromItem(context, item, forever_date, itemCalculationType);
     }
 
     @Override
     public String getEmbargoFromItem(Context context, Item item) throws SQLException {
         return helper.getEmbargoFromItem(context, item, forever_date);
+    }
+
+    @Override
+    public LocalDate getAvailabilityDateFromBitstream(Context context, Bitstream bitstream) throws SQLException {
+        return helper.getAvailabilityDateFromBitstream(context, bitstream, forever_date, bitstreamCalculationType);
+    }
+
+    @Override
+    public String getAccessStatusFromAvailabilityDate(LocalDate availabilityDate) {
+        return helper.getAccessStatusFromAvailabilityDate(availabilityDate, forever_date);
+    }
+
+    private String getAccessStatusCalculationType(String key) {
+        String value = configurationService.getProperty(key);
+        if (StringUtils.equalsIgnoreCase(value, "anonymous")) {
+            return value;
+        } else if (StringUtils.equalsIgnoreCase(value, "current")) {
+            return value;
+        }
+        log.warn("The configuration parameter \"" + key + "\" contains an invalid value.");
+        return "anonymous";
     }
 }
