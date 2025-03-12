@@ -93,4 +93,11 @@
         <scope_note>Stores the timestamp related to the user authentication on ORCID</scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>dspace</schema>
+        <element>filtermedia</element>
+        <qualifier>lastdate</qualifier>
+        <scope_note>Last date filter-media was run</scope_note>
+    </dc-type>
+
 </dspace-dc-types>
