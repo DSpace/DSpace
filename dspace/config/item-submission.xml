@@ -63,6 +63,8 @@
         <name-map collection-entity-type="Journal" submission-name="Journal"/>
         <name-map collection-entity-type="JournalVolume" submission-name="JournalVolume"/>
         <name-map collection-entity-type="JournalIssue" submission-name="JournalIssue"/>
+        <name-map collection-entity-type="Product" submission-name="Product"/>
+        <name-map collection-entity-type="Patent" submission-name="Patent"/>
 
         <!-- Example of configuration using a community handle to map an Item Submission Process.
 
@@ -178,6 +180,17 @@
             <heading>submit.progressbar.accessCondition</heading>
             <processing-class>org.dspace.app.rest.submit.step.AccessConditionStep</processing-class>
             <type>accessCondition</type>
+        </step-definition>
+
+        <step-definition id="productStep" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
+        </step-definition>
+        <step-definition id="patentStep" mandatory="true">
+            <heading>submit.progressbar.describe.stepone</heading>
+            <processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
+            <type>submission-form</type>
         </step-definition>
 
         <!-- This optional step may enrich the current submission using information extracted
@@ -422,6 +435,24 @@
         <submission-process name="openaireOrganizationSubmission">
             <step id="collection"/>
             <step id="openaireOrganizationForm"/>
+        </submission-process>
+
+        <submission-process name="Product">
+
+            <step id="collection"/>
+            <step id="productStep"/>
+            <step id="upload"/>
+            <step id="license"/>
+
+        </submission-process>
+
+        <submission-process name="Patent">
+
+            <step id="collection"/>
+            <step id="patentStep"/>
+            <step id="upload"/>
+            <step id="license"/>
+
         </submission-process>
     </submission-definitions>
 
