@@ -237,7 +237,7 @@ public class StatisticsDataVisits extends StatisticsData {
                                              false, null, facetMinCount);
                         for (int j = 0; j < maxObjectCounts.length; j++) {
                             ObjectCount firstCount = maxObjectCounts[j];
-                            String newQuery = dataSetQuery.getFacetField() + ": " + ClientUtils
+                            String newQuery = dataSetQuery.getFacetField() + ":" + ClientUtils
                                 .escapeQueryChars(firstCount.getValue()) + " AND " + query;
                             ObjectCount[] maxDateFacetCounts = solrLoggerService
                                 .queryFacetDate(newQuery, filterQuery, dataSetQuery.getMax(), dateFacet.getDateType(),
@@ -813,7 +813,7 @@ public class StatisticsDataVisits extends StatisticsData {
             String query = "";
             //Check (& add if needed) the dsoType
             if (dsoType != -1) {
-                query += "type: " + dsoType;
+                query += "type:" + dsoType;
             }
 
             //Check (& add if needed) the dsoId
