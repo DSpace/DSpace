@@ -305,7 +305,7 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
      * @return an availability date
      */
     private LocalDate findAvailabilityDate(List<ResourcePolicy> readPolicies, LocalDate threshold) {
-        // If the list is null, the object is readable 
+        // If the list is null, the object is readable
         if (readPolicies == null) {
             return null;
         }
