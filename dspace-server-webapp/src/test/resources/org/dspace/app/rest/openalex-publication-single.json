@@ -248,23 +248,6 @@
       },
       "is_retracted": false,
       "is_paratext": false,
-      "primary_topic": {
-        "id": "https://openalex.org/T10602",
-        "display_name": "Glycosylation and Glycoproteins Research",
-        "score": 0.9678,
-        "subfield": {
-          "id": "https://openalex.org/subfields/1312",
-          "display_name": "Molecular Biology"
-        },
-        "field": {
-          "id": "https://openalex.org/fields/13",
-          "display_name": "Biochemistry, Genetics and Molecular Biology"
-        },
-        "domain": {
-          "id": "https://openalex.org/domains/1",
-          "display_name": "Life Sciences"
-        }
-      },
       "topics": [
         {
           "id": "https://openalex.org/T10602",
@@ -478,29 +461,6 @@
       "grants": [],
       "datasets": [],
       "versions": [],
-      "referenced_works_count": 20,
-      "referenced_works": [
-        "https://openalex.org/W1507976594",
-        "https://openalex.org/W1515052776",
-        "https://openalex.org/W1535643256",
-        "https://openalex.org/W1540384225",
-        "https://openalex.org/W1557790601",
-        "https://openalex.org/W1573055659",
-        "https://openalex.org/W1576013682",
-        "https://openalex.org/W195762992",
-        "https://openalex.org/W1979011732",
-        "https://openalex.org/W1979607356",
-        "https://openalex.org/W2051330591",
-        "https://openalex.org/W2149417143",
-        "https://openalex.org/W2298123771",
-        "https://openalex.org/W2412728352",
-        "https://openalex.org/W2415297835",
-        "https://openalex.org/W59369663",
-        "https://openalex.org/W8863503",
-        "https://openalex.org/W89669270",
-        "https://openalex.org/W951165088",
-        "https://openalex.org/W97662572"
-      ],
       "related_works": [
         "https://openalex.org/W4387497383",
         "https://openalex.org/W2948807893",
@@ -1173,66 +1133,6 @@
       },
       "abstract_inverted_index_v3": null,
       "cited_by_api_url": "https://api.openalex.org/works?filter=cites:W1775749144",
-      "counts_by_year": [
-        {
-          "year": 2025,
-          "cited_by_count": 172
-        },
-        {
-          "year": 2024,
-          "cited_by_count": 2885
-        },
-        {
-          "year": 2023,
-          "cited_by_count": 3287
-        },
-        {
-          "year": 2022,
-          "cited_by_count": 3518
-        },
-        {
-          "year": 2021,
-          "cited_by_count": 3697
-        },
-        {
-          "year": 2020,
-          "cited_by_count": 3751
-        },
-        {
-          "year": 2019,
-          "cited_by_count": 3512
-        },
-        {
-          "year": 2018,
-          "cited_by_count": 3467
-        },
-        {
-          "year": 2017,
-          "cited_by_count": 3642
-        },
-        {
-          "year": 2016,
-          "cited_by_count": 3933
-        },
-        {
-          "year": 2015,
-          "cited_by_count": 4522
-        },
-        {
-          "year": 2014,
-          "cited_by_count": 5022
-        },
-        {
-          "year": 2013,
-          "cited_by_count": 4941
-        },
-        {
-          "year": 2012,
-          "cited_by_count": 4964
-        }
-      ],
-      "updated_date": "2025-02-14T14:15:09.084261",
-      "created_date": "2016-06-24",
       "license": "cc-by"
     }
   ],
