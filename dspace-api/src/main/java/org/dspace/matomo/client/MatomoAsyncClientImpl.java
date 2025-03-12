@@ -47,21 +47,25 @@ public class MatomoAsyncClientImpl extends MatomoAbstractClient<HttpClient, Http
         super(baseUrl, token, matomoRequestBuilder, matomoResponseReader, httpClient);
     }
 
+
     @Override
-    protected HttpRequest createRequest(String requestBody) {
+    protected HttpRequest createRequest(String requestBody, String cookies) {
         return HttpRequest.newBuilder(URI.create(baseUrl))
                           .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                           .setHeader("Content-Type", "application/json")
+                          .setHeader("Cookie", cookies)
                           .build();
     }
 
     @Override
     protected void executeRequest(
         String requestBody,
+        String cookies,
         BiConsumer<HttpResponse<String>, String> responseConsumer
     ) {
-        httpClient.sendAsync(createRequest(requestBody), java.net.http.HttpResponse.BodyHandlers.ofString())
-                  .thenAccept(response -> responseConsumer.accept(response, requestBody));
+        httpClient
+            .sendAsync(createRequest(requestBody, cookies), java.net.http.HttpResponse.BodyHandlers.ofString())
+            .thenAccept(response -> responseConsumer.accept(response, requestBody));
     }
 
     protected int getStatusCode(HttpResponse<String> response) {

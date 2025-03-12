@@ -28,7 +28,10 @@ import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.matomo.factory.MatomoRequestCookieIdentifierEnricher;
+import org.dspace.matomo.factory.MatomoRequestCookieSessionEnricher;
 import org.dspace.matomo.factory.MatomoRequestCountryEnricher;
+import org.dspace.matomo.factory.MatomoRequestCustomCookiesEnricher;
+import org.dspace.matomo.factory.MatomoRequestCustomVariablesEnricher;
 import org.dspace.matomo.factory.MatomoRequestDetailsEnricher;
 import org.dspace.matomo.factory.MatomoRequestDetailsEnricherFactory;
 import org.dspace.matomo.factory.MatomoRequestIpAddressEnricher;
@@ -394,6 +397,104 @@ public class MatomoRequestDetailsBuilderTest extends AbstractUnitTest {
                     Matchers.is("_id"),
                     Matchers.any(String.class)
                 )
+            )
+        );
+    }
+
+    @Test
+    public void testMatomoCustomCookieEnricher() {
+        MatomoRequestCustomCookiesEnricher cookiesEnricher =
+            new MatomoRequestCustomCookiesEnricher("_pk_ref,_pk_hsr,_pk_ses");
+        enrichers.add(cookiesEnricher);
+
+        Cookie pkRefCookie = Mockito.mock(Cookie.class);
+        Mockito.when(pkRefCookie.getName()).thenReturn("_pk_ref.1.1fff");
+        Mockito.when(pkRefCookie.getValue()).thenReturn("http://localhost/home");
+
+        Cookie pkHsr = Mockito.mock(Cookie.class);
+        Mockito.when(pkHsr.getName()).thenReturn("_pk_hsr.1.1fff");
+        Mockito.when(pkHsr.getValue()).thenReturn("hsr-value");
+
+        Cookie pkSes = Mockito.mock(Cookie.class);
+        Mockito.when(pkSes.getName()).thenReturn("_pk_ses.1.1fff");
+        Mockito.when(pkSes.getValue()).thenReturn("1");
+
+        Cookie noCustom = Mockito.mock(Cookie.class);
+        Mockito.when(noCustom.getName()).thenReturn("_pk_custom.1.1fff");
+
+        Mockito.when(request.getCookies()).thenReturn(new Cookie[] { pkRefCookie, pkHsr, pkSes, noCustom });
+        Mockito.when(usageEvent.getRequest()).thenReturn(request);
+
+        MatomoRequestDetails requestDetails = builder.build(usageEvent);
+        assertThat(
+            requestDetails.cookies,
+            Matchers.allOf(
+                Matchers.hasEntry(
+                    Matchers.is("_pk_ref.1.1fff"),
+                    Matchers.is("http://localhost/home")
+                ),
+                Matchers.hasEntry(
+                    Matchers.is("_pk_hsr.1.1fff"),
+                    Matchers.is("hsr-value")
+                ),
+                Matchers.hasEntry(
+                    Matchers.is("_pk_ses.1.1fff"),
+                    Matchers.is("1")
+                )
+            )
+        );
+
+        assertThat(
+            requestDetails.cookies,
+            Matchers.not(
+                Matchers.hasEntry(
+                    Matchers.is("_pk_custom.1.1fff"),
+                    Matchers.any(String.class)
+                )
+            )
+        );
+    }
+
+    @Test
+    public void testMatomoCookieSessionEnricher() {
+        MatomoRequestCookieSessionEnricher sessionEnricher = new MatomoRequestCookieSessionEnricher();
+        enrichers.add(sessionEnricher);
+
+        Cookie sessionCookie = Mockito.mock(Cookie.class);
+        Mockito.when(sessionCookie.getName()).thenReturn("MATOMO_SESSID");
+        Mockito.when(sessionCookie.getValue()).thenReturn("44d4405e1652daa7a7e451c019cf01db");
+
+        Mockito.when(request.getCookies()).thenReturn(new Cookie[] { sessionCookie });
+        Mockito.when(usageEvent.getRequest()).thenReturn(request);
+
+        MatomoRequestDetails requestDetails = builder.build(usageEvent);
+        assertThat(
+            requestDetails.cookies,
+            Matchers.hasEntry(
+                Matchers.is("MATOMO_SESSID"),
+                Matchers.is("44d4405e1652daa7a7e451c019cf01db")
+            )
+        );
+    }
+
+    @Test
+    public void testMatomoCustomVaribalesEnricher() {
+        MatomoRequestCustomVariablesEnricher customVariablesEnricher = new MatomoRequestCustomVariablesEnricher();
+        enrichers.add(customVariablesEnricher);
+
+        Cookie cvar = Mockito.mock(Cookie.class);
+        Mockito.when(cvar.getName()).thenReturn("_pk_cvar.1.1fff");
+        Mockito.when(cvar.getValue()).thenReturn("{\"1\":[\"key1\",\"value1\"],\"2\":[\"key2\",\"value2\"]}");
+
+        Mockito.when(request.getCookies()).thenReturn(new Cookie[] { cvar });
+        Mockito.when(usageEvent.getRequest()).thenReturn(request);
+
+        MatomoRequestDetails requestDetails = builder.build(usageEvent);
+        assertThat(
+            requestDetails.parameters,
+            Matchers.hasEntry(
+                Matchers.is("_cvar"),
+                Matchers.is("{\"1\":[\"key1\",\"value1\"],\"2\":[\"key2\",\"value2\"]}")
             )
         );
     }

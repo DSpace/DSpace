@@ -17,6 +17,7 @@ import org.apache.logging.log4j.Logger;
 import org.dspace.matomo.client.MatomoClient;
 import org.dspace.matomo.model.MatomoRequestDetails;
 import org.dspace.matomo.model.MatomoRequestDetailsBuilder;
+import org.dspace.matomo.model.MatomoRequestDetailsSplitter;
 import org.dspace.usage.UsageEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -67,7 +68,9 @@ public class MatomoAsyncDequeHandler extends MatomoAbstractHandler {
         try {
             ArrayList<MatomoRequestDetails> details = new ArrayList<>();
             deque.drainTo(details);
-            this.matomoClient.sendDetails(details);
+            MatomoRequestDetailsSplitter.split(details)
+                                        .values()
+                                        .forEach(this.matomoClient::sendDetails);
         } finally {
             lock.unlock();
         }

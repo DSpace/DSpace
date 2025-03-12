@@ -14,9 +14,15 @@
                 <bean id="actionNameEnricher" class="org.dspace.matomo.factory.MatomoRequestDetailsEnricherFactory" factory-method="actionNameEnricher"/>
                 <bean id="urlEnricher" class="org.dspace.matomo.factory.MatomoRequestDetailsEnricherFactory" factory-method="urlEnricher"/>
                 <bean id="downloadEnricher" class="org.dspace.matomo.factory.MatomoRequestDetailsEnricherFactory" factory-method="downloadEnricher"/>
-                <bean id="ipEnricher" class="org.dspace.matomo.factory.MatomoRequestIpAddressEnricher"/>
-                <bean id="requestCountryEnricher" class="org.dspace.matomo.factory.MatomoRequestCountryEnricher"/>
                 <bean id="cookieIdEnricher" class="org.dspace.matomo.factory.MatomoRequestCookieIdentifierEnricher"/>
+                <bean id="cookieSessionEnricher" class="org.dspace.matomo.factory.MatomoRequestCookieSessionEnricher"/>
+                <bean id="customVariablesEnricher" class="org.dspace.matomo.factory.MatomoRequestCustomVariablesEnricher"/>
+                <bean id="customCookiesEnricher" class="org.dspace.matomo.factory.MatomoRequestCustomCookiesEnricher">
+                        <constructor-arg name="customCookies" value="${matomo.request.customcookies.cookie-name:}"/>
+                </bean>
+                <!-- These two enrichers requires a valid token set on the client -->
+<!--                <bean id="ipEnricher" class="org.dspace.matomo.factory.MatomoRequestIpAddressEnricher"/>-->
+<!--                <bean id="requestCountryEnricher" class="org.dspace.matomo.factory.MatomoRequestCountryEnricher"/>-->
             </list>
         </constructor-arg>
         <constructor-arg name="siteId" value="${matomo.request.siteid:}"/>

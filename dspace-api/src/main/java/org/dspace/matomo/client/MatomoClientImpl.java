@@ -38,8 +38,10 @@ public class MatomoClientImpl extends MatomoAbstractClient<CloseableHttpClient, 
     }
 
     @Override
-    protected void executeRequest(String requestBody, BiConsumer<HttpResponse, String> responseConsumer) {
-        try (CloseableHttpResponse response = httpClient.execute(createRequest(requestBody))) {
+    protected void executeRequest(
+        String requestBody, String cookies, BiConsumer<HttpResponse, String> responseConsumer
+    ) {
+        try (CloseableHttpResponse response = httpClient.execute(createRequest(requestBody, cookies))) {
             responseConsumer.accept(response, requestBody);
         } catch (MatomoClientException ex) {
             throw ex;
@@ -49,9 +51,10 @@ public class MatomoClientImpl extends MatomoAbstractClient<CloseableHttpClient, 
     }
 
     @Override
-    protected HttpPost createRequest(String requestBody) {
+    protected HttpPost createRequest(String requestBody, String cookies) {
         HttpPost httpPost = new HttpPost(baseUrl);
         try {
+            httpPost.setHeader("Cookie", cookies);
             httpPost.setEntity(new StringEntity(requestBody));
         } catch (UnsupportedEncodingException e) {
             throw new MatomoClientException("Error creating request", e);
