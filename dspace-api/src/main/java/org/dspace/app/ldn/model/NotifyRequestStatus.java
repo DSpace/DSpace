@@ -25,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  *    "Offer", "coar-notify:IngestAction"
  *    "Offer", "coar-notify:ReviewAction"
  * 
- * and their acknownledgements - if any
+ * and their acknowledgements - if any
  * 
  * @author Francesco Bacchelli (francesco.bacchelli at 4science dot it)
  */

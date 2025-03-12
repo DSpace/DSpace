@@ -322,6 +322,8 @@
             <!-- Publications use a custom first step, but share page 2 with "traditional" Item form -->
             <step id="publicationStep"/>
             <step id="traditionalpagetwo"/>
+            <!--Step for COAR Notify services requests -->
+            <!-- <step id="coarnotify"/> -->
             <step id="upload"/>
             <step id="license"/>
         </submission-process>

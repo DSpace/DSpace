@@ -1,4 +1,4 @@
-## generate LDN message json when request-review of an item
+## generate LDN message json when request-endorsement of an item
 ##
 ## Parameters: {0} config 'dspace.ui.url' or submitter email id (e.g. 'mailto:submitter-email') depending on the service configuration
 ##             {1} config 'ldn.notify.inbox'
@@ -10,7 +10,9 @@
 ##             {7} the url to the primary bitstream or the first bitstream in the ORIGINAL bundle if there is no primary bitstream. The url is 'dspace.ui.url'/bitstreams/:uuid/download
 ##             {8} the bitstream  MimeType or get User Format MimeType if getFormat is 'Unknown'
 ##             {9} id of the created LDNMessage
-##            {14} config 'dspace.ui.url'
+##             {13} type of actor: Service or Person
+##             {14} config 'dspace.ui.url'
+##             {15} for endorsement resubmissions the inReplyTo notification URN
 
 {
   "@context": [
@@ -20,7 +22,7 @@
   "actor": {
     "id": "${params[0]}",
     "name": "${params[2]}",
-    "type": "Service"
+    "type": "${params[13]}"
   },
   "id": "${params[9]}",
   "object": {
@@ -36,6 +38,7 @@
       ]
     }
   },
+  ${params[15]}
   "origin": {
     "id": "${params[14]}",
     "inbox": "${params[1]}",
@@ -48,6 +51,6 @@
   },
   "type": [
     "Offer",
-    "coar-notify:ReviewAction"
+    "coar-notify:EndorsementAction"
   ]
 }

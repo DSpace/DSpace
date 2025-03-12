@@ -8,7 +8,7 @@
 package org.dspace.app.ldn.model;
 
 /**
- * Informations about the Offer and Acknowledgements targeting a specified Item
+ * Information about the Offer and Acknowledgements targeting a specified Item
  * 
  * @author Francesco Bacchelli (francesco.bacchelli at 4science.com)
  */
