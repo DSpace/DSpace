@@ -36,6 +36,7 @@ public class MatomoRequestDetailsBuilder {
 
         requestDetails.addParameter("idsite", siteId)
                       .addParameter("rec", "1")
+                      .addParameter("cookie", "1")
                       .addParameter("apiv", "1");
 
         return enrichers.stream()

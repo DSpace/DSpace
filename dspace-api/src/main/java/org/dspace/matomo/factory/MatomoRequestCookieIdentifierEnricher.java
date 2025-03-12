@@ -36,16 +36,22 @@ public class MatomoRequestCookieIdentifierEnricher implements MatomoRequestDetai
         if (cookies == null || cookies.length == 0) {
             return matomoRequestDetails;
         }
-        Optional<String> pk_id =
-            Stream.of(cookies)
-                  .filter(cookie -> cookie.getName().startsWith(_PK_ID_NAME))
-                  .map(cookie -> _pk_id.matcher(cookie.getValue()))
-                  .filter(Matcher::find)
-                  .findFirst()
-                  .map(Matcher::group);
-        return pk_id.filter(StringUtils::isNotEmpty)
-                    .map(id -> matomoRequestDetails.addParameter("_id", id))
-                    .orElse(matomoRequestDetails);
+        return getCookie(cookies).filter(StringUtils::isNotEmpty)
+                                 .map(id -> matomoRequestDetails.addParameter("_id", id))
+                                 .orElse(matomoRequestDetails);
+    }
+
+    public static boolean hasCookie(Cookie[] cookies) {
+        return getCookie(cookies).isPresent();
+    }
+
+    public static Optional<String> getCookie(Cookie[] cookies) {
+        return Stream.of(cookies)
+                     .filter(cookie -> cookie.getName().startsWith(_PK_ID_NAME))
+                     .map(cookie -> _pk_id.matcher(cookie.getValue()))
+                     .filter(Matcher::find)
+                     .findFirst()
+                     .map(Matcher::group);
     }
 
 }

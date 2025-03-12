@@ -7,14 +7,18 @@
  */
 package org.dspace.matomo.client;
 
+import java.net.HttpURLConnection;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.matomo.exception.MatomoClientException;
+import org.dspace.matomo.model.MatomoCookieConverter;
 import org.dspace.matomo.model.MatomoRequestDetails;
 
 /**
@@ -44,9 +48,13 @@ public abstract class MatomoAbstractClient<C, T, U> implements MatomoClient {
         this.httpClient = httpClient;
     }
 
-    protected abstract T createRequest(String requestBody);
+    protected T createRequest(String requestBody) {
+        return createRequest(requestBody, "");
+    }
 
-    protected abstract void executeRequest(String requestBody, BiConsumer<U, String> responseConsumer);
+    protected abstract T createRequest(String requestBody, String cookies);
+
+    protected abstract void executeRequest(String requestBody, String cookies, BiConsumer<U, String> responseConsumer);
 
     protected abstract int getStatusCode(U response);
 
@@ -73,9 +81,35 @@ public abstract class MatomoAbstractClient<C, T, U> implements MatomoClient {
         }
 
         try {
-            this.executeRequest(createRequestBody(details), this::logError);
+            this.executeRequest(
+                createRequestBody(details),
+                generateCookies(details),
+                this::logError
+            );
         } catch (Exception ex) {
             throw new MatomoClientException("An error occurs sending events to " + baseUrl, ex);
+        }
+    }
+
+    protected String generateCookies(List<MatomoRequestDetails> details) {
+        return MatomoCookieConverter.convert(details);
+    }
+
+    protected static void addCookies(
+        HttpURLConnection connection, Map<String, String> cookies
+    ) {
+        StringBuilder cookiesValue = new StringBuilder();
+        if (cookies != null) {
+            for (Iterator<Map.Entry<String, String>> iterator = cookies.entrySet().iterator(); iterator.hasNext(); ) {
+                Map.Entry<String, String> entry = iterator.next();
+                cookiesValue.append(entry.getKey()).append("=").append(entry.getValue());
+                if (iterator.hasNext()) {
+                    cookiesValue.append("; ");
+                }
+            }
+        }
+        if (!cookiesValue.isEmpty()) {
+            connection.setRequestProperty("Cookie", cookiesValue.toString());
         }
     }
 

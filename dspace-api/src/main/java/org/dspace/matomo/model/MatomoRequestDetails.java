@@ -18,9 +18,15 @@ import java.util.Map;
 public class MatomoRequestDetails {
 
     final Map<String, String> parameters = new HashMap<>();
+    final Map<String, String> cookies = new HashMap<>();
 
     public MatomoRequestDetails addParameter(String key, String value) {
         parameters.put(key, value);
+        return this;
+    }
+
+    public MatomoRequestDetails addCookie(String key, String value) {
+        cookies.put(key, value);
         return this;
     }
 
