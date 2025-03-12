@@ -95,6 +95,9 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
     @Autowired
     ChoiceAuthorityService choiceAuthorityService;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     /**
      * This field has been created to easily modify the tests when updating the defaultConfiguration's sidebar facets
      */
@@ -6882,8 +6885,6 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
     @Test
     public void discoverSearchObjectsNOTIFYIncomingConfigurationTest() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-
         context.turnOffAuthorisationSystem();
 
         Community community = CommunityBuilder.createCommunity(context)
@@ -6945,8 +6946,6 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
     @Test
     public void discoverSearchObjectsNOTIFYOutgoingConfigurationTest() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-
         context.turnOffAuthorisationSystem();
 
         Community community = CommunityBuilder.createCommunity(context)

@@ -31,6 +31,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
@@ -99,6 +100,9 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
     @Autowired
     CommunityService communityService;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Test
     public void findAllTest() throws Exception {
@@ -1244,7 +1248,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         context.restoreAuthSystemState();
         String token = getAuthToken(asUser.getEmail(), password);
 
-        new MetadataPatchSuite().runWith(getClient(token), "/api/core/bitstreams/"
+        new MetadataPatchSuite(mapper).runWith(getClient(token), "/api/core/bitstreams/"
                 + parentCommunity.getLogo().getID(), expectedStatus);
     }
 

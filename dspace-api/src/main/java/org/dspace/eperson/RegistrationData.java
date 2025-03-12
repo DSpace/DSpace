@@ -7,7 +7,7 @@
  */
 package org.dspace.eperson;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -23,8 +23,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import org.dspace.core.Context;
 import org.dspace.core.ReloadableEntity;
 import org.hibernate.annotations.SortNatural;
@@ -60,8 +58,7 @@ public class RegistrationData implements ReloadableEntity<Integer> {
      * Expiration date of this registration data.
      */
     @Column(name = "expires")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date expires;
+    private Instant expires;
 
     /**
      * Metadata linked to this registration data
@@ -126,11 +123,11 @@ public class RegistrationData implements ReloadableEntity<Integer> {
         this.token = token;
     }
 
-    public Date getExpires() {
+    public Instant getExpires() {
         return expires;
     }
 
-    void setExpires(Date expires) {
+    void setExpires(Instant expires) {
         this.expires = expires;
     }
 

@@ -8,7 +8,7 @@
 package org.dspace.util;
 
 import java.io.IOException;
-import java.util.Date;
+import java.time.LocalDate;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
  * Dates are parsed as being in the UTC zone.
  *
  */
-public class MultiFormatDateDeserializer extends StdDeserializer<Date> {
+public class MultiFormatDateDeserializer extends StdDeserializer<LocalDate> {
 
     public MultiFormatDateDeserializer() {
         this(null);
@@ -33,9 +33,9 @@ public class MultiFormatDateDeserializer extends StdDeserializer<Date> {
     }
 
     @Override
-    public Date deserialize(JsonParser jsonparser, DeserializationContext context)
+    public LocalDate deserialize(JsonParser jsonparser, DeserializationContext context)
             throws IOException, JsonProcessingException {
         String date = jsonparser.getText();
-        return MultiFormatDateParser.parse(date);
+        return MultiFormatDateParser.parse(date).toLocalDate();
     }
 }

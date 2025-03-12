@@ -33,7 +33,6 @@ import org.dspace.app.rest.utils.Utils;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.InvalidReCaptchaException;
@@ -42,7 +41,6 @@ import org.dspace.eperson.RegistrationTypeEnum;
 import org.dspace.eperson.service.AccountService;
 import org.dspace.eperson.service.CaptchaService;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
@@ -89,16 +87,13 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
     private RegistrationDataService registrationDataService;
 
     @Autowired
-    private AuthorizeService authorizeService;
-
-    @Autowired
-    private GroupService groupService;
-
-    @Autowired
     private Utils utils;
 
     @Autowired
     private ResourcePatch<RegistrationData> resourcePatch;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Override
     @PreAuthorize("permitAll()")
@@ -114,7 +109,6 @@ public class RegistrationRestRepository extends DSpaceRestRepository<Registratio
     @Override
     public RegistrationRest createAndReturn(Context context) {
         HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
-        ObjectMapper mapper = new ObjectMapper();
         RegistrationRest registrationRest;
         String accountType = request.getParameter(TYPE_QUERY_PARAM);
         if (StringUtils.isBlank(accountType) ||
