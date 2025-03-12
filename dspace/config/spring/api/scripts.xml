@@ -102,4 +102,8 @@
        <property name="dspaceRunnableClass" value="org.dspace.app.suggestion.openaire.PublicationLoaderRunnableCli"/>
     </bean>
 
+    <bean id="item-enhancer" class="org.dspace.app.ItemEnhancerByDateScriptConfiguration">
+        <property name="description" value="Run enhancers"/>
+        <property name="dspaceRunnableClass" value="org.dspace.app.ItemEnhancerByDateScript"/>
+    </bean>
 </beans>
