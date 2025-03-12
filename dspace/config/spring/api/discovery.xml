@@ -47,6 +47,9 @@
     <!-- Additional indexing plugin that normalises and indexes value(s) for comparison to be used in e.g. duplication detection -->
     <bean id="solrServiceIndexComparisonPlugin" class="org.dspace.discovery.SolrServiceIndexComparisonPlugin" scope="prototype"/>
 
+    <!-- Additional indexing plugin that enables filtering items by access status -->
+    <bean id="solrServiceIndexAccessStatusPlugin" class="org.dspace.discovery.SolrServiceIndexAccessStatusPlugin" scope="prototype"/>
+
     <!--Bean that is used for mapping communities/collections to certain discovery configurations.-->
     <bean id="org.dspace.discovery.configuration.DiscoveryConfigurationService" class="org.dspace.discovery.configuration.DiscoveryConfigurationService">
         <property name="map">
@@ -190,6 +193,7 @@
                 <ref bean="searchFilterIssued" />
                 <ref bean="searchFilterContentInOriginalBundle"/>
                 <ref bean="searchFilterEntityType"/>
+                <ref bean="searchFilterAccessStatus" />
             </list>
         </property>
         <!-- Set TagCloud configuration per discovery configuration -->
@@ -205,6 +209,7 @@
                 <ref bean="searchFilterFileNameInOriginalBundle" />
                 <ref bean="searchFilterFileDescriptionInOriginalBundle" />
                 <ref bean="searchFilterEntityType"/>
+                <ref bean="searchFilterAccessStatus" />
                 <ref bean="searchFilterIsAuthorOfPublicationRelation"/>
                 <ref bean="searchFilterIsProjectOfPublicationRelation"/>
                 <ref bean="searchFilterIsOrgUnitOfPublicationRelation"/>
@@ -2648,6 +2653,13 @@
             <list>
                 <value>dc.type</value>
             </list>
+        </property>
+    </bean>
+
+    <bean id="searchFilterAccessStatus" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="access_status" />
+        <property name="metadataFields">
+            <list/>
         </property>
     </bean>
 
