@@ -15,7 +15,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.LocalDate;
 
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
@@ -167,13 +167,13 @@ public class AccessStatusServiceTest extends AbstractUnitTest {
 
     @Test
     public void testGetAvailabilityDateFromBitstream() throws Exception {
-        Date availabilityDate = accessStatusService.getAvailabilityDateFromBitstream(context, bitstream);
+        LocalDate availabilityDate = accessStatusService.getAvailabilityDateFromBitstream(context, bitstream);
         assertNull("testGetAvailabilityDateFromBitstream 0", availabilityDate);
     }
 
     @Test
     public void testGetAccessStatusFromAvailabilityDate() throws Exception {
-        Date availabilityDate = accessStatusService.getAvailabilityDateFromBitstream(context, bitstream);
+        LocalDate availabilityDate = accessStatusService.getAvailabilityDateFromBitstream(context, bitstream);
         String status = accessStatusService.getAccessStatusFromAvailabilityDate(availabilityDate);
         assertNotEquals("testGetAccessStatusFromAvailabilityDate 0", status, DefaultAccessStatusHelper.UNKNOWN);
     }
