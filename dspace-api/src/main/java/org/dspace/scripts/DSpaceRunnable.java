@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.DefaultParser.Builder;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -118,7 +119,9 @@ public abstract class DSpaceRunnable<T extends ScriptConfiguration> implements R
      * @throws ParseException   If something goes wrong
      */
     private StepResult parse(String[] args) throws ParseException {
-        commandLine = new DefaultParser().parse(getScriptConfiguration().getOptions(), args);
+        Builder builder = new DefaultParser().builder();
+        builder.setStripLeadingAndTrailingQuotes(false);
+        commandLine = builder.build().parse(getScriptConfiguration().getOptions(), args);
         setup();
         return StepResult.Continue;
     }
