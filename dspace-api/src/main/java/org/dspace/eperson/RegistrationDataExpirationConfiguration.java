@@ -10,7 +10,6 @@ package org.dspace.eperson;
 import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -80,7 +79,7 @@ public class RegistrationDataExpirationConfiguration {
      * @param type is the RegistrationTypeEnum of the token
      * @return a Date that represents the expiration date.
      */
-    public Date computeExpirationDate(RegistrationTypeEnum type) {
+    public Instant computeExpirationDate(RegistrationTypeEnum type) {
 
         if (type == null) {
             return null;
@@ -92,7 +91,7 @@ public class RegistrationDataExpirationConfiguration {
             return null;
         }
 
-        return Date.from(Instant.now().plus(duration));
+        return Instant.now().plus(duration);
     }
 
 }

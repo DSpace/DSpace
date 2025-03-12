@@ -8,7 +8,7 @@
 package org.dspace.eperson.dao;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 
 import org.dspace.core.Context;
 import org.dspace.core.GenericDAO;
@@ -69,8 +69,8 @@ public interface RegistrationDataDAO extends GenericDAO<RegistrationData> {
      * Deletes expired {@link RegistrationData}.
      *
      * @param context Context for the current request
-     * @param date The date to delete expired registrations for
+     * @param instant The date to delete expired registrations for
      * @throws SQLException
      */
-    void deleteExpiredBy(Context context, Date date) throws SQLException;
+    void deleteExpiredBy(Context context, Instant instant) throws SQLException;
 }

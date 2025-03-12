@@ -8,7 +8,7 @@
 package org.dspace.eperson.dao.impl;
 
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.Instant;
 
 import jakarta.persistence.Query;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -79,12 +79,12 @@ public class RegistrationDataDAOImpl extends AbstractHibernateDAO<RegistrationDa
     }
 
     @Override
-    public void deleteExpiredBy(Context context, Date date) throws SQLException {
+    public void deleteExpiredBy(Context context, Instant instant) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaDelete<RegistrationData> deleteQuery = criteriaBuilder.createCriteriaDelete(RegistrationData.class);
         Root<RegistrationData> deleteRoot = deleteQuery.from(RegistrationData.class);
         deleteQuery.where(
-            criteriaBuilder.lessThanOrEqualTo(deleteRoot.get(RegistrationData_.expires), date)
+            criteriaBuilder.lessThanOrEqualTo(deleteRoot.get(RegistrationData_.expires), instant)
         );
         getHibernateSession(context).createQuery(deleteQuery).executeUpdate();
     }
