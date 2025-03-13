@@ -60,7 +60,7 @@
     </bean>
 
     <bean name="metadata-export-filtered-items-report" class="org.dspace.app.bulkedit.MetadataExportFilteredItemsReportScriptConfiguration">
-        <property name="description" value="export metadata from a Filtered Items content report execution" />
+        <property name="description" value="Export metadata from item results in a Metadata Query Report" />
         <property name="dspaceRunnableClass" value="org.dspace.app.bulkedit.MetadataExportFilteredItemsReport" />
     </bean>
 
