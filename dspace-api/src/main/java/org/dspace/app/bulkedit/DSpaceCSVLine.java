@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.factory.AuthorityServiceFactory;
@@ -138,13 +139,23 @@ public class DSpaceCSVLine implements Serializable {
     }
 
     /**
-     * Get all the metadata keys that are represented in this line
+     * Get all the header keys that are represented in this line
      *
-     * @return An enumeration of all the keys
+     * @return An enumeration of all the header keys
      */
     public Set<String> keys() {
         // Return the keys
         return items.keySet();
+    }
+
+    /**
+     * Get all the metadata keys that are represented in this line
+     *
+     * @return An enumeration of all the metadata keys
+     */
+    public Set<String> metadataKeys() {
+        // Return the keys
+        return items.keySet().stream().filter((key) -> key.contains(".")).collect(Collectors.toSet());
     }
 
     /**

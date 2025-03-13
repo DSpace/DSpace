@@ -3,12 +3,16 @@ package org.dspace.app.bulkedit.service;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.bulkedit.BulkEditChange;
+import org.dspace.app.bulkedit.BulkEditMetadataField;
 import org.dspace.app.bulkedit.BulkEditMetadataValue;
 import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.app.bulkedit.DSpaceCSVLine;
@@ -70,6 +74,9 @@ public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<D
                 throw new MetadataImportException("'action' not allowed for new items!");
             }
 
+            Map<String, List<String>> metadataValues =
+                getAuthorityCleanMetadataValues(line, csv.getAuthoritySeparator());
+
             BulkEditChange whatHasChanged;
 
             // Is this an existing item?
@@ -95,23 +102,9 @@ public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<D
                 }
 
                 // Iterate through each metadata element in the csv line
-                for (String md : line.keys()) {
-                    // Get the values we already have
-                    if (!"id".equals(md)) {
-                        // Get the values from the CSV
-                        String[] fromCSV = line.get(md).toArray(new String[line.get(md).size()]);
-                        // Remove authority unless the md is not authority controlled
-                        if (!isAuthorityControlledField(md)) {
-                            for (int i = 0; i < fromCSV.length; i++) {
-                                int pos = fromCSV[i].indexOf(csv.getAuthoritySeparator());
-                                if (pos > -1) {
-                                    fromCSV[i] = fromCSV[i].substring(0, pos);
-                                }
-                            }
-                        }
-                        // Compare
-                        compareAndUpdate(c, item, csv, fromCSV, md, whatHasChanged, line);
-                    }
+                for (String md : metadataValues.keySet()) {
+                    // Compare
+                    compareAndUpdate(c, item, csv, metadataValues.get(md), md, whatHasChanged, line);
                 }
 
                 // Perform the action
@@ -156,25 +149,9 @@ public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<D
 
                 // Iterate through each metadata element in the csv line
                 whatHasChanged = new BulkEditChange(new UUID(0, bulkEditCacheService.getRowCount()));
-                for (String md : line.keys()) {
-                    // Get the values we already have
-                    if (!"id".equals(md) && !"rowName".equals(md)) {
-                        // Get the values from the CSV
-                        String[] fromCSV = line.get(md).toArray(new String[line.get(md).size()]);
-
-                        // Remove authority unless the md is not authority controlled
-                        if (!isAuthorityControlledField(md)) {
-                            for (int i = 0; i < fromCSV.length; i++) {
-                                int pos = fromCSV[i].indexOf(csv.getAuthoritySeparator());
-                                if (pos > -1) {
-                                    fromCSV[i] = fromCSV[i].substring(0, pos);
-                                }
-                            }
-                        }
-
-                        // Add all the values from the CSV line
-                        add(c, csv, fromCSV, md, whatHasChanged);
-                    }
+                for (String md : metadataValues.keySet()) {
+                    // Add all the values from the CSV line
+                    add(c, csv, metadataValues.get(md), md, whatHasChanged);
                 }
 
                 // Check it has an owning collection
@@ -358,7 +335,7 @@ public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<D
         for (String key : line.keys()) {
             // If a key represents a relation field attempt to resolve the target reference from the csvRefMap
             if (key.split("\\.")[0].equalsIgnoreCase("relation")) {
-                if (line.get(key).size() > 0) {
+                if (!line.get(key).isEmpty()) {
                     for (String val : line.get(key)) {
                         // Attempt to resolve the relation target reference
                         // These can be a UUID, metadata target reference or rowName target reference
@@ -372,7 +349,7 @@ public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<D
                     newLine.add(key, null);
                 }
             } else {
-                if (line.get(key).size() > 0) {
+                if (!line.get(key).isEmpty()) {
                     for (String value : line.get(key)) {
                         newLine.add(key, value);
                     }
@@ -393,97 +370,55 @@ public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<D
      * @param md      The element to compare
      * @param changes The changes object to populate
      * @param line    line in CSV file
-     * @throws SQLException       if there is a problem accessing a Collection from the database, from its handle
-     * @throws AuthorizeException if there is an authorization problem with permissions
-     * @throws MetadataImportException custom exception for error handling within metadataimport
      */
-    protected void compareAndUpdate(Context c, Item item, DSpaceCSV csv, String[] fromCSV,
-                                    String md, BulkEditChange changes, DSpaceCSVLine line)
-        throws SQLException, AuthorizeException, MetadataImportException {
+    protected void compareAndUpdate(Context c, Item item, DSpaceCSV csv, List<String> fromCSV,
+                                    String md, BulkEditChange changes, DSpaceCSVLine line) {
         // Log what metadata element we're looking at
-        String all = "";
-        for (String part : fromCSV) {
-            all += part + ",";
-        }
-        all = all.substring(0, all.length());
+        String all = StringUtils.join(fromCSV, ',');
         log.debug(LogHelper.getHeader(c, "metadata_import",
             "item_id=" + item.getID() + ",fromCSV=" + all));
 
-        // Don't compare collections or actions or rowNames
-        if (("collection".equals(md)) || ("action".equals(md)) || ("rowName".equals(md))) {
-            return;
-        }
-
-        // Make a String array of the current values stored in this element
-        // First, strip of language if it is there
-        String language = null;
-        if (md.contains("[")) {
-            String[] bits = md.split("\\[");
-            language = bits[1].substring(0, bits[1].length() - 1);
-        }
-
+        BulkEditMetadataField metadataField = BulkEditMetadataField.parse(md);
         AuthorityValue fromAuthority = authorityValueService.getAuthorityValueType(md);
-        if (md.indexOf(':') > 0) {
-            md = md.substring(md.indexOf(':') + 1);
-        }
 
-        String[] bits = md.split("\\.");
-        String schema = bits[0];
-        String element = bits[1];
-        // If there is a language on the element, strip if off
-        if (element.contains("[")) {
-            element = element.substring(0, element.indexOf('['));
-        }
-        String qualifier = null;
-        if (bits.length > 2) {
-            qualifier = bits[2];
-
-            // If there is a language, strip if off
-            if (qualifier.contains("[")) {
-                qualifier = qualifier.substring(0, qualifier.indexOf('['));
-            }
-        }
         log.debug(LogHelper.getHeader(c, "metadata_import",
             "item_id=" + item.getID() + ",fromCSV=" + all +
-                ",looking_for_schema=" + schema +
-                ",looking_for_element=" + element +
-                ",looking_for_qualifier=" + qualifier +
-                ",looking_for_language=" + language));
-        String[] dcvalues;
+                ",looking_for_schema=" + metadataField.getSchema() +
+                ",looking_for_element=" + metadataField.getElement() +
+                ",looking_for_qualifier=" + metadataField.getQualifier() +
+                ",looking_for_language=" + metadataField.getLanguage()));
+        List<String> dcvalues = new ArrayList<>();
         if (fromAuthority == null) {
-            List<MetadataValue> current = itemService.getMetadata(item, schema, element, qualifier, language);
-            dcvalues = new String[current.size()];
-            int i = 0;
+            List<MetadataValue> current = itemService.getMetadata(item, metadataField.getSchema(),
+                metadataField.getElement(), metadataField.getQualifier(), metadataField.getLanguage());
             for (MetadataValue dcv : current) {
                 if (dcv.getAuthority() == null || !isAuthorityControlledField(md)) {
-                    dcvalues[i] = dcv.getValue();
+                    dcvalues.add(dcv.getValue());
                 } else {
-                    dcvalues[i] = dcv.getValue() + csv.getAuthoritySeparator() + dcv.getAuthority();
-                    dcvalues[i] += csv.getAuthoritySeparator() + (dcv.getConfidence() != -1 ? dcv
-                        .getConfidence() : Choices.CF_ACCEPTED);
+                    dcvalues.add(dcv.getValue() + csv.getAuthoritySeparator() + dcv.getAuthority() +
+                        csv.getAuthoritySeparator() +
+                        (dcv.getConfidence() != -1 ? dcv.getConfidence() : Choices.CF_ACCEPTED));
                 }
-                i++;
                 log.debug(LogHelper.getHeader(c, "metadata_import",
                     "item_id=" + item.getID() + ",fromCSV=" + all +
                         ",found=" + dcv.getValue()));
             }
         } else {
-            dcvalues = line.get(md).toArray(new String[line.get(md).size()]);
+            dcvalues = line.get(md);
         }
 
 
         // Compare from current->csv
-        for (int v = 0; v < fromCSV.length; v++) {
-            String value = fromCSV[v];
-            BulkEditMetadataValue dcv = getBulkEditValueFromCSV(c, csv, language, schema, element, qualifier, value,
-                fromAuthority);
+        for (int v = 0; v < fromCSV.size(); v++) {
+            String value = fromCSV.get(v);
+            BulkEditMetadataValue dcv = getBulkEditValueFromCSV(c, csv, metadataField, value, fromAuthority);
             if (fromAuthority != null) {
                 value = dcv.getValue() + csv.getAuthoritySeparator() + dcv.getAuthority() + csv
                     .getAuthoritySeparator() + dcv.getConfidence();
-                fromCSV[v] = value;
+                fromCSV.set(v, value);
             }
 
-            if ((value != null) && (!"".equals(value)) && (!contains(value, dcvalues))) {
+            if (StringUtils.isNotBlank(value) && !contains(value, dcvalues)) {
                 changes.registerAdd(dcv);
             } else {
                 // Keep it
@@ -495,84 +430,47 @@ public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<D
         for (String value : dcvalues) {
             // Look to see if it should be removed
             BulkEditMetadataValue dcv = new BulkEditMetadataValue();
-            dcv.setSchema(schema);
-            dcv.setElement(element);
-            dcv.setQualifier(qualifier);
-            dcv.setLanguage(language);
+            dcv.setFromField(metadataField);
             if (value == null || !value.contains(csv.getAuthoritySeparator())) {
                 simplyCopyValue(value, dcv);
             } else {
                 String[] parts = value.split(csv.getAuthoritySeparator());
                 dcv.setValue(parts[0]);
                 dcv.setAuthority(parts[1]);
-                dcv.setConfidence((parts.length > 2 ? Integer.valueOf(parts[2]) : Choices.CF_ACCEPTED));
+                dcv.setConfidence((parts.length > 2 ? Integer.parseInt(parts[2]) : Choices.CF_ACCEPTED));
             }
 
             // fromAuthority==null: with the current implementation metadata values from external authority sources
             // can only be used to add metadata, not to change or remove them
             // because e.g. an author that is not in the column "ORCID:dc.contributor.author" could still be in the
             // column "dc.contributor.author" so don't remove it
-            if ((value != null) && (!"".equals(value)) && (!contains(value, fromCSV)) && fromAuthority == null) {
+            if (StringUtils.isNotBlank(value) && !contains(value, fromCSV) && fromAuthority == null) {
                 // Remove it
                 log.debug(LogHelper.getHeader(c, "metadata_import",
                     "item_id=" + item.getID() + ",fromCSV=" + all +
-                        ",removing_schema=" + schema +
-                        ",removing_element=" + element +
-                        ",removing_qualifier=" + qualifier +
-                        ",removing_language=" + language));
+                        ",removing_schema=" + metadataField.getSchema() +
+                        ",removing_element=" + metadataField.getElement() +
+                        ",removing_qualifier=" + metadataField.getQualifier() +
+                        ",removing_language=" + metadataField.getLanguage()));
                 changes.registerRemove(dcv);
             }
         }
     }
 
     /**
-     * Add an item metadata with a line from CSV, and optionally update the item
+     * Add an item metadata with a line from CSV
      *
      * @param fromCSV The metadata from the CSV file
      * @param md      The element to compare
      * @param changes The changes object to populate
-     * @throws SQLException       when an SQL error has occurred (querying DSpace)
-     * @throws AuthorizeException If the user can't make the changes
      */
-    protected void add(Context c, DSpaceCSV csv, String[] fromCSV, String md, BulkEditChange changes)
-        throws SQLException, AuthorizeException {
-        // Don't add owning collection or action
-        if (("collection".equals(md)) || ("action".equals(md))) {
-            return;
-        }
-
-        // Make a String array of the values
-        // First, strip of language if it is there
-        String language = null;
-        if (md.contains("[")) {
-            String[] bits = md.split("\\[");
-            language = bits[1].substring(0, bits[1].length() - 1);
-        }
+    protected void add(Context c, DSpaceCSV csv, List<String> fromCSV, String md, BulkEditChange changes) {
+        BulkEditMetadataField metadataField = BulkEditMetadataField.parse(md);
         AuthorityValue fromAuthority = authorityValueService.getAuthorityValueType(md);
-        if (md.indexOf(':') > 0) {
-            md = md.substring(md.indexOf(':') + 1);
-        }
-
-        String[] bits = md.split("\\.");
-        String schema = bits[0];
-        String element = bits[1];
-        // If there is a language on the element, strip if off
-        if (element.contains("[")) {
-            element = element.substring(0, element.indexOf('['));
-        }
-        String qualifier = null;
-        if (bits.length > 2) {
-            qualifier = bits[2];
-
-            // If there is a language, strip if off
-            if (qualifier.contains("[")) {
-                qualifier = qualifier.substring(0, qualifier.indexOf('['));
-            }
-        }
 
         // Add all the values
         for (String value : fromCSV) {
-            BulkEditMetadataValue dcv = getBulkEditValueFromCSV(c, csv, language, schema, element, qualifier, value,
+            BulkEditMetadataValue dcv = getBulkEditValueFromCSV(c, csv, metadataField, value,
                 fromAuthority);
             if (fromAuthority != null) {
                 value = dcv.getValue() + csv.getAuthoritySeparator() + dcv.getAuthority() + csv
@@ -580,32 +478,30 @@ public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<D
             }
 
             // Add it
-            if ((value != null) && (!"".equals(value))) {
+            if (StringUtils.isNotBlank(value)) {
                 changes.registerAdd(dcv);
             }
         }
     }
 
-    protected BulkEditMetadataValue getBulkEditValueFromCSV(Context c, DSpaceCSV csv, String language, String schema,
-                                                            String element, String qualifier, String value,
+    protected BulkEditMetadataValue getBulkEditValueFromCSV(Context c, DSpaceCSV csv,
+                                                            BulkEditMetadataField metadataField, String value,
                                                             AuthorityValue fromAuthority) {
         // Look to see if it should be removed
         BulkEditMetadataValue dcv = new BulkEditMetadataValue();
-        dcv.setSchema(schema);
-        dcv.setElement(element);
-        dcv.setQualifier(qualifier);
-        dcv.setLanguage(language);
+        dcv.setFromField(metadataField);
         if (fromAuthority != null) {
             if (value.indexOf(':') > 0) {
                 value = value.substring(0, value.indexOf(':'));
             }
 
             // look up the value and authority in solr
-            List<AuthorityValue> byValue = authorityValueService.findByValue(c, schema, element, qualifier, value);
+            List<AuthorityValue> byValue = authorityValueService.findByValue(c, metadataField.getSchema(),
+                metadataField.getElement(), metadataField.getQualifier(), value);
             AuthorityValue authorityValue = null;
             if (byValue.isEmpty()) {
                 String toGenerate = fromAuthority.generateString() + value;
-                String field = schema + "_" + element + (StringUtils.isNotBlank(qualifier) ? "_" + qualifier : "");
+                String field = metadataField.getMetadataField("_");
                 authorityValue = authorityValueService.generate(c, toGenerate, value, field);
                 dcv.setAuthority(toGenerate);
             } else {
@@ -621,7 +517,7 @@ public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<D
             String[] parts = value.split(csv.getEscapedAuthoritySeparator());
             dcv.setValue(parts[0]);
             dcv.setAuthority(parts[1]);
-            dcv.setConfidence((parts.length > 2 ? Integer.valueOf(parts[2]) : Choices.CF_ACCEPTED));
+            dcv.setConfidence((parts.length > 2 ? Integer.parseInt(parts[2]) : Choices.CF_ACCEPTED));
         }
         return dcv;
     }
@@ -633,20 +529,30 @@ public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<D
     }
 
     /**
+     * Get metadata values from a csv line, cleaned to have authority stripped if field is not authority controlled
+     * @param line DSpaceCSVLine to get values from
+     * @param authoritySeparator Expected separator between value and authority
+     */
+    protected Map<String, List<String>> getAuthorityCleanMetadataValues(DSpaceCSVLine line, String authoritySeparator) {
+        Map<String, List<String>> metadataValues = new HashMap<>();
+        for (String key : line.metadataKeys()) {
+            metadataValues.put(key, isAuthorityControlledField(key) ? line.get(key) : line.get(key).stream()
+                .map((value) -> StringUtils.substringBefore(value, authoritySeparator))
+                .collect(Collectors.toList()));
+        }
+        return metadataValues;
+    }
+
+    /**
      * Method to find if a String occurs in an array of Strings
      *
      * @param needle   The String to look for
-     * @param haystack The array of Strings to search through
-     * @return Whether or not it is contained
+     * @param haystack The list of Strings to search through
+     * @return Whether it is contained
      */
-    protected boolean contains(String needle, String[] haystack) {
+    protected boolean contains(String needle, List<String> haystack) {
         // Look for the needle in the haystack
-        for (String examine : haystack) {
-            if (clean(examine).equals(clean(needle))) {
-                return true;
-            }
-        }
-        return false;
+        return haystack.stream().anyMatch((examine) -> StringUtils.equals(clean(examine), clean(needle)));
     }
 
     /**
