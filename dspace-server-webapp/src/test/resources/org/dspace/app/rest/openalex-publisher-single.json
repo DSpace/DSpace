@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "count": 2,
+    "db_response_time_ms": 32,
+    "page": 1,
+    "per_page": 1,
+    "groups_count": null
+  },
+  "results": [
+    {
+      "id": "https://openalex.org/P4310320990",
+      "display_name": "Elsevier BV",
+      "alternate_titles": [
+        "Elsevier",
+        "elsevier.com",
+        "Elsevier Science",
+        "Uitg. Elsevier",
+        "السفیر",
+        "السویر",
+        "انتشارات الزویر",
+        "لودویک السفیر",
+        "爱思唯尔"
+      ],
+      "country_codes": [
+        "NL"
+      ],
+      "ids": {
+        "openalex": "https://openalex.org/P4310320990",
+        "ror": "https://ror.org/02scfj030",
+        "wikidata": "https://www.wikidata.org/entity/Q746413"
+      }
+    }
+  ],
+  "group_by": []
+}

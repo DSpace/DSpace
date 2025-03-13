@@ -1,0 +1,39 @@
+{
+  "meta": {
+    "count": 1819,
+    "db_response_time_ms": 19,
+    "page": 1,
+    "per_page": 1,
+    "groups_count": null
+  },
+  "results": [
+    {
+      "id": "https://openalex.org/F4320321001",
+      "display_name": "National Natural Science Foundation of China",
+      "alternate_titles": [
+        "NNSF of China",
+        "Guójiā Zìrán Kēxué Jījīn Wěiyuánhuì",
+        "NSF of China",
+        "The National Natural Science Foundation of China",
+        "国家自然科学基金委员会",
+        "National Nature Science Foundation of China",
+        "NSFC",
+        "National Science Foundation of China",
+        "Natural Science Foundation of China",
+        "NNSFC",
+        "Chinese National Science Foundation",
+        "NNSF"
+      ],
+      "country_code": "CN",
+      "description": "Chinese government body",
+      "ids": {
+        "openalex": "https://openalex.org/F4320321001",
+        "ror": "https://ror.org/01h0zpd94",
+        "wikidata": "https://www.wikidata.org/entity/Q4501917",
+        "crossref": "501100001809",
+        "doi": "https://doi.org/10.13039/501100001809"
+      }
+    }
+  ],
+  "group_by": []
+}
