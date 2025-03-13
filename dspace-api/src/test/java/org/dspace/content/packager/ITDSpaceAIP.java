@@ -435,6 +435,109 @@ public class ITDSpaceAIP extends AbstractIntegrationTest {
     }
 
     /**
+     * Test restoration from AIP of the Users/Groups in a Community
+     */
+    @Test
+    public void testRestoreCommunityGroups() throws Exception {
+        log.info("testRestoreCommunityGroups() - BEGIN");
+
+        // Locate the top-level Community (as a parent)
+        Community parent = (Community) handleService.resolveToObject(context, topCommunityHandle);
+
+        // Create a brand new (empty) Community to test with
+        Community community = communityService.createSubcommunity(context, parent);
+        communityService.addMetadata(context, community, "dc", "title", null, null, "Restricted Community");
+        communityService.update(context, community);
+        String communityHandle = community.getHandle();
+
+        // Create an admin group for the community
+        Group communityAdminGroup = communityService.createAdministrators(context, community);
+        String communityAdminGroupName = communityAdminGroup.getName();
+
+        // Add a test user to the admin group
+        String testUserEmail = "test@user.com";
+        EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+        EPerson testUser = ePersonService.create(context);
+        testUser.setEmail(testUserEmail);
+        ePersonService.update(context, testUser);
+        groupService.addMember(context, communityAdminGroup, testUser);
+
+        // Add a subgroup with user to the community
+        String subGroupName = "Special Users";
+        Group subGroup = groupService.create(context);
+        groupService.setName(subGroup, subGroupName);
+        groupService.update(context, subGroup);
+        groupService.addMember(context, communityAdminGroup, subGroup);
+        groupService.update(context, communityAdminGroup);
+        String testUser2Email = "test@user2.com";
+        EPerson testUser2 = ePersonService.create(context);
+        testUser2.setEmail(testUser2Email);
+        ePersonService.update(context, testUser2);
+        groupService.addMember(context, subGroup, testUser2);
+
+        // Export collection AIP
+        log.info("testRestoreCommunityGroups() - CREATE Community AIP");
+        File aipFile = createAIP(community, null, true);
+
+        // Now, delete that Collection
+        log.info("testRestoreCommunityGroups() - DELETE Community");
+        communityService.removeSubcommunity(context, parent, community);
+
+        // Now, delete the Sub Group
+        log.info("testRestoreCommunityGroups() - DELETE Sub Group");
+        groupService.delete(context, subGroup);
+
+        // Assert the deleted collection no longer exists
+        DSpaceObject obj = handleService.resolveToObject(context, communityHandle);
+        assertThat("testRestoreCommunityGroups() " + communityHandle + " doesn't exist", obj,
+                   nullValue());
+
+        // Assert the admin group no longer exists
+        Group grp = groupService.findByName(context, communityAdminGroupName);
+        assertThat("testRestoreCommunityGroups() Community Admin Group doesn't exist", grp, nullValue());
+
+        // Assert the admin subgroup no longer exists
+        Group subGrp = groupService.findByName(context, subGroupName);
+        assertThat("testRestoreCommunityGroups() Community Admin Sub Group doesn't exist", subGrp, nullValue());
+
+        // Now, delete the test user
+        log.info("testRestoreCommunityGroups() - DELETE testUser and testUser2");
+        ePersonService.delete(context, testUser);
+        ePersonService.delete(context, testUser2);
+
+        // Assert the test users no longer exist
+        testUser = ePersonService.findByEmail(context, testUserEmail);
+        assertThat("testRestoreCommunityGroups() testUser doesn't exist", testUser, nullValue());
+        testUser2 = ePersonService.findByEmail(context, testUser2Email);
+        assertThat("testRestoreCommunityGroups() testUser2 doesn't exist", testUser2, nullValue());
+
+        // Restore Collection from AIP (non-recursive)
+        log.info("testRestoreCommunityGroups() - RESTORE Community");
+        restoreFromAIP(parent, aipFile, null, true);
+
+        // Assert the deleted Collection is RESTORED
+        DSpaceObject objRestored = handleService.resolveToObject(context, communityHandle);
+        assertThat("testRestoreCommunityGroups() Community " + communityHandle + " exists", objRestored,
+                   notNullValue());
+
+        // Assert the deleted Admin Group is RESTORED
+        Group grpRestored = groupService.findByName(context, communityAdminGroupName);
+        assertThat("testRestoreCommunityGroups() Community Admin Group exists", grpRestored, notNullValue());
+
+        // Assert the deleted Sub Group is RESTORED
+        Group subGrpRestored = groupService.findByName(context, subGroupName);
+        assertThat("testRestoreCommunityGroups() Community Admin Sub Group exists", subGrpRestored, notNullValue());
+
+        // Assert the deletes testUsers are RESTORED
+        EPerson testUserRestored = ePersonService.findByEmail(context, testUserEmail);
+        assertThat("testRestoreCommunityGroups() testUser exists", testUserRestored, notNullValue());
+        EPerson testUser2Restored = ePersonService.findByEmail(context, testUser2Email);
+        assertThat("testRestoreCommunityGroups() testUser2 exists", testUser2Restored, notNullValue());
+
+        log.info("testRestoreCommunityGroups() - END");
+    }
+
+    /**
      * Test replacement from AIP of entire Community Hierarchy
      */
     @Test
