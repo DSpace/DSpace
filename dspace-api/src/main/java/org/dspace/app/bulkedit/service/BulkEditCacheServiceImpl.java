@@ -40,14 +40,9 @@ public class BulkEditCacheServiceImpl implements BulkEditCacheService {
     protected RelationshipTypeService relationshipTypeService;
 
     /**
-     * Map of field:value to csv row number, used to resolve indirect entity target references.
+     * Map of field:value to item UUID, used to resolve indirect entity target references.
      */
-    protected Map<String, Set<Integer>> csvRefMap = new ConcurrentHashMap<>();
-
-    /**
-     * Map of csv row number to UUID, used to resolve indirect entity target references.
-     */
-    protected Map<Integer, UUID> csvRowMap = new ConcurrentHashMap<>();
+    protected Map<String, Set<UUID>> metadataReferenceToUUIDMap = new ConcurrentHashMap<>();
 
     /**
      * Map of UUIDs to their entity types.
@@ -59,89 +54,39 @@ public class BulkEditCacheServiceImpl implements BulkEditCacheService {
      */
     protected Map<String, HashMap<String, ArrayList<String>>> entityRelationMap = new ConcurrentHashMap<>();
 
-    protected ArrayList<String> relationValidationErrors = new ArrayList<>();
-
     @Override
     public void resetCache() {
-        csvRefMap = new ConcurrentHashMap<>();
-        csvRowMap = new ConcurrentHashMap<>();
+        metadataReferenceToUUIDMap = new ConcurrentHashMap<>();
         entityTypeMap = new ConcurrentHashMap<>();
         entityRelationMap = new ConcurrentHashMap<>();
     }
 
     /**
-     * Populates the csvRefMap, csvRowMap, and entityTypeMap for the given csv line.
+     * Populates the metadataReferenceToUUIDMap, and entityTypeMap for the given metadata values.
      *
-     * The csvRefMap is an index that keeps track of which rows have a specific value for
+     * The metadataReferenceToUUIDMap is an index that keeps track of which bulk edit items have a specific value for
      * a specific metadata field or the special "rowName" column. This is used to help resolve indirect
-     * entity target references in the same CSV.
+     * entity target references in the same batch edit.
      *
-     * The csvRowMap is a row number to UUID map, and contains an entry for every row that has
-     * been processed so far which has a known (minted) UUID for its item. This is used to help complete
-     * the resolution after the row number has been determined.
-     *
-     * @param values the values ordered by field.
-     * @param uuid the uuid of the item, which may be null if it has not been minted yet.
+     * @param values the values ordered by column header (metadata fields and other).
+     * @param uuid the uuid of the item, which may be a placeholder one in case it's not minted yet.
      */
-    public void populateRefAndRowMap(Map<String, List<String>> values, Integer row, @Nullable UUID uuid) {
-        if (uuid != null) {
-            csvRowMap.put(row, uuid);
-        } else {
-            csvRowMap.put(row, new UUID(0, row));
-        }
+    public void populateMetadataReferenceMap(Map<String, List<String>> values, UUID uuid) {
         for (String key : values.keySet()) {
-            if (key.contains(".") && !key.split("\\.")[0].equalsIgnoreCase("relation") ||
+            if ((key.contains(".") && !key.split("\\.")[0].equalsIgnoreCase("relation")) ||
                 key.equalsIgnoreCase("rowName")) {
                 for (String value : values.get(key)) {
                     String valueKey = key + ":" + value;
-                    Set<Integer> rowNums = csvRefMap.get(valueKey);
-                    if (rowNums == null) {
-                        rowNums = new HashSet<>();
-                        csvRefMap.put(valueKey, rowNums);
+                    if (!metadataReferenceToUUIDMap.containsKey(valueKey)) {
+                        metadataReferenceToUUIDMap.put(valueKey, new HashSet<>());
                     }
-                    rowNums.add(row);
+                    metadataReferenceToUUIDMap.get(valueKey).add(uuid);
                 }
             }
             //Populate entityTypeMap
             if (key.equalsIgnoreCase("dspace.entity.type") && !values.get(key).isEmpty()) {
-                if (uuid == null) {
-                    entityTypeMap.put(new UUID(0, row), values.get(key).get(0));
-                } else {
-                    entityTypeMap.put(uuid, values.get(key).get(0));
-                }
+                entityTypeMap.put(uuid, values.get(key).get(0));
             }
-        }
-    }
-
-    /**
-     * Gets the set of matching lines as UUIDs that have already been processed given a metadata value.
-     *
-     * @param mdValueRef the metadataValue reference to search for.
-     * @return the set of matching lines as UUIDs.
-     */
-    public Set<UUID> getMatchingCSVUUIDs(String mdValueRef) {
-        Set<UUID> set = new HashSet<>();
-        if (csvRefMap.containsKey(mdValueRef)) {
-            for (Integer rowNum : csvRefMap.get(mdValueRef)) {
-                set.add(getUUIDForRow(rowNum));
-            }
-        }
-        return set;
-    }
-
-    /**
-     * Gets the UUID of the item of a given row in the CSV, if it has been minted.
-     * If the UUID has not yet been minted, gets a UUID representation of the row
-     * (a UUID whose numeric value equals the row number).
-     *
-     * @param rowNum the row number.
-     * @return the UUID of the item
-     */
-    public UUID getUUIDForRow(int rowNum) {
-        if (csvRowMap.containsKey(rowNum)) {
-            return csvRowMap.get(rowNum);
-        } else {
-            return new UUID(0, rowNum);
         }
     }
 
@@ -180,7 +125,7 @@ public class BulkEditCacheServiceImpl implements BulkEditCacheService {
      * which may be a direct UUID string, a row reference
      * of the form rowName:VALUE, or a metadata value reference of the form schema.element[.qualifier]:VALUE.
      *
-     * The reference may refer to a previously-processed item in the CSV or an item in the database.
+     * The reference may refer to a previously-processed item in the batch edit or an item in the database.
      *
      * @param context the context to use.
      * @param reference the target reference which may be a UUID, metadata reference, or rowName reference.
@@ -232,22 +177,21 @@ public class BulkEditCacheServiceImpl implements BulkEditCacheService {
                     "Error looking up item by metadata reference: " + reference, e);
             }
         }
-        // Lookup UUIDs that may have already been processed into the csvRefMap
-        // See populateRefAndRowMap() for how the csvRefMap is populated
-        // See getMatchingCSVUUIDs() for how the reference param is sourced from the csvRefMap
-        Set<UUID> csvUUIDs = getMatchingCSVUUIDs(reference);
-        if (csvUUIDs.size() > 1) {
+        // Lookup UUIDs that may have already been processed
+        // See populateRefAndRowMap() for how the Map is populated
+        Set<UUID> referencedUUIDs = metadataReferenceToUUIDMap.get(reference);
+        if (referencedUUIDs.size() > 1) {
             throw new MetadataImportException("Error resolving Entity reference:\n" +
-                "Ambiguous reference; multiple matches in csv: " + reference);
-        } else if (csvUUIDs.size() == 1) {
-            UUID csvUUID = csvUUIDs.iterator().next();
-            if (csvUUID.equals(uuid)) {
-                return uuid; // one match from csv and db (same item)
+                "Ambiguous reference; multiple matches in import: " + reference);
+        } else if (referencedUUIDs.size() == 1) {
+            UUID batchEditUUID = referencedUUIDs.iterator().next();
+            if (batchEditUUID.equals(uuid)) {
+                return uuid; // one match from batch edit and db (same item)
             } else if (uuid != null) {
                 throw new MetadataImportException("Error resolving Entity reference:\n" +
-                    "Ambiguous reference; multiple matches in db and csv: " + reference);
+                    "Ambiguous reference; multiple matches in db and import: " + reference);
             } else {
-                return csvUUID; // one match from csv
+                return batchEditUUID; // one match from batch edit
             }
         } else { // size == 0; the reference does not exist throw an error
             if (uuid == null) {
@@ -255,7 +199,7 @@ public class BulkEditCacheServiceImpl implements BulkEditCacheService {
                     "No matches found for reference: " + reference
                     + "\nKeep in mind you can only reference entries that are " +
                     "listed before " +
-                    "this one within the CSV.");
+                    "this one within the batch edit.");
             } else {
                 return uuid; // one match from db
             }

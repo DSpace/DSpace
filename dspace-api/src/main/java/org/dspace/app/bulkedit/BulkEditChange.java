@@ -9,6 +9,7 @@ package org.dspace.app.bulkedit;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -19,6 +20,7 @@ import org.dspace.content.Item;
  * @author Stuart Lewis
  */
 public class BulkEditChange {
+    private UUID uuid;
 
     /**
      * The item these changes relate to
@@ -94,7 +96,9 @@ public class BulkEditChange {
     /**
      * Initialise a change holder for a new item
      */
-    public BulkEditChange() {
+    public BulkEditChange(UUID tempUUID) {
+        uuid = tempUUID;
+
         // Set the item to be null
         item = null;
         newItem = true;
@@ -118,7 +122,7 @@ public class BulkEditChange {
      */
     public BulkEditChange(Item i) {
         // Store the item
-        item = i;
+        setItem(i);
         newItem = false;
         empty = true;
 
@@ -139,6 +143,7 @@ public class BulkEditChange {
     public void setItem(Item i) {
         // Store the item
         item = i;
+        uuid = i.getID();
     }
 
     /**
@@ -402,5 +407,14 @@ public class BulkEditChange {
      */
     public boolean hasChanges() {
         return !empty;
+    }
+
+    /**
+     * Get the UUID of the Item
+     * May be a fake UUID as a temporary placeholder for items to be imported
+     * The fake UUID can then be used as a reference throughout the same import
+     */
+    public UUID getUuid() {
+        return uuid;
     }
 }

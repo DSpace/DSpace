@@ -10,7 +10,7 @@ import org.dspace.app.bulkedit.MetadataImportException;
 import org.dspace.core.Context;
 
 public interface CSVBulkEditCacheService extends BulkEditCacheService {
-    void populateRefAndRowMap(DSpaceCSVLine line, @Nullable UUID uuid);
+    void populateReferenceMaps(DSpaceCSVLine line, Integer rowNumber, UUID uuid);
     Set<String> getAuthorityControlledFields();
     boolean isAuthorityControlledField(String field);
     Integer getRowCount();

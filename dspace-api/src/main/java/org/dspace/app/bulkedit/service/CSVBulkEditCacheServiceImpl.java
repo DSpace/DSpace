@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +29,11 @@ public class CSVBulkEditCacheServiceImpl extends BulkEditCacheServiceImpl implem
     protected static final String AC_PREFIX = "authority.controlled.";
 
     /**
+     * Map with item UUIDs for each CSV row
+     */
+    protected Map<Integer, UUID> csvRowMap = new ConcurrentHashMap<>();
+
+    /**
      * The authority controlled fields
      */
     private Set<String> authorityControlledFields;
@@ -36,6 +42,19 @@ public class CSVBulkEditCacheServiceImpl extends BulkEditCacheServiceImpl implem
      * Counter of rows processed in a CSV.
      */
     protected Integer rowCount = 1;
+
+    /**
+     * List of errors detected during relation validation
+     */
+    protected ArrayList<String> relationValidationErrors = new ArrayList<>();
+
+    @Override
+    public void resetCache() {
+        super.resetCache();
+        csvRowMap = new ConcurrentHashMap<>();
+        relationValidationErrors = new ArrayList<>();
+        rowCount = 1;
+    }
 
     /**
      * Set authority controlled fields
@@ -53,12 +72,13 @@ public class CSVBulkEditCacheServiceImpl extends BulkEditCacheServiceImpl implem
     }
 
     @Override
-    public void populateRefAndRowMap(DSpaceCSVLine line, @Nullable UUID uuid) {
+    public void populateReferenceMaps(DSpaceCSVLine line, Integer rowNumber, UUID uuid) {
         Map<String, List<String>> valueMap = new HashMap<>();
         for (String key : line.keys()) {
             valueMap.put(key, line.get(key));
         }
-        populateRefAndRowMap(valueMap, rowCount, uuid);
+        populateMetadataReferenceMap(valueMap, uuid);
+        csvRowMap.put(rowNumber, uuid);
     }
 
     public Set<String> getAuthorityControlledFields() {

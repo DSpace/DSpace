@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -50,9 +51,6 @@ public class BulkEditImportServiceImpl implements BulkEditImportService {
     protected RelationshipService relationshipService;
 
     @Autowired
-    protected BulkEditCacheService bulkEditCacheService;
-
-    @Autowired
     protected EntityService entityService;
 
     @Autowired
@@ -60,6 +58,12 @@ public class BulkEditImportServiceImpl implements BulkEditImportService {
 
     @Autowired
     protected InstallItemService installItemService;
+
+    /**
+     * Map to store temporary UUIDs of newly imported items, mapped to the UUID of their actual imported item
+     * Used to resolve relationship references between two items in the same import
+     */
+    protected Map<UUID, UUID> fakeToRealUUIDMap = new ConcurrentHashMap<>();
 
     @Override
     public void importBulkEditChange(Context c, BulkEditChange bechange, boolean useCollectionTemplate,
@@ -125,6 +129,7 @@ public class BulkEditImportServiceImpl implements BulkEditImportService {
             }
         }
 
+        fakeToRealUUIDMap.put(bechange.getUuid(), item.getID());
         bechange.setItem(item);
     }
 
@@ -334,14 +339,24 @@ public class BulkEditImportServiceImpl implements BulkEditImportService {
      * Gets an existing entity from a target reference.
      *
      * @param context the context to use.
-     * @param targetReference the target reference which may be a UUID, metadata reference, or rowName reference.
+     * @param value the target reference which is expected to be a UUID
      * @return the entity, which is guaranteed to exist.
      * @throws MetadataImportException if the target reference is badly formed or refers to a non-existing item.
      */
-    private Entity getEntity(Context context, String targetReference) throws MetadataImportException {
-        Entity entity = null;
-        UUID uuid = bulkEditCacheService.resolveEntityRef(context, targetReference);
-        // At this point, we have a uuid, so we can get an entity
+    private Entity getEntity(Context context, String value) throws MetadataImportException {
+        Entity entity;
+        UUID uuid;
+        try {
+            uuid = UUID.fromString(value);
+        } catch (IllegalArgumentException e) {
+            throw new MetadataImportException("Relationship reference was expected to be a UUID: " + value, e);
+        }
+        // If the reference is a fake UUID, it refers to an item that's been created earlier in the import, get the
+        // real UUID
+        if (fakeToRealUUIDMap.containsKey(uuid)) {
+            uuid = fakeToRealUUIDMap.get(uuid);
+        }
+        // Resolve the UUID to an entity
         try {
             entity = entityService.findByItemId(context, uuid);
             if (entity.getItem() == null) {
@@ -349,7 +364,7 @@ public class BulkEditImportServiceImpl implements BulkEditImportService {
             }
             return entity;
         } catch (SQLException sqle) {
-            throw new MetadataImportException("Unable to find entity using reference: " + targetReference, sqle);
+            throw new MetadataImportException("Unable to find entity using reference: " + value, sqle);
         }
     }
 }

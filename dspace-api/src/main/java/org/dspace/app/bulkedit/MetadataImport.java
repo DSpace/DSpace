@@ -125,8 +125,6 @@ public class MetadataImport extends DSpaceRunnable<MetadataImportScriptConfigura
         boolean testRun = !commandLine.hasOption('s') || validateOnly;
 
         // Register the changes - just highlight differences
-        c.setMode(Context.Mode.READ_ONLY);
-        bulkEditCacheService.resetCache();
         List<BulkEditChange> changes = bulkEditRegisterService.registerBulkEditChange(c, csv);
 
         // Display the changes

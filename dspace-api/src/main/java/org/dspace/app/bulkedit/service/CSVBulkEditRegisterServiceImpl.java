@@ -29,7 +29,7 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class CSVBulkEditRegisterServiceImpl extends AbstractBulkEditRegisterService<DSpaceCSV> {
+public class CSVBulkEditRegisterServiceImpl implements BulkEditRegisterService<DSpaceCSV> {
     protected static final Logger log =
         org.apache.logging.log4j.LogManager.getLogger(CSVBulkEditRegisterServiceImpl.class);
 
@@ -50,12 +50,16 @@ public class CSVBulkEditRegisterServiceImpl extends AbstractBulkEditRegisterServ
 
     public List<BulkEditChange> registerBulkEditChange(Context c, DSpaceCSV csv)
         throws MetadataImportException, SQLException, AuthorizeException, IOException {
+        Context.Mode lastMode = c.getCurrentMode();
+        // Force a READ ONLY mode to make it clear no actual changes are meant to be made during a register
+        c.setMode(Context.Mode.READ_ONLY);
+        bulkEditCacheService.resetCache();
+
         List<BulkEditChange> changes = new ArrayList<>();
 
         bulkEditCacheService.resetRowCount();
         for (DSpaceCSVLine line : csv.getCSVLines()) {
             // Resolve target references to other items
-            bulkEditCacheService.populateRefAndRowMap(line, line.getID());
             line = resolveEntityRefs(c, line);
 
             // Get the DSpace item to compare with
@@ -66,18 +70,18 @@ public class CSVBulkEditRegisterServiceImpl extends AbstractBulkEditRegisterServ
                 throw new MetadataImportException("'action' not allowed for new items!");
             }
 
-            Item item = null;
+            BulkEditChange whatHasChanged;
 
             // Is this an existing item?
             if (id != null) {
                 // Get the item
-                item = itemService.find(c, id);
+                Item item = itemService.find(c, id);
                 if (item == null) {
                     throw new MetadataImportException("Unknown item ID " + id);
                 }
 
                 // Record changes
-                BulkEditChange whatHasChanged = new BulkEditChange(item);
+                whatHasChanged = new BulkEditChange(item);
 
                 // Has it moved collection?
                 List<String> collections = line.get("collection");
@@ -151,7 +155,7 @@ public class CSVBulkEditRegisterServiceImpl extends AbstractBulkEditRegisterServ
                 }
 
                 // Iterate through each metadata element in the csv line
-                BulkEditChange whatHasChanged = new BulkEditChange();
+                whatHasChanged = new BulkEditChange(new UUID(0, bulkEditCacheService.getRowCount()));
                 for (String md : line.keys()) {
                     // Get the values we already have
                     if (!"id".equals(md) && !"rowName".equals(md)) {
@@ -226,11 +230,14 @@ public class CSVBulkEditRegisterServiceImpl extends AbstractBulkEditRegisterServ
                 changes.add(whatHasChanged);
             }
 
-            bulkEditCacheService.populateRefAndRowMap(line, item == null ? null : item.getID());
+            bulkEditCacheService.populateReferenceMaps(line, bulkEditCacheService.getRowCount(), whatHasChanged.getUuid());
             bulkEditCacheService.increaseRowCount();
         }
 
         bulkEditCacheService.validateExpressedRelations(c, csv);
+
+        // Restore the Context Mode
+        c.setMode(lastMode);
 
         return changes;
     }
