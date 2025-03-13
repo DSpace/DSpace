@@ -95,8 +95,8 @@
 
     <dc-type>
         <schema>dspace</schema>
-        <element>lastimport</element>
-        <qualifier>loader-openalex</qualifier>
+        <element>openalex</element>
+        <qualifier>lastimport</qualifier>
         <scope_note>Stores the timestamp related to the last import from OpenAlex</scope_note>
     </dc-type>
 
