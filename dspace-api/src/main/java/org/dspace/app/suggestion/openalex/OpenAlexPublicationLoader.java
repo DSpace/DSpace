@@ -45,7 +45,7 @@ public class OpenAlexPublicationLoader extends PublicationLoader {
                                       .collect(Collectors.toList());
 
         if (!authorIds.isEmpty()) {
-            return Collections.singletonList("filter=authorships.author.id:" + StringUtils.join(authorIds, "|"));
+            return Collections.singletonList(StringUtils.join(authorIds, "|"));
         }
 
         // Otherwise, collect all available metadata values

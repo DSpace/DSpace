@@ -8,6 +8,8 @@
 package org.dspace.app.rest;
 
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -20,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.dspace.app.rest.matcher.ExternalSourceEntryMatcher;
@@ -30,6 +33,7 @@ import org.dspace.importer.external.openalex.service.OpenAlexImportMetadataSourc
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -38,14 +42,14 @@ import org.springframework.test.util.ReflectionTestUtils;
 /**
  * @author Adamo Fapohunda (adamo.fapohunda at 4science.com)
  **/
-public class OpenAlexPublicationExternalSourcesIT extends AbstractControllerIntegrationTest {
+public class OpenAlexPublicationByAuthorIdExternalSourcesIT extends AbstractControllerIntegrationTest {
 
 
     @MockitoBean
     private LiveImportClient liveImportClient;
 
     @Autowired
-    @Qualifier("openalexImportPublicationService")
+    @Qualifier("openalexImportPublicationByAuthorIdService")
     private OpenAlexImportMetadataSourceServiceImpl openAlexImportMetadataSourceService;
 
 
@@ -55,15 +59,15 @@ public class OpenAlexPublicationExternalSourcesIT extends AbstractControllerInte
     }
 
     @Test
-    public void findOneOpenalexImportPublicationExternalSourceTest() throws Exception {
+    public void findOneOpenalexImportPublicationByAuthorIdExternalSourceTest() throws Exception {
         getClient().perform(get("/api/integration/externalsources?size=25")).andExpect(status().isOk())
                    .andExpect(jsonPath("$._embedded.externalsources", Matchers.hasItem(
-                       ExternalSourceMatcher.matchExternalSource("openalexPublication",
-                                                                 "openalexPublication", false))));
+                       ExternalSourceMatcher.matchExternalSource("openalexPublicationByAuthorId",
+                                                                 "openalexPublicationByAuthorId", false))));
     }
 
     @Test
-    public void findOpenalexPublicationExternalSourceEntriesEmptyWithQueryTest() throws Exception {
+    public void findOpenalexPublicationByAuthorIdExternalSourceEntriesEmptyWithQueryTest() throws Exception {
 
         try (InputStream file = getClass().getResourceAsStream("openalex-empty.json")) {
             String jsonResponse = IOUtils.toString(file, Charset.defaultCharset());
@@ -71,15 +75,15 @@ public class OpenAlexPublicationExternalSourcesIT extends AbstractControllerInte
                 .thenReturn(jsonResponse);
 
 
-            getClient().perform(get("/api/integration/externalsources/openalexPublication/entries")
-                                    .param("query", "empty"))
+            getClient().perform(get("/api/integration/externalsources/openalexPublicationByAuthorId/entries")
+                                    .param("query", "W1775749144"))
                        .andExpect(status().isOk()).andExpect(jsonPath("$.page.number", is(0)));
             verify(liveImportClient, times(2)).executeHttpGetRequest(anyInt(), anyString(), anyMap());
         }
     }
 
     @Test
-    public void findOneOpenalexPublicationExternalSourceEntriesWithQueryTest() throws Exception {
+    public void findOneOpenalexPublicationByAuthorIdExternalSourceEntriesWithQueryTest() throws Exception {
 
         try (InputStream file = getClass().getResourceAsStream("openalex-publication-single.json")) {
             String jsonResponse = IOUtils.toString(file, Charset.defaultCharset());
@@ -87,8 +91,8 @@ public class OpenAlexPublicationExternalSourcesIT extends AbstractControllerInte
             when(liveImportClient.executeHttpGetRequest(anyInt(), anyString(), anyMap()))
                 .thenReturn(jsonResponse);
 
-            getClient().perform(get("/api/integration/externalsources/openalexPublication/entries")
-                                    .param("query", "protein"))
+            getClient().perform(get("/api/integration/externalsources/openalexPublicationByAuthorId/entries")
+                                    .param("query", "A5050011235"))
                        .andExpect(status().isOk())
                        .andExpect(jsonPath("$._embedded.externalSourceEntries", Matchers.hasSize(1)))
                        .andExpect(jsonPath("$._embedded.externalSourceEntries[0].id").value("W1775749144"))
@@ -97,7 +101,7 @@ public class OpenAlexPublicationExternalSourcesIT extends AbstractControllerInte
                        .andExpect(jsonPath("$._embedded.externalSourceEntries[0].value")
                                       .value("PROTEIN MEASUREMENT WITH THE FOLIN PHENOL REAGENT"))
                        .andExpect(jsonPath("$._embedded.externalSourceEntries[0].externalSource")
-                                      .value("openalexPublication"))
+                                      .value("openalexPublicationByAuthorId"))
                        .andExpect(jsonPath("$._embedded.externalSourceEntries[0].metadata['dc.contributor.author']",
                                            Matchers.hasSize(4)))
                        .andExpect(
@@ -190,12 +194,33 @@ public class OpenAlexPublicationExternalSourcesIT extends AbstractControllerInte
                        .andExpect(jsonPath("$.page.size").value(20))
                        .andExpect(jsonPath("$.page.number").value(0));
 
-            verify(liveImportClient, times(2)).executeHttpGetRequest(anyInt(), anyString(), anyMap());
+            // Capture arguments
+            ArgumentCaptor<String> urlCaptor = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<Map<String, Map<String, String>>> paramsCaptor = ArgumentCaptor.forClass(Map.class);
+
+            verify(liveImportClient, times(2)).executeHttpGetRequest(anyInt(), urlCaptor.capture(),
+                                                                     paramsCaptor.capture());
+
+            // Assert the URL is correct
+            assertEquals(2, urlCaptor.getAllValues().size());
+            assertEquals("https://api.openalex.org/works", urlCaptor.getAllValues().get(0));
+            assertEquals("https://api.openalex.org/works", urlCaptor.getAllValues().get(1));
+
+            // Assert the parameters contain "filter" => "authorships.author.id:"
+            assertEquals(2, paramsCaptor.getAllValues().size());
+            Map<String, Map<String, String>> capturedParams = paramsCaptor.getAllValues().get(0);
+            assertTrue(capturedParams.containsKey("uriParameters"));
+            assertEquals("authorships.author.id:A5050011235", capturedParams.get("uriParameters").get("filter"));
+            assertEquals("20", capturedParams.get("uriParameters").get("per_page"));
+            assertEquals("1", capturedParams.get("uriParameters").get("page"));
+            Map<String, Map<String, String>> capturedParams1 = paramsCaptor.getAllValues().get(1);
+            assertTrue(capturedParams1.containsKey("uriParameters"));
+            assertEquals("authorships.author.id:A5050011235", capturedParams1.get("uriParameters").get("filter"));
         }
     }
 
     @Test
-    public void findAllOpenalexPublicationExternalSourceEntriesWithQueryTest() throws Exception {
+    public void findAllOpenalexPublicationByAuthorIdExternalSourceEntriesWithQueryTest() throws Exception {
 
         try (InputStream file = getClass().getResourceAsStream("openalex-publication-multiple.json")) {
             String jsonResponse = IOUtils.toString(file, Charset.defaultCharset());
@@ -203,8 +228,8 @@ public class OpenAlexPublicationExternalSourcesIT extends AbstractControllerInte
             when(liveImportClient.executeHttpGetRequest(anyInt(), anyString(), anyMap()))
                 .thenReturn(jsonResponse);
 
-            getClient().perform(get("/api/integration/externalsources/openalexPublication/entries")
-                                    .param("query", "covid"))
+            getClient().perform(get("/api/integration/externalsources/openalexPublicationByAuthorId/entries")
+                                    .param("query", "A5050011235"))
                        .andExpect(status().isOk())
                        .andExpect(jsonPath("$._embedded.externalSourceEntries", Matchers.hasSize(2)))
                        .andExpect(jsonPath("$._embedded.externalSourceEntries",
@@ -213,7 +238,7 @@ public class OpenAlexPublicationExternalSourcesIT extends AbstractControllerInte
                                                    "W3111255098",
                                                    "Safety and Efficacy of the BNT162b2 mRNA Covid-19 Vaccine",
                                                    "Safety and Efficacy of the BNT162b2 mRNA Covid-19 Vaccine",
-                                                   "openalexPublication"
+                                                   "openalexPublicationByAuthorId"
                                                ),
                                                ExternalSourceEntryMatcher.matchExternalSourceEntry(
                                                    "W3008028633",
@@ -221,12 +246,33 @@ public class OpenAlexPublicationExternalSourcesIT extends AbstractControllerInte
                                                        "Disease 2019 (COVID-19) Outbreak in China",
                                                    "Characteristics of and Important Lessons From the Coronavirus " +
                                                        "Disease 2019 (COVID-19) Outbreak in China",
-                                                   "openalexPublication"
+                                                   "openalexPublicationByAuthorId"
                                                )
                                            )
                        ));
 
-            verify(liveImportClient, times(2)).executeHttpGetRequest(anyInt(), anyString(), anyMap());
+            // Capture arguments
+            ArgumentCaptor<String> urlCaptor = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<Map<String, Map<String, String>>> paramsCaptor = ArgumentCaptor.forClass(Map.class);
+
+            verify(liveImportClient, times(2)).executeHttpGetRequest(anyInt(), urlCaptor.capture(),
+                                                                     paramsCaptor.capture());
+
+            // Assert the URL is correct
+            assertEquals(2, urlCaptor.getAllValues().size());
+            assertEquals("https://api.openalex.org/works", urlCaptor.getAllValues().get(0));
+            assertEquals("https://api.openalex.org/works", urlCaptor.getAllValues().get(1));
+
+            // Assert the parameters contain "filter" => "authorships.author.id:"
+            assertEquals(2, paramsCaptor.getAllValues().size());
+            Map<String, Map<String, String>> capturedParams = paramsCaptor.getAllValues().get(0);
+            assertTrue(capturedParams.containsKey("uriParameters"));
+            assertEquals("authorships.author.id:A5050011235", capturedParams.get("uriParameters").get("filter"));
+            assertEquals("20", capturedParams.get("uriParameters").get("per_page"));
+            assertEquals("1", capturedParams.get("uriParameters").get("page"));
+            Map<String, Map<String, String>> capturedParams1 = paramsCaptor.getAllValues().get(1);
+            assertTrue(capturedParams1.containsKey("uriParameters"));
+            assertEquals("authorships.author.id:A5050011235", capturedParams1.get("uriParameters").get("filter"));
         }
     }
 

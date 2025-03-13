@@ -70,7 +70,7 @@ public class OpenAlexPublicationLoaderTest {
         // Then
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals("filter=authorships.author.id:ID123", result.get(0));
+        assertEquals("ID123", result.get(0));
     }
 
     @Test

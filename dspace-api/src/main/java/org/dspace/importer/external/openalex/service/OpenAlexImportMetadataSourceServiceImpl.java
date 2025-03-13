@@ -177,16 +177,17 @@ public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetad
         Map<String, Map<String, String>> params = new HashMap<>();
         Map<String, String> uriParams = new HashMap<>();
         params.put(LiveImportClientImpl.URI_PARAMETERS, uriParams);
+        String queryUrl = url;
         try {
-            if (query.contains("filter=authorships.author.id")) {
-                query = query.replace("filter=", "");
-                uriParams.put("filter", query);
-            } else if (url.contains("sources")) {
+            if (queryUrl.contains("?filter=authorships.author.id:")) {
+                queryUrl = queryUrl.replace("?filter=authorships.author.id:", "");
+                uriParams.put("filter", "authorships.author.id:" + query);
+            } else if (queryUrl.contains("sources")) {
                 uriParams.put("filter", "type:journal,default.search:" + query);
             } else {
                 uriParams.put("search", query);
             }
-            String resp = liveImportClient.executeHttpGetRequest(timeout, this.url, params);
+            String resp = liveImportClient.executeHttpGetRequest(timeout, queryUrl, params);
             if (StringUtils.isEmpty(resp)) {
                 log.error("Got an empty response from LiveImportClient for query: {}", query);
                 return 0;
@@ -233,12 +234,12 @@ public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetad
         Map<String, Map<String, String>> params = new HashMap<>();
         Map<String, String> uriParams = new HashMap<>();
         params.put(LiveImportClientImpl.URI_PARAMETERS, uriParams);
-
+        String queryUrl = url;
         try {
-            if (query.contains("filter=authorships.author.id")) {
-                query = query.replace("filter=", "");
-                uriParams.put("filter", query);
-            } else if (url.contains("sources")) {
+            if (queryUrl.contains("?filter=authorships.author.id:")) {
+                queryUrl = queryUrl.replace("?filter=authorships.author.id:", "");
+                uriParams.put("filter", "authorships.author.id:" + query);
+            } else if (queryUrl.contains("sources")) {
                 uriParams.put("filter", "type:journal,default.search:" + query);
             } else {
                 uriParams.put("search", query);
@@ -250,7 +251,7 @@ public class OpenAlexImportMetadataSourceServiceImpl extends AbstractImportMetad
                 uriParams.put("per_page", String.valueOf(pageSize));
             }
 
-            String resp = liveImportClient.executeHttpGetRequest(timeout, this.url, params);
+            String resp = liveImportClient.executeHttpGetRequest(timeout, queryUrl, params);
             if (StringUtils.isEmpty(resp)) {
                 return results;
             }

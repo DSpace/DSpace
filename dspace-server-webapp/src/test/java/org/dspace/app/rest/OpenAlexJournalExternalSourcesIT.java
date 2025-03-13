@@ -40,6 +40,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
+/**
+ * @author Adamo Fapohunda (adamo.fapohunda at 4science.com)
+ **/
 public class OpenAlexJournalExternalSourcesIT extends AbstractControllerIntegrationTest {
 
 

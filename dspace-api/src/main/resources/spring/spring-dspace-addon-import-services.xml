@@ -259,7 +259,7 @@
     <bean id="openalexImportPublicationByAuthorIdService"
           class="org.dspace.importer.external.openalex.service.OpenAlexImportMetadataSourceServiceImpl">
         <property name="metadataFieldMapping" ref="openalexPublicationMetadataFieldMapping"/>
-        <property name="url" value="${openalex.url.works}"/>
+        <property name="url" value="${openalex.url.works}?filter=authorships.author.id:"/>
     </bean>
 
     <bean id="openalexImportJournalService"
