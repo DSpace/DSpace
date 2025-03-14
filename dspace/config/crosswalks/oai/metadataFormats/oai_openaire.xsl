@@ -369,7 +369,7 @@
     <!-- This template creates the sub-element <datacite:nameIdentifier> of type Researcher ID from a Person built entity -->
     <xsl:template match="doc:field[starts-with(@name,'person.identifier.rid')]" mode="entity_author">
         <datacite:nameIdentifier nameIdentifierScheme="Researcher ID"
-            schemeURI="https://www.researcherid.com">
+            schemeURI="https://www.webofscience.com">
             <xsl:value-of select="./text()"/>
         </datacite:nameIdentifier>
     </xsl:template>
