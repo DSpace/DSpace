@@ -70,4 +70,14 @@ EXPOSE 8080 8000
 # Give java extra memory (2GB)
 ENV JAVA_OPTS=-Xmx2000m
 # On startup, run DSpace Runnable JAR
-ENTRYPOINT ["java", "-jar", "webapps/server-boot.jar", "--dspace.dir=$DSPACE_INSTALL"]
+# Variable substitution doesn't works in ENTRYPOINT, 'tini' is used to init the java CMD
+ENV TINI_VERSION=v0.19.0
+ARG TINI_DOWNLOAD_URL=https://github.com/krallin/tini/releases/download/
+ADD ${TINI_DOWNLOAD_URL}/${TINI_VERSION}/tini /tini
+RUN wget --no-check-certificate --no-cookies --quiet ${TINI_DOWNLOAD_URL}/${TINI_VERSION}/tini-amd64 \
+    && wget --no-check-certificate --no-cookies --quiet ${TINI_DOWNLOAD_URL}/${TINI_VERSION}/tini-amd64.sha256sum \
+    && echo "$(cat tini-amd64.sha256sum)" | sha256sum -c
+RUN chmod +x /tini
+ENTRYPOINT ["/tini", "--"]
+# Will give a 'JSONArgsRecommended' warning, can be ignored because tini is handling the OS signals
+CMD java -jar webapps/server-boot.jar --dspace.dir=$DSPACE_INSTALL
