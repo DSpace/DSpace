@@ -101,12 +101,23 @@
                 <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>contributor</dc-element>
-                    <dc-qualifier></dc-qualifier>
+                    <dc-qualifier>editor</dc-qualifier>
                     <repeatable>true</repeatable>
                     <label>Atores Principais</label>
-		    <input-type>onebox</input-type>
+		            <input-type>onebox</input-type>
                     <hint>Digite os atores.</hint>
                     <required>Campo obrigatório.</required>
+                </field>
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>UF-Município</label>
+                    <input-type>onebox</input-type>
+                    <hint>Digite um município e selecione as coordenadas</hint>
+                    <required>Campo obrigatório.</required>
+                    <vocabulary>longitude-latitude</vocabulary>
                 </field>
             </row>
             <row>
@@ -119,83 +130,6 @@
                     <input-type>onebox</input-type>
                     <hint>Adicione os objetivos da ação.</hint>
                     <required>Campo obrigatório.</required>
-                </field>
-            </row>
-	    <row>
-		<field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>description</dc-element>
-                    <label>Estado</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite o nome do estado</hint>
-                </field>
-
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>description</dc-element>
-                    <label>Município</label>
-                    <input-type>onebox</input-type>
-                    <hint>Digite o nome do município</hint>
-                </field>
-
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>description</dc-element>
-                    <label>Latitude</label>
-                    <input-type>onebox</input-type>
-                    <hint>Coordenada preenchida automaticamente</hint>
-                </field>
-
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>description</dc-element>
-                    <label>Longitude</label>
-                    <input-type>onebox</input-type>
-                    <hint>Coordenada preenchida automaticamente</hint>
-                </field>
-
-            </row>
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>identifier</dc-element>
-                    <dc-qualifier></dc-qualifier>
-                    <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
-                    <repeatable>true</repeatable>
-                    <label>Identifiers</label>
-                    <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
-                    <hint>If the item has any identification numbers or codes associated with
-                        it, please enter the types and the actual numbers or codes.
-                    </hint>
-                    <required></required>
-                </field>
-            </row>
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>type</dc-element>
-                    <dc-qualifier></dc-qualifier>
-                    <repeatable>true</repeatable>
-                    <label>Type</label>
-                    <input-type value-pairs-name="common_types">dropdown</input-type>
-                    <hint>Select the type of content of the item.
-                    </hint>
-                    <required>You must choose at least one type.</required>
-                </field>
-            </row>
-            <row>
-                <field>
-                    <dc-schema>dc</dc-schema>
-                    <dc-element>language</dc-element>
-                    <dc-qualifier>iso</dc-qualifier>
-                    <repeatable>false</repeatable>
-                    <label>Language</label>
-                    <input-type value-pairs-name="common_iso_languages">dropdown</input-type>
-                    <hint>Select the language of the main content of the item. If the language does not appear in the
-                        list, please select 'Other'. If the content does not really have a language (for example, if it
-                        is a dataset or an image) please select 'N/A'.
-                    </hint>
-                    <required></required>
                 </field>
             </row>
         </form>

@@ -295,7 +295,7 @@
             <!--<step id="identifiers"/>-->
             <!--Step will be to Describe the item. -->
             <step id="traditionalpageone"/>
-            <step id="traditionalpagetwo"/>
+<!--            <step id="traditionalpagetwo"/>-->
             <step id="regulamentacao"/>
             <step id="contato"/>
 
