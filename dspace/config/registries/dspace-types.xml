@@ -100,4 +100,11 @@
         <scope_note>Stores the timestamp related to the last import from OpenAlex</scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>dspace</schema>
+        <element>openaire</element>
+        <qualifier>lastimport</qualifier>
+        <scope_note>Stores the timestamp related to the last import from OpenAIRE Graph</scope_note>
+    </dc-type>
+
 </dspace-dc-types>
