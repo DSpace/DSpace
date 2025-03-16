@@ -89,8 +89,8 @@ public class PublicationLoaderRunnable
         } else {
             LOGGER.info("Process eperson item with UUID " + profile);
         }
-        if (commandLine.hasOption("il")) {
-            this.itemLimit = Integer.valueOf(commandLine.getOptionValue("il"));
+        if (commandLine.hasOption("m")) {
+            this.itemLimit = Integer.valueOf(commandLine.getOptionValue("m"));
         } else {
             this.itemLimit = getDefaultLimit();
         }
@@ -167,7 +167,7 @@ public class PublicationLoaderRunnable
             discoverQuery.addFilterQueries(filterQuery);
         }
 
-        DiscoverResultItemIterator iterator = new DiscoverResultItemIterator(context, discoverQuery);
+        DiscoverResultItemIterator iterator = new DiscoverResultItemIterator(context, discoverQuery, itemLimit);
         return iterator;
     }
 
@@ -195,6 +195,6 @@ public class PublicationLoaderRunnable
      * @return The default item limit, as defined in the DSpace configuration.
      */
     private Integer getDefaultLimit() {
-        return configurationService.getIntProperty("publication-loader.limit", 1000);
+        return configurationService.getIntProperty("suggestion.publication-loader.limit", -1);
     }
 }

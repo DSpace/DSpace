@@ -86,16 +86,16 @@ public class PublicationLoaderScriptConfiguration<T extends PublicationLoaderRun
             options.addOption("s", "single-researcher", true, "Single researcher UUID");
             options.getOption("s").setType(String.class);
 
-            options.addOption("l", "loader", true, "publication loader to be used");
+            options.addOption("l", "loader", true, "Publication loader to be used");
+            options.getOption("l").setType(String.class);
             options.getOption("l").setRequired(true);
 
             options.addOption("f", "solrfilter", true, "The additional SORL filter to better refine results");
             options.getOption("f").setType(String.class);
 
-            options.addOption("il", "limit", true, "the max number of Researcher profiles. If no limit is provided, "
+            options.addOption("m", "max", true, "The max number of Researcher profiles. If no limit is provided, "
                 + "the default one will be used");
-            options.getOption("il").setType(Integer.class);
-            options.getOption("il").setRequired(false);
+            options.getOption("m").setType(Integer.class);
 
             super.options = options;
         }
