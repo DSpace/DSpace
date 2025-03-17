@@ -177,6 +177,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         notifyServiceRest.setScore(BigDecimal.TEN);
         notifyServiceRest.setNotifyServiceInboundPatterns(List.of(inboundPatternRestOne, inboundPatternRestTwo));
         notifyServiceRest.setEnabled(false);
+        notifyServiceRest.setUsesActorEmailId(false);
 
         AtomicReference<Integer> idRef = new AtomicReference<Integer>();
         String authToken = getAuthToken(admin.getEmail(), password);
@@ -204,6 +205,7 @@ public class NotifyServiceRestRepositoryIT extends AbstractControllerIntegration
         notifyServiceRest.setLdnUrl("https://service.ldn.org/inbox");
         notifyServiceRest.setNotifyServiceInboundPatterns(List.of(inboundPatternRestOne, inboundPatternRestTwo));
         notifyServiceRest.setEnabled(false);
+        notifyServiceRest.setUsesActorEmailId(false);
         notifyServiceRest.setLowerIp("192.168.0.1");
         notifyServiceRest.setUpperIp("192.168.0.5");
 
