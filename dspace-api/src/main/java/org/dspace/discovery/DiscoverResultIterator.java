@@ -113,6 +113,15 @@ public class DiscoverResultIterator<T extends ReloadableEntity, PK extends Seria
         return (T) getNextIndexableObject().getIndexedObject();
     }
 
+    /**
+     * Returns the total number of search results.
+     * <p>
+     * This method calculates the total number of search results based on the current search query.
+     * If the slot iterator has not been initialized, it updates the iterator.
+     * </p>
+     *
+     * @return the total number of search results as a {@code long}
+     */
     public long getTotalSearchResults() {
 
         if (currentSlotIterator == null) {
