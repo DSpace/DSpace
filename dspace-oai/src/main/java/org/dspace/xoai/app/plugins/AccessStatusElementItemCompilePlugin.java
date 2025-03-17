@@ -8,11 +8,13 @@
 package org.dspace.xoai.app.plugins;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 import com.lyncode.xoai.dataprovider.xml.xoai.Metadata;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.access.status.factory.AccessStatusServiceFactory;
 import org.dspace.access.status.service.AccessStatusService;
 import org.dspace.content.Item;
@@ -51,8 +53,8 @@ public class AccessStatusElementItemCompilePlugin implements XOAIExtensionItemCo
         AccessStatusService accessStatusService = AccessStatusServiceFactory.getInstance().getAccessStatusService();
 
         try {
-            String accessStatusType;
-            accessStatusType = accessStatusService.getAccessStatus(context, item);
+            Pair<String, LocalDate> accessStatusResult = accessStatusService.getAccessStatus(context, item);
+            String accessStatusType = accessStatusResult.getLeft();
 
             String embargoFromItem = accessStatusService.getEmbargoFromItem(context, item);
 

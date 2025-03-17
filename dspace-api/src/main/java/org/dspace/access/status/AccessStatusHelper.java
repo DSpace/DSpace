@@ -10,6 +10,7 @@ package org.dspace.access.status;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -25,11 +26,11 @@ public interface AccessStatusHelper {
      * @param item the item
      * @param threshold the embargo threshold date
      * @param type the type of calculation
-     * @return an access status value
+     * @return a pair with an access status value and the availability date
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public String getAccessStatusFromItem(Context context, Item item, LocalDate threshold, String type)
-        throws SQLException;
+    public Pair<String, LocalDate> getAccessStatusFromItem(Context context,
+        Item item, LocalDate threshold, String type) throws SQLException;
 
     /**
      * Retrieve embargo information for the item
@@ -43,24 +44,15 @@ public interface AccessStatusHelper {
     public String getEmbargoFromItem(Context context, Item item, LocalDate threshold) throws SQLException;
 
     /**
-     * Retrieve the availability date for the bitstream
+     * Calculate the access status for the bitstream.
      *
      * @param context the DSpace context
-     * @param bitstream the bitstream to check for embargo information
+     * @param bitstream the bitstream
      * @param threshold the embargo threshold date
      * @param type the type of calculation
-     * @return an availability date
+     * @return a pair with an access status value and the availability date
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public LocalDate getAvailabilityDateFromBitstream(Context context,
+    public Pair<String, LocalDate> getAccessStatusFromBitstream(Context context,
         Bitstream bitstream, LocalDate threshold, String type) throws SQLException;
-
-    /**
-     * Look at the DSpace object availability date to determine an access status value.
-     *
-     * @param availabilityDate the DSpace object availability date
-     * @param threshold the embargo threshold date
-     * @return an access status value
-     */
-    public String getAccessStatusFromAvailabilityDate(LocalDate availabilityDate, LocalDate threshold);
 }

@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dspace.access.status.service.AccessStatusService;
@@ -75,7 +76,7 @@ public class AccessStatusServiceImpl implements AccessStatusService {
     }
 
     @Override
-    public String getAccessStatus(Context context, Item item) throws SQLException {
+    public Pair<String, LocalDate> getAccessStatus(Context context, Item item) throws SQLException {
         return helper.getAccessStatusFromItem(context, item, forever_date, itemCalculationType);
     }
 
@@ -85,23 +86,18 @@ public class AccessStatusServiceImpl implements AccessStatusService {
     }
 
     @Override
-    public LocalDate getAvailabilityDateFromBitstream(Context context, Bitstream bitstream) throws SQLException {
-        return helper.getAvailabilityDateFromBitstream(context, bitstream, forever_date, bitstreamCalculationType);
-    }
-
-    @Override
-    public String getAccessStatusFromAvailabilityDate(LocalDate availabilityDate) {
-        return helper.getAccessStatusFromAvailabilityDate(availabilityDate, forever_date);
+    public Pair<String, LocalDate> getAccessStatus(Context context, Bitstream bitstream) throws SQLException {
+        return helper.getAccessStatusFromBitstream(context, bitstream, forever_date, bitstreamCalculationType);
     }
 
     private String getAccessStatusCalculationType(String key) {
-        String value = configurationService.getProperty(key);
-        if (StringUtils.equalsIgnoreCase(value, "anonymous")) {
-            return value;
-        } else if (StringUtils.equalsIgnoreCase(value, "current")) {
-            return value;
+        String value = configurationService.getProperty(key, DefaultAccessStatusHelper.STATUS_FOR_ANONYMOUS);
+        if (!StringUtils.equalsIgnoreCase(value, DefaultAccessStatusHelper.STATUS_FOR_ANONYMOUS) &&
+            !StringUtils.equalsIgnoreCase(value, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER)) {
+            log.warn("The configuration parameter \"" + key
+                + "\" contains an invalid value. Valid values include: 'anonymous' and 'current'.");
+            value = DefaultAccessStatusHelper.STATUS_FOR_ANONYMOUS;
         }
-        log.warn("The configuration parameter \"" + key + "\" contains an invalid value.");
-        return "anonymous";
+        return value;
     }
 }

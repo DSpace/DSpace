@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -46,6 +47,9 @@ import org.dspace.eperson.service.GroupService;
  * functionality.
  */
 public class DefaultAccessStatusHelper implements AccessStatusHelper {
+    public static final String STATUS_FOR_CURRENT_USER  = "current";
+    public static final String STATUS_FOR_ANONYMOUS  = "anonymous";
+
     public static final String EMBARGO = "embargo";
     public static final String METADATA_ONLY = "metadata.only";
     public static final String OPEN_ACCESS = "open.access";
@@ -66,7 +70,7 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
     }
 
     /**
-     * Look at the item's policies to determine an access status value.
+     * Look at the item's primary or first bitstream policies to determine an access status value.
      * It is also considering a date threshold for embargoes and restrictions.
      *
      * If the item is null, simply returns the "unknown" value.
@@ -75,70 +79,44 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
      * @param item        the item to check for embargoes
      * @param threshold   the embargo threshold date
      * @param type        the type of calculation
-     * @return an access status value
+     * @return a pair with an access status value and the availability date
      */
     @Override
-    public String getAccessStatusFromItem(Context context, Item item, LocalDate threshold, String type)
+    public Pair<String, LocalDate> getAccessStatusFromItem(Context context, Item item, LocalDate threshold, String type)
             throws SQLException {
         if (item == null) {
-            return UNKNOWN;
+            return Pair.of(UNKNOWN, null);
         }
         Bitstream bitstream = getPrimaryOrFirstBitstreamInOriginalBundle(item);
         if (bitstream == null) {
-            return METADATA_ONLY;
+            return Pair.of(METADATA_ONLY, null);
         }
-        return calculateAccessStatusForDso(context, bitstream, threshold, type);
+        return getAccessStatusFromBitstream(context, bitstream, threshold, type);
     }
 
     /**
-     * Look at the DSpace object's policies to determine an access status value.
+     * Look at the bitstream policies to determine an access status value.
+     * It is also considering a date threshold for embargoes and restrictions.
      *
-     * If the object is null, returns the "metadata.only" value.
-     * If any policy attached to the object is valid for the anonymous group,
-     * returns the "open.access" value.
-     * Otherwise, if the policy start date is after or equal to the embargo
-     * threshold date, returns the "restricted" value.
-     * Every other cases return the "embargo" value.
+     * If the bitstream is null, simply returns the "unknown" value.
      *
      * @param context     the DSpace context
-     * @param dso         the DSpace object
+     * @param bitstream   the bitstream to check for embargoes
      * @param threshold   the embargo threshold date
-     * @return an access status value
-     */
-    private String calculateAccessStatusForDso(Context context, DSpaceObject dso, LocalDate threshold, String type)
-            throws SQLException {
-        List<ResourcePolicy> policies = getReadPolicies(context, dso, type);
-        LocalDate availabilityDate = findAvailabilityDate(policies, threshold);
-        // Get the access status based on the availability date
-        return getAccessStatusFromAvailabilityDate(availabilityDate, threshold);
-    }
-
-    /**
-     * Look at the DSpace object availability date to determine an access status value.
-     *
-     * If the object is null, returns the "metadata.only" value.
-     * If there's no availability date, returns the "open.access" value.
-     * If the availability date is after or equal to the embargo
-     * threshold date, returns the "restricted" value.
-     * Every other cases return the "embargo" value.
-     *
-     * @param availabilityDate  the DSpace object availability date
-     * @param threshold         the embargo threshold date
-     * @return an access status value
+     * @param type        the type of calculation
+     * @return a pair with an access status value and the availability date
      */
     @Override
-    public String getAccessStatusFromAvailabilityDate(LocalDate availabilityDate, LocalDate threshold) {
-        // If there is no availability date, it's an open access.
-        if (availabilityDate == null) {
-            return OPEN_ACCESS;
+    public Pair<String, LocalDate> getAccessStatusFromBitstream(Context context,
+        Bitstream bitstream, LocalDate threshold, String type) throws SQLException {
+        if (bitstream == null) {
+            return Pair.of(UNKNOWN, null);
         }
-        // If the policy start date have a value and if this value
-        // is equal or superior to the configured forever date, the
-        // access status is also restricted.
-        if (!availabilityDate.isBefore(threshold)) {
-            return RESTRICTED;
-        }
-        return EMBARGO;
+        List<ResourcePolicy> policies = getReadPolicies(context, bitstream, type);
+        LocalDate availabilityDate = findAvailabilityDate(policies, threshold);
+        // Get the access status based on the availability date
+        String accessStatus = getAccessStatusFromAvailabilityDate(availabilityDate, threshold);
+        return Pair.of(accessStatus, availabilityDate);
     }
 
     /**
@@ -163,7 +141,7 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
             return null;
         }
         // Only calculate the status for the anonymous group read policies
-        List<ResourcePolicy> policies = getAnonymousReadPolicies(context, bitstream);
+        List<ResourcePolicy> policies = getReadPolicies(context, bitstream, STATUS_FOR_ANONYMOUS);
         LocalDate availabilityDate = findAvailabilityDate(policies, threshold);
         // If the date is null, it's an open access
         // If the date is equal of after the threshold, it's a restriction
@@ -171,27 +149,6 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
             return null;
         }
         return availabilityDate.toString();
-    }
-
-    /**
-     * Look at the current user bitstream policies to retrieve its availability date.
-     *
-     * If the bitstream is null, simply returns no date.
-     * 
-     * @param context       the DSpace context
-     * @param bitstream     the bitstream
-     * @param threshold     the embargo threshold date
-     * @param type          the type of calculation
-     * @return an availability date
-     */
-    @Override
-    public LocalDate getAvailabilityDateFromBitstream(Context context, Bitstream bitstream,
-            LocalDate threshold, String type) throws SQLException {
-        if (bitstream == null) {
-            return null;
-        }
-        List<ResourcePolicy> readPolicies = getReadPolicies(context, bitstream, type);
-        return findAvailabilityDate(readPolicies, threshold);
     }
 
     /**
@@ -289,7 +246,7 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
      */
     private List<ResourcePolicy> getReadPolicies(Context context, DSpaceObject dso, String type)
             throws SQLException {
-        if (StringUtils.equalsIgnoreCase(type, "current")) {
+        if (StringUtils.equalsIgnoreCase(type, STATUS_FOR_CURRENT_USER)) {
             return getCurrentUserReadPolicies(context, dso);
         } else {
             // Only calculate the status for the anonymous group read policies
@@ -346,5 +303,32 @@ public class DefaultAccessStatusHelper implements AccessStatusHelper {
             }
         }
         return availabilityDate;
+    }
+
+    /**
+     * Look at the DSpace object availability date to determine an access status value.
+     *
+     * If the object is null, returns the "metadata.only" value.
+     * If there's no availability date, returns the "open.access" value.
+     * If the availability date is after or equal to the embargo
+     * threshold date, returns the "restricted" value.
+     * Every other cases return the "embargo" value.
+     *
+     * @param availabilityDate  the DSpace object availability date
+     * @param threshold         the embargo threshold date
+     * @return an access status value
+     */
+    private String getAccessStatusFromAvailabilityDate(LocalDate availabilityDate, LocalDate threshold) {
+        // If there is no availability date, it's an open access.
+        if (availabilityDate == null) {
+            return OPEN_ACCESS;
+        }
+        // If the policy start date have a value and if this value
+        // is equal or superior to the configured forever date, the
+        // access status is also restricted.
+        if (!availabilityDate.isBefore(threshold)) {
+            return RESTRICTED;
+        }
+        return EMBARGO;
     }
 }

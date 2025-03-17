@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.access.status.DefaultAccessStatusHelper;
 import org.dspace.access.status.service.AccessStatusService;
 import org.dspace.app.rest.model.AccessStatusRest;
@@ -54,9 +55,10 @@ public class BitstreamAccessStatusLinkRepository extends AbstractDSpaceRestRepos
                 throw new ResourceNotFoundException("No such bitstream: " + bitstreamId);
             }
             AccessStatusRest accessStatusRest = new AccessStatusRest();
-            LocalDate availabilityDate = accessStatusService.getAvailabilityDateFromBitstream(context, bitstream);
-            String status = accessStatusService.getAccessStatusFromAvailabilityDate(availabilityDate);
+            Pair<String, LocalDate> accessStatus = accessStatusService.getAccessStatus(context, bitstream);
+            String status = accessStatus.getLeft();
             if (status == DefaultAccessStatusHelper.EMBARGO) {
+                LocalDate availabilityDate = accessStatus.getRight();
                 String embargoDate = availabilityDate.toString();
                 accessStatusRest.setEmbargoDate(embargoDate);
             }

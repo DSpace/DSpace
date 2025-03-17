@@ -10,6 +10,7 @@ package org.dspace.access.status.service;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -41,11 +42,11 @@ public interface AccessStatusService {
      * Calculate the access status for an Item while considering the forever embargo date threshold.
      *
      * @param context the DSpace context
-     * @param item    the item
-     * @return an access status value
+     * @param item the item
+     * @return a pair with an access status value and the availability date
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public String getAccessStatus(Context context, Item item) throws SQLException;
+    public Pair<String, LocalDate> getAccessStatus(Context context, Item item) throws SQLException;
 
     /**
      * Retrieve embargo information for the item
@@ -58,20 +59,12 @@ public interface AccessStatusService {
     public String getEmbargoFromItem(Context context, Item item) throws SQLException;
 
     /**
-     * Retrieve the availability date for the bitstream
+     * Calculate the access status for a bitstream while considering the forever embargo date threshold.
      *
      * @param context the DSpace context
-     * @param bitstream the bitstream to check for embargo information
-     * @return an availability date
+     * @param bitstream the bitstream
+     * @return a pair with an access status value and the availability date
      * @throws SQLException An exception that provides information on a database access error or other errors.
      */
-    public LocalDate getAvailabilityDateFromBitstream(Context context, Bitstream bitstream) throws SQLException;
-
-    /**
-     * Retrieve the access status information based on the availability date
-     *
-     * @param availabilityDate the DSpace object availability date
-     * @return an access status value
-     */
-    public String getAccessStatusFromAvailabilityDate(LocalDate availabilityDate) throws SQLException;
+    public Pair<String, LocalDate> getAccessStatus(Context context, Bitstream bitstream) throws SQLException;
 }

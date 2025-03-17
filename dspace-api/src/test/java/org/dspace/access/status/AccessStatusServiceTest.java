@@ -17,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.access.status.factory.AccessStatusServiceFactory;
@@ -154,9 +155,10 @@ public class AccessStatusServiceTest extends AbstractUnitTest {
     }
 
     @Test
-    public void testGetAccessStatus() throws Exception {
-        String status = accessStatusService.getAccessStatus(context, item);
-        assertNotEquals("testGetAccessStatus 0", status, DefaultAccessStatusHelper.UNKNOWN);
+    public void testGetAccessStatusItem() throws Exception {
+        Pair<String, LocalDate> accessStatus = accessStatusService.getAccessStatus(context, item);
+        String status = accessStatus.getLeft();
+        assertNotEquals("testGetAccessStatusItem 0", status, DefaultAccessStatusHelper.UNKNOWN);
     }
 
     @Test
@@ -166,15 +168,9 @@ public class AccessStatusServiceTest extends AbstractUnitTest {
     }
 
     @Test
-    public void testGetAvailabilityDateFromBitstream() throws Exception {
-        LocalDate availabilityDate = accessStatusService.getAvailabilityDateFromBitstream(context, bitstream);
-        assertNull("testGetAvailabilityDateFromBitstream 0", availabilityDate);
-    }
-
-    @Test
-    public void testGetAccessStatusFromAvailabilityDate() throws Exception {
-        LocalDate availabilityDate = accessStatusService.getAvailabilityDateFromBitstream(context, bitstream);
-        String status = accessStatusService.getAccessStatusFromAvailabilityDate(availabilityDate);
-        assertNotEquals("testGetAccessStatusFromAvailabilityDate 0", status, DefaultAccessStatusHelper.UNKNOWN);
+    public void testGetAccessStatusBitstream() throws Exception {
+        Pair<String, LocalDate> accessStatus = accessStatusService.getAccessStatus(context, bitstream);
+        String status = accessStatus.getLeft();
+        assertNotEquals("testGetAccessStatusBitstream 0", status, DefaultAccessStatusHelper.UNKNOWN);
     }
 }
