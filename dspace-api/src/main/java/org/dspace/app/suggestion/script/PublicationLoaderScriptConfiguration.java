@@ -93,8 +93,9 @@ public class PublicationLoaderScriptConfiguration<T extends PublicationLoaderRun
             options.addOption("f", "solrfilter", true, "The additional SORL filter to better refine results");
             options.getOption("f").setType(String.class);
 
-            options.addOption("m", "max", true, "The max number of Researcher profiles. If no limit is provided, "
-                + "the default one will be used");
+            options.addOption("m", "max", true,
+                              "The maximum number of researcher profiles to process. If no maximum is provided, then " +
+                                  "the configured default will be used.");
             options.getOption("m").setType(Integer.class);
 
             super.options = options;
