@@ -209,12 +209,16 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
      */
     @Test
     public void testWithNullItem() throws Exception {
+        // getAccessStatusFromItem
         Pair<String, LocalDate> accessStatus = helper.getAccessStatusFromItem(context,
                 null, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getLeft();
         assertThat("testWithNullItem 0", status, equalTo(DefaultAccessStatusHelper.UNKNOWN));
+        LocalDate availabilityDate = accessStatus.getRight();
+        assertNull("testWithNullItem 1", availabilityDate);
+        // getEmbargoFromItem
         String embargoDate = helper.getEmbargoFromItem(context, null, threshold);
-        assertNull("testWithNullItem 1", embargoDate);
+        assertNull("testWithNullItem 2", embargoDate);
     }
 
     /**
@@ -223,12 +227,16 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
      */
     @Test
     public void testWithoutBundle() throws Exception {
+        // getAccessStatusFromItem
         Pair<String, LocalDate> accessStatus = helper.getAccessStatusFromItem(context,
                 itemWithoutBundle, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getLeft();
         assertThat("testWithoutBundle 0", status, equalTo(DefaultAccessStatusHelper.METADATA_ONLY));
+        LocalDate availabilityDate = accessStatus.getRight();
+        assertNull("testWithoutBundle 1", availabilityDate);
+        // getEmbargoFromItem
         String embargoDate = helper.getEmbargoFromItem(context, itemWithoutBundle, threshold);
-        assertNull("testWithoutBundle 1", embargoDate);
+        assertNull("testWithoutBundle 2", embargoDate);
     }
 
     /**
@@ -240,18 +248,23 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         context.turnOffAuthorisationSystem();
         bundleService.create(context, itemWithoutBitstream, Constants.CONTENT_BUNDLE_NAME);
         context.restoreAuthSystemState();
+        // getAccessStatusFromItem
         Pair<String, LocalDate> accessStatus = helper.getAccessStatusFromItem(context,
                 itemWithoutBitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getLeft();
         assertThat("testWithoutBitstream 0", status, equalTo(DefaultAccessStatusHelper.METADATA_ONLY));
+        LocalDate availabilityDate = accessStatus.getRight();
+        assertNull("testWithoutBitstream 1", availabilityDate);
+        // getEmbargoFromItem
         String embargoDate = helper.getEmbargoFromItem(context, itemWithoutBitstream, threshold);
-        assertNull("testWithoutBitstream 1", embargoDate);
+        assertNull("testWithoutBitstream 2", embargoDate);
+        // getAccessStatusFromBitstream
         Pair<String, LocalDate> accessStatusBitstream = helper.getAccessStatusFromBitstream(context,
                 null, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String bitstreamStatus = accessStatusBitstream.getLeft();
-        assertThat("testWithoutBitstream 2", bitstreamStatus, equalTo(DefaultAccessStatusHelper.UNKNOWN));
-        LocalDate availabilityDate = accessStatusBitstream.getRight();
-        assertNull("testWithoutBitstream 3", availabilityDate);
+        assertThat("testWithoutBitstream 3", bitstreamStatus, equalTo(DefaultAccessStatusHelper.UNKNOWN));
+        LocalDate bitstreamAvailabilityDate = accessStatusBitstream.getRight();
+        assertNull("testWithoutBitstream 4", bitstreamAvailabilityDate);
     }
 
     /**
@@ -267,18 +280,23 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         bitstream.setName(context, "primary");
         bundle.setPrimaryBitstreamID(bitstream);
         context.restoreAuthSystemState();
+        // getAccessStatusFromItem
         Pair<String, LocalDate> accessStatus = helper.getAccessStatusFromItem(context,
                 itemWithBitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getLeft();
         assertThat("testWithBitstream 0", status, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+        LocalDate availabilityDate = accessStatus.getRight();
+        assertNull("testWithBitstream 1", availabilityDate);
+        // getEmbargoFromItem
         String embargoDate = helper.getEmbargoFromItem(context, itemWithBitstream, threshold);
-        assertNull("testWithBitstream 1", embargoDate);
+        assertNull("testWithBitstream 2", embargoDate);
+        // getAccessStatusFromBitstream
         Pair<String, LocalDate> accessStatusBitstream = helper.getAccessStatusFromBitstream(context,
                 bitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String bitstreamStatus = accessStatusBitstream.getLeft();
-        assertThat("testWithBitstream 2", bitstreamStatus, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
-        LocalDate availabilityDate = accessStatusBitstream.getRight();
-        assertNull("testWithBitstream 3", availabilityDate);
+        assertThat("testWithBitstream 3", bitstreamStatus, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+        LocalDate bitstreamAvailabilityDate = accessStatusBitstream.getRight();
+        assertNull("testWithBitstream 4", bitstreamAvailabilityDate);
     }
 
     /**
@@ -304,18 +322,23 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         authorizeService.removeAllPolicies(context, bitstream);
         authorizeService.addPolicies(context, policies, bitstream);
         context.restoreAuthSystemState();
+        // getAccessStatusFromItem
         Pair<String, LocalDate> accessStatus = helper.getAccessStatusFromItem(context,
                 itemWithEmbargo, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getLeft();
         assertThat("testWithEmbargo 0", status, equalTo(DefaultAccessStatusHelper.EMBARGO));
+        LocalDate availabilityDate = accessStatus.getRight();
+        assertThat("testWithEmbargo 1", availabilityDate, equalTo(startDate));
+        // getEmbargoFromItem
         String embargoDate = helper.getEmbargoFromItem(context, itemWithEmbargo, threshold);
-        assertThat("testWithEmbargo 1", embargoDate, equalTo(startDate.toString()));
+        assertThat("testWithEmbargo 2", embargoDate, equalTo(startDate.toString()));
+        // getAccessStatusFromBitstream
         Pair<String, LocalDate> accessStatusBitstream = helper.getAccessStatusFromBitstream(context,
                 bitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String bitstreamStatus = accessStatusBitstream.getLeft();
-        assertThat("testWithEmbargo 2", bitstreamStatus, equalTo(DefaultAccessStatusHelper.EMBARGO));
-        LocalDate availabilityDate = accessStatusBitstream.getRight();
-        assertThat("testWithEmbargo 3", availabilityDate, equalTo(startDate));
+        assertThat("testWithEmbargo 3", bitstreamStatus, equalTo(DefaultAccessStatusHelper.EMBARGO));
+        LocalDate bitstreamAvailabilityDate = accessStatusBitstream.getRight();
+        assertThat("testWithEmbargo 4", bitstreamAvailabilityDate, equalTo(startDate));
     }
 
     /**
@@ -341,18 +364,23 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         authorizeService.removeAllPolicies(context, bitstream);
         authorizeService.addPolicies(context, policies, bitstream);
         context.restoreAuthSystemState();
+        // getAccessStatusFromItem
         Pair<String, LocalDate> accessStatus = helper.getAccessStatusFromItem(context,
                 itemWithDateRestriction, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getLeft();
         assertThat("testWithDateRestriction 0", status, equalTo(DefaultAccessStatusHelper.RESTRICTED));
+        LocalDate availabilityDate = accessStatus.getRight();
+        assertThat("testWithDateRestriction 1", availabilityDate, equalTo(startDate));
+        // getEmbargoFromItem
         String embargoDate = helper.getEmbargoFromItem(context, itemWithDateRestriction, threshold);
-        assertNull("testWithDateRestriction 1", embargoDate);
+        assertNull("testWithDateRestriction 2", embargoDate);
+        // getAccessStatusFromBitstream
         Pair<String, LocalDate> accessStatusBitstream = helper.getAccessStatusFromBitstream(context,
                 bitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String bitstreamStatus = accessStatusBitstream.getLeft();
-        assertThat("testWithDateRestriction 2", bitstreamStatus, equalTo(DefaultAccessStatusHelper.RESTRICTED));
-        LocalDate availabilityDate = accessStatusBitstream.getRight();
-        assertThat("testWithDateRestriction 3", availabilityDate, equalTo(startDate));
+        assertThat("testWithDateRestriction 3", bitstreamStatus, equalTo(DefaultAccessStatusHelper.RESTRICTED));
+        LocalDate bistreamAvailabilityDate = accessStatusBitstream.getRight();
+        assertThat("testWithDateRestriction 4", bistreamAvailabilityDate, equalTo(startDate));
     }
 
     /**
@@ -376,18 +404,23 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         authorizeService.removeAllPolicies(context, bitstream);
         authorizeService.addPolicies(context, policies, bitstream);
         context.restoreAuthSystemState();
+        // getAccessStatusFromItem
         Pair<String, LocalDate> accessStatus = helper.getAccessStatusFromItem(context,
                 itemWithGroupRestriction, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getLeft();
         assertThat("testWithGroupRestriction 0", status, equalTo(DefaultAccessStatusHelper.RESTRICTED));
+        LocalDate availabilityDate = accessStatus.getRight();
+        assertThat("testWithGroupRestriction 1", availabilityDate, equalTo(threshold));
+        // getEmbargoFromItem
         String embargoDate = helper.getEmbargoFromItem(context, itemWithGroupRestriction, threshold);
-        assertNull("testWithGroupRestriction 1", embargoDate);
+        assertNull("testWithGroupRestriction 2", embargoDate);
+        // getAccessStatusFromBitstream
         Pair<String, LocalDate> accessStatusBitstream = helper.getAccessStatusFromBitstream(context,
                 bitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String bitstreamStatus = accessStatusBitstream.getLeft();
-        assertThat("testWithGroupRestriction 2", bitstreamStatus, equalTo(DefaultAccessStatusHelper.RESTRICTED));
-        LocalDate availabilityDate = accessStatusBitstream.getRight();
-        assertThat("testWithGroupRestriction 3", availabilityDate, equalTo(threshold));
+        assertThat("testWithGroupRestriction 3", bitstreamStatus, equalTo(DefaultAccessStatusHelper.RESTRICTED));
+        LocalDate bitstreamAvailabilityDate = accessStatusBitstream.getRight();
+        assertThat("testWithGroupRestriction 4", bitstreamAvailabilityDate, equalTo(threshold));
     }
 
     /**
@@ -404,18 +437,23 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         bundle.setPrimaryBitstreamID(bitstream);
         authorizeService.removeAllPolicies(context, bitstream);
         context.restoreAuthSystemState();
+        // getAccessStatusFromItem
         Pair<String, LocalDate> accessStatus = helper.getAccessStatusFromItem(context,
                 itemWithoutPolicy, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getLeft();
         assertThat("testWithoutPolicy 0", status, equalTo(DefaultAccessStatusHelper.RESTRICTED));
+        LocalDate availabilityDate = accessStatus.getRight();
+        assertThat("testWithoutPolicy 1", availabilityDate, equalTo(threshold));
+        // getEmbargoFromItem
         String embargoDate = helper.getEmbargoFromItem(context, itemWithoutPolicy, threshold);
-        assertNull("testWithoutPolicy 1", embargoDate);
+        assertNull("testWithoutPolicy 2", embargoDate);
+        // getAccessStatusFromBitstream
         Pair<String, LocalDate> accessStatusBitstream = helper.getAccessStatusFromBitstream(context,
                 bitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String bitstreamStatus = accessStatusBitstream.getLeft();
-        assertThat("testWithoutPolicy 2", bitstreamStatus, equalTo(DefaultAccessStatusHelper.RESTRICTED));
-        LocalDate availabilityDate = accessStatusBitstream.getRight();
-        assertThat("testWithoutPolicy 3", availabilityDate, equalTo(threshold));
+        assertThat("testWithoutPolicy 3", bitstreamStatus, equalTo(DefaultAccessStatusHelper.RESTRICTED));
+        LocalDate bitstreamAvailabilityDate = accessStatusBitstream.getRight();
+        assertThat("testWithoutPolicy 4", bitstreamAvailabilityDate, equalTo(threshold));
     }
 
     /**
@@ -430,18 +468,23 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
                 new ByteArrayInputStream("1".getBytes(StandardCharsets.UTF_8)));
         bitstream.setName(context, "first");
         context.restoreAuthSystemState();
+        // getAccessStatusFromItem
         Pair<String, LocalDate> accessStatus = helper.getAccessStatusFromItem(context,
                 itemWithoutPrimaryBitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getLeft();
         assertThat("testWithoutPrimaryBitstream 0", status, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+        LocalDate availabilityDate = accessStatus.getRight();
+        assertNull("testWithoutPrimaryBitstream 1", availabilityDate);
+        // getEmbargoFromItem
         String embargoDate = helper.getEmbargoFromItem(context, itemWithoutPrimaryBitstream, threshold);
-        assertNull("testWithoutPrimaryBitstream 1", embargoDate);
+        assertNull("testWithoutPrimaryBitstream 2", embargoDate);
+        // getAccessStatusFromBitstream
         Pair<String, LocalDate> accessStatusBitstream = helper.getAccessStatusFromBitstream(context,
                 bitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String bitstreamStatus = accessStatusBitstream.getLeft();
-        assertThat("testWithoutPrimaryBitstream 2", bitstreamStatus, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
-        LocalDate availabilityDate = accessStatusBitstream.getRight();
-        assertNull("testWithoutPrimaryBitstream 3", availabilityDate);
+        assertThat("testWithoutPrimaryBitstream 3", bitstreamStatus, equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+        LocalDate bitstreamAvailabilityDate = accessStatusBitstream.getRight();
+        assertNull("testWithoutPrimaryBitstream 4", bitstreamAvailabilityDate);
     }
 
     /**
@@ -470,26 +513,32 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         authorizeService.removeAllPolicies(context, primaryBitstream);
         authorizeService.addPolicies(context, policies, primaryBitstream);
         context.restoreAuthSystemState();
+        // getAccessStatusFromItem
         Pair<String, LocalDate> accessStatus = helper.getAccessStatusFromItem(context,
                 itemWithPrimaryAndMultipleBitstreams, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getLeft();
         assertThat("testWithPrimaryAndMultipleBitstreams 0", status, equalTo(DefaultAccessStatusHelper.EMBARGO));
+        LocalDate availabilityDate = accessStatus.getRight();
+        assertThat("testWithPrimaryAndMultipleBitstreams 1", availabilityDate, equalTo(startDate));
+        // getEmbargoFromItem
         String embargoDate = helper.getEmbargoFromItem(context, itemWithPrimaryAndMultipleBitstreams, threshold);
-        assertThat("testWithPrimaryAndMultipleBitstreams 1", embargoDate, equalTo(startDate.toString()));
+        assertThat("testWithPrimaryAndMultipleBitstreams 2", embargoDate, equalTo(startDate.toString()));
+        // getAccessStatusFromBitstream -> primary
         Pair<String, LocalDate> accessStatusPrimaryBitstream = helper.getAccessStatusFromBitstream(context,
                 primaryBitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String primaryBitstreamStatus = accessStatusPrimaryBitstream.getLeft();
-        assertThat("testWithPrimaryAndMultipleBitstreams 2", primaryBitstreamStatus,
+        assertThat("testWithPrimaryAndMultipleBitstreams 3", primaryBitstreamStatus,
                 equalTo(DefaultAccessStatusHelper.EMBARGO));
         LocalDate primaryAvailabilityDate = accessStatusPrimaryBitstream.getRight();
-        assertThat("testWithPrimaryAndMultipleBitstreams 3", primaryAvailabilityDate, equalTo(startDate));
+        assertThat("testWithPrimaryAndMultipleBitstreams 4", primaryAvailabilityDate, equalTo(startDate));
+        // getAccessStatusFromBitstream -> other
         Pair<String, LocalDate> accessStatusOtherBitstream = helper.getAccessStatusFromBitstream(context,
                 otherBitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String otherBitstreamStatus = accessStatusOtherBitstream.getLeft();
-        assertThat("testWithPrimaryAndMultipleBitstreams 4", otherBitstreamStatus,
+        assertThat("testWithPrimaryAndMultipleBitstreams 5", otherBitstreamStatus,
                 equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
         LocalDate otherAvailabilityDate = accessStatusOtherBitstream.getRight();
-        assertNull("testWithPrimaryAndMultipleBitstreams 5", otherAvailabilityDate);
+        assertNull("testWithPrimaryAndMultipleBitstreams 6", otherAvailabilityDate);
     }
 
     /**
@@ -517,35 +566,41 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         authorizeService.removeAllPolicies(context, anotherBitstream);
         authorizeService.addPolicies(context, policies, anotherBitstream);
         context.restoreAuthSystemState();
+        // getAccessStatusFromItem
         Pair<String, LocalDate> accessStatus = helper.getAccessStatusFromItem(context,
                 itemWithoutPrimaryAndMultipleBitstreams, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getLeft();
         assertThat("testWithNoPrimaryAndMultipleBitstreams 0", status,
                 equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+        LocalDate availabilityDate = accessStatus.getRight();
+        assertNull("testWithNoPrimaryAndMultipleBitstreams 1", availabilityDate);
+        // getEmbargoFromItem
         String embargoDate = helper.getEmbargoFromItem(context, itemWithEmbargo, threshold);
-        assertNull("testWithNoPrimaryAndMultipleBitstreams 1", embargoDate);
+        assertNull("testWithNoPrimaryAndMultipleBitstreams 2", embargoDate);
+        // getAccessStatusFromBitstream -> first
         Pair<String, LocalDate> accessStatusFirstBitstream = helper.getAccessStatusFromBitstream(context,
                 firstBitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String firstBitstreamStatus = accessStatusFirstBitstream.getLeft();
-        assertThat("testWithNoPrimaryAndMultipleBitstreams 2", firstBitstreamStatus,
+        assertThat("testWithNoPrimaryAndMultipleBitstreams 3", firstBitstreamStatus,
                 equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
         LocalDate firstAvailabilityDate = accessStatusFirstBitstream.getRight();
-        assertNull("testWithNoPrimaryAndMultipleBitstreams 3", firstAvailabilityDate);
+        assertNull("testWithNoPrimaryAndMultipleBitstreams 4", firstAvailabilityDate);
+        // getAccessStatusFromBitstream -> other
         Pair<String, LocalDate> accessStatusOtherBitstream = helper.getAccessStatusFromBitstream(context,
                 anotherBitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String otherBitstreamStatus = accessStatusOtherBitstream.getLeft();
-        assertThat("testWithNoPrimaryAndMultipleBitstreams 4", otherBitstreamStatus,
+        assertThat("testWithNoPrimaryAndMultipleBitstreams 5", otherBitstreamStatus,
                 equalTo(DefaultAccessStatusHelper.EMBARGO));
         LocalDate otherAvailabilityDate = accessStatusOtherBitstream.getRight();
-        assertThat("testWithNoPrimaryAndMultipleBitstreams 5", otherAvailabilityDate, equalTo(startDate));
+        assertThat("testWithNoPrimaryAndMultipleBitstreams 6", otherAvailabilityDate, equalTo(startDate));
     }
 
     /**
-     * Test for an item with an embargo
+     * Test for an item with an embargo for both configurations (current, anonymous) and as a guest
      * @throws java.lang.Exception passed through.
      */
     @Test
-    public void testWithEmbargoForAnonymousOrAdminUser() throws Exception {
+    public void testWithEmbargoForCurrentOrAnonymousAsGuest() throws Exception {
         context.turnOffAuthorisationSystem();
         Bundle bundle = bundleService.create(context, itemWithEmbargo, Constants.CONTENT_BUNDLE_NAME);
         Bitstream bitstream = bitstreamService.create(context, bundle,
@@ -569,31 +624,112 @@ public class DefaultAccessStatusHelperTest  extends AbstractUnitTest {
         authorizeService.removeAllPolicies(context, bitstream);
         authorizeService.addPolicies(context, policies, bitstream);
         context.restoreAuthSystemState();
+        // getEmbargoFromItem
+        String embargoDate = helper.getEmbargoFromItem(context, itemWithEmbargo, threshold);
+        assertThat("testWithEmbargoForCurrentOrAnonymousAsGuest 0", embargoDate, equalTo(startDate.toString()));
+        // Configuration: current
+        // getAccessStatusFromItem
         Pair<String, LocalDate> accessStatus = helper.getAccessStatusFromItem(context,
                 itemWithEmbargo, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String status = accessStatus.getLeft();
-        assertThat("testWithEmbargoForAnonymousOrAdminUser 0", status, equalTo(DefaultAccessStatusHelper.EMBARGO));
-        String embargoDate = helper.getEmbargoFromItem(context, itemWithEmbargo, threshold);
-        assertThat("testWithEmbargoForAnonymousOrAdminUser 1", embargoDate, equalTo(startDate.toString()));
+        assertThat("testWithEmbargoForCurrentOrAnonymousAsGuest 1", status,
+                equalTo(DefaultAccessStatusHelper.EMBARGO));
+        LocalDate availabilityDate = accessStatus.getRight();
+        assertThat("testWithEmbargoForCurrentOrAnonymousAsGuest 2", availabilityDate, equalTo(startDate));
+        // getAccessStatusFromBitstream
         Pair<String, LocalDate> accessStatusBitstream = helper.getAccessStatusFromBitstream(context,
                 bitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
         String bitstreamStatus = accessStatusBitstream.getLeft();
-        assertThat("testWithEmbargoForAnonymousOrAdminUser 2", bitstreamStatus,
+        assertThat("testWithEmbargoForCurrentOrAnonymousAsGuest 3", bitstreamStatus,
                 equalTo(DefaultAccessStatusHelper.EMBARGO));
-        LocalDate availabilityDate = accessStatusBitstream.getRight();
-        assertThat("testWithEmbargoForAnonymousOrAdminUser 3", availabilityDate, equalTo(startDate));
+        LocalDate bistreamAvailabilityDate = accessStatusBitstream.getRight();
+        assertThat("testWithEmbargoForCurrentOrAnonymousAsGuest 4", bistreamAvailabilityDate, equalTo(startDate));
+        // Configuration: anonymous
+        // getAccessStatusFromItem
+        accessStatus = helper.getAccessStatusFromItem(context,
+                itemWithEmbargo, threshold, DefaultAccessStatusHelper.STATUS_FOR_ANONYMOUS);
+        status = accessStatus.getLeft();
+        assertThat("testWithEmbargoForCurrentOrAnonymousAsGuest 5", status,
+                equalTo(DefaultAccessStatusHelper.EMBARGO));
+        availabilityDate = accessStatus.getRight();
+        assertThat("testWithEmbargoForCurrentOrAnonymousAsGuest 6", availabilityDate, equalTo(startDate));
+        // getAccessStatusFromBitstream
+        accessStatusBitstream = helper.getAccessStatusFromBitstream(context,
+                bitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_ANONYMOUS);
+        bitstreamStatus = accessStatusBitstream.getLeft();
+        assertThat("testWithEmbargoForCurrentOrAnonymousAsGuest 7", bitstreamStatus,
+                equalTo(DefaultAccessStatusHelper.EMBARGO));
+        bistreamAvailabilityDate = accessStatusBitstream.getRight();
+        assertThat("testWithEmbargoForCurrentOrAnonymousAsGuest 8", bistreamAvailabilityDate, equalTo(startDate));
+    }
+
+    /**
+     * Test for an item with an embargo for both configurations (current, anonymous) and as an admin
+     * @throws java.lang.Exception passed through.
+     */
+    @Test
+    public void testWithEmbargoForCurrentOrAnonymousAsAdmin() throws Exception {
+        context.turnOffAuthorisationSystem();
+        Bundle bundle = bundleService.create(context, itemWithEmbargo, Constants.CONTENT_BUNDLE_NAME);
+        Bitstream bitstream = bitstreamService.create(context, bundle,
+                new ByteArrayInputStream("1".getBytes(StandardCharsets.UTF_8)));
+        bitstream.setName(context, "primary");
+        bundle.setPrimaryBitstreamID(bitstream);
+        List<ResourcePolicy> policies = new ArrayList<>();
+        Group group = groupService.findByName(context, Group.ANONYMOUS);
+        ResourcePolicy policy = resourcePolicyService.create(context, null, group);
+        policy.setRpName("Embargo");
+        policy.setAction(Constants.READ);
+        LocalDate startDate = LocalDate.of(9999, 12, 31);
+        policy.setStartDate(startDate);
+        policies.add(policy);
+        EPerson admin = ePersonService.create(context);
+        Group adminGroup = groupService.findByName(context, Group.ADMIN);
+        ResourcePolicy adminPolicy = resourcePolicyService.create(context, admin, adminGroup);
+        adminPolicy.setRpName("Open Access For Admin");
+        adminPolicy.setAction(Constants.READ);
+        policies.add(adminPolicy);
+        authorizeService.removeAllPolicies(context, bitstream);
+        authorizeService.addPolicies(context, policies, bitstream);
+        context.restoreAuthSystemState();
         EPerson currentUser = context.getCurrentUser();
         context.setCurrentUser(admin);
-        Pair<String, LocalDate> accessStatusAdmin = helper.getAccessStatusFromItem(context,
+        // getEmbargoFromItem
+        String embargoDate = helper.getEmbargoFromItem(context, itemWithEmbargo, threshold);
+        assertThat("testWithEmbargoForCurrentOrAnonymousAsAdmin 0", embargoDate, equalTo(startDate.toString()));
+        // Configuration: current
+        // getAccessStatusFromItem
+        Pair<String, LocalDate> accessStatus = helper.getAccessStatusFromItem(context,
                 itemWithEmbargo, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
-        String statusAdmin = accessStatusAdmin.getLeft();
-        assertThat("testWithEmbargoForAnonymousOrAdminUser 4", statusAdmin,
+        String status = accessStatus.getLeft();
+        assertThat("testWithEmbargoForCurrentOrAnonymousAsAdmin 1", status,
                 equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
-        Pair<String, LocalDate> accessStatusAnonymous = helper.getAccessStatusFromItem(context,
+        LocalDate availabilityDate = accessStatus.getRight();
+        assertNull("testWithEmbargoForCurrentOrAnonymousAsAdmin 2", availabilityDate);
+        // getAccessStatusFromBitstream
+        Pair<String, LocalDate> accessStatusBitstream = helper.getAccessStatusFromBitstream(context,
+                bitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_CURRENT_USER);
+        String bitstreamStatus = accessStatusBitstream.getLeft();
+        assertThat("testWithEmbargoForCurrentOrAnonymousAsAdmin 3", bitstreamStatus,
+                equalTo(DefaultAccessStatusHelper.OPEN_ACCESS));
+        LocalDate bitstreamAvailabilityDate = accessStatusBitstream.getRight();
+        assertNull("testWithEmbargoForCurrentOrAnonymousAsAdmin 4", bitstreamAvailabilityDate);
+        // Configuration: anonymous
+        accessStatus = helper.getAccessStatusFromItem(context,
                 itemWithEmbargo, threshold, DefaultAccessStatusHelper.STATUS_FOR_ANONYMOUS);
-        String statusAnonymous = accessStatusAnonymous.getLeft();
-        assertThat("testWithEmbargoForAnonymousOrAdminUser 5", statusAnonymous,
+        status = accessStatus.getLeft();
+        assertThat("testWithEmbargoForCurrentOrAnonymousAsAdmin 5", status,
                 equalTo(DefaultAccessStatusHelper.EMBARGO));
+        availabilityDate = accessStatus.getRight();
+        assertThat("testWithEmbargoForCurrentOrAnonymousAsAdmin 6", availabilityDate, equalTo(startDate));
+        // getAccessStatusFromBitstream
+        accessStatusBitstream = helper.getAccessStatusFromBitstream(context,
+                bitstream, threshold, DefaultAccessStatusHelper.STATUS_FOR_ANONYMOUS);
+        bitstreamStatus = accessStatusBitstream.getLeft();
+        assertThat("testWithEmbargoForCurrentOrAnonymousAsAdmin 7", bitstreamStatus,
+                equalTo(DefaultAccessStatusHelper.EMBARGO));
+        bitstreamAvailabilityDate = accessStatusBitstream.getRight();
+        assertThat("testWithEmbargoForCurrentOrAnonymousAsAdmin 8", bitstreamAvailabilityDate, equalTo(startDate));
         context.setCurrentUser(currentUser);
     }
 }
