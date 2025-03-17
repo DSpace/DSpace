@@ -2,7 +2,7 @@
 ## request is granted.
 ##
 ## Parameters:
-##  {0} name of the requestor
+##  {0} name of the requester
 ##  {1} Handle URL of the requested Item
 ##  {2} title of the requested Item
 ##  {3} name of the grantor
