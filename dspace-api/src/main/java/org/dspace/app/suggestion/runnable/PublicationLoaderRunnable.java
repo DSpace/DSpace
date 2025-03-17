@@ -195,6 +195,6 @@ public class PublicationLoaderRunnable
      * @return The default item limit, as defined in the DSpace configuration.
      */
     private Integer getDefaultLimit() {
-        return configurationService.getIntProperty("suggestion.publication-loader.limit", -1);
+        return configurationService.getIntProperty("suggestion.publication-loader.max", -1);
     }
 }
