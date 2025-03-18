@@ -25,6 +25,7 @@ import org.dspace.app.ldn.service.LDNMessageService;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.util.SolrUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -146,7 +147,7 @@ public class LDNMessageEntityIndexFactoryImpl extends IndexFactoryImpl<Indexable
                                                                                        ZoneOffset.UTC));
             addFacetIndex(doc, "queue_last_start_time", value, value);
             doc.addField("queue_last_start_time", value);
-            doc.addField("queue_last_start_time_dt", queueLastStartTime);
+            doc.addField("queue_last_start_time_dt", SolrUtils.getDateFormatter().format(queueLastStartTime));
             doc.addField("queue_last_start_time_min", value);
             doc.addField("queue_last_start_time_min_sort", value);
             doc.addField("queue_last_start_time_max", value);
