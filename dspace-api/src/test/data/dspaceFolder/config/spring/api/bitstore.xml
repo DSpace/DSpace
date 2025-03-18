@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" default-lazy-init="true">
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd"
+       default-lazy-init="true">
 
     <bean name="org.dspace.storage.bitstore.BitstreamStorageService" class="org.dspace.storage.bitstore.BitstreamStorageServiceImpl">
         <property name="incoming" value="${assetstore.index.primary}"/>
@@ -9,9 +10,7 @@
             <map>
                 <entry key="0" value-ref="localStore"/>
                 <entry key="1" value-ref="s3Store"/>
-                <!--
                 <entry key="2" value-ref="jcloudStore"/>
-                -->
             </map>
         </property>
     </bean>
@@ -39,36 +38,26 @@
         <property name="subfolder" value="${assetstore.s3.subfolder}"/>
     </bean>
 
-    <!-- 
-        JCloudStoreService
-                
-        Configuration properties for the JCloud assetstore integration.
+    <util:constant static-field="org.jclouds.filesystem.reference.FilesystemConstants.PROPERTY_BASEDIR"
+                   id="propertyBaseDir"/>
 
-            Properties:
-            - enabled: Determines if the JCloud assetstore is enabled. Default is false.
-            - providerOrApi: Specifies the provider or API for the JCloud assetstore.
-              see https://jclouds.apache.org/reference/providers/#blobstore
-            - identity: The identity (e.g., username or access key) for the JCloud assetstore.
-            - credentials: The credentials (e.g., password or secret key) for the JCloud assetstore.
-            - endpoint: The endpoint URL for the JCloud assetstore.
-            - container: The container name in the JCloud assetstore.
-            - subfolder: The subfolder within the container in the JCloud assetstore.
-            - useRelativePath: Indicates whether to use relative paths. Default is false.
-            - maxCounter: The maximum counter value for reseting remote connections. Default is -1 (disabled).
-    -->
-    <!--
+    <!-- Define JCloudStoreService bean -->
     <bean name="jcloudStore" class="org.dspace.storage.bitstore.JCloudBitStoreService" scope="singleton" lazy-init="true">
-        <property name="enabled" value="${assetstore.jcloud.enabled:false}"/>
+        <property name="enabled" value="${assetstore.jcloud.enabled}"/>
+        <property name="useRelativePath" value="${assetstore.jcloud.useRelativePath}"/>
         <property name="providerOrApi" value="${assetstore.jcloud.provider}"/>
-        <property name="identity" value="${assetstore.jcloud.identity:}"/>
-        <property name="credentials" value="${assetstore.jcloud.credentials:}"/>
-        <property name="endpoint" value="${assetstore.jcloud.endpoint:}"/>
-        <property name="container" value="${assetstore.jcloud.container:}"/>
-        <property name="subfolder" value="${assetstore.jcloud.subfolder:}"/>
-        <property name="useRelativePath" value="${assetstore.jcloud.useRelativePath:false}"/>
-        <property name="maxCounter" value="${assetstore.jcloud.maxCounter:-1}"/>
+        <property name="container" value="${assetstore.jcloud.container}"/>
+        <property name="overrides">
+            <props>
+                <prop key="#{propertyBaseDir}">target/testing/dspace</prop>
+            </props>
+        </property>
+        <!--
+        Subfolder to organize assets within the bucket, in case this bucket is shared -->
+        <!-- Optional, default is root level of bucket -->
+        <property name="subfolder" value="${assetstore.jcloud.subfolder}"/>
+
     </bean>
-    -->
 
     <!-- <bean name="localStore2 ... -->
     <!-- <bean name="s3Store2 ... -->
