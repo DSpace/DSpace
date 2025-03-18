@@ -23,7 +23,7 @@ public class MetadataExportFilteredItemsReportCli extends MetadataExportFiltered
     protected String getFileNameOrExportFile() {
         return Optional.ofNullable(commandLine.getOptionValue('n'))
                 .filter(StringUtils::isNotBlank)
-                .orElse("filtered-items-export.csv");
+                .orElseGet(() -> super.getFileNameOrExportFile());
     }
 
 }

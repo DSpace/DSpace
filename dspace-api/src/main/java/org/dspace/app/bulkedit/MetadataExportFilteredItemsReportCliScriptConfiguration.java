@@ -9,6 +9,8 @@
 package org.dspace.app.bulkedit;
 
 import org.apache.commons.cli.Options;
+import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This is the CLI version of the {@link MetadataExportFilteredItemsReportScriptConfiguration} class that handles the
@@ -19,10 +21,14 @@ import org.apache.commons.cli.Options;
 public class MetadataExportFilteredItemsReportCliScriptConfiguration
     extends MetadataExportFilteredItemsReportScriptConfiguration<MetadataExportFilteredItemsReportCli> {
 
+    @Autowired
+    private ConfigurationService configurationService;
+
     @Override
     public Options getOptions() {
         Options options = super.getOptions();
-        options.addOption("n", "filename", true, "the filename to export to (default: filtered-items-export.csv)");
+        String filename = configurationService.getProperty("contentreport.metadataquery.csv.filename.default");
+        options.addOption("n", "filename", true, "the filename to export to (default: " + filename + ")");
         return options;
     }
 

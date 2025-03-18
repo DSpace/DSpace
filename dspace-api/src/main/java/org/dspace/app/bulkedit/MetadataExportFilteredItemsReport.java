@@ -33,7 +33,9 @@ import org.dspace.contentreport.service.ContentReportService;
 import org.dspace.core.Context;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.kernel.ServiceManager;
 import org.dspace.scripts.DSpaceRunnable;
+import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 
 /**
@@ -50,6 +52,7 @@ public class MetadataExportFilteredItemsReport extends DSpaceRunnable
     private String[] queryPredicates;
     private String[] queryFilters;
 
+    private ConfigurationService configurationService;
     private ContentReportService contentReportService;
     private EPersonService ePersonService;
     private MetadataDSpaceCsvExportService metadataDSpaceCsvExportService;
@@ -65,13 +68,13 @@ public class MetadataExportFilteredItemsReport extends DSpaceRunnable
 
     @Override
     public void setup() throws ParseException {
+        ServiceManager serviceManager = new DSpace().getServiceManager();
+        configurationService = serviceManager.getServicesByType(ConfigurationService.class).get(0);
         contentReportService = ContentReportServiceFactory.getInstance().getContentReportService();
         ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-        metadataDSpaceCsvExportService = new DSpace().getServiceManager()
-                                                     .getServiceByName(
-                                                         MetadataDSpaceCsvExportServiceImpl.class.getCanonicalName(),
-                                                         MetadataDSpaceCsvExportService.class
-                                                     );
+        metadataDSpaceCsvExportService = serviceManager.getServiceByName(
+                MetadataDSpaceCsvExportServiceImpl.class.getCanonicalName(),
+                MetadataDSpaceCsvExportService.class);
 
         if (commandLine.hasOption('h')) {
             help = true;
@@ -150,7 +153,7 @@ public class MetadataExportFilteredItemsReport extends DSpaceRunnable
     }
 
     protected String getFileNameOrExportFile() {
-        return "metadataExportFilteredItems.csv";
+        return configurationService.getProperty("contentreport.metadataquery.csv.filename.default");
     }
 
     private static Stream<String> arrayToStream(String... array) {
