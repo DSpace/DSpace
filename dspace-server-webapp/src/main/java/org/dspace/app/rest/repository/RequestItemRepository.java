@@ -14,14 +14,19 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
+import net.bytebuddy.asm.Advice;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.logging.log4j.LogManager;
@@ -49,6 +54,10 @@ import org.dspace.eperson.InvalidReCaptchaException;
 import org.dspace.eperson.factory.CaptchaServiceFactory;
 import org.dspace.eperson.service.CaptchaService;
 import org.dspace.services.ConfigurationService;
+import org.dspace.util.DateMathParser;
+import static org.dspace.util.MultiFormatDateParser.parse;
+
+import org.dspace.util.MultiFormatDateParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -291,15 +300,13 @@ public class RequestItemRepository
         // Set the decision date (now)`
         ri.setDecision_date(Instant.now());
 
-        // If the (optional) access period was included, extract it here and set accordingly
-        JsonNode accessPeriodNode = requestBody.findValue("accessPeriod");
-        int accessPeriod = 0;
-        if (accessPeriodNode != null && !accessPeriodNode.isNull()) {
-            accessPeriod = accessPeriodNode.asInt(0);
-        }
-        // If a valid access period was set, update the request, otherwise we will leave it as null
-        if (accessPeriod > 0) {
-            ri.setAccess_period(accessPeriod);
+        // If the (optional) access expiry period was included, extract it here and set accordingly
+        // We expect it to be sent either as a timestamp or as a delta math like +7DAYS
+        JsonNode accessPeriod = requestBody.findValue("accessPeriod");
+        if (accessPeriod != null && !accessPeriod.isNull()) {
+            // The request item service is responsible for parsing and setting the expiry date based
+            // on a delta like "+7DAYS" or special string like "FOREVER", or a formatted date
+            requestItemService.setAccessExpiry(ri, accessPeriod.asText());
         }
 
         JsonNode responseSubjectNode = requestBody.findValue("subject");
@@ -307,7 +314,6 @@ public class RequestItemRepository
         if (responseSubjectNode != null && !responseSubjectNode.isNull()) {
             subject = responseSubjectNode.asText();
         }
-        ri.setDecision_date(Instant.now());
         requestItemService.update(context, ri);
 
         // Send the response email
@@ -356,8 +362,10 @@ public class RequestItemRepository
             throw new ResourceNotFoundException("No such request item for accessToken=" + accessToken);
         }
 
-        // Send 403 FORBIDDEN if request access has not been granted or access period is in the past
-        if (!requestItem.isAccept_request() || !requestItem.accessPeriodCurrent()) {
+        // Send 403 FORBIDDEN if request access has not been granted or access period is null or in the past
+        if (!requestItem.isAccept_request() ||
+                requestItem.getAccess_expiry() == null ||
+                requestItem.getAccess_expiry().isBefore(Instant.now())) {
             throw new AccessDeniedException("Access has not been granted for this item request");
         }
 

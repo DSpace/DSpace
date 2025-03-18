@@ -40,7 +40,7 @@ public class RequestItemBuilder
     private Instant decisionDate;
     private boolean accepted;
     private String accessToken = null;
-    private int accessPeriod;
+    private Instant accessExpiry = null;
     private boolean allFiles;
 
     protected RequestItemBuilder(Context context) {
@@ -95,8 +95,8 @@ public class RequestItemBuilder
         return this;
     }
 
-    public RequestItemBuilder withAccessPeriod(int accessPeriod) {
-        this.accessPeriod = accessPeriod;
+    public RequestItemBuilder withAccessExpiry(Instant accessExpiry) {
+        this.accessExpiry = accessExpiry;
         return this;
     }
 
@@ -128,7 +128,7 @@ public class RequestItemBuilder
         if (accessToken != null) {
             requestItem.setAccess_token(accessToken);
         }
-        requestItem.setAccess_period(accessPeriod);
+        requestItem.setAccess_expiry(accessExpiry);
         requestItem.setAllfiles(allFiles);
 
         requestItemService.update(context, requestItem);

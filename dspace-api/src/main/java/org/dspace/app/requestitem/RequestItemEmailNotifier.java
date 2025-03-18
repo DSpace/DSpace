@@ -10,7 +10,9 @@ package org.dspace.app.requestitem;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.DateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import jakarta.annotation.ManagedBean;
@@ -175,6 +177,12 @@ public class RequestItemEmailNotifier {
             grantorAddress = grantor.getEmail();
         }
 
+        // Set date format for access expiry date
+        String accessExpiryFormat = configurationService.getProperty("request.item.grant.link.dateformat",
+                "yyyy-MM-dd");
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(accessExpiryFormat)
+                .withZone(ZoneId.of("UTC"));
+
         Email email;
         // If this item has a secure access token, send the template with that link instead of attaching files
         if (ri.isAccept_request() && ri.getAccess_token() != null) {
@@ -201,11 +209,10 @@ public class RequestItemEmailNotifier {
                     // {6} secure access link
                     email.addArgument(configurationService.getProperty("dspace.ui.url")
                             + "/items/" + ri.getItem().getID()
-                            + "/access-by-token?accessToken=" + ri.getAccess_token());
-                    // {7} access end date
-                    if (ri.getAccess_period() > 0) {
-                        DateFormat dateFormat = DateFormat.getDateInstance();
-                        email.addArgument(dateFormat.format(ri.getAccessEndDate()));
+                            + "?accessToken=" + ri.getAccess_token());
+                    // {7} access end date, but only add formatted date string if it is set and not "forever"
+                    if (ri.getAccess_expiry() != null && !ri.getAccess_expiry().equals(Instant.MAX)) {
+                        email.addArgument(dateTimeFormatter.format(ri.getAccess_expiry()));
                     } else {
                         email.addArgument(null);
                     }
