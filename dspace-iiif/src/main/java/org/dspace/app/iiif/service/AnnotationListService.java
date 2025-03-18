@@ -7,14 +7,19 @@
  */
 package org.dspace.app.iiif.service;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
+import de.digitalcollections.iiif.model.OtherContent;
+import de.digitalcollections.iiif.model.sharedcanvas.Manifest;
 import org.dspace.app.iiif.model.generator.AnnotationGenerator;
 import org.dspace.app.iiif.model.generator.AnnotationListGenerator;
 import org.dspace.app.iiif.model.generator.ExternalLinksGenerator;
+import org.dspace.app.iiif.model.reader.ManifestReader;
 import org.dspace.app.iiif.service.utils.IIIFUtils;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Item;
@@ -55,6 +60,8 @@ public class AnnotationListService extends AbstractResourceService {
     @Autowired
     AnnotationListGenerator annotationList;
 
+    @Autowired
+    ManifestReader manifestReader;
 
     public AnnotationListService(ConfigurationService configurationService) {
         setConfiguration(configurationService);
@@ -82,8 +89,27 @@ public class AnnotationListService extends AbstractResourceService {
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+
+        try {
+            Manifest manifest = manifestReader.getManifestResource(item, context);
+            // The manifest could have @seeAlso not defined, which is valid. Return empty
+            if (manifest != null) {
+                List<OtherContent> list = manifest.getSeeAlso();
+                if (list != null && !list.isEmpty()) {
+                    return utils.otherContentAsJson(list);
+                }
+                return "";
+            }
+        } catch (SQLException | IOException | AuthorizeException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+
+        return generateSeeAlso(context, item);
+    }
+
+    private String generateSeeAlso(Context context, Item item) {
         // AnnotationList requires an identifier.
-        annotationList.setIdentifier(IIIF_ENDPOINT + id + "/manifest/seeAlso");
+        annotationList.setIdentifier(IIIF_ENDPOINT + item.getID() + "/manifest/seeAlso");
 
         // Get the "seeAlso" bitstreams for the item. Add
         // Annotations for each bitstream found.

@@ -7,11 +7,13 @@
  */
 package org.dspace.app.iiif.service;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import de.digitalcollections.iiif.model.sharedcanvas.Manifest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.app.iiif.model.generator.CanvasGenerator;
@@ -20,8 +22,10 @@ import org.dspace.app.iiif.model.generator.ExternalLinksGenerator;
 import org.dspace.app.iiif.model.generator.ImageContentGenerator;
 import org.dspace.app.iiif.model.generator.ManifestGenerator;
 import org.dspace.app.iiif.model.generator.RangeGenerator;
+import org.dspace.app.iiif.model.reader.ManifestReader;
 import org.dspace.app.iiif.service.utils.IIIFUtils;
 import org.dspace.app.util.service.MetadataExposureService;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
@@ -84,6 +88,9 @@ public class ManifestService extends AbstractResourceService {
     @Autowired
     MetadataExposureService metadataExposureService;
 
+    @Autowired
+    ManifestReader manifestReader;
+
     protected String[] METADATA_FIELDS;
 
     /**
@@ -102,17 +109,41 @@ public class ManifestService extends AbstractResourceService {
 
     /**
      * Returns JSON manifest response for a DSpace item.
+     * 
+     * Will retrieve a customized manifest from the first bitstream in the
+     * item's manifest bundle or generate a "default" manifest if the bundle isn't found.
      *
      * @param item the DSpace Item
      * @param context the DSpace context
      * @return manifest as JSON
+     * @throws AuthorizeException
+     * @throws IOExpcetion
+     * @throws SQLException
      */
-    public String getManifest(Item item, Context context) {
+    public String getManifest(Item item, Context context) throws AuthorizeException, IOException, SQLException {
+        Manifest manifest = manifestReader.getManifestResource(item, context);
+
+        if (manifest == null) {
+            return createManifest(item, context);
+        }
+
+        return utils.asJson(manifest);
+    }
+
+    /**
+     * Create a default manifest
+     *
+     * @param item the DSpace item
+     * @param context DSpace context
+     * @return manifest as JSON, existing or new
+     */
+    protected String createManifest(Item item, Context context) throws SQLException {
         // If default dimensions are provided via configuration do not guess the default dimension.
         String wid = configurationService.getProperty("iiif.canvas.default-width");
         String hgt = configurationService.getProperty("iiif.canvas.default-height");
         guessCanvasDimension = (wid == null && hgt == null);
         populateManifest(item, context);
+
         return utils.asJson(manifestGenerator.generateResource());
     }
 
